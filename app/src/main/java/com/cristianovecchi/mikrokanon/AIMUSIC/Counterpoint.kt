@@ -1,0 +1,151 @@
+package com.cristianovecchi.mikrokanon.AIMUSIC
+
+import android.inputmethodservice.Keyboard
+import android.os.Parcelable
+import com.cristianovecchi.mikrokanon.composables.Clip
+import com.cristianovecchi.mikrokanon.composables.NoteNamesIt
+import com.cristianovecchi.mikrokanon.composables.randomClipSequence
+import kotlinx.android.parcel.Parcelize
+import java.util.*
+import kotlin.math.abs
+
+fun main(args : Array<String>){
+    val absPitches1 = mutableListOf(-1,1,0,6,11,5,7,8,8,3,3,3,6,9)
+    val absPitches2 = mutableListOf(1,11,2,10,3,-1,9,6)
+    val absParts = listOf(
+        AbsPart(absPitches1),
+        AbsPart(absPitches2),
+    )
+    val counterpoint = Counterpoint(absParts)
+
+    val sequence = listOf(2,10,5,10,3,9,6,7)
+    val intervalSet = listOf(0,1,11,2,10,3,9)
+    val newCounterpoints = Counterpoint.findAllCounterpoints(counterpoint,sequence, intervalSet, 5)
+    newCounterpoints.sortedBy { it.emptiness }.reversed().forEach{it.display(); println()}
+
+    val seq1 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,10, false))
+    Counterpoint.counterpointFromClipList(seq1).display()
+
+//    val delay = 3
+//    val transpose = 0
+//    val rowForm = 3
+//    val mikroKanon = MikroKanon.find2AbsPartMikroKanon(absPitches, intervalSet, delay, transpose, rowForm)
+//    mikroKanon.display()
+}
+@Parcelize
+data class Counterpoint(val parts: List<AbsPart>,
+                        val intervalSet: List<Int> = (0..11).toList(),
+                        var emptiness: Float? = null) : Parcelable {
+
+    init {
+        emptiness ?: findEmptiness().also<Float> { it -> emptiness = it }
+    }
+
+    companion object {
+        fun counterpointFromClipList(clipList: List<Clip>) : Counterpoint{
+            return Counterpoint(listOf(AbsPart.absPartfromClipList(clipList)))
+        }
+        fun empty(): Counterpoint{
+            return Counterpoint(emptyList(), emptyList(), 1.0f)
+        }
+        fun findCounterpoint(target: Counterpoint, sequence: List<Int>, intervalSet: List<Int>,
+                             delay: Int, transpose: Int, rowForm: RowForm) : Counterpoint{
+            var result = mutableListOf<Int>()
+
+            var actualSeq = sequence.toMutableList()
+            when (rowForm){
+                RowForm.INVERSE -> actualSeq = Insieme.invertAbsPitches(actualSeq.toIntArray()).toMutableList()
+                RowForm.RETROGRADE -> actualSeq = actualSeq.reversed().toMutableList()
+                RowForm.INV_RETROGRADE -> actualSeq = Insieme.invertAbsPitches(actualSeq.toIntArray()).reversedArray().toMutableList()
+                else -> {}
+            }
+            actualSeq = actualSeq.map {Insieme.transposeAbsPitch(it, transpose) }.toMutableList()
+            for(i in 0 until delay) {
+                result.add(-1)
+            }
+
+            var resultIndex = delay
+            var actualSeqIndex = 0
+            while (actualSeqIndex < actualSeq.size) {
+                val matchValues = mutableListOf<Int>()
+                for(j in target.parts.indices){
+                    if( resultIndex < target.parts[j].absPitches.size) matchValues.add(target.parts[j].absPitches[resultIndex])
+                    else {
+                        matchValues.add(-1)
+                    }
+                }
+                val newAbsPitch = actualSeq[actualSeqIndex]
+                val isValid = matchValues.map{
+                    it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(),it,newAbsPitch)
+                }.fold(true) { acc, b ->  acc && b}
+                if(isValid) {
+                    actualSeqIndex++
+                    result.add(newAbsPitch)
+                } else {
+                    result.add(-1)
+                }
+                resultIndex++
+            }
+
+
+
+
+            val resultAbsPart = AbsPart(result, rowForm, transpose, delay)
+            return Counterpoint(listOf(*target.parts.toTypedArray(), resultAbsPart), intervalSet)
+        }
+
+
+        fun findAllCounterpoints(target: Counterpoint, sequence: List<Int>, intervalSet: List<Int>, deepness: Int) : List<Counterpoint> {
+            val result = mutableListOf<Counterpoint>()
+
+            for(delay in 0 until deepness) {
+                var counterpoint: Counterpoint
+                for (transpose in 0 until 12) {
+                    for (form in 0 until 4) {
+                        counterpoint = findCounterpoint(target, sequence, intervalSet, delay, transpose, RowForm.values()[form])
+                        result.add(counterpoint)
+                    }
+                }
+            }
+
+            return result
+        }
+    }
+
+
+    fun isEmpty() : Boolean {
+        return parts.isEmpty()
+    }
+    fun display() {
+        parts.forEachIndexed { index, absPart ->
+            println("Part #$index: ${Arrays.toString(absPart.absPitches.toIntArray())}")
+        }
+        println("Emptiness: $emptiness")
+    }
+
+    private fun findEmptiness() : Float {
+        val maxSize = parts.maxOf { it.absPitches.size }
+        val nCells = maxSize * parts.size
+        if (nCells == 0) return 1.0f
+        // considering the counterpoint like a grid and counting every empty cell
+        val nEmptyNotes = parts.map{ it -> it.nEmptyNotes() + (maxSize - it.absPitches.size)  }
+            .reduce { acc, nNotes -> nNotes + acc}
+        if (nEmptyNotes == 0) return 0.0f
+        // (100 : X = nCells : nEmptyNotes) / 100
+        return nEmptyNotes.toFloat() / nCells
+    }
+}
+
+
+
+@Parcelize
+data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowForm.UNRELATED, val transpose: Int = 0, val delay: Int = 0) : Parcelable {
+    companion object{
+        fun absPartfromClipList(clipList: List<Clip>) : AbsPart {
+            return AbsPart(clipList.map { it -> it.abstractNote }.toMutableList())
+        }
+    }
+    fun nEmptyNotes() : Int {
+        return absPitches.count { it == -1 }
+    }
+}
