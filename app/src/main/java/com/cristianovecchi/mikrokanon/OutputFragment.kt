@@ -49,18 +49,10 @@ class OutputFragment: Fragment() {
                                 model = model,
                                 onClick = {counterpoint -> model.changeSelectedCounterpoint(counterpoint) },
                                 onKP = { index ->
-                                    model.changeSequenceToMikroKanons(emptyList())
-                                    model.changeSequenceToAdd(model.sequences.value!![index])
-                                    model.addSequenceToCounterpoint()
+                                   model.onKPfurtherSelections(index)
                                 },
                                 dispatchIntervals = { newIntervals ->
-                                    model.changeIntervalSet(newIntervals)
-                                    if(model.sequenceToMikroKanons.value!!.isNotEmpty()){
-                                        model.findCounterpointsByMikroKanons()
-                                    } else {
-                                        model.addSequenceToCounterpoint()
-                                    }
-
+                                    model.dispatchIntervals(newIntervals)
                                 }
                         )
                     }

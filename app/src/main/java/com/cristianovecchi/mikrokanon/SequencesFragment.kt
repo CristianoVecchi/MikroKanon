@@ -25,6 +25,7 @@ class SequencesFragment(): Fragment() {
         model.allSequencesData.observe(viewLifecycleOwner){
             model.retrieveSequencesFromDB()
         }
+        model.setInitialBlankState()
         return ComposeView(requireContext()).apply {
             setContent {
                 MikroKanonTheme {
@@ -39,24 +40,14 @@ class SequencesFragment(): Fragment() {
                             },
                             onKP = { list, index ->
                                 findNavController().navigate(R.id.outputFragment)
-                                model.changeFirstSequence(list)
-                                model.convertFirstSequenceToSelectedCounterpoint()
-                                model.changeSequenceToAdd(model.sequences.value!![index])
-                                model.addSequenceToCounterpoint()
+                                model.onKPfromFirstSelection(list, index)
 
                             },
                             onMikrokanons = { list ->
                                // val bundle = Bundle()
                                //bundle.putParcelableArrayList("list", list)
                                 findNavController().navigate(R.id.outputFragment)
-                                model.changeSequenceToMikroKanons(list)
-                                model.findCounterpointsByMikroKanons()
-                                model.counterpoints.value?.get(0)?.let {
-                                    model.changeSelectedCounterpoint(
-                                        it
-                                    )
-                                }
-
+                                model.onMikroKanons(list)
                             })
                     }
                 }
