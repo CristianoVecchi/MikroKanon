@@ -10,21 +10,31 @@ import java.util.*
 import kotlin.math.abs
 
 fun main(args : Array<String>){
-    val absPitches1 = mutableListOf(-1,1,0,6,11,5,7,8,8,3,3,3,6,9)
-    val absPitches2 = mutableListOf(1,11,2,10,3,-1,9,6)
+//    val absPitches1 = mutableListOf(-1,1,0,6,11,5,7,8,8,3,3,3,6,9)
+//    val absPitches2 = mutableListOf(1,11,2,10,3,-1,9,6)
+//    val absPitches3 = mutableListOf(1,11,2,10)
+    val absPitches1 = mutableListOf(0, 4, 7, 11, 2, 6, 9)
+    val absPitches2 = mutableListOf(-1, 0, 4, 7, 11, 2, 6, 9)
+    val absPitches3 = mutableListOf(-1,2, 0, -1, -1, 10, -1, 7, 5, 9, 10, 0, 2)
     val absParts = listOf(
         AbsPart(absPitches1),
         AbsPart(absPitches2),
+        AbsPart(absPitches3),
     )
-    val counterpoint = Counterpoint(absParts)
-
-    val sequence = listOf(2,10,5,10,3,9,6,7)
-    val intervalSet = listOf(0,1,11,2,10,3,9)
-    val newCounterpoints = Counterpoint.findAllCounterpoints(counterpoint,sequence, intervalSet, 5)
-    newCounterpoints.sortedBy { it.emptiness }.reversed().forEach{it.display(); println()}
-
-    val seq1 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,10, false))
-    Counterpoint.counterpointFromClipList(seq1).display()
+    val counterpoint = Counterpoint(absParts, listOf(2, 10, 3, 9, 4, 8, 5, 7))
+    counterpoint.normalizePartsSize(true)
+    counterpoint.display()
+    val counterpoints = listOf(counterpoint, counterpoint)
+    counterpoints.map{it.spreadAsPossible()}
+    counterpoints[0].display()
+    //counterpoint.populate().display()
+//    val sequence = listOf(2,10,5,10,3,9,6,7)
+//    val intervalSet = listOf(0,1,11,2,10,3,9)
+//    val newCounterpoints = Counterpoint.findAllCounterpoints(counterpoint,sequence, intervalSet, 5)
+//    newCounterpoints.sortedBy { it.emptiness }.reversed().forEach{it.display(); println()}
+//
+//    val seq1 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,10, false))
+//    Counterpoint.counterpointFromClipList(seq1).display()
 
 //    val delay = 3
 //    val transpose = 0
@@ -40,8 +50,13 @@ data class Counterpoint(val parts: List<AbsPart>,
     init {
         emptiness ?: findEmptiness().also<Float> { it -> emptiness = it }
     }
+    fun clone(): Counterpoint {
+
+        return Counterpoint(parts.map{it.clone()}, ArrayList(intervalSet), emptiness)
+    }
 
     companion object {
+
         fun counterpointFromClipList(clipList: List<Clip>) : Counterpoint{
             return Counterpoint(listOf(AbsPart.absPartfromClipList(clipList)))
         }
@@ -86,10 +101,6 @@ data class Counterpoint(val parts: List<AbsPart>,
                 }
                 resultIndex++
             }
-
-
-
-
             val resultAbsPart = AbsPart(result, rowForm, transpose, delay)
             return Counterpoint(listOf(*target.parts.toTypedArray(), resultAbsPart), intervalSet)
         }
@@ -110,6 +121,79 @@ data class Counterpoint(val parts: List<AbsPart>,
 
             return result
         }
+    }
+    fun normalizePartsSize(refreshEmptiness: Boolean){
+        val maxSize: Int = parts.maxOf { it.absPitches.size }
+        parts.forEach(){ absPart ->
+            if(absPart.absPitches.size != maxSize){
+                val diff = maxSize - absPart.absPitches.size
+                (0 until diff).forEach(){ _ ->
+                    absPart.absPitches.add(-1)
+                }
+            }
+        }
+        if(refreshEmptiness) this.emptiness = findEmptiness()
+    }
+
+
+    fun spreadAsPossible() : Counterpoint {
+        val clone = this.clone() // cloning is necessary in a coroutine context
+        clone.normalizePartsSize(false)
+        for(partIndex in clone.parts.indices){
+            val part = clone.parts[partIndex]
+            for(pitchIndex in part.absPitches.indices)
+
+                if(part.absPitches[pitchIndex] == -1) {
+                    val previous = if(pitchIndex > 0) {part.absPitches[pitchIndex-1]} else {null }
+                    if(previous != null && previous != -1){
+                        val matchValues = mutableListOf<Int>()
+                        label@for(j in clone.parts.indices) {
+                            if (j == partIndex) continue@label
+
+                            matchValues.add(clone.parts[j].absPitches[pitchIndex])
+                        }
+                        val isValid = matchValues.map{
+                            it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(),it,previous)
+                        }.fold(true) { acc, b ->  acc && b}
+                        if (isValid) {
+                            part.absPitches[pitchIndex] = previous
+                        } else {
+                            part.absPitches[pitchIndex] = -1
+                        }
+
+                    }
+                }
+            }
+            clone.parts.forEachIndexed() { partIndex, part ->
+                for(pitchIndex in part.absPitches.indices)
+                    if(part.absPitches[pitchIndex] == -1) {
+                        val next = if(pitchIndex < part.absPitches.size -1) {part.absPitches[pitchIndex+1]} else {null }
+                        if (next != null && next != -1){
+                            val matchValues = mutableListOf<Int>()
+                            label@for(j in clone.parts.indices){
+                                if(j == partIndex) continue@label
+
+                                    matchValues.add(clone.parts[j].absPitches[pitchIndex])
+                            }
+
+                            val isValid = matchValues.map{
+                                it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(),it,next)
+                            }.fold(true) { acc, b ->  acc && b}
+                            if (isValid) {
+                                part.absPitches[pitchIndex] = next
+                            } else {
+                                part.absPitches[pitchIndex] = -1
+                            }
+
+                        }
+                    }
+                }
+
+
+
+        clone.emptiness = clone.findEmptiness()
+
+        return clone
     }
 
 
@@ -144,6 +228,9 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         fun absPartfromClipList(clipList: List<Clip>) : AbsPart {
             return AbsPart(clipList.map { it -> it.abstractNote }.toMutableList())
         }
+    }
+    fun clone(): AbsPart{
+       return AbsPart(ArrayList(absPitches),rowForm, transpose, delay)
     }
     fun nEmptyNotes() : Int {
         return absPitches.count { it == -1 }

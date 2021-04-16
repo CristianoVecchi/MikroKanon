@@ -56,7 +56,7 @@ fun SequenceSelector(model: AppViewModel,
         Row(modifier1, verticalAlignment = Alignment.CenterVertically){
 
             Button(modifier= Modifier.padding(2.dp),
-                onClick = {onDelete(selected)})
+                onClick = { if(selected in sequences.indices)  onDelete(selected)   else {} } )
             {
                 Text(text = "DEL",
                     style = TextStyle(fontSize = 22.sp,
@@ -65,7 +65,7 @@ fun SequenceSelector(model: AppViewModel,
 
             //Edit Button
             Button(modifier= Modifier.padding(2.dp),
-                onClick = {onAdd(sequences[selected], true)})
+                onClick = { if(selected in sequences.indices)  {onAdd(sequences[selected], true)}  else {} } )
             {
                 Text(text = "EDIT",
                     style = TextStyle(fontSize = 22.sp,
@@ -74,11 +74,7 @@ fun SequenceSelector(model: AppViewModel,
 
             //MK Button
             Button(modifier= Modifier.padding(2.dp),
-                onClick = { if(selected == -1) {
-                   // MAKE TOAST
-                } else {
-                    onMikrokanons(sequences[selected])
-                }})
+                onClick = { if(selected in sequences.indices) onMikrokanons(sequences[selected])  else {} } )
             {
                 Text(text = "MK",
                     style = TextStyle(fontSize = 22.sp,
@@ -87,15 +83,7 @@ fun SequenceSelector(model: AppViewModel,
 
             //KP Button
             Button(modifier= Modifier.padding(2.dp),
-                onClick = { if(model.selectedSequence.value!! == -1) {
-//                Toast.makeText(
-//                    ,
-//                    "Please, select or create a Sequence",
-//                    Toast.LENGTH_SHORT
-//                )
-                } else {
-                    dialogState.value = true
-                }})
+                onClick = { if(selected in sequences.indices) {dialogState.value = true} else {} } )
             {
                 Text(text = "KP",
                     style = TextStyle(fontSize = 22.sp,
@@ -127,14 +115,11 @@ fun SequenceScrollableColumn(
     ) {
         itemsIndexed(items = sequences) { index, sequence ->
             if (index == selected) {
-                Card(Modifier.clickable { }) {
-                    Text("#$index ${sequence.toStringAll()} + SELECTED")
-                }
+                SelectedCard(text = "${sequence.toStringAll()}", 20,onClick = {})
             } else {
-                Card(Modifier.clickable { onSelect(index) }) {
-                    Text("#$index ${sequence.toStringAll()}")
+                UnSelectedCard(text = "${sequence.toStringAll()}", 18,onClick = {onSelect(index)})
                 }
-            }
+
 
         }
     }

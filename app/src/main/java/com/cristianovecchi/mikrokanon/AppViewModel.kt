@@ -17,28 +17,32 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
 //    val seq1 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,10, false))
 //    val seq2 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,7, false))
 
+    private val SPREAD_AS_POSSIBLE = true
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 18
     val allSequencesData: LiveData<List<SequenceData>> = repository.allSequences.asLiveData()
     private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
-    private val counterpointStack = Stack<Counterpoint>()
+    private data class Computation(val counterpoint: Counterpoint,
+                                   val sequenceAdded: List<Clip>, val isMikroKanon: Boolean)
+    private val counterpointStack = Stack<Computation>()
 
     // macro Functions called by fragments -----------------------------------------------------
     val dispatchIntervals = { newIntervals: List<Int> ->
         //changeIntervalSet(newIntervals)
         if (isJustMikrokanonState()){ // handling just a mikrokanon
             //println("CALLING DISPATCHINTERVALS IN STATE: JUST MIKROKANON")
-            counterpointStack.pop()
-            findCounterpointsByMikroKanons()
+           counterpointStack.pop()
+           findCounterpointsByMikroKanons()
 
         } else if(isFirstSequenceAddingState()) {
             //println("CALLING DISPATCHINTERVALS IN STATE: FIRST SEQUENCE ADDING")
-            counterpointStack.pop()
+           counterpointStack.pop()
             convertFirstSequenceToSelectedCounterpoint()
             addSequenceToCounterpoint()
         } else if(isFurtherSequenceAddingState())
         {
             //println("CALLING DISPATCHINTERVALS IN STATE: FURTHER SEQUENCE ADDING ")
-            val previousCounterpoint = counterpointStack.pop()
+            val previousComputation = counterpointStack.pop()
+            val previousCounterpoint = previousComputation.counterpoint
             changeSelectedCounterpoint(previousCounterpoint)
             addSequenceToCounterpoint()
         }
@@ -59,6 +63,28 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         if(list.isNotEmpty()) changeSequenceToMikroKanons(list)
             findCounterpointsByMikroKanons()
     }
+    val onBack = {
+        if (isJustMikrokanonState()){ // handling just a mikrokanon
+            //println("CALLING DISPATCHINTERVALS IN STATE: JUST MIKROKANON")
+        } else if(isFirstSequenceAddingState()) {
+            //println("CALLING DISPATCHINTERVALS IN STATE: FIRST SEQUENCE ADDING")
+        } else if(isFurtherSequenceAddingState())
+        {
+            //println("CALLING DISPATCHINTERVALS IN STATE: FURTHER SEQUENCE ADDING ")
+            counterpointStack.pop()
+            val previousComputation = counterpointStack.pop()
+            if(previousComputation.isMikroKanon){
+                changeSequenceToMikroKanons(previousComputation.sequenceAdded)
+                findCounterpointsByMikroKanons()
+            } else {
+                val previousCounterpoint = previousComputation.counterpoint
+                val previousSequenceToAdd = previousComputation.sequenceAdded
+                changeSelectedCounterpoint(previousCounterpoint)
+                changeSequenceToAdd(previousSequenceToAdd)
+                addSequenceToCounterpoint()
+            }
+        }
+    }
     //-------------end macro functions--------------------
 
     fun isJustMikrokanonState() : Boolean {
@@ -74,7 +100,8 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     fun findCounterpointsByMikroKanons(){
         _counterpoints.value = emptyList()
         viewModelScope.launch(Dispatchers.Unconfined){
-            counterpointStack.push(selectedCounterpoint!!.value) //saving the previous counterpoint
+            counterpointStack.push(Computation(selectedCounterpoint.value!!.clone(),
+                ArrayList(sequenceToMikroKanons.value!!), true)) //saving the previous counterpoint
             findCounterpoints()
             counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
             // println("STACK SIZE: ${counterpointStack.size}")
@@ -96,7 +123,8 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         if(!selectedCounterpoint.value!!.isEmpty()){
             _counterpoints.value = emptyList()
             viewModelScope.launch(Dispatchers.Unconfined){
-                counterpointStack.push(selectedCounterpoint!!.value) //saving the previous counterpoint
+                counterpointStack.push(Computation(selectedCounterpoint.value!!.clone(),
+                    ArrayList(sequenceToAdd.value!!), false)) //saving the previous counterpoint
                 addSeqToCounterpoint()
                 counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
                 // println("STACK SIZE: ${counterpointStack.size}")
@@ -108,6 +136,12 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
             selectedCounterpoint.value!! , sequenceToAdd.value!!.map { it.abstractNote }.toList(),
             intervalSet.value!!, 5
         ).sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+        counterpoints.value!![0].display()
+        if(SPREAD_AS_POSSIBLE){
+            val newCounterpoints = counterpoints.value!!.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
+            _counterpoints.value = newCounterpoints
+        }
+        counterpoints.value!![0].display()
     }
 
     fun convertFirstSequenceToSelectedCounterpoint() {
@@ -156,7 +190,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
 
     fun changeSelectedCounterpoint(newCounterpoint: Counterpoint){
         _selectedCounterpoint.value = newCounterpoint
-        println("SELECTED COUNTERPOINT:")
+       println("SELECTED COUNTERPOINT:")
        println(selectedCounterpoint.value!!.display())
     }
     fun changeIntervalSet(newIntervalSet: List<Int>){
@@ -203,6 +237,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
                 repository.delete(sequenceData)
             }
         }
+        changeSequenceSelection(-1)
     }
     fun updateSequence(index: Int, sequence: ArrayList<Clip>){
         val oldSequence = sequences.value!![index]
@@ -226,6 +261,8 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         map[sequence] = sequenceData
         return sequence
     }
+
+
 
 
 }

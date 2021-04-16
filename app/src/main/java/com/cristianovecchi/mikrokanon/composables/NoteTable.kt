@@ -22,15 +22,21 @@ import com.cristianovecchi.mikrokanon.AppViewModel
 
 
 @Composable
-fun NoteTable(model: AppViewModel, counterpoint: Counterpoint,
+fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, fontSize: Int,
 
               onClick: (Counterpoint) -> Unit){
     val listState = rememberLazyListState()
     val selectedCounterpoint by model.selectedCounterpoint.observeAsState()
     val isSelected = counterpoint == selectedCounterpoint
     val borderWidth = if(isSelected) 4 else 0
+    val fontWeight = if(isSelected) FontWeight.ExtraBold else FontWeight.Normal
     val parts = toClips(counterpoint, NoteNamesIt.values().map { value -> value.toString() })
     val maxSize = parts.maxOf{ it.size}
+    val cellDarkColor = Color(0.0f,0.0f,0.7f,1.0f)
+    val cellLightColor = Color(0.0f,0.0f,0.9f,1.0f)
+    val selectionColor = Color(0.8f,0.8f,0.9f,1.0f)
+
+
     LazyRow(modifier = Modifier
         .fillMaxWidth()
         .padding(4.dp)
@@ -44,15 +50,16 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint,
 
                 Box(modifier = Modifier
                     .width(80.dp)
-                    .background(if ((i + j) % 2 == 0) Color.Gray else Color.LightGray)
-                    .border(BorderStroke(borderWidth.dp, Color.Blue))
+                    .background(if ((i + j) % 2 == 0) cellDarkColor else cellLightColor)
+                    .border(BorderStroke(borderWidth.dp, selectionColor))
                 ) {
 
                     Text(text = clip.text,
                         modifier = Modifier.padding(8.dp),
 
-                        style = TextStyle(fontSize = 18.sp,
-                            fontWeight = FontWeight.Normal))
+                        style = TextStyle(fontSize = if(isSelected) (fontSize+3).sp else fontSize.sp,
+                            color = Color.White,
+                            fontWeight = fontWeight))
 
 
                 }
