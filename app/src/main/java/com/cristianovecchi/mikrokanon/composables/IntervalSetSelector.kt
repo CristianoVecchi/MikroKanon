@@ -64,49 +64,10 @@ fun IntervalSetSelector(model: AppViewModel, fontSize: Int,
             UnSelectedCard(text = "4a\n5d", fontSize, onClick = {model.addIntervals(listOf(6)); dispatchIntervals(intervals)})
         }
         if(intervals.contains(0)){
-            SelectedCard(text = "un\noct", fontSize + 2, onClick = {model.removeIntervals(listOf(0)); dispatchIntervals(intervals)})
+            SelectedCard(text = "1\n8", fontSize + 2, onClick = {model.removeIntervals(listOf(0)); dispatchIntervals(intervals)})
         } else {
-            UnSelectedCard(text = "un\noct", fontSize, onClick = {model.addIntervals(listOf(0)); dispatchIntervals(intervals)})
+            UnSelectedCard(text = "1\n8", fontSize, onClick = {model.addIntervals(listOf(0)); dispatchIntervals(intervals)})
         }
     }
 }
 
-@Composable
-fun SelectedCard(text: String,  fontSize: Int, onClick: () -> Unit){
-    val selectionBackColor = Color.White
-    val selectionTextColor = Color.Red
-    val selectionBorderColor = Color.Black
-    Card(modifier = Modifier
-        .background(Color.White)
-        .clip(RoundedCornerShape(6.dp))
-        .padding(6.dp)
-        .clickable { onClick() },
-                            backgroundColor = selectionBackColor,
-                            contentColor = selectionTextColor,
-                            border = BorderStroke(2.dp, selectionBorderColor )) {
-
-        Text(text = text, modifier = Modifier.padding(18.dp),
-                style = TextStyle(fontSize = fontSize.sp,
-                        fontWeight = FontWeight.Bold))
-    }
-}
-
-@Composable
-fun UnSelectedCard(text: String, fontSize: Int, onClick: (Int) -> Unit ){
-    val unselectionBackColor = Color.LightGray
-    val unselectionTextColor = Color.Blue
-    val unselectionBorderColor = Color.DarkGray
-    Card(modifier = Modifier
-            .background(Color.White)
-            .clip(RoundedCornerShape(6.dp))
-            .padding(6.dp)
-            .clickable { onClick(-1) },
-            backgroundColor = unselectionBackColor,
-            contentColor = unselectionTextColor,
-            border = BorderStroke(2.dp, unselectionBorderColor )) {
-
-        Text(text = text, modifier = Modifier.padding(18.dp),
-                style = TextStyle(fontSize = fontSize.sp,
-                        fontWeight = FontWeight.Bold))
-    }
-}

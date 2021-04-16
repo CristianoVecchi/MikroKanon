@@ -115,9 +115,9 @@ fun SequenceScrollableColumn(
     ) {
         itemsIndexed(items = sequences) { index, sequence ->
             if (index == selected) {
-                SelectedCard(text = "${sequence.toStringAll()}", 20,onClick = {})
+                SelectedCard(text = sequence.toStringAll(), 20,onClick = {})
             } else {
-                UnSelectedCard(text = "${sequence.toStringAll()}", 18,onClick = {onSelect(index)})
+                UnSelectedCard(text = sequence.toStringAll(), 18,onClick = {onSelect(index)})
                 }
 
 

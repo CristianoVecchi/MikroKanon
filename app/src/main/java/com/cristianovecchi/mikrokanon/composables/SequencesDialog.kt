@@ -59,12 +59,12 @@ fun SingleSelectDialog(
                         val selected = if (selectedOption == -1) {
                             ""
                         } else {
-                            sequence
+                            sequencesList[selectedOption]
                             //sequencesList[selectedOption.value]
                         }
 
                         RadioButton(sequence, selected) { selectedValue ->
-                            selectedOption = sequencesList.indexOf(sequence)
+                            selectedOption = sequencesList.indexOf(selectedValue)
                         }
                     }
 

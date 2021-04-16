@@ -28,18 +28,18 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, fontSize: Int,
     val listState = rememberLazyListState()
     val selectedCounterpoint by model.selectedCounterpoint.observeAsState()
     val isSelected = counterpoint == selectedCounterpoint
-    val borderWidth = if(isSelected) 4 else 0
+    val borderWidth = if(isSelected) 10 else 0
     val fontWeight = if(isSelected) FontWeight.ExtraBold else FontWeight.Normal
     val parts = toClips(counterpoint, NoteNamesIt.values().map { value -> value.toString() })
     val maxSize = parts.maxOf{ it.size}
-    val cellDarkColor = Color(0.0f,0.0f,0.7f,1.0f)
-    val cellLightColor = Color(0.0f,0.0f,0.9f,1.0f)
+    val cellDarkColor = if(isSelected) Color(0.0f,0.0f,0.9f,1.0f) else Color(0.0f,0.0f,0.5f,1.0f)
+    val cellLightColor = if(isSelected) Color(0.0f,0.0f,1f,1.0f) else Color(0.0f,0.0f,0.6f,1.0f)
     val selectionColor = Color(0.8f,0.8f,0.9f,1.0f)
-
+    val textColor = if(isSelected) Color.White else Color(0.9f,0.9f,0.9f,1.0f)
 
     LazyRow(modifier = Modifier
         .fillMaxWidth()
-        .padding(4.dp)
+        .padding(10.dp).border(BorderStroke(borderWidth.dp, selectionColor))
         .clickable {
             onClick(counterpoint)
         }, state = listState) { itemsIndexed((0 until maxSize).toList()) { i, _ ->
@@ -51,14 +51,14 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, fontSize: Int,
                 Box(modifier = Modifier
                     .width(80.dp)
                     .background(if ((i + j) % 2 == 0) cellDarkColor else cellLightColor)
-                    .border(BorderStroke(borderWidth.dp, selectionColor))
+
                 ) {
 
                     Text(text = clip.text,
                         modifier = Modifier.padding(8.dp),
 
                         style = TextStyle(fontSize = if(isSelected) (fontSize+3).sp else fontSize.sp,
-                            color = Color.White,
+                            color = textColor,
                             fontWeight = fontWeight))
 
 

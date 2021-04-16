@@ -9,6 +9,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -48,7 +49,7 @@ fun ResultDisplay(model: AppViewModel,
             }
 
         }
-        Row(modifier1){
+        Row(modifier1,verticalAlignment = Alignment.CenterVertically){
             val dialogState by lazy { mutableStateOf(false) }
             val selectedDialogSequence by lazy { mutableStateOf(-1) }
             SequencesDialog(dialogState = dialogState, sequencesList = model.sequences.value!!.map{ it.toStringAll()},
@@ -82,7 +83,7 @@ fun ResultDisplay(model: AppViewModel,
         }
         Row(modifier1){
             IntervalSetSelector(
-                    model, fontSize = 14,
+                    model, fontSize = 10,
                     dispatchIntervals = { newIntervals ->
                         dispatchIntervals(newIntervals)
                     }
