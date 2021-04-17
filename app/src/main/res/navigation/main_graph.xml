@@ -7,16 +7,11 @@
     <fragment
         android:id="@+id/inputFragment"
         android:name="com.cristianovecchi.mikrokanon.InputFragment"
-        android:label="InputFragment" >
-        <action
-            android:id="@+id/action_inputFragment_to_outputFragment"
-            app:destination="@id/outputFragment" />
-    </fragment>
+        android:label="InputFragment" />
     <fragment
         android:id="@+id/outputFragment"
         android:name="com.cristianovecchi.mikrokanon.OutputFragment"
         android:label="OutputFragment" >
-
     </fragment>
 
     <fragment

@@ -25,11 +25,14 @@ fun SequenceSelector(model: AppViewModel,
                      onDelete: (Int) -> Unit = model::deleteSequence,
                     onAdd: (ArrayList<Clip>, Boolean) -> Unit,
                      onKP: (ArrayList<Clip>, Int) -> Unit ,
-                    onMikrokanons: (ArrayList<Clip>) -> Unit) {
+                     onFreePart: (ArrayList<Clip>) -> Unit,
+                    onMikrokanons: (ArrayList<Clip>) -> Unit,
+                    onMikrokanons3: (ArrayList<Clip>) -> Unit
+) {
     Column(modifier = Modifier.fillMaxHeight()) {
-        val modifier4 = Modifier
+        val modifier3 = Modifier
             .fillMaxWidth()
-            .weight(4f)
+            .weight(3f)
         val modifier1 = Modifier
             .fillMaxSize()
             .fillMaxWidth()
@@ -50,56 +53,79 @@ fun SequenceSelector(model: AppViewModel,
 
         Text("${sequences.size}")
         SequenceScrollableColumn(
-            modifier = modifier4, sequences = sequences, selected, onSelect
+            modifier = modifier3, sequences = sequences, selected, onSelect
         )
-        // DEL | EDIT | MK | KP | ADD
-        Row(modifier1, verticalAlignment = Alignment.CenterVertically){
+        //  DEL | EDIT | ADD
+        // MK | MK3 | KP | FP
+        Column(modifier1) {
+            Row(verticalAlignment = Alignment.CenterVertically){
+                // DEL
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices)  onDelete(selected)   else {} } )
+                {
+                    Text(text = "DEL",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
 
-            Button(modifier= Modifier.padding(2.dp),
-                onClick = { if(selected in sequences.indices)  onDelete(selected)   else {} } )
-            {
-                Text(text = "DEL",
-                    style = TextStyle(fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold) )
+                //Edit Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices)  {onAdd(sequences[selected], true)}  else {} } )
+                {
+                    Text(text = "EDIT",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+
+                //ADD Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = {onAdd(ArrayList<Clip>(), false)})
+                {
+                    Text(text = "ADD",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
             }
+            Row(verticalAlignment = Alignment.CenterVertically){
+                //MK Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices) onMikrokanons(sequences[selected])  else {} } )
+                {
+                    Text(text = "MK",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
 
-            //Edit Button
-            Button(modifier= Modifier.padding(2.dp),
-                onClick = { if(selected in sequences.indices)  {onAdd(sequences[selected], true)}  else {} } )
-            {
-                Text(text = "EDIT",
-                    style = TextStyle(fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold) )
+                //MK3 Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices) onMikrokanons3(sequences[selected])  else {} } )
+                {
+                    Text(text = "MK3",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+
+                //KP Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices) {dialogState.value = true} else {} } )
+                {
+                    Text(text = "KP",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+
+                //FP Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected])  else {} } )
+                {
+                    Text(text = "FP",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+
             }
-
-            //MK Button
-            Button(modifier= Modifier.padding(2.dp),
-                onClick = { if(selected in sequences.indices) onMikrokanons(sequences[selected])  else {} } )
-            {
-                Text(text = "MK",
-                    style = TextStyle(fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold) )
-            }
-
-            //KP Button
-            Button(modifier= Modifier.padding(2.dp),
-                onClick = { if(selected in sequences.indices) {dialogState.value = true} else {} } )
-            {
-                Text(text = "KP",
-                    style = TextStyle(fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold) )
-            }
-
-            //ADD Button
-            Button(modifier= Modifier.padding(2.dp),
-                onClick = {onAdd(ArrayList<Clip>(), false)})
-            {
-                Text(text = "ADD",
-                    style = TextStyle(fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold) )
-            }
-
         }
+
 
     }
 }
@@ -108,7 +134,7 @@ fun SequenceSelector(model: AppViewModel,
 fun SequenceScrollableColumn(
     modifier: Modifier,
     sequences: List<ArrayList<Clip>>, selected:Int, onSelect: (Int) -> Unit
-){
+) {
     val listState = rememberLazyListState()
     LazyColumn(state = listState,
         modifier = modifier
@@ -119,11 +145,8 @@ fun SequenceScrollableColumn(
             } else {
                 UnSelectedCard(text = sequence.toStringAll(), 18,onClick = {onSelect(index)})
                 }
-
-
         }
     }
-
 }
 
 

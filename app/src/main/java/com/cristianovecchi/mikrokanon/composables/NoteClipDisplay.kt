@@ -77,7 +77,7 @@ fun NoteClipDisplay(modifier: Modifier, noteClips: List<Clip>, cursor: Int = -1,
     }
 }
 
-@Parcelize
+@Parcelize // remove?
 data class Clip(val text: String = "",
                 val id: Int = -1,
                 var abstractNote: Int = -1,
@@ -98,18 +98,18 @@ data class Clip(val text: String = "",
                         }
                         fun convertAbsToString(absPitch: Int, noteNames: List<String> ): String {
                             return when (absPitch) {
-                                0 -> "${noteNames[0]}"
+                                0 -> noteNames[0]
                                 1 -> "${noteNames[0]}${Accidents.SHARP.ax}" //C#
-                                2 -> "${noteNames[1]}"
+                                2 -> noteNames[1]
                                 3 -> "${noteNames[2]}${Accidents.FLAT.ax}"//Eb
-                                4 -> "${noteNames[2]}"
-                                5 -> "${noteNames[3]}"
+                                4 -> noteNames[2]
+                                5 -> noteNames[3]
                                 6 -> "${noteNames[3]}${Accidents.SHARP.ax}"//F#
-                                7 -> "${noteNames[4]}"
+                                7 -> noteNames[4]
                                 8 -> "${noteNames[4]}${Accidents.SHARP.ax}"//G#
-                                9 -> "${noteNames[5]}"
+                                9 -> noteNames[5]
                                 10 -> "${noteNames[6]}${Accidents.FLAT.ax}"//Bb
-                                11 -> "${noteNames[6]}"
+                                11 -> noteNames[6]
                                 else -> ""
                             }
                         }

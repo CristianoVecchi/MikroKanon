@@ -6,14 +6,12 @@ import java.util.*
 
 @Parcelize
 data class MikroKanon(val parts: List<AbsPart>,
-                      val intervalSet: List<Int>,
-                      val emptiness: Float) : Parcelable {
+                      val intervalSet: List<Int> ) : Parcelable {
     fun display(){
-        println("DUX:   ${Arrays.toString(parts[0].absPitches.toIntArray())}" )
-        println("COMES: ${Arrays.toString(parts[1].absPitches.toIntArray())}" )
-        println("Emptiness: $emptiness")
+        println("DUX:     ${Arrays.toString(parts[0].absPitches.toIntArray())}" )
+        println("COMES:   ${Arrays.toString(parts[1].absPitches.toIntArray())}" )
+        if(parts.size>1) println("COMES 2: ${Arrays.toString(parts[2].absPitches.toIntArray())}" )
         println("Interval Set: ${Arrays.toString(intervalSet.toIntArray())}" )
-
     }
 
     fun toCounterpoint(): Counterpoint {
@@ -27,7 +25,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                 return MikroKanon(listOf(
                     AbsPart(mutableListOf(),RowForm.values()[rowForm],transpose, delay),
                     AbsPart(mutableListOf(),RowForm.values()[rowForm],transpose, delay)
-                ),intervalSet,0f)
+                ),intervalSet)
             }
             var list2 = absPitches.toMutableList()
             when (rowForm){
@@ -65,11 +63,93 @@ data class MikroKanon(val parts: List<AbsPart>,
                     index ++
                 }
             }
-            // 100: x = (size+delay) : rests
-            //
-            val emptiness = if (nRests == 0) 0f else (nRests * 100) / (comes.absPitches.size + delay).toFloat()
 
-            return MikroKanon(listOf(dux,comes), intervalSet, emptiness)
+            return MikroKanon(listOf(dux,comes), intervalSet)
+        }
+        fun find3AbsPartMikroKanon(absPitches: List<Int>, intervalSet: List<Int>,
+                                   delay1: Int, transpose1: Int, rowForm1: Int,
+                                   delay2:Int, transpose2: Int, rowForm2: Int): MikroKanon{
+            if(delay1 == 0 && delay2 == 0 && rowForm1 == 0 && rowForm2 == 0){
+                return MikroKanon(listOf(
+                    AbsPart(mutableListOf(),RowForm.values()[rowForm1],transpose1, 0),
+                    AbsPart(mutableListOf(),RowForm.values()[rowForm1],transpose1, delay1),
+                    AbsPart(mutableListOf(),RowForm.values()[rowForm1],transpose1, delay2)
+                ),intervalSet)
+            }
+            var list2 = absPitches.toMutableList()
+            var list3 = absPitches.toMutableList()
+            when (rowForm1){
+                1 -> list2 = Insieme.invertAbsPitches(list2.toIntArray()).toMutableList()
+                2 -> list2 = list2.reversed().toMutableList()
+                3 -> list2 = Insieme.invertAbsPitches(list2.toIntArray()).reversedArray().toMutableList()
+                else -> {}
+            }
+            when (rowForm2){
+                1 -> list3 = Insieme.invertAbsPitches(list3.toIntArray()).toMutableList()
+                2 -> list3 = list3.reversed().toMutableList()
+                3 -> list3 = Insieme.invertAbsPitches(list3.toIntArray()).reversedArray().toMutableList()
+                else -> {}
+            }
+            list2 = list2.map {Insieme.transposeAbsPitch(it, transpose1) }.toMutableList()
+            list3 = list3.map {Insieme.transposeAbsPitch(it, transpose2) }.toMutableList()
+            //println("list1: ${Arrays.toString(absPitches.toIntArray())}" )
+            //println("list2: ${Arrays.toString(list2.toIntArray())}" )
+
+            val dux = AbsPart( mutableListOf(), RowForm.ORIGINAL, 0 ,0 )
+            val comes1 = AbsPart( mutableListOf(), RowForm.values()[rowForm1], transpose1, delay1)
+            val comes2 = AbsPart( mutableListOf(), RowForm.values()[rowForm2], transpose2, delay2)
+            for(i in 0 until delay1) { comes1.absPitches.add(-1) }
+            for(i in 0 until delay2) { comes2.absPitches.add(-1) }
+
+
+            var absIndex = 0
+            var duxIndex = 0
+//            val duxPitch = absPitches[absIndex]
+//            dux.absPitches.add(duxIndex,duxPitch)
+//            comes1.absPitches.add(duxIndex + delay1, list2[absIndex])
+//            comes2.absPitches.add(duxIndex + delay2, list3[absIndex])
+////            println("Comes1 size:${comes1.absPitches.size}")
+////            println("Comes2 size:${comes2.absPitches.size}")
+//            absIndex++
+//            duxIndex++
+            while ( absIndex < absPitches.size) {
+                val duxPitch = absPitches[absIndex]
+                val comes1Pitch = comes1.absPitches[duxIndex]
+                val comes2Pitch = comes2.absPitches[duxIndex]
+
+                if( (comes1Pitch == - 1 || Insieme.isIntervalInSet(intervalSet.toIntArray(), duxPitch, comes1Pitch))
+                        &&  (comes2Pitch == - 1 || Insieme.isIntervalInSet(intervalSet.toIntArray(), duxPitch, comes2Pitch))
+                        && (comes2.absPitches[duxIndex+delay1] == - 1 || Insieme.isIntervalInSet(intervalSet.toIntArray(),
+                        list2[absIndex], comes2.absPitches[duxIndex+delay1])) ){
+                    dux.absPitches.add(duxIndex,duxPitch)
+                    comes1.absPitches.add(duxIndex + delay1, list2[absIndex])
+                    comes2.absPitches.add(duxIndex + delay2, list3[absIndex])
+                    absIndex++
+                    duxIndex++
+                } else {
+                    dux.absPitches.add(duxIndex,-1)
+                    comes1.absPitches.add(duxIndex + delay1, -1)
+                    comes2.absPitches.add(duxIndex + delay2, -1)
+                    duxIndex++
+                }
+            }
+//            while ( listIndex < absPitches.size) {
+//                val newPitch = absPitches[listIndex]
+//                val comesPitch = if(index > comes.absPitches.size -1) list2[listIndex] else comes.absPitches[index]
+//                if (comesPitch == - 1 || Insieme.isIntervalInSet(intervalSet.toIntArray(), newPitch, comesPitch)){
+//                    dux.absPitches.add(index,newPitch)
+//                    comes.absPitches.add(index+delay, list2[listIndex])
+//                    index ++
+//                    listIndex ++
+//                } else {
+//
+//                    dux.absPitches.add(index, -1)
+//                    comes.absPitches.add(index+delay, -1)
+//                    index ++
+//                }
+//            }
+
+            return MikroKanon(listOf(dux,comes1,comes2), intervalSet)
         }
 
         fun findAll2AbsPartMikroKanons(absPitches: List<Int>, intervalSet: List<Int>, deepness: Int) : List<MikroKanon>{
@@ -84,7 +164,35 @@ data class MikroKanon(val parts: List<AbsPart>,
                     }
                 }
             }
-
+            return result
+        }
+        fun findAll3AbsPartMikroKanons(absPitches: List<Int>, intervalSet: List<Int>, deepness: Int) : List<MikroKanon>{
+            val result = mutableListOf<MikroKanon>()
+            // delay = 0 CASE requires another algorhythm
+            for(delay1 in 1 until deepness) {
+                for(delay2 in delay1 + 1 until deepness + delay1) {
+                    var mikroKanon: MikroKanon
+                    for (tr1 in 0 until 12) {
+                        for (form1 in 0 until 4) {
+                            for (tr2 in 0 until 12) {
+                                for (form2 in 0 until 4) {
+                                    mikroKanon = find3AbsPartMikroKanon(
+                                        absPitches,
+                                        intervalSet,
+                                        delay1,
+                                        tr1,
+                                        form1,
+                                        delay2,
+                                        tr2,
+                                        form2
+                                    )
+                                    result.add(mikroKanon)
+                                }
+                            }
+                        }
+                    }
+                }
+              }
             return result
         }
 
@@ -98,11 +206,14 @@ enum class RowForm {
 }
 
 fun main(args : Array<String>){
-    val absPitches = listOf(1,0,6,11,5,7,8,8,3,3,3,6,9)
+    val absPitches = listOf(1,0,6,11,5,7,8,3,6,9)
     val intervalSet = listOf(1,11,2,10,3,9,6)
 
-    val mikroKanons = MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet, 4)
+    val mikroKanons = MikroKanon.findAll3AbsPartMikroKanons(absPitches,intervalSet, 4)
     mikroKanons.forEach{it.display(); println()}
+
+//    val mikroKanons = MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet, 4)
+//    mikroKanons.forEach{it.display(); println()}
 
 //    val delay = 3
 //    val transpose = 0

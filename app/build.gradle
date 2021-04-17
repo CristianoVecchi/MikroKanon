@@ -81,7 +81,7 @@ dependencies {
 
     //MIDI
     //https://github.com/LeffelMania/android-midi-lib.git
-    // implementation "com.github.owncloud:LeffelMania/android-midi-lib"
+    //implementation "com.github.owncloud:LeffelMania/android-midi-lib" // not working
 
 
     testImplementation 'junit:junit:4.+'

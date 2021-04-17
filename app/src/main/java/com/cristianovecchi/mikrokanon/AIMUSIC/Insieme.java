@@ -205,6 +205,25 @@ public class Insieme {
         }
         return 0;
     }
+    public static Integer[] extractDirectionsFromIntervalSet(Integer[] intervalSet, boolean ascendantTrend){
+        Vector list = new Vector();
+        int[] dirs;
+        if(ascendantTrend) {
+            dirs = new int[]{0,1,11,2,10,3,9,4,8,5,7,6};
+        } else {
+            dirs = new int[]{0,11,1,10,2,9,3,8,4,7,5,6};
+        }
+        for (int j = 0; j < 12; j++) {
+            for (int i = 0; i < intervalSet.length; i++) {
+                int interval = intervalSet[i];
+                    if(intervalSet[i] == dirs[j] ) {
+                        list.add(interval);
+                        break;
+                    }
+                }
+        }
+        return (Integer[]) list.toArray(new Integer[0]);
+    }
 
     public static boolean isIntervalInSet(int[] intervalSet, int pitch1, int pitch2){
         int interval = Math.abs(pitch2 - pitch1);

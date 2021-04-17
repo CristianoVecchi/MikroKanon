@@ -25,46 +25,40 @@ fun ResultDisplay(model: AppViewModel,
                   onKP: (Int) -> Unit = {},
                   onClick: (Counterpoint) -> Unit = {},
                   onBack: () -> Unit = {},
-                  dispatchIntervals: (List<Int>) -> Unit = {})
-                   {
+                  onFreePart: () -> Unit = {},
+                  dispatchIntervals: (List<Int>) -> Unit = {}) {
 
     val counterpoints by model.counterpoints.observeAsState(emptyList())
     val backgroundColor = Color(0.5f,0.5f,1.0f,1.0f)
     Column(modifier = Modifier.fillMaxHeight().background(backgroundColor)) {
-        val modifier5 = Modifier
-            .fillMaxWidth()
-            .weight(5f)
-        val modifier1 = Modifier
-            .fillMaxSize()
-            .weight(1f)
-        val listState = rememberLazyListState()
-        Text(text = "N. of Results found: ${counterpoints.size}")
-        if(counterpoints.isEmpty()) Text(text = "ELABORATING...")
-        LazyColumn(
-            modifier = modifier5, state = listState,
-        ) {
-            items(counterpoints) { counterpoint ->
-                NoteTable(model,counterpoint , 16,
-                    onClick = {onClick(counterpoint)})
-            }
 
+        val modifier5 = Modifier.fillMaxWidth().weight(5f)
+        val modifier1 = Modifier .fillMaxSize().weight(1f)
+        val listState = rememberLazyListState()
+        //Text(text = "N. of Results found: ${counterpoints.size} STACK SIZE: ${model.counterpointStack.size}")
+
+        if(counterpoints.isEmpty()) Text(text = "ELABORATING...")
+
+        LazyColumn( modifier = modifier5, state = listState,)
+         {
+            items(counterpoints) { counterpoint ->
+                NoteTable(model,counterpoint , 16, onClick = {onClick(counterpoint)})
+            }
         }
-        Row(modifier1,verticalAlignment = Alignment.CenterVertically){
+        Row(modifier1,verticalAlignment = Alignment.CenterVertically) {
+
             val dialogState by lazy { mutableStateOf(false) }
             val selectedDialogSequence by lazy { mutableStateOf(-1) }
+
             SequencesDialog(dialogState = dialogState, sequencesList = model.sequences.value!!.map{ it.toStringAll()},
                 onSubmitButtonClick = { index ->
                     dialogState.value = false
-                    if(index != -1) {
-                        onKP(index)
-                    }
-                }
-            )
+                    if(index != -1) { onKP(index) }
+                } )
+
             // BACK BUTTON
             Button(modifier= Modifier.padding(2.dp),
-                onClick = {
-                    onBack()
-                })
+                onClick = { onBack() } )
             {
                 Text(text = "Back",
                     style = TextStyle(fontSize = 22.sp,
@@ -72,15 +66,22 @@ fun ResultDisplay(model: AppViewModel,
             }
             // KP BUTTON
             Button(modifier= Modifier.padding(2.dp),
-                onClick = {
-                    dialogState.value = true
-                })
+                onClick = { dialogState.value = true } )
             {
                 Text(text = "KP",
                     style = TextStyle(fontSize = 22.sp,
                         fontWeight = FontWeight.Bold) )
             }
+            // FP BUTTON
+            Button(modifier= Modifier.padding(2.dp),
+                onClick = { onFreePart() } )
+            {
+                Text(text = "FP",
+                    style = TextStyle(fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold) )
+            }
         }
+
         Row(modifier1){
             IntervalSetSelector(
                     model, fontSize = 10,

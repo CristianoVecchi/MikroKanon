@@ -12,6 +12,15 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
+sealed class Computation {
+    data class MikroKanonOnly(val counterpoint: Counterpoint,val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int): Computation()
+    data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int): Computation()
+    data class FurtherFromKP(val counterpoint: Counterpoint,val indexSequenceToAdd: Int): Computation()
+    data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>): Computation()
+    data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>): Computation()
+}
+
+
 class AppViewModel(private val repository: SequenceDataRepository) : ViewModel() {
 
 //    val seq1 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,10, false))
@@ -21,93 +30,136 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 18
     val allSequencesData: LiveData<List<SequenceData>> = repository.allSequences.asLiveData()
     private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
-    private data class Computation(val counterpoint: Counterpoint,
-                                   val sequenceAdded: List<Clip>, val isMikroKanon: Boolean)
-    private val counterpointStack = Stack<Computation>()
-
+    val counterpointStack = Stack<Computation>()
+    private var elaborating = false
     // macro Functions called by fragments -----------------------------------------------------
     val dispatchIntervals = { newIntervals: List<Int> ->
-        //changeIntervalSet(newIntervals)
-        if (isJustMikrokanonState()){ // handling just a mikrokanon
-            //println("CALLING DISPATCHINTERVALS IN STATE: JUST MIKROKANON")
-           counterpointStack.pop()
-           findCounterpointsByMikroKanons()
-
-        } else if(isFirstSequenceAddingState()) {
-            //println("CALLING DISPATCHINTERVALS IN STATE: FIRST SEQUENCE ADDING")
-           counterpointStack.pop()
-            convertFirstSequenceToSelectedCounterpoint()
-            addSequenceToCounterpoint()
-        } else if(isFurtherSequenceAddingState())
-        {
-            //println("CALLING DISPATCHINTERVALS IN STATE: FURTHER SEQUENCE ADDING ")
-            val previousComputation = counterpointStack.pop()
-            val previousCounterpoint = previousComputation.counterpoint
-            changeSelectedCounterpoint(previousCounterpoint)
-            addSequenceToCounterpoint()
-        }
+        refreshComputation(false)
     }
     val onKPfurtherSelections = {index: Int ->
+        counterpointStack.push(Computation.FurtherFromKP(selectedCounterpoint.value!!.clone(), index))
         changeSequenceToAdd(sequences.value!![index])
         addSequenceToCounterpoint()
 
     }
     val onKPfromFirstSelection = {list: ArrayList<Clip>, index: Int ->
         changeFirstSequence(list)
+        counterpointStack.push(Computation.FirstFromKP(selectedCounterpoint.value!!.clone(),
+                                ArrayList(firstSequence.value!!), index))
         convertFirstSequenceToSelectedCounterpoint()
         changeSequenceToAdd(sequences.value!![index])
         addSequenceToCounterpoint()
 
     }
+    val onFreePartFromFirstSelection = { list: ArrayList<Clip> ->
+        changeFirstSequence(list)
+        counterpointStack.push(Computation.FirstFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!)))
+        convertFirstSequenceToSelectedCounterpoint()
+        findFreeParts()
+    }
+    val onFreePartFurtherSelections = {
+        counterpointStack.push(Computation.FurtherFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!)))
+        findFreeParts()
+    }
     val onMikroKanons = {list: ArrayList<Clip> ->
+        counterpointStack.push(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),ArrayList(sequenceToMikroKanons.value!!),2))
         if(list.isNotEmpty()) changeSequenceToMikroKanons(list)
             findCounterpointsByMikroKanons()
+
+    }
+    val onMikroKanons3 = {list: ArrayList<Clip> ->
+        counterpointStack.push(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),ArrayList(sequenceToMikroKanons.value!!),3))
+        if(list.isNotEmpty()) changeSequenceToMikroKanons(list)
+        findCounterpointsByMikroKanons3()
+
     }
     val onBack = {
-        if (isJustMikrokanonState()){ // handling just a mikrokanon
-            //println("CALLING DISPATCHINTERVALS IN STATE: JUST MIKROKANON")
-        } else if(isFirstSequenceAddingState()) {
-            //println("CALLING DISPATCHINTERVALS IN STATE: FIRST SEQUENCE ADDING")
-        } else if(isFurtherSequenceAddingState())
-        {
-            //println("CALLING DISPATCHINTERVALS IN STATE: FURTHER SEQUENCE ADDING ")
-            counterpointStack.pop()
-            val previousComputation = counterpointStack.pop()
-            if(previousComputation.isMikroKanon){
-                changeSequenceToMikroKanons(previousComputation.sequenceAdded)
-                findCounterpointsByMikroKanons()
-            } else {
-                val previousCounterpoint = previousComputation.counterpoint
-                val previousSequenceToAdd = previousComputation.sequenceAdded
-                changeSelectedCounterpoint(previousCounterpoint)
-                changeSequenceToAdd(previousSequenceToAdd)
-                addSequenceToCounterpoint()
-            }
+        if(counterpointStack.size > 1) {
+            refreshComputation(true)
         }
     }
     //-------------end macro functions--------------------
 
-    fun isJustMikrokanonState() : Boolean {
-        return sequenceToMikroKanons.value!!.isNotEmpty() && counterpointStack.size == 1
-    }
-    fun isFirstSequenceAddingState() : Boolean {
-        return firstSequence.value!!.isNotEmpty() && counterpointStack.size == 1
-    }
-    fun isFurtherSequenceAddingState() : Boolean {
-        return counterpointStack.size > 1
-    }
+    fun refreshComputation(stepBack: Boolean){
+            if (!elaborating) {
+                elaborating = true
+                if (stepBack) counterpointStack.pop()
+                val previousComputation = counterpointStack.pop()
+                when (previousComputation) {
+                    is Computation.FirstFromFreePart -> onFreePartFromFirstSelection(
+                        previousComputation.firstSequence
+                    )
+                    is Computation.FurtherFromFreePart -> {
+                        changeSelectedCounterpoint(previousComputation.counterpoint)
+                        onFreePartFurtherSelections()
+                    }
+                    is Computation.FirstFromKP -> onKPfromFirstSelection(
+                        previousComputation.firstSequence,
+                        previousComputation.indexSequenceToAdd
+                    )
+                    is Computation.FurtherFromKP -> {
+                        changeSelectedCounterpoint(previousComputation.counterpoint)
+                        onKPfurtherSelections(previousComputation.indexSequenceToAdd)
+                    }
+                    is Computation.MikroKanonOnly -> {
+                        println(sequenceToMikroKanons.value!!)
+                        // changeSequenceToMikroKanons(previousComputation.sequenceToMikroKanon)
+                        when (previousComputation.nParts) {
+                            2 -> onMikroKanons(ArrayList(sequenceToMikroKanons.value!!))
+                            3 -> onMikroKanons3(ArrayList(sequenceToMikroKanons.value!!))
+                            else -> Unit
+                        }
+                    }
+                }
+                elaborating = false
+            }
 
-    fun findCounterpointsByMikroKanons(){
+    }
+    fun findFreeParts(){
         _counterpoints.value = emptyList()
         viewModelScope.launch(Dispatchers.Unconfined){
-            counterpointStack.push(Computation(selectedCounterpoint.value!!.clone(),
-                ArrayList(sequenceToMikroKanons.value!!), true)) //saving the previous counterpoint
-            findCounterpoints()
+            findFreePts()
             counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
             // println("STACK SIZE: ${counterpointStack.size}")
         }
     }
-    private suspend fun findCounterpoints(){
+    private suspend fun findFreePts() {
+        _counterpoints.value = Counterpoint.findAllFreeParts( selectedCounterpoint.value!!,  intervalSet.value!!)
+            .sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+
+        if(SPREAD_AS_POSSIBLE){
+            val newCounterpoints = counterpoints.value!!.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
+            _counterpoints.value = newCounterpoints
+        }
+
+    }
+    fun findCounterpointsByMikroKanons3(){
+        _counterpoints.value = emptyList()
+        viewModelScope.launch(Dispatchers.Unconfined){
+            findCpByMikroKanons3()
+            counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
+        }
+    }
+    private suspend fun findCpByMikroKanons3(){
+
+        if(sequenceToMikroKanons.value!!.isNotEmpty()) {
+            _counterpoints.value = MikroKanon.findAll3AbsPartMikroKanons(
+                sequenceToMikroKanons.value!!.map { it.abstractNote }.toList(),
+                intervalSet.value!!, 5
+            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+        } else {
+            println("Sequence to MikroKanons is empty.")
+        }
+    }
+    fun findCounterpointsByMikroKanons(){
+        _counterpoints.value = emptyList()
+        viewModelScope.launch(Dispatchers.Unconfined){
+            findCpByMikroKanons()
+            counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
+            // println("STACK SIZE: ${counterpointStack.size}")
+        }
+    }
+    private suspend fun findCpByMikroKanons(){
 
         if(sequenceToMikroKanons.value!!.isNotEmpty()) {
             _counterpoints.value = MikroKanon.findAll2AbsPartMikroKanons(
@@ -123,8 +175,6 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         if(!selectedCounterpoint.value!!.isEmpty()){
             _counterpoints.value = emptyList()
             viewModelScope.launch(Dispatchers.Unconfined){
-                counterpointStack.push(Computation(selectedCounterpoint.value!!.clone(),
-                    ArrayList(sequenceToAdd.value!!), false)) //saving the previous counterpoint
                 addSeqToCounterpoint()
                 counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
                 // println("STACK SIZE: ${counterpointStack.size}")

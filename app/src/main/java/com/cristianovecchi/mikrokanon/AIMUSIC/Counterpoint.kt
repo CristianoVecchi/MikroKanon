@@ -22,11 +22,12 @@ fun main(args : Array<String>){
         AbsPart(absPitches3),
     )
     val counterpoint = Counterpoint(absParts, listOf(2, 10, 3, 9, 4, 8, 5, 7))
-    counterpoint.normalizePartsSize(true)
-    counterpoint.display()
-    val counterpoints = listOf(counterpoint, counterpoint)
-    counterpoints.map{it.spreadAsPossible()}
-    counterpoints[0].display()
+    Counterpoint.findAllFreeParts(counterpoint, listOf(2, 10, 3, 9, 4, 8, 5, 7) ).map { it.display() }
+//    counterpoint.normalizePartsSize(true)
+//    counterpoint.display()
+//    val counterpoints = listOf(counterpoint, counterpoint)
+//    counterpoints.map{it.spreadAsPossible()}
+//    counterpoints[0].display()
     //counterpoint.populate().display()
 //    val sequence = listOf(2,10,5,10,3,9,6,7)
 //    val intervalSet = listOf(0,1,11,2,10,3,9)
@@ -62,6 +63,47 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         fun empty(): Counterpoint{
             return Counterpoint(emptyList(), emptyList(), 1.0f)
+        }
+        fun findFreePart(counterpoint: Counterpoint, intervalSet: List<Int>, startAbsPitch : Int ) : Counterpoint {
+            var result = mutableListOf<Int>()
+            val verticalList = listOf(0,1,2,3,4,5,6,7,8,9,10,11)
+            val directions: Array<Int> = Insieme.extractDirectionsFromIntervalSet(verticalList.toTypedArray(), true)
+            var index = 0
+            val maxSize: Int = counterpoint.parts.maxOf { it.absPitches.size }
+            var lastAbsPitch = startAbsPitch
+            while(index < maxSize){
+                var resultPitch = -1
+                directions@for(dir in directions) {
+                   var newAbsPitch = lastAbsPitch + dir
+                    if( newAbsPitch > 11) newAbsPitch -= 12
+
+
+                    val matchValues = mutableListOf<Int>()
+                    for(j in counterpoint.parts.indices) {
+                        if(index<counterpoint.parts[j].absPitches.size){
+                            matchValues.add(counterpoint.parts[j].absPitches[index])
+                        }
+                    }
+                    val isValid = matchValues.map{
+                        it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(),it,newAbsPitch)
+                    }.fold(true) { acc, b ->  acc && b}
+                    if (isValid) {
+                        resultPitch= newAbsPitch
+                        lastAbsPitch = newAbsPitch
+                        break@directions
+                    }
+                }
+                result.add(resultPitch)
+                index ++
+            }
+            return Counterpoint(listOf(*counterpoint.parts.toTypedArray(), AbsPart(result)), intervalSet)
+        }
+        fun findAllFreeParts(counterpoint: Counterpoint, intervalSet: List<Int> ) : List<Counterpoint> {
+            val result = mutableListOf<Counterpoint>()
+            (0..11).forEach() {
+                result.add(findFreePart(counterpoint, intervalSet, it))
+            }
+            return result.distinctBy { it.parts }
         }
         fun findCounterpoint(target: Counterpoint, sequence: List<Int>, intervalSet: List<Int>,
                              delay: Int, transpose: Int, rowForm: RowForm) : Counterpoint{
