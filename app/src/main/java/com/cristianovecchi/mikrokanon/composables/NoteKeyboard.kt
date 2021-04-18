@@ -21,7 +21,8 @@ import androidx.compose.ui.unit.sp
 
 enum class NoteNamesEn(val abs:Int) {
     C(0),D(2),E(4),F(5),G(7),A(9),B(11),EMPTY(-1)
-}enum class NoteNamesIt {
+}
+enum class NoteNamesIt {
     Do,Re,Mi,Fa,Sol,La,Si,EMPTY
 }
 enum class Accidents(val ax : String, val sum : Int){

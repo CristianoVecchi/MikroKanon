@@ -205,18 +205,18 @@ public class Insieme {
         }
         return 0;
     }
-    public static Integer[] extractDirectionsFromIntervalSet(Integer[] intervalSet, boolean ascendantTrend){
+
+    public static Integer[] TREND_ASCENDANT_DYNAMIC = {1,11,2,10,3,9,4,8,5,7,6,0};
+    public static Integer[] TREND_DESCENDANT_DYNAMIC = {11,1,10,2,9,3,8,4,7,5,6,0};
+    public static Integer[] TREND_ASCENDANT_STATIC = {0,1,11,2,10,3,9,4,8,5,7,6};
+    public static Integer[] TREND_DESCENDANT_STATIC = {0,11,1,10,2,9,3,8,4,7,5,6};
+    public static Integer[] extractDirectionsFromIntervalSet(Integer[] intervalSet, Integer[] trend){
         Vector list = new Vector();
-        int[] dirs;
-        if(ascendantTrend) {
-            dirs = new int[]{0,1,11,2,10,3,9,4,8,5,7,6};
-        } else {
-            dirs = new int[]{0,11,1,10,2,9,3,8,4,7,5,6};
-        }
+        Integer[] dirs = trend;
         for (int j = 0; j < 12; j++) {
             for (int i = 0; i < intervalSet.length; i++) {
                 int interval = intervalSet[i];
-                    if(intervalSet[i] == dirs[j] ) {
+                    if(intervalSet[i].equals(dirs[j])) {
                         list.add(interval);
                         break;
                     }

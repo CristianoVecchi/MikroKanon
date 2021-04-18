@@ -15,20 +15,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.toStringAll
 
 
 @Composable
 fun SequenceSelector(model: AppViewModel,
-                        onSelect: (Int) -> Unit = model::changeSequenceSelection,
+                     onSelect: (Int) -> Unit = model::changeSequenceSelection,
                      onDelete: (Int) -> Unit = model::deleteSequence,
-                    onAdd: (ArrayList<Clip>, Boolean) -> Unit,
-                     onKP: (ArrayList<Clip>, Int) -> Unit ,
-                     onFreePart: (ArrayList<Clip>) -> Unit,
-                    onMikrokanons: (ArrayList<Clip>) -> Unit,
-                    onMikrokanons3: (ArrayList<Clip>) -> Unit,
-                    onMikrokanons4: (ArrayList<Clip>) -> Unit
+                     onAdd: (ArrayList<Clip>, Boolean) -> Unit,
+                     onKP: (ArrayList<Clip>, Int) -> Unit,
+                     onFreePart: (ArrayList<Clip>, TREND) -> Unit,
+                     onMikrokanons: (ArrayList<Clip>) -> Unit,
+                     onMikrokanons3: (ArrayList<Clip>) -> Unit,
+                     onMikrokanons4: (ArrayList<Clip>) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxHeight()) {
         val modifier3 = Modifier
@@ -57,6 +58,7 @@ fun SequenceSelector(model: AppViewModel,
             modifier = modifier3, sequences = sequences, selected, onSelect
         )
         //  DEL | EDIT | ADD | KP
+        // FPad | FPdd | FPas | FPds
         // MK | MK3 | MK4 | FP
         Column(modifier1) {
             Row(verticalAlignment = Alignment.CenterVertically){
@@ -97,6 +99,40 @@ fun SequenceSelector(model: AppViewModel,
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically){
+                //FPad Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.ASCENDANT_DYNAMIC)  else {} } )
+                {
+                    Text(text = "FPad",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+                //FPdd Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.DESCENDANT_DYNAMIC)  else {} } )
+                {
+                    Text(text = "FPdd",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+                //FPas Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.ASCENDANT_STATIC)  else {} } )
+                {
+                    Text(text = "FPas",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+                //FPds Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.DESCENDANT_STATIC)  else {} } )
+                {
+                    Text(text = "FPds",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically){
                 //MK Button
                 Button(modifier= Modifier.padding(2.dp),
                     onClick = { if(selected in sequences.indices) onMikrokanons(sequences[selected])  else {} } )
@@ -125,14 +161,6 @@ fun SequenceSelector(model: AppViewModel,
                 }
 
 
-                //FP Button
-                Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected])  else {} } )
-                {
-                    Text(text = "FP",
-                        style = TextStyle(fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold) )
-                }
 
             }
         }

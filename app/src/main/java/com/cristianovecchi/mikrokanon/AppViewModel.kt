@@ -2,7 +2,9 @@ package com.cristianovecchi.mikrokanon
 
 import androidx.lifecycle.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
+import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme
 import com.cristianovecchi.mikrokanon.AIMUSIC.MikroKanon
+import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.dao.SequenceData
 import com.cristianovecchi.mikrokanon.dao.SequenceDataRepository
@@ -17,8 +19,9 @@ sealed class Computation {
     data class MikroKanonOnly(val counterpoint: Counterpoint,val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int): Computation()
     data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int): Computation()
     data class FurtherFromKP(val counterpoint: Counterpoint,val indexSequenceToAdd: Int): Computation()
-    data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>): Computation()
-    data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>): Computation()
+    data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
+    data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
+    data class Expand(val counterpoints: List<Counterpoint>) : Computation()
 }
 
 
@@ -33,9 +36,20 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
     val counterpointStack = Stack<Computation>()
     private var elaborating = false
+    private data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
+    private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
+    private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
     // macro Functions called by fragments -----------------------------------------------------
     val dispatchIntervals = { newIntervals: List<Int> ->
         refreshComputation(false)
+    }
+    val onExpand = {
+        val counterpointsClone = counterpoints.value!!.map{
+            it.clone()
+        }
+        counterpointStack.push(Computation.Expand(counterpointsClone))
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        expandCounterpoints(index)
     }
     val onKPfurtherSelections = {index: Int ->
         counterpointStack.push(Computation.FurtherFromKP(selectedCounterpoint.value!!.clone(), index))
@@ -52,15 +66,15 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         addSequenceToCounterpoint()
 
     }
-    val onFreePartFromFirstSelection = { list: ArrayList<Clip> ->
+    val onFreePartFromFirstSelection = { list: ArrayList<Clip>, trend: TREND ->
         changeFirstSequence(list)
-        counterpointStack.push(Computation.FirstFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!)))
+        counterpointStack.push(Computation.FirstFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!), trend))
         convertFirstSequenceToSelectedCounterpoint()
-        findFreeParts()
+        findFreeParts(trend)
     }
-    val onFreePartFurtherSelections = {
-        counterpointStack.push(Computation.FurtherFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!)))
-        findFreeParts()
+    val onFreePartFurtherSelections = { trend: TREND ->
+        counterpointStack.push(Computation.FurtherFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!), trend))
+        findFreeParts(trend)
     }
     val onMikroKanons = {list: ArrayList<Clip> ->
         counterpointStack.push(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),ArrayList(sequenceToMikroKanons.value!!),2))
@@ -90,15 +104,18 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     fun refreshComputation(stepBack: Boolean){
             if (!elaborating) {
                 elaborating = true
-                if (stepBack) counterpointStack.pop()
-                val previousComputation = counterpointStack.pop()
+                if (stepBack ) counterpointStack.pop()
+                val previousComputation = when(counterpointStack.lastElement()){
+                    is Computation.Expand -> counterpointStack.lastElement()
+                    else -> counterpointStack.pop()
+                }
                 when (previousComputation) {
                     is Computation.FirstFromFreePart -> onFreePartFromFirstSelection(
-                        previousComputation.firstSequence
+                        previousComputation.firstSequence, previousComputation.trend
                     )
                     is Computation.FurtherFromFreePart -> {
                         changeSelectedCounterpoint(previousComputation.counterpoint)
-                        onFreePartFurtherSelections()
+                        onFreePartFurtherSelections(previousComputation.trend)
                     }
                     is Computation.FirstFromKP -> onKPfromFirstSelection(
                         previousComputation.firstSequence,
@@ -110,7 +127,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
                     }
                     is Computation.MikroKanonOnly -> {
                         println(sequenceToMikroKanons.value!!)
-                        // changeSequenceToMikroKanons(previousComputation.sequenceToMikroKanon)
+                        //changeSequenceToMikroKanons(previousComputation.sequenceToMikroKanon)
                         when (previousComputation.nParts) {
                             2 -> onMikroKanons(ArrayList(sequenceToMikroKanons.value!!))
                             3 -> onMikroKanons3(ArrayList(sequenceToMikroKanons.value!!))
@@ -118,25 +135,33 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
                             else -> Unit
                         }
                     }
+                    is Computation.Expand -> {
+                        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+                        changeCounterPoints(previousComputation.counterpoints)
+                        expandCounterpoints(index)
+
+                    }
                 }
                 elaborating = false
             }
 
     }
-    fun findFreeParts(){
+    fun findFreeParts(trend: TREND){
         _counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = findFreePts()
+                newList = findFreePts(trend)
             }
             changeCounterPoints(newList)
             counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
             // println("STACK SIZE: ${counterpointStack.size}")
         }
     }
-    private suspend fun findFreePts() : List<Counterpoint>{
-        var newList = Counterpoint.findAllFreeParts( selectedCounterpoint.value!!,  intervalSet.value!!)
+    private suspend fun findFreePts(trend: TREND) : List<Counterpoint>{
+        var newList = Counterpoint.findAllFreeParts(
+            selectedCounterpoint.value!!,  intervalSet.value!!, trend.directions
+        )
             .sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
 
         if(SPREAD_AS_POSSIBLE){
@@ -155,13 +180,21 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
             counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
         }
     }
-    private suspend fun findCpByMikroKanons4(): List<Counterpoint> {
 
+    private suspend fun findCpByMikroKanons4(): List<Counterpoint> {
         if(sequenceToMikroKanons.value!!.isNotEmpty()) {
-            return MikroKanon.findAll4AbsPartMikroKanons(
-                sequenceToMikroKanons.value!!.map { it.abstractNote }.toList(),
-                intervalSet.value!!, 2
-            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+            val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
+            val key = CacheKey(sequence, intervalSet.value!!)
+            if(mk4cache.containsKey(key)){
+                return mk4cache[key]!!
+            } else {
+                val counterpoints = MikroKanon.findAll4AbsPartMikroKanons(
+                    sequence,  intervalSet.value!!, 2
+                ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+                mk4cache[key] = counterpoints
+                return counterpoints
+            }
+
         } else {
             println("Sequence to MikroKanons is empty.")
             return emptyList()
@@ -181,10 +214,18 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     private suspend fun findCpByMikroKanons3(): List<Counterpoint>{
 
         if(sequenceToMikroKanons.value!!.isNotEmpty()) {
-           return MikroKanon.findAll3AbsPartMikroKanons(
-                sequenceToMikroKanons.value!!.map { it.abstractNote }.toList(),
-                intervalSet.value!!, 5
-            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+            val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
+            val key = CacheKey(sequence, intervalSet.value!!)
+            if(mk3cache.containsKey(key)){
+                return mk3cache[key]!!
+            } else {
+                val counterpoints = MikroKanon.findAll3AbsPartMikroKanons(
+                    sequence,  intervalSet.value!!, 5
+                ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+                mk3cache[key] = counterpoints
+                return counterpoints
+            }
+
         } else {
             println("Sequence to MikroKanons is empty.")
             return emptyList()
@@ -212,7 +253,28 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
             return emptyList()
         }
     }
-
+    fun expandCounterpoints(index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = expandCps()
+                }
+                changeCounterPoints(newList)
+                if(index in counterpoints.value!!.indices){
+                    changeSelectedCounterpoint(counterpoints.value!![index])
+                } else {
+                    counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
+                }
+                // println("STACK SIZE: ${counterpointStack.size}")
+            }
+        }
+    }
+    private suspend fun expandCps(): List<Counterpoint>{
+        return counterpoints.value!!.map{
+            Counterpoint.expand(it,2)
+        }
+    }
     fun addSequenceToCounterpoint(){
         if(!selectedCounterpoint.value!!.isEmpty()){
             _counterpoints.value = emptyList()
@@ -288,7 +350,8 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
 //       println(selectedCounterpoint.value!!.display())
     }
     fun changeIntervalSet(newIntervalSet: List<Int>){
-        _intervalSet.value = newIntervalSet
+        val sortedList = newIntervalSet.sorted()
+        _intervalSet.value = sortedList
     }
     fun changeCounterPoints(newCounterpoints: List<Counterpoint>){
         _counterpoints.value = newCounterpoints
@@ -308,12 +371,12 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     fun removeIntervals(list: List<Int>){
         val newList = intervalSet.value!!.toMutableList()
         newList.removeAll(list)
-        _intervalSet.value = newList
+        changeIntervalSet(newList)
     }
     fun addIntervals(list: List<Int>){
         val newList = intervalSet.value!!.toMutableList()
         newList.addAll(list)
-        _intervalSet.value = newList
+        changeIntervalSet(newList)
     }
 
 

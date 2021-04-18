@@ -52,9 +52,10 @@ class OutputFragment: Fragment() {
                                    model.onKPfurtherSelections(index)
                                 },
                                 onBack = { model.onBack()},
-                                onFreePart= {
-                                    model.onFreePartFurtherSelections()
+                                onFreePart= { trend ->
+                                    model.onFreePartFurtherSelections(trend)
                                 },
+                                onExpand = { model.onExpand()},
                                 dispatchIntervals = { newIntervals ->
                                     model.dispatchIntervals(newIntervals)
                                 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
+import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.toStringAll
 
@@ -25,27 +26,28 @@ fun ResultDisplay(model: AppViewModel,
                   onKP: (Int) -> Unit = {},
                   onClick: (Counterpoint) -> Unit = {},
                   onBack: () -> Unit = {},
-                  onFreePart: () -> Unit = {},
+                  onFreePart: (TREND) -> Unit = {},
+                  onExpand: () -> Unit = {},
                   dispatchIntervals: (List<Int>) -> Unit = {}) {
 
     val counterpoints by model.counterpoints.observeAsState(emptyList())
     val backgroundColor = Color(0.5f,0.5f,1.0f,1.0f)
     Column(modifier = Modifier.fillMaxHeight().background(backgroundColor)) {
 
-        val modifier5 = Modifier.fillMaxWidth().weight(5f)
-        val modifier1 = Modifier .fillMaxSize().weight(1f)
+        val modifier4 = Modifier.fillMaxWidth().weight(4f)
+        val modifier1 = Modifier.fillMaxSize().weight(1f)
         val listState = rememberLazyListState()
-        //Text(text = "N. of Results found: ${counterpoints.size} STACK SIZE: ${model.counterpointStack.size}")
+        Text(text = "N. of Results found: ${counterpoints.size} STACK SIZE: ${model.counterpointStack.size}")
 
         if(counterpoints.isEmpty()) Text(text = "ELABORATING...")
 
-        LazyColumn( modifier = modifier5, state = listState,)
+        LazyColumn( modifier = modifier4, state = listState,)
          {
             items(counterpoints) { counterpoint ->
                 NoteTable(model,counterpoint , 16, onClick = {onClick(counterpoint)})
             }
         }
-        Row(modifier1,verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier1){
 
             val dialogState by lazy { mutableStateOf(false) }
             val selectedDialogSequence by lazy { mutableStateOf(-1) }
@@ -56,29 +58,69 @@ fun ResultDisplay(model: AppViewModel,
                     if(index != -1) { onKP(index) }
                 } )
 
-            // BACK BUTTON
-            Button(modifier= Modifier.padding(2.dp),
-                onClick = { onBack() } )
-            {
-                Text(text = "Back",
-                    style = TextStyle(fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold) )
+            Row(verticalAlignment = Alignment.CenterVertically){
+                //FPad Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { onFreePart(TREND.ASCENDANT_DYNAMIC) } )
+                {
+                    Text(text = "FPad",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+                //FPdd Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = {  onFreePart(TREND.DESCENDANT_DYNAMIC) } )
+                {
+                    Text(text = "FPdd",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+                //FPas Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { onFreePart(TREND.ASCENDANT_STATIC) } )
+                {
+                    Text(text = "FPas",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+                //FPds Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { onFreePart(TREND.DESCENDANT_STATIC)} )
+                {
+                    Text(text = "FPds",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
             }
-            // KP BUTTON
-            Button(modifier= Modifier.padding(2.dp),
-                onClick = { dialogState.value = true } )
-            {
-                Text(text = "KP",
-                    style = TextStyle(fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold) )
-            }
-            // FP BUTTON
-            Button(modifier= Modifier.padding(2.dp),
-                onClick = { onFreePart() } )
-            {
-                Text(text = "FP",
-                    style = TextStyle(fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold) )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                // BACK BUTTON
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { onBack() } )
+                {
+                    Text(text = "Back",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+
+                // EX BUTTON
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { onExpand() } )
+                {
+                    Text(text = "EX",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+
+                // KP BUTTON
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { dialogState.value = true } )
+                {
+                    Text(text = "KP",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+
             }
         }
 

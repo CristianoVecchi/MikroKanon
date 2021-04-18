@@ -22,26 +22,7 @@ fun main(args : Array<String>){
         AbsPart(absPitches3),
     )
     val counterpoint = Counterpoint(absParts, listOf(2, 10, 3, 9, 4, 8, 5, 7))
-    Counterpoint.findAllFreeParts(counterpoint, listOf(2, 10, 3, 9, 4, 8, 5, 7) ).map { it.display() }
-//    counterpoint.normalizePartsSize(true)
-//    counterpoint.display()
-//    val counterpoints = listOf(counterpoint, counterpoint)
-//    counterpoints.map{it.spreadAsPossible()}
-//    counterpoints[0].display()
-    //counterpoint.populate().display()
-//    val sequence = listOf(2,10,5,10,3,9,6,7)
-//    val intervalSet = listOf(0,1,11,2,10,3,9)
-//    val newCounterpoints = Counterpoint.findAllCounterpoints(counterpoint,sequence, intervalSet, 5)
-//    newCounterpoints.sortedBy { it.emptiness }.reversed().forEach{it.display(); println()}
-//
-//    val seq1 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,10, false))
-//    Counterpoint.counterpointFromClipList(seq1).display()
-
-//    val delay = 3
-//    val transpose = 0
-//    val rowForm = 3
-//    val mikroKanon = MikroKanon.find2AbsPartMikroKanon(absPitches, intervalSet, delay, transpose, rowForm)
-//    mikroKanon.display()
+    Counterpoint.expand(counterpoint, 2).display()
 }
 @Parcelize
 data class Counterpoint(val parts: List<AbsPart>,
@@ -64,10 +45,25 @@ data class Counterpoint(val parts: List<AbsPart>,
         fun empty(): Counterpoint{
             return Counterpoint(emptyList(), emptyList(), 1.0f)
         }
-        fun findFreePart(counterpoint: Counterpoint, intervalSet: List<Int>, startAbsPitch : Int ) : Counterpoint {
+        fun expand(counterpoint: Counterpoint, nTimes: Int): Counterpoint{
+            if(nTimes <= 0) return counterpoint
+            val parts = mutableListOf<AbsPart>()
+            counterpoint.parts.forEach { oldPart ->
+                val pitches = mutableListOf<Int>()
+                oldPart.absPitches.forEach { pitch ->
+                    (0 until nTimes).forEach { _ ->
+                        pitches.add(pitch)
+                    }
+                }
+                parts.add(AbsPart(pitches, oldPart.rowForm, oldPart.transpose, oldPart.delay))
+            }
+            return Counterpoint(parts, counterpoint.intervalSet)
+        }
+        fun findFreePart(counterpoint: Counterpoint, intervalSet: List<Int>, startAbsPitch : Int, trend: List<Int> ) : Counterpoint {
             var result = mutableListOf<Int>()
             val verticalList = listOf(0,1,2,3,4,5,6,7,8,9,10,11)
-            val directions: Array<Int> = Insieme.extractDirectionsFromIntervalSet(verticalList.toTypedArray(), true)
+            val directions: Array<Int> = Insieme.extractDirectionsFromIntervalSet(verticalList.toTypedArray(), trend.toTypedArray())
+
             var index = 0
             val maxSize: Int = counterpoint.parts.maxOf { it.absPitches.size }
             var lastAbsPitch = startAbsPitch
@@ -98,10 +94,10 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
             return Counterpoint(listOf(*counterpoint.parts.toTypedArray(), AbsPart(result)), intervalSet)
         }
-        fun findAllFreeParts(counterpoint: Counterpoint, intervalSet: List<Int> ) : List<Counterpoint> {
+        fun findAllFreeParts(counterpoint: Counterpoint, intervalSet: List<Int>, trend: List<Int>) : List<Counterpoint> {
             val result = mutableListOf<Counterpoint>()
             (0..11).forEach() {
-                result.add(findFreePart(counterpoint, intervalSet, it))
+                result.add(findFreePart(counterpoint, intervalSet, it, trend))
             }
             return result.distinctBy { it.parts } // several counterpoints could be equal
         }
@@ -262,7 +258,12 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
 }
 
-
+enum class TREND(val directions: List<Int>){
+    ASCENDANT_DYNAMIC(Insieme.TREND_ASCENDANT_DYNAMIC.toList()),
+    DESCENDANT_DYNAMIC(Insieme.TREND_DESCENDANT_DYNAMIC.toList()),
+    ASCENDANT_STATIC(Insieme.TREND_ASCENDANT_STATIC.toList()),
+    DESCENDANT_STATIC(Insieme.TREND_ASCENDANT_DYNAMIC.toList())
+}
 
 @Parcelize
 data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowForm.UNRELATED, val transpose: Int = 0, val delay: Int = 0) : Parcelable {
