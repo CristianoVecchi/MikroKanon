@@ -27,7 +27,8 @@ fun SequenceSelector(model: AppViewModel,
                      onKP: (ArrayList<Clip>, Int) -> Unit ,
                      onFreePart: (ArrayList<Clip>) -> Unit,
                     onMikrokanons: (ArrayList<Clip>) -> Unit,
-                    onMikrokanons3: (ArrayList<Clip>) -> Unit
+                    onMikrokanons3: (ArrayList<Clip>) -> Unit,
+                    onMikrokanons4: (ArrayList<Clip>) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxHeight()) {
         val modifier3 = Modifier
@@ -55,8 +56,8 @@ fun SequenceSelector(model: AppViewModel,
         SequenceScrollableColumn(
             modifier = modifier3, sequences = sequences, selected, onSelect
         )
-        //  DEL | EDIT | ADD
-        // MK | MK3 | KP | FP
+        //  DEL | EDIT | ADD | KP
+        // MK | MK3 | MK4 | FP
         Column(modifier1) {
             Row(verticalAlignment = Alignment.CenterVertically){
                 // DEL
@@ -85,6 +86,15 @@ fun SequenceSelector(model: AppViewModel,
                         style = TextStyle(fontSize = 22.sp,
                             fontWeight = FontWeight.Bold) )
                 }
+
+                //KP Button
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { if(selected in sequences.indices) {dialogState.value = true} else {} } )
+                {
+                    Text(text = "KP",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
             }
             Row(verticalAlignment = Alignment.CenterVertically){
                 //MK Button
@@ -105,14 +115,15 @@ fun SequenceSelector(model: AppViewModel,
                             fontWeight = FontWeight.Bold) )
                 }
 
-                //KP Button
+                //MK4 Button
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices) {dialogState.value = true} else {} } )
+                    onClick = { if(selected in sequences.indices) onMikrokanons4(sequences[selected])  else {} } )
                 {
-                    Text(text = "KP",
+                    Text(text = "MK4",
                         style = TextStyle(fontSize = 22.sp,
                             fontWeight = FontWeight.Bold) )
                 }
+
 
                 //FP Button
                 Button(modifier= Modifier.padding(2.dp),

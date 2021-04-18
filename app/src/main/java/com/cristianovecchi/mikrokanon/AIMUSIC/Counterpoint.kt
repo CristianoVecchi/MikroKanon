@@ -103,7 +103,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             (0..11).forEach() {
                 result.add(findFreePart(counterpoint, intervalSet, it))
             }
-            return result.distinctBy { it.parts }
+            return result.distinctBy { it.parts } // several counterpoints could be equal
         }
         fun findCounterpoint(target: Counterpoint, sequence: List<Int>, intervalSet: List<Int>,
                              delay: Int, transpose: Int, rowForm: RowForm) : Counterpoint{

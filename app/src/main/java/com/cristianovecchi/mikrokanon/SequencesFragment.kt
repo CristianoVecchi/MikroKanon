@@ -9,9 +9,12 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.platform.ComposeView
 
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.composables.SequenceSelector
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SequencesFragment(): Fragment() {
 
@@ -58,7 +61,12 @@ class SequencesFragment(): Fragment() {
                             onMikrokanons3 = { list ->
                                 findNavController().navigate(R.id.outputFragment)
                                 model.onMikroKanons3(list)
-                            })
+                            },
+                            onMikrokanons4 = { list ->
+                                    findNavController().navigate(R.id.outputFragment)
+                                    model.onMikroKanons4(list)
+                            }
+                        )
                     }
                 }
             }

@@ -8,6 +8,7 @@ import com.cristianovecchi.mikrokanon.dao.SequenceData
 import com.cristianovecchi.mikrokanon.dao.SequenceDataRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -68,10 +69,16 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
 
     }
     val onMikroKanons3 = {list: ArrayList<Clip> ->
-        counterpointStack.push(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),ArrayList(sequenceToMikroKanons.value!!),3))
+        counterpointStack.push(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),
+                                ArrayList(sequenceToMikroKanons.value!!),3))
         if(list.isNotEmpty()) changeSequenceToMikroKanons(list)
         findCounterpointsByMikroKanons3()
-
+    }
+    val onMikroKanons4 = {list: ArrayList<Clip> ->
+        counterpointStack.push(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),
+                                ArrayList(sequenceToMikroKanons.value!!),4))
+        if(list.isNotEmpty()) changeSequenceToMikroKanons(list)
+        findCounterpointsByMikroKanons4()
     }
     val onBack = {
         if(counterpointStack.size > 1) {
@@ -107,6 +114,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
                         when (previousComputation.nParts) {
                             2 -> onMikroKanons(ArrayList(sequenceToMikroKanons.value!!))
                             3 -> onMikroKanons3(ArrayList(sequenceToMikroKanons.value!!))
+                            4 -> onMikroKanons4(ArrayList(sequenceToMikroKanons.value!!))
                             else -> Unit
                         }
                     }
@@ -117,81 +125,117 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     }
     fun findFreeParts(){
         _counterpoints.value = emptyList()
-        viewModelScope.launch(Dispatchers.Unconfined){
-            findFreePts()
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                newList = findFreePts()
+            }
+            changeCounterPoints(newList)
             counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
             // println("STACK SIZE: ${counterpointStack.size}")
         }
     }
-    private suspend fun findFreePts() {
-        _counterpoints.value = Counterpoint.findAllFreeParts( selectedCounterpoint.value!!,  intervalSet.value!!)
+    private suspend fun findFreePts() : List<Counterpoint>{
+        var newList = Counterpoint.findAllFreeParts( selectedCounterpoint.value!!,  intervalSet.value!!)
             .sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
 
         if(SPREAD_AS_POSSIBLE){
-            val newCounterpoints = counterpoints.value!!.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
-            _counterpoints.value = newCounterpoints
+            newList = newList.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
         }
-
+        return newList
     }
-    fun findCounterpointsByMikroKanons3(){
+    fun findCounterpointsByMikroKanons4(){
         _counterpoints.value = emptyList()
-        viewModelScope.launch(Dispatchers.Unconfined){
-            findCpByMikroKanons3()
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                newList = findCpByMikroKanons4()
+            }
+            changeCounterPoints(newList)
             counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
         }
     }
-    private suspend fun findCpByMikroKanons3(){
+    private suspend fun findCpByMikroKanons4(): List<Counterpoint> {
 
         if(sequenceToMikroKanons.value!!.isNotEmpty()) {
-            _counterpoints.value = MikroKanon.findAll3AbsPartMikroKanons(
+            return MikroKanon.findAll4AbsPartMikroKanons(
+                sequenceToMikroKanons.value!!.map { it.abstractNote }.toList(),
+                intervalSet.value!!, 2
+            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+        } else {
+            println("Sequence to MikroKanons is empty.")
+            return emptyList()
+        }
+    }
+    fun findCounterpointsByMikroKanons3(){
+        _counterpoints.value = emptyList()
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+             withContext(Dispatchers.Default){
+                    newList = findCpByMikroKanons3()
+                }
+                changeCounterPoints(newList)
+                counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
+        }
+    }
+    private suspend fun findCpByMikroKanons3(): List<Counterpoint>{
+
+        if(sequenceToMikroKanons.value!!.isNotEmpty()) {
+           return MikroKanon.findAll3AbsPartMikroKanons(
                 sequenceToMikroKanons.value!!.map { it.abstractNote }.toList(),
                 intervalSet.value!!, 5
             ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
         } else {
             println("Sequence to MikroKanons is empty.")
+            return emptyList()
         }
     }
     fun findCounterpointsByMikroKanons(){
         _counterpoints.value = emptyList()
-        viewModelScope.launch(Dispatchers.Unconfined){
-            findCpByMikroKanons()
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                newList = findCpByMikroKanons()
+            }
+            changeCounterPoints(newList)
             counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
-            // println("STACK SIZE: ${counterpointStack.size}")
         }
     }
-    private suspend fun findCpByMikroKanons(){
-
+    private suspend fun findCpByMikroKanons(): List<Counterpoint>{
         if(sequenceToMikroKanons.value!!.isNotEmpty()) {
-            _counterpoints.value = MikroKanon.findAll2AbsPartMikroKanons(
+            return MikroKanon.findAll2AbsPartMikroKanons(
                 sequenceToMikroKanons.value!!.map { it.abstractNote }.toList(),
                 intervalSet.value!!, 5
             ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
         } else {
             println("Sequence to MikroKanons is empty.")
+            return emptyList()
         }
     }
 
     fun addSequenceToCounterpoint(){
         if(!selectedCounterpoint.value!!.isEmpty()){
             _counterpoints.value = emptyList()
-            viewModelScope.launch(Dispatchers.Unconfined){
-                addSeqToCounterpoint()
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = addSeqToCounterpoint()
+                }
+                changeCounterPoints(newList)
                 counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
                 // println("STACK SIZE: ${counterpointStack.size}")
             }
         }
     }
-    private suspend fun addSeqToCounterpoint() {
-        _counterpoints.value = Counterpoint.findAllCounterpoints(
+    private suspend fun addSeqToCounterpoint(): List<Counterpoint> {
+        var newList = Counterpoint.findAllCounterpoints(
             selectedCounterpoint.value!! , sequenceToAdd.value!!.map { it.abstractNote }.toList(),
             intervalSet.value!!, 5
         ).sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
-        counterpoints.value!![0].display()
         if(SPREAD_AS_POSSIBLE){
-            val newCounterpoints = counterpoints.value!!.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
-            _counterpoints.value = newCounterpoints
+            newList = newList.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
         }
-        counterpoints.value!![0].display()
+        return newList
     }
 
     fun convertFirstSequenceToSelectedCounterpoint() {
@@ -240,8 +284,8 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
 
     fun changeSelectedCounterpoint(newCounterpoint: Counterpoint){
         _selectedCounterpoint.value = newCounterpoint
-       println("SELECTED COUNTERPOINT:")
-       println(selectedCounterpoint.value!!.display())
+//       println("SELECTED COUNTERPOINT:")
+//       println(selectedCounterpoint.value!!.display())
     }
     fun changeIntervalSet(newIntervalSet: List<Int>){
         _intervalSet.value = newIntervalSet
