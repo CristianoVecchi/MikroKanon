@@ -16,6 +16,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.AppViewModel
@@ -23,19 +24,25 @@ import com.cristianovecchi.mikrokanon.toStringAll
 
 @Composable
 fun ResultDisplay(model: AppViewModel,
-                  onKP: (Int) -> Unit = {},
+                  onKP: (Int, Boolean) -> Unit = { _, _ -> },
                   onClick: (Counterpoint) -> Unit = {},
                   onBack: () -> Unit = {},
                   onFreePart: (TREND) -> Unit = {},
                   onExpand: () -> Unit = {},
                   dispatchIntervals: (List<Int>) -> Unit = {}) {
 
-    val counterpoints by model.counterpoints.observeAsState(emptyList())
+    val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
     val backgroundColor = Color(0.5f,0.5f,1.0f,1.0f)
-    Column(modifier = Modifier.fillMaxHeight().background(backgroundColor)) {
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .background(backgroundColor)) {
 
-        val modifier4 = Modifier.fillMaxWidth().weight(4f)
-        val modifier1 = Modifier.fillMaxSize().weight(1f)
+        val modifier4 = Modifier
+            .fillMaxWidth()
+            .weight(4f)
+        val modifier1 = Modifier
+            .fillMaxSize()
+            .weight(1f)
         val listState = rememberLazyListState()
         Text(text = "N. of Results found: ${counterpoints.size} STACK SIZE: ${model.counterpointStack.size}")
 
@@ -53,9 +60,9 @@ fun ResultDisplay(model: AppViewModel,
             val selectedDialogSequence by lazy { mutableStateOf(-1) }
 
             SequencesDialog(dialogState = dialogState, sequencesList = model.sequences.value!!.map{ it.toStringAll()},
-                onSubmitButtonClick = { index ->
+                onSubmitButtonClick = { index, repeat ->
                     dialogState.value = false
-                    if(index != -1) { onKP(index) }
+                    if(index != -1) { onKP(index, repeat) }
                 } )
 
             Row(verticalAlignment = Alignment.CenterVertically){

@@ -23,6 +23,8 @@ fun main(args : Array<String>){
     )
     val counterpoint = Counterpoint(absParts, listOf(2, 10, 3, 9, 4, 8, 5, 7))
     Counterpoint.expand(counterpoint, 2).display()
+    val repeatedSequence = Collections.nCopies(3, absPitches1).flatten()
+    println(repeatedSequence)
 }
 @Parcelize
 data class Counterpoint(val parts: List<AbsPart>,
@@ -38,6 +40,7 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
 
     companion object {
+
 
         fun counterpointFromClipList(clipList: List<Clip>) : Counterpoint{
             return Counterpoint(listOf(AbsPart.absPartfromClipList(clipList)))
@@ -143,7 +146,13 @@ data class Counterpoint(val parts: List<AbsPart>,
             return Counterpoint(listOf(*target.parts.toTypedArray(), resultAbsPart), intervalSet)
         }
 
-
+        fun findAllCounterpointsWithRepeatedSequence(target: Counterpoint, sequence: List<Int>,
+                                                     intervalSet: List<Int>, deepness: Int): List<Counterpoint>{
+            val maxSize: Int = target.parts.maxOf { it.absPitches.size }
+            val nRepetitions = if(sequence.size > maxSize) 2 else maxSize/sequence.size + 1
+            val repeatedSequence = Collections.nCopies(nRepetitions, sequence).flatten()
+            return findAllCounterpoints(target, repeatedSequence, intervalSet, deepness)
+        }
         fun findAllCounterpoints(target: Counterpoint, sequence: List<Int>, intervalSet: List<Int>, deepness: Int) : List<Counterpoint> {
             val result = mutableListOf<Counterpoint>()
 
@@ -262,7 +271,7 @@ enum class TREND(val directions: List<Int>){
     ASCENDANT_DYNAMIC(Insieme.TREND_ASCENDANT_DYNAMIC.toList()),
     DESCENDANT_DYNAMIC(Insieme.TREND_DESCENDANT_DYNAMIC.toList()),
     ASCENDANT_STATIC(Insieme.TREND_ASCENDANT_STATIC.toList()),
-    DESCENDANT_STATIC(Insieme.TREND_ASCENDANT_DYNAMIC.toList())
+    DESCENDANT_STATIC(Insieme.TREND_DESCENDANT_STATIC.toList())
 }
 
 @Parcelize
@@ -277,5 +286,13 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
     }
     fun nEmptyNotes() : Int {
         return absPitches.count { it == -1 }
+    }
+    fun repeat(nTimes: Int) : AbsPart {
+        if(nTimes == 0) return this.clone()
+        var newAbsPitches = mutableListOf<Int>()
+        (0 until nTimes).forEach{ _ ->
+            absPitches.forEach { newAbsPitches.add(it) }
+        }
+        return AbsPart(newAbsPitches, this.rowForm, this.transpose, this.delay)
     }
 }

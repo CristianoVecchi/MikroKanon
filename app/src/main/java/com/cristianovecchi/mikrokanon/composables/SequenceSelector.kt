@@ -25,7 +25,7 @@ fun SequenceSelector(model: AppViewModel,
                      onSelect: (Int) -> Unit = model::changeSequenceSelection,
                      onDelete: (Int) -> Unit = model::deleteSequence,
                      onAdd: (ArrayList<Clip>, Boolean) -> Unit,
-                     onKP: (ArrayList<Clip>, Int) -> Unit,
+                     onKP: (ArrayList<Clip>, Int, Boolean) -> Unit,
                      onFreePart: (ArrayList<Clip>, TREND) -> Unit,
                      onMikrokanons: (ArrayList<Clip>) -> Unit,
                      onMikrokanons3: (ArrayList<Clip>) -> Unit,
@@ -45,10 +45,10 @@ fun SequenceSelector(model: AppViewModel,
         val dialogState by lazy { mutableStateOf(false) }
         val selectedDialogSequence by lazy { mutableStateOf(-1) }
         SequencesDialog(dialogState = dialogState, sequencesList = model.sequences.value!!.map{ it.toStringAll()},
-            onSubmitButtonClick = { index ->
+            onSubmitButtonClick = { index, repeat ->
                 dialogState.value = false
                 if(index != -1) {
-                    onKP(sequences[selected], index)
+                    onKP(sequences[selected], index, repeat)
                 }
             }
         )
@@ -59,7 +59,7 @@ fun SequenceSelector(model: AppViewModel,
         )
         //  DEL | EDIT | ADD | KP
         // FPad | FPdd | FPas | FPds
-        // MK | MK3 | MK4 | FP
+        // MK | MK3 | MK4 | RP
         Column(modifier1) {
             Row(verticalAlignment = Alignment.CenterVertically){
                 // DEL
@@ -159,8 +159,6 @@ fun SequenceSelector(model: AppViewModel,
                         style = TextStyle(fontSize = 22.sp,
                             fontWeight = FontWeight.Bold) )
                 }
-
-
 
             }
         }

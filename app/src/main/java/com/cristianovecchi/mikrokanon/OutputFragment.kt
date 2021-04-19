@@ -48,8 +48,8 @@ class OutputFragment: Fragment() {
                         ResultDisplay(
                                 model = model,
                                 onClick = {counterpoint -> model.changeSelectedCounterpoint(counterpoint) },
-                                onKP = { index ->
-                                   model.onKPfurtherSelections(index)
+                                onKP = { index, repeat->
+                                   model.onKPfurtherSelections(index, repeat)
                                 },
                                 onBack = { model.onBack()},
                                 onFreePart= { trend ->

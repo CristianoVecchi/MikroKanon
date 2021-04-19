@@ -17,11 +17,11 @@ import kotlin.collections.HashMap
 
 sealed class Computation {
     data class MikroKanonOnly(val counterpoint: Counterpoint,val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int): Computation()
-    data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int): Computation()
-    data class FurtherFromKP(val counterpoint: Counterpoint,val indexSequenceToAdd: Int): Computation()
+    data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
+    data class FurtherFromKP(val counterpoint: Counterpoint,val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
     data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
-    data class Expand(val counterpoints: List<Counterpoint>) : Computation()
+    data class Expand(val counterpoints: List<Counterpoint>, val index: Int) : Computation()
 }
 
 
@@ -29,7 +29,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
 
 //    val seq1 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,10, false))
 //    val seq2 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,7, false))
-
+    private var lastIndex = 0
     private val SPREAD_AS_POSSIBLE = true
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 18
     val allSequencesData: LiveData<List<SequenceData>> = repository.allSequences.asLiveData()
@@ -47,23 +47,25 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         val counterpointsClone = counterpoints.value!!.map{
             it.clone()
         }
-        counterpointStack.push(Computation.Expand(counterpointsClone))
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        counterpointStack.push(Computation.Expand(counterpointsClone, index))
         expandCounterpoints(index)
+        println("ON EXPAND")
     }
-    val onKPfurtherSelections = {index: Int ->
-        counterpointStack.push(Computation.FurtherFromKP(selectedCounterpoint.value!!.clone(), index))
+    val onKPfurtherSelections = {index: Int , repeat: Boolean->
+        counterpointStack.push(Computation.FurtherFromKP(selectedCounterpoint.value!!.clone(), index, repeat))
         changeSequenceToAdd(sequences.value!![index])
-        addSequenceToCounterpoint()
+        if(!repeat) addSequenceToCounterpoint() else addRepeatedSequenceToCounterpoint()
 
     }
-    val onKPfromFirstSelection = {list: ArrayList<Clip>, index: Int ->
+    val onKPfromFirstSelection = {list: ArrayList<Clip>, index: Int, repeat: Boolean ->
+        //println(repeat)
         changeFirstSequence(list)
         counterpointStack.push(Computation.FirstFromKP(selectedCounterpoint.value!!.clone(),
-                                ArrayList(firstSequence.value!!), index))
+                                ArrayList(firstSequence.value!!), index, repeat))
         convertFirstSequenceToSelectedCounterpoint()
         changeSequenceToAdd(sequences.value!![index])
-        addSequenceToCounterpoint()
+        if(!repeat) addSequenceToCounterpoint() else addRepeatedSequenceToCounterpoint()
 
     }
     val onFreePartFromFirstSelection = { list: ArrayList<Clip>, trend: TREND ->
@@ -96,6 +98,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     }
     val onBack = {
         if(counterpointStack.size > 1) {
+            println("ON BACK")
             refreshComputation(true)
         }
     }
@@ -119,11 +122,12 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
                     }
                     is Computation.FirstFromKP -> onKPfromFirstSelection(
                         previousComputation.firstSequence,
-                        previousComputation.indexSequenceToAdd
+                        previousComputation.indexSequenceToAdd,
+                        previousComputation.repeat
                     )
                     is Computation.FurtherFromKP -> {
                         changeSelectedCounterpoint(previousComputation.counterpoint)
-                        onKPfurtherSelections(previousComputation.indexSequenceToAdd)
+                        onKPfurtherSelections(previousComputation.indexSequenceToAdd,previousComputation.repeat)
                     }
                     is Computation.MikroKanonOnly -> {
                         println(sequenceToMikroKanons.value!!)
@@ -136,10 +140,59 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
                         }
                     }
                     is Computation.Expand -> {
-                        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
-                        changeCounterPoints(previousComputation.counterpoints)
-                        expandCounterpoints(index)
+                        //val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+                        if(stepBack){
+                            changeCounterPoints(previousComputation.counterpoints)
+                            expandCounterpoints(previousComputation.index)
+                        } else {
+                            elaborating = false
+                            var count = 0
+                            var originalComputation: Computation
 
+                            viewModelScope.launch(Dispatchers.Unconfined){
+                                do {
+
+                                    onBack()
+                                    originalComputation = counterpointStack.lastElement()
+//                                    if (originalComputation is Computation.Expand) {
+//                                        counterpointStack.pop()
+//                                        counterpointStack.pop()
+//                                    }
+                                    count++
+                                } while(originalComputation is Computation.Expand )
+                                //for(i in 0 until count) {println("count: $i"); onExpand() }
+                            }
+                            count = 0
+//                            when(originalComputation){
+//                                is Computation.MikroKanonOnly -> {
+//                                    when (originalComputation.nParts) {
+//                                        2 -> onMikroKanons(ArrayList(sequenceToMikroKanons.value!!))
+//                                        3 -> onMikroKanons3(ArrayList(sequenceToMikroKanons.value!!))
+//                                        4 -> onMikroKanons4(ArrayList(sequenceToMikroKanons.value!!))
+//                                        else -> Unit
+//                                    }
+//                                }
+//                                is Computation.FirstFromFreePart -> onFreePartFromFirstSelection(
+//                                    originalComputation.firstSequence, originalComputation.trend
+//                                )
+//                                is Computation.FirstFromKP -> onKPfromFirstSelection(
+//                                    originalComputation.firstSequence,
+//                                    originalComputation.indexSequenceToAdd
+//                                )
+//                                is Computation.FurtherFromFreePart -> {
+//                                    changeSelectedCounterpoint(originalComputation.counterpoint)
+//                                    onFreePartFurtherSelections(originalComputation.trend)
+//                                }
+//                                is Computation.FurtherFromKP -> {
+//                                    changeSelectedCounterpoint(originalComputation.counterpoint)
+//                                    onKPfurtherSelections(originalComputation.indexSequenceToAdd)
+//                                }
+//                                else -> Unit
+//                            }
+//                            //elaborating = false
+//                            println("REEXPANDE count=$count")
+
+                        }
                     }
                 }
                 elaborating = false
@@ -147,7 +200,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
 
     }
     fun findFreeParts(trend: TREND){
-        _counterpoints.value = emptyList()
+        //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
@@ -170,7 +223,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         return newList
     }
     fun findCounterpointsByMikroKanons4(){
-        _counterpoints.value = emptyList()
+        //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
@@ -201,7 +254,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         }
     }
     fun findCounterpointsByMikroKanons3(){
-        _counterpoints.value = emptyList()
+        //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
              withContext(Dispatchers.Default){
@@ -232,7 +285,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         }
     }
     fun findCounterpointsByMikroKanons(){
-        _counterpoints.value = emptyList()
+        //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
@@ -275,9 +328,31 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
             Counterpoint.expand(it,2)
         }
     }
+    fun addRepeatedSequenceToCounterpoint(){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = addRepSeqToCounterpoint()
+                }
+                changeCounterPoints(newList)
+                counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
+            }
+        }
+    }
+    private suspend fun addRepSeqToCounterpoint(): List<Counterpoint> {
+        var newList = Counterpoint.findAllCounterpointsWithRepeatedSequence(
+            selectedCounterpoint.value!! , sequenceToAdd.value!!.map { it.abstractNote }.toList(),
+            intervalSet.value!!, 5
+        ).sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+        if(SPREAD_AS_POSSIBLE){
+            newList = newList.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
+        }
+        return newList
+    }
     fun addSequenceToCounterpoint(){
         if(!selectedCounterpoint.value!!.isEmpty()){
-            _counterpoints.value = emptyList()
+            //_counterpoints.value = emptyList()
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
@@ -354,6 +429,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         _intervalSet.value = sortedList
     }
     fun changeCounterPoints(newCounterpoints: List<Counterpoint>){
+        lastIndex = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         _counterpoints.value = newCounterpoints
     }
     fun changeSequenceToMikroKanons(newSequenceToMikroKanons: List<Clip>){

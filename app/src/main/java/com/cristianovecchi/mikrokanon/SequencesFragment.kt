@@ -41,9 +41,9 @@ class SequencesFragment(): Fragment() {
                             bundle.putBoolean("editing", editing)
                             findNavController().navigate(R.id.inputFragment, bundle)
                             },
-                            onKP = { list, index ->
+                            onKP = { list, index, repeat ->
                                 findNavController().navigate(R.id.outputFragment)
-                                model.onKPfromFirstSelection(list, index)
+                                model.onKPfromFirstSelection(list, index, repeat)
 
                             },
                             onFreePart= { list, trend ->
