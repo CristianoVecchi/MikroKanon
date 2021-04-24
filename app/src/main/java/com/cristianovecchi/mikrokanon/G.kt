@@ -3,7 +3,7 @@ package com.cristianovecchi.mikrokanon
 // General Constants
 class G {
  companion object{
-     const val quarter: Long = 96
+     public const val quarter: Long = 480
      const val totalPieceTickDuration: Long = 96 * 4 * 64
 
      @JvmStatic

@@ -52,17 +52,17 @@ class SequencesFragment(): Fragment() {
                                 findNavController().navigate(R.id.outputFragment)
                                 model.onFreePartFromFirstSelection(list, trend)
                             },
-                            onMikrokanons = { list ->
+                            onMikroKanons = { list ->
                                // val bundle = Bundle()
                                //bundle.putParcelableArrayList("list", list)
                                 findNavController().navigate(R.id.outputFragment)
                                 model.onMikroKanons(list)
                             },
-                            onMikrokanons3 = { list ->
+                            onMikroKanons3 = { list ->
                                 findNavController().navigate(R.id.outputFragment)
                                 model.onMikroKanons3(list)
                             },
-                            onMikrokanons4 = { list ->
+                            onMikroKanons4 = { list ->
                                     findNavController().navigate(R.id.outputFragment)
                                     model.onMikroKanons4(list)
                             }

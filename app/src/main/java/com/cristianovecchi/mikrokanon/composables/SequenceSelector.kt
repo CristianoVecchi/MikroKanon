@@ -27,9 +27,9 @@ fun SequenceSelector(model: AppViewModel,
                      onAdd: (ArrayList<Clip>, Boolean) -> Unit,
                      onKP: (ArrayList<Clip>, Int, Boolean) -> Unit,
                      onFreePart: (ArrayList<Clip>, TREND) -> Unit,
-                     onMikrokanons: (ArrayList<Clip>) -> Unit,
-                     onMikrokanons3: (ArrayList<Clip>) -> Unit,
-                     onMikrokanons4: (ArrayList<Clip>) -> Unit
+                     onMikroKanons: (ArrayList<Clip>) -> Unit,
+                     onMikroKanons3: (ArrayList<Clip>) -> Unit,
+                     onMikroKanons4: (ArrayList<Clip>) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxHeight()) {
         val modifier3 = Modifier
@@ -42,8 +42,10 @@ fun SequenceSelector(model: AppViewModel,
         val selected by model.selectedSequence.observeAsState(initial = -1)
         val sequences by model.sequences.observeAsState(emptyList())
 
+        val snackbarVisibleState = remember { mutableStateOf(false) }
         val dialogState by lazy { mutableStateOf(false) }
         val selectedDialogSequence by lazy { mutableStateOf(-1) }
+
         SequencesDialog(dialogState = dialogState, sequencesList = model.sequences.value!!.map{ it.toStringAll()},
             onSubmitButtonClick = { index, repeat ->
                 dialogState.value = false
@@ -64,7 +66,7 @@ fun SequenceSelector(model: AppViewModel,
             Row(verticalAlignment = Alignment.CenterVertically){
                 // DEL
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices)  onDelete(selected)   else {} } )
+                    onClick = { if(selected in sequences.indices)  onDelete(selected)   else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "DEL",
                         style = TextStyle(fontSize = 22.sp,
@@ -73,7 +75,7 @@ fun SequenceSelector(model: AppViewModel,
 
                 //Edit Button
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices)  {onAdd(sequences[selected], true)}  else {} } )
+                    onClick = { if(selected in sequences.indices)  {onAdd(sequences[selected], true)}  else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "EDIT",
                         style = TextStyle(fontSize = 22.sp,
@@ -91,7 +93,7 @@ fun SequenceSelector(model: AppViewModel,
 
                 //KP Button
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices) {dialogState.value = true} else {} } )
+                    onClick = { if(selected in sequences.indices) {dialogState.value = true} else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "KP",
                         style = TextStyle(fontSize = 22.sp,
@@ -101,7 +103,7 @@ fun SequenceSelector(model: AppViewModel,
             Row(verticalAlignment = Alignment.CenterVertically){
                 //FPad Button
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.ASCENDANT_DYNAMIC)  else {} } )
+                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.ASCENDANT_DYNAMIC)  else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "FPad",
                         style = TextStyle(fontSize = 22.sp,
@@ -109,7 +111,7 @@ fun SequenceSelector(model: AppViewModel,
                 }
                 //FPdd Button
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.DESCENDANT_DYNAMIC)  else {} } )
+                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.DESCENDANT_DYNAMIC)  else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "FPdd",
                         style = TextStyle(fontSize = 22.sp,
@@ -117,7 +119,7 @@ fun SequenceSelector(model: AppViewModel,
                 }
                 //FPas Button
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.ASCENDANT_STATIC)  else {} } )
+                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.ASCENDANT_STATIC)  else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "FPas",
                         style = TextStyle(fontSize = 22.sp,
@@ -125,7 +127,7 @@ fun SequenceSelector(model: AppViewModel,
                 }
                 //FPds Button
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.DESCENDANT_STATIC)  else {} } )
+                    onClick = { if(selected in sequences.indices) onFreePart(sequences[selected], TREND.DESCENDANT_STATIC)  else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "FPds",
                         style = TextStyle(fontSize = 22.sp,
@@ -135,7 +137,7 @@ fun SequenceSelector(model: AppViewModel,
             Row(verticalAlignment = Alignment.CenterVertically){
                 //MK Button
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices) onMikrokanons(sequences[selected])  else {} } )
+                    onClick = { if(selected in sequences.indices) onMikroKanons(sequences[selected])  else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "MK",
                         style = TextStyle(fontSize = 22.sp,
@@ -144,7 +146,7 @@ fun SequenceSelector(model: AppViewModel,
 
                 //MK3 Button
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices) onMikrokanons3(sequences[selected])  else {} } )
+                    onClick = { if(selected in sequences.indices) onMikroKanons3(sequences[selected])  else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "MK3",
                         style = TextStyle(fontSize = 22.sp,
@@ -153,7 +155,7 @@ fun SequenceSelector(model: AppViewModel,
 
                 //MK4 Button
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices) onMikrokanons4(sequences[selected])  else {} } )
+                    onClick = { if(selected in sequences.indices) onMikroKanons4(sequences[selected])  else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "MK4",
                         style = TextStyle(fontSize = 22.sp,
@@ -161,6 +163,16 @@ fun SequenceSelector(model: AppViewModel,
                 }
 
             }
+        }
+        if (snackbarVisibleState.value) {
+            Snackbar(
+                action = {
+                    Button(onClick = { snackbarVisibleState.value = false}) {
+                        Text("OK")
+                    }
+                },
+                modifier = Modifier.padding(8.dp)
+            ) { Text(text = "Please, select a Sequence!") }
         }
 
 

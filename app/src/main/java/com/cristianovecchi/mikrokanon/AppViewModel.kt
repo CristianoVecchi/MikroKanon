@@ -8,6 +8,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.dao.SequenceData
 import com.cristianovecchi.mikrokanon.dao.SequenceDataRepository
+import com.leff.midi.MidiFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,7 +41,7 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
     // macro Functions called by fragments -----------------------------------------------------
-    val dispatchIntervals = { newIntervals: List<Int> ->
+    val dispatchIntervals = {
         refreshComputation(false)
     }
     val onExpand = {
@@ -444,15 +445,17 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     fun changeSequenceSelection(newIndex: Int) {
         _selectedSequence.value = newIndex
     }
-    fun removeIntervals(list: List<Int>){
+    fun removeIntervalsAndRefresh(list: List<Int>){
         val newList = intervalSet.value!!.toMutableList()
         newList.removeAll(list)
         changeIntervalSet(newList)
+        dispatchIntervals()
     }
-    fun addIntervals(list: List<Int>){
+    fun addIntervalsAndRefresh(list: List<Int>){
         val newList = intervalSet.value!!.toMutableList()
         newList.addAll(list)
         changeIntervalSet(newList)
+        dispatchIntervals()
     }
 
 

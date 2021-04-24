@@ -55,10 +55,8 @@ class OutputFragment: Fragment() {
                                 onFreePart= { trend ->
                                     model.onFreePartFurtherSelections(trend)
                                 },
-                                onExpand = { model.onExpand()},
-                                dispatchIntervals = { newIntervals ->
-                                    model.dispatchIntervals(newIntervals)
-                                }
+                                onExpand = { model.onExpand()}
+
                         )
                     }
             }

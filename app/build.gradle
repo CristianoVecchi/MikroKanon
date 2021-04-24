@@ -7,7 +7,7 @@ plugins {
 
 android {
     compileSdk 30
-    buildToolsVersion "30.0.3"
+    buildToolsVersion '31.0.2'
 
     defaultConfig {
         applicationId "com.example.mikrokanon"
@@ -43,6 +43,8 @@ android {
         kotlinCompilerExtensionVersion compose_version
         kotlinCompilerVersion '1.4.32'
     }
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 }
 
 dependencies {
@@ -65,7 +67,8 @@ dependencies {
     implementation "androidx.compose.runtime:runtime-rxjava2:$compose_version"
     implementation "androidx.compose.material:material-icons-core:$compose_version"
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0" //version??
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
+    implementation files('libs\\android-midi-libv3-1-42.jar') //version??
 
     def nav_version = "2.3.5"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
