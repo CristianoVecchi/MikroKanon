@@ -345,6 +345,33 @@ public class Insieme {
         }
         return 0;
     }
+    // MIDI: A0 = 21, C4 = 60, C8 = 108
+    // octave 4 = central
+    public static int[] linearMelody(int octave, int[] absPitches, int lowerLimit, int upperLimit){
+        int[] melody = new int[absPitches.length];
+        int length = absPitches.length;
+        int index = 0;
+        while (index < length && absPitches[index] == -1){
+            melody[index++] = -1;
+        }
+        if (index == length) {return melody;}
+        melody[index]=absPitches[index] + (octave + 1) * 12;
+        int lastNote = melody[index];
+        if (index == length -1 ) {return melody;}
+        for (int i = index; i<length-1; i++ ){
+            int checkNote = absPitches[i+1];
+            if(checkNote==-1){
+                melody[i+1]=-1;
+            } else {
+                checkNote = checkNote + (octave + 1) * 12;
+                int newNote = notaInRange(lastNote
+                        +(checkNote-lastNote)+(12*Insieme.trovaOttavaLineare(lastNote, checkNote)),lowerLimit,upperLimit);
+                melody[i+1] = newNote;
+                lastNote = newNote;
+            }
+        }
+        return melody;
+    }
     public static int[] sequenzaLineare(int ottavaIniz, int[] valoriNote, int min, int max){
         int[] seqAltezze = new int[valoriNote.length];
         if (valoriNote[0]==0) seqAltezze[0] = -1;

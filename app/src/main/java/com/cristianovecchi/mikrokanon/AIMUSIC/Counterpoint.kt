@@ -13,18 +13,20 @@ fun main(args : Array<String>){
 //    val absPitches1 = mutableListOf(-1,1,0,6,11,5,7,8,8,3,3,3,6,9)
 //    val absPitches2 = mutableListOf(1,11,2,10,3,-1,9,6)
 //    val absPitches3 = mutableListOf(1,11,2,10)
-    val absPitches1 = mutableListOf(0, 4, 7, 11, 2, 6, 9)
-    val absPitches2 = mutableListOf(-1, 0, 4, 7, 11, 2, 6, 9)
-    val absPitches3 = mutableListOf(-1,2, 0, -1, -1, 10, -1, 7, 5, 9, 10, 0, 2)
-    val absParts = listOf(
-        AbsPart(absPitches1),
-        AbsPart(absPitches2),
-        AbsPart(absPitches3),
-    )
-    val counterpoint = Counterpoint(absParts, listOf(2, 10, 3, 9, 4, 8, 5, 7))
-    Counterpoint.expand(counterpoint, 2).display()
-    val repeatedSequence = Collections.nCopies(3, absPitches1).flatten()
-    println(repeatedSequence)
+//    val absPitches1 = mutableListOf(0, 4, 7, 11, 2, 6, 9)
+//    val absPitches2 = mutableListOf(-1, 0, 4, 7, 11, 2, 6, 9)
+//    val absPitches3 = mutableListOf(-1,2, 0, -1, -1, 10, -1, 7, 5, 9, 10, 0, 2)
+//    val absParts = listOf(
+//        AbsPart(absPitches1),
+//        AbsPart(absPitches2),
+//        AbsPart(absPitches3),
+//    )
+//    val counterpoint = Counterpoint(absParts, listOf(2, 10, 3, 9, 4, 8, 5, 7))
+//    Counterpoint.expand(counterpoint, 2).display()
+//    val repeatedSequence = Collections.nCopies(3, absPitches1).flatten()
+//    println(repeatedSequence)
+    val list = listOf(-1,-1,0,10,5,6,11,2,-1,-1,3,-1,10)
+    println(Insieme.linearMelody(4,list.toIntArray(),21,108).asList())
 }
 @Parcelize
 data class Counterpoint(val parts: List<AbsPart>,

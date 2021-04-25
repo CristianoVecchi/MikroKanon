@@ -1,13 +1,10 @@
 package com.cristianovecchi.mikrokanon
 
 import androidx.lifecycle.*
-import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
-import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme
-import com.cristianovecchi.mikrokanon.AIMUSIC.MikroKanon
-import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.dao.SequenceData
 import com.cristianovecchi.mikrokanon.dao.SequenceDataRepository
+import com.cristianovecchi.mikrokanon.midi.Player
 import com.leff.midi.MidiFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,6 +12,8 @@ import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import android.media.MediaPlayer
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 
 sealed class Computation {
     data class MikroKanonOnly(val counterpoint: Counterpoint,val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int): Computation()
@@ -40,7 +39,17 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     private data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
+    private var mediaPlayer: MediaPlayer? = null
+
     // macro Functions called by fragments -----------------------------------------------------
+    val onPlay = {
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            if (mediaPlayer == null) mediaPlayer = MediaPlayer()
+            Player.playCounterpoint(mediaPlayer!!,false,selectedCounterpoint.value!!,
+                90f,0f,listOf(360,120),EnsembleType.STRINGS)
+        }
+
+    }
     val dispatchIntervals = {
         refreshComputation(false)
     }

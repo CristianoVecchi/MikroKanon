@@ -3,12 +3,10 @@ package com.cristianovecchi.mikrokanon.midi
 import android.media.MediaPlayer
 import android.os.Environment
 import android.util.Log
-import com.cristianovecchi.mikrokanon.AIMUSIC.BebopMelody
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.BebopBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParker
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParkerBand
-import com.cristianovecchi.mikrokanon.AIMUSIC.ChordSequence
-import com.cristianovecchi.mikrokanon.AIMUSIC.DEF
 import com.cristianovecchi.mikrokanon.AIMUSIC.DEF.MIDDLE_C
 
 import com.leff.midi.MidiFile
@@ -84,6 +82,25 @@ object Player {
         val midi: MidiFile = genius!!.playScheme(bebopBand,charlieParker, bebopMelody, chordSequence,bpm,soloInstrument, shuffle) ?: return
         //System.out.println("Midifile creato");
         saveAndPlayMidiFile(mediaPlayer, midi, looping)
+
+
+    }
+
+    fun playCounterpoint(mediaPlayer: MediaPlayer, looping: Boolean,
+                         counterpoint: Counterpoint, bpm: Float, shuffle: Float,
+                         durations: List<Int>, ensembleType: EnsembleType){
+
+        val counterpointTracks = CounterpointInterpreter.doTheMagic(counterpoint,durations,ensembleType)
+        if (counterpointTracks.isEmpty()) return
+        val tempoTrack = MidiTrack()
+        val t = Tempo()
+        t.bpm = bpm
+        tempoTrack.insertEvent(t)
+        val tracks: java.util.ArrayList<MidiTrack> = java.util.ArrayList<MidiTrack>()
+        tracks.add(tempoTrack)
+        tracks.addAll(counterpointTracks)
+        val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
+        saveAndPlayMidiFile(mediaPlayer, midi, looping)
     }
 
     fun saveAndPlayMidiFile(mediaPlayer: MediaPlayer, midi: MidiFile, looping: Boolean) {
@@ -91,12 +108,10 @@ object Player {
             mediaPlayer.stop()
         }
         mediaPlayer.reset()
-
-
         // 4. Write the MIDI data to a file
         //File output = new File(getExternalFilesDir(null), "example.mid");
         //File output = new File("/sdcard/example.mid");
-        output = java.io.File(Environment.getExternalStorageDirectory(), "Genius.mid")
+        output = java.io.File(Environment.getExternalStorageDirectory(), "MKexecution.mid")
         //createDialog(output.toString());
         //mediaPlayer2 = new MediaPlayer();
         try {

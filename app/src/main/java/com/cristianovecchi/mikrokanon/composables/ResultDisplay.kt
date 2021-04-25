@@ -29,6 +29,7 @@ fun ResultDisplay(model: AppViewModel,
                   onBack: () -> Unit = {},
                   onFreePart: (TREND) -> Unit = {},
                   onExpand: () -> Unit = {},
+                  onPlay: () -> Unit = {},
                   dispatchIntervals: (List<Int>) -> Unit = {}) {
 
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
@@ -124,6 +125,15 @@ fun ResultDisplay(model: AppViewModel,
                     onClick = { dialogState.value = true } )
                 {
                     Text(text = "KP",
+                        style = TextStyle(fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold) )
+                }
+
+                // PLAY BUTTON
+                Button(modifier= Modifier.padding(2.dp),
+                    onClick = { onPlay() } )
+                {
+                    Text(text = "->",
                         style = TextStyle(fontSize = 22.sp,
                             fontWeight = FontWeight.Bold) )
                 }

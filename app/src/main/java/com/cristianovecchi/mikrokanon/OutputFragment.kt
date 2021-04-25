@@ -55,7 +55,8 @@ class OutputFragment: Fragment() {
                                 onFreePart= { trend ->
                                     model.onFreePartFurtherSelections(trend)
                                 },
-                                onExpand = { model.onExpand()}
+                                onExpand = { model.onExpand()},
+                                onPlay = {model.onPlay()}
 
                         )
                     }
