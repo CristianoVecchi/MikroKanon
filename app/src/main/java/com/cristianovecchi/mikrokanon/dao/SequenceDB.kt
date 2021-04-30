@@ -6,12 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-// Annotates class to be a Room Database with a table (entity) of the Word class
-@Database(entities = arrayOf(SequenceData::class), version = 1, exportSchema = false)
+@Database(entities = [SequenceData::class, UserOptionsData::class], version = 2, exportSchema = false)
 @TypeConverters(ClipConverters::class)
 public abstract class SequenceDB : RoomDatabase() {
 
     abstract fun sequenceDataDao(): SequenceDataDao
+    abstract fun userOptionsDataDao(): UserOptionsDataDao
 
     companion object {
         // Singleton prevents multiple instances of database opening at the

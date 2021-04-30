@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon
 
+import android.content.Context
 import androidx.lifecycle.*
 import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.dao.SequenceData
@@ -14,6 +15,10 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import android.media.MediaPlayer
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
+import android.content.SharedPreferences
+import com.cristianovecchi.mikrokanon.dao.UserOptionsData
+import com.cristianovecchi.mikrokanon.dao.UserOptionsDataRepository
+
 
 sealed class Computation {
     data class MikroKanonOnly(val counterpoint: Counterpoint,val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int): Computation()
@@ -25,14 +30,16 @@ sealed class Computation {
 }
 
 
-class AppViewModel(private val repository: SequenceDataRepository) : ViewModel() {
+class AppViewModel(private val repository: SequenceDataRepository, private val userRepository: UserOptionsDataRepository) : ViewModel() {
 
 //    val seq1 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,10, false))
 //    val seq2 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,7, false))
     private var lastIndex = 0
     private val SPREAD_AS_POSSIBLE = true
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 18
+    private var ensembleTypeSelected: EnsembleType = EnsembleType.STRING_ORCHESTRA
     val allSequencesData: LiveData<List<SequenceData>> = repository.allSequences.asLiveData()
+    val userOptionsData: LiveData<List<UserOptionsData>> = userRepository.userOptions.asLiveData()
     private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
     val counterpointStack = Stack<Computation>()
     private var elaborating = false
@@ -41,12 +48,20 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
     private var mediaPlayer: MediaPlayer? = null
 
+
+
+
     // macro Functions called by fragments -----------------------------------------------------
     val onPlay = {
         if(!selectedCounterpoint.value!!.isEmpty()){
             if (mediaPlayer == null) mediaPlayer = MediaPlayer()
+            val ensType: EnsembleType = EnsembleType.values()[userOptions.value!!["ensemble_type"]?.let {
+                Integer.parseInt(
+                    it
+                )
+            } ?: 0]
             Player.playCounterpoint(mediaPlayer!!,false,selectedCounterpoint.value!!,
-                90f,0f,listOf(360,120),EnsembleType.STRINGS)
+                90f,0f,listOf(360,120), ensType)
         }
 
     }
@@ -407,6 +422,9 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
 
     val sequences : LiveData<List<ArrayList<Clip>>> = _sequences
 
+    private var _userOptions= MutableLiveData<HashMap<String,String>>(HashMap<String,String>())
+    val userOptions : LiveData<HashMap<String,String>> = _userOptions
+
     private var _firstSequence= MutableLiveData<List<Clip>>(listOf())
     val firstSequence : LiveData<List<Clip>> = _firstSequence
 
@@ -505,6 +523,35 @@ class AppViewModel(private val repository: SequenceDataRepository) : ViewModel()
         val sequence = ArrayList(sequenceData.clips.map { clipDataToClip(it)})
         map[sequence] = sequenceData
         return sequence
+    }
+    fun updateUserOptions(key: String, value: String){
+        var newUserOptionsData: UserOptionsData? = null
+        when(key){
+            "ensemble_type" -> {
+                newUserOptionsData = UserOptionsData(0, value)
+            }
+        }
+        newUserOptionsData?.let {
+            viewModelScope.launch(Dispatchers.IO) {
+                if(userOptionsData.value!!.isNotEmpty()){
+                    userRepository.deleteAllUserOptions()
+                }
+                userRepository.insertUserOptions(newUserOptionsData)
+            }
+        }
+
+
+    }
+    fun retrieveUserOptions() {
+        val map = HashMap<String, String>()
+        if(userOptionsData.value != null && userOptionsData.value!!.isNotEmpty()){
+            val userOptionsData = userOptionsData.value!![0]
+            map["ensemble_type"] = userOptionsData.ensembleType
+
+        } else {
+            map["ensemble_type"] = "1"
+        }
+        _userOptions.value = map
     }
 
 

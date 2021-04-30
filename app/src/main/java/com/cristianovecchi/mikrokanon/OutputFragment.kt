@@ -39,26 +39,35 @@ class OutputFragment: Fragment() {
 
         //val model = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         val model = (activity as MainActivity).model
+         model.userOptionsData.observe(viewLifecycleOwner){
+             model.retrieveUserOptions()
+         }
         return ComposeView(requireContext()).apply {
             setContent {
                 MikroKanonTheme {
                     // A surface container using the 'background' color from the theme
                     Surface(color = MaterialTheme.colors.background) {
                       //  val absPitches = list.map{it.abstractNote}.toList()
-                        ResultDisplay(
+                       AppScaffold(model = model) {
+                            ResultDisplay(
                                 model = model,
-                                onClick = {counterpoint -> model.changeSelectedCounterpoint(counterpoint) },
-                                onKP = { index, repeat->
-                                   model.onKPfurtherSelections(index, repeat)
+                                onClick = { counterpoint ->
+                                    model.changeSelectedCounterpoint(
+                                        counterpoint
+                                    )
                                 },
-                                onBack = { model.onBack()},
-                                onFreePart= { trend ->
+                                onKP = { index, repeat ->
+                                    model.onKPfurtherSelections(index, repeat)
+                                },
+                                onBack = { model.onBack() },
+                                onFreePart = { trend ->
                                     model.onFreePartFurtherSelections(trend)
                                 },
-                                onExpand = { model.onExpand()},
-                                onPlay = {model.onPlay()}
+                                onExpand = { model.onExpand() },
+                                onPlay = { model.onPlay() }
 
-                        )
+                            )
+                        }
                     }
             }
         }

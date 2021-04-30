@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.toStringAll
@@ -41,7 +42,7 @@ fun SequenceSelector(model: AppViewModel,
             .weight(1f)
         val selected by model.selectedSequence.observeAsState(initial = -1)
         val sequences by model.sequences.observeAsState(emptyList())
-
+        val userOptions by model.userOptions.observeAsState(HashMap<String,String>())
         val snackbarVisibleState = remember { mutableStateOf(false) }
         val dialogState by lazy { mutableStateOf(false) }
         val selectedDialogSequence by lazy { mutableStateOf(-1) }
@@ -55,7 +56,9 @@ fun SequenceSelector(model: AppViewModel,
             }
         )
 
-        Text("${sequences.size}")
+        Text("number of sequences: ${sequences.size}")
+        val ensType: String = userOptions["ensemble_type"] ?: "0"
+        Text("ensemble type selected: ${EnsembleType.values()[Integer.parseInt(ensType)]}")
         SequenceScrollableColumn(
             modifier = modifier3, sequences = sequences, selected, onSelect
         )

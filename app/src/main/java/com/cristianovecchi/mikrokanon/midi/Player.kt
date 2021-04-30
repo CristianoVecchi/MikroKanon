@@ -111,7 +111,11 @@ object Player {
         // 4. Write the MIDI data to a file
         //File output = new File(getExternalFilesDir(null), "example.mid");
         //File output = new File("/sdcard/example.mid");
-        output = java.io.File(Environment.getExternalStorageDirectory(), "MKexecution.mid")
+
+        // ------------- WARNING!!!! -------------
+        //DOESN'T WORK FOR LATEST ANDROID VERSIONS
+        output = java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
+
         //createDialog(output.toString());
         //mediaPlayer2 = new MediaPlayer();
         try {
