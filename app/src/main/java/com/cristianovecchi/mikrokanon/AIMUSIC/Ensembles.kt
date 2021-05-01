@@ -3,6 +3,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES, DOUBLEREEDS,  BASSOONS, CELLOS, CLARINETS, PIANO
 }
+
 object Ensembles {
     fun getEnsemble(nParts: Int, type: EnsembleType): List<EnsemblePart> {
         return when (type) {

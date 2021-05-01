@@ -16,5 +16,8 @@ import androidx.room.PrimaryKey
         val ensembleType: String,
 
         @ColumnInfo(name = "bpm")
-        val bpm: String
+        val bpm: String,
+
+        @ColumnInfo(name = "rhythm")
+        val rhythm: String
     )

@@ -45,7 +45,7 @@ fun SequenceSelector(model: AppViewModel,
         val selected by model.selectedSequence.observeAsState(initial = -1)
         val sequences by model.sequences.observeAsState(emptyList())
         val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-        val userOptions = if(userOptionsData.isEmpty()) UserOptionsData(0,"0","90") else userOptionsData[0]
+        val userOptions = if(userOptionsData.isEmpty()) UserOptionsData(0,"0","90","0") else userOptionsData[0]
         val snackbarVisibleState = remember { mutableStateOf(false) }
         val dialogState by lazy { mutableStateOf(false) }
         val selectedDialogSequence by lazy { mutableStateOf(-1) }

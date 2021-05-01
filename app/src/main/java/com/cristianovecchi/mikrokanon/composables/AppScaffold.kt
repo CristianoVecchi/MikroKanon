@@ -17,6 +17,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
+import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns.Companion.getTitles
 import com.cristianovecchi.mikrokanon.dao.UserOptionsData
 import com.cristianovecchi.mikrokanon.toStringAll
 
@@ -58,9 +60,10 @@ fun SettingsDrawer(model: AppViewModel){
 
     ListDialog(listDialogData)
     NumberDialog(numberDialogData)
-    val optionNames= listOf<String>("Ensemble", "BPM")
+    val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm")
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-    val userOptions = if(userOptionsData.isEmpty()) UserOptionsData(0,"0","90") else userOptionsData[0]
+    val userOptions = if(userOptionsData.isEmpty()) UserOptionsData(0,"0","90", "0")
+                        else userOptionsData[0]
     val listState = rememberLazyListState()
     userOptionsData.forEach{
         Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
@@ -68,11 +71,12 @@ fun SettingsDrawer(model: AppViewModel){
 
     LazyColumn(state = listState,
         ) { items(optionNames) { optionName ->
+            val fontSize = 18
             when(optionName){
                 "Ensemble" -> {
                     val ensNames: List<String> = EnsembleType.values().map{ it.toString()}
                     val ensIndex = Integer.parseInt(userOptions.ensembleType)
-                        Card(Modifier.clickable {
+                        SelectedCard(text = "Ensemble: ${ensNames[ensIndex]}", fontSize = fontSize, onClick = {
                             listDialogData.value = ListDialogData(true,ensNames,ensIndex,"Select an Ensemble!"
                             ) { index ->
                                 model.updateUserOptions(
@@ -81,29 +85,42 @@ fun SettingsDrawer(model: AppViewModel){
                                 )
                                 listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
                             }
-                        }) {
-                            Text(text = "Ensemble: ${ensNames[ensIndex]}")
-                        }
+                        })
                     }
-
-
                 "BPM" -> {
                     val bpm = Integer.parseInt(userOptions.bpm)
-                    Card(Modifier.clickable {
-                        numberDialogData.value = NumberDialogData(true,"Beats Per Measure:", bpm, 18, 360
+                    SelectedCard(text = "BPM: $bpm", fontSize = fontSize, onClick = {
+                        numberDialogData.value = NumberDialogData(
+                            true, "Beats Per Measure:", bpm, 18, 360
                         ) { bpm ->
                             model.updateUserOptions(
                                 "bpm",
                                 bpm.toString()
                             )
+                            listDialogData.value =
+                                ListDialogData(itemList = listDialogData.value.itemList)
+                        }
+                    })
+                }
+                "Rhythm" -> {
+                    val rhythmNames = RhythmPatterns.getTitles()
+                    val rhythmIndex = Integer.parseInt(userOptions.rhythm)
+                    SelectedCard(text = "Ensemble: ${rhythmNames[rhythmIndex]}", fontSize = fontSize, onClick = {
+                        listDialogData.value = ListDialogData(true,rhythmNames,rhythmIndex,"Select a Rhythm!"
+                        ) { index ->
+                            model.updateUserOptions(
+                                "rhythm",
+                                index.toString()
+                            )
                             listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
                         }
-                    }) {
-                        Text(text = "BPM: $bpm")
-                    }
+                    })
                 }
-                else -> {}
             }
         }
     }
+}
+
+enum class Rhythms {
+
 }

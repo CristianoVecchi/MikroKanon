@@ -64,8 +64,13 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
                 Integer.parseInt(
                     userOptionsData.value!![0].bpm
                 ).toFloat()} ?: 90f
+            val rhythm: RhythmPatterns = RhythmPatterns.values()[userOptionsData.value?.let {
+                Integer.parseInt(
+                    userOptionsData.value!![0].rhythm
+                )
+            } ?: 0]
             Player.playCounterpoint(mediaPlayer!!,false,selectedCounterpoint.value!!,
-                bpm,0f,listOf(360,120), ensType)
+                bpm,0f,rhythm.values, ensType)
         }
 
     }
@@ -531,7 +536,8 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
 
     fun updateUserOptions(key: String, value: String){
         var newUserOptionsData: UserOptionsData? = null
-        val optionsDataClone = if(userOptionsData.value!!.isEmpty()) UserOptionsData(0,"0","90")
+        val optionsDataClone = if(userOptionsData.value!!.isEmpty())
+                                UserOptionsData(0,"0","90","0")
                                 else userOptionsData.value!![0].copy()
         when(key){
             "ensemble_type" -> {
@@ -539,6 +545,9 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
             }
             "bpm" -> {
                 newUserOptionsData = optionsDataClone.copy(bpm = value)
+            }
+            "rhythm" -> {
+                newUserOptionsData = optionsDataClone.copy(rhythm = value)
             }
         }
         newUserOptionsData?.let {
