@@ -39,9 +39,9 @@ class OutputFragment: Fragment() {
 
         //val model = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         val model = (activity as MainActivity).model
-         model.userOptionsData.observe(viewLifecycleOwner){
-             model.retrieveUserOptions()
-         }
+//         model.userOptionsData.observe(viewLifecycleOwner){
+//             model.retrieveUserOptions()
+//         }
         return ComposeView(requireContext()).apply {
             setContent {
                 MikroKanonTheme {
@@ -52,9 +52,13 @@ class OutputFragment: Fragment() {
                             ResultDisplay(
                                 model = model,
                                 onClick = { counterpoint ->
-                                    model.changeSelectedCounterpoint(
-                                        counterpoint
-                                    )
+                                    if(counterpoint == model.selectedCounterpoint.value!!){
+                                        model.onPlay()
+                                    } else {
+                                        model.changeSelectedCounterpoint(
+                                            counterpoint
+                                        )
+                                    }
                                 },
                                 onKP = { index, repeat ->
                                     model.onKPfurtherSelections(index, repeat)

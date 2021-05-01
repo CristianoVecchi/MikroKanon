@@ -93,20 +93,20 @@ object Ensembles {
             )
             4 -> listOf(
                 EnsemblePart(73, 5), //flute
-                EnsemblePart(60, 4), //oboe
+                EnsemblePart(68, 4), //oboe
                 EnsemblePart(71, 3), //clarinet
                 EnsemblePart(70, 2)  // bassoon
             )
             5 -> listOf(
                 EnsemblePart(73, 5), //flute
-                EnsemblePart(60, 5), //oboe
+                EnsemblePart(68, 5), //oboe
                 EnsemblePart(71, 4), //clarinet
                 EnsemblePart(60, 3), // french horn
                 EnsemblePart(70, 2)  // bassoon
             )
             6 -> listOf(
                 EnsemblePart(73, 5), //flute
-                EnsemblePart(60, 5), //oboe
+                EnsemblePart(68, 5), //oboe
                 EnsemblePart(71, 4), //clarinet
                 EnsemblePart(60, 3), // french horn
                 EnsemblePart(71, 3), // bass clarinet
@@ -114,7 +114,7 @@ object Ensembles {
             )
             7 -> listOf(
                 EnsemblePart(73, 5), //flute
-                EnsemblePart(60, 5), //oboe
+                EnsemblePart(68, 5), //oboe
                 EnsemblePart(69, 4), // english horn
                 EnsemblePart(71, 4), //clarinet
                 EnsemblePart(60, 3), // french horn
@@ -124,7 +124,7 @@ object Ensembles {
             8 -> listOf(
                 EnsemblePart(72, 6), //piccolo
                 EnsemblePart(73, 5), //flute
-                EnsemblePart(60, 5), //oboe
+                EnsemblePart(68, 5), //oboe
                 EnsemblePart(69, 4), // english horn
                 EnsemblePart(71, 4), //clarinet
                 EnsemblePart(60, 3), // french horn
@@ -134,7 +134,7 @@ object Ensembles {
             9 -> listOf(
                 EnsemblePart(72, 6), //piccolo
                 EnsemblePart(73, 5), //flute
-                EnsemblePart(60, 5), //oboe
+                EnsemblePart(68, 5), //oboe
                 EnsemblePart(69, 4), // english horn
                 EnsemblePart(71, 4), //clarinet
                 EnsemblePart(60, 3), // french horn

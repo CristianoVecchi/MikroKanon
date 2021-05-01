@@ -55,13 +55,17 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
     val onPlay = {
         if(!selectedCounterpoint.value!!.isEmpty()){
             if (mediaPlayer == null) mediaPlayer = MediaPlayer()
-            val ensType: EnsembleType = EnsembleType.values()[userOptions.value!!["ensemble_type"]?.let {
+            val ensType: EnsembleType = EnsembleType.values()[userOptionsData.value?.let {
                 Integer.parseInt(
-                    it
+                    userOptionsData.value!![0].ensembleType
                 )
             } ?: 0]
+            val bpm: Float = userOptionsData.value?.let {
+                Integer.parseInt(
+                    userOptionsData.value!![0].bpm
+                ).toFloat()} ?: 90f
             Player.playCounterpoint(mediaPlayer!!,false,selectedCounterpoint.value!!,
-                90f,0f,listOf(360,120), ensType)
+                bpm,0f,listOf(360,120), ensType)
         }
 
     }
@@ -422,9 +426,6 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
 
     val sequences : LiveData<List<ArrayList<Clip>>> = _sequences
 
-    private var _userOptions= MutableLiveData<HashMap<String,String>>(HashMap<String,String>())
-    val userOptions : LiveData<HashMap<String,String>> = _userOptions
-
     private var _firstSequence= MutableLiveData<List<Clip>>(listOf())
     val firstSequence : LiveData<List<Clip>> = _firstSequence
 
@@ -524,11 +525,20 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
         map[sequence] = sequenceData
         return sequence
     }
+    fun retrieveUserOptionsFromDB(){
+
+    }
+
     fun updateUserOptions(key: String, value: String){
         var newUserOptionsData: UserOptionsData? = null
+        val optionsDataClone = if(userOptionsData.value!!.isEmpty()) UserOptionsData(0,"0","90")
+                                else userOptionsData.value!![0].copy()
         when(key){
             "ensemble_type" -> {
-                newUserOptionsData = UserOptionsData(0, value)
+                newUserOptionsData = optionsDataClone.copy(ensembleType = value)
+            }
+            "bpm" -> {
+                newUserOptionsData = optionsDataClone.copy(bpm = value)
             }
         }
         newUserOptionsData?.let {
@@ -542,19 +552,4 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
 
 
     }
-    fun retrieveUserOptions() {
-        val map = HashMap<String, String>()
-        if(userOptionsData.value != null && userOptionsData.value!!.isNotEmpty()){
-            val userOptionsData = userOptionsData.value!![0]
-            map["ensemble_type"] = userOptionsData.ensembleType
-
-        } else {
-            map["ensemble_type"] = "1"
-        }
-        _userOptions.value = map
-    }
-
-
-
-
 }

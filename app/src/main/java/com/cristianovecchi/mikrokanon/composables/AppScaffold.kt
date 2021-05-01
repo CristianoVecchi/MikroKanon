@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.dao.UserOptionsData
 import com.cristianovecchi.mikrokanon.toStringAll
 
 @Composable
@@ -45,44 +46,61 @@ fun AppScaffold(model: AppViewModel, content: @Composable () -> Unit) {
 
 data class ListDialogData(val dialogState: Boolean = false, val itemList: List<String> = listOf(), val selectedListDialogItem: Int = -1,
                           val dialogTitle: String = "", val onSubmitButtonClick: (Int) -> Unit = {} )
+data class NumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:Int = 0,
+                            val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
 @Composable
 fun SettingsDrawer(model: AppViewModel){
 
 
 
     val listDialogData by lazy { mutableStateOf(ListDialogData())}
+    val numberDialogData by lazy { mutableStateOf(NumberDialogData())}
 
     ListDialog(listDialogData)
+    NumberDialog(numberDialogData)
     val optionNames= listOf<String>("Ensemble", "BPM")
-    val options by model.userOptions.observeAsState()
+    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+    val userOptions = if(userOptionsData.isEmpty()) UserOptionsData(0,"0","90") else userOptionsData[0]
     val listState = rememberLazyListState()
-    options!!.forEach{
-        Text("{$it.key!!} = {$it.value!!}")
+    userOptionsData.forEach{
+        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
     }
+
     LazyColumn(state = listState,
         ) { items(optionNames) { optionName ->
             when(optionName){
                 "Ensemble" -> {
                     val ensNames: List<String> = EnsembleType.values().map{ it.toString()}
-                    val ensIndex = options!!.get("ensemble_type")?.let {
-                        Integer.parseInt( it )
-                    } ?: 0
+                    val ensIndex = Integer.parseInt(userOptions.ensembleType)
+                        Card(Modifier.clickable {
+                            listDialogData.value = ListDialogData(true,ensNames,ensIndex,"Select an Ensemble!"
+                            ) { index ->
+                                model.updateUserOptions(
+                                    "ensemble_type",
+                                    index.toString()
+                                )
+                                listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
+                            }
+                        }) {
+                            Text(text = "Ensemble: ${ensNames[ensIndex]}")
+                        }
+                    }
+
+
+                "BPM" -> {
+                    val bpm = Integer.parseInt(userOptions.bpm)
                     Card(Modifier.clickable {
-                        listDialogData.value = ListDialogData(true,ensNames,ensIndex,"Select an Ensemble!"
-                        ) { index ->
+                        numberDialogData.value = NumberDialogData(true,"Beats Per Measure:", bpm, 18, 360
+                        ) { bpm ->
                             model.updateUserOptions(
-                                "ensemble_type",
-                                index.toString()
+                                "bpm",
+                                bpm.toString()
                             )
                             listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
                         }
                     }) {
-                        Text(text = "Ensemble: ${ensNames[ensIndex]}")
+                        Text(text = "BPM: $bpm")
                     }
-
-                }
-                "BPM" -> {
-
                 }
                 else -> {}
             }
