@@ -53,6 +53,9 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
 
     // macro Functions called by fragments -----------------------------------------------------
     val onPlay = {
+        if(userOptionsData.value!!.isEmpty()){
+            retrieveUserOptionsFromDB() // Check if work at first installation (no previous DB)
+        }
         if(!selectedCounterpoint.value!!.isEmpty()){
             if (mediaPlayer == null) mediaPlayer = MediaPlayer()
             val ensType: EnsembleType = EnsembleType.values()[userOptionsData.value?.let {

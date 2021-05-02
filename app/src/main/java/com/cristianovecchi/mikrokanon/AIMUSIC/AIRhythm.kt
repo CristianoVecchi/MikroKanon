@@ -22,7 +22,13 @@ enum class RhythmPatterns(val title: String, val values: List<Int> ) {
     DOTTED2_1_4("Dotted2 1/4", listOf(360,60,60)),
     DOTTED3_1_4("Dotted3 1/4", listOf(300,60,60,60)),
     RAGTIME("Ragtime", listOf(120,240,120,240,240)),
-    SNARE("Snare", listOf(120,60,60,120,60,60,120,60,60,60,60,40,40,40));
+    SNARE("Snare", listOf(90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,30,-30,30,-30,30,-30,30,-30)),
+    TAKE5("Take Five",listOf(120,240,120,240,240,240)),
+    HABANERA("Habanera", listOf(360,120,60,-180,60,-180)),
+    SARABANDA("Sarabanda", listOf(480,720,240)),
+    STACCATO_1_16("Staccato 1/16",listOf(30,-90)),
+    GRAZIOSO_1_8("Grazioso 1/8",listOf(240,60,-180)),
+    GRAZIOSO_1_16("Grazioso 1/16",listOf(120,30,-90));
     companion object {
         fun getTitles(): List<String> {
             return values().map {

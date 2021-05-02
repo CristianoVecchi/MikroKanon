@@ -90,7 +90,7 @@ object Player {
                          counterpoint: Counterpoint, bpm: Float, shuffle: Float,
                          durations: List<Int>, ensembleType: EnsembleType){
 
-        val counterpointTracks = CounterpointInterpreter.doTheMagic(counterpoint,durations,ensembleType)
+        val counterpointTracks = CounterpointInterpreter.doTheMagic(counterpoint,durations,ensembleType,true)
         if (counterpointTracks.isEmpty()) return
         val tempoTrack = MidiTrack()
         val t = Tempo()

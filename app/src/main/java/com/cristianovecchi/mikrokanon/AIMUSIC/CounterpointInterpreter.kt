@@ -5,39 +5,71 @@ import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.NoteOff
 import com.leff.midi.event.NoteOn
 import com.leff.midi.event.ProgramChange
+import java.lang.Math.abs
 
 object CounterpointInterpreter {
     fun doTheMagic(counterpoint: Counterpoint,
                    durations: List<Int> = listOf(240), // 1/8
-                   ensembleType: EnsembleType = EnsembleType.STRINGS): List<MidiTrack> {
+                   ensembleType: EnsembleType = EnsembleType.STRINGS,
+                   nuances: Boolean): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
         val ensParts: List<EnsemblePart> = Ensembles.getEnsemble(counterpoint.parts.size, ensembleType)
+
         counterpoint.parts.forEachIndexed { partIndex, part ->
-            val channel = partIndex + 1
+            val channel = partIndex //+ 1
             val track = MidiTrack()
-            val pc: MidiEvent = ProgramChange(0, channel, ensParts[partIndex].instrument) // cambia strumento
+            val pc: MidiEvent =
+                ProgramChange(0, channel, ensParts[partIndex].instrument) // cambia strumento
             track.insertEvent(pc)
 
             var tick = 0
             var index = 0
-            val actualPitches = Insieme.linearMelody(ensParts[partIndex].octave, part.absPitches.toIntArray(),21,108)
-            while(index < actualPitches.size) {
+            var durIndex = 0
+            val actualPitches = Insieme.linearMelody(
+                ensParts[partIndex].octave,
+                part.absPitches.toIntArray(),
+                21,
+                108
+            )
+            val velocities: IntArray = if(nuances){
+                val mssq = MelodySubSequencer(actualPitches)
+                mssq.assignVelocities(0.90f, 0.50f)
+                mssq.velocities
+            } else IntArray(actualPitches.size){ 100 }
+//            println(actualPitches.asList())
+//            println(velocities.asList())
+            while (index < actualPitches.size) {
                 val pitch = actualPitches[index]
-                var dur = durations[index % durations.size]
+                val velocity = velocities[index]
+                var dur = durations[durIndex % durations.size]
+                if (dur < 0) { // negative values are considered as rests
+                    dur *= -1
+                    tick += dur
+                    durIndex++
+                } else {
+                    if (pitch != -1) {
+                        while (index + 1 < actualPitches.size && actualPitches[index + 1] == pitch) {
+                            var nextDur = durations[(durIndex + 1) % durations.size]
+                            if (nextDur < 0) {
+                                nextDur *= -1
+                                dur += nextDur
+                                durIndex++
+                            } else {
+                                dur += nextDur
+                                index++
+                                durIndex++
+                            }
+                        }
 
-                if(pitch != -1 ) {
-
-                    while(index + 1 < actualPitches.size && actualPitches[index + 1] == pitch){
-                        dur += durations[ (index + 1) % durations.size ]
-                        index++
+                        insertNote(
+                            track, tick, dur, channel, pitch,
+                            velocity, 0
+                        )
                     }
-                    insertNote(
-                        track, tick, dur, channel, pitch,
-                       100, 80
-                    )
+                    tick += dur
+                    index++
+                    durIndex++
                 }
-                tick += dur
-                index++
             }
             result.add(track)
         }

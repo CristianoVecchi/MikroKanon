@@ -11,7 +11,8 @@ public class MelodySubSequencer {
     enum SubSeqQuality {
         ASCENDENT,
         DESCENDENT,
-        EQUAL
+        EQUAL,
+        INTERRUPTED
     }
     private int[] pitches;
     public int[] velocities;
@@ -27,6 +28,7 @@ public class MelodySubSequencer {
     }
 
     private SubSeqQuality checkQuality(int pitch, int nextPitch){
+        if(nextPitch == -1) return SubSeqQuality.INTERRUPTED;
         if(pitch<nextPitch) return SubSeqQuality.ASCENDENT;
         if(pitch>nextPitch) return SubSeqQuality.DESCENDENT;
         return SubSeqQuality.EQUAL;
@@ -59,15 +61,29 @@ public class MelodySubSequencer {
         //SubSeqQuality firstDirection = checkQuality(pitches[start], pitches[indexNext]);
         SubSeqQuality firstDirection = SubSeqQuality.ASCENDENT;
         for (int i = 0; i < pitches.length; i++) {
+            if(pitches[i] == -1) {
+                firstDirection = SubSeqQuality.INTERRUPTED;
+                continue;
+            }
             int next = (i+1) % pitches.length;
             SubSeqQuality newDirection = checkQuality(pitches[i], pitches[next]);
-           // System.out.println("i:"+ i+" next:"+next + " quality:" +newDirection.toString()+ " start:"+start);
+            // System.out.println("i:"+ i+" next:"+next + " quality:" +newDirection.toString()+ " start:"+start);
             if(newDirection!=firstDirection || i==pitches.length-1){
-                MelodySubSequence mss = new MelodySubSequence(start,i-start, firstDirection);
-                ssvector.add(mss);
-                firstDirection = newDirection;
-                start = next-1;
+                if(newDirection != SubSeqQuality.INTERRUPTED){
+                    MelodySubSequence mss = new MelodySubSequence(start,i-start+1, firstDirection);
+                    ssvector.add(mss);
+                    firstDirection = newDirection;
+                    start = next-1;
+                } else {
+                    MelodySubSequence mss = new MelodySubSequence(start,i-start +1, firstDirection);
+                    ssvector.add(mss);
+                    firstDirection = SubSeqQuality.INTERRUPTED;
+                    start = next;
+                }
+
             }
+
+
         }
        // ssvector.add(new MelodySubSequence(start+pitches.length, 1,
                // firstDirection));
@@ -102,11 +118,13 @@ public class MelodySubSequencer {
     public void assignVelocities(float firstNoteLimit, float lowLimit){
         float equalValue = (firstNoteLimit+lowLimit) / 2;
         int[] velocities = new int[pitches.length];
-        Arrays.fill(velocities,(int)(equalValue*127));
+        Arrays.fill(velocities,-1);
+        //Arrays.fill(velocities,(int)(equalValue*127));
         int nDescend, nAscend, nEqual;
         List<MelodySubSequence> descMsq = new LinkedList<MelodySubSequence>();
         List<MelodySubSequence> ascMsq = new LinkedList<MelodySubSequence>();
         List<MelodySubSequence> equalMsq = new LinkedList<MelodySubSequence>();
+        //List<MelodySubSequence> interrMsq = new LinkedList<MelodySubSequence>();
         nAscend = nDescend =nEqual = 0;
         for (MelodySubSequence msq: this.subSequences
              ) {

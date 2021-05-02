@@ -1,15 +1,16 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
-import android.inputmethodservice.Keyboard
 import android.os.Parcelable
 import com.cristianovecchi.mikrokanon.composables.Clip
-import com.cristianovecchi.mikrokanon.composables.NoteNamesIt
-import com.cristianovecchi.mikrokanon.composables.randomClipSequence
 import kotlinx.android.parcel.Parcelize
 import java.util.*
-import kotlin.math.abs
 
 fun main(args : Array<String>){
+    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,7,6,4,9,12,46,67,32,64,43,0,1,9,8,-1,-1);
+
+    val mssq = MelodySubSequencer(pitches.toIntArray())
+    mssq.assignVelocities(0.90f, 0.50f)
+    mssq.printSubSequences()
 //    val absPitches1 = mutableListOf(-1,1,0,6,11,5,7,8,8,3,3,3,6,9)
 //    val absPitches2 = mutableListOf(1,11,2,10,3,-1,9,6)
 //    val absPitches3 = mutableListOf(1,11,2,10)
@@ -25,8 +26,8 @@ fun main(args : Array<String>){
 //    Counterpoint.expand(counterpoint, 2).display()
 //    val repeatedSequence = Collections.nCopies(3, absPitches1).flatten()
 //    println(repeatedSequence)
-    val list = listOf(-1,-1,0,10,5,6,11,2,-1,-1,3,-1,10)
-    println(Insieme.linearMelody(4,list.toIntArray(),21,108).asList())
+//    val list = listOf(-1,-1,0,10,5,6,11,2,-1,-1,3,-1,10)
+//    println(Insieme.linearMelody(4,list.toIntArray(),21,108).asList())
 }
 @Parcelize
 data class Counterpoint(val parts: List<AbsPart>,

@@ -105,7 +105,7 @@ fun SettingsDrawer(model: AppViewModel){
                 "Rhythm" -> {
                     val rhythmNames = RhythmPatterns.getTitles()
                     val rhythmIndex = Integer.parseInt(userOptions.rhythm)
-                    SelectedCard(text = "Ensemble: ${rhythmNames[rhythmIndex]}", fontSize = fontSize, onClick = {
+                    SelectedCard(text = "Rhythm: ${rhythmNames[rhythmIndex]}", fontSize = fontSize, onClick = {
                         listDialogData.value = ListDialogData(true,rhythmNames,rhythmIndex,"Select a Rhythm!"
                         ) { index ->
                             model.updateUserOptions(
