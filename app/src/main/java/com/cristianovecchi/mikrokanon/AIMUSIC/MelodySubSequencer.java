@@ -118,8 +118,8 @@ public class MelodySubSequencer {
     public void assignVelocities(float firstNoteLimit, float lowLimit){
         float equalValue = (firstNoteLimit+lowLimit) / 2;
         int[] velocities = new int[pitches.length];
-        Arrays.fill(velocities,-1);
-        //Arrays.fill(velocities,(int)(equalValue*127));
+        //Arrays.fill(velocities,-1);
+        Arrays.fill(velocities,(int)(equalValue*127));
         int nDescend, nAscend, nEqual;
         List<MelodySubSequence> descMsq = new LinkedList<MelodySubSequence>();
         List<MelodySubSequence> ascMsq = new LinkedList<MelodySubSequence>();

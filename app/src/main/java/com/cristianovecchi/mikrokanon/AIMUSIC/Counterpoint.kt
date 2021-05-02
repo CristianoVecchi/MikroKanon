@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 fun main(args : Array<String>){
-    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,7,6,4,9,12,46,67,32,64,43,0,1,9,8,-1,-1);
+    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8);
 
     val mssq = MelodySubSequencer(pitches.toIntArray())
     mssq.assignVelocities(0.90f, 0.50f)

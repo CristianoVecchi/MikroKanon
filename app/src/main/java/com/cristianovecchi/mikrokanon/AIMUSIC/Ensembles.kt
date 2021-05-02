@@ -1,7 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 enum class EnsembleType {
-    STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES, DOUBLEREEDS,  BASSOONS, CELLOS, CLARINETS, PIANO
+    STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES, DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS,  PIANO
 }
 
 object Ensembles {
@@ -14,6 +14,10 @@ object Ensembles {
             EnsembleType.SAXOPHONES -> getSaxophones(nParts)
             EnsembleType.FLUTES -> getFlutes(nParts)
             EnsembleType.DOUBLEREEDS -> getDoubleReeds(nParts)
+            EnsembleType.CLARINETS -> getClarinets(nParts)
+            EnsembleType.BASSOONS -> getBassoons(nParts)
+            EnsembleType.CELLOS -> getCellos(nParts)
+            EnsembleType.PIANO -> getPiano(nParts)
             else -> listOf()
         }
     }
@@ -144,7 +148,7 @@ object Ensembles {
                 EnsemblePart(60, 3), // french horn
                 EnsemblePart(71, 3), // bass clarinet
                 EnsemblePart(70, 2),  // bassoon
-                EnsemblePart(70, 1)  // contrabassoon
+                EnsemblePart(70, 2)  // bassoon
             )
             else -> listOf()
         }
@@ -323,12 +327,7 @@ object Ensembles {
                     EnsemblePart(73, 5), // Flute
                     EnsemblePart(73, 4)  // Flute
                 )
-                3 -> listOf(
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 3)  // Flute
-                )
-                4 -> listOf(
+                3, 4 -> listOf(
                     EnsemblePart(72, 6), // Piccolo
                     EnsemblePart(73, 5), // Flute
                     EnsemblePart(73, 4),  // Flute
@@ -414,16 +413,7 @@ object Ensembles {
                 EnsemblePart(70, 3),  // Bassoon
                 EnsemblePart(70, 2)  // Bassoon
             )
-            7 -> listOf(
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 2),  // Bassoon
-                EnsemblePart(70, 1)  // Contrabassoon
-            )
-            8 -> listOf(
+            7, 8 -> listOf(
                 EnsemblePart(68, 5), // Oboe
                 EnsemblePart(68, 5), // Oboe
                 EnsemblePart(69, 4), // English Horn
@@ -431,7 +421,7 @@ object Ensembles {
                 EnsemblePart(70, 3),  // Bassoon
                 EnsemblePart(70, 3),  // Bassoon
                 EnsemblePart(70, 2),  // Bassoon
-                EnsemblePart(70, 1)  // Contrabassoon
+                EnsemblePart(70, 2)  // Bassoon
             )
             9 -> listOf(
                 EnsemblePart(68, 5), // Oboe
@@ -442,7 +432,150 @@ object Ensembles {
                 EnsemblePart(70, 3),  // Bassoon
                 EnsemblePart(70, 3),  // Bassoon
                 EnsemblePart(70, 2),  // Bassoon
-                EnsemblePart(70, 1)  // Contrabassoon
+                EnsemblePart(70, 2)  // Bassoon
+            )
+            else -> listOf()
+        }
+    }
+    fun getClarinets(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            2, 3 -> listOf(
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 4),  // Clarinet
+                EnsemblePart(71, 3)  // Clarinet
+            )
+            4, 5 -> listOf(
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 4), // Clarinet
+                EnsemblePart(71, 3),  // Clarinet
+                EnsemblePart(71, 2)  // Clarinet
+            )
+            6, 7 -> listOf(
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 4), // Clarinet
+                EnsemblePart(71, 4), // Clarinet
+                EnsemblePart(71, 3),  // Clarinet
+                EnsemblePart(71, 3),  // Clarinet
+                EnsemblePart(71, 2)  // Clarinet
+            )
+            8, 9 -> listOf(
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 4), // Clarinet
+                EnsemblePart(71, 4), // Clarinet
+                EnsemblePart(71, 4), // Clarinet
+                EnsemblePart(71, 3),  // Clarinet
+                EnsemblePart(71, 3),  // Clarinet
+                EnsemblePart(71, 2)  // Clarinet
+            )
+            else -> listOf()
+        }
+    }
+    fun getBassoons(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            2, 3 -> listOf(
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 3), // Bassoon
+                EnsemblePart(70, 2)  // Bassoon
+            )
+            in (4..6) -> listOf(
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 3), // Bassoon
+                EnsemblePart(70, 3),  // Bassoon
+                EnsemblePart(70, 2),  // Bassoon
+                EnsemblePart(70, 2),  // Bassoon
+            )
+            in (7..9) -> listOf(
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 3), // Bassoon
+                EnsemblePart(70, 3), // Bassoon
+                EnsemblePart(70, 3),  // Bassoon
+                EnsemblePart(70, 2),  // Bassoon
+                EnsemblePart(70, 2),  // Bassoon
+            )
+            else -> listOf()
+        }
+    }
+    fun getCellos(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            2, 3 -> listOf(
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 3), // Cello
+                EnsemblePart(42, 2)  // Cello
+            )
+            in (4..6) -> listOf(
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 3), // Cello
+                EnsemblePart(42, 3),  // Cello
+                EnsemblePart(42, 2),  // Cello
+                EnsemblePart(42, 2),  // Cello
+            )
+            in (7..9) -> listOf(
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 3), // Cello
+                EnsemblePart(42, 3), // Cello
+                EnsemblePart(42, 3),  // Cello
+                EnsemblePart(42, 2),  // Cello
+                EnsemblePart(42, 2),  // Cello
+            )
+            else -> listOf()
+        }
+    }
+    fun getPiano(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            2, 3 -> listOf(
+                EnsemblePart(0, 4), // Piano
+                EnsemblePart(0, 3), // Piano
+                EnsemblePart(0, 2)  // Piano
+            )
+            in (4..6) -> listOf(
+                EnsemblePart(0, 5), // Piano
+                EnsemblePart(0, 4), // Piano
+                EnsemblePart(0, 4), // Piano
+                EnsemblePart(0, 3),  // Piano
+                EnsemblePart(0, 3),  // Piano
+                EnsemblePart(0, 2),  // Piano
+            )
+            7 -> listOf(
+                EnsemblePart(0, 5), // Piano
+                EnsemblePart(0, 4), // Piano
+                EnsemblePart(0, 4), // Piano
+                EnsemblePart(0, 3),  // Piano
+                EnsemblePart(0, 3),  // Piano
+                EnsemblePart(0, 2),  // Piano
+                EnsemblePart(0, 1),  // Piano
+            )
+            8 -> listOf(
+                EnsemblePart(0, 6), // Piano
+                EnsemblePart(0, 5), // Piano
+                EnsemblePart(0, 5), // Piano
+                EnsemblePart(0, 4), // Piano
+                EnsemblePart(0, 4),  // Piano
+                EnsemblePart(0, 3),  // Piano
+                EnsemblePart(0, 2),  // Piano
+                EnsemblePart(0, 1),  // Piano
+            )
+            9 -> listOf(
+                EnsemblePart(0, 6), // Piano
+                EnsemblePart(0, 5), // Piano
+                EnsemblePart(0, 5), // Piano
+                EnsemblePart(0, 4), // Piano
+                EnsemblePart(0, 4),  // Piano
+                EnsemblePart(0, 3),  // Piano
+                EnsemblePart(0, 3),  // Piano
+                EnsemblePart(0, 2),  // Piano
+                EnsemblePart(0, 1),  // Piano
             )
             else -> listOf()
         }
