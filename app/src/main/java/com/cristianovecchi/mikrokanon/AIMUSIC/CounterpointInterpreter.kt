@@ -36,13 +36,13 @@ object CounterpointInterpreter {
                 mssq.assignVelocities(0.90f, 0.50f)
                 mssq.velocities
             } else IntArray(actualPitches.size){ 100 }
-            println("PART: #$partIndex")
-            println(actualPitches.asList())
-            println(velocities.asList())
+//            println("PART: #$partIndex")
+//            println(actualPitches.asList())
+//            println(velocities.asList())
             while (index < actualPitches.size) {
                 val pitch = actualPitches[index]
                 val velocity = velocities[index]
-                println("pitch: $pitch vel: $velocity")
+                //println("pitch: $pitch vel: $velocity")
                 var dur = durations[durIndex % durations.size]
                 if (dur < 0) { // negative values are considered as rests
                     dur *= -1

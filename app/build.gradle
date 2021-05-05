@@ -7,7 +7,7 @@ plugins {
 
 android {
     compileSdk 30
-    buildToolsVersion '31.0.2'
+    buildToolsVersion '30.0.3'
 
     defaultConfig {
         applicationId "com.example.mikrokanon"
@@ -39,12 +39,12 @@ android {
     buildFeatures {
         compose true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion '1.4.32'
-    }
-    compileSdkVersion 29
-    buildToolsVersion '29.0.2'
+//    composeOptions {
+//        kotlinCompilerExtensionVersion compose_version
+//        kotlinCompilerVersion '1.4.32'
+//    }
+    compileSdkVersion 30
+    buildToolsVersion '30.0.3'
 }
 
 dependencies {
