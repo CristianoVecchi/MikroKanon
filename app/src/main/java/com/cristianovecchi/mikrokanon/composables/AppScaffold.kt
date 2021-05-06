@@ -21,6 +21,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns.Companion.getTitles
 import com.cristianovecchi.mikrokanon.dao.UserOptionsData
 import com.cristianovecchi.mikrokanon.toStringAll
+import java.io.File
 
 @Composable
 fun AppScaffold(model: AppViewModel, content: @Composable () -> Unit) {
@@ -50,17 +51,21 @@ data class ListDialogData(val dialogState: Boolean = false, val itemList: List<S
                           val dialogTitle: String = "", val onSubmitButtonClick: (Int) -> Unit = {} )
 data class NumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:Int = 0,
                             val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
+data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
+                            val error:String = "", val onSubmitButtonClick: () -> Unit = {})
 @Composable
 fun SettingsDrawer(model: AppViewModel){
 
 
 
     val listDialogData by lazy { mutableStateOf(ListDialogData())}
-    val numberDialogData by lazy { mutableStateOf(NumberDialogData())}
+    val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
+    val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
 
     ListDialog(listDialogData)
-    NumberDialog(numberDialogData)
-    val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm")
+    BpmDialog(bpmDialogData)
+    ExportDialog(exportDialogData)
+    val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm", "Export MIDI")
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData(0,"0","90", "0")
                         else userOptionsData[0]
@@ -69,8 +74,9 @@ fun SettingsDrawer(model: AppViewModel){
         Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
     }
 
-    LazyColumn(state = listState,
-        ) { items(optionNames) { optionName ->
+    LazyColumn(
+        state = listState,
+    ) { items(optionNames) { optionName ->
             val fontSize = 18
             when(optionName){
                 "Ensemble" -> {
@@ -90,7 +96,7 @@ fun SettingsDrawer(model: AppViewModel){
                 "BPM" -> {
                     val bpm = Integer.parseInt(userOptions.bpm)
                     SelectedCard(text = "BPM: $bpm", fontSize = fontSize, onClick = {
-                        numberDialogData.value = NumberDialogData(
+                        bpmDialogData.value = NumberDialogData(
                             true, "Beats Per Measure:", bpm, 18, 360
                         ) { bpm ->
                             model.updateUserOptions(
@@ -113,6 +119,22 @@ fun SettingsDrawer(model: AppViewModel){
                                 index.toString()
                             )
                             listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
+                        }
+                    })
+                }
+                "Export MIDI" -> {
+                    SelectedCard(text = "Export MIDI", fontSize = fontSize, onClick = {
+                        val path = model.midiPath.absolutePath.toString()
+                        var error = model.createMidi()
+                        if (error.isNotEmpty()){
+                           // TODO sending to Google Drive
+                        }
+
+                        exportDialogData.value = ExportDialogData(true,"Exporting MIDI File:",
+                            path = model.midiPath.absolutePath.toString(), error = error
+                        ) {
+
+                            exportDialogData.value = ExportDialogData(path = path, error = error)
                         }
                     })
                 }

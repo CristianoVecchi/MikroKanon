@@ -16,6 +16,7 @@ import kotlin.collections.HashMap
 import android.media.MediaPlayer
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import android.content.SharedPreferences
+import android.os.Environment
 import com.cristianovecchi.mikrokanon.dao.UserOptionsData
 import com.cristianovecchi.mikrokanon.dao.UserOptionsDataRepository
 
@@ -47,10 +48,36 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
     private var mediaPlayer: MediaPlayer? = null
+    val midiPath = java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
 
 
 
-
+    fun createMidi(): String{
+        var error = "No File Created yet!!!"
+        if(userOptionsData.value!!.isEmpty()){
+            retrieveUserOptionsFromDB() // Check if work at first installation (no previous DB)
+        }
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            if (mediaPlayer == null) mediaPlayer = MediaPlayer()
+            val ensType: EnsembleType = EnsembleType.values()[userOptionsData.value?.let {
+                Integer.parseInt(
+                    userOptionsData.value!![0].ensembleType
+                )
+            } ?: 0]
+            val bpm: Float = userOptionsData.value?.let {
+                Integer.parseInt(
+                    userOptionsData.value!![0].bpm
+                ).toFloat()} ?: 90f
+            val rhythm: RhythmPatterns = RhythmPatterns.values()[userOptionsData.value?.let {
+                Integer.parseInt(
+                    userOptionsData.value!![0].rhythm
+                )
+            } ?: 0]
+            error = Player.playCounterpoint(mediaPlayer!!,false,selectedCounterpoint.value!!,
+                bpm,0f,rhythm.values, ensType, true, midiPath)
+        }
+        return error
+    }
     // macro Functions called by fragments -----------------------------------------------------
     val onPlay = {
         if(userOptionsData.value!!.isEmpty()){
@@ -73,7 +100,7 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
                 )
             } ?: 0]
             Player.playCounterpoint(mediaPlayer!!,false,selectedCounterpoint.value!!,
-                bpm,0f,rhythm.values, ensType)
+                bpm,0f,rhythm.values, ensType, true, midiPath)
         }
 
     }
