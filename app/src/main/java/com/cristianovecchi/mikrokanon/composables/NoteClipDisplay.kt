@@ -37,6 +37,9 @@ fun NoteClipDisplay(modifier: Modifier, noteClips: List<Clip>, cursor: Int = -1,
     val unselectionBackColor = Color.LightGray
     val unselectionTextColor = Color.Blue
     val unselectionBorderColor = Color.DarkGray
+    val fontSize = 18.sp
+    val intervalPadding = 4.dp
+    val innerPadding = 10.dp
     if (noteClips.isEmpty()){
         Text(text= "ENTER SOME NOTES", modifier = Modifier.padding(16.dp))
     } else {
@@ -53,7 +56,7 @@ fun NoteClipDisplay(modifier: Modifier, noteClips: List<Clip>, cursor: Int = -1,
                         val clip = noteClips[index]
 
                         Card(modifier = Modifier.background(Color.White).
-                        clip(RoundedCornerShape(6.dp)).padding(6.dp).clickable {dispatch(clip.id)},
+                        clip(RoundedCornerShape(6.dp)).padding(intervalPadding).clickable {dispatch(clip.id)},
 
                             backgroundColor = if (cursor == index) selectionBackColor else unselectionBackColor,
                             contentColor = if (cursor == index) selectionTextColor else unselectionTextColor,
@@ -61,8 +64,8 @@ fun NoteClipDisplay(modifier: Modifier, noteClips: List<Clip>, cursor: Int = -1,
                             elevation = if (cursor == index) 4.dp else 4.dp
                         )
                         {
-                            Text(text = clip.text, modifier = Modifier.padding(18.dp),
-                                style = TextStyle(fontSize = if (cursor == index) 20.sp else 20.sp),
+                            Text(text = clip.text, modifier = Modifier.padding(innerPadding),
+                                style = TextStyle(fontSize = if (cursor == index) fontSize else fontSize),
                                 fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal)
                         }
                         index++
@@ -144,7 +147,7 @@ fun toClips(csv: String, noteNames: List<String>) : List<Clip>{
     val list = mutableListOf<Clip>()
     var count = 0
 
-    for(i in 0 until array.size step 2){
+    for(i in array.indices step 2){
         val clip = Clip.createClip(Integer.parseInt(array[i]),Integer.parseInt(array[i+1]),noteNames,count++)
     }
     return list
@@ -176,7 +179,7 @@ fun randomClip(noteNames: List<String>, id: Int, optRest: Boolean): Clip {
 }
 
 fun randomClipSequence(noteNames: List<String>, id: Int, size: Int, optRests: Boolean): MutableList<Clip>{
-    var seq = mutableListOf<Clip>()
+    val seq = mutableListOf<Clip>()
     for(i in 0 until size){
         val newId = id + i
         seq.add(randomClip(noteNames, newId, optRests))

@@ -19,39 +19,39 @@ fun IntervalSetSelector(model: AppViewModel, fontSize: Int,
 
 
         if(intervals.containsAll(listOf(1,11))){
-            SelectedCard(text = "2m\n7M", fontSize + 2, onClick = { model.removeIntervalsAndRefresh(listOf(1,11)) })
+            SelectableCard(text = "2m\n7M", fontSize + 2, isSelected = true, onClick = { model.removeIntervalsAndRefresh(listOf(1,11)) })
         } else {
-            UnSelectedCard(text = "2m\n7M",fontSize,  onClick = {model.addIntervalsAndRefresh(listOf(1,11))})
+            SelectableCard(text = "2m\n7M",fontSize, isSelected = false, onClick = {model.addIntervalsAndRefresh(listOf(1,11))})
         }
         if(intervals.containsAll(listOf(2,10))){
-            SelectedCard(text = "2M\n7m",fontSize + 2,  onClick = {model.removeIntervalsAndRefresh(listOf(2,10))})
+            SelectableCard(text = "2M\n7m",fontSize + 2, isSelected = true, onClick = {model.removeIntervalsAndRefresh(listOf(2,10))})
         } else {
-            UnSelectedCard(text = "2M\n7m", fontSize, onClick = {model.addIntervalsAndRefresh(listOf(2,10))})
+            SelectableCard(text = "2M\n7m", fontSize,isSelected = false,  onClick = {model.addIntervalsAndRefresh(listOf(2,10))})
         }
         if(intervals.containsAll(listOf(3,9))){
-            SelectedCard(text = "3m\n6M", fontSize + 2, onClick = {model.removeIntervalsAndRefresh(listOf(3,9))})
+            SelectableCard(text = "3m\n6M", fontSize + 2,isSelected = true, onClick = {model.removeIntervalsAndRefresh(listOf(3,9))})
         } else {
-            UnSelectedCard(text = "3m\n6M", fontSize, onClick = {model.addIntervalsAndRefresh(listOf(3,9))})
+            SelectableCard(text = "3m\n6M", fontSize,isSelected = false,  onClick = {model.addIntervalsAndRefresh(listOf(3,9))})
         }
         if(intervals.containsAll(listOf(4,8))){
-            SelectedCard(text = "3M\n6m", fontSize + 2, onClick = {model.removeIntervalsAndRefresh(listOf(4,8))})
+            SelectableCard(text = "3M\n6m", fontSize + 2,isSelected = true, onClick = {model.removeIntervalsAndRefresh(listOf(4,8))})
         } else {
-            UnSelectedCard(text = "3M\n6m", fontSize, onClick = {model.addIntervalsAndRefresh(listOf(4,8))})
+            SelectableCard(text = "3M\n6m", fontSize, isSelected = false, onClick = {model.addIntervalsAndRefresh(listOf(4,8))})
         }
         if(intervals.containsAll(listOf(5,7))){
-            SelectedCard(text = "4\n5", fontSize + 2, onClick = {model.removeIntervalsAndRefresh(listOf(5,7))})
+            SelectableCard(text = "4\n5", fontSize + 2,isSelected = true, onClick = {model.removeIntervalsAndRefresh(listOf(5,7))})
         } else {
-            UnSelectedCard(text = "4\n5", fontSize, onClick = {model.addIntervalsAndRefresh(listOf(5,7))})
+            SelectableCard(text = "4\n5", fontSize, isSelected = false, onClick = {model.addIntervalsAndRefresh(listOf(5,7))})
         }
         if(intervals.contains(6)){
-            SelectedCard(text = "4a\n5d", fontSize + 2, onClick = {model.removeIntervalsAndRefresh(listOf(6))})
+            SelectableCard(text = "4a\n5d", fontSize + 2, isSelected = true, onClick = {model.removeIntervalsAndRefresh(listOf(6))})
         } else {
-            UnSelectedCard(text = "4a\n5d", fontSize, onClick = {model.addIntervalsAndRefresh(listOf(6))})
+            SelectableCard(text = "4a\n5d", fontSize,isSelected = false,  onClick = {model.addIntervalsAndRefresh(listOf(6))})
         }
         if(intervals.contains(0)){
-            SelectedCard(text = "1\n8", fontSize + 2, onClick = {model.removeIntervalsAndRefresh(listOf(0))})
+            SelectableCard(text = "1\n8", fontSize + 2, isSelected = true, onClick = {model.removeIntervalsAndRefresh(listOf(0))})
         } else {
-            UnSelectedCard(text = "1\n8", fontSize, onClick = {model.addIntervalsAndRefresh(listOf(0))})
+            SelectableCard(text = "1\n8", fontSize,isSelected = false,  onClick = {model.addIntervalsAndRefresh(listOf(0))})
         }
     }
 }

@@ -35,6 +35,17 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
 
 //    val seq1 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,10, false))
 //    val seq2 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,7, false))
+    val iconMap = mapOf<String,Int>(
+        "done" to R.drawable.ic_baseline_done_24,
+        "add" to R.drawable.ic_baseline_add_24,
+        "delete" to R.drawable.ic_baseline_delete_forever_24,
+        "edit" to R.drawable.ic_baseline_edit_24,
+        "undo" to R.drawable.ic_baseline_undo_24,
+        "forward" to R.drawable.ic_baseline_arrow_forward_24,
+        "full_forward" to R.drawable.ic_baseline_fast_forward_24,
+        "back" to R.drawable.ic_baseline_arrow_back_24,
+        "full_back" to R.drawable.ic_baseline_fast_rewind_24,
+    )
     private var lastIndex = 0
     private val SPREAD_AS_POSSIBLE = true
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 18

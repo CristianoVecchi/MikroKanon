@@ -44,35 +44,37 @@ sealed class Out {
     object Analysis : Out()
 }
 
-private data class ButtonInfo(val text: String, val output: Out)
+private data class ButtonInfo(val text: String, val output: Out, val resId: Int = -1)
 
 @Composable
 fun NoteKeyboard(
     names : List<String> = NoteNamesIt.values().map{it.toString()},
-    nRows: Int = 5, nCols: Int = 4, res_done: Int? = null,
+    nRows: Int = 5, nCols: Int = 4, iconMap: Map<String,Int> = HashMap<String,Int>(),
     dispatch : (Out, String) -> Unit ) {
+    val buttonSize = 60.dp
+    val fontSize = 14.sp
     val buttonInfos = listOf(
             ButtonInfo(text = Accidents.D_FLAT.ax, output = Out.Accident(Accidents.D_FLAT)),
             ButtonInfo(text = Accidents.D_SHARP.ax, output = Out.Accident(Accidents.D_SHARP)),
             ButtonInfo(text = Accidents.FLAT.ax, output = Out.Accident(Accidents.FLAT)),
             ButtonInfo(text = Accidents.SHARP.ax, output = Out.Accident(Accidents.SHARP)),
 
-            ButtonInfo(text = "DEL", output = Out.Delete),
-            ButtonInfo(text = "UN", output = Out.Undo),
+            ButtonInfo(text = "DEL", output = Out.Delete, resId = iconMap["delete"] ?: -1),
+            ButtonInfo(text = "UN", output = Out.Undo, resId = iconMap["undo"] ?: -1),
             ButtonInfo(text = Accidents.NATURAL.ax, output = Out.Accident(Accidents.NATURAL)),
             ButtonInfo(text = names[3], output = Out.Note(NoteNamesEn.F)),
 
-            ButtonInfo(text = "|<-", output = Out.FullBack),
-            ButtonInfo(text = "->|", output = Out.FullForward),
+            ButtonInfo(text = "|<-", output = Out.FullBack,resId = iconMap["full_back"] ?: -1),
+            ButtonInfo(text = "->|", output = Out.FullForward, resId = iconMap["full_forward"] ?: -1),
             ButtonInfo(text = names[6], output = Out.Note(NoteNamesEn.B)),
             ButtonInfo(text = names[2], output = Out.Note(NoteNamesEn.E)),
 
-            ButtonInfo(text = "<-", output = Out.Back),
-            ButtonInfo(text = "->", output = Out.Forward),
+            ButtonInfo(text = "<-", output = Out.Back,resId = iconMap["back"] ?: -1),
+            ButtonInfo(text = "->", output = Out.Forward, resId = iconMap["forward"] ?: -1),
             ButtonInfo(text = names[5], output = Out.Note(NoteNamesEn.A)),
             ButtonInfo(text = names[1], output = Out.Note(NoteNamesEn.D)),
 
-            ButtonInfo(text = "OK", output = Out.Enter),
+            ButtonInfo(text = "OK", output = Out.Enter, resId = iconMap["done"] ?: -1),
             ButtonInfo(text = "AN", output = Out.Analysis),
             ButtonInfo(text = names[4], output = Out.Note(NoteNamesEn.G)),
             ButtonInfo(text = names[0], output = Out.Note(NoteNamesEn.C)),
@@ -93,26 +95,28 @@ fun NoteKeyboard(
                     {
                         val buttonInfo = buttonInfos[buttonIndex++]
                         val text = buttonInfo.text
-
-                        if(text == "OK" && res_done != null) {
+                        val resId = buttonInfo.resId
+                        if(resId != -1) {
 
                             IconButton(modifier = Modifier.padding(2.dp).
                                                     background(Color.White, RoundedCornerShape(4.dp))
-                                .then(Modifier.size(72.dp).border(2.dp, Color.Black)),
+                                .then(Modifier.size(buttonSize).border(2.dp, Color.Black)),
                                         onClick = {dispatch(buttonInfo.output, buttonInfo.text)})
                             {
                                 Icon(
-                                    painter = painterResource(id = res_done),
+                                    painter = painterResource(id = resId),
                                     contentDescription = null, // decorative element
-                                    tint = Color.Green)
+                                    tint = if(text == "OK") Color.Green else Color.Blue )
                             }
                         } else
                         {
-                            Button(modifier= Modifier.padding(2.dp),
+                            Button(modifier = Modifier.padding(2.dp).
+                                    background(Color.White, RoundedCornerShape(4.dp))
+                                        .then(Modifier.size(buttonSize).border(2.dp, Color.Black)),
                                     onClick = {dispatch(buttonInfo.output, buttonInfo.text)})
                             {
-                                Text(text = text,
-                                        style = TextStyle(fontSize = 22.sp,
+                                Text(text = text, color = Color.Cyan,
+                                        style = TextStyle(fontSize = fontSize,
                                         fontWeight = FontWeight.Bold) )
                             }
                         }

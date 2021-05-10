@@ -82,7 +82,7 @@ fun SettingsDrawer(model: AppViewModel){
                 "Ensemble" -> {
                     val ensNames: List<String> = EnsembleType.values().map{ it.toString()}
                     val ensIndex = Integer.parseInt(userOptions.ensembleType)
-                        SelectedCard(text = "Ensemble: ${ensNames[ensIndex]}", fontSize = fontSize, onClick = {
+                        SelectableCard(text = "Ensemble: ${ensNames[ensIndex]}", fontSize = fontSize, isSelected = true, onClick = { _ ->
                             listDialogData.value = ListDialogData(true,ensNames,ensIndex,"Select an Ensemble!"
                             ) { index ->
                                 model.updateUserOptions(
@@ -95,7 +95,7 @@ fun SettingsDrawer(model: AppViewModel){
                     }
                 "BPM" -> {
                     val bpm = Integer.parseInt(userOptions.bpm)
-                    SelectedCard(text = "BPM: $bpm", fontSize = fontSize, onClick = {
+                    SelectableCard(text = "BPM: $bpm", fontSize = fontSize, isSelected = true, onClick = { _ ->
                         bpmDialogData.value = NumberDialogData(
                             true, "Beats Per Measure:", bpm, 18, 360
                         ) { bpm ->
@@ -111,7 +111,7 @@ fun SettingsDrawer(model: AppViewModel){
                 "Rhythm" -> {
                     val rhythmNames = RhythmPatterns.getTitles()
                     val rhythmIndex = Integer.parseInt(userOptions.rhythm)
-                    SelectedCard(text = "Rhythm: ${rhythmNames[rhythmIndex]}", fontSize = fontSize, onClick = {
+                    SelectableCard(text = "Rhythm: ${rhythmNames[rhythmIndex]}", fontSize = fontSize, isSelected = true,onClick = { _ ->
                         listDialogData.value = ListDialogData(true,rhythmNames,rhythmIndex,"Select a Rhythm!"
                         ) { index ->
                             model.updateUserOptions(
@@ -123,7 +123,7 @@ fun SettingsDrawer(model: AppViewModel){
                     })
                 }
                 "Export MIDI" -> {
-                    SelectedCard(text = "Export MIDI", fontSize = fontSize, onClick = {
+                    SelectableCard(text = "Export MIDI", fontSize = fontSize, isSelected = true, onClick = { _ ->
                         val path = model.midiPath.absolutePath.toString()
                         var error = model.createMidi()
                         if (error.isNotEmpty()){

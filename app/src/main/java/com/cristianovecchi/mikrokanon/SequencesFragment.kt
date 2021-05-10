@@ -27,9 +27,6 @@ class SequencesFragment(): Fragment() {
         model.allSequencesData.observe(viewLifecycleOwner){
             model.retrieveSequencesFromDB()
         }
-//        model.userOptionsData.observe(viewLifecycleOwner){
-//            model.retrieveUserOptions()
-//        }
         model.setInitialBlankState()
         return ComposeView(requireContext()).apply {
             setContent {
@@ -48,17 +45,12 @@ class SequencesFragment(): Fragment() {
                                    onKP = { list, index, repeat ->
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onKPfromFirstSelection(list, index, repeat)
-
                                    },
                                    onFreePart = { list, trend ->
-                                       // val bundle = Bundle()
-                                       //bundle.putParcelableArrayList("list", list)
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onFreePartFromFirstSelection(list, trend)
                                    },
                                    onMikroKanons = { list ->
-                                       // val bundle = Bundle()
-                                       //bundle.putParcelableArrayList("list", list)
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onMikroKanons(list)
                                    },

@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.composables
 
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -32,13 +33,13 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, fontSize: Int,
     val fontWeight = if(isSelected) FontWeight.ExtraBold else FontWeight.Normal
     val parts = toClips(counterpoint, NoteNamesIt.values().map { value -> value.toString() })
     val maxSize = parts.maxOf{ it.size}
-    val cellDarkColor = if(isSelected) Color(0.0f,0.0f,0.9f,1.0f)
-                        else Color(0.0f,0.0f,0.5f,1.0f)
-    val cellLightColor = if(isSelected) Color(0.0f,0.0f,1f,1.0f)
-                        else Color(0.0f,0.0f,0.6f,1.0f)
+    val cellDarkColor by animateColorAsState( if(isSelected) Color(0.0f,0.0f,0.9f,1.0f)
+                        else Color(0.0f,0.0f,0.5f,1.0f) )
+    val cellLightColor by animateColorAsState( if(isSelected) Color(0.0f,0.0f,1f,1.0f)
+                        else Color(0.0f,0.0f,0.6f,1.0f) )
     val selectionColor = Color(0.8f,0.8f,0.9f,1.0f)
-    val textColor = if(isSelected) Color.White
-                    else Color(0.9f,0.9f,0.9f,1.0f)
+    val textColor by animateColorAsState( if(isSelected) Color.White
+                    else Color(0.9f,0.9f,0.9f,1.0f) )
 
     LazyRow(modifier = Modifier
         .fillMaxWidth()

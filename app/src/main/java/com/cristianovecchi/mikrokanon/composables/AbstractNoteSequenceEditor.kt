@@ -7,14 +7,16 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.material.Text
 
 import com.cristianovecchi.mikrokanon.AppViewModel
 import java.util.*
+import kotlin.collections.HashMap
 
 
 @Composable
 fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model: AppViewModel, editing: Boolean,
-                               res_done: Int? = null, done_action: (ArrayList<Clip>, Boolean) -> Unit) {
+                               iconMap: Map<String,Int> = HashMap<String,Int>(), done_action: (ArrayList<Clip>, Boolean) -> Unit) {
     val nClipCols = 6
     val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
 
@@ -29,27 +31,29 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model:
     val stack: Stack<Undo> = Stack()
 
     Column(modifier = Modifier.fillMaxHeight()) {
-        val modifier3 = Modifier
+        val modifier1 = Modifier
                 .fillMaxWidth()
-                .weight(3f)
+                .weight(1f)
         val modifier4 = Modifier
                 .fillMaxSize()
                 .weight(4f)
-        Row(modifier3) {
-
+        Row(modifier1) {
+            Text(text = "Build a Sequence!")
+        }
+        Row(modifier4) {
+            NoteClipDisplay(modifier = Modifier.fillMaxWidth(),  noteClips = clips, cursor = cursor.value, nCols = nClipCols,
+                dispatch = { id ->
+                    clips.forEachIndexed { index, clip ->
+                        if (clip.id == id) {
+                            cursor.value = index
+                            stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                            lastOutIsNotUndo.value = true
+                            lastIsCursorChanged.value = true
+                        }
+                    }
+                })
         }
 
-            NoteClipDisplay(modifier = modifier4,  noteClips = clips, cursor = cursor.value, nCols = nClipCols,
-                    dispatch = { id ->
-                        clips.forEachIndexed { index, clip ->
-                            if (clip.id == id) {
-                                cursor.value = index
-                                stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
-                                lastOutIsNotUndo.value = true
-                                lastIsCursorChanged.value = true
-                            }
-                        }
-                    })
 //            if(lastIsCursorChanged.value){
 //
 //                val nRows = (clips.size / nClipCols)
@@ -70,8 +74,8 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model:
 
 
 
-        Row(modifier3) {
-            NoteKeyboard(names = NoteNamesIt.values().map { it.toString() }, res_done = res_done,
+        Row(modifier4) {
+            NoteKeyboard(names = NoteNamesIt.values().map { it.toString() }, iconMap = iconMap,
                     dispatch = { out, text ->
                         when (out) {
                             is Out.Note -> {

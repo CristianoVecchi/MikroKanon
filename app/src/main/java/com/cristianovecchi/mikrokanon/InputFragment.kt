@@ -41,7 +41,7 @@ class InputFragment(): Fragment() {
                     // A surface container using the 'background' color from the theme
                     Surface(color = MaterialTheme.colors.background) {
                         AbstractNoteSequenceEditor(list, model = model, editing,
-                            res_done = R.drawable.ic_baseline_done_24,
+                            iconMap = model.iconMap,
 
                         done_action = { list , editing ->
                             findNavController().popBackStack()
