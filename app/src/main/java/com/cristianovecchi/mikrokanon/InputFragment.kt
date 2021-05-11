@@ -32,29 +32,24 @@ class InputFragment(): Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         //val model = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         val model = (activity as MainActivity).model
         return ComposeView(requireContext()).apply {
             setContent {
                 MikroKanonTheme {
-                    // A surface container using the 'background' color from the theme
                     Surface(color = MaterialTheme.colors.background) {
-                        AbstractNoteSequenceEditor(list, model = model, editing,
-                            iconMap = model.iconMap,
-
-                        done_action = { list , editing ->
-                            findNavController().popBackStack()
-                            if(list.isNotEmpty()){
-                                if(editing){
-                                    model.selectedSequence.value?.let { model.updateSequence(it, list) }
-                                } else {
-                                    model.addSequence(list)
+                        AbstractNoteSequenceEditor(list, model = model, editing, iconMap = model.iconMap,
+                            done_action = { list , editing ->
+                                findNavController().popBackStack()
+                                if(list.isNotEmpty()){
+                                    if(editing){
+                                        model.selectedSequence.value?.let { model.updateSequence(it, list) }
+                                    } else {
+                                        model.addSequence(list)
+                                    }
                                 }
                             }
-
-
-                        })
+                        )
                     }
                 }
             }

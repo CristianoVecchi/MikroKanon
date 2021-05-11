@@ -2,15 +2,12 @@ package com.cristianovecchi.mikrokanon.composables
 
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.material.Text
+import androidx.compose.runtime.*
 
 import com.cristianovecchi.mikrokanon.AppViewModel
-import java.util.*
+//import java.util.*
 import kotlin.collections.HashMap
 
 
@@ -28,7 +25,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model:
 
     data class Undo(val list: MutableList<Clip>, val cursor: Int)
 
-    val stack: Stack<Undo> = Stack()
+    val stack: java.util.Stack<Undo> = java.util.Stack<Undo>()
 
     Column(modifier = Modifier.fillMaxHeight()) {
         val modifier1 = Modifier
@@ -41,17 +38,20 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model:
             Text(text = "Build a Sequence!")
         }
         Row(modifier4) {
-            NoteClipDisplay(modifier = Modifier.fillMaxWidth(),  noteClips = clips, cursor = cursor.value, nCols = nClipCols,
-                dispatch = { id ->
-                    clips.forEachIndexed { index, clip ->
-                        if (clip.id == id) {
-                            cursor.value = index
-                            stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
-                            lastOutIsNotUndo.value = true
-                            lastIsCursorChanged.value = true
-                        }
+
+            NoteClipDisplay(
+                modifier = Modifier.fillMaxWidth(),  clips = clips.toList(),
+                cursor = mutableStateOf(cursor.value), nCols = nClipCols
+            ) { id ->
+                clips.forEachIndexed { index, clip ->
+                    if (clip.id == id) {
+                        cursor.value = index
+                        stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                        lastOutIsNotUndo.value = true
+                        lastIsCursorChanged.value = true
                     }
-                })
+                }
+            }
         }
 
 //            if(lastIsCursorChanged.value){

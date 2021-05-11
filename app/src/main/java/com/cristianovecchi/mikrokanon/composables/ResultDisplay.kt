@@ -45,7 +45,9 @@ fun ResultDisplay(model: AppViewModel,
             .fillMaxSize()
             .weight(1f)
         val listState = rememberLazyListState()
-        Text(text = "N. of Results found: ${counterpoints.size} STACK SIZE: ${model.counterpointStack.size}")
+
+
+        //Text(text = "N. of Results found: ${counterpoints.size} STACK SIZE: ${model.counterpointStack.size}")
 
         if(counterpoints.isEmpty()) Text(text = "ELABORATING...")
 
