@@ -22,7 +22,6 @@ import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.dao.UserOptionsData
 import com.cristianovecchi.mikrokanon.toStringAll
 
-
 @Composable
 fun SequenceSelector(model: AppViewModel,
                      onSelect: (Int) -> Unit = model::changeSequenceSelection,
@@ -45,10 +44,10 @@ fun SequenceSelector(model: AppViewModel,
         val selected by model.selectedSequence.observeAsState(initial = -1)
         val sequences by model.sequences.observeAsState(emptyList())
         val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-        val userOptions = if(userOptionsData.isEmpty()) UserOptionsData(0,"0","90","0") else userOptionsData[0]
+        //val userOptions = if(userOptionsData.isEmpty()) UserOptionsData(0,"0","90","0","0") else userOptionsData[0]
         val snackbarVisibleState = remember { mutableStateOf(false) }
         val dialogState by lazy { mutableStateOf(false) }
-        val selectedDialogSequence by lazy { mutableStateOf(-1) }
+        //val selectedDialogSequence by lazy { mutableStateOf(-1) }
 
         SequencesDialog(dialogState = dialogState, sequencesList = model.sequences.value!!.map{ it.toStringAll()},
             onSubmitButtonClick = { index, repeat ->
@@ -58,14 +57,13 @@ fun SequenceSelector(model: AppViewModel,
                 }
             }
         )
-
-        Text("number of sequences: ${sequences.size}")
-
-        val ensType = userOptions.ensembleType
-
-        Text("ensemble type selected: ${ensType}")
+        //Text("number of sequences: ${sequences.size}")
+        val onSelectComposition = { index:Int ->
+            snackbarVisibleState.value = false
+            onSelect(index)
+         }
         SequenceScrollableColumn(
-            modifier = modifier3, sequences = sequences, selected, onSelect
+            modifier = modifier3, sequences = sequences, selected, onSelect = onSelectComposition
         )
         //  DEL | EDIT | ADD | KP
         // FPad | FPdd | FPas | FPds
@@ -74,7 +72,9 @@ fun SequenceSelector(model: AppViewModel,
             Row(verticalAlignment = Alignment.CenterVertically){
                 // DEL
                 Button(modifier= Modifier.padding(2.dp),
-                    onClick = { if(selected in sequences.indices)  onDelete(selected)   else {snackbarVisibleState.value = true} } )
+                    onClick = { if(selected in sequences.indices)
+                        onDelete(selected)
+                    else {snackbarVisibleState.value = true} } )
                 {
                     Text(text = "DEL",
                         style = TextStyle(fontSize = 22.sp,
@@ -182,8 +182,6 @@ fun SequenceSelector(model: AppViewModel,
                 modifier = Modifier.padding(8.dp)
             ) { Text(text = "Please, select a Sequence!") }
         }
-
-
     }
 }
 
@@ -197,11 +195,15 @@ fun SequenceScrollableColumn(
         modifier = modifier
     ) {
         itemsIndexed(items = sequences) { index, sequence ->
-            if (index == selected) {
-                SelectableCard(text = sequence.toStringAll(), 20, isSelected = true, onClick = {})
-            } else {
-                SelectableCard(text = sequence.toStringAll(), 18, isSelected = false,onClick = {onSelect(index)})
+            Row(modifier = Modifier.padding(8.dp)){
+                if (index == selected) {
+                    SelectableCard(text = sequence.toStringAll(), 20, isSelected = true, onClick = {})
+                } else {
+                    SelectableCard(text = sequence.toStringAll(), 18, isSelected = false,onClick = {
+                        onSelect(index)})
                 }
+            }
+
         }
     }
 }

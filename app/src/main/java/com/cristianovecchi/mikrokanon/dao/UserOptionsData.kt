@@ -19,5 +19,17 @@ import androidx.room.PrimaryKey
         val bpm: String,
 
         @ColumnInfo(name = "rhythm")
-        val rhythm: String
-    )
+        val rhythm: String,
+
+        @ColumnInfo(name = "rhythmshuffle")
+        val rhythmShuffle: String,
+
+        @ColumnInfo(name = "partsshuffle")
+        val partsShuffle: String
+    ){
+        companion object{
+            fun getDefaultUserOptionData(): UserOptionsData{
+                return UserOptionsData(0,"0","90","0","0","0")
+            }
+        }
+    }

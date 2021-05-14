@@ -10,23 +10,23 @@ import java.lang.Math.abs
 object CounterpointInterpreter {
     fun doTheMagic(counterpoint: Counterpoint,
                    durations: List<Int> = listOf(240), // 1/8
-                   ensembleType: EnsembleType = EnsembleType.STRINGS,
+                   ensembleParts: List<EnsemblePart>,
                    nuances: Boolean): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
-        val ensParts: List<EnsemblePart> = Ensembles.getEnsemble(counterpoint.parts.size, ensembleType)
+
 
         counterpoint.parts.forEachIndexed { partIndex, part ->
             val channel = partIndex //+ 1
             val track = MidiTrack()
             val pc: MidiEvent =
-                ProgramChange(0, channel, ensParts[partIndex].instrument) // cambia strumento
+                ProgramChange(0, channel, ensembleParts[partIndex].instrument) // cambia strumento
             track.insertEvent(pc)
 
             var tick = 0
             var index = 0
             var durIndex = 0
             val actualPitches = Insieme.linearMelody(
-                ensParts[partIndex].octave,
+                ensembleParts[partIndex].octave,
                 part.absPitches.toIntArray(),
                 21,
                 108

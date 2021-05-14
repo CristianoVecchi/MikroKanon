@@ -12,8 +12,6 @@ import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.composables.AppScaffold
 import com.cristianovecchi.mikrokanon.composables.SequenceSelector
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 class SequencesFragment(): Fragment() {
 
@@ -21,7 +19,7 @@ class SequencesFragment(): Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
        // val model = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         val model = (activity as MainActivity).model
         model.allSequencesData.observe(viewLifecycleOwner){

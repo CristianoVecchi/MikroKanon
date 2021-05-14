@@ -88,13 +88,19 @@ object Player {
 
     }
 
-    fun playCounterpoint(mediaPlayer: MediaPlayer, looping: Boolean,
-                         counterpoint: Counterpoint, bpm: Float, shuffle: Float,
-                         durations: List<Int>, ensembleType: EnsembleType,
-                            play: Boolean, midiFile:File) : String {
+    fun playCounterpoint(
+        mediaPlayer: MediaPlayer, looping: Boolean,
+        counterpoint: Counterpoint, bpm: Float, shuffle: Float,
+        durations: List<Int>, ensembleType: EnsembleType,
+        play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false
+    ) : String {
         var error = ""
-        val counterpointTracks = CounterpointInterpreter.doTheMagic(counterpoint,durations,ensembleType,true)
+        val actualDurations = if (rhythmShuffle) listOf<Int>(*durations.toTypedArray(),*durations.toTypedArray(),*durations.toTypedArray()).shuffled() else durations
+        val ensembleParts: List<EnsemblePart> = Ensembles.getEnsemble(counterpoint.parts.size, ensembleType)
+        val actualEnsembleParts = if (partsShuffle) ensembleParts.shuffled() else ensembleParts
+        val counterpointTracks = CounterpointInterpreter.doTheMagic(counterpoint,actualDurations, actualEnsembleParts,true)
         if (counterpointTracks.isEmpty()) return "No Tracks in Counterpoint!!!"
+
         val tempoTrack = MidiTrack()
         // from TimeSignature.class
 //        public static final int DEFAULT_METER = 24;

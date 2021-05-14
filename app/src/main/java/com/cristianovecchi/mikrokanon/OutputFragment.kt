@@ -13,47 +13,22 @@ import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 
 class OutputFragment: Fragment() {
 
-//    private var list: List<Clip> = emptyList()
-//    private var sequenceToAdd: List<Clip> = emptyList()
-
-    //private var mikrokanons: MutableList<MikroKanon> = mutableListOf<MikroKanon>()
-
-
-    
-
- //   override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        arguments?.getParcelableArrayList<Clip>("list")?.let {
-//            this.list = it
-//        }
-//        arguments?.getParcelableArrayList<Clip>("sequenceToAdd")?.let {
-//            this.sequenceToAdd = it
-//        }
-        
- //   }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        //val model = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         val model = (activity as MainActivity).model
-//         model.userOptionsData.observe(viewLifecycleOwner){
-//             model.retrieveUserOptions()
-//         }
         return ComposeView(requireContext()).apply {
             setContent {
                 MikroKanonTheme {
-                    // A surface container using the 'background' color from the theme
                     Surface(color = MaterialTheme.colors.background) {
-                      //  val absPitches = list.map{it.abstractNote}.toList()
                        AppScaffold(model = model) {
                             ResultDisplay(
                                 model = model,
                                 onClick = { counterpoint ->
                                     if(counterpoint == model.selectedCounterpoint.value!!){
-                                        model.onPlay()
+                                        model.onPlay(true)
                                     } else {
                                         model.changeSelectedCounterpoint(
                                             counterpoint
@@ -68,20 +43,12 @@ class OutputFragment: Fragment() {
                                     model.onFreePartFurtherSelections(trend)
                                 },
                                 onExpand = { model.onExpand() },
-                                onPlay = { model.onPlay() }
-
+                                onPlay = { model.onPlay(true) }
                             )
                         }
                     }
+                }
             }
         }
-            }
-    }
-
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
     }
 }

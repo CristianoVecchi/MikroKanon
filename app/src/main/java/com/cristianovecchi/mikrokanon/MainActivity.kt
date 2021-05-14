@@ -1,21 +1,17 @@
 package com.cristianovecchi.mikrokanon
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.cristianovecchi.mikrokanon.composables.Clip
 import com.cristianovecchi.mikrokanon.dao.SequenceDataRepository
 import com.cristianovecchi.mikrokanon.dao.UserOptionsDataRepository
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,27 +49,6 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
     }
-//    @SuppressLint("MissingSuperCall")
-//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-//                                            grantResults: IntArray) {
-//        //super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        when (requestCode) {
-//            1 -> {
-//                if (grantResults.isNotEmpty() && grantResults[0] ==
-//                    PackageManager.PERMISSION_GRANTED) {
-//                    if ((ContextCompat.checkSelfPermission(this@MainActivity,
-//                            Manifest.permission.WRITE_EXTERNAL_STORAGE) ===
-//                                PackageManager.PERMISSION_GRANTED && Manifest.permission.WRITE_EXTERNAL_STORAGE) !==
-//                        PackageManager.PERMISSION_GRANTED)) {
-//                        Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
-//                    }
-//                } else {
-//                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
-//                }
-//                return
-//            }
-//        }
-//    }
 }
 
 fun ArrayList<Clip>.toStringAll(): String {
@@ -85,11 +60,11 @@ fun ArrayList<Clip>.toStringAll(): String {
 }
 
 
-class AppViewModelFactory(private val repository: SequenceDataRepository, private val userRepository: UserOptionsDataRepository) : ViewModelProvider.Factory {
+class AppViewModelFactory(private val sequenceRepository: SequenceDataRepository, private val userRepository: UserOptionsDataRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AppViewModel(repository, userRepository) as T
+            return AppViewModel(sequenceRepository, userRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

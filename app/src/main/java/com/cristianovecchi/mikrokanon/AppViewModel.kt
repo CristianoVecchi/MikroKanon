@@ -1,12 +1,10 @@
 package com.cristianovecchi.mikrokanon
 
-import android.content.Context
 import androidx.lifecycle.*
 import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.dao.SequenceData
 import com.cristianovecchi.mikrokanon.dao.SequenceDataRepository
 import com.cristianovecchi.mikrokanon.midi.Player
-import com.leff.midi.MidiFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -15,7 +13,6 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import android.media.MediaPlayer
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
-import android.content.SharedPreferences
 import android.os.Environment
 import com.cristianovecchi.mikrokanon.dao.UserOptionsData
 import com.cristianovecchi.mikrokanon.dao.UserOptionsDataRepository
@@ -31,11 +28,11 @@ sealed class Computation {
 }
 
 
-class AppViewModel(private val repository: SequenceDataRepository, private val userRepository: UserOptionsDataRepository) : ViewModel() {
+class AppViewModel(private val sequenceRepository: SequenceDataRepository, private val userRepository: UserOptionsDataRepository) : ViewModel() {
 
-//    val seq1 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,10, false))
-//    val seq2 = ArrayList<Clip>(randomClipSequence(NoteNamesIt.values().map{it.toString()},0,7, false))
-    val iconMap = mapOf<String,Int>(
+    val creditsUri: String = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
+
+    val iconMap = mapOf(
         "done" to R.drawable.ic_baseline_done_24,
         "add" to R.drawable.ic_baseline_add_24,
         "delete" to R.drawable.ic_baseline_delete_forever_24,
@@ -50,10 +47,11 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
     private val SPREAD_AS_POSSIBLE = true
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 18
     private var ensembleTypeSelected: EnsembleType = EnsembleType.STRING_ORCHESTRA
-    val allSequencesData: LiveData<List<SequenceData>> = repository.allSequences.asLiveData()
+    private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
+    val allSequencesData: LiveData<List<SequenceData>> = sequenceRepository.allSequences.asLiveData()
     val userOptionsData: LiveData<List<UserOptionsData>> = userRepository.userOptions.asLiveData()
     private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
-    val counterpointStack = Stack<Computation>()
+    private val counterpointStack = Stack<Computation>()
     private var elaborating = false
     private data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
@@ -61,12 +59,11 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
     private var mediaPlayer: MediaPlayer? = null
     val midiPath = java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
 
-
-
-    fun createMidi(): String{
+    // macro Functions called by fragments -----------------------------------------------------
+    val onPlay = { createAndPlay: Boolean ->
         var error = "No File Created yet!!!"
         if(userOptionsData.value!!.isEmpty()){
-            retrieveUserOptionsFromDB() // Check if work at first installation (no previous DB)
+            insertUserOptionData(UserOptionsData.getDefaultUserOptionData())
         }
         if(!selectedCounterpoint.value!!.isEmpty()){
             if (mediaPlayer == null) mediaPlayer = MediaPlayer()
@@ -84,37 +81,22 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
                     userOptionsData.value!![0].rhythm
                 )
             } ?: 0]
-            error = Player.playCounterpoint(mediaPlayer!!,false,selectedCounterpoint.value!!,
-                bpm,0f,rhythm.values, ensType, true, midiPath)
+            val rhythmShuffle: Boolean = 0 != (userOptionsData.value?.let {
+                Integer.parseInt(
+                    userOptionsData.value!![0].rhythmShuffle
+                ).toInt()} ?: 0 )
+            val partsShuffle: Boolean = 0 != (userOptionsData.value?.let {
+                Integer.parseInt(
+                    userOptionsData.value!![0].partsShuffle
+                ).toInt()} ?: 0 )
+            error = Player.playCounterpoint(
+                mediaPlayer!!, false, selectedCounterpoint.value!!,
+                bpm, 0f, rhythm.values, ensType, createAndPlay, midiPath, rhythmShuffle, partsShuffle
+            )
         }
-        return error
+        error
     }
-    // macro Functions called by fragments -----------------------------------------------------
-    val onPlay = {
-        if(userOptionsData.value!!.isEmpty()){
-            retrieveUserOptionsFromDB() // Check if work at first installation (no previous DB)
-        }
-        if(!selectedCounterpoint.value!!.isEmpty()){
-            if (mediaPlayer == null) mediaPlayer = MediaPlayer()
-            val ensType: EnsembleType = EnsembleType.values()[userOptionsData.value?.let {
-                Integer.parseInt(
-                    userOptionsData.value!![0].ensembleType
-                )
-            } ?: 0]
-            val bpm: Float = userOptionsData.value?.let {
-                Integer.parseInt(
-                    userOptionsData.value!![0].bpm
-                ).toFloat()} ?: 90f
-            val rhythm: RhythmPatterns = RhythmPatterns.values()[userOptionsData.value?.let {
-                Integer.parseInt(
-                    userOptionsData.value!![0].rhythm
-                )
-            } ?: 0]
-            Player.playCounterpoint(mediaPlayer!!,false,selectedCounterpoint.value!!,
-                bpm,0f,rhythm.values, ensType, true, midiPath)
-        }
 
-    }
     val dispatchIntervals = {
         refreshComputation(false)
     }
@@ -179,7 +161,7 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
     }
     //-------------end macro functions--------------------
 
-    fun refreshComputation(stepBack: Boolean){
+    private fun refreshComputation(stepBack: Boolean){
             if (!elaborating) {
                 elaborating = true
                 if (stepBack ) counterpointStack.pop()
@@ -274,7 +256,7 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
             }
 
     }
-    fun findFreeParts(trend: TREND){
+    private fun findFreeParts(trend: TREND){
         //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
@@ -297,7 +279,7 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
         }
         return newList
     }
-    fun findCounterpointsByMikroKanons4(){
+    private fun findCounterpointsByMikroKanons4(){
         //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
@@ -313,22 +295,21 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
         if(sequenceToMikroKanons.value!!.isNotEmpty()) {
             val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
             val key = CacheKey(sequence, intervalSet.value!!)
-            if(mk4cache.containsKey(key)){
-                return mk4cache[key]!!
+            return if(mk4cache.containsKey(key)){
+                mk4cache[key]!!
             } else {
                 val counterpoints = MikroKanon.findAll4AbsPartMikroKanons(
                     sequence,  intervalSet.value!!, 2
                 ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
                 mk4cache[key] = counterpoints
-                return counterpoints
+                counterpoints
             }
-
         } else {
             println("Sequence to MikroKanons is empty.")
             return emptyList()
         }
     }
-    fun findCounterpointsByMikroKanons3(){
+    private fun findCounterpointsByMikroKanons3(){
         //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
@@ -344,14 +325,14 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
         if(sequenceToMikroKanons.value!!.isNotEmpty()) {
             val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
             val key = CacheKey(sequence, intervalSet.value!!)
-            if(mk3cache.containsKey(key)){
-                return mk3cache[key]!!
+            return if(mk3cache.containsKey(key)){
+                mk3cache[key]!!
             } else {
                 val counterpoints = MikroKanon.findAll3AbsPartMikroKanons(
                     sequence,  intervalSet.value!!, 5
                 ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
                 mk3cache[key] = counterpoints
-                return counterpoints
+                counterpoints
             }
 
         } else {
@@ -359,7 +340,7 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
             return emptyList()
         }
     }
-    fun findCounterpointsByMikroKanons(){
+    private fun findCounterpointsByMikroKanons(){
         //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
@@ -371,17 +352,17 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
         }
     }
     private suspend fun findCpByMikroKanons(): List<Counterpoint>{
-        if(sequenceToMikroKanons.value!!.isNotEmpty()) {
-            return MikroKanon.findAll2AbsPartMikroKanons(
+        return if(sequenceToMikroKanons.value!!.isNotEmpty()) {
+            MikroKanon.findAll2AbsPartMikroKanons(
                 sequenceToMikroKanons.value!!.map { it.abstractNote }.toList(),
                 intervalSet.value!!, 5
             ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
         } else {
             println("Sequence to MikroKanons is empty.")
-            return emptyList()
+            emptyList()
         }
     }
-    fun expandCounterpoints(index: Int){
+    private fun expandCounterpoints(index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
@@ -403,7 +384,7 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
             Counterpoint.expand(it,2)
         }
     }
-    fun addRepeatedSequenceToCounterpoint(){
+    private fun addRepeatedSequenceToCounterpoint(){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
@@ -425,7 +406,7 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
         }
         return newList
     }
-    fun addSequenceToCounterpoint(){
+    private fun addSequenceToCounterpoint(){
         if(!selectedCounterpoint.value!!.isEmpty()){
             //_counterpoints.value = emptyList()
             var newList: List<Counterpoint>
@@ -450,13 +431,8 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
         return newList
     }
 
-    fun convertFirstSequenceToSelectedCounterpoint() {
+    private fun convertFirstSequenceToSelectedCounterpoint() {
         val newCounterpoint = Counterpoint.counterpointFromClipList(firstSequence.value!!)
-        _selectedCounterpoint.value = newCounterpoint
-    }
-
-    fun convertMikroKanonSequenceToCounterpoint() {
-        val newCounterpoint = Counterpoint.counterpointFromClipList(sequenceToMikroKanons.value!!)
         _selectedCounterpoint.value = newCounterpoint
     }
 
@@ -496,8 +472,7 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
 
     fun changeSelectedCounterpoint(newCounterpoint: Counterpoint){
         _selectedCounterpoint.value = newCounterpoint
-//       println("SELECTED COUNTERPOINT:")
-//       println(selectedCounterpoint.value!!.display())
+
     }
     fun changeIntervalSet(newIntervalSet: List<Int>){
         val sortedList = newIntervalSet.sorted()
@@ -532,53 +507,57 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
         dispatchIntervals()
     }
 
-
     // ROOM ---------------------------------------------------------------------
     fun addSequence(sequence: ArrayList<Clip>){
         viewModelScope.launch(Dispatchers.IO) {
-            repository.insert(SequenceData(0,sequence.map { clipToDataClip(it) }))
+            sequenceRepository.insert(SequenceData(0,sequence.map { clipToDataClip(it) }))
         }
     }
     fun deleteSequence(index: Int){
         val sequence = sequences.value!![index]
-        val sequenceData = map[sequence]
+        val sequenceData = sequenceDataMap[sequence]
         viewModelScope.launch(Dispatchers.IO) {
             if (sequenceData != null) {
-                repository.delete(sequenceData)
+                sequenceRepository.delete(sequenceData)
             }
         }
         changeSequenceSelection(-1)
     }
     fun updateSequence(index: Int, sequence: ArrayList<Clip>){
         val oldSequence = sequences.value!![index]
-        val sequenceData = map[oldSequence]
+        val sequenceData = sequenceDataMap[oldSequence]
         viewModelScope.launch(Dispatchers.IO) {
             if (sequenceData != null) {
-                repository.delete(sequenceData)
-                repository.insert(SequenceData(0,sequence.map { clipToDataClip(it) }))
+                sequenceRepository.delete(sequenceData)
+                sequenceRepository.insert(SequenceData(0,sequence.map { clipToDataClip(it) }))
             }
         }
     }
 
     fun retrieveSequencesFromDB(){
-        map.clear()
+        sequenceDataMap.clear()
         _sequences.value = allSequencesData.value!!.map{sequenceDataToSequence(it)}
     }
-    val map = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
-    val noteNames: List<String> = NoteNamesIt.values().map{it.toString()}
-    fun sequenceDataToSequence(sequenceData: SequenceData) : ArrayList<Clip>{
+
+    private fun sequenceDataToSequence(sequenceData: SequenceData) : ArrayList<Clip>{
         val sequence = ArrayList(sequenceData.clips.map { clipDataToClip(it)})
-        map[sequence] = sequenceData
+        sequenceDataMap[sequence] = sequenceData
         return sequence
     }
-    fun retrieveUserOptionsFromDB(){
 
+    fun insertUserOptionData(newUserOptionsData: UserOptionsData){
+        viewModelScope.launch(Dispatchers.IO) {
+            if(userOptionsData.value!!.isNotEmpty()){
+                userRepository.deleteAllUserOptions()
+            }
+            userRepository.insertUserOptions(newUserOptionsData)
+        }
     }
 
     fun updateUserOptions(key: String, value: String){
         var newUserOptionsData: UserOptionsData? = null
         val optionsDataClone = if(userOptionsData.value!!.isEmpty())
-                                UserOptionsData(0,"0","90","0")
+                                UserOptionsData.getDefaultUserOptionData()
                                 else userOptionsData.value!![0].copy()
         when(key){
             "ensemble_type" -> {
@@ -590,6 +569,12 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
             "rhythm" -> {
                 newUserOptionsData = optionsDataClone.copy(rhythm = value)
             }
+            "rhythmShuffle" -> {
+                newUserOptionsData = optionsDataClone.copy(rhythmShuffle = value)
+            }
+            "partsShuffle" -> {
+                newUserOptionsData = optionsDataClone.copy(partsShuffle = value)
+            }
         }
         newUserOptionsData?.let {
             viewModelScope.launch(Dispatchers.IO) {
@@ -599,7 +584,5 @@ class AppViewModel(private val repository: SequenceDataRepository, private val u
                 userRepository.insertUserOptions(newUserOptionsData)
             }
         }
-
-
     }
 }

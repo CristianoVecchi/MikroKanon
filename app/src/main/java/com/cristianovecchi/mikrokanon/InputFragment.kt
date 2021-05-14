@@ -25,14 +25,12 @@ class InputFragment(): Fragment() {
         arguments?.getBoolean("editing")?.let {
             editing = it
         }
-
     }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        //val model = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
+    ): View {
         val model = (activity as MainActivity).model
         return ComposeView(requireContext()).apply {
             setContent {
