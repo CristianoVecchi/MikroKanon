@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
        AppViewModelFactory((application as MikroKanonApplication).repository,
            (application as MikroKanonApplication).userRepository)
    }
+
     fun hasPermissions(context: Context?, vararg permissions: String?): Boolean {
         if (context != null && permissions != null) {
             for (permission in permissions) {
@@ -60,7 +61,8 @@ fun ArrayList<Clip>.toStringAll(): String {
 }
 
 
-class AppViewModelFactory(private val sequenceRepository: SequenceDataRepository, private val userRepository: UserOptionsDataRepository) : ViewModelProvider.Factory {
+class AppViewModelFactory(private val sequenceRepository: SequenceDataRepository,
+                          private val userRepository: UserOptionsDataRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AppViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

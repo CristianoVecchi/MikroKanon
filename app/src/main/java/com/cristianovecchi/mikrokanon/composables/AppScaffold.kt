@@ -1,7 +1,9 @@
 package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -16,6 +18,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
@@ -47,21 +50,23 @@ fun AppScaffold(model: AppViewModel, content: @Composable () -> Unit) {
         drawerContent = { SettingsDrawer(model = model)},
         topBar = {
             TopAppBar() {
-                IconButton(
-                    onClick = {scope.launch { scaffoldState.drawerState.open() }  }
-                ) {
-                    Icon(Icons.Filled.Menu,"")
+                Row(Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, ){
+                    IconButton(
+                        onClick = {scope.launch { scaffoldState.drawerState.open() }  }
+                    ) {
+                        Icon(Icons.Filled.Menu,"")
+                    }
+                    ClickableText(text = buildAnnotatedString {
+                        withStyle(titleStyle){
+                            append("MikroKanon\n")
+                        }
+                        withStyle(creditStyle) {
+                            append("by Cristiano Vecchi")
+                        }
+                    },onClick = {
+                        uriHandler.openUri(model.creditsUri)
+                    })
                 }
-                ClickableText(text = buildAnnotatedString {
-                    withStyle(titleStyle){
-                        append("MikroKanon\n")
-                    }
-                    withStyle(creditStyle) {
-                        append("by Cristiano Vecchi")
-                    }
-                },onClick = {
-                    uriHandler.openUri(model.creditsUri)
-                })
             }
         },
         content = {
@@ -166,7 +171,7 @@ fun SettingsDrawer(model: AppViewModel){
                 "Rhythm Shuffle" -> {
                     var isOn = userOptions.rhythmShuffle != "0"
                     val onOff = if(isOn) "On" else "Off"
-                    SelectableCard(text = "Rhythm Shuffle: $onOff", fontSize = fontSize, isSelected = true, onClick = { _ ->
+                    SelectableCard(text = "Rhythm Shuffle: $onOff", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         isOn = !isOn
                         model.updateUserOptions(
                             "rhythmShuffle",
@@ -178,7 +183,7 @@ fun SettingsDrawer(model: AppViewModel){
                 "Parts Shuffle" -> {
                     var isOn = userOptions.partsShuffle != "0"
                     val onOff = if(isOn) "On" else "Off"
-                    SelectableCard(text = "Parts Shuffle: $onOff", fontSize = fontSize, isSelected = true, onClick = { _ ->
+                    SelectableCard(text = "Parts Shuffle: $onOff", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         isOn = !isOn
                         model.updateUserOptions(
                             "partsShuffle",

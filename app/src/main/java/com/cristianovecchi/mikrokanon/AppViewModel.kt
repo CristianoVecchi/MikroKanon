@@ -84,11 +84,11 @@ class AppViewModel(private val sequenceRepository: SequenceDataRepository, priva
             val rhythmShuffle: Boolean = 0 != (userOptionsData.value?.let {
                 Integer.parseInt(
                     userOptionsData.value!![0].rhythmShuffle
-                ).toInt()} ?: 0 )
+                )} ?: 0 )
             val partsShuffle: Boolean = 0 != (userOptionsData.value?.let {
                 Integer.parseInt(
                     userOptionsData.value!![0].partsShuffle
-                ).toInt()} ?: 0 )
+                )} ?: 0 )
             error = Player.playCounterpoint(
                 mediaPlayer!!, false, selectedCounterpoint.value!!,
                 bpm, 0f, rhythm.values, ensType, createAndPlay, midiPath, rhythmShuffle, partsShuffle

@@ -23,7 +23,7 @@ import com.cristianovecchi.mikrokanon.AppViewModel
 
 
 @Composable
-fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, fontSize: Int,
+fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clips: MutableList<MutableList<Clip>>, fontSize: Int,
               onClick: (Counterpoint) -> Unit){
 
     val listState = rememberLazyListState()
@@ -31,42 +31,42 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, fontSize: Int,
     val isSelected = counterpoint == selectedCounterpoint
     val borderWidth = if(isSelected) 10 else 0
     val fontWeight = if(isSelected) FontWeight.ExtraBold else FontWeight.Normal
-    val parts = toClips(counterpoint, NoteNamesIt.values().map { value -> value.toString() })
-    val maxSize = parts.maxOf{ it.size}
+    val finalFontSize = if (isSelected) (fontSize + 3).sp else fontSize.sp
     val cellDarkColor by animateColorAsState( if(isSelected) Color(0.0f,0.0f,0.9f,1.0f)
                         else Color(0.0f,0.0f,0.5f,1.0f) )
     val cellLightColor by animateColorAsState( if(isSelected) Color(0.0f,0.0f,1f,1.0f)
                         else Color(0.0f,0.0f,0.6f,1.0f) )
+    val cellColors = listOf(cellDarkColor, cellLightColor)
     val selectionColor = Color(0.8f,0.8f,0.9f,1.0f)
     val textColor by animateColorAsState( if(isSelected) Color.White
                     else Color(0.9f,0.9f,0.9f,1.0f) )
-
-    LazyRow(modifier = Modifier
-        .fillMaxWidth()
-        .padding(10.dp).border(BorderStroke(borderWidth.dp, selectionColor))
-        .clickable {
-            onClick(counterpoint)
-        }, state = listState)
-            {
-                itemsIndexed((0 until maxSize).toList()) { i, _ ->
-                Column(modifier = Modifier.fillMaxWidth()
-                    ) {
-                            for(j in parts.indices){
-
-                                val clip = if (i < parts[j].size) parts[j][i] else Clip()
-
-                                Box(modifier = Modifier
-                                    .width(80.dp)
-                                    .background(if ((i + j) % 2 == 0) cellDarkColor else cellLightColor)
-                                ) {
-                                    Text(text = clip.text, modifier = Modifier.padding(8.dp),
-                                        style = TextStyle(fontSize = if(isSelected) (fontSize+3).sp else fontSize.sp,
-                                        color = textColor, fontWeight = fontWeight))
-                                }
-                            }
-                     }
+    val textStyle = TextStyle(
+        fontSize = finalFontSize,
+        color = textColor, fontWeight = fontWeight
+    )
+        LazyRow(modifier = Modifier
+            .fillMaxWidth().padding(10.dp).border(BorderStroke(borderWidth.dp, selectionColor))
+            .clickable {
+                onClick(counterpoint)
+            }, state = listState)
+        {
+            itemsIndexed(clips) { i, col ->
+                Column(
+                    Modifier.width(65.dp)
+                ) {
+                    for (j in col.indices) {
+                        val clip = col[j]
+                        Text(
+                            text = clip.text,
+                            modifier = Modifier.fillMaxWidth()
+                                .background(cellColors[ (i+j) % 2 ] )
+                                .padding(8.dp),
+                            style = textStyle
+                        )
+                    }
+                }
             }
-    }
+        }
 }
 
 

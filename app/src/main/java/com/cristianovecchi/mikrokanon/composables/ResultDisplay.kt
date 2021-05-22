@@ -54,7 +54,18 @@ fun ResultDisplay(model: AppViewModel,
         LazyColumn( modifier = modifier4, state = listState,)
          {
             items(counterpoints) { counterpoint ->
-                NoteTable(model,counterpoint , 16, onClick = {onClick(counterpoint)})
+                val parts = toClips(counterpoint, NoteNamesIt.values().map { value -> value.toString() })
+                val maxSize = parts.maxOf{ it.size}
+                val clips: MutableList<MutableList<Clip>> = mutableListOf()
+                for( i in 0 until maxSize){
+                    val col: MutableList<Clip> = mutableListOf()
+                    for(j in parts.indices) {
+                        val clip = if (i < parts[j].size) parts[j][i] else Clip()
+                        col.add(clip)
+                    }
+                    clips.add(col)
+                }
+                NoteTable(model,counterpoint , clips,16, onClick = {onClick(counterpoint)})
             }
         }
         Column(modifier1){

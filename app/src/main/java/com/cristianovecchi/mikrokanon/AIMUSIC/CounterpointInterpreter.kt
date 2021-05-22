@@ -33,7 +33,7 @@ object CounterpointInterpreter {
             )
             val velocities: IntArray = if(nuances){
                 val mssq = MelodySubSequencer(actualPitches)
-                mssq.assignVelocities(0.90f, 0.50f)
+                mssq.assignVelocities(0.95f, 0.45f)
                 mssq.velocities
             } else IntArray(actualPitches.size){ 100 }
 //            println("PART: #$partIndex")
