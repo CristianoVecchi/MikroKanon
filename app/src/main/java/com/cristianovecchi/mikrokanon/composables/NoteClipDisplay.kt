@@ -91,7 +91,8 @@ fun NoteClipDisplay(
                     }
                 }
                 if (cursor.value > -1) coroutineScope.launch {
-                    listState.animateScrollToItem((cursor.value / nCols))
+                    val rowIndex = if (clips.size <= nCols) 1 else cursor.value / nCols
+                    listState.animateScrollToItem(rowIndex)
                 }
             }
         }

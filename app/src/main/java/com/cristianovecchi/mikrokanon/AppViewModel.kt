@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon
 
+import android.app.Application
 import androidx.lifecycle.*
 import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.dao.SequenceData
@@ -12,10 +13,14 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import android.media.MediaPlayer
+import android.os.Build
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import android.os.Environment
+import android.provider.MediaStore
 import com.cristianovecchi.mikrokanon.dao.UserOptionsData
 import com.cristianovecchi.mikrokanon.dao.UserOptionsDataRepository
+import java.io.File
+import java.security.AccessController.getContext
 
 
 sealed class Computation {
@@ -28,7 +33,7 @@ sealed class Computation {
 }
 
 
-class AppViewModel(private val sequenceRepository: SequenceDataRepository, private val userRepository: UserOptionsDataRepository) : ViewModel() {
+class AppViewModel(application: Application, private val sequenceRepository: SequenceDataRepository, private val userRepository: UserOptionsDataRepository) : AndroidViewModel(application) {
 
     val creditsUri: String = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
 
@@ -57,7 +62,11 @@ class AppViewModel(private val sequenceRepository: SequenceDataRepository, priva
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
     private var mediaPlayer: MediaPlayer? = null
-    val midiPath = java.io.File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
+    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
+     else {
+        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
+    }
 
     // macro Functions called by fragments -----------------------------------------------------
     val onPlay = { createAndPlay: Boolean ->
@@ -91,9 +100,10 @@ class AppViewModel(private val sequenceRepository: SequenceDataRepository, priva
                 )} ?: 0 )
             error = Player.playCounterpoint(
                 mediaPlayer!!, false, selectedCounterpoint.value!!,
-                bpm, 0f, rhythm.values, ensType, createAndPlay, midiPath, rhythmShuffle, partsShuffle
+                bpm, 0f, rhythm.values, ensType, createAndPlay, midiPath , rhythmShuffle, partsShuffle
             )
         }
+
         error
     }
 

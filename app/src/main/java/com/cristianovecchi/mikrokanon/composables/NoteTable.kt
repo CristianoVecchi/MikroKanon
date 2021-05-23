@@ -2,6 +2,10 @@ package com.cristianovecchi.mikrokanon.composables
 
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -29,9 +33,9 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clips: MutableLis
     val listState = rememberLazyListState()
     val selectedCounterpoint by model.selectedCounterpoint.observeAsState()
     val isSelected = counterpoint == selectedCounterpoint
-    val borderWidth = if(isSelected) 10 else 0
+    val borderWidth by animateIntAsState(if(isSelected) 10 else 0)
     val fontWeight = if(isSelected) FontWeight.ExtraBold else FontWeight.Normal
-    val finalFontSize = if (isSelected) (fontSize + 3).sp else fontSize.sp
+    val finalFontSize by animateIntAsState(if (isSelected) (fontSize + 2 ) else fontSize)
     val cellDarkColor by animateColorAsState( if(isSelected) Color(0.0f,0.0f,0.9f,1.0f)
                         else Color(0.0f,0.0f,0.5f,1.0f) )
     val cellLightColor by animateColorAsState( if(isSelected) Color(0.0f,0.0f,1f,1.0f)
@@ -41,11 +45,13 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clips: MutableLis
     val textColor by animateColorAsState( if(isSelected) Color.White
                     else Color(0.9f,0.9f,0.9f,1.0f) )
     val textStyle = TextStyle(
-        fontSize = finalFontSize,
+        fontSize = finalFontSize.sp,
         color = textColor, fontWeight = fontWeight
     )
         LazyRow(modifier = Modifier
-            .fillMaxWidth().padding(10.dp).border(BorderStroke(borderWidth.dp, selectionColor))
+            .animateContentSize(animationSpec = tween(30,  easing = LinearEasing))
+            .padding(10.dp)
+            .border(BorderStroke(borderWidth.dp, selectionColor))
             .clickable {
                 onClick(counterpoint)
             }, state = listState)

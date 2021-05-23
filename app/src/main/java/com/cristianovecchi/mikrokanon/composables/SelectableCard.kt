@@ -1,9 +1,15 @@
 package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -24,10 +30,12 @@ fun SelectableCard(text: String, fontSize: Int, isSelected: Boolean, onClick: (I
     val backColor by animateColorAsState( if(isSelected) Color.White else Color.LightGray )
     val textColor  by animateColorAsState( if(isSelected) Color.Red else Color.Blue )
     val borderColor by animateColorAsState( if(isSelected) Color.Black else Color.DarkGray )
-    val padding = if(isSelected) 3.dp else 2.dp
+    val padding by animateDpAsState( if(isSelected) 3.dp else 2.dp )
     Card(modifier = Modifier
-        .clip(RoundedCornerShape(6.dp))
+        .animateContentSize(animationSpec = tween(25,  easing = LinearEasing))
+        //.aspectRatio( if (portraitMode) 3/4f else 16/9f)
         .padding(padding)
+        .clip(RoundedCornerShape(6.dp))
         .clickable { if (isSelected) onClick(1) else onClick(-1) },
         backgroundColor = backColor,
         contentColor = textColor,

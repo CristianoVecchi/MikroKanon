@@ -87,11 +87,7 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, onDismissRequest
 
                     var bpm by remember { mutableStateOf(numberDialogData.value.value) }
                     val setBpm = { bpmToCheck: Int ->
-                        val newBpm = when{
-                            bpmToCheck > numberDialogData.value.max -> numberDialogData.value.max
-                            bpmToCheck < numberDialogData.value.min -> numberDialogData.value.min
-                            else -> bpmToCheck
-                        }
+                        val newBpm = bpmToCheck.coerceIn(numberDialogData.value.min, numberDialogData.value.max )
                         bpm = newBpm
                     }
                     val fontSize = 26.sp
@@ -189,11 +185,7 @@ fun NumberDialog(numberDialogData: MutableState<NumberDialogData>, onDismissRequ
                         onClick = {
                             val bpm = if(textState.value.text.isBlank()) numberDialogData.value.value
                                 else Integer.parseInt(textState.value.text)
-                            val newBpm = when{
-                                bpm > numberDialogData.value.max -> numberDialogData.value.max
-                                bpm < numberDialogData.value.min -> numberDialogData.value.min
-                                else -> bpm
-                            }
+                            val newBpm = bpm.coerceIn(numberDialogData.value.min, numberDialogData.value.max )
                             numberDialogData.value.onSubmitButtonClick.invoke(newBpm)
                             onDismissRequest.invoke()
                         },
