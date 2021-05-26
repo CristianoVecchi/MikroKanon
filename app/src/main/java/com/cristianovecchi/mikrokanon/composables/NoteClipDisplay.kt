@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
-import com.cristianovecchi.mikrokanon.dao.ClipData
+import com.cristianovecchi.mikrokanon.db.ClipData
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.launch
 import kotlin.random.Random

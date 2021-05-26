@@ -1,4 +1,4 @@
-package com.cristianovecchi.mikrokanon.dao
+package com.cristianovecchi.mikrokanon.db
 
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow

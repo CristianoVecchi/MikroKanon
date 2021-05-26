@@ -1,16 +1,20 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import android.os.Parcelable
+import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.Clip
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 fun main(args : Array<String>){
-    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8);
+//    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8);
+//
+//    val mssq = MelodySubSequencer(pitches.toIntArray())
+//    mssq.assignVelocities(0.90f, 0.50f)
+//    mssq.printSubSequences()
 
-    val mssq = MelodySubSequencer(pitches.toIntArray())
-    mssq.assignVelocities(0.90f, 0.50f)
-    mssq.printSubSequences()
+
+
 //    val absPitches1 = mutableListOf(-1,1,0,6,11,5,7,8,8,3,3,3,6,9)
 //    val absPitches2 = mutableListOf(1,11,2,10,3,-1,9,6)
 //    val absPitches3 = mutableListOf(1,11,2,10)
@@ -38,12 +42,23 @@ data class Counterpoint(val parts: List<AbsPart>,
         emptiness ?: findEmptiness().also<Float> { it -> emptiness = it }
     }
     fun clone(): Counterpoint {
-
         return Counterpoint(parts.map{it.clone()}, ArrayList(intervalSet), emptiness)
+    }
+    fun enqueue(counterpoint: Counterpoint): Counterpoint{
+        val newParts = parts.mapIndexed { index, absPart ->
+            if(index<counterpoint.parts.size) absPart.enqueue( counterpoint.parts[index]) else absPart }
+        return Counterpoint(newParts, intervalSet)
+    }
+    fun inverse(): Counterpoint {
+        val newParts = parts.map{ it.inverse() }
+        return Counterpoint(newParts, intervalSet)
+    }
+    fun retrograde(): Counterpoint {
+        val newParts = parts.map{ it.retrograde() }
+        return Counterpoint(newParts, intervalSet)
     }
 
     companion object {
-
 
         fun counterpointFromClipList(clipList: List<Clip>) : Counterpoint{
             return Counterpoint(listOf(AbsPart.absPartfromClipList(clipList)))
@@ -113,9 +128,9 @@ data class Counterpoint(val parts: List<AbsPart>,
 
             var actualSeq = sequence.toMutableList()
             when (rowForm){
-                RowForm.INVERSE -> actualSeq = Insieme.invertAbsPitches(actualSeq.toIntArray()).toMutableList()
-                RowForm.RETROGRADE -> actualSeq = actualSeq.reversed().toMutableList()
-                RowForm.INV_RETROGRADE -> actualSeq = Insieme.invertAbsPitches(actualSeq.toIntArray()).reversedArray().toMutableList()
+                INVERSE -> actualSeq = Insieme.invertAbsPitches(actualSeq.toIntArray()).toMutableList()
+                RETROGRADE -> actualSeq = actualSeq.reversed().toMutableList()
+                INV_RETROGRADE -> actualSeq = Insieme.invertAbsPitches(actualSeq.toIntArray()).reversedArray().toMutableList()
                 else -> {}
             }
             actualSeq = actualSeq.map {Insieme.transposeAbsPitch(it, transpose) }.toMutableList()
@@ -163,12 +178,22 @@ data class Counterpoint(val parts: List<AbsPart>,
                 var counterpoint: Counterpoint
                 for (transpose in 0 until 12) {
                     for (form in 0 until 4) {
-                        counterpoint = findCounterpoint(target, sequence, intervalSet, delay, transpose, RowForm.values()[form])
+                        counterpoint = findCounterpoint(target, sequence, intervalSet, delay, transpose, values()[form])
                         result.add(counterpoint)
                     }
                 }
             }
 
+            return result
+        }
+
+        fun explodeRowForms(counterpoint: Counterpoint, rowFormsFlags: Int): Counterpoint {
+
+            val original = counterpoint.clone().also { it.normalizePartsSize(true)}
+            var result = original.clone()
+            result = if(rowFormsFlags and RowForm.INVERSE.flag != 0) result.enqueue(original.inverse()) else result
+            result = if(rowFormsFlags and RowForm.RETROGRADE.flag != 0) result.enqueue(original.retrograde()) else result
+            result = if(rowFormsFlags and RowForm.INV_RETROGRADE.flag != 0) result.enqueue(original.inverse().retrograde()) else result
             return result
         }
     }
@@ -257,6 +282,8 @@ data class Counterpoint(val parts: List<AbsPart>,
         println("Emptiness: $emptiness")
     }
 
+
+
     private fun findEmptiness() : Float {
         val maxSize = parts.maxOf { it.absPitches.size }
         val nCells = maxSize * parts.size
@@ -278,11 +305,33 @@ enum class TREND(val directions: List<Int>){
 }
 
 @Parcelize
-data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowForm.UNRELATED, val transpose: Int = 0, val delay: Int = 0) : Parcelable {
+data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = UNRELATED, val transpose: Int = 0, val delay: Int = 0) : Parcelable {
     companion object{
         fun absPartfromClipList(clipList: List<Clip>) : AbsPart {
             return AbsPart(clipList.map { it -> it.abstractNote }.toMutableList())
         }
+        val INVERTED_PITCHES = (11 downTo 0).toList()
+    }
+    fun inverse(): AbsPart{
+        val newAbsPitches = mutableListOf<Int>()
+        val newRowForm = when (rowForm){
+            ORIGINAL -> INVERSE
+            INVERSE -> ORIGINAL
+            RETROGRADE -> INV_RETROGRADE
+            INV_RETROGRADE -> RETROGRADE
+            UNRELATED -> UNRELATED
+        }
+        absPitches.map{ pitch -> if (pitch == -1) newAbsPitches.add(pitch)
+                                else newAbsPitches.add(INVERTED_PITCHES[pitch]) }
+        return AbsPart(newAbsPitches, newRowForm, transpose, delay)
+    }
+    fun retrograde(): AbsPart {
+        val newAbsPitches = absPitches.asReversed()
+        return AbsPart(newAbsPitches, rowForm, transpose, delay)
+    }
+    fun enqueue(absPart: AbsPart) : AbsPart {
+        val newAbsPitches = absPitches.toMutableList().also { it.addAll(absPart.absPitches)}
+        return AbsPart(newAbsPitches, rowForm, transpose, delay)
     }
     fun clone(): AbsPart{
        return AbsPart(ArrayList(absPitches),rowForm, transpose, delay)
@@ -298,4 +347,6 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         }
         return AbsPart(newAbsPitches, this.rowForm, this.transpose, this.delay)
     }
+
+
 }

@@ -1,10 +1,11 @@
 package com.cristianovecchi.mikrokanon
 
 import android.app.Application
+import android.content.Intent
 import androidx.lifecycle.*
 import com.cristianovecchi.mikrokanon.composables.*
-import com.cristianovecchi.mikrokanon.dao.SequenceData
-import com.cristianovecchi.mikrokanon.dao.SequenceDataRepository
+import com.cristianovecchi.mikrokanon.db.SequenceData
+import com.cristianovecchi.mikrokanon.db.SequenceDataRepository
 import com.cristianovecchi.mikrokanon.midi.Player
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,14 +14,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import android.media.MediaPlayer
-import android.os.Build
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
-import android.os.Environment
-import android.provider.MediaStore
-import com.cristianovecchi.mikrokanon.dao.UserOptionsData
-import com.cristianovecchi.mikrokanon.dao.UserOptionsDataRepository
+import androidx.core.content.FileProvider
+import com.cristianovecchi.mikrokanon.db.UserOptionsData
+import com.cristianovecchi.mikrokanon.db.UserOptionsDataRepository
 import java.io.File
-import java.security.AccessController.getContext
 
 
 sealed class Computation {
@@ -62,11 +60,12 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
     private var mediaPlayer: MediaPlayer? = null
-    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
-     else {
-        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
-    }
+    val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
+//    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+//        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
+//     else {
+//        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
+//    }
 
     // macro Functions called by fragments -----------------------------------------------------
     val onPlay = { createAndPlay: Boolean ->
@@ -98,9 +97,14 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
                 Integer.parseInt(
                     userOptionsData.value!![0].partsShuffle
                 )} ?: 0 )
+            val rowFormsFlags: Int = userOptionsData.value?.let {
+                Integer.parseInt(
+                    userOptionsData.value!![0].rowFormsFlags
+                )
+            } ?: 1 // ORIGINAL by default
             error = Player.playCounterpoint(
                 mediaPlayer!!, false, selectedCounterpoint.value!!,
-                bpm, 0f, rhythm.values, ensType, createAndPlay, midiPath , rhythmShuffle, partsShuffle
+                bpm, 0f, rhythm.values, ensType, createAndPlay, midiPath , rhythmShuffle, partsShuffle, rowFormsFlags
             )
         }
 
@@ -170,6 +174,39 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         }
     }
     //-------------end macro functions--------------------
+
+    fun shareMidi(file: File){
+        try {
+            if(file.exists()) {
+                val uri = FileProvider.getUriForFile(getApplication<MikroKanonApplication>().applicationContext,
+                    BuildConfig.APPLICATION_ID + ".fileprovider",
+                    file)
+                val intent = Intent(Intent.ACTION_SEND)
+                //println(Intent.FLAG_ACTIVITY_NEW_TASK)
+                //var flags = Intent.FLAG_GRANT_READ_URI_PERMISSION //or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                //val flags = Intent.FLAG_ACTIVITY_NEW_TASK + 1
+                //println("FLAGS: ${flags.toByte()}")
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                intent.setType("audio/midi")
+                intent.putExtra(Intent.EXTRA_STREAM, uri)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                //println("FLAGS: ${intent.flags}")
+                getApplication<MikroKanonApplication>()
+                    .applicationContext
+                    .startActivity(intent)
+                    //.startActivity(Intent.createChooser(intent,"Share MIDI to..."))
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+//        val shareIntent: Intent = Intent().apply {
+//            action = Intent.ACTION_SEND
+//            putExtra(Intent.EXTRA_STREAM, file.toURI() as Parcelable)
+//            type = "audio/midi"
+//        }
+//        getApplication<MikroKanonApplication>().applicationContext
+//
+    }
 
     private fun refreshComputation(stepBack: Boolean){
             if (!elaborating) {
@@ -585,6 +622,10 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
             "partsShuffle" -> {
                 newUserOptionsData = optionsDataClone.copy(partsShuffle = value)
             }
+            "rowFormsFlags" -> {
+                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = value)
+            }
+
         }
         newUserOptionsData?.let {
             viewModelScope.launch(Dispatchers.IO) {

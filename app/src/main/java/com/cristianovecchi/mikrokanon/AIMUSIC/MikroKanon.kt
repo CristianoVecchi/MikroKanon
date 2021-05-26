@@ -385,8 +385,8 @@ data class MikroKanon(val parts: List<AbsPart>,
 
 
 
-enum class RowForm {
-    ORIGINAL, INVERSE, RETROGRADE, INV_RETROGRADE, UNRELATED
+enum class RowForm(val flag: Int) {
+    ORIGINAL(1), INVERSE(2), RETROGRADE(4), INV_RETROGRADE(8), UNRELATED(0);
 }
 
 fun main(args : Array<String>){

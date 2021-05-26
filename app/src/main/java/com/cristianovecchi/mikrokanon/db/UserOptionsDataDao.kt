@@ -1,4 +1,4 @@
-package com.cristianovecchi.mikrokanon.dao
+package com.cristianovecchi.mikrokanon.db
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserOptionsDataDao {
-    @Query("SELECT * FROM useroptionsdata")
+    @Query("SELECT * FROM useroptions_data")
     fun getAllUserOptions(): Flow<List<UserOptionsData>>
 
     @Insert
@@ -17,6 +17,6 @@ interface UserOptionsDataDao {
     @Delete
     fun deleteUserOptions(userOptionsData: UserOptionsData)
 
-    @Query("DELETE FROM useroptionsdata")
+    @Query("DELETE FROM useroptions_data")
     fun deleteAllUserOptions()
 }

@@ -1,4 +1,4 @@
-package com.cristianovecchi.mikrokanon.dao
+package com.cristianovecchi.mikrokanon.db
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SequenceDataDao {
 
-    @Query("SELECT * FROM sequencedata")
+    @Query("SELECT * FROM sequence_data")
     fun getAll(): Flow<List<SequenceData>>
 
     @Insert
-    fun insertAll(vararg sequencedata: SequenceData)
+    fun insertAll(vararg sequence_data: SequenceData)
 
     @Delete
-    fun delete(sequencedata: SequenceData)
+    fun delete(sequence_data: SequenceData)
 }

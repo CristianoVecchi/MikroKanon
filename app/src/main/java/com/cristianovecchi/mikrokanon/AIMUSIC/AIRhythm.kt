@@ -34,11 +34,31 @@ enum class RhythmPatterns(val title: String, val values: List<Int> ) {
     FLUX_34567654("Flux 34567654",listOf(160,160,160,120,120,120,120,96,96,96,96,96,80,80,80,80,80,80,69,68,69,68,69,68,69,80,80,80,80,80,80,96,96,96,96,96,120,120,120,120,160,160,160)),
     FLUX_3456787654("Flux 3456787654",listOf(160,160,160,120,120,120,120,96,96,96,96,96,80,80,80,80,80,80,69,68,69,68,69,68,69,60,60,60,60,60,60,60,60, 69,68,69,68,69,68,69,80,80,80,80,80,80,96,96,96,96,96,120,120,120,120,160,160,160)),
     ;
+    fun durationSum(nNotes: Int): Int{
+       return RhythmPatterns.durationSum(nNotes, values)
+    }
     companion object {
+        fun durationSum(nNotes: Int, values: List<Int>): Int{
+            var index = 0;
+            var sum = 0
+            var valueIndex = 0
+            while(index < nNotes){
+                val value = values[valueIndex % values.size]
+                if (value < 0){
+                    sum += value * -1
+                    valueIndex++
+                } else {
+                    sum += value
+                    index++; valueIndex++
+                }
+            }
+            return sum
+        }
         fun getTitles(): List<String> {
             return values().map {
                 it.title
             }
         }
+
     }
 }

@@ -1,10 +1,10 @@
-package com.cristianovecchi.mikrokanon.dao
+package com.cristianovecchi.mikrokanon.db
 
 import androidx.room.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-@Entity(tableName = "sequencedata")
+@Entity(tableName = "sequence_data")
 data class SequenceData(
     @PrimaryKey(autoGenerate = true)
     val id: Long,

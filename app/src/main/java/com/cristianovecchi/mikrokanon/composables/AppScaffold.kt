@@ -1,6 +1,5 @@
 package com.cristianovecchi.mikrokanon.composables
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,27 +11,21 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
-import com.cristianovecchi.mikrokanon.AIMUSIC.Ensembles
 import com.cristianovecchi.mikrokanon.AppViewModel
 import kotlinx.coroutines.launch
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
-import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns.Companion.getTitles
-import com.cristianovecchi.mikrokanon.dao.UserOptionsData
-import com.cristianovecchi.mikrokanon.toStringAll
-import java.io.File
+import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
+import com.cristianovecchi.mikrokanon.db.UserOptionsData
 
 @Composable
 fun AppScaffold(model: AppViewModel, content: @Composable () -> Unit) {
@@ -94,9 +87,9 @@ fun SettingsDrawer(model: AppViewModel){
     ListDialog(listDialogData)
     BpmDialog(bpmDialogData)
     ExportDialog(exportDialogData)
-    val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm", "Export MIDI", "Rhythm Shuffle", "Parts Shuffle")
+    val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle", "Inverse", "Retrograde", "Inv-Retrograde", "Export MIDI",)
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-    val userOptions = if(userOptionsData.isEmpty()) UserOptionsData(0,"0","90", "0","0","0")
+    val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionData()
                         else userOptionsData[0]
     val listState = rememberLazyListState()
 
@@ -107,7 +100,7 @@ fun SettingsDrawer(model: AppViewModel){
     LazyColumn(
         state = listState,
     ) { items(optionNames) { optionName ->
-            val fontSize = 18
+            val fontSize = 16
             when(optionName){
                 "Ensemble" -> {
                     val ensNames: List<String> = EnsembleType.values().map{ it.toString()}
@@ -152,22 +145,6 @@ fun SettingsDrawer(model: AppViewModel){
                         }
                     })
                 }
-                "Export MIDI" -> {
-                    SelectableCard(text = "Export MIDI", fontSize = fontSize, isSelected = true, onClick = { _ ->
-                        val path = model.midiPath.absolutePath.toString()
-                        var error = model.onPlay(false)
-                        if (error.isNotEmpty()){
-                           // TODO sending to Google Drive
-                        }
-
-                        exportDialogData.value = ExportDialogData(true,"Exporting MIDI File:",
-                            path = model.midiPath.absolutePath.toString(), error = error
-                        ) {
-
-                            exportDialogData.value = ExportDialogData(path = path, error = error)
-                        }
-                    })
-                }
                 "Rhythm Shuffle" -> {
                     var isOn = userOptions.rhythmShuffle != "0"
                     val onOff = if(isOn) "On" else "Off"
@@ -191,11 +168,57 @@ fun SettingsDrawer(model: AppViewModel){
                         )
                     })
                 }
+                "Inverse" -> {
+                    val flags = Integer.parseInt(userOptions.rowFormsFlags)
+                    val isOn = flags and RowForm.INVERSE.flag != 0
+                    SelectableCard(text = "Inverse", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                        val newFlags = flags xor RowForm.INVERSE.flag // ^ toggles the flag
+                        model.updateUserOptions(
+                            "rowFormsFlags",
+                            newFlags.toString()
+                        )
+                    })
+                }
+                "Retrograde" -> {
+                    val flags = Integer.parseInt(userOptions.rowFormsFlags)
+                    val isOn = flags and RowForm.RETROGRADE.flag != 0
+                    SelectableCard(text = "Retrograde", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                        val newFlags = flags xor RowForm.RETROGRADE.flag // ^ toggles the flag
+                        model.updateUserOptions(
+                            "rowFormsFlags",
+                            newFlags.toString()
+                        )
+                    })
+                }
+                "Inv-Retrograde" -> {
+                    val flags = Integer.parseInt(userOptions.rowFormsFlags)
+                    val isOn = flags and RowForm.INV_RETROGRADE.flag != 0
+                    SelectableCard(text = "Inv-Retrograde", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                        val newFlags = flags xor RowForm.INV_RETROGRADE.flag // ^ toggles the flag
+                        model.updateUserOptions(
+                            "rowFormsFlags",
+                            newFlags.toString()
+                        )
+                    })
+                }
+                "Export MIDI" -> {
+                    SelectableCard(text = "Export MIDI", fontSize = fontSize, isSelected = true, onClick = { _ ->
+                        val path = model.midiPath.absolutePath.toString()
+                        var error = model.onPlay(false)
+                        if (error.isEmpty()){
+                            model.shareMidi(model.midiPath)
+                        }
+
+                        exportDialogData.value = ExportDialogData(true,"Exporting MIDI File:",
+                            path = model.midiPath.absolutePath.toString(), error = error
+                        ) {
+
+                            exportDialogData.value = ExportDialogData(path = path, error = error)
+                        }
+                    })
+                }
             }
         }
     }
 }
 
-enum class Rhythms {
-
-}
