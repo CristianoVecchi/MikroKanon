@@ -45,6 +45,8 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         "full_forward" to R.drawable.ic_baseline_fast_forward_24,
         "back" to R.drawable.ic_baseline_arrow_back_24,
         "full_back" to R.drawable.ic_baseline_fast_rewind_24,
+        "play" to R.drawable.ic_baseline_play_arrow_24,
+        "expand" to R.drawable.ic_baseline_sync_alt_24,
     )
     private var lastIndex = 0
     private val SPREAD_AS_POSSIBLE = true

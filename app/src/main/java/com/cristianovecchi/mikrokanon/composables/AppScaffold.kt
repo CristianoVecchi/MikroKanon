@@ -100,7 +100,7 @@ fun SettingsDrawer(model: AppViewModel){
     LazyColumn(
         state = listState,
     ) { items(optionNames) { optionName ->
-            val fontSize = 16
+            val fontSize = 18
             when(optionName){
                 "Ensemble" -> {
                     val ensNames: List<String> = EnsembleType.values().map{ it.toString()}
@@ -147,8 +147,7 @@ fun SettingsDrawer(model: AppViewModel){
                 }
                 "Rhythm Shuffle" -> {
                     var isOn = userOptions.rhythmShuffle != "0"
-                    val onOff = if(isOn) "On" else "Off"
-                    SelectableCard(text = "Rhythm Shuffle: $onOff", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                    SelectableCard(text = "Rhythm Shuffle", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         isOn = !isOn
                         model.updateUserOptions(
                             "rhythmShuffle",
@@ -159,8 +158,8 @@ fun SettingsDrawer(model: AppViewModel){
                 }
                 "Parts Shuffle" -> {
                     var isOn = userOptions.partsShuffle != "0"
-                    val onOff = if(isOn) "On" else "Off"
-                    SelectableCard(text = "Parts Shuffle: $onOff", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+
+                    SelectableCard(text = "Parts Shuffle", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         isOn = !isOn
                         model.updateUserOptions(
                             "partsShuffle",

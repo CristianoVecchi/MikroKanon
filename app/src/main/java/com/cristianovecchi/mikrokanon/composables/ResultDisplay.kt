@@ -1,17 +1,22 @@
 package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,7 +51,7 @@ fun ResultDisplay(model: AppViewModel,
             .weight(1f)
         val listState = rememberLazyListState()
 
-
+        val buttonSize = 60.dp
         //Text(text = "N. of Results found: ${counterpoints.size} STACK SIZE: ${model.counterpointStack.size}")
 
         if(counterpoints.isEmpty()) Text(text = "ELABORATING...")
@@ -79,58 +84,41 @@ fun ResultDisplay(model: AppViewModel,
                     if(index != -1) { onKP(index, repeat) }
                 } )
 
-            Row(verticalAlignment = Alignment.CenterVertically){
-                //FPad Button
-                Button(modifier= Modifier.padding(2.dp),
-                    onClick = { onFreePart(TREND.ASCENDANT_DYNAMIC) } )
-                {
-                    Text(text = "FPad",
-                        style = TextStyle(fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold) )
-                }
-                //FPdd Button
-                Button(modifier= Modifier.padding(2.dp),
-                    onClick = {  onFreePart(TREND.DESCENDANT_DYNAMIC) } )
-                {
-                    Text(text = "FPdd",
-                        style = TextStyle(fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold) )
-                }
-                //FPas Button
-                Button(modifier= Modifier.padding(2.dp),
-                    onClick = { onFreePart(TREND.ASCENDANT_STATIC) } )
-                {
-                    Text(text = "FPas",
-                        style = TextStyle(fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold) )
-                }
-                //FPds Button
-                Button(modifier= Modifier.padding(2.dp),
-                    onClick = { onFreePart(TREND.DESCENDANT_STATIC)} )
-                {
-                    Text(text = "FPds",
-                        style = TextStyle(fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold) )
-                }
-            }
+
             Row(verticalAlignment = Alignment.CenterVertically) {
 
-                // BACK BUTTON
-                Button(modifier= Modifier.padding(2.dp),
-                    onClick = { onBack() } )
+                // UNDO BUTTON
+                IconButton(modifier = Modifier
+                    .padding(2.dp)
+                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .then(
+                        Modifier
+                            .size(buttonSize)
+                            .border(2.dp, Color.Black)
+                    ),
+                onClick = { onBack() } )
                 {
-                    Text(text = "Back",
-                        style = TextStyle(fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold) )
+                    Icon(
+                        painter = painterResource(id = model.iconMap["undo"]!!),
+                        contentDescription = null, // decorative element
+                        tint =  Color.Blue )
                 }
 
                 // EX BUTTON
-                Button(modifier= Modifier.padding(2.dp),
+                IconButton(modifier = Modifier
+                    .padding(2.dp)
+                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .then(
+                        Modifier
+                            .size(buttonSize)
+                            .border(2.dp, Color.Black)
+                    ),
                     onClick = { onExpand() } )
                 {
-                    Text(text = "EX",
-                        style = TextStyle(fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold) )
+                    Icon(
+                        painter = painterResource(id = model.iconMap["expand"]!!),
+                        contentDescription = null, // decorative element
+                        tint =  Color.Blue )
                 }
 
                 // KP BUTTON
@@ -142,18 +130,32 @@ fun ResultDisplay(model: AppViewModel,
                             fontWeight = FontWeight.Bold) )
                 }
 
+
+                FreePartsButtons(
+                    fontSize = 22,
+                    onAscDynamicClick = { onFreePart(TREND.ASCENDANT_DYNAMIC) },
+                    onAscStaticClick = { onFreePart(TREND.ASCENDANT_STATIC) },
+                    onDescDynamicClick = {  onFreePart(TREND.DESCENDANT_DYNAMIC) },
+                    onDescStaticClick =  { onFreePart(TREND.DESCENDANT_STATIC)}
+                )
                 // PLAY BUTTON
-                Button(modifier= Modifier.padding(2.dp),
+                IconButton(modifier = Modifier
+                    .padding(2.dp)
+                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .then(
+                        Modifier
+                            .size(buttonSize)
+                            .border(2.dp, Color.Black)
+                    ),
                     onClick = { onPlay() } )
                 {
-                    Text(text = "->",
-                        style = TextStyle(fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold) )
+                    Icon(
+                        painter = painterResource(id = model.iconMap["play"]!!),
+                        contentDescription = null, // decorative element
+                        tint =  Color.Blue )
                 }
-
             }
         }
-
         Row(modifier1){
             IntervalSetSelector(
                     model, fontSize = 10,
