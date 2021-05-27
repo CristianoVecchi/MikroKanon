@@ -36,6 +36,9 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     val creditsUri: String = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
 
     val iconMap = mapOf(
+       // "mikrokanon" to R.drawable.ic_baseline_account_tree_24,
+        "mikrokanon" to R.drawable.ic_baseline_clear_all_24,
+        "counterpoint" to R.drawable.ic_baseline_drag_handle_24,
         "done" to R.drawable.ic_baseline_done_24,
         "add" to R.drawable.ic_baseline_add_24,
         "delete" to R.drawable.ic_baseline_delete_forever_24,

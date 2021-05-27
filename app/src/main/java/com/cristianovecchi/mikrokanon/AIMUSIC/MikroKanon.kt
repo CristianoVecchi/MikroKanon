@@ -81,7 +81,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                 }
             }
 
-            return MikroKanon(listOf(dux, comes), intervalSet)
+            return MikroKanon(listOf(comes, dux), intervalSet)
         }
 
         fun find3AbsPartMikroKanon(
@@ -164,7 +164,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                 }
             }
 
-            return MikroKanon(listOf(dux, comes1, comes2), intervalSet)
+            return MikroKanon(listOf(comes2, comes1, dux), intervalSet)
         }
 
         fun find4AbsPartMikroKanon(
@@ -279,7 +279,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                     duxIndex++
                 }
             }
-            return MikroKanon(listOf(dux, comes1, comes2, comes3), intervalSet)
+            return MikroKanon(listOf(comes3, comes2, comes1, dux), intervalSet)
         }
 
         fun findAll2AbsPartMikroKanons(

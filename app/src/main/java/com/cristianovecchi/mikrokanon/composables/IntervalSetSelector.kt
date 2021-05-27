@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
@@ -15,7 +16,7 @@ fun IntervalSetSelector(model: AppViewModel, fontSize: Int,
                         dispatchIntervals: (List<Int>) -> Unit) {
     val intervals by model.intervalSet.observeAsState(emptyList())
     val backgroundColor = Color(0.5f,0.5f,1.0f,1.0f)
-    Row(modifier = Modifier.fillMaxWidth().background(backgroundColor), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = Modifier.fillMaxWidth().background(backgroundColor), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
 
 
         if(intervals.containsAll(listOf(1,11))){

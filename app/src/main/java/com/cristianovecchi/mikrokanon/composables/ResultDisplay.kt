@@ -73,7 +73,7 @@ fun ResultDisplay(model: AppViewModel,
                 NoteTable(model,counterpoint , clips,16, onClick = {onClick(counterpoint)})
             }
         }
-        Column(modifier1){
+        Column(modifier1, verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally){
 
             val dialogState by lazy { mutableStateOf(false) }
             val selectedDialogSequence by lazy { mutableStateOf(-1) }
@@ -121,15 +121,25 @@ fun ResultDisplay(model: AppViewModel,
                         tint =  Color.Blue )
                 }
 
-                // KP BUTTON
-                Button(modifier= Modifier.padding(2.dp),
-                    onClick = { dialogState.value = true } )
+                // Add Counterpoint Button
+                IconButton(modifier = Modifier
+                    .padding(2.dp)
+                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .then(
+                        Modifier
+                            .size(buttonSize)
+                            .border(2.dp, Color.Black)
+                    ),
+                    onClick = {
+                        dialogState.value = true
+                   })
                 {
-                    Text(text = "KP",
-                        style = TextStyle(fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold) )
+                    Icon(
+                        painter = painterResource(id = model.iconMap["counterpoint"]!!),
+                        contentDescription = null, // decorative element
+                        tint = Color.Blue
+                    )
                 }
-
 
                 FreePartsButtons(
                     fontSize = 22,
@@ -156,7 +166,7 @@ fun ResultDisplay(model: AppViewModel,
                 }
             }
         }
-        Row(modifier1){
+        Column(modifier1, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
             IntervalSetSelector(
                     model, fontSize = 10,
                     dispatchIntervals = { newIntervals ->

@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
@@ -44,11 +45,8 @@ fun SequenceSelector(model: AppViewModel,
             .weight(1f)
         val selected by model.selectedSequence.observeAsState(initial = -1)
         val sequences by model.sequences.observeAsState(emptyList())
-        val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-        //val userOptions = if(userOptionsData.isEmpty()) UserOptionsData(0,"0","90","0","0") else userOptionsData[0]
         val snackbarVisibleState = remember { mutableStateOf(false) }
         val dialogState by lazy { mutableStateOf(false) }
-        //val selectedDialogSequence by lazy { mutableStateOf(-1) }
         val buttonSize = 54.dp
 
         SequencesDialog(dialogState = dialogState,
@@ -60,7 +58,6 @@ fun SequenceSelector(model: AppViewModel,
                 }
             }
         )
-        //Text("number of sequences: ${sequences.size}")
         val onSelectComposition = { index: Int ->
             snackbarVisibleState.value = false
             onSelect(index)
@@ -69,135 +66,64 @@ fun SequenceSelector(model: AppViewModel,
             modifier = modifier3, sequences = sequences, selected, onSelect = onSelectComposition
         )
 
-        //  DEL | EDIT | ADD | KP
-        // FPad | FPdd | FPas | FPds
-        // MK | MK3 | MK4 | RP
         Column(modifier1) {
-            Row() {
+            Row(modifier = Modifier.fillMaxSize(),horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                SequenceEditingButtons(
+                    model = model,
+                    buttonSize = buttonSize,
+                    onDelete = {if (selected in sequences.indices)
+                        onDelete(selected)
+                    else {
+                        snackbarVisibleState.value = true
+                    } },
+                    onEdit = { if (selected in sequences.indices) {
+                        onAdd(sequences[selected], true)
+                    } else {
+                        snackbarVisibleState.value = true
+                    }},
+                    onAdd= { onAdd(ArrayList<Clip>(), false)})
 
-                Column(horizontalAlignment = Alignment.Start) {
-                    // DEL
-                    IconButton(modifier = Modifier.padding(2.dp).
-                    background(Color.White, RoundedCornerShape(4.dp))
-                        .then(Modifier.size(buttonSize).border(2.dp, Color.Black)),
-                        onClick = {
-                            if (selected in sequences.indices)
-                                onDelete(selected)
-                            else {
-                                snackbarVisibleState.value = true
-                            }
-                        })
-                    {
-                        Icon(
-                            painter = painterResource(id = model.iconMap["delete"]!!),
-                            contentDescription = null, // decorative element
-                            tint =  Color.Blue )
-                    }
-                    //Edit Button
-                    IconButton(modifier = Modifier.padding(2.dp).
-                    background(Color.White, RoundedCornerShape(4.dp))
-                        .then(Modifier.size(buttonSize).border(2.dp, Color.Black)),
-                        onClick = {
-                            if (selected in sequences.indices) {
-                                onAdd(sequences[selected], true)
-                            } else {
-                                snackbarVisibleState.value = true
-                            }
-                        })
-                    {
-                        Icon(
-                            painter = painterResource(id = model.iconMap["edit"]!!),
-                            contentDescription = null, // decorative element
-                            tint =  Color.Blue )
-                    }
-
-
-                    //ADD Button
-                    IconButton(modifier = Modifier.padding(2.dp).
-                    background(Color.White, RoundedCornerShape(4.dp))
-                        .then(Modifier.size(buttonSize).border(2.dp, Color.Black)),
-                        onClick = { onAdd(ArrayList<Clip>(), false) })
-                    {
-                        Icon(
-                            painter = painterResource(id = model.iconMap["add"]!!),
-                            contentDescription = null, // decorative element
-                            tint =  Color.Blue )
-                    }
-
-                }
-                Column(horizontalAlignment = Alignment.Start) {
-                    //MK Button
-                    Button(modifier = Modifier.padding(2.dp),
-                        onClick = {
-                            if (selected in sequences.indices) onMikroKanons(sequences[selected]) else {
-                                snackbarVisibleState.value = true
-                            }
-                        })
-                    {
-                        Text(
-                            text = "MK2",
-                            style = TextStyle(
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }
-
-                    //MK3 Button
-                    Button(modifier = Modifier.padding(2.dp),
-                        onClick = {
-                            if (selected in sequences.indices) onMikroKanons3(sequences[selected]) else {
-                                snackbarVisibleState.value = true
-                            }
-                        })
-                    {
-                        Text(
-                            text = "MK3",
-                            style = TextStyle(
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }
-
-                    //MK4 Button
-                    Button(modifier = Modifier.padding(2.dp),
-                        onClick = {
-                            if (selected in sequences.indices) onMikroKanons4(sequences[selected]) else {
-                                snackbarVisibleState.value = true
-                            }
-                        })
-                    {
-                        Text(
-                            text = "MK4",
-                            style = TextStyle(
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }
-                }
-
-
-                //KP Button
-                Button(modifier = Modifier.padding(2.dp),
-                    onClick = {
-                        if (selected in sequences.indices) {
-                            dialogState.value = true
-                        } else {
+                MikroKanonsButtons(
+                    model = model,
+                    buttonSize = buttonSize,
+                    fontSize = 18,
+                    onMK2Click = {
+                        if (selected in sequences.indices) onMikroKanons(sequences[selected]) else {
                             snackbarVisibleState.value = true
                         }
-                    })
+                    },
+                    onMK3Click = {
+                        if (selected in sequences.indices) onMikroKanons3(sequences[selected]) else {
+                            snackbarVisibleState.value = true
+                        }
+                    },
+                    onMK4Click = {
+                        if (selected in sequences.indices) onMikroKanons4(sequences[selected]) else {
+                            snackbarVisibleState.value = true
+                        }
+                    }
+                )
+                // Add Counterpoint Button
+                IconButton(modifier = Modifier
+                    .padding(2.dp)
+                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .then(
+                        Modifier
+                            .size(buttonSize)
+                            .border(2.dp, Color.Black)
+                    ),
+                    onClick = { if (selected in sequences.indices) {
+                        dialogState.value = true
+                    } else {
+                        snackbarVisibleState.value = true
+                    }})
                 {
-                    Text(
-                        text = "KP",
-                        style = TextStyle(
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                    Icon(
+                        painter = painterResource(id = model.iconMap["counterpoint"]!!),
+                        contentDescription = null, // decorative element
+                        tint = Color.Blue
                     )
                 }
-
 
 
                 FreePartsButtons(
@@ -240,80 +166,17 @@ fun SequenceSelector(model: AppViewModel,
         if (snackbarVisibleState.value) {
             Snackbar(
                 action = {
-                    Button(onClick = { snackbarVisibleState.value = false}) {
+                    Button(onClick = { snackbarVisibleState.value = false }) {
                         Text("OK")
                     }
                 },
                 modifier = Modifier.padding(8.dp)
             ) { Text(text = "Please, select a Sequence!") }
         }
+
     }
 }
 
-@Composable
-fun FreePartsButtons(
-    fontSize: Int,
-    onAscDynamicClick: () -> Unit, onAscStaticClick: () -> Unit,
-    onDescDynamicClick: () -> Unit, onDescStaticClick: () -> Unit
-) {
-    Row() {
-        Column() {
-            //FPad Button
-            Button(modifier = Modifier.padding(2.dp),
-                onClick = { onAscDynamicClick() })
-            {
-                Text(
-                    text = "∼\u279A",
-                    style = TextStyle(
-                        fontSize = fontSize.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-            //FPdd Button
-            Button(modifier = Modifier.padding(2.dp),
-                onClick = { onDescDynamicClick() })
-            {
-                Text(
-                    text = "∼\u2798",
-                    style = TextStyle(
-                        fontSize = fontSize.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-
-        }
-        Column() {
-            // \u2B08
-            //FPas Button
-            Button(modifier = Modifier.padding(2.dp),
-                onClick = { onAscStaticClick() })
-            {
-                Text(
-                    text = "-➚",
-                    style = TextStyle(
-                        fontSize = fontSize.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-            // \u2B0A
-            //FPds Button
-            Button(modifier = Modifier.padding(2.dp),
-                onClick = { onDescStaticClick() })
-            {
-                Text(
-                    text = "-➘",
-                    style = TextStyle(
-                        fontSize = fontSize.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun SequenceScrollableColumn(
