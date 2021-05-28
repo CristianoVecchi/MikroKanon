@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Colors
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,23 +25,25 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cristianovecchi.mikrokanon.ui.*
 
 
 @Composable
 fun SelectableCard(text: String, fontSize: Int, isSelected: Boolean, onClick: (Int) -> Unit ){
-    val backColor by animateColorAsState( if(isSelected) Color.White else Color.LightGray )
-    val textColor  by animateColorAsState( if(isSelected) Color.Red else Color.Blue )
-    val borderColor by animateColorAsState( if(isSelected) Color.Black else Color.DarkGray )
+    val colors = MaterialTheme.colors
+    val backColor by animateColorAsState( if(isSelected) colors.selCardBackColorSelected else colors.selCardBackColorUnselected )
+    val textColor  by animateColorAsState( if(isSelected) colors.selCardTextColorSelected else colors.selCardTextColorUnselected )
+    val borderColor by animateColorAsState( if(isSelected) colors.selCardBorderColorSelected else colors.selCardBorderColorUnselected )
     val padding by animateDpAsState( if(isSelected) 3.dp else 2.dp )
-    Card(modifier = Modifier
+    Card(backgroundColor = backColor,
+        contentColor = textColor,
+        border = BorderStroke(2.dp, borderColor),modifier = Modifier
         .animateContentSize(animationSpec = tween(25,  easing = LinearEasing))
         //.aspectRatio( if (portraitMode) 3/4f else 16/9f)
         .padding(padding)
         .clip(RoundedCornerShape(6.dp))
-        .clickable { if (isSelected) onClick(1) else onClick(-1) },
-        backgroundColor = backColor,
-        contentColor = textColor,
-        border = BorderStroke(2.dp, borderColor )
+        .clickable { if (isSelected) onClick(1) else onClick(-1) }
+
     ) {
         Text(text = text, modifier = Modifier.padding(18.dp),
             style = TextStyle(fontSize = fontSize.sp,

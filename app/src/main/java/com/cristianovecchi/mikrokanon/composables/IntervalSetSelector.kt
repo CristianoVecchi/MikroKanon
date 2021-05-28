@@ -4,18 +4,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.ui.buttonsDisplayBackgroundColor
 
 @Composable
 fun IntervalSetSelector(model: AppViewModel, fontSize: Int,
                         dispatchIntervals: (List<Int>) -> Unit) {
     val intervals by model.intervalSet.observeAsState(emptyList())
-    val backgroundColor = Color(0.5f,0.5f,1.0f,1.0f)
+    val backgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
     Row(modifier = Modifier.fillMaxWidth().background(backgroundColor), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
 
 

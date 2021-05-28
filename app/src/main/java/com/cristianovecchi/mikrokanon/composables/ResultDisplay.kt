@@ -7,10 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -26,6 +23,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.toStringAll
+import com.cristianovecchi.mikrokanon.ui.*
 
 @Composable
 fun ResultDisplay(model: AppViewModel,
@@ -38,7 +36,8 @@ fun ResultDisplay(model: AppViewModel,
                   dispatchIntervals: (List<Int>) -> Unit = {}) {
 
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
-    val backgroundColor = Color(0.5f,0.5f,1.0f,1.0f)
+    val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
+    val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
     Column(modifier = Modifier
         .fillMaxHeight()
         .background(backgroundColor)) {
@@ -47,7 +46,7 @@ fun ResultDisplay(model: AppViewModel,
             .fillMaxWidth()
             .weight(4f)
         val modifier1 = Modifier
-            .fillMaxSize()
+            .fillMaxSize().background(buttonsBackgroundColor)
             .weight(1f)
         val listState = rememberLazyListState()
 
@@ -90,45 +89,45 @@ fun ResultDisplay(model: AppViewModel,
                 // UNDO BUTTON
                 IconButton(modifier = Modifier
                     .padding(2.dp)
-                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colors.iconButtonBackgroundColor, RoundedCornerShape(4.dp))
                     .then(
                         Modifier
                             .size(buttonSize)
-                            .border(2.dp, Color.Black)
+                            .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
                     ),
                 onClick = { onBack() } )
                 {
                     Icon(
                         painter = painterResource(id = model.iconMap["undo"]!!),
                         contentDescription = null, // decorative element
-                        tint =  Color.Blue )
+                        tint =  MaterialTheme.colors.iconButtonIconColor )
                 }
 
                 // EX BUTTON
                 IconButton(modifier = Modifier
                     .padding(2.dp)
-                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colors.iconButtonBackgroundColor, RoundedCornerShape(4.dp))
                     .then(
                         Modifier
                             .size(buttonSize)
-                            .border(2.dp, Color.Black)
+                            .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
                     ),
                     onClick = { onExpand() } )
                 {
                     Icon(
                         painter = painterResource(id = model.iconMap["expand"]!!),
                         contentDescription = null, // decorative element
-                        tint =  Color.Blue )
+                        tint =  MaterialTheme.colors.iconButtonIconColor )
                 }
 
                 // Add Counterpoint Button
                 IconButton(modifier = Modifier
                     .padding(2.dp)
-                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colors.iconButtonBackgroundColor, RoundedCornerShape(4.dp))
                     .then(
                         Modifier
                             .size(buttonSize)
-                            .border(2.dp, Color.Black)
+                            .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
                     ),
                     onClick = {
                         dialogState.value = true
@@ -137,7 +136,7 @@ fun ResultDisplay(model: AppViewModel,
                     Icon(
                         painter = painterResource(id = model.iconMap["counterpoint"]!!),
                         contentDescription = null, // decorative element
-                        tint = Color.Blue
+                        tint = MaterialTheme.colors.iconButtonIconColor
                     )
                 }
 
@@ -151,18 +150,18 @@ fun ResultDisplay(model: AppViewModel,
                 // PLAY BUTTON
                 IconButton(modifier = Modifier
                     .padding(2.dp)
-                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colors.iconButtonBackgroundColor, RoundedCornerShape(4.dp))
                     .then(
                         Modifier
                             .size(buttonSize)
-                            .border(2.dp, Color.Black)
+                            .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
                     ),
                     onClick = { onPlay() } )
                 {
                     Icon(
                         painter = painterResource(id = model.iconMap["play"]!!),
                         contentDescription = null, // decorative element
-                        tint =  Color.Blue )
+                        tint =  MaterialTheme.colors.iconButtonIconColor )
                 }
             }
         }

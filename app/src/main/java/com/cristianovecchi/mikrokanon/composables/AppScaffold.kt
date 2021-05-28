@@ -1,7 +1,10 @@
 package com.cristianovecchi.mikrokanon.composables
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,11 +24,13 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
+import com.cristianovecchi.mikrokanon.ui.drawerBackgroundColor
 
 @Composable
 fun AppScaffold(model: AppViewModel, content: @Composable () -> Unit) {
@@ -39,11 +44,18 @@ fun AppScaffold(model: AppViewModel, content: @Composable () -> Unit) {
         color = Color.LightGray)
     val uriHandler = LocalUriHandler.current
     Scaffold(
+        modifier = Modifier.background(MaterialTheme.colors.drawerBackgroundColor)
+            .border(1.dp, MaterialTheme.colors.drawerBackgroundColor),
         scaffoldState = scaffoldState,
         drawerContent = { SettingsDrawer(model = model)},
         topBar = {
             TopAppBar() {
-                Row(Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, ){
+                Row(Modifier.fillMaxWidth()
+                    .background(MaterialTheme.colors.drawerBackgroundColor)
+                    .border(1.dp, MaterialTheme.colors.drawerBackgroundColor),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically, )
+                {
                     IconButton(
                         onClick = {scope.launch { scaffoldState.drawerState.open() }  }
                     ) {
@@ -97,7 +109,7 @@ fun SettingsDrawer(model: AppViewModel){
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
 //    }
 
-    LazyColumn(
+    LazyColumn(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.drawerBackgroundColor),
         state = listState,
     ) { items(optionNames) { optionName ->
             val fontSize = 18

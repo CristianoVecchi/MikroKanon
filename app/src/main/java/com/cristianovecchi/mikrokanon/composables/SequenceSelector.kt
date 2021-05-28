@@ -23,6 +23,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.toStringAll
+import com.cristianovecchi.mikrokanon.ui.*
 
 @Composable
 fun SequenceSelector(model: AppViewModel,
@@ -35,12 +36,14 @@ fun SequenceSelector(model: AppViewModel,
                      onMikroKanons3: (ArrayList<Clip>) -> Unit,
                      onMikroKanons4: (ArrayList<Clip>) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxHeight()) {
+    val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
+    val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
+    Column(modifier = Modifier.fillMaxHeight().background(MaterialTheme.colors.drawerBackgroundColor)) {
         val modifier3 = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth().background(backgroundColor)
             .weight(3f)
         val modifier1 = Modifier
-            .fillMaxSize()
+            .fillMaxSize().background(buttonsBackgroundColor)
             .fillMaxWidth()
             .weight(1f)
         val selected by model.selectedSequence.observeAsState(initial = -1)
@@ -106,11 +109,11 @@ fun SequenceSelector(model: AppViewModel,
                 // Add Counterpoint Button
                 IconButton(modifier = Modifier
                     .padding(2.dp)
-                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colors.iconButtonBackgroundColor, RoundedCornerShape(4.dp))
                     .then(
                         Modifier
                             .size(buttonSize)
-                            .border(2.dp, Color.Black)
+                            .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
                     ),
                     onClick = { if (selected in sequences.indices) {
                         dialogState.value = true
@@ -121,7 +124,7 @@ fun SequenceSelector(model: AppViewModel,
                     Icon(
                         painter = painterResource(id = model.iconMap["counterpoint"]!!),
                         contentDescription = null, // decorative element
-                        tint = Color.Blue
+                        tint = MaterialTheme.colors.iconButtonIconColor
                     )
                 }
 
