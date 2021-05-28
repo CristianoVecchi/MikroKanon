@@ -2,6 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.JetpackComposeMagic" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:navigationBarColor">@color/black</item>
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_200</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>

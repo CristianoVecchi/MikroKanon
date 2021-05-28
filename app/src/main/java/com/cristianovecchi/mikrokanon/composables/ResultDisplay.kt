@@ -1,5 +1,7 @@
 package com.cristianovecchi.mikrokanon.composables
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -32,146 +34,195 @@ fun ResultDisplay(model: AppViewModel,
                   onBack: () -> Unit = {},
                   onFreePart: (TREND) -> Unit = {},
                   onExpand: () -> Unit = {},
-                  onPlay: () -> Unit = {},
-                  dispatchIntervals: (List<Int>) -> Unit = {}) {
+                  onPlay: () -> Unit = {}
+                  ) {
 
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
+    val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
+    val elaboratingBackgroundColor by animateColorAsState(
+        if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
-    Column(modifier = Modifier
-        .fillMaxHeight()
-        .background(backgroundColor)) {
 
-        val modifier4 = Modifier
-            .fillMaxWidth()
-            .weight(4f)
-        val modifier1 = Modifier
-            .fillMaxSize().background(buttonsBackgroundColor)
-            .weight(1f)
-        val listState = rememberLazyListState()
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .background(backgroundColor)
+        ) {
 
-        val buttonSize = 60.dp
-        //Text(text = "N. of Results found: ${counterpoints.size} STACK SIZE: ${model.counterpointStack.size}")
+            val modifier4 = Modifier
+                .fillMaxWidth()
+                .weight(4f)
+            val modifier1 = Modifier
+                .fillMaxSize()
+                .background(buttonsBackgroundColor)
+                .weight(1f)
+            val listState = rememberLazyListState()
 
-        if(counterpoints.isEmpty()) Text(text = "ELABORATING...")
+            val buttonSize = 60.dp
+            //Text(text = "N. of Results found: ${counterpoints.size} STACK SIZE: ${model.counterpointStack.size}")
 
-        LazyColumn( modifier = modifier4, state = listState,)
-         {
-            items(counterpoints) { counterpoint ->
-                val parts = toClips(counterpoint, NoteNamesIt.values().map { value -> value.toString() })
-                val maxSize = parts.maxOf{ it.size}
-                val clips: MutableList<MutableList<Clip>> = mutableListOf()
-                for( i in 0 until maxSize){
-                    val col: MutableList<Clip> = mutableListOf()
-                    for(j in parts.indices) {
-                        val clip = if (i < parts[j].size) parts[j][i] else Clip()
-                        col.add(clip)
+            //if(counterpoints.isEmpty()) Text(text = "ELABORATING...")
+            Box(modifier = modifier4) {
+                LazyColumn(modifier = Modifier.fillMaxSize(), state = listState)
+                {
+                    items(counterpoints) { counterpoint ->
+                        val parts = toClips(
+                            counterpoint,
+                            NoteNamesIt.values().map { value -> value.toString() })
+                        val maxSize = parts.maxOf { it.size }
+                        val clips: MutableList<MutableList<Clip>> = mutableListOf()
+                        for (i in 0 until maxSize) {
+                            val col: MutableList<Clip> = mutableListOf()
+                            for (j in parts.indices) {
+                                val clip = if (i < parts[j].size) parts[j][i] else Clip()
+                                col.add(clip)
+                            }
+                            clips.add(col)
+                        }
+                        NoteTable(
+                            model,
+                            counterpoint,
+                            clips,
+                            16,
+                            onClick = { onClick(counterpoint) })
                     }
-                    clips.add(col)
                 }
-                NoteTable(model,counterpoint , clips,16, onClick = {onClick(counterpoint)})
+                if(elaborating){
+                    Column(modifier = Modifier.fillMaxSize().background(elaboratingBackgroundColor),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally)
+                    {
+                        CircularProgressIndicator(color = Color.White,
+                        strokeWidth = 6.dp)
+                    }
+                }
             }
-        }
-        Column(modifier1, verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally){
+            Column(
+                modifier1,
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            val dialogState by lazy { mutableStateOf(false) }
-            val selectedDialogSequence by lazy { mutableStateOf(-1) }
+                val dialogState by lazy { mutableStateOf(false) }
+                val selectedDialogSequence by lazy { mutableStateOf(-1) }
 
-            SequencesDialog(dialogState = dialogState, sequencesList = model.sequences.value!!.map{ it.toStringAll()},
-                onSubmitButtonClick = { index, repeat ->
-                    dialogState.value = false
-                    if(index != -1) { onKP(index, repeat) }
-                } )
+                SequencesDialog(dialogState = dialogState,
+                    sequencesList = model.sequences.value!!.map { it.toStringAll() },
+                    onSubmitButtonClick = { index, repeat ->
+                        dialogState.value = false
+                        if (index != -1) {
+                            onKP(index, repeat)
+                        }
+                    })
 
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
 
-                // UNDO BUTTON
-                IconButton(modifier = Modifier
-                    .padding(2.dp)
-                    .background(MaterialTheme.colors.iconButtonBackgroundColor, RoundedCornerShape(4.dp))
-                    .then(
-                        Modifier
-                            .size(buttonSize)
-                            .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
-                    ),
-                onClick = { onBack() } )
-                {
-                    Icon(
-                        painter = painterResource(id = model.iconMap["undo"]!!),
-                        contentDescription = null, // decorative element
-                        tint =  MaterialTheme.colors.iconButtonIconColor )
-                }
+                    // UNDO BUTTON
+                    IconButton(modifier = Modifier
+                        .padding(2.dp)
+                        .background(
+                            MaterialTheme.colors.iconButtonBackgroundColor,
+                            RoundedCornerShape(4.dp)
+                        )
+                        .then(
+                            Modifier
+                                .size(buttonSize)
+                                .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
+                        ),
+                        onClick = { onBack() })
+                    {
+                        Icon(
+                            painter = painterResource(id = model.iconMap["undo"]!!),
+                            contentDescription = null, // decorative element
+                            tint = MaterialTheme.colors.iconButtonIconColor
+                        )
+                    }
 
-                // EX BUTTON
-                IconButton(modifier = Modifier
-                    .padding(2.dp)
-                    .background(MaterialTheme.colors.iconButtonBackgroundColor, RoundedCornerShape(4.dp))
-                    .then(
-                        Modifier
-                            .size(buttonSize)
-                            .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
-                    ),
-                    onClick = { onExpand() } )
-                {
-                    Icon(
-                        painter = painterResource(id = model.iconMap["expand"]!!),
-                        contentDescription = null, // decorative element
-                        tint =  MaterialTheme.colors.iconButtonIconColor )
-                }
+                    // EX BUTTON
+                    IconButton(modifier = Modifier
+                        .padding(2.dp)
+                        .background(
+                            MaterialTheme.colors.iconButtonBackgroundColor,
+                            RoundedCornerShape(4.dp)
+                        )
+                        .then(
+                            Modifier
+                                .size(buttonSize)
+                                .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
+                        ),
+                        onClick = { onExpand() })
+                    {
+                        Icon(
+                            painter = painterResource(id = model.iconMap["expand"]!!),
+                            contentDescription = null, // decorative element
+                            tint = MaterialTheme.colors.iconButtonIconColor
+                        )
+                    }
 
-                // Add Counterpoint Button
-                IconButton(modifier = Modifier
-                    .padding(2.dp)
-                    .background(MaterialTheme.colors.iconButtonBackgroundColor, RoundedCornerShape(4.dp))
-                    .then(
-                        Modifier
-                            .size(buttonSize)
-                            .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
-                    ),
-                    onClick = {
-                        dialogState.value = true
-                   })
-                {
-                    Icon(
-                        painter = painterResource(id = model.iconMap["counterpoint"]!!),
-                        contentDescription = null, // decorative element
-                        tint = MaterialTheme.colors.iconButtonIconColor
+                    // Add Counterpoint Button
+                    IconButton(modifier = Modifier
+                        .padding(2.dp)
+                        .background(
+                            MaterialTheme.colors.iconButtonBackgroundColor,
+                            RoundedCornerShape(4.dp)
+                        )
+                        .then(
+                            Modifier
+                                .size(buttonSize)
+                                .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
+                        ),
+                        onClick = {
+                            dialogState.value = true
+                        })
+                    {
+                        Icon(
+                            painter = painterResource(id = model.iconMap["counterpoint"]!!),
+                            contentDescription = null, // decorative element
+                            tint = MaterialTheme.colors.iconButtonIconColor
+                        )
+                    }
+
+                    FreePartsButtons(
+                        fontSize = 22,
+                        onAscDynamicClick = { onFreePart(TREND.ASCENDANT_DYNAMIC) },
+                        onAscStaticClick = { onFreePart(TREND.ASCENDANT_STATIC) },
+                        onDescDynamicClick = { onFreePart(TREND.DESCENDANT_DYNAMIC) },
+                        onDescStaticClick = { onFreePart(TREND.DESCENDANT_STATIC) }
                     )
-                }
-
-                FreePartsButtons(
-                    fontSize = 22,
-                    onAscDynamicClick = { onFreePart(TREND.ASCENDANT_DYNAMIC) },
-                    onAscStaticClick = { onFreePart(TREND.ASCENDANT_STATIC) },
-                    onDescDynamicClick = {  onFreePart(TREND.DESCENDANT_DYNAMIC) },
-                    onDescStaticClick =  { onFreePart(TREND.DESCENDANT_STATIC)}
-                )
-                // PLAY BUTTON
-                IconButton(modifier = Modifier
-                    .padding(2.dp)
-                    .background(MaterialTheme.colors.iconButtonBackgroundColor, RoundedCornerShape(4.dp))
-                    .then(
-                        Modifier
-                            .size(buttonSize)
-                            .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
-                    ),
-                    onClick = { onPlay() } )
-                {
-                    Icon(
-                        painter = painterResource(id = model.iconMap["play"]!!),
-                        contentDescription = null, // decorative element
-                        tint =  MaterialTheme.colors.iconButtonIconColor )
+                    // PLAY BUTTON
+                    IconButton(modifier = Modifier
+                        .padding(2.dp)
+                        .background(
+                            MaterialTheme.colors.iconButtonBackgroundColor,
+                            RoundedCornerShape(4.dp)
+                        )
+                        .then(
+                            Modifier
+                                .size(buttonSize)
+                                .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
+                        ),
+                        onClick = { onPlay() })
+                    {
+                        Icon(
+                            painter = painterResource(id = model.iconMap["play"]!!),
+                            contentDescription = null, // decorative element
+                            tint = MaterialTheme.colors.iconButtonIconColor
+                        )
+                    }
                 }
             }
+            Column(
+                modifier1,
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IntervalSetSelector(
+                    model, fontSize = 10
+                )
+            }
         }
-        Column(modifier1, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-            IntervalSetSelector(
-                    model, fontSize = 10,
-                    dispatchIntervals = { newIntervals ->
-                        dispatchIntervals(newIntervals)
-                    }
-            )
-        }
-    }
+
+
 }

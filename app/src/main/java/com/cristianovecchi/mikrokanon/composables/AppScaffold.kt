@@ -99,7 +99,7 @@ fun SettingsDrawer(model: AppViewModel){
     ListDialog(listDialogData)
     BpmDialog(bpmDialogData)
     ExportDialog(exportDialogData)
-    val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle", "Inverse", "Retrograde", "Inv-Retrograde", "Export MIDI",)
+    val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle", "Retrograde", "Inverse",  "Inv-Retrograde", "Export MIDI",)
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionData()
                         else userOptionsData[0]

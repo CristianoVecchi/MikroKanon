@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.cristianovecchi.mikrokanon.composables.Clip
 import com.cristianovecchi.mikrokanon.db.SequenceDataRepository
 import com.cristianovecchi.mikrokanon.db.UserOptionsDataRepository
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 

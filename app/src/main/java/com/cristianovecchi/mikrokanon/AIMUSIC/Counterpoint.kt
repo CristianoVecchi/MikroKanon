@@ -191,8 +191,8 @@ data class Counterpoint(val parts: List<AbsPart>,
 
             val original = counterpoint.clone().also { it.normalizePartsSize(true)}
             var result = original.clone()
-            result = if(rowFormsFlags and RowForm.INVERSE.flag != 0) result.enqueue(original.inverse()) else result
             result = if(rowFormsFlags and RowForm.RETROGRADE.flag != 0) result.enqueue(original.retrograde()) else result
+            result = if(rowFormsFlags and RowForm.INVERSE.flag != 0) result.enqueue(original.inverse()) else result
             result = if(rowFormsFlags and RowForm.INV_RETROGRADE.flag != 0) result.enqueue(original.inverse().retrograde()) else result
             return result
         }

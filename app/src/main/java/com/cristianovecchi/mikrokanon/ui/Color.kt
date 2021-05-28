@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.Color
 
 val purple200 = Color(0xFFBB86FC)
 //val purple500 = Color(0xFF6200EE)
-val purple500 = Color(0.2f,0.2f,1.0f,1.0f)
+val purple500 = Color(0.0f,0.2f,1.0f,1.0f)
 val purple700 = Color(0xFF3700B3)
 val teal200 = Color(0xFF03DAC5)
 
@@ -23,7 +23,7 @@ val Colors.selCardTextColorSelected: Color
     get() = if (isLight) Color.Red else Color.Red
 val Colors.selCardTextColorUnselected: Color
     @Composable
-    get() = if (isLight) Color.Blue else Color.Blue
+    get() = if (isLight) Color(0.2f,0.2f,1.0f,1.0f) else Color.Blue
 
 val Colors.selCardBorderColorSelected: Color
     @Composable
