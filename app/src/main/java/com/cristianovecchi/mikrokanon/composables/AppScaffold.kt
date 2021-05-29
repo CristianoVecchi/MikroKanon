@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
+import com.cristianovecchi.mikrokanon.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.ui.drawerBackgroundColor
 
@@ -99,7 +100,7 @@ fun SettingsDrawer(model: AppViewModel){
     ListDialog(listDialogData)
     BpmDialog(bpmDialogData)
     ExportDialog(exportDialogData)
-    val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle", "Retrograde", "Inverse",  "Inv-Retrograde", "Export MIDI",)
+    val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle", "Retrograde", "Inverse",  "Inv-Retrograde", "Export MIDI","Language")
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionData()
                         else userOptionsData[0]
@@ -228,6 +229,29 @@ fun SettingsDrawer(model: AppViewModel){
                         }
                     })
                 }
+                "Language" -> {
+                    val languages = LANGUAGES.values().map{ it.language}
+                    val langDef: String = if(userOptions.language == "System") model.getSystemLangDef() else userOptions.language
+                    val languageName = when(langDef){
+                        "en" -> LANGUAGES.en.language
+                        "fr" -> LANGUAGES.fr.language
+                        "it" -> LANGUAGES.it.language
+                        else -> LANGUAGES.en.language
+                    }
+                    val languageIndex= languages.indexOf(languageName)
+
+                        SelectableCard(text = "Language: $languageName", fontSize = fontSize, isSelected = true,onClick = { _ ->
+                            listDialogData.value = ListDialogData(true,languages,languageIndex,"Select a Language!"
+                            ) { index ->
+                                model.updateUserOptions(
+                                    "language",
+                                    LANGUAGES.values()[index].toString()
+                                )
+                                listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
+                            }
+                        })
+                    }
+
             }
         }
     }

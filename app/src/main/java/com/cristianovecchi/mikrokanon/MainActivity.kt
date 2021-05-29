@@ -26,13 +26,6 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-fun ArrayList<Clip>.toStringAll(): String {
-    return if (this.isNotEmpty()) {
-        this.map { clip -> clip.text }.reduce { acc, string -> "$acc $string" }
-    } else {
-        "empty Sequence"
-    }
-}
 
 class AppViewModelFactory(
     private val application: Application,

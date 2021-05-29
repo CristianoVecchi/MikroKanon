@@ -25,6 +25,9 @@ class SequencesFragment(): Fragment() {
         model.allSequencesData.observe(viewLifecycleOwner){
             model.retrieveSequencesFromDB()
         }
+        model.userOptionsData.observe(viewLifecycleOwner){
+            model.selectNotesNames()
+        }
         model.setInitialBlankState()
         return ComposeView(requireContext()).apply {
             setContent {

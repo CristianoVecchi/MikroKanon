@@ -9,6 +9,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -18,12 +20,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.AppViewModel
 
 enum class NoteNamesEn(val abs:Int) {
     C(0),D(2),E(4),F(5),G(7),A(9),B(11),EMPTY(-1)
 }
 enum class NoteNamesIt {
     Do,Re,Mi,Fa,Sol,La,Si,EMPTY
+}
+enum class NoteNamesFr {
+    Ut,Re,Mi,Fa,Sol,La,Si,EMPTY
 }
 enum class Accidents(val ax : String, val sum : Int){
     //SHARP("\uF023"), FLAT("\uF062") , D_SHARP("\uF045"), D_FLAT("\uF0BA"), NATURAL("\uF06E")
@@ -48,9 +55,10 @@ private data class ButtonInfo(val text: String, val output: Out, val resId: Int 
 
 @Composable
 fun NoteKeyboard(
-    names : List<String> = NoteNamesIt.values().map{it.toString()},
+    model: AppViewModel,
     nRows: Int = 5, nCols: Int = 4, iconMap: Map<String,Int> = HashMap<String,Int>(),
-    dispatch : (Out, String) -> Unit ) {
+    dispatch : (Out) -> Unit ) {
+    val names by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
     val buttonSize = 60.dp
     val fontSize = 14.sp
     val buttonInfos = listOf(
@@ -101,7 +109,7 @@ fun NoteKeyboard(
                             IconButton(modifier = Modifier.padding(2.dp).
                                                     background(Color.White, RoundedCornerShape(4.dp))
                                 .then(Modifier.size(buttonSize).border(2.dp, Color.Black)),
-                                        onClick = {dispatch(buttonInfo.output, buttonInfo.text)})
+                                        onClick = {dispatch(buttonInfo.output)})
                             {
                                 Icon(
                                     painter = painterResource(id = resId),
@@ -113,7 +121,7 @@ fun NoteKeyboard(
                             Button(modifier = Modifier.padding(2.dp).
                                     background(Color.White, RoundedCornerShape(4.dp))
                                         .then(Modifier.size(buttonSize).border(2.dp, Color.Black)),
-                                    onClick = {dispatch(buttonInfo.output, buttonInfo.text)})
+                                    onClick = {dispatch(buttonInfo.output)})
                             {
                                 Text(text = text, color = Color.Cyan,
                                         style = TextStyle(fontSize = fontSize,

@@ -28,11 +28,15 @@ import androidx.room.PrimaryKey
         val partsShuffle: String,
 
         @ColumnInfo(name = "rowforms_flags")
-        val rowFormsFlags: String
+        val rowFormsFlags: String,
+
+        @ColumnInfo(name = "language")
+        val language: String
     ){
         companion object{
             fun getDefaultUserOptionData(): UserOptionsData{
-                return UserOptionsData(0,"0","90","1","0","0", "1")
+                return UserOptionsData(0,"0","90","1",
+                    "0","0", "1", "System")
             }
         }
     }

@@ -36,20 +36,19 @@ fun ResultDisplay(model: AppViewModel,
                   onExpand: () -> Unit = {},
                   onPlay: () -> Unit = {}
                   ) {
-
+    val notesNames by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
+    val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, toClipsText(it, notesNames))}
     val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
     val elaboratingBackgroundColor by animateColorAsState(
         if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
-
         Column(
             modifier = Modifier
                 .fillMaxHeight()
                 .background(backgroundColor)
         ) {
-
             val modifier4 = Modifier
                 .fillMaxWidth()
                 .weight(4f)
@@ -58,38 +57,35 @@ fun ResultDisplay(model: AppViewModel,
                 .background(buttonsBackgroundColor)
                 .weight(1f)
             val listState = rememberLazyListState()
-
             val buttonSize = 60.dp
-            //Text(text = "N. of Results found: ${counterpoints.size} STACK SIZE: ${model.counterpointStack.size}")
-
-            //if(counterpoints.isEmpty()) Text(text = "ELABORATING...")
             Box(modifier = modifier4) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), state = listState)
                 {
-                    items(counterpoints) { counterpoint ->
-                        val parts = toClips(
-                            counterpoint,
-                            NoteNamesIt.values().map { value -> value.toString() })
+                    items(counterpointsData) { counterpointsData ->
+                        val counterpoint = counterpointsData.first
+                        val parts = counterpointsData.second
                         val maxSize = parts.maxOf { it.size }
-                        val clips: MutableList<MutableList<Clip>> = mutableListOf()
+                        val clipsText: MutableList<MutableList<String>> = mutableListOf()
                         for (i in 0 until maxSize) {
-                            val col: MutableList<Clip> = mutableListOf()
+                            val col: MutableList<String> = mutableListOf()
                             for (j in parts.indices) {
-                                val clip = if (i < parts[j].size) parts[j][i] else Clip()
-                                col.add(clip)
+                                val text = if (i < parts[j].size) parts[j][i] else ""
+                                col.add(text)
                             }
-                            clips.add(col)
+                            clipsText.add(col)
                         }
                         NoteTable(
                             model,
                             counterpoint,
-                            clips,
+                            clipsText,
                             16,
                             onClick = { onClick(counterpoint) })
                     }
                 }
                 if(elaborating){
-                    Column(modifier = Modifier.fillMaxSize().background(elaboratingBackgroundColor),
+                    Column(modifier = Modifier
+                        .fillMaxSize()
+                        .background(elaboratingBackgroundColor),
                         verticalArrangement = Arrangement.SpaceEvenly,
                         horizontalAlignment = Alignment.CenterHorizontally)
                     {
@@ -108,17 +104,14 @@ fun ResultDisplay(model: AppViewModel,
                 val selectedDialogSequence by lazy { mutableStateOf(-1) }
 
                 SequencesDialog(dialogState = dialogState,
-                    sequencesList = model.sequences.value!!.map { it.toStringAll() },
+                    sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames) },
                     onSubmitButtonClick = { index, repeat ->
                         dialogState.value = false
                         if (index != -1) {
                             onKP(index, repeat)
                         }
                     })
-
-
                 Row(verticalAlignment = Alignment.CenterVertically) {
-
                     // UNDO BUTTON
                     IconButton(modifier = Modifier
                         .padding(2.dp)
@@ -223,6 +216,4 @@ fun ResultDisplay(model: AppViewModel,
                 )
             }
         }
-
-
 }

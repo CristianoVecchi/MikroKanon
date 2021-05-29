@@ -38,6 +38,7 @@ fun SequenceSelector(model: AppViewModel,
 ) {
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
+    val notesNames by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
     Column(modifier = Modifier.fillMaxHeight().background(MaterialTheme.colors.drawerBackgroundColor)) {
         val modifier3 = Modifier
             .fillMaxWidth().background(backgroundColor)
@@ -53,7 +54,7 @@ fun SequenceSelector(model: AppViewModel,
         val buttonSize = 54.dp
 
         SequencesDialog(dialogState = dialogState,
-            sequencesList = model.sequences.value!!.map { it.toStringAll() },
+            sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames) },
             onSubmitButtonClick = { index, repeat ->
                 dialogState.value = false
                 if (index != -1) {
@@ -66,7 +67,7 @@ fun SequenceSelector(model: AppViewModel,
             onSelect(index)
         }
         SequenceScrollableColumn(
-            modifier = modifier3, sequences = sequences, selected, onSelect = onSelectComposition
+            modifier = modifier3, notesNames = notesNames, sequences = sequences, selected = selected, onSelect = onSelectComposition
         )
 
         Column(modifier1) {
@@ -183,7 +184,7 @@ fun SequenceSelector(model: AppViewModel,
 
 @Composable
 fun SequenceScrollableColumn(
-    modifier: Modifier,
+    modifier: Modifier, notesNames: List<String>,
     sequences: List<ArrayList<Clip>>, selected:Int, onSelect: (Int) -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -193,9 +194,9 @@ fun SequenceScrollableColumn(
         itemsIndexed(items = sequences) { index, sequence ->
             Row(modifier = Modifier.padding(8.dp)){
                 if (index == selected) {
-                    SelectableCard(text = sequence.toStringAll(), 20, isSelected = true, onClick = {})
+                    SelectableCard(sequence.toStringAll(notesNames), 20, isSelected = true, onClick = {})
                 } else {
-                    SelectableCard(text = sequence.toStringAll(), 18, isSelected = false,onClick = {
+                    SelectableCard(text = sequence.toStringAll(notesNames), 18, isSelected = false,onClick = {
                         onSelect(index)})
                 }
             }

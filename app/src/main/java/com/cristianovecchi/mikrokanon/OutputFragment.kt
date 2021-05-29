@@ -19,6 +19,9 @@ class OutputFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val model = (activity as MainActivity).model
+        model.userOptionsData.observe(viewLifecycleOwner){
+            model.selectNotesNames()
+        }
         return ComposeView(requireContext()).apply {
             setContent {
                 MikroKanonTheme {

@@ -15,7 +15,6 @@ data class SequenceData(
 )
 
 data class ClipData(
-    val text: String,
     val clipId: Int,
     var abstractNote: Int,
     val name: Int,

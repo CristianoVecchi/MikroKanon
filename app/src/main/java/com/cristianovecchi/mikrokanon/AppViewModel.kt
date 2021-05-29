@@ -14,8 +14,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import android.media.MediaPlayer
+import androidx.compose.runtime.collectAsState
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import androidx.core.content.FileProvider
+import androidx.lifecycle.Observer
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.db.UserOptionsDataRepository
 import java.io.File
@@ -28,6 +30,9 @@ sealed class Computation {
     data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int) : Computation()
+}
+enum class LANGUAGES(val language:String){
+    en("English"), fr("Français"), it("Italiano")
 }
 
 
@@ -51,20 +56,52 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         "play" to R.drawable.ic_baseline_play_arrow_24,
         "expand" to R.drawable.ic_baseline_sync_alt_24,
     )
+
     private var lastIndex = 0
     private val SPREAD_AS_POSSIBLE = true
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 18
     private var ensembleTypeSelected: EnsembleType = EnsembleType.STRING_ORCHESTRA
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
+
+    private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
+    val sequences : LiveData<List<ArrayList<Clip>>> = _sequences
+
+    private var _notesNames = MutableLiveData<List<String>>(listOf("do","re","mi","fa","sol","la","si"))
+    var notesNames: LiveData<List<String>> = _notesNames
+
+    private var _elaborating = MutableLiveData<Boolean>(false)
+    var elaborating: LiveData<Boolean> = _elaborating
+
+    private var _firstSequence= MutableLiveData<List<Clip>>(listOf())
+    val firstSequence : LiveData<List<Clip>> = _firstSequence
+
+    private var _sequenceToAdd = MutableLiveData<List<Clip>>(listOf())
+    val sequenceToAdd : LiveData<List<Clip>> = _sequenceToAdd
+
+    private val _selectedSequence = MutableLiveData<Int>(-1)
+    val selectedSequence : LiveData<Int> = _selectedSequence
+
+    private var _sequenceToMikroKanons = MutableLiveData<List<Clip>>(listOf())
+    val sequenceToMikroKanons : LiveData<List<Clip>> = _sequenceToMikroKanons
+
+    private val _counterpoints = MutableLiveData<List<Counterpoint>>(listOf())
+    val counterpoints : LiveData<List<Counterpoint>> = _counterpoints
+
+    private val _intervalSet = MutableLiveData<List<Int>>(listOf(2, 10, 3, 9, 4, 8, 5, 7))
+    val intervalSet : LiveData<List<Int>> = _intervalSet
+
+    private var _selectedCounterpoint = MutableLiveData<Counterpoint>(Counterpoint.empty())
+    val selectedCounterpoint : LiveData<Counterpoint> = _selectedCounterpoint
     val allSequencesData: LiveData<List<SequenceData>> = sequenceRepository.allSequences.asLiveData()
     val userOptionsData: LiveData<List<UserOptionsData>> = userRepository.userOptions.asLiveData()
-    private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
+
     private val counterpointStack = Stack<Computation>()
 
     private data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
     private var mediaPlayer: MediaPlayer? = null
+
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 //        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
@@ -341,7 +378,6 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         return newList
     }
     private fun findCounterpointsByMikroKanons4(){
-        var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
@@ -508,31 +544,7 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         changeSequenceSelection(-1)
     }
 
-    val sequences : LiveData<List<ArrayList<Clip>>> = _sequences
 
-    private var _elaborating = MutableLiveData<Boolean>(false)
-    var elaborating: LiveData<Boolean> = _elaborating
-
-    private var _firstSequence= MutableLiveData<List<Clip>>(listOf())
-    val firstSequence : LiveData<List<Clip>> = _firstSequence
-
-    private var _sequenceToAdd = MutableLiveData<List<Clip>>(listOf())
-    val sequenceToAdd : LiveData<List<Clip>> = _sequenceToAdd
-
-    private val _selectedSequence = MutableLiveData<Int>(-1)
-    val selectedSequence : LiveData<Int> = _selectedSequence
-
-    private var _sequenceToMikroKanons = MutableLiveData<List<Clip>>(listOf())
-    val sequenceToMikroKanons : LiveData<List<Clip>> = _sequenceToMikroKanons
-
-    private val _counterpoints = MutableLiveData<List<Counterpoint>>(listOf())
-    val counterpoints : LiveData<List<Counterpoint>> = _counterpoints
-
-    private val _intervalSet = MutableLiveData<List<Int>>(listOf(2, 10, 3, 9, 4, 8, 5, 7))
-    val intervalSet : LiveData<List<Int>> = _intervalSet
-
-    private var _selectedCounterpoint = MutableLiveData<Counterpoint>(Counterpoint.empty())
-    val selectedCounterpoint : LiveData<Counterpoint> = _selectedCounterpoint
 
 
     fun changeSelectedCounterpoint(newCounterpoint: Counterpoint){
@@ -643,7 +655,9 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
             "rowFormsFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = value)
             }
-
+            "language" -> {
+                newUserOptionsData  = optionsDataClone.copy(language = value)
+            }
         }
         newUserOptionsData?.let {
             viewModelScope.launch(Dispatchers.IO) {
@@ -653,5 +667,41 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
                 userRepository.insertUserOptions(newUserOptionsData)
             }
         }
+    }
+    fun selectNotesNames(): List<String> {
+        val systemLangDef = Locale.getDefault().language
+        val userLangDef = if(userOptionsData.value != null && userOptionsData.value!!.isNotEmpty()) {
+            if(userOptionsData.value!![0].language == "System") systemLangDef else userOptionsData.value!![0].language
+        } else systemLangDef
+
+        val newNotesNames =
+             when(userLangDef) {
+                 "en" -> NoteNamesEn.values().map { it.toString() }
+                 "it" -> NoteNamesIt.values().map { it.toString() }
+                 "fr" -> NoteNamesFr.values().map { it.toString() }
+                 else -> NoteNamesEn.values().map { it.toString() }
+             }
+        //println("new notes names: ${newNotesNames.toString()}")
+        _notesNames.value = newNotesNames
+        return newNotesNames
+    }
+
+    fun getSystemLanguage(): String {
+        return when (Locale.getDefault().language){
+            "en" -> "English"
+            "fr" -> "Français"
+            "it" -> "Italiano"
+            else -> "English"
+        }
+    }
+    fun getSystemLangDef(): String {
+        return Locale.getDefault().language
+    }
+}
+fun ArrayList<Clip>.toStringAll(notesNames: List<String>): String {
+    return if (this.isNotEmpty()) {
+        this.map { clip -> clip.findText(notesNames = notesNames) }.reduce { acc, string -> "$acc $string" }
+    } else {
+        "empty Sequence"
     }
 }

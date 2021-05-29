@@ -22,12 +22,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AppViewModel
 
 
 @Composable
-fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clips: MutableList<MutableList<Clip>>, fontSize: Int,
+fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: MutableList<MutableList<String>>, fontSize: Int,
               onClick: (Counterpoint) -> Unit){
 
     val listState = rememberLazyListState()
@@ -49,23 +50,24 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clips: MutableLis
         color = textColor, fontWeight = fontWeight
     )
         LazyRow(modifier = Modifier
-            .animateContentSize(animationSpec = tween(30,  easing = LinearEasing))
+            .animateContentSize(animationSpec = tween(30, easing = LinearEasing))
             .padding(10.dp)
             .border(BorderStroke(borderWidth.dp, selectionColor))
             .clickable {
                 onClick(counterpoint)
             }, state = listState)
         {
-            itemsIndexed(clips) { i, col ->
+            itemsIndexed(clipsText) { i, col ->
                 Column(
                     Modifier.width(65.dp)
                 ) {
                     for (j in col.indices) {
-                        val clip = col[j]
+                        val clipText = col[j]
                         Text(
-                            text = clip.text,
-                            modifier = Modifier.fillMaxWidth()
-                                .background(cellColors[ (i+j) % 2 ] )
+                            text = clipText,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(cellColors[(i + j) % 2])
                                 .padding(8.dp),
                             style = textStyle
                         )
