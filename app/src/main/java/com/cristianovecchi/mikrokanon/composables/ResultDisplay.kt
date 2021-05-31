@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
+import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.*
@@ -40,6 +41,7 @@ fun ResultDisplay(model: AppViewModel,
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, toClipsText(it, notesNames))}
     val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
+    val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons())
     val elaboratingBackgroundColor by animateColorAsState(
         if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
@@ -113,96 +115,28 @@ fun ResultDisplay(model: AppViewModel,
                     })
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // UNDO BUTTON
-                    IconButton(modifier = Modifier
-                        .padding(2.dp)
-                        .background(
-                            MaterialTheme.colors.iconButtonBackgroundColor,
-                            RoundedCornerShape(4.dp)
-                        )
-                        .then(
-                            Modifier
-                                .size(buttonSize)
-                                .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
-                        ),
-                        onClick = { onBack() })
-                    {
-                        Icon(
-                            painter = painterResource(id = model.iconMap["undo"]!!),
-                            contentDescription = null, // decorative element
-                            tint = MaterialTheme.colors.iconButtonIconColor
-                        )
+                    CustomButton(iconId = model.iconMap["undo"]!!, isActive = activeButtons.undo, buttonSize = buttonSize) {
+                        onBack()
                     }
-
-                    // EX BUTTON
-                    IconButton(modifier = Modifier
-                        .padding(2.dp)
-                        .background(
-                            MaterialTheme.colors.iconButtonBackgroundColor,
-                            RoundedCornerShape(4.dp)
-                        )
-                        .then(
-                            Modifier
-                                .size(buttonSize)
-                                .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
-                        ),
-                        onClick = { onExpand() })
-                    {
-                        Icon(
-                            painter = painterResource(id = model.iconMap["expand"]!!),
-                            contentDescription = null, // decorative element
-                            tint = MaterialTheme.colors.iconButtonIconColor
-                        )
+                    // EXPAND BUTTON
+                    CustomButton(iconId = model.iconMap["expand"]!!, isActive = activeButtons.expand, buttonSize = buttonSize) {
+                        onExpand()
                     }
-
                     // Add Counterpoint Button
-                    IconButton(modifier = Modifier
-                        .padding(2.dp)
-                        .background(
-                            MaterialTheme.colors.iconButtonBackgroundColor,
-                            RoundedCornerShape(4.dp)
-                        )
-                        .then(
-                            Modifier
-                                .size(buttonSize)
-                                .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
-                        ),
-                        onClick = {
-                            dialogState.value = true
-                        })
-                    {
-                        Icon(
-                            painter = painterResource(id = model.iconMap["counterpoint"]!!),
-                            contentDescription = null, // decorative element
-                            tint = MaterialTheme.colors.iconButtonIconColor
-                        )
+                    CustomButton(iconId = model.iconMap["counterpoint"]!!, isActive = activeButtons.counterpoint, buttonSize = buttonSize) {
+                        dialogState.value = true
                     }
 
                     FreePartsButtons(
-                        fontSize = 22,
+                        fontSize = 22, isActive = activeButtons.freeparts,
                         onAscDynamicClick = { onFreePart(TREND.ASCENDANT_DYNAMIC) },
                         onAscStaticClick = { onFreePart(TREND.ASCENDANT_STATIC) },
                         onDescDynamicClick = { onFreePart(TREND.DESCENDANT_DYNAMIC) },
                         onDescStaticClick = { onFreePart(TREND.DESCENDANT_STATIC) }
                     )
                     // PLAY BUTTON
-                    IconButton(modifier = Modifier
-                        .padding(2.dp)
-                        .background(
-                            MaterialTheme.colors.iconButtonBackgroundColor,
-                            RoundedCornerShape(4.dp)
-                        )
-                        .then(
-                            Modifier
-                                .size(buttonSize)
-                                .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
-                        ),
-                        onClick = { onPlay() })
-                    {
-                        Icon(
-                            painter = painterResource(id = model.iconMap["play"]!!),
-                            contentDescription = null, // decorative element
-                            tint = MaterialTheme.colors.iconButtonIconColor
-                        )
+                    CustomButton(iconId = model.iconMap["play"]!!, isActive = activeButtons.play, buttonSize = buttonSize) {
+                        onPlay()
                     }
                 }
             }

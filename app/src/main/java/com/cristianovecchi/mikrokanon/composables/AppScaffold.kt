@@ -32,9 +32,10 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
 import com.cristianovecchi.mikrokanon.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.ui.drawerBackgroundColor
+import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun AppScaffold(model: AppViewModel, content: @Composable () -> Unit) {
+fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>, content: @Composable () -> Unit) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val titleStyle = SpanStyle(
@@ -48,7 +49,7 @@ fun AppScaffold(model: AppViewModel, content: @Composable () -> Unit) {
         modifier = Modifier.background(MaterialTheme.colors.drawerBackgroundColor)
             .border(1.dp, MaterialTheme.colors.drawerBackgroundColor),
         scaffoldState = scaffoldState,
-        drawerContent = { SettingsDrawer(model = model)},
+        drawerContent = { SettingsDrawer(model, userOptionsDataFlow)},
         topBar = {
             TopAppBar() {
                 Row(Modifier.fillMaxWidth()
@@ -89,7 +90,7 @@ data class NumberDialogData(val dialogState: Boolean = false, val title:String =
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
                             val error:String = "", val onSubmitButtonClick: () -> Unit = {})
 @Composable
-fun SettingsDrawer(model: AppViewModel){
+fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>){
 
 
 
@@ -101,7 +102,8 @@ fun SettingsDrawer(model: AppViewModel){
     BpmDialog(bpmDialogData)
     ExportDialog(exportDialogData)
     val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle", "Retrograde", "Inverse",  "Inv-Retrograde", "Export MIDI","Language")
-    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+    //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+    val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionData()
                         else userOptionsData[0]
     val listState = rememberLazyListState()
@@ -117,27 +119,27 @@ fun SettingsDrawer(model: AppViewModel){
             when(optionName){
                 "Ensemble" -> {
                     val ensNames: List<String> = EnsembleType.values().map{ it.toString()}
-                    val ensIndex = Integer.parseInt(userOptions.ensembleType)
+                    val ensIndex = userOptions.ensembleType
                         SelectableCard(text = "Ensemble: ${ensNames[ensIndex]}", fontSize = fontSize, isSelected = true, onClick = { _ ->
                             listDialogData.value = ListDialogData(true,ensNames,ensIndex,"Select an Ensemble!"
                             ) { index ->
                                 model.updateUserOptions(
                                     "ensemble_type",
-                                    index.toString()
+                                    index
                                 )
                                 listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
                             }
                         })
                     }
                 "BPM" -> {
-                    val bpm = Integer.parseInt(userOptions.bpm)
+                    val bpm = userOptions.bpm
                     SelectableCard(text = "BPM: $bpm", fontSize = fontSize, isSelected = true, onClick = { _ ->
                         bpmDialogData.value = NumberDialogData(
                             true, "Beats Per Measure:", bpm, 18, 360
                         ) { bpm ->
                             model.updateUserOptions(
                                 "bpm",
-                                bpm.toString()
+                                bpm
                             )
                             listDialogData.value =
                                 ListDialogData(itemList = listDialogData.value.itemList)
@@ -146,70 +148,68 @@ fun SettingsDrawer(model: AppViewModel){
                 }
                 "Rhythm" -> {
                     val rhythmNames = RhythmPatterns.getTitles()
-                    val rhythmIndex = Integer.parseInt(userOptions.rhythm)
+                    val rhythmIndex = userOptions.rhythm
                     SelectableCard(text = "Rhythm: ${rhythmNames[rhythmIndex]}", fontSize = fontSize, isSelected = true,onClick = { _ ->
                         listDialogData.value = ListDialogData(true,rhythmNames,rhythmIndex,"Select a Rhythm!"
                         ) { index ->
                             model.updateUserOptions(
                                 "rhythm",
-                                index.toString()
+                                index
                             )
                             listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
                         }
                     })
                 }
                 "Rhythm Shuffle" -> {
-                    var isOn = userOptions.rhythmShuffle != "0"
+                    var isOn = userOptions.rhythmShuffle != 0
                     SelectableCard(text = "Rhythm Shuffle", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         isOn = !isOn
                         model.updateUserOptions(
                             "rhythmShuffle",
-                            if(isOn) "1" else "0"
+                            if(isOn) 1 else 0
                         )
-
                     })
                 }
                 "Parts Shuffle" -> {
-                    var isOn = userOptions.partsShuffle != "0"
-
+                    var isOn = userOptions.partsShuffle != 0
                     SelectableCard(text = "Parts Shuffle", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         isOn = !isOn
                         model.updateUserOptions(
                             "partsShuffle",
-                            if(isOn) "1" else "0"
+                            if(isOn) 1 else 0
                         )
                     })
                 }
                 "Inverse" -> {
-                    val flags = Integer.parseInt(userOptions.rowFormsFlags)
+                    val flags = userOptions.rowFormsFlags
                     val isOn = flags and RowForm.INVERSE.flag != 0
                     SelectableCard(text = "Inverse", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         val newFlags = flags xor RowForm.INVERSE.flag // ^ toggles the flag
                         model.updateUserOptions(
                             "rowFormsFlags",
-                            newFlags.toString()
+                            newFlags
                         )
                     })
                 }
                 "Retrograde" -> {
-                    val flags = Integer.parseInt(userOptions.rowFormsFlags)
+                    val flags = userOptions.rowFormsFlags
                     val isOn = flags and RowForm.RETROGRADE.flag != 0
                     SelectableCard(text = "Retrograde", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         val newFlags = flags xor RowForm.RETROGRADE.flag // ^ toggles the flag
                         model.updateUserOptions(
                             "rowFormsFlags",
-                            newFlags.toString()
+                            newFlags
                         )
                     })
                 }
                 "Inv-Retrograde" -> {
-                    val flags = Integer.parseInt(userOptions.rowFormsFlags)
+                    val flags = userOptions.rowFormsFlags
                     val isOn = flags and RowForm.INV_RETROGRADE.flag != 0
                     SelectableCard(text = "Inv-Retrograde", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         val newFlags = flags xor RowForm.INV_RETROGRADE.flag // ^ toggles the flag
                         model.updateUserOptions(
                             "rowFormsFlags",
-                            newFlags.toString()
+                            newFlags
                         )
                     })
                 }

@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.ui.platform.ComposeView
 
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asFlow
 import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.composables.AppScaffold
 import com.cristianovecchi.mikrokanon.composables.SequenceSelector
@@ -25,6 +26,11 @@ class SequencesFragment(): Fragment() {
         model.allSequencesData.observe(viewLifecycleOwner){
             model.retrieveSequencesFromDB()
         }
+        model.selectedSequence.observe(viewLifecycleOwner){
+            model.changeActiveButtons( if(model.selectedSequence.value!! != -1 )
+                ActiveButtons(editing = true, mikrokanon = true, counterpoint = true, freeparts = true)
+            else ActiveButtons() )
+        }
         model.userOptionsData.observe(viewLifecycleOwner){
             model.selectNotesNames()
         }
@@ -35,7 +41,7 @@ class SequencesFragment(): Fragment() {
                     // A surface container using the 'background' color from the theme
                     Surface(color = MaterialTheme.colors.background) {
 
-                        AppScaffold(model = model) {
+                        AppScaffold(model = model, model.userOptionsData.asFlow()) {
                                SequenceSelector(model = model,
                                    onAdd = { list, editing ->
                                        val bundle = Bundle()

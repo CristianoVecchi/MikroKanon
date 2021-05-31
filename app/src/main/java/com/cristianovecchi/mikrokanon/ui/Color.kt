@@ -42,6 +42,9 @@ val Colors.iconButtonIconColor: Color
 val Colors.iconButtonBackgroundColor: Color
     @Composable
     get() = if (isLight) Color.White else Color.White
+val Colors.iconButtonInactiveColor: Color
+    @Composable
+    get() = if (isLight) Color.LightGray else Color.LightGray
 
 val Colors.sequencesListBackgroundColor: Color
     @Composable

@@ -34,6 +34,9 @@ sealed class Computation {
 enum class LANGUAGES(val language:String){
     en("English"), fr("Français"), it("Italiano")
 }
+data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
+                         val undo: Boolean = false, val expand: Boolean = true,
+                         val counterpoint: Boolean = false, val freeparts: Boolean = false, val play: Boolean = true)
 
 
 class AppViewModel(application: Application, private val sequenceRepository: SequenceDataRepository, private val userRepository: UserOptionsDataRepository) : AndroidViewModel(application) {
@@ -57,11 +60,28 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         "expand" to R.drawable.ic_baseline_sync_alt_24,
     )
 
+
+    private fun Stack<Computation>.pushAndDispatch(computation: Computation){
+        push(computation)
+        this@AppViewModel._stackSize.value = this.size
+    }
+    private fun Stack<Computation>.popAndDispatch(){
+        pop()
+        this@AppViewModel._stackSize.value = this.size
+    }
+    private fun Stack<Computation>.clearAndDispatch(){
+        clear()
+        this@AppViewModel._stackSize.value = this.size
+    }
+
     private var lastIndex = 0
     private val SPREAD_AS_POSSIBLE = true
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 18
     private var ensembleTypeSelected: EnsembleType = EnsembleType.STRING_ORCHESTRA
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
+
+    private val _activeButtons = MutableLiveData<ActiveButtons>(ActiveButtons())
+    val activeButtons : LiveData<ActiveButtons> = _activeButtons
 
     private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
     val sequences : LiveData<List<ArrayList<Clip>>> = _sequences
@@ -81,6 +101,9 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     private val _selectedSequence = MutableLiveData<Int>(-1)
     val selectedSequence : LiveData<Int> = _selectedSequence
 
+    private val _stackSize = MutableLiveData<Int>(1)
+    val stackSize : LiveData<Int> = _stackSize
+
     private var _sequenceToMikroKanons = MutableLiveData<List<Clip>>(listOf())
     val sequenceToMikroKanons : LiveData<List<Clip>> = _sequenceToMikroKanons
 
@@ -95,7 +118,7 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     val allSequencesData: LiveData<List<SequenceData>> = sequenceRepository.allSequences.asLiveData()
     val userOptionsData: LiveData<List<UserOptionsData>> = userRepository.userOptions.asLiveData()
 
-    private val counterpointStack = Stack<Computation>()
+    private val computationStack = Stack<Computation>()
 
     private data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
@@ -117,42 +140,20 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         }
         if(!selectedCounterpoint.value!!.isEmpty()){
             if (mediaPlayer == null) mediaPlayer = MediaPlayer()
-            val ensType: EnsembleType = EnsembleType.values()[userOptionsData.value?.let {
-                Integer.parseInt(
-                    userOptionsData.value!![0].ensembleType
-                )
-            } ?: 0]
-            val bpm: Float = userOptionsData.value?.let {
-                Integer.parseInt(
-                    userOptionsData.value!![0].bpm
-                ).toFloat()} ?: 90f
-            val rhythm: RhythmPatterns = RhythmPatterns.values()[userOptionsData.value?.let {
-                Integer.parseInt(
-                    userOptionsData.value!![0].rhythm
-                )
-            } ?: 0]
-            val rhythmShuffle: Boolean = 0 != (userOptionsData.value?.let {
-                Integer.parseInt(
-                    userOptionsData.value!![0].rhythmShuffle
-                )} ?: 0 )
-            val partsShuffle: Boolean = 0 != (userOptionsData.value?.let {
-                Integer.parseInt(
-                    userOptionsData.value!![0].partsShuffle
-                )} ?: 0 )
-            val rowFormsFlags: Int = userOptionsData.value?.let {
-                Integer.parseInt(
-                    userOptionsData.value!![0].rowFormsFlags
-                )
-            } ?: 1 // ORIGINAL by default
+            val ensType: EnsembleType = EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType } ?:0]
+            val bpm: Float = userOptionsData.value?.let { userOptionsData.value!![0].bpm.toFloat() } ?: 90f
+            val rhythm: RhythmPatterns = RhythmPatterns.values()[userOptionsData.value?.let { userOptionsData.value!![0].rhythm } ?: 0]
+            val rhythmShuffle: Boolean = 0 != (userOptionsData.value?.let { userOptionsData.value!![0].rhythmShuffle } ?: 0 )
+            val partsShuffle: Boolean = 0 != (userOptionsData.value?.let { userOptionsData.value!![0].partsShuffle } ?: 0 )
+            val rowFormsFlags: Int = userOptionsData.value?.let { userOptionsData.value!![0].rowFormsFlags } ?: 1 // ORIGINAL by default
+
             error = Player.playCounterpoint(
                 mediaPlayer!!, false, selectedCounterpoint.value!!,
                 bpm, 0f, rhythm.values, ensType, createAndPlay, midiPath , rhythmShuffle, partsShuffle, rowFormsFlags
             )
         }
-
         error
     }
-
     val dispatchIntervals = {
         refreshComputation(false)
     }
@@ -161,12 +162,12 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
             it.clone()
         }
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
-        counterpointStack.push(Computation.Expand(counterpointsClone, index))
+        computationStack.pushAndDispatch(Computation.Expand(counterpointsClone, index))
         expandCounterpoints(index)
         println("ON EXPAND")
     }
     val onKPfurtherSelections = {index: Int , repeat: Boolean->
-        counterpointStack.push(Computation.FurtherFromKP(selectedCounterpoint.value!!.clone(), index, repeat))
+        computationStack.pushAndDispatch(Computation.FurtherFromKP(selectedCounterpoint.value!!.clone(), index, repeat))
         changeSequenceToAdd(sequences.value!![index])
         if(!repeat) addSequenceToCounterpoint() else addRepeatedSequenceToCounterpoint()
 
@@ -174,7 +175,7 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     val onKPfromFirstSelection = {list: ArrayList<Clip>, index: Int, repeat: Boolean ->
         //println(repeat)
         changeFirstSequence(list)
-        counterpointStack.push(Computation.FirstFromKP(selectedCounterpoint.value!!.clone(),
+        computationStack.pushAndDispatch(Computation.FirstFromKP(selectedCounterpoint.value!!.clone(),
                                 ArrayList(firstSequence.value!!), index, repeat))
         convertFirstSequenceToSelectedCounterpoint()
         changeSequenceToAdd(sequences.value!![index])
@@ -183,23 +184,23 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     }
     val onFreePartFromFirstSelection = { list: ArrayList<Clip>, trend: TREND ->
         changeFirstSequence(list)
-        counterpointStack.push(Computation.FirstFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!), trend))
+        computationStack.pushAndDispatch(Computation.FirstFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!), trend))
         convertFirstSequenceToSelectedCounterpoint()
         findFreeParts(trend)
     }
     val onFreePartFurtherSelections = { trend: TREND ->
-        counterpointStack.push(Computation.FurtherFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!), trend))
+        computationStack.pushAndDispatch(Computation.FurtherFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!), trend))
         findFreeParts(trend)
     }
     val onMikroKanons = {list: ArrayList<Clip> ->
-        counterpointStack.push(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),ArrayList(sequenceToMikroKanons.value!!),2))
+        computationStack.pushAndDispatch(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),ArrayList(sequenceToMikroKanons.value!!),2))
         if(list.isNotEmpty()) changeSequenceToMikroKanons(list)
             findCounterpointsByMikroKanons()
 
     }
     val onMikroKanons3 = {list: ArrayList<Clip> ->
        // if(!elaborating.value!!) {
-            counterpointStack.push(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),
+            computationStack.pushAndDispatch(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),
                 ArrayList(sequenceToMikroKanons.value!!),3))
             if(list.isNotEmpty()) changeSequenceToMikroKanons(list)
             findCounterpointsByMikroKanons3()
@@ -208,7 +209,7 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     }
     val onMikroKanons4 = {list: ArrayList<Clip> ->
         //if(!elaborating.value!!) {
-            counterpointStack.push(
+            computationStack.pushAndDispatch(
                 Computation.MikroKanonOnly(
                     selectedCounterpoint.value!!.clone(),
                     ArrayList(sequenceToMikroKanons.value!!), 4
@@ -219,12 +220,13 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         //}
     }
     val onBack = {
-        if(counterpointStack.size > 1) {
+        if(computationStack.size > 1) {
             println("ON BACK")
             refreshComputation(true)
         }
     }
     //-------------end macro functions--------------------
+    //fun pushInComputationStack(computation: Computation)
 
     fun shareMidi(file: File){
         try {
@@ -262,10 +264,10 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     private fun refreshComputation(stepBack: Boolean){
             if (!elaborating.value!!) {
                 _elaborating.value = true
-                if (stepBack ) counterpointStack.pop()
-                val previousComputation = when(counterpointStack.lastElement()){
-                    is Computation.Expand -> counterpointStack.lastElement()
-                    else -> counterpointStack.pop()
+                if (stepBack ) computationStack.popAndDispatch()
+                val previousComputation = when(computationStack.lastElement()){
+                    is Computation.Expand -> computationStack.lastElement()
+                    else -> computationStack.pop() // do not Dispatch!!!
                 }
                 when (previousComputation) {
                     is Computation.FirstFromFreePart -> onFreePartFromFirstSelection(
@@ -308,7 +310,7 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
                                 do {
 
                                     onBack()
-                                    originalComputation = counterpointStack.lastElement()
+                                    originalComputation = computationStack.lastElement()
 //                                    if (originalComputation is Computation.Expand) {
 //                                        counterpointStack.pop()
 //                                        counterpointStack.pop()
@@ -535,7 +537,7 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     }
 
     fun setInitialBlankState() {
-        counterpointStack.clear()
+        computationStack.clearAndDispatch()
         changeCounterPoints(listOf())
         changeSequenceToMikroKanons(listOf())
         changeFirstSequence(listOf())
@@ -546,7 +548,9 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
 
 
 
-
+    fun changeActiveButtons(newActiveButtons: ActiveButtons){
+        _activeButtons.value = newActiveButtons
+    }
     fun changeSelectedCounterpoint(newCounterpoint: Counterpoint){
         _selectedCounterpoint.value = newCounterpoint
 
@@ -631,32 +635,32 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         }
     }
 
-    fun updateUserOptions(key: String, value: String){
+    fun updateUserOptions(key: String, value: Any){
         var newUserOptionsData: UserOptionsData? = null
         val optionsDataClone = if(userOptionsData.value!!.isEmpty())
                                 UserOptionsData.getDefaultUserOptionData()
                                 else userOptionsData.value!![0].copy()
         when(key){
             "ensemble_type" -> {
-                newUserOptionsData = optionsDataClone.copy(ensembleType = value)
+                newUserOptionsData = optionsDataClone.copy(ensembleType = value as Int)
             }
             "bpm" -> {
-                newUserOptionsData = optionsDataClone.copy(bpm = value)
+                newUserOptionsData = optionsDataClone.copy(bpm = value as Int)
             }
             "rhythm" -> {
-                newUserOptionsData = optionsDataClone.copy(rhythm = value)
+                newUserOptionsData = optionsDataClone.copy(rhythm = value as Int)
             }
             "rhythmShuffle" -> {
-                newUserOptionsData = optionsDataClone.copy(rhythmShuffle = value)
+                newUserOptionsData = optionsDataClone.copy(rhythmShuffle = value as Int)
             }
             "partsShuffle" -> {
-                newUserOptionsData = optionsDataClone.copy(partsShuffle = value)
+                newUserOptionsData = optionsDataClone.copy(partsShuffle = value as Int)
             }
             "rowFormsFlags" -> {
-                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = value)
+                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = value as Int)
             }
             "language" -> {
-                newUserOptionsData  = optionsDataClone.copy(language = value)
+                newUserOptionsData  = optionsDataClone.copy(language = value as String)
             }
         }
         newUserOptionsData?.let {

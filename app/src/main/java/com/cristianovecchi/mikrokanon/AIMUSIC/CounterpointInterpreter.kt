@@ -14,9 +14,11 @@ object CounterpointInterpreter {
                    nuances: Boolean): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
 
-
+        if(counterpoint.parts.size > 15) {
+            println("WARNING: Counterpoint n. parts: ${counterpoint.parts.size}")
+        }
         counterpoint.parts.forEachIndexed { partIndex, part ->
-            val channel = partIndex //+ 1
+            val channel = if (partIndex < 9) partIndex else partIndex + 1 // skip percussion midi channel
             val track = MidiTrack()
             val pc: MidiEvent =
                 ProgramChange(0, channel, ensembleParts[partIndex].instrument) // cambia strumento

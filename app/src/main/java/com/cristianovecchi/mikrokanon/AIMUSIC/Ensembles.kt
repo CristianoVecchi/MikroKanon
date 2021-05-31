@@ -18,7 +18,6 @@ object Ensembles {
             EnsembleType.BASSOONS -> getBassoons(nParts)
             EnsembleType.CELLOS -> getCellos(nParts)
             EnsembleType.PIANO -> getPiano(nParts)
-            else -> listOf()
         }
     }
 
@@ -82,6 +81,20 @@ object Ensembles {
                 EnsemblePart(41, 3), //viola
                 EnsemblePart(42, 3),  // cello
                 EnsemblePart(42, 2),  // cello
+                EnsemblePart(43, 1)  // double-bass
+            )
+            in 10..12 -> listOf(
+                EnsemblePart(40, 6), //violin
+                EnsemblePart(40, 6), //violin
+                EnsemblePart(40, 5), //violin
+                EnsemblePart(40, 5), //violin
+                EnsemblePart(41, 4), //viola
+                EnsemblePart(41, 4), //viola
+                EnsemblePart(41, 3), //viola
+                EnsemblePart(42, 3),  // cello
+                EnsemblePart(42, 2),  // cello
+                EnsemblePart(42, 2),  // cello
+                EnsemblePart(43, 1),  // double-bass
                 EnsemblePart(43, 1)  // double-bass
             )
             else -> listOf()
@@ -150,6 +163,20 @@ object Ensembles {
                 EnsemblePart(70, 2),  // bassoon
                 EnsemblePart(70, 2)  // bassoon
             )
+            in 10..12 -> listOf(
+                EnsemblePart(72, 6), //piccolo
+                EnsemblePart(72, 6), //piccolo
+                EnsemblePart(73, 5), //flute
+                EnsemblePart(68, 5), //oboe
+                EnsemblePart(71, 5), //clarinet
+                EnsemblePart(69, 4), // english horn
+                EnsemblePart(71, 4), //clarinet
+                EnsemblePart(60, 3), // french horn
+                EnsemblePart(60, 3), // french horn
+                EnsemblePart(71, 3), // bass clarinet
+                EnsemblePart(70, 2),  // bassoon
+                EnsemblePart(70, 2)  // bassoon
+            )
             else -> listOf()
         }
     }
@@ -180,6 +207,20 @@ object Ensembles {
             8, 9 -> listOf(
                 EnsemblePart(48, 5), // string ensemble
                 EnsemblePart(48, 5), // string ensemble
+                EnsemblePart(48, 4), // string ensemble
+                EnsemblePart(48, 4), // string ensemble
+                EnsemblePart(48, 3), // string ensemble
+                EnsemblePart(48, 3), // string ensemble
+                EnsemblePart(48, 2), // string ensemble
+                EnsemblePart(48, 2), // string ensemble
+                EnsemblePart(48, 1), // string ensemble
+            )
+            in 10..12 -> listOf(
+                EnsemblePart(48, 6), // string ensemble
+                EnsemblePart(48, 5), // string ensemble
+                EnsemblePart(48, 5), // string ensemble
+                EnsemblePart(48, 5), // string ensemble
+                EnsemblePart(48, 4), // string ensemble
                 EnsemblePart(48, 4), // string ensemble
                 EnsemblePart(48, 4), // string ensemble
                 EnsemblePart(48, 3), // string ensemble
@@ -253,6 +294,20 @@ object Ensembles {
                 EnsemblePart(57, 2),  // trombone
                 EnsemblePart(58, 1)  //tuba
             )
+            in 10..12 -> listOf(
+                EnsemblePart(56, 5), //trumpet
+                EnsemblePart(56, 5), //trumpet
+                EnsemblePart(56, 5), //trumpet
+                EnsemblePart(56, 4), //trumpet
+                EnsemblePart(60, 4), //french horn
+                EnsemblePart(60, 4), //french horn
+                EnsemblePart(57, 4), // trombone
+                EnsemblePart(60, 3), //french horn
+                EnsemblePart(60, 3), //french horn
+                EnsemblePart(57, 3),  // trombone
+                EnsemblePart(57, 2),  // trombone
+                EnsemblePart(58, 1)  //tuba
+            )
             else -> listOf()
         }
     }
@@ -318,6 +373,20 @@ object Ensembles {
                 EnsemblePart(67, 2),  // Tenor Sax
                 EnsemblePart(67, 2)  // Tenor Sax
             )
+            in 10..12 -> listOf(
+                EnsemblePart(64, 6), // Soprano Sax
+                EnsemblePart(64, 5), // Soprano Sax
+                EnsemblePart(64, 5), // Soprano Sax
+                EnsemblePart(64, 5), // Soprano Sax
+                EnsemblePart(65, 4), // Alto Sax
+                EnsemblePart(65, 4), // Alto Sax
+                EnsemblePart(65, 4), // Alto Sax
+                EnsemblePart(65, 3), // Alto Sax
+                EnsemblePart(66, 3),  // Tenor Sax
+                EnsemblePart(66, 3),  // Tenor Sax
+                EnsemblePart(67, 2),  // Tenor Sax
+                EnsemblePart(67, 2)  // Tenor Sax
+            )
             else -> listOf()
         }
     }
@@ -373,6 +442,20 @@ object Ensembles {
                     EnsemblePart(73, 5), // Flute
                     EnsemblePart(73, 5), // Flute
                     EnsemblePart(73, 5), // Flute
+                    EnsemblePart(73, 4),  // Flute
+                    EnsemblePart(73, 4),  // Flute
+                    EnsemblePart(73, 3),  // Flute
+                    EnsemblePart(73, 3)  // Flute
+                )
+                in 10..12 -> listOf(
+                    EnsemblePart(72, 6), // Piccolo
+                    EnsemblePart(72, 6), // Piccolo
+                    EnsemblePart(72, 6), // Piccolo
+                    EnsemblePart(73, 5), // Flute
+                    EnsemblePart(73, 5), // Flute
+                    EnsemblePart(73, 5), // Flute
+                    EnsemblePart(73, 5), // Flute
+                    EnsemblePart(73, 4),  // Flute
                     EnsemblePart(73, 4),  // Flute
                     EnsemblePart(73, 4),  // Flute
                     EnsemblePart(73, 3),  // Flute
@@ -434,6 +517,20 @@ object Ensembles {
                 EnsemblePart(70, 2),  // Bassoon
                 EnsemblePart(70, 2)  // Bassoon
             )
+            in 10..12 -> listOf(
+                EnsemblePart(68, 6), // Oboe
+                EnsemblePart(68, 5), // Oboe
+                EnsemblePart(68, 5), // Oboe
+                EnsemblePart(68, 5), // Oboe
+                EnsemblePart(68, 4), // Oboe
+                EnsemblePart(69, 4), // English Horn
+                EnsemblePart(69, 4), // English Horn
+                EnsemblePart(69, 3), // English Horn
+                EnsemblePart(70, 3),  // Bassoon
+                EnsemblePart(70, 3),  // Bassoon
+                EnsemblePart(70, 2),  // Bassoon
+                EnsemblePart(70, 2)  // Bassoon
+            )
             else -> listOf()
         }
     }
@@ -471,6 +568,20 @@ object Ensembles {
                 EnsemblePart(71, 3),  // Clarinet
                 EnsemblePart(71, 2)  // Clarinet
             )
+            in 10..12 -> listOf(
+                EnsemblePart(71, 6), // Clarinet
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 5), // Clarinet
+                EnsemblePart(71, 4), // Clarinet
+                EnsemblePart(71, 4), // Clarinet
+                EnsemblePart(71, 4), // Clarinet
+                EnsemblePart(71, 3),  // Clarinet
+                EnsemblePart(71, 3),  // Clarinet
+                EnsemblePart(71, 3),  // Clarinet
+                EnsemblePart(71, 2),  // Clarinet
+                EnsemblePart(71, 2)  // Clarinet
+            )
             else -> listOf()
         }
     }
@@ -500,6 +611,20 @@ object Ensembles {
                 EnsemblePart(70, 2),  // Bassoon
                 EnsemblePart(70, 2),  // Bassoon
             )
+            in (10..12) -> listOf(
+                EnsemblePart(70, 5), // Bassoon
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 4), // Bassoon
+                EnsemblePart(70, 3), // Bassoon
+                EnsemblePart(70, 3), // Bassoon
+                EnsemblePart(70, 3), // Bassoon
+                EnsemblePart(70, 3),  // Bassoon
+                EnsemblePart(70, 2),  // Bassoon
+                EnsemblePart(70, 2),  // Bassoon
+            )
             else -> listOf()
         }
     }
@@ -523,6 +648,20 @@ object Ensembles {
                 EnsemblePart(42, 4), // Cello
                 EnsemblePart(42, 4), // Cello
                 EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 3), // Cello
+                EnsemblePart(42, 3), // Cello
+                EnsemblePart(42, 3),  // Cello
+                EnsemblePart(42, 2),  // Cello
+                EnsemblePart(42, 2),  // Cello
+            )
+            in 10..12 -> listOf(
+                EnsemblePart(42, 5), // Cello
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 4), // Cello
+                EnsemblePart(42, 3), // Cello
                 EnsemblePart(42, 3), // Cello
                 EnsemblePart(42, 3), // Cello
                 EnsemblePart(42, 3),  // Cello
@@ -574,6 +713,20 @@ object Ensembles {
                 EnsemblePart(0, 4),  // Piano
                 EnsemblePart(0, 3),  // Piano
                 EnsemblePart(0, 3),  // Piano
+                EnsemblePart(0, 2),  // Piano
+                EnsemblePart(0, 1),  // Piano
+            )
+            in 10..12 -> listOf(
+                EnsemblePart(0, 6), // Piano
+                EnsemblePart(0, 6), // Piano
+                EnsemblePart(0, 5), // Piano
+                EnsemblePart(0, 5), // Piano
+                EnsemblePart(0, 5), // Piano
+                EnsemblePart(0, 4), // Piano
+                EnsemblePart(0, 4),  // Piano
+                EnsemblePart(0, 3),  // Piano
+                EnsemblePart(0, 3),  // Piano
+                EnsemblePart(0, 2),  // Piano
                 EnsemblePart(0, 2),  // Piano
                 EnsemblePart(0, 1),  // Piano
             )

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
+import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.*
@@ -38,6 +39,7 @@ fun SequenceSelector(model: AppViewModel,
 ) {
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
+    val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons())
     val notesNames by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
     Column(modifier = Modifier.fillMaxHeight().background(MaterialTheme.colors.drawerBackgroundColor)) {
         val modifier3 = Modifier
@@ -73,7 +75,7 @@ fun SequenceSelector(model: AppViewModel,
         Column(modifier1) {
             Row(modifier = Modifier.fillMaxSize(),horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                 SequenceEditingButtons(
-                    model = model,
+                    model = model, isActive = activeButtons.editing,
                     buttonSize = buttonSize,
                     onDelete = {if (selected in sequences.indices)
                         onDelete(selected)
@@ -88,7 +90,7 @@ fun SequenceSelector(model: AppViewModel,
                     onAdd= { onAdd(ArrayList<Clip>(), false)})
 
                 MikroKanonsButtons(
-                    model = model,
+                    model = model, isActive = activeButtons.mikrokanon,
                     buttonSize = buttonSize,
                     fontSize = 18,
                     onMK2Click = {
@@ -108,30 +110,15 @@ fun SequenceSelector(model: AppViewModel,
                     }
                 )
                 // Add Counterpoint Button
-                IconButton(modifier = Modifier
-                    .padding(2.dp)
-                    .background(MaterialTheme.colors.iconButtonBackgroundColor, RoundedCornerShape(4.dp))
-                    .then(
-                        Modifier
-                            .size(buttonSize)
-                            .border(2.dp, MaterialTheme.colors.iconButtonBorderColor)
-                    ),
-                    onClick = { if (selected in sequences.indices) {
+                CustomButton(iconId = model.iconMap["counterpoint"]!!, isActive = activeButtons.counterpoint, buttonSize = buttonSize) {
+                    if (selected in sequences.indices) {
                         dialogState.value = true
                     } else {
                         snackbarVisibleState.value = true
-                    }})
-                {
-                    Icon(
-                        painter = painterResource(id = model.iconMap["counterpoint"]!!),
-                        contentDescription = null, // decorative element
-                        tint = MaterialTheme.colors.iconButtonIconColor
-                    )
+                    }
                 }
-
-
                 FreePartsButtons(
-                    fontSize = 22,
+                    fontSize = 22, isActive = activeButtons.freeparts,
                     onAscDynamicClick = {
                         if (selected in sequences.indices) onFreePart(
                             sequences[selected],

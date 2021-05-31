@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 
@@ -22,11 +23,23 @@ class OutputFragment: Fragment() {
         model.userOptionsData.observe(viewLifecycleOwner){
             model.selectNotesNames()
         }
+        model.stackSize.observe(viewLifecycleOwner){
+            model.changeActiveButtons(  if(model.stackSize.value!! <= 1)
+                model.activeButtons.value!!.copy(undo = false )
+            else model.activeButtons.value!!.copy(undo = true )
+            )
+        }
+        model.selectedCounterpoint.observe(viewLifecycleOwner){
+            model.changeActiveButtons( if(model.selectedCounterpoint.value!!.parts.size >= 12)
+                model.activeButtons.value!!.copy(counterpoint = false, freeparts = false)
+            else model.activeButtons.value!!.copy(counterpoint = true, freeparts = true)
+            )
+        }
         return ComposeView(requireContext()).apply {
             setContent {
                 MikroKanonTheme {
                     Surface(color = MaterialTheme.colors.background) {
-                       AppScaffold(model = model) {
+                       AppScaffold(model = model, model.userOptionsData.asFlow()) {
                             ResultDisplay(
                                 model = model,
                                 onClick = { counterpoint ->

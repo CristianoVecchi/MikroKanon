@@ -13,30 +13,30 @@ import androidx.room.PrimaryKey
         val id: Long,
 
         @ColumnInfo(name = "ensemble_type")
-        val ensembleType: String,
+        val ensembleType: Int,
 
         @ColumnInfo(name = "bpm")
-        val bpm: String,
+        val bpm: Int,
 
         @ColumnInfo(name = "rhythm")
-        val rhythm: String,
+        val rhythm: Int,
 
         @ColumnInfo(name = "rhythm_shuffle")
-        val rhythmShuffle: String,
+        val rhythmShuffle: Int,
 
         @ColumnInfo(name = "parts_shuffle")
-        val partsShuffle: String,
+        val partsShuffle: Int,
 
         @ColumnInfo(name = "rowforms_flags")
-        val rowFormsFlags: String,
+        val rowFormsFlags: Int,
 
         @ColumnInfo(name = "language")
         val language: String
     ){
         companion object{
             fun getDefaultUserOptionData(): UserOptionsData{
-                return UserOptionsData(0,"0","90","1",
-                    "0","0", "1", "System")
+                return UserOptionsData(0,0,90,1,
+                    1,1, 1, "System")
             }
         }
     }
