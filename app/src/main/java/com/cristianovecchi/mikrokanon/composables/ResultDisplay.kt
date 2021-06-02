@@ -1,32 +1,29 @@
 package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.toStringAll
-import com.cristianovecchi.mikrokanon.ui.*
+import com.cristianovecchi.mikrokanon.ui.buttonsDisplayBackgroundColor
+import com.cristianovecchi.mikrokanon.ui.sequencesListBackgroundColor
 
 @Composable
 fun ResultDisplay(model: AppViewModel,
@@ -36,12 +33,13 @@ fun ResultDisplay(model: AppViewModel,
                   onFreePart: (TREND) -> Unit = {},
                   onExpand: () -> Unit = {},
                   onPlay: () -> Unit = {}
-                  ) {
+                  )
+{
     val notesNames by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, toClipsText(it, notesNames))}
     val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
-    val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons())
+    val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, freeparts = true))
     val elaboratingBackgroundColor by animateColorAsState(
         if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
@@ -103,7 +101,6 @@ fun ResultDisplay(model: AppViewModel,
             ) {
 
                 val dialogState by lazy { mutableStateOf(false) }
-                val selectedDialogSequence by lazy { mutableStateOf(-1) }
 
                 SequencesDialog(dialogState = dialogState,
                     sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames) },
@@ -116,27 +113,27 @@ fun ResultDisplay(model: AppViewModel,
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // UNDO BUTTON
                     CustomButton(iconId = model.iconMap["undo"]!!, isActive = activeButtons.undo, buttonSize = buttonSize) {
-                        onBack()
+                        if(!elaborating) onBack()
                     }
                     // EXPAND BUTTON
                     CustomButton(iconId = model.iconMap["expand"]!!, isActive = activeButtons.expand, buttonSize = buttonSize) {
-                        onExpand()
+                        if(!elaborating) onExpand()
                     }
                     // Add Counterpoint Button
                     CustomButton(iconId = model.iconMap["counterpoint"]!!, isActive = activeButtons.counterpoint, buttonSize = buttonSize) {
-                        dialogState.value = true
+                        if(!elaborating) dialogState.value = true
                     }
 
                     FreePartsButtons(
                         fontSize = 22, isActive = activeButtons.freeparts,
-                        onAscDynamicClick = { onFreePart(TREND.ASCENDANT_DYNAMIC) },
-                        onAscStaticClick = { onFreePart(TREND.ASCENDANT_STATIC) },
-                        onDescDynamicClick = { onFreePart(TREND.DESCENDANT_DYNAMIC) },
-                        onDescStaticClick = { onFreePart(TREND.DESCENDANT_STATIC) }
+                        onAscDynamicClick = { if(!elaborating) onFreePart(TREND.ASCENDANT_DYNAMIC) },
+                        onAscStaticClick = { if(!elaborating) onFreePart(TREND.ASCENDANT_STATIC) },
+                        onDescDynamicClick = { if(!elaborating) onFreePart(TREND.DESCENDANT_DYNAMIC) },
+                        onDescStaticClick = { if(!elaborating) onFreePart(TREND.DESCENDANT_STATIC) }
                     )
                     // PLAY BUTTON
                     CustomButton(iconId = model.iconMap["play"]!!, isActive = activeButtons.play, buttonSize = buttonSize) {
-                        onPlay()
+                        if(!elaborating) onPlay()
                     }
                 }
             }

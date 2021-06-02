@@ -23,14 +23,14 @@ class UserOptionsDataRepository(private val userOptionsDataDao: UserOptionsDataD
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun deleteUserOptions(userOptionsData: UserOptionsData) {
-        val deleted = userOptionsDataDao.deleteUserOptions(userOptionsData)
+        userOptionsDataDao.deleteUserOptions(userOptionsData)
         println("userOptions DELETED: ${userOptionsData.toString()}")
 
     }
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun deleteAllUserOptions() {
-        val deleted = userOptionsDataDao.deleteAllUserOptions()
+        userOptionsDataDao.deleteAllUserOptions()
         println("All userOptions DELETED")
 
     }

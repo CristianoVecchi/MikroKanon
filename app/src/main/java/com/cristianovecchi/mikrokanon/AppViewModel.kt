@@ -134,28 +134,52 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
 
     // macro Functions called by fragments -----------------------------------------------------
     val onPlay = { createAndPlay: Boolean ->
-        var error = "No File Created yet!!!"
-        if(userOptionsData.value!!.isEmpty()){
-            insertUserOptionData(UserOptionsData.getDefaultUserOptionData())
-        }
-        if(!selectedCounterpoint.value!!.isEmpty()){
-            if (mediaPlayer == null) mediaPlayer = MediaPlayer()
-            val ensType: EnsembleType = EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType } ?:0]
-            val bpm: Float = userOptionsData.value?.let { userOptionsData.value!![0].bpm.toFloat() } ?: 90f
-            val rhythm: RhythmPatterns = RhythmPatterns.values()[userOptionsData.value?.let { userOptionsData.value!![0].rhythm } ?: 0]
-            val rhythmShuffle: Boolean = 0 != (userOptionsData.value?.let { userOptionsData.value!![0].rhythmShuffle } ?: 0 )
-            val partsShuffle: Boolean = 0 != (userOptionsData.value?.let { userOptionsData.value!![0].partsShuffle } ?: 0 )
-            val rowFormsFlags: Int = userOptionsData.value?.let { userOptionsData.value!![0].rowFormsFlags } ?: 1 // ORIGINAL by default
-
-            error = Player.playCounterpoint(
-                mediaPlayer!!, false, selectedCounterpoint.value!!,
-                bpm, 0f, rhythm.values, ensType, createAndPlay, midiPath , rhythmShuffle, partsShuffle, rowFormsFlags
-            )
-        }
-        error
+            var error = "No File Created yet!!!"
+            if(userOptionsData.value!!.isEmpty()){
+                insertUserOptionData(UserOptionsData.getDefaultUserOptionData())
+            }
+            if(!selectedCounterpoint.value!!.isEmpty()) {
+                if (mediaPlayer == null) mediaPlayer = MediaPlayer()
+                val ensType: EnsembleType =
+                    EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType }
+                        ?: 0]
+                val bpm: Float =
+                    userOptionsData.value?.let { userOptionsData.value!![0].bpm.toFloat() } ?: 90f
+                val rhythm: RhythmPatterns =
+                    RhythmPatterns.values()[userOptionsData.value?.let { userOptionsData.value!![0].rhythm }
+                        ?: 0]
+                val rhythmShuffle: Boolean =
+                    0 != (userOptionsData.value?.let { userOptionsData.value!![0].rhythmShuffle }
+                        ?: 0)
+                val partsShuffle: Boolean =
+                    0 != (userOptionsData.value?.let { userOptionsData.value!![0].partsShuffle }
+                        ?: 0)
+                val rowFormsFlags: Int =
+                    userOptionsData.value?.let { userOptionsData.value!![0].rowFormsFlags }
+                        ?: 1 // ORIGINAL by default
+                val doublingFlags: Int =
+                    userOptionsData.value?.let { userOptionsData.value!![0].doublingFlags }
+                        ?: 1 // ORIGINAL by default
+                error = Player.playCounterpoint(
+                    mediaPlayer!!,
+                    false,
+                    selectedCounterpoint.value!!,
+                    bpm,
+                    0f,
+                    rhythm.values,
+                    ensType,
+                    createAndPlay,
+                    midiPath,
+                    rhythmShuffle,
+                    partsShuffle,
+                    rowFormsFlags,
+                    doublingFlags
+                )
+            }
+            error
     }
     val dispatchIntervals = {
-        refreshComputation(false)
+            refreshComputation(false)
     }
     val onExpand = {
         val counterpointsClone = counterpoints.value!!.map{
@@ -192,10 +216,10 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         computationStack.pushAndDispatch(Computation.FurtherFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!), trend))
         findFreeParts(trend)
     }
-    val onMikroKanons = {list: ArrayList<Clip> ->
+    val onMikroKanons2 = {list: ArrayList<Clip> ->
         computationStack.pushAndDispatch(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),ArrayList(sequenceToMikroKanons.value!!),2))
         if(list.isNotEmpty()) changeSequenceToMikroKanons(list)
-            findCounterpointsByMikroKanons()
+            findCounterpointsByMikroKanons2()
 
     }
     val onMikroKanons3 = {list: ArrayList<Clip> ->
@@ -226,7 +250,6 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         }
     }
     //-------------end macro functions--------------------
-    //fun pushInComputationStack(computation: Computation)
 
     fun shareMidi(file: File){
         try {
@@ -290,7 +313,7 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
                         println(sequenceToMikroKanons.value!!)
                         //changeSequenceToMikroKanons(previousComputation.sequenceToMikroKanon)
                         when (previousComputation.nParts) {
-                            2 -> onMikroKanons(ArrayList(sequenceToMikroKanons.value!!))
+                            2 -> onMikroKanons2(ArrayList(sequenceToMikroKanons.value!!))
                             3 -> onMikroKanons3(ArrayList(sequenceToMikroKanons.value!!))
                             4 -> onMikroKanons4(ArrayList(sequenceToMikroKanons.value!!))
                             else -> Unit
@@ -440,18 +463,18 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
             ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
             return counterpoints
     }
-    private fun findCounterpointsByMikroKanons(){
+    private fun findCounterpointsByMikroKanons2(){
         //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = findCpByMikroKanons()
+                newList = findCpByMikroKanons2()
             }
             changeCounterPoints(newList)
             counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
         }
     }
-    private suspend fun findCpByMikroKanons(): List<Counterpoint>{
+    private suspend fun findCpByMikroKanons2(): List<Counterpoint>{
         return if(sequenceToMikroKanons.value!!.isNotEmpty()) {
             MikroKanon.findAll2AbsPartMikroKanons(
                 sequenceToMikroKanons.value!!.map { it.abstractNote }.toList(),
@@ -545,8 +568,6 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         changeSelectedCounterpoint(Counterpoint.empty())
         changeSequenceSelection(-1)
     }
-
-
 
     fun changeActiveButtons(newActiveButtons: ActiveButtons){
         _activeButtons.value = newActiveButtons
@@ -658,6 +679,9 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
             }
             "rowFormsFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = value as Int)
+            }
+            "doublingFlags" -> {
+                newUserOptionsData  = optionsDataClone.copy(doublingFlags = value as Int)
             }
             "language" -> {
                 newUserOptionsData  = optionsDataClone.copy(language = value as String)

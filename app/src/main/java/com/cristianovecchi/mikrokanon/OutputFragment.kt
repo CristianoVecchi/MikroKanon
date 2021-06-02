@@ -23,18 +23,22 @@ class OutputFragment: Fragment() {
         model.userOptionsData.observe(viewLifecycleOwner){
             model.selectNotesNames()
         }
+        model.selectedCounterpoint.observe(viewLifecycleOwner){
+            if(model.selectedCounterpoint.value!!.parts.isNotEmpty()) {
+                model.changeActiveButtons( if(model.selectedCounterpoint.value!!.parts.size >= 12)
+                    model.activeButtons.value!!.copy(counterpoint = false, freeparts = false)
+                else model.activeButtons.value!!.copy(counterpoint = true, freeparts = true)
+                )
+            }
+
+        }
         model.stackSize.observe(viewLifecycleOwner){
             model.changeActiveButtons(  if(model.stackSize.value!! <= 1)
-                model.activeButtons.value!!.copy(undo = false )
+                model.activeButtons.value!!.copy(undo = false)
             else model.activeButtons.value!!.copy(undo = true )
             )
         }
-        model.selectedCounterpoint.observe(viewLifecycleOwner){
-            model.changeActiveButtons( if(model.selectedCounterpoint.value!!.parts.size >= 12)
-                model.activeButtons.value!!.copy(counterpoint = false, freeparts = false)
-            else model.activeButtons.value!!.copy(counterpoint = true, freeparts = true)
-            )
-        }
+
         return ComposeView(requireContext()).apply {
             setContent {
                 MikroKanonTheme {

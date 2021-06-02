@@ -30,13 +30,16 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "rowforms_flags")
         val rowFormsFlags: Int,
 
+        @ColumnInfo(name = "doubling_flags")
+        val doublingFlags: Int,
+
         @ColumnInfo(name = "language")
         val language: String
     ){
         companion object{
             fun getDefaultUserOptionData(): UserOptionsData{
                 return UserOptionsData(0,0,90,1,
-                    1,1, 1, "System")
+                    1,1, 1, 0,"System")
             }
         }
     }

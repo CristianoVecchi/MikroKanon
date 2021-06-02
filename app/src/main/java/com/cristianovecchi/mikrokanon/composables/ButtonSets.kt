@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.composables
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,22 +28,27 @@ fun CustomButton(iconId: Int = -1, text: String = "", isActive: Boolean = true, 
                  borderColor: Color = MaterialTheme.colors.iconButtonBorderColor,
                  iconColor: Color = MaterialTheme.colors.iconButtonIconColor,
                  backgroundColor: Color = MaterialTheme.colors.iconButtonBackgroundColor,
-                 inactiveColor: Color = MaterialTheme.colors.iconButtonInactiveColor,
+                 inactiveIconColor: Color = MaterialTheme.colors.iconButtonInactiveIconColor,
+                 inactiveBackgroundColor: Color = MaterialTheme.colors.iconButtonInactiveBackgroundColor,
+                 inactiveBorderColor: Color = MaterialTheme.colors.iconButtonInactiveBorderColor,
                  onClick : () -> Unit) {
+    val actualBackgroundColor by animateColorAsState( if(isActive) backgroundColor else inactiveBackgroundColor )
+    val actualIconColor  by animateColorAsState( if(isActive) iconColor else inactiveIconColor )
+    val actualBorderColor by animateColorAsState( if(isActive) borderColor else inactiveBorderColor )
     if (iconId != -1) {
         if (text.isNotEmpty()) { //MK button (Icon + Text)
             val textStyle = TextStyle(
                 fontSize = fontSize.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isActive) iconColor else inactiveColor
+                color = actualIconColor
             )
             IconButton(modifier = Modifier
                 .padding(2.dp)
-                .background(backgroundColor, RoundedCornerShape(4.dp))
+                .background(actualBackgroundColor, RoundedCornerShape(4.dp))
                 .then(
                     Modifier
                         .size(buttonSize)
-                        .border(2.dp, borderColor)
+                        .border(2.dp, actualBorderColor)
                 ),
                 onClick = { if (isActive) onClick() })
             {
@@ -49,7 +56,7 @@ fun CustomButton(iconId: Int = -1, text: String = "", isActive: Boolean = true, 
                     Icon(
                         painter = painterResource(id = iconId),
                         contentDescription = null, // decorative element
-                        tint = if (isActive) iconColor else inactiveColor
+                        tint = actualIconColor
                     )
                     Text(text = text, style = textStyle)
                 }
@@ -58,11 +65,11 @@ fun CustomButton(iconId: Int = -1, text: String = "", isActive: Boolean = true, 
         } else { // Icon button
             IconButton(modifier = Modifier
                 .padding(2.dp)
-                .background(backgroundColor, RoundedCornerShape(4.dp))
+                .background(actualBackgroundColor, RoundedCornerShape(4.dp))
                 .then(
                     Modifier
                         .size(buttonSize)
-                        .border(2.dp, borderColor)
+                        .border(2.dp, actualBorderColor)
                 ),
                 onClick = { if (isActive) onClick() }
             )
@@ -70,7 +77,7 @@ fun CustomButton(iconId: Int = -1, text: String = "", isActive: Boolean = true, 
                 Icon(
                     painter = painterResource(id = iconId),
                     contentDescription = null, // decorative element
-                    tint = if (isActive) iconColor else inactiveColor
+                    tint = actualIconColor
                 )
             }
         }
@@ -78,9 +85,9 @@ fun CustomButton(iconId: Int = -1, text: String = "", isActive: Boolean = true, 
         if (text.isNotEmpty()) { // text button
             Button(modifier = Modifier
                 .padding(2.dp)
-                .border(2.dp, borderColor),
+                .border(2.dp, actualBorderColor),
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = backgroundColor,
+                    backgroundColor = actualBackgroundColor,
                     contentColor = iconColor
                 ),
                 onClick = { if (isActive) onClick() })
@@ -88,7 +95,7 @@ fun CustomButton(iconId: Int = -1, text: String = "", isActive: Boolean = true, 
                 Text(
                     text = text,
                     style = TextStyle(
-                        color = if (isActive) iconColor else inactiveColor,
+                        color = actualIconColor,
                         fontSize = fontSize.sp,
                         fontWeight = FontWeight.Bold
                     )

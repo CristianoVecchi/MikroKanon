@@ -46,17 +46,21 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
         color = Color.LightGray)
     val uriHandler = LocalUriHandler.current
     Scaffold(
-        modifier = Modifier.background(MaterialTheme.colors.drawerBackgroundColor)
+        modifier = Modifier
+            .background(MaterialTheme.colors.drawerBackgroundColor)
             .border(1.dp, MaterialTheme.colors.drawerBackgroundColor),
         scaffoldState = scaffoldState,
         drawerContent = { SettingsDrawer(model, userOptionsDataFlow)},
         topBar = {
             TopAppBar() {
-                Row(Modifier.fillMaxWidth()
-                    .background(MaterialTheme.colors.drawerBackgroundColor)
-                    .border(1.dp, MaterialTheme.colors.drawerBackgroundColor),
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colors.drawerBackgroundColor)
+                        .border(1.dp, MaterialTheme.colors.drawerBackgroundColor),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically, )
+                    verticalAlignment = Alignment.CenterVertically,
+                )
                 {
                     IconButton(
                         onClick = {scope.launch { scaffoldState.drawerState.open() }  }
@@ -83,25 +87,52 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
 }
 
 
-data class ListDialogData(val dialogState: Boolean = false, val itemList: List<String> = listOf(), val selectedListDialogItem: Int = -1,
+data class ListDialogData(val dialogState: Boolean = false, val itemList: List<String> = listOf(),
+                          val selectedListDialogItem: Int = -1,
                           val dialogTitle: String = "", val onSubmitButtonClick: (Int) -> Unit = {} )
+data class MultiListDialogData(val dialogState: Boolean = false, val itemList: List<String> = listOf(),
+                               val selectedListDialogItems: Set<Int> = setOf(),
+                          val dialogTitle: String = "", val onSubmitButtonClick: (List<Int>) -> Unit = {} )
 data class NumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:Int = 0,
                             val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
                             val error:String = "", val onSubmitButtonClick: () -> Unit = {})
+
+fun convertIntsToFlags(ints: Set<Int>): Int{
+    var flags = 0
+    ints.forEach{ flags = 1 shl it or flags }
+    println("Flags: $flags")
+    return flags
+}
+fun convertFlagsToInts(flags: Int): Set<Int>{
+    val result = mutableSetOf<Int>()
+    for (i in 0..24) {
+        if (1 shl i and flags > 0) {
+            result.add(i)
+        }
+    }
+    println("Ints: $result")
+    return result.toSet()
+}
 @Composable
 fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>){
 
-
+    val doubling_en = listOf("minor 2nd","Major 2nd", "minor 3rd", "Major 3rd", "4th",
+                            "Augm. 4th", "5th", "minor 6th", "Major 6th", "minor 7th", "Major 7th",
+                            "Octave", "minor 9th", "Major 9th", "minor 10th", "Major 10th", "11th",
+                            "Augm. 11th", "12th", "minor 13th", "Major 13th", "minor 14th", "Major 14th", "Double Octave")
 
     val listDialogData by lazy { mutableStateOf(ListDialogData())}
     val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
+    val multiListDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
 
     ListDialog(listDialogData)
+    MultiListDialog(multiListDialogData)
     BpmDialog(bpmDialogData)
     ExportDialog(exportDialogData)
-    val optionNames= listOf<String>("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle", "Retrograde", "Inverse",  "Inv-Retrograde", "Export MIDI","Language")
+    val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
+        "Retrograde", "Inverse",  "Inv-Retrograde", "Doubling", "Export MIDI","Language")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionData()
@@ -112,7 +143,10 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
 //    }
 
-    LazyColumn(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.drawerBackgroundColor),
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.drawerBackgroundColor),
         state = listState,
     ) { items(optionNames) { optionName ->
             val fontSize = 18
@@ -213,6 +247,26 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                         )
                     })
                 }
+                "Doubling" -> {
+                    val flags = userOptions.doublingFlags
+                    val intsFromFlags = convertFlagsToInts(flags).map{ it - 1 }
+                    val isOn = flags > 0
+                    val text = if(!isOn) "Doubling" else "Doubling at ${
+                        intsFromFlags.joinToString(
+                            separator = ", "
+                        ) { doubling_en[it] }
+                    }"
+                    SelectableCard(text = text, fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                        multiListDialogData.value = MultiListDialogData(true, doubling_en, intsFromFlags.toSet() ,"Select intervals for doubling!"
+                        ) { indexes ->
+                            model.updateUserOptions(
+                                "doublingFlags",
+                                convertIntsToFlags(indexes.map{it + 1}.toSortedSet())
+                            )
+                            multiListDialogData.value = MultiListDialogData(itemList = multiListDialogData.value.itemList)
+                        }
+                    })
+                }
                 "Export MIDI" -> {
                     SelectableCard(text = "Export MIDI", fontSize = fontSize, isSelected = true, onClick = { _ ->
                         val path = model.midiPath.absolutePath.toString()
@@ -230,7 +284,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                     })
                 }
                 "Language" -> {
-                    val languages = LANGUAGES.values().map{ it.language}
+                    val languages = LANGUAGES.values().map{ it.language }
                     val langDef: String = if(userOptions.language == "System") model.getSystemLangDef() else userOptions.language
                     val languageName = when(langDef){
                         "en" -> LANGUAGES.en.language
@@ -251,7 +305,6 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                             }
                         })
                     }
-
             }
         }
     }

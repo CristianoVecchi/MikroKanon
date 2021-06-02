@@ -33,10 +33,11 @@ fun SequenceSelector(model: AppViewModel,
                      onAdd: (ArrayList<Clip>, Boolean) -> Unit,
                      onKP: (ArrayList<Clip>, Int, Boolean) -> Unit,
                      onFreePart: (ArrayList<Clip>, TREND) -> Unit,
-                     onMikroKanons: (ArrayList<Clip>) -> Unit,
+                     onMikroKanons2: (ArrayList<Clip>) -> Unit,
                      onMikroKanons3: (ArrayList<Clip>) -> Unit,
                      onMikroKanons4: (ArrayList<Clip>) -> Unit
-) {
+                    )
+{
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
     val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons())
@@ -51,7 +52,7 @@ fun SequenceSelector(model: AppViewModel,
             .weight(1f)
         val selected by model.selectedSequence.observeAsState(initial = -1)
         val sequences by model.sequences.observeAsState(emptyList())
-        val snackbarVisibleState = remember { mutableStateOf(false) }
+        //val snackbarVisibleState = remember { mutableStateOf(false) }
         val dialogState by lazy { mutableStateOf(false) }
         val buttonSize = 54.dp
 
@@ -65,7 +66,6 @@ fun SequenceSelector(model: AppViewModel,
             }
         )
         val onSelectComposition = { index: Int ->
-            snackbarVisibleState.value = false
             onSelect(index)
         }
         SequenceScrollableColumn(
@@ -77,119 +77,72 @@ fun SequenceSelector(model: AppViewModel,
                 SequenceEditingButtons(
                     model = model, isActive = activeButtons.editing,
                     buttonSize = buttonSize,
-                    onDelete = {if (selected in sequences.indices)
-                        onDelete(selected)
-                    else {
-                        snackbarVisibleState.value = true
-                    } },
-                    onEdit = { if (selected in sequences.indices) {
-                        onAdd(sequences[selected], true)
-                    } else {
-                        snackbarVisibleState.value = true
-                    }},
-                    onAdd= { onAdd(ArrayList<Clip>(), false)})
-
+                    onDelete = { onDelete(selected) },
+                    onEdit = { onAdd(sequences[selected], true) },
+                    onAdd= { onAdd(ArrayList<Clip>(), false) }
+                )
                 MikroKanonsButtons(
                     model = model, isActive = activeButtons.mikrokanon,
                     buttonSize = buttonSize,
                     fontSize = 18,
                     onMK2Click = {
-                        if (selected in sequences.indices) onMikroKanons(sequences[selected]) else {
-                            snackbarVisibleState.value = true
-                        }
+                        onMikroKanons2(sequences[selected])
                     },
                     onMK3Click = {
-                        if (selected in sequences.indices) onMikroKanons3(sequences[selected]) else {
-                            snackbarVisibleState.value = true
-                        }
+                        onMikroKanons3(sequences[selected])
                     },
                     onMK4Click = {
-                        if (selected in sequences.indices) onMikroKanons4(sequences[selected]) else {
-                            snackbarVisibleState.value = true
-                        }
+                       onMikroKanons4(sequences[selected])
                     }
                 )
                 // Add Counterpoint Button
                 CustomButton(iconId = model.iconMap["counterpoint"]!!, isActive = activeButtons.counterpoint, buttonSize = buttonSize) {
-                    if (selected in sequences.indices) {
                         dialogState.value = true
-                    } else {
-                        snackbarVisibleState.value = true
                     }
                 }
                 FreePartsButtons(
                     fontSize = 22, isActive = activeButtons.freeparts,
-                    onAscDynamicClick = {
-                        if (selected in sequences.indices) onFreePart(
-                            sequences[selected],
-                            TREND.ASCENDANT_DYNAMIC
-                        ) else {
-                            snackbarVisibleState.value = true
-                        }
-                    },
-                    onAscStaticClick = {
-                        if (selected in sequences.indices) onFreePart(
-                            sequences[selected],
-                            TREND.ASCENDANT_STATIC
-                        ) else {
-                            snackbarVisibleState.value = true
-                        }
-                    },
-                    onDescDynamicClick = {
-                        if (selected in sequences.indices) onFreePart(
-                            sequences[selected],
-                            TREND.DESCENDANT_DYNAMIC
-                        ) else {
-                            snackbarVisibleState.value = true
-                        }
-                    },
-                    onDescStaticClick = {
-                        if (selected in sequences.indices) onFreePart(
-                            sequences[selected],
-                            TREND.DESCENDANT_STATIC
-                        ) else {
-                            snackbarVisibleState.value = true
-                        }
-                    }
+                    onAscDynamicClick = { onFreePart(sequences[selected], TREND.ASCENDANT_DYNAMIC ) },
+                    onAscStaticClick = { onFreePart( sequences[selected], TREND.ASCENDANT_STATIC) },
+                    onDescDynamicClick = { onFreePart( sequences[selected], TREND.DESCENDANT_DYNAMIC ) },
+                    onDescStaticClick = { onFreePart(sequences[selected],TREND.DESCENDANT_STATIC) }
                 )
             }
         }
-        if (snackbarVisibleState.value) {
-            Snackbar(
-                action = {
-                    Button(onClick = { snackbarVisibleState.value = false }) {
-                        Text("OK")
-                    }
-                },
-                modifier = Modifier.padding(8.dp)
-            ) { Text(text = "Please, select a Sequence!") }
-        }
-
-    }
+//        if (snackbarVisibleState.value) {
+//            Snackbar(
+//                action = {
+//                    Button(onClick = { snackbarVisibleState.value = false }) {
+//                        Text("OK")
+//                    }
+//                },
+//                modifier = Modifier.padding(8.dp)
+//            ) { Text(text = "Please, select a Sequence!") }
+//        }
+//     }
 }
-
-
 @Composable
 fun SequenceScrollableColumn(
-    modifier: Modifier, notesNames: List<String>,
-    sequences: List<ArrayList<Clip>>, selected:Int, onSelect: (Int) -> Unit
-) {
-    val listState = rememberLazyListState()
-    LazyColumn(state = listState,
-        modifier = modifier
-    ) {
-        itemsIndexed(items = sequences) { index, sequence ->
-            Row(modifier = Modifier.padding(8.dp)){
-                if (index == selected) {
-                    SelectableCard(sequence.toStringAll(notesNames), 20, isSelected = true, onClick = {})
-                } else {
-                    SelectableCard(text = sequence.toStringAll(notesNames), 18, isSelected = false,onClick = {
-                        onSelect(index)})
+        modifier: Modifier, notesNames: List<String>,
+        sequences: List<ArrayList<Clip>>, selected:Int, onSelect: (Int) -> Unit
+    )
+    {
+        val listState = rememberLazyListState()
+        LazyColumn(state = listState,
+            modifier = modifier
+        )
+        {
+            itemsIndexed(items = sequences) { index, sequence ->
+                Row(modifier = Modifier.padding(8.dp)){
+                    if (index == selected) {
+                        SelectableCard(sequence.toStringAll(notesNames), 20, isSelected = true, onClick = {})
+                    } else {
+                        SelectableCard(text = sequence.toStringAll(notesNames), 18, isSelected = false,onClick = {
+                            onSelect(index)})
+                    }
                 }
             }
-
         }
-    }
 }
 
 

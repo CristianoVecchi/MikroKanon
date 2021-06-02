@@ -30,7 +30,7 @@ enum class NoteNamesIt {
     Do,Re,Mi,Fa,Sol,La,Si,EMPTY
 }
 enum class NoteNamesFr {
-    Ut,Re,Mi,Fa,Sol,La,Si,EMPTY
+    Ut,Ré,Mi,Fa,Sol,La,Si,EMPTY
 }
 enum class Accidents(val ax : String, val sum : Int){
     //SHARP("\uF023"), FLAT("\uF062") , D_SHARP("\uF045"), D_FLAT("\uF0BA"), NATURAL("\uF06E")

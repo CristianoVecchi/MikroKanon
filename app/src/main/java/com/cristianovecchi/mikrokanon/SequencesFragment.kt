@@ -57,9 +57,9 @@ class SequencesFragment(): Fragment() {
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onFreePartFromFirstSelection(list, trend)
                                    },
-                                   onMikroKanons = { list ->
+                                   onMikroKanons2 = { list ->
                                        findNavController().navigate(R.id.outputFragment)
-                                       model.onMikroKanons(list)
+                                       model.onMikroKanons2(list)
                                    },
                                    onMikroKanons3 = { list ->
                                        findNavController().navigate(R.id.outputFragment)

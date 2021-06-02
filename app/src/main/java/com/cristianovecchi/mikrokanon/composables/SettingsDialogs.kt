@@ -8,12 +8,8 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -197,8 +193,104 @@ fun NumberDialog(numberDialogData: MutableState<NumberDialogData>, onDismissRequ
             }
         }
     }
-
 }
+@Composable
+fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>) {
+    MultiSelectListDialog(
+        listDialogData = listDialogData,
+        submitButtonText = "Select",
+        onDismissRequest = { listDialogData.value = MultiListDialogData(itemList = listDialogData.value.itemList)  }
+    )
+}
+@Composable
+fun MultiSelectListDialog(
+    listDialogData: MutableState<MultiListDialogData>,
+    submitButtonText: String,
+    onDismissRequest: () -> Unit
+) {
+    if (listDialogData.value.dialogState) {
+        var selectedOptions by remember{ mutableStateOf(listDialogData.value.selectedListDialogItems) }
+        Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
+            Surface(
+                modifier = Modifier.width(300.dp),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(text = listDialogData.value.dialogTitle)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    val listState = rememberLazyListState()
+                    if(listDialogData.value.itemList.isNotEmpty()){
+                        LazyColumn( state = listState,
+                            modifier = Modifier.height(500.dp)
+                        ) { items(listDialogData.value.itemList) { item ->
+                            val selected = if (selectedOptions.isEmpty()) {
+                                listOf<String>()
+                            } else {
+                                listDialogData.value.itemList.filterIndexed{ index, _ -> selectedOptions.contains(index)}
+                                //sequencesList[selectedOption.value]
+                            }
+
+                            MultiRadioButton(item, selected) { selectedValue ->
+                                val index = listDialogData.value.itemList.indexOf(selectedValue)
+                                selectedOptions = if(selectedOptions.contains(index)){
+                                    selectedOptions.toMutableSet().also{
+                                        it.remove(index)}.sorted().toSet()
+                                } else {
+                                    selectedOptions.toMutableSet().also{
+                                        it.add(index)}.sorted().toSet()
+                                }
+
+                            }
+                        }
+
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Button(
+                            onClick = {
+                                listDialogData.value.onSubmitButtonClick.invoke(selectedOptions.toList())
+                                onDismissRequest.invoke()
+                            },
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text(text = submitButtonText)
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+}
+@Composable
+fun MultiRadioButton(text: String, selectedValues: List<String>, onClickListener: (String) -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .selectable(
+                selected = (selectedValues.contains(text)),
+                onClick = {
+                    onClickListener(text)
+                }
+            )
+            .padding(horizontal = 16.dp)
+    ) {
+        // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.
+        // So have Text Composable to show text.
+        androidx.compose.material.RadioButton(
+            selected = (selectedValues.contains(text)),
+            onClick = {
+                onClickListener(text)
+            }
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.body1.merge(),
+            modifier = Modifier.padding(start = 16.dp)
+        )
+    }
+}
+
 @Composable
 fun ListDialog(listDialogData: MutableState<ListDialogData>) {
     SingleSelectListDialog(
@@ -262,7 +354,7 @@ fun SingleSelectListDialog(
     }
 }
 @Composable
-fun RadioListButton(text: String, selectedValue: String, onClickListener: (String) -> Unit) {
+fun RadioButton(text: String, selectedValue: String, onClickListener: (String) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()

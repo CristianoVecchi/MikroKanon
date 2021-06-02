@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.composables.convertFlagsToInts
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.NoteOff
@@ -11,14 +12,16 @@ object CounterpointInterpreter {
     fun doTheMagic(counterpoint: Counterpoint,
                    durations: List<Int> = listOf(240), // 1/8
                    ensembleParts: List<EnsemblePart>,
-                   nuances: Boolean): List<MidiTrack> {
+                   nuances: Boolean,
+                   doublingFlags: Int): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
 
         if(counterpoint.parts.size > 15) {
             println("WARNING: Counterpoint n. parts: ${counterpoint.parts.size}")
         }
         counterpoint.parts.forEachIndexed { partIndex, part ->
-            val channel = if (partIndex < 9) partIndex else partIndex + 1 // skip percussion midi channel
+            val channel =
+                if (partIndex < 9) partIndex else partIndex + 1 // skip percussion midi channel
             val track = MidiTrack()
             val pc: MidiEvent =
                 ProgramChange(0, channel, ensembleParts[partIndex].instrument) // cambia strumento
@@ -33,49 +36,93 @@ object CounterpointInterpreter {
                 21,
                 108
             )
-            val velocities: IntArray = if(nuances){
+            val velocities: IntArray = if (nuances) {
                 val mssq = MelodySubSequencer(actualPitches)
                 mssq.assignVelocities(0.95f, 0.45f)
                 mssq.velocities
-            } else IntArray(actualPitches.size){ 100 }
+            } else IntArray(actualPitches.size) { 100 }
 //            println("PART: #$partIndex")
 //            println(actualPitches.asList())
 //            println(velocities.asList())
-            while (index < actualPitches.size) {
-                val pitch = actualPitches[index]
-                val velocity = velocities[index]
-                //println("pitch: $pitch vel: $velocity")
-                var dur = durations[durIndex % durations.size]
-                if (dur < 0) { // negative values are considered as rests
-                    dur *= -1
-                    tick += dur
-                    durIndex++
-                } else {
-                    if (pitch != -1) {
-                        while (index + 1 < actualPitches.size && actualPitches[index + 1] == pitch) {
-                            var nextDur = durations[(durIndex + 1) % durations.size]
-                            if (nextDur < 0) {
-                                nextDur *= -1
-                                dur += nextDur
-                                durIndex++
-                            } else {
-                                dur += nextDur
-                                index++
-                                durIndex++
+            if (doublingFlags == 0) {
+                while (index < actualPitches.size) {
+                    val pitch = actualPitches[index]
+                    val velocity = velocities[index]
+                    //println("pitch: $pitch vel: $velocity")
+                    var dur = durations[durIndex % durations.size]
+                    if (dur < 0) { // negative values are considered as rests
+                        dur *= -1
+                        tick += dur
+                        durIndex++
+                    } else {
+                        if (pitch != -1) {
+                            while (index + 1 < actualPitches.size && actualPitches[index + 1] == pitch) {
+                                var nextDur = durations[(durIndex + 1) % durations.size]
+                                if (nextDur < 0) {
+                                    nextDur *= -1
+                                    dur += nextDur
+                                    durIndex++
+                                } else {
+                                    dur += nextDur
+                                    index++
+                                    durIndex++
+                                }
+                            }
+
+                            insertNote(
+                                track, tick, dur, channel, pitch,
+                                velocity, 80
+                            )
+                        }
+                        tick += dur
+                        index++
+                        durIndex++
+                    }
+                }
+                result.add(track)
+            } else {
+                val doubling = convertFlagsToInts(doublingFlags)
+                while (index < actualPitches.size) {
+                    val pitch = actualPitches[index]
+                    val velocity = velocities[index]
+                    //println("pitch: $pitch vel: $velocity")
+                    var dur = durations[durIndex % durations.size]
+                    if (dur < 0) { // negative values are considered as rests
+                        dur *= -1
+                        tick += dur
+                        durIndex++
+                    } else {
+                        if (pitch != -1) {
+                            while (index + 1 < actualPitches.size && actualPitches[index + 1] == pitch) {
+                                var nextDur = durations[(durIndex + 1) % durations.size]
+                                if (nextDur < 0) {
+                                    nextDur *= -1
+                                    dur += nextDur
+                                    durIndex++
+                                } else {
+                                    dur += nextDur
+                                    index++
+                                    durIndex++
+                                }
+                            }
+                            insertNote(
+                                track, tick, dur, channel, pitch,
+                                velocity, 80
+                            )
+                            doubling.forEach {
+                                insertNote(
+                                    track, tick, dur, channel, pitch + it,
+                                    velocity, 80
+                                )
                             }
                         }
-
-                        insertNote(
-                            track, tick, dur, channel, pitch,
-                            velocity, 80
-                        )
+                        tick += dur
+                        index++
+                        durIndex++
                     }
-                    tick += dur
-                    index++
-                    durIndex++
                 }
+                result.add(track)
             }
-            result.add(track)
         }
         return result
     }
@@ -85,6 +132,19 @@ object CounterpointInterpreter {
     ) {
         val on = NoteOn(start.toLong(), channel, pitch, velOn)
         val off = NoteOff((start + duration).toLong(), channel, pitch, velOff)
+        mt.insertEvent(on)
+        mt.insertEvent(off)
+    }
+    fun insertNoteCheckingHigh(
+        mt: MidiTrack, start: Int, duration: Int, channel: Int,
+        pitch: Int, velOn: Int, velOff: Int
+    ) {
+        var actualPitch = pitch
+        while (actualPitch > 108){
+            actualPitch -= 12
+        }
+        val on = NoteOn(start.toLong(), channel, actualPitch, velOn)
+        val off = NoteOff((start + duration).toLong(), channel, actualPitch, velOff)
         mt.insertEvent(on)
         mt.insertEvent(off)
     }

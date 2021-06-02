@@ -92,31 +92,3 @@ fun SingleSelectDialog(
         }
     }
 }
-@Composable
-fun RadioButton(text: String, selectedValue: String, onClickListener: (String) -> Unit) {
-    Row(
-        Modifier
-        .fillMaxWidth()
-        .selectable(
-            selected = (text == selectedValue),
-            onClick = {
-                onClickListener(text)
-            }
-        )
-        .padding(horizontal = 16.dp)
-    ) {
-        // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.
-        // So have Text Composable to show text.
-        androidx.compose.material.RadioButton(
-            selected = (text == selectedValue),
-            onClick = {
-                onClickListener(text)
-            }
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.body1.merge(),
-            modifier = Modifier.padding(start = 16.dp)
-        )
-    }
-}

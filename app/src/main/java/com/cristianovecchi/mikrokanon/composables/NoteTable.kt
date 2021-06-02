@@ -36,7 +36,7 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: Mutabl
     val isSelected = counterpoint == selectedCounterpoint
     val borderWidth by animateIntAsState(if(isSelected) 10 else 0)
     val fontWeight = if(isSelected) FontWeight.ExtraBold else FontWeight.Normal
-    val finalFontSize by animateIntAsState(if (isSelected) (fontSize + 2 ) else fontSize)
+    val finalFontSize by animateIntAsState(if (isSelected) (fontSize  ) else fontSize)
     val cellDarkColor by animateColorAsState( if(isSelected) Color(0.0f,0.0f,0.9f,1.0f)
                         else Color(0.0f,0.0f,0.5f,1.0f) )
     val cellLightColor by animateColorAsState( if(isSelected) Color(0.0f,0.0f,1f,1.0f)
