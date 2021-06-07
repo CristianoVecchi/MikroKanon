@@ -5,13 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +23,8 @@ import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.buttonsDisplayBackgroundColor
 import com.cristianovecchi.mikrokanon.ui.sequencesListBackgroundColor
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ResultDisplay(model: AppViewModel,
@@ -35,6 +36,8 @@ fun ResultDisplay(model: AppViewModel,
                   onPlay: () -> Unit = {}
                   )
 {
+    val coroutineScope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
     val notesNames by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, toClipsText(it, notesNames))}
@@ -44,6 +47,7 @@ fun ResultDisplay(model: AppViewModel,
         if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
+    var indexSelected by remember { mutableStateOf( -1 )}
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -56,12 +60,11 @@ fun ResultDisplay(model: AppViewModel,
                 .fillMaxSize()
                 .background(buttonsBackgroundColor)
                 .weight(1f)
-            val listState = rememberLazyListState()
             val buttonSize = 60.dp
             Box(modifier = modifier4) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), state = listState)
                 {
-                    items(counterpointsData) { counterpointsData ->
+                    itemsIndexed(counterpointsData) { index, counterpointsData ->
                         val counterpoint = counterpointsData.first
                         val parts = counterpointsData.second
                         val maxSize = parts.maxOf { it.size }
@@ -80,6 +83,14 @@ fun ResultDisplay(model: AppViewModel,
                             clipsText,
                             16,
                             onClick = { onClick(counterpoint) })
+
+                        if(model.selectedCounterpoint.value!! == counterpoint) indexSelected = index
+                    }
+                }
+                if(counterpoints.isNotEmpty() && !model.lastComputationIsExpansion()) {
+                    coroutineScope.launch {
+                        delay(100)
+                        listState.animateScrollToItem(0)
                     }
                 }
                 if(elaborating){

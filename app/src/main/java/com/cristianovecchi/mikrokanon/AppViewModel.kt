@@ -21,6 +21,12 @@ import androidx.lifecycle.Observer
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.db.UserOptionsDataRepository
 import java.io.File
+import androidx.lifecycle.Lifecycle
+
+import androidx.lifecycle.OnLifecycleEvent
+
+
+
 
 
 sealed class Computation {
@@ -39,12 +45,29 @@ data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean =
                          val counterpoint: Boolean = false, val freeparts: Boolean = false, val play: Boolean = true)
 
 
-class AppViewModel(application: Application, private val sequenceRepository: SequenceDataRepository, private val userRepository: UserOptionsDataRepository) : AndroidViewModel(application) {
+class AppViewModel(
+    application: Application,
+    private val sequenceRepository: SequenceDataRepository,
+    private val userRepository: UserOptionsDataRepository,
+) : AndroidViewModel(application), LifecycleObserver {
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onLifeCycleStop() {
+        stopPlaying()
+    }
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onLifeCyclePause() {
+        stopPlaying()
+    }
+    private fun stopPlaying(){
+        mediaPlayer?.stop()
+        mediaPlayer = null
+    }
 
     val creditsUri: String = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
 
     val iconMap = mapOf(
-       // "mikrokanon" to R.drawable.ic_baseline_account_tree_24,
+
         "mikrokanon" to R.drawable.ic_baseline_clear_all_24,
         "counterpoint" to R.drawable.ic_baseline_drag_handle_24,
         "done" to R.drawable.ic_baseline_done_24,
@@ -73,7 +96,7 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
         clear()
         this@AppViewModel._stackSize.value = this.size
     }
-
+    private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
     private val SPREAD_AS_POSSIBLE = true
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 18
@@ -123,7 +146,7 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     private data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
-    private var mediaPlayer: MediaPlayer? = null
+
 
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -135,11 +158,11 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     // macro Functions called by fragments -----------------------------------------------------
     val onPlay = { createAndPlay: Boolean ->
             var error = "No File Created yet!!!"
+            if (mediaPlayer == null) mediaPlayer = MediaPlayer()
             if(userOptionsData.value!!.isEmpty()){
                 insertUserOptionData(UserOptionsData.getDefaultUserOptionData())
             }
             if(!selectedCounterpoint.value!!.isEmpty()) {
-                if (mediaPlayer == null) mediaPlayer = MediaPlayer()
                 val ensType: EnsembleType =
                     EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType }
                         ?: 0]
@@ -379,6 +402,12 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
             }
 
     }
+    fun lastComputationIsExpansion(): Boolean{
+        return when (computationStack.lastElement()) {
+            is Computation.Expand -> true
+            else -> false
+        }
+    }
     private fun findFreeParts(trend: TREND){
         //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
@@ -560,6 +589,7 @@ class AppViewModel(application: Application, private val sequenceRepository: Seq
     }
 
     fun setInitialBlankState() {
+        stopPlaying()
         computationStack.clearAndDispatch()
         changeCounterPoints(listOf())
         changeSequenceToMikroKanons(listOf())
