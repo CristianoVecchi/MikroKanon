@@ -38,8 +38,8 @@ import androidx.room.PrimaryKey
     ){
         companion object{
             fun getDefaultUserOptionData(): UserOptionsData{
-                return UserOptionsData(0,0,90,1,
-                    1,1, 1, 0,"System")
+                return UserOptionsData(0,2,90,3,
+                    0,0, 1, 0,"System")
             }
         }
     }

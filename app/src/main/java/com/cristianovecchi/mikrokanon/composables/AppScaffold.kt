@@ -101,7 +101,6 @@ data class ExportDialogData(val dialogState: Boolean = false, val title:String =
 fun convertIntsToFlags(ints: Set<Int>): Int{
     var flags = 0
     ints.forEach{ flags = 1 shl it or flags }
-    println("Flags: $flags")
     return flags
 }
 fun convertFlagsToInts(flags: Int): Set<Int>{
@@ -111,7 +110,6 @@ fun convertFlagsToInts(flags: Int): Set<Int>{
             result.add(i)
         }
     }
-    println("Ints: $result")
     return result.toSet()
 }
 @Composable

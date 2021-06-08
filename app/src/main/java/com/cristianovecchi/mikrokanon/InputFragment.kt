@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.composables.AbstractNoteSequenceEditor
-import com.cristianovecchi.mikrokanon.composables.Clip
+import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 import java.util.ArrayList
 

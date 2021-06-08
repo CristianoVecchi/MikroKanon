@@ -4,18 +4,17 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
@@ -27,27 +26,33 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun ResultDisplay(model: AppViewModel,
+fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
                   onClick: (Counterpoint) -> Unit = {},
                   onBack: () -> Unit = {},
                   onFreePart: (TREND) -> Unit = {},
                   onExpand: () -> Unit = {},
-                  onPlay: () -> Unit = {}
+                  onPlay: () -> Unit = {},
+                  onStop: () -> Unit = {}
                   )
 {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val notesNames by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
-    val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, toClipsText(it, notesNames))}
+    val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames))}
+
     val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
+    val playing by model.playing.asFlow().collectAsState(initial = false)
+    var scrollToTopList by remember{mutableStateOf(false)}
     val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, freeparts = true))
+
     val elaboratingBackgroundColor by animateColorAsState(
         if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
-    var indexSelected by remember { mutableStateOf( -1 )}
+
+
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -84,13 +89,14 @@ fun ResultDisplay(model: AppViewModel,
                             16,
                             onClick = { onClick(counterpoint) })
 
-                        if(model.selectedCounterpoint.value!! == counterpoint) indexSelected = index
+                       // if(model.selectedCounterpoint.value!! == counterpoint) indexSelected = index
                     }
                 }
-                if(counterpoints.isNotEmpty() && !model.lastComputationIsExpansion()) {
+                if(scrollToTopList) {
                     coroutineScope.launch {
-                        delay(100)
+                        delay(150)
                         listState.animateScrollToItem(0)
+                        scrollToTopList = false
                     }
                 }
                 if(elaborating){
@@ -122,30 +128,74 @@ fun ResultDisplay(model: AppViewModel,
                         }
                     })
                 Row(verticalAlignment = Alignment.CenterVertically) {
+
                     // UNDO BUTTON
-                    CustomButton(iconId = model.iconMap["undo"]!!, isActive = activeButtons.undo, buttonSize = buttonSize) {
-                        if(!elaborating) onBack()
+                    CustomButton(
+                        iconId = iconMap["undo"]!!,
+                        isActive = activeButtons.undo,
+                        buttonSize = buttonSize
+                    ) {
+                        if (!elaborating) onBack(); scrollToTopList = !model.lastComputationIsExpansion()
                     }
                     // EXPAND BUTTON
-                    CustomButton(iconId = model.iconMap["expand"]!!, isActive = activeButtons.expand, buttonSize = buttonSize) {
-                        if(!elaborating) onExpand()
+                    CustomButton(
+                        iconId = iconMap["expand"]!!,
+                        isActive = activeButtons.expand,
+                        buttonSize = buttonSize
+                    ) {
+                        if (!elaborating) onExpand();scrollToTopList = false
                     }
                     // Add Counterpoint Button
-                    CustomButton(iconId = model.iconMap["counterpoint"]!!, isActive = activeButtons.counterpoint, buttonSize = buttonSize) {
-                        if(!elaborating) dialogState.value = true
+                    CustomButton(
+                        iconId = iconMap["counterpoint"]!!,
+                        isActive = activeButtons.counterpoint,
+                        buttonSize = buttonSize
+                    ) {
+                        if (!elaborating) dialogState.value = true; scrollToTopList = true
                     }
 
                     FreePartsButtons(
                         fontSize = 22, isActive = activeButtons.freeparts,
-                        onAscDynamicClick = { if(!elaborating) onFreePart(TREND.ASCENDANT_DYNAMIC) },
-                        onAscStaticClick = { if(!elaborating) onFreePart(TREND.ASCENDANT_STATIC) },
-                        onDescDynamicClick = { if(!elaborating) onFreePart(TREND.DESCENDANT_DYNAMIC) },
-                        onDescStaticClick = { if(!elaborating) onFreePart(TREND.DESCENDANT_STATIC) }
+                        onAscDynamicClick = {
+                            if (!elaborating) onFreePart(TREND.ASCENDANT_DYNAMIC);
+                            scrollToTopList = true
+                        },
+                        onAscStaticClick = {
+                            if (!elaborating) onFreePart(TREND.ASCENDANT_STATIC);
+                            scrollToTopList = true
+
+                        },
+                        onDescDynamicClick = {
+                            if (!elaborating) onFreePart(TREND.DESCENDANT_DYNAMIC);
+                            scrollToTopList = true
+
+                        },
+                        onDescStaticClick = {
+                            if (!elaborating) onFreePart(TREND.DESCENDANT_STATIC);
+                            scrollToTopList = true
+                        }
                     )
-                    // PLAY BUTTON
-                    CustomButton(iconId = model.iconMap["play"]!!, isActive = activeButtons.play, buttonSize = buttonSize) {
-                        if(!elaborating) onPlay()
+                    // PLAY||STOP BUTTON
+                    if (!playing) {
+                        CustomButton(
+                            iconId = iconMap["play"]!!,
+                            isActive = activeButtons.playOrStop,
+                            buttonSize = buttonSize
+                        ) {
+                            if (!elaborating) {
+                                onPlay(); scrollToTopList = false
+                            }
+                        }
+                    } else {
+                        CustomButton(
+                            iconId = iconMap["stop"]!!,
+                            isActive = activeButtons.playOrStop,
+                            buttonSize = buttonSize
+                        ) {
+                            onStop(); scrollToTopList = false
+                        }
                     }
+
                 }
             }
             Column(
@@ -155,7 +205,7 @@ fun ResultDisplay(model: AppViewModel,
             ) {
                 IntervalSetSelector(
                     model, fontSize = 10
-                )
+                ) { scrollToTopList = true }
             }
         }
 }

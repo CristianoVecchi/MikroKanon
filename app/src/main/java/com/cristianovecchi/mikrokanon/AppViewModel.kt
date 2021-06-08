@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon
 
+import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import androidx.lifecycle.*
@@ -14,6 +15,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import android.media.MediaPlayer
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import androidx.core.content.FileProvider
@@ -42,7 +44,7 @@ enum class LANGUAGES(val language:String){
 }
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
                          val undo: Boolean = false, val expand: Boolean = true,
-                         val counterpoint: Boolean = false, val freeparts: Boolean = false, val play: Boolean = true)
+                         val counterpoint: Boolean = false, val freeparts: Boolean = false, val playOrStop: Boolean = true)
 
 
 class AppViewModel(
@@ -53,16 +55,13 @@ class AppViewModel(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onLifeCycleStop() {
-        stopPlaying()
+        onStop()
     }
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun onLifeCyclePause() {
-        stopPlaying()
+        onStop()
     }
-    private fun stopPlaying(){
-        mediaPlayer?.stop()
-        mediaPlayer = null
-    }
+
 
     val creditsUri: String = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
 
@@ -80,6 +79,7 @@ class AppViewModel(
         "back" to R.drawable.ic_baseline_arrow_back_24,
         "full_back" to R.drawable.ic_baseline_fast_rewind_24,
         "play" to R.drawable.ic_baseline_play_arrow_24,
+        "stop" to R.drawable.ic_baseline_stop_24,
         "expand" to R.drawable.ic_baseline_sync_alt_24,
     )
 
@@ -114,6 +114,9 @@ class AppViewModel(
 
     private var _elaborating = MutableLiveData<Boolean>(false)
     var elaborating: LiveData<Boolean> = _elaborating
+
+    private var _playing = MutableLiveData<Boolean>(false)
+    var playing: LiveData<Boolean> = _playing
 
     private var _firstSequence= MutableLiveData<List<Clip>>(listOf())
     val firstSequence : LiveData<List<Clip>> = _firstSequence
@@ -156,13 +159,23 @@ class AppViewModel(
 //    }
 
     // macro Functions called by fragments -----------------------------------------------------
+    val onStop = {
+        mediaPlayer?.let{ if (it.isPlaying) it.stop() }
+        mediaPlayer?.let{ if (!it.isPlaying) _playing.value = false}
+        mediaPlayer?.let{ it.release() }
+        mediaPlayer = null
+    }
     val onPlay = { createAndPlay: Boolean ->
             var error = "No File Created yet!!!"
-            if (mediaPlayer == null) mediaPlayer = MediaPlayer()
             if(userOptionsData.value!!.isEmpty()){
                 insertUserOptionData(UserOptionsData.getDefaultUserOptionData())
             }
             if(!selectedCounterpoint.value!!.isEmpty()) {
+                //mediaPlayer?.let{onStop()}
+                if (mediaPlayer == null) {
+                    mediaPlayer = MediaPlayer()
+                    mediaPlayer?.setOnCompletionListener { onStop() }
+                }
                 val ensType: EnsembleType =
                     EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType }
                         ?: 0]
@@ -199,6 +212,7 @@ class AppViewModel(
                     doublingFlags
                 )
             }
+        mediaPlayer?.let{ if (it.isPlaying) _playing.value = true}
             error
     }
     val dispatchIntervals = {
@@ -286,14 +300,23 @@ class AppViewModel(
                 //val flags = Intent.FLAG_ACTIVITY_NEW_TASK + 1
                 //println("FLAGS: ${flags.toByte()}")
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 intent.setType("audio/midi")
                 intent.putExtra(Intent.EXTRA_STREAM, uri)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                val chooserIntent = Intent.createChooser(intent,"Share MIDI to...")
+                chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 //println("FLAGS: ${intent.flags}")
-                getApplication<MikroKanonApplication>()
-                    .applicationContext
-                    .startActivity(intent)
-                    //.startActivity(Intent.createChooser(intent,"Share MIDI to..."))
+                try{
+                    getApplication<MikroKanonApplication>()
+                        .applicationContext
+                        //.startActivity(intent)
+                        .startActivity(chooserIntent)
+                } catch (ex: Exception){
+                    println("Exception in Share Midi: ${ex.message}")
+                    getApplication<MikroKanonApplication>()
+                        .applicationContext
+                        .startActivity(intent)
+                }
             }
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
@@ -403,6 +426,7 @@ class AppViewModel(
 
     }
     fun lastComputationIsExpansion(): Boolean{
+        if (computationStack.isEmpty()) return true
         return when (computationStack.lastElement()) {
             is Computation.Expand -> true
             else -> false
@@ -589,7 +613,7 @@ class AppViewModel(
     }
 
     fun setInitialBlankState() {
-        stopPlaying()
+        onStop()
         computationStack.clearAndDispatch()
         changeCounterPoints(listOf())
         changeSequenceToMikroKanons(listOf())
@@ -642,7 +666,7 @@ class AppViewModel(
     // ROOM ---------------------------------------------------------------------
     fun addSequence(sequence: ArrayList<Clip>){
         viewModelScope.launch(Dispatchers.IO) {
-            sequenceRepository.insert(SequenceData(0,sequence.map { clipToDataClip(it) }))
+            sequenceRepository.insert(SequenceData(0,sequence.map { Clip.clipToDataClip(it) }))
         }
     }
     fun deleteSequence(index: Int){
@@ -661,7 +685,7 @@ class AppViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             if (sequenceData != null) {
                 sequenceRepository.delete(sequenceData)
-                sequenceRepository.insert(SequenceData(0,sequence.map { clipToDataClip(it) }))
+                sequenceRepository.insert(SequenceData(0,sequence.map { Clip.clipToDataClip(it) }))
             }
         }
     }
@@ -672,7 +696,7 @@ class AppViewModel(
     }
 
     private fun sequenceDataToSequence(sequenceData: SequenceData) : ArrayList<Clip>{
-        val sequence = ArrayList(sequenceData.clips.map { clipDataToClip(it)})
+        val sequence = ArrayList(sequenceData.clips.map { Clip.clipDataToClip(it)})
         sequenceDataMap[sequence] = sequenceData
         return sequence
     }

@@ -15,19 +15,23 @@ import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.ui.buttonsDisplayBackgroundColor
 
 @Composable
-fun IntervalSetSelector(model: AppViewModel, fontSize: Int) {
+fun IntervalSetSelector(model: AppViewModel, fontSize: Int, callback: () -> Unit = {}) {
     val intervals by model.intervalSet.observeAsState(emptyList())
     val backgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
     val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
     val removeIntervalsAndRefresh = { list:List<Int> ->
-        if(!elaborating) model.removeIntervalsAndRefresh(list)
+        if(!elaborating) {
+            model.removeIntervalsAndRefresh(list)
+            callback()
+        }
     }
     val addIntervalsAndRefresh = { list:List<Int> ->
-        if(!elaborating) model.addIntervalsAndRefresh(list)
+        if(!elaborating){
+            model.addIntervalsAndRefresh(list)
+            callback()
+        }
     }
     Row(modifier = Modifier.fillMaxWidth().background(backgroundColor), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-
-
         if(intervals.containsAll(listOf(1,11))){
             SelectableCard(text = "2m\n7M", fontSize + 2, isSelected = true, onClick = { removeIntervalsAndRefresh(listOf(1,11)) })
         } else {

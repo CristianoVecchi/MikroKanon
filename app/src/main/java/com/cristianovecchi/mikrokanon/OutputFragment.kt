@@ -46,6 +46,7 @@ class OutputFragment: Fragment() {
                        AppScaffold(model = model, model.userOptionsData.asFlow()) {
                             ResultDisplay(
                                 model = model,
+                                model.iconMap,
                                 onClick = { counterpoint ->
                                     if(counterpoint == model.selectedCounterpoint.value!!){
                                         model.onPlay(true)
@@ -63,7 +64,10 @@ class OutputFragment: Fragment() {
                                     model.onFreePartFurtherSelections(trend)
                                 },
                                 onExpand = { model.onExpand() },
-                                onPlay = { model.onPlay(true) }
+                                onPlay = {
+                                    model.onPlay(true)
+                                },
+                                onStop = { model.onStop() }
                             )
                         }
                     }

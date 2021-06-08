@@ -2,7 +2,6 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import android.os.Parcelable
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
-import com.cristianovecchi.mikrokanon.composables.Clip
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
@@ -347,6 +346,4 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = UNRE
         }
         return AbsPart(newAbsPitches, this.rowForm, this.transpose, this.delay)
     }
-
-
 }

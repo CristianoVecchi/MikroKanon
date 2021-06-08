@@ -121,7 +121,7 @@ object Player {
     }
 
     fun saveAndPlayMidiFile(mediaPlayer: MediaPlayer, midi: MidiFile, looping: Boolean, play: Boolean, midiFile: File?) : String {
-        if (mediaPlayer.isPlaying()) {
+        if (mediaPlayer.isPlaying) {
             mediaPlayer.stop()
         }
         mediaPlayer.reset()
@@ -146,6 +146,7 @@ object Player {
             try {
                 mediaPlayer.setDataSource(output!!.getAbsolutePath())
                 mediaPlayer.prepare()
+
                 //player.create(Harmony12.this, output.);
             } catch (e: java.lang.Exception) {
                 Log.e(Player::class.java.toString(), e.message, e)

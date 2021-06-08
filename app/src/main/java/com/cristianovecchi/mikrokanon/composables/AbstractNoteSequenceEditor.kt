@@ -1,20 +1,17 @@
 package com.cristianovecchi.mikrokanon.composables
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Modifier
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.lifecycle.asFlow
-
+import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AppViewModel
-//import java.util.*
 import kotlin.collections.HashMap
 
-
 @Composable
-fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model: AppViewModel, editing: Boolean,
-                               iconMap: Map<String,Int> = HashMap<String,Int>(), done_action: (ArrayList<Clip>, Boolean) -> Unit) {
+fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppViewModel, editing: Boolean,
+                               iconMap: Map<String,Int> = HashMap(), done_action: (ArrayList<Clip>, Boolean) -> Unit) {
     val nClipCols = 6
     val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
     val notesNames by model.notesNames.asFlow().collectAsState(initial = emptyList())
@@ -23,9 +20,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model:
     val lastOutIsNotUndo = remember { mutableStateOf(true) }
     val lastIsCursorChanged = remember { mutableStateOf(false) }
 
-
     data class Undo(val list: MutableList<Clip>, val cursor: Int)
-
     val stack: java.util.Stack<Undo> = java.util.Stack<Undo>()
 
     Column(modifier = Modifier.fillMaxHeight()) {
@@ -54,27 +49,6 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model:
                 }
             }
         }
-
-//            if(lastIsCursorChanged.value){
-//
-//                val nRows = (clips.size / nClipCols)
-//                val maybeRow = if (clips.size % nClipCols != 0) 1 else 0
-//                val clipHeight: Float = scrollState.maxValue / nRows.toFloat()
-//                val cursorRows: Int = (cursor.value / nClipCols)
-//                val maybeCursorRow = if(cursorRows % nClipCols != 0) 1 else 0
-//                val limit = (nRows + maybeRow) * nClipCols - nClipCols
-//
-//                println("Cursor: ${cursor.value}   Limit: $limit   Scroll: ${scrollState.maxValue}")
-//                scrollState.smoothScrollTo(clipHeight * (cursorRows + maybeCursorRow).toFloat())
-//                    when (cursor.value) {
-//                        in -1 until nClipCols -> scrollState.smoothScrollTo(0f)
-//                        in nClipCols until limit -> scrollState.smoothScrollTo(clipHeight * (cursorRows + maybeCursorRow).toFloat() )
-//
-//                        else -> {scrollState.smoothScrollTo(scrollState.maxValue); println("LIMIT CONDITION")}
-//                    }
-
-
-
         Row(modifier4) {
             NoteKeyboard(model, iconMap = iconMap
             ) { out ->
@@ -84,7 +58,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model:
                             cursor.value++
                             clips.add(Clip(id.value++, out.note.abs, out.note, Accidents.NATURAL))
 
-                            stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                            stack.push(Undo(ArrayList(clips), cursor.value))
                             lastOutIsNotUndo.value = true
                             lastIsCursorChanged.value = true
 
@@ -93,7 +67,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model:
                                 cursor.value,
                                 Clip(id.value++, out.note.abs, out.note, Accidents.NATURAL)
                             )
-                            stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                            stack.push(Undo(ArrayList(clips), cursor.value))
                             lastOutIsNotUndo.value = true
                         }
                     }
@@ -149,7 +123,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model:
                             }
                             if (change) {
                                 clips[cursor.value] = newClip
-                                stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                                stack.push(Undo(ArrayList(clips), cursor.value))
                                 lastOutIsNotUndo.value = true
                             }
                         }
@@ -172,13 +146,13 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList<Clip>(), model:
                             lastIsCursorChanged.value = true
 
                         }
-                        if (change) stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                        if (change) stack.push(Undo(ArrayList(clips), cursor.value))
                         lastOutIsNotUndo.value = true
                     }
                     is Out.Forward -> {
                         if (cursor.value < clips.size - 1) {
                             cursor.value++
-                            stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                            stack.push(Undo(ArrayList(clips), cursor.value))
                             lastOutIsNotUndo.value = true
                             lastIsCursorChanged.value = true
 

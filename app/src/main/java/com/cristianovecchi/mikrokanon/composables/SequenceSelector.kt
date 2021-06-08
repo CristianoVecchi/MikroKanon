@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
@@ -99,7 +100,7 @@ fun SequenceSelector(model: AppViewModel,
                 CustomButton(iconId = model.iconMap["counterpoint"]!!, isActive = activeButtons.counterpoint, buttonSize = buttonSize) {
                         dialogState.value = true
                     }
-                }
+
                 FreePartsButtons(
                     fontSize = 22, isActive = activeButtons.freeparts,
                     onAscDynamicClick = { onFreePart(sequences[selected], TREND.ASCENDANT_DYNAMIC ) },
@@ -119,7 +120,7 @@ fun SequenceSelector(model: AppViewModel,
 //                modifier = Modifier.padding(8.dp)
 //            ) { Text(text = "Please, select a Sequence!") }
 //        }
-//     }
+    }
 }
 @Composable
 fun SequenceScrollableColumn(
