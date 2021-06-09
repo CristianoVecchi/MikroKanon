@@ -130,7 +130,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     BpmDialog(bpmDialogData)
     ExportDialog(exportDialogData)
     val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
-        "Retrograde", "Inverse",  "Inv-Retrograde", "Doubling", "Export MIDI","Language")
+        "Retrograde", "Inverse",  "Inv-Retrograde", "Doubling", "Spread where possible", "Deep Search in 4 parts MK","Export MIDI","Language")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionData()
@@ -263,6 +263,26 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                             )
                             multiListDialogData.value = MultiListDialogData(itemList = multiListDialogData.value.itemList)
                         }
+                    })
+                }
+                "Spread where possible" -> {
+                    var isOn = userOptions.spread != 0
+                    SelectableCard(text = "Spread where possible", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                        isOn = !isOn
+                        model.updateUserOptions(
+                            "spread",
+                            if(isOn) 1 else 0
+                        )
+                    })
+                }
+                "Deep Search in 4 parts MK" -> {
+                    var isOn = userOptions.deepSearch != 0
+                    SelectableCard(text = "Deep Search in 4 parts MK", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                        isOn = !isOn
+                        model.updateUserOptions(
+                            "deepSearch",
+                            if(isOn) 1 else 0
+                        )
                     })
                 }
                 "Export MIDI" -> {

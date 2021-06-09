@@ -124,7 +124,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     onSubmitButtonClick = { index, repeat ->
                         dialogState.value = false
                         if (index != -1) {
-                            onKP(index, repeat)
+                            onKP(index, repeat); scrollToTopList = true
                         }
                     })
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -151,7 +151,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         isActive = activeButtons.counterpoint,
                         buttonSize = buttonSize
                     ) {
-                        if (!elaborating) dialogState.value = true; scrollToTopList = true
+                        if (!elaborating) dialogState.value = true
                     }
 
                     FreePartsButtons(

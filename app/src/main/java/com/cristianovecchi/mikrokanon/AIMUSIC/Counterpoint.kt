@@ -41,7 +41,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         emptiness ?: findEmptiness().also<Float> { it -> emptiness = it }
     }
     fun clone(): Counterpoint {
-        return Counterpoint(parts.map{it.clone()}, ArrayList(intervalSet), emptiness)
+        return Counterpoint(parts.map{it.clone()}, ArrayList(intervalSet.toList()), emptiness)
     }
     fun enqueue(counterpoint: Counterpoint): Counterpoint{
         val newParts = parts.mapIndexed { index, absPart ->
@@ -55,6 +55,9 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun retrograde(): Counterpoint {
         val newParts = parts.map{ it.retrograde() }
         return Counterpoint(newParts, intervalSet)
+    }
+    fun getAbsPitches(): List<List<Int>>{
+        return parts.map{ it.absPitches }
     }
 
     companion object {
@@ -262,11 +265,8 @@ data class Counterpoint(val parts: List<AbsPart>,
                         }
                     }
                 }
-
-
-
         clone.emptiness = clone.findEmptiness()
-
+        //clone.display()
         return clone
     }
 
@@ -333,7 +333,7 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = UNRE
         return AbsPart(newAbsPitches, rowForm, transpose, delay)
     }
     fun clone(): AbsPart{
-       return AbsPart(ArrayList(absPitches),rowForm, transpose, delay)
+       return AbsPart(ArrayList(absPitches.toList()),rowForm, transpose, delay)
     }
     fun nEmptyNotes() : Int {
         return absPitches.count { it == -1 }

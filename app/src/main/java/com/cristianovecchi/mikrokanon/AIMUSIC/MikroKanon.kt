@@ -15,6 +15,18 @@ data class MikroKanon(val parts: List<AbsPart>,
         println("Interval Set: ${Arrays.toString(intervalSet.toIntArray())}" )
     }
 
+    private fun findEmptiness() : Float {
+        val maxSize = parts.maxOf { it.absPitches.size }
+        val nCells = maxSize * parts.size
+        if (nCells == 0) return 1.0f
+        // considering the counterpoint like a grid and counting every empty cell
+        val nEmptyNotes = parts.map{ it -> it.nEmptyNotes() + (maxSize - it.absPitches.size)  }
+            .reduce { acc, nNotes -> nNotes + acc}
+        if (nEmptyNotes == 0) return 0.0f
+        // (100 : X = nCells : nEmptyNotes) / 100
+        return nEmptyNotes.toFloat() / nCells
+    }
+
     fun toCounterpoint(): Counterpoint {
         return Counterpoint(this.parts, this.intervalSet)
     }
@@ -171,7 +183,7 @@ data class MikroKanon(val parts: List<AbsPart>,
             absPitches: List<Int>, intervalSet: List<Int>,
             delay1: Int, transpose1: Int, rowForm1: Int,
             delay2: Int, transpose2: Int, rowForm2: Int,
-            delay3: Int, transpose3: Int, rowForm3: Int
+            delay3: Int, transpose3: Int, rowForm3: Int,
         ): MikroKanon {
             if ((delay1 == 0 || delay2 == 0 || delay3 == 0) && rowForm1 == 0 && rowForm2 == 0) {
                 return MikroKanon(
@@ -340,35 +352,43 @@ data class MikroKanon(val parts: List<AbsPart>,
         fun findAll4AbsPartMikroKanons(
             absPitches: List<Int>,
             intervalSet: List<Int>,
-            deepness: Int
+            deepness: Int,
+            emptinessGate: Float = 1.0f // no check
         ): List<MikroKanon> {
             val result = mutableListOf<MikroKanon>()
             // delay = 0 CASE requires another algorhythm
-            for (delay1 in 1 until deepness) {
-                for (delay2 in delay1 + 1 until deepness + delay1) {
-                    for (delay3 in delay2 + 1 until deepness + delay2) {
+            try{
+                for (delay1 in 1 until deepness) {
+                    for (delay2 in delay1 + 1 until deepness + delay1) {
+                        for (delay3 in delay2 + 1 until deepness + delay2) {
 
-                        var mikroKanon: MikroKanon
-                        for (tr1 in 0 until 12) {
-                            for (form1 in 0 until 4) {
-                                for (tr2 in 0 until 12) {
-                                    for (form2 in 0 until 4) {
-                                        for (tr3 in 0 until 12) {
-                                            for (form3 in 0 until 4) {
-                                                mikroKanon = find4AbsPartMikroKanon(
-                                                    absPitches,
-                                                    intervalSet,
-                                                    delay1,
-                                                    tr1,
-                                                    form1,
-                                                    delay2,
-                                                    tr2,
-                                                    form2,
-                                                    delay3,
-                                                    tr3,
-                                                    form3
-                                                )
-                                                result.add(mikroKanon)
+                            var mikroKanon: MikroKanon
+                            for (tr1 in 0 until 12) {
+                                for (form1 in 0 until 4) {
+                                    for (tr2 in 0 until 12) {
+                                        for (form2 in 0 until 4) {
+                                            for (tr3 in 0 until 12) {
+                                                for (form3 in 0 until 4) {
+                                                    mikroKanon = find4AbsPartMikroKanon(
+                                                        absPitches,
+                                                        intervalSet,
+                                                        delay1,
+                                                        tr1,
+                                                        form1,
+                                                        delay2,
+                                                        tr2,
+                                                        form2,
+                                                        delay3,
+                                                        tr3,
+                                                        form3
+                                                    )
+                                                    if(emptinessGate < 1.0f){
+                                                        if(mikroKanon.findEmptiness() < emptinessGate) result.add(mikroKanon)
+                                                    } else {
+                                                        result.add(mikroKanon)
+                                                    }
+
+                                                }
                                             }
                                         }
                                     }
@@ -377,7 +397,10 @@ data class MikroKanon(val parts: List<AbsPart>,
                         }
                     }
                 }
+            } catch (ex: OutOfMemoryError){
+                return result
             }
+
             return result
         }
     }

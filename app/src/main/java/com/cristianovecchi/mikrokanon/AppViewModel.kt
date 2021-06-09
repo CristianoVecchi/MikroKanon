@@ -98,8 +98,8 @@ class AppViewModel(
     }
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
-    private val SPREAD_AS_POSSIBLE = true
-    private val MAX_VISIBLE_COUNTERPOINTS: Int = 18
+
+    private val MAX_VISIBLE_COUNTERPOINTS: Int = 36
     private var ensembleTypeSelected: EnsembleType = EnsembleType.STRING_ORCHESTRA
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
 
@@ -111,6 +111,9 @@ class AppViewModel(
 
     private var _notesNames = MutableLiveData<List<String>>(listOf("do","re","mi","fa","sol","la","si"))
     var notesNames: LiveData<List<String>> = _notesNames
+
+//    private var _deepSearch = MutableLiveData<Boolean>(false)
+//    var deepSearch: LiveData<Boolean> = _deepSearch
 
     private var _elaborating = MutableLiveData<Boolean>(false)
     var elaborating: LiveData<Boolean> = _elaborating
@@ -149,6 +152,7 @@ class AppViewModel(
     private data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
+    private val mk4deepSearchCache = HashMap<CacheKey, List<Counterpoint>>()
 
 
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
@@ -162,7 +166,7 @@ class AppViewModel(
     val onStop = {
         mediaPlayer?.let{ if (it.isPlaying) it.stop() }
         mediaPlayer?.let{ if (!it.isPlaying) _playing.value = false}
-        mediaPlayer?.let{ it.release() }
+        mediaPlayer?.release()
         mediaPlayer = null
     }
     val onPlay = { createAndPlay: Boolean ->
@@ -445,23 +449,28 @@ class AppViewModel(
         }
     }
     private suspend fun findFreePts(trend: TREND) : List<Counterpoint>{
+        val spreadWherePossible = userOptionsData.value!![0].spread != 0
         var newList = Counterpoint.findAllFreeParts(
             selectedCounterpoint.value!!,  intervalSet.value!!, trend.directions
         )
             .sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
 
-        if(SPREAD_AS_POSSIBLE){
+        if(spreadWherePossible){
             newList = newList.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
         }
         return newList
     }
     private fun findCounterpointsByMikroKanons4(){
         viewModelScope.launch(Dispatchers.Main){
+            val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
                 val key = CacheKey(sequence, intervalSet.value!!)
-                if(mk4cache.containsKey(key)) {
+                if(mk4cache.containsKey(key) && !deepSearch) {
                     changeCounterPoints(mk4cache[key]!!)
+                    counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
+                }else if(mk4deepSearchCache.containsKey(key) && deepSearch) {
+                    changeCounterPoints(mk4deepSearchCache[key]!!)
                     counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
                 }else {
                     val newList: List<Counterpoint>
@@ -469,7 +478,11 @@ class AppViewModel(
                     withContext(Dispatchers.Default) {
                         newList = findCpByMikroKanons4()
                     }
-                    mk4cache[key] = newList
+                    if(deepSearch){
+                        mk4deepSearchCache[key] = newList
+                    } else {
+                        mk4cache[key] = newList
+                    }
                     _elaborating.value = false
                     changeCounterPoints(newList)
                     counterpoints.value?.get(0)?.let { changeSelectedCounterpoint(it) }
@@ -479,13 +492,18 @@ class AppViewModel(
     }
 
     private suspend fun findCpByMikroKanons4(): List<Counterpoint> {
+        val spreadWherePossible = userOptionsData.value!![0].spread != 0
             val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
-
-                val counterpoints = MikroKanon.findAll4AbsPartMikroKanons(
-                    sequence,  intervalSet.value!!, 2
-                ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
-
-                return counterpoints
+            val deepSearch = userOptionsData.value!![0].deepSearch != 0
+            val emptinessGate = if(deepSearch) 0.5f else 1.0f
+            val deepness = if(deepSearch) 3 else 2
+            var counterpoints = MikroKanon.findAll4AbsPartMikroKanons(
+                sequence,  intervalSet.value!!, deepness, emptinessGate
+            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
+            if(spreadWherePossible){
+                counterpoints = counterpoints.map{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+            }
+            return counterpoints
     }
     private fun findCounterpointsByMikroKanons3(){
         viewModelScope.launch(Dispatchers.Main){
@@ -510,11 +528,15 @@ class AppViewModel(
         }
     }
     private suspend fun findCpByMikroKanons3(): List<Counterpoint>{
-            val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
-            val counterpoints = MikroKanon.findAll3AbsPartMikroKanons(
-                sequence, intervalSet.value!!, 2
-            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
-            return counterpoints
+        val spreadWherePossible = userOptionsData.value!![0].spread != 0
+        val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
+        var counterpoints = MikroKanon.findAll3AbsPartMikroKanons(
+            sequence, intervalSet.value!!, 5
+            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
+        if(spreadWherePossible){
+            counterpoints = counterpoints.map{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+        }
+        return counterpoints
     }
     private fun findCounterpointsByMikroKanons2(){
         //_counterpoints.value = emptyList()
@@ -528,15 +550,20 @@ class AppViewModel(
         }
     }
     private suspend fun findCpByMikroKanons2(): List<Counterpoint>{
-        return if(sequenceToMikroKanons.value!!.isNotEmpty()) {
+        val spreadWherePossible = userOptionsData.value!![0].spread != 0
+        var counterpoints = if(sequenceToMikroKanons.value!!.isNotEmpty()) {
             MikroKanon.findAll2AbsPartMikroKanons(
                 sequenceToMikroKanons.value!!.map { it.abstractNote }.toList(),
                 intervalSet.value!!, 5
-            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
         } else {
             println("Sequence to MikroKanons is empty.")
             emptyList()
         }
+        if(spreadWherePossible){
+            counterpoints = counterpoints.map{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+        }
+        return counterpoints
     }
     private fun expandCounterpoints(index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
@@ -573,12 +600,13 @@ class AppViewModel(
         }
     }
     private suspend fun addRepSeqToCounterpoint(): List<Counterpoint> {
+        val spreadWherePossible = userOptionsData.value!![0].spread != 0
         var newList = Counterpoint.findAllCounterpointsWithRepeatedSequence(
             selectedCounterpoint.value!! , sequenceToAdd.value!!.map { it.abstractNote }.toList(),
             intervalSet.value!!, 5
-        ).sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
-        if(SPREAD_AS_POSSIBLE){
-            newList = newList.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
+        ).sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS)
+        if(spreadWherePossible){
+            newList = newList.map{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
         }
         return newList
     }
@@ -597,12 +625,13 @@ class AppViewModel(
         }
     }
     private suspend fun addSeqToCounterpoint(): List<Counterpoint> {
+        val spreadWherePossible = userOptionsData.value!![0].spread != 0
         var newList = Counterpoint.findAllCounterpoints(
             selectedCounterpoint.value!! , sequenceToAdd.value!!.map { it.abstractNote }.toList(),
             intervalSet.value!!, 5
-        ).sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
-        if(SPREAD_AS_POSSIBLE){
-            newList = newList.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
+        ).sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS)
+        if(spreadWherePossible){
+            newList = newList.map{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
         }
         return newList
     }
@@ -737,9 +766,16 @@ class AppViewModel(
             "doublingFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(doublingFlags = value as Int)
             }
+            "spread" -> {
+                newUserOptionsData  = optionsDataClone.copy(spread = value as Int)
+            }
+            "deepSearch" -> {
+                newUserOptionsData  = optionsDataClone.copy(deepSearch = value as Int)
+            }
             "language" -> {
                 newUserOptionsData  = optionsDataClone.copy(language = value as String)
             }
+
         }
         newUserOptionsData?.let {
             viewModelScope.launch(Dispatchers.IO) {

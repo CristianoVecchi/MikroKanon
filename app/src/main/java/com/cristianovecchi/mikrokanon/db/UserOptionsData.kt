@@ -33,13 +33,22 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "doubling_flags")
         val doublingFlags: Int,
 
+        @ColumnInfo(name = "spread")
+        val spread: Int,
+
+        @ColumnInfo(name = "deep_search")
+        val deepSearch: Int,
+
         @ColumnInfo(name = "language")
-        val language: String
+        val language: String,
+
+
     ){
         companion object{
             fun getDefaultUserOptionData(): UserOptionsData{
                 return UserOptionsData(0,2,90,3,
-                    0,0, 1, 0,"System")
+                    0,0, 1,
+                    0,0, 0,"System" )
             }
         }
     }
