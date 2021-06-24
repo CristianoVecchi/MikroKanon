@@ -65,10 +65,14 @@ data class MikroKanon(val parts: List<AbsPart>,
             val comes = AbsPart(mutableListOf(), RowForm.values()[rowForm], transpose, delay)
             var nRests = 0
             for (i in 0 until delay) {
-                dux.absPitches.add(absPitches[i])
+                val pitch = if(i < absPitches.size) absPitches[i] else -1
+                dux.absPitches.add(pitch)
                 comes.absPitches.add(-1)
             }
-            for (i in 0 until delay) comes.absPitches.add(i + delay, list2[i])
+            for (i in 0 until delay) {
+                val pitch = if(i < list2.size) list2[i] else -1
+                comes.absPitches.add(i + delay, pitch)
+            }
             var listIndex = delay
             var index = delay
             while (listIndex < absPitches.size) {

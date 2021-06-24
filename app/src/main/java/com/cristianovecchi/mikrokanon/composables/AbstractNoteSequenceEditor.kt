@@ -15,13 +15,14 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
     val nClipCols = 6
     val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
     val notesNames by model.notesNames.asFlow().collectAsState(initial = emptyList())
+    val playing by model.playing.asFlow().collectAsState(initial = false)
     val cursor = remember { mutableStateOf(clips.size -1) }
     val id = remember { mutableStateOf(0) }
     val lastOutIsNotUndo = remember { mutableStateOf(true) }
     val lastIsCursorChanged = remember { mutableStateOf(false) }
 
     data class Undo(val list: MutableList<Clip>, val cursor: Int)
-    val stack: java.util.Stack<Undo> = java.util.Stack<Undo>()
+    val stack: java.util.Stack<Undo> by remember { mutableStateOf( java.util.Stack<Undo>()) }
 
     Column(modifier = Modifier.fillMaxHeight()) {
         val modifier1 = Modifier
@@ -204,7 +205,8 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
 
                         }
                     }
-                    is Out.Analysis -> {
+                    is Out.PlaySequence -> {
+                        if (clips.isNotEmpty() && !playing) model.onPlaySequence(clips) else model.onStop
                     }
                     is Out.Enter -> {
                         val newList = ArrayList<Clip>()

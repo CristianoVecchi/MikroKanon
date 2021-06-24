@@ -23,7 +23,7 @@ object Ensembles {
 
     fun getStrings(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
-            2 -> listOf(
+            1, 2 -> listOf(
                 EnsemblePart(40, 5), //violin
                 EnsemblePart(42, 3)  // cello
             )
@@ -103,7 +103,7 @@ object Ensembles {
 
     fun getWoodwinds(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
-            2 -> listOf(
+            1, 2 -> listOf(
                 EnsemblePart(73, 5), //flute
                 EnsemblePart(70, 3)  // bassoon
             )
@@ -183,7 +183,7 @@ object Ensembles {
 
     fun getStringOrchestra(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
-            2, 3 -> listOf(
+            1, 2, 3 -> listOf(
                 EnsemblePart(48, 4), // string ensemble
                 EnsemblePart(48, 3), // string ensemble
                 EnsemblePart(48, 2), // string ensemble
@@ -234,7 +234,7 @@ object Ensembles {
     }
     fun getBrass(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
-            2 -> listOf(
+            1, 2 -> listOf(
                 EnsemblePart(56, 4), //trumpet
                 EnsemblePart(57, 3)  // trombone
             )
@@ -313,7 +313,7 @@ object Ensembles {
     }
     fun getSaxophones(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
-            2 -> listOf(
+            1, 2 -> listOf(
                 EnsemblePart(65, 4), // Alto Sax
                 EnsemblePart(66, 3)  // Tenor Sax
             )
@@ -392,7 +392,7 @@ object Ensembles {
     }
         fun getFlutes(nParts: Int): List<EnsemblePart> {
             return when (nParts) {
-                2 -> listOf(
+                1, 2 -> listOf(
                     EnsemblePart(73, 5), // Flute
                     EnsemblePart(73, 4)  // Flute
                 )
@@ -466,7 +466,7 @@ object Ensembles {
         }
     fun getDoubleReeds(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
-            2 -> listOf(
+            1, 2 -> listOf(
                 EnsemblePart(68, 4), // Oboe
                 EnsemblePart(70, 3)  // Bassoon
             )
@@ -536,7 +536,7 @@ object Ensembles {
     }
     fun getClarinets(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
-            2, 3 -> listOf(
+            1, 2, 3 -> listOf(
                 EnsemblePart(71, 5), // Clarinet
                 EnsemblePart(71, 4),  // Clarinet
                 EnsemblePart(71, 3)  // Clarinet
@@ -587,7 +587,7 @@ object Ensembles {
     }
     fun getBassoons(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
-            2, 3 -> listOf(
+            1, 2, 3 -> listOf(
                 EnsemblePart(70, 4), // Bassoon
                 EnsemblePart(70, 3), // Bassoon
                 EnsemblePart(70, 2)  // Bassoon
@@ -630,7 +630,7 @@ object Ensembles {
     }
     fun getCellos(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
-            2, 3 -> listOf(
+            1, 2, 3 -> listOf(
                 EnsemblePart(42, 4), // Cello
                 EnsemblePart(42, 3), // Cello
                 EnsemblePart(42, 2)  // Cello
@@ -673,7 +673,7 @@ object Ensembles {
     }
     fun getPiano(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
-            2, 3 -> listOf(
+            1, 2, 3 -> listOf(
                 EnsemblePart(0, 4), // Piano
                 EnsemblePart(0, 3), // Piano
                 EnsemblePart(0, 2)  // Piano

@@ -48,7 +48,7 @@ sealed class Out {
     object Undo: Out()
     object FullBack : Out()
     object FullForward : Out()
-    object Analysis : Out()
+    object PlaySequence : Out()
 }
 
 private data class ButtonInfo(val text: String, val output: Out, val resId: Int = -1)
@@ -59,6 +59,7 @@ fun NoteKeyboard(
     nRows: Int = 5, nCols: Int = 4, iconMap: Map<String,Int> = HashMap<String,Int>(),
     dispatch : (Out) -> Unit ) {
     val names by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
+    val playing by model.playing.asFlow().collectAsState(initial = false)
     val buttonSize = 60.dp
     val fontSize = 14.sp
     val buttonInfos = listOf(
@@ -83,7 +84,8 @@ fun NoteKeyboard(
             ButtonInfo(text = names[1], output = Out.Note(NoteNamesEn.D)),
 
             ButtonInfo(text = "OK", output = Out.Enter, resId = iconMap["done"] ?: -1),
-            ButtonInfo(text = "AN", output = Out.Analysis),
+            ButtonInfo(text = "PL", output = Out.PlaySequence,
+                resId = if(!playing) iconMap["play"] ?: -1 else iconMap["stop"] ?: -1),
             ButtonInfo(text = names[4], output = Out.Note(NoteNamesEn.G)),
             ButtonInfo(text = names[0], output = Out.Note(NoteNamesEn.C)),
 

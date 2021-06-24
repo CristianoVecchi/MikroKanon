@@ -1,5 +1,9 @@
 package com.cristianovecchi.mikrokanon
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.awaitAll
 import android.app.Activity
 import android.app.Application
 import android.content.Intent
@@ -168,6 +172,10 @@ class AppViewModel(
         mediaPlayer?.let{ if (!it.isPlaying) _playing.value = false}
         mediaPlayer?.release()
         mediaPlayer = null
+    }
+    val onPlaySequence = { clips: List<Clip> ->
+        _selectedCounterpoint.value = Counterpoint.counterpointFromClipList(clips)
+        onPlay(true)
     }
     val onPlay = { createAndPlay: Boolean ->
             var error = "No File Created yet!!!"
@@ -692,6 +700,11 @@ class AppViewModel(
         dispatchIntervals()
     }
 
+    fun clearMKcaches() {
+        mk3cache.clear()
+        mk4cache.clear()
+    }
+
     // ROOM ---------------------------------------------------------------------
     fun addSequence(sequence: ArrayList<Clip>){
         viewModelScope.launch(Dispatchers.IO) {
@@ -768,9 +781,11 @@ class AppViewModel(
             }
             "spread" -> {
                 newUserOptionsData  = optionsDataClone.copy(spread = value as Int)
+                clearMKcaches()
             }
             "deepSearch" -> {
                 newUserOptionsData  = optionsDataClone.copy(deepSearch = value as Int)
+                clearMKcaches()
             }
             "language" -> {
                 newUserOptionsData  = optionsDataClone.copy(language = value as String)
@@ -822,4 +837,9 @@ fun ArrayList<Clip>.toStringAll(notesNames: List<String>): String {
     } else {
         "empty Sequence"
     }
+}
+
+//TODO: implement in CounterpointInterpreter
+suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
+    map { async { f(it) } }.awaitAll()
 }
