@@ -8,9 +8,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asFlow
 import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.composables.AbstractNoteSequenceEditor
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
+import com.cristianovecchi.mikrokanon.composables.AppScaffold
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 import java.util.ArrayList
 
@@ -39,18 +41,28 @@ class InputFragment(): Fragment() {
             setContent {
                 MikroKanonTheme {
                     Surface(color = MaterialTheme.colors.background) {
-                        AbstractNoteSequenceEditor(list, model = model, editing, iconMap = model.iconMap,
-                            done_action = { list , editing ->
-                                findNavController().popBackStack()
-                                if(list.isNotEmpty()){
-                                    if(editing){
-                                        model.selectedSequence.value?.let { model.updateSequence(it, list) }
-                                    } else {
-                                        model.addSequence(list)
+                        AppScaffold(model = model, model.userOptionsData.asFlow()) {
+                            AbstractNoteSequenceEditor(list,
+                                model = model,
+                                editing,
+                                iconMap = model.iconMap,
+                                done_action = { list, editing ->
+                                    findNavController().popBackStack()
+                                    if (list.isNotEmpty()) {
+                                        if (editing) {
+                                            model.selectedSequence.value?.let {
+                                                model.updateSequence(
+                                                    it,
+                                                    list
+                                                )
+                                            }
+                                        } else {
+                                            model.addSequence(list)
+                                        }
                                     }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }

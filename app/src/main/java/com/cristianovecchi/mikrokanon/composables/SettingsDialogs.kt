@@ -6,21 +6,127 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.composables.RadioButton
 
+@Composable
+fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>,
+                 onDismissRequest: () -> Unit = {creditsDialogData.value = CreditsDialogData()})
+{
+    if (creditsDialogData.value.dialogState) {
+        // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
+        val nameStyle = SpanStyle(
+            fontSize = 22.sp,
+            color = Color.Black)
+        val commentStyle = SpanStyle(
+            fontSize = 18.sp,
+            color = Color.DarkGray)
+        val uriStyle = SpanStyle(
+            fontSize = 20.sp,
+            color = Color.Blue)
+        val uriHandler = LocalUriHandler.current
+        val youtubeChannelUri: String = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
+        Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
+            Surface(
+                modifier = Modifier.width(300.dp),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(text = creditsDialogData.value.title)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(text = buildAnnotatedString {
+                        withStyle(commentStyle){
+                            append("the MikroKanon App has been conceived and developed in 2021 by\n")
+                        }
+                        withStyle(nameStyle){
+                            append("Cristiano Vecchi")
+                        }
+                    })
+                    ClickableText(text = buildAnnotatedString {
+                        withStyle(uriStyle){
+                            append("Youtube Channel")
+                        }
+                    },onClick = {
+                        uriHandler.openUri(youtubeChannelUri)
+                    })
+                    ClickableText(text = buildAnnotatedString {
+                        withStyle(uriStyle){
+                            append("Youtube MK examples")
+                        }
+                    },onClick = {
+                        uriHandler.openUri("https://www.youtube.com/watch?v=zaa3d3FVqA4&list=PLO0dKPP71phouGDmrOQA_yXEp0Z1L1PLV&index=2")
+                    })
+                    ClickableText(text = buildAnnotatedString {
+                        withStyle(uriStyle){
+                            append("Instagram")
+                        }
+                    },onClick = {
+                        uriHandler.openUri("https://www.instagram.com/cristiano.vecchi/")
+                    })
+                    ClickableText(text = buildAnnotatedString {
+                        withStyle(uriStyle){
+                            append("Linkedin")
+                        }
+                    },onClick = {
+                        uriHandler.openUri("https://www.linkedin.com/in/cristiano-vecchi-ba1a311a/")
+                    })
+                    ClickableText(text = buildAnnotatedString {
+                        withStyle(uriStyle){
+                            append("GitHub")
+                        }
+                    },onClick = {
+                        uriHandler.openUri("https://github.com/CristianoVecchi")
+                    })
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(text = buildAnnotatedString {
+                        withStyle(commentStyle){
+                            append("this App uses the android-midi-lib library by\n")
+                        }
+                        withStyle(nameStyle){
+                            append("Alex Leffelman")
+                        }
+                    })
+                    ClickableText(text = buildAnnotatedString {
+                        withStyle(uriStyle){
+                            append("GitHub")
+                        }
+                    },onClick = {
+                        uriHandler.openUri("https://github.com/LeffelMania")
+                    })
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Button(
+                        onClick = {
+                            creditsDialogData.value.onSubmitButtonClick.invoke()
+                            onDismissRequest.invoke()
+                        },
+                        shape = MaterialTheme.shapes.large
+                    ) {
+                        Text(text = "Done")
+                    }
+                }
+            }
+        }
+    }
+
+}
 @Composable
 fun ExportDialog(exportDialogData: MutableState<ExportDialogData>,
                  onDismissRequest: () -> Unit = { exportDialogData.value = ExportDialogData(path = exportDialogData.value.path, error = exportDialogData.value.error)})

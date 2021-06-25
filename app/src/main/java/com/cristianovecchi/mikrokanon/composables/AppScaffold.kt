@@ -45,6 +45,7 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
         fontSize = 14.sp,
         color = Color.LightGray)
     val uriHandler = LocalUriHandler.current
+
     Scaffold(
         modifier = Modifier
             .background(MaterialTheme.colors.drawerBackgroundColor)
@@ -52,6 +53,8 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
         scaffoldState = scaffoldState,
         drawerContent = { SettingsDrawer(model, userOptionsDataFlow)},
         topBar = {
+            val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
+            CreditsDialog(creditsDialogData)
             TopAppBar() {
                 Row(
                     Modifier
@@ -75,7 +78,10 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
                             append("by Cristiano Vecchi")
                         }
                     },onClick = {
-                        uriHandler.openUri(model.creditsUri)
+                        creditsDialogData.value = CreditsDialogData(true,"Credits:",
+                        ) {
+                            creditsDialogData.value = CreditsDialogData()
+                        }
                     })
                 }
             }
@@ -97,6 +103,8 @@ data class NumberDialogData(val dialogState: Boolean = false, val title:String =
                             val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
                             val error:String = "", val onSubmitButtonClick: () -> Unit = {})
+data class CreditsDialogData(val dialogState: Boolean = false, val title:String = "",  val onSubmitButtonClick: () -> Unit = {})
+
 
 fun convertIntsToFlags(ints: Set<Int>): Int{
     var flags = 0
@@ -124,13 +132,18 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
     val multiListDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
+    val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
 
     ListDialog(listDialogData)
     MultiListDialog(multiListDialogData)
     BpmDialog(bpmDialogData)
     ExportDialog(exportDialogData)
+    CreditsDialog(creditsDialogData)
+
     val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
-        "Retrograde", "Inverse",  "Inv-Retrograde", "Doubling", "Spread where possible", "Deep Search in 4 parts MK","Export MIDI","Language")
+        "Retrograde", "Inverse",  "Inv-Retrograde", "Doubling",
+        "Spread where possible", "Deep Search in 4 parts MK",
+        "Export MIDI","Language", "Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionData()
@@ -323,6 +336,14 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                             }
                         })
                     }
+                "Credits" -> {
+                    SelectableCard(text = "Credits", fontSize = fontSize, isSelected = true, onClick = { _ ->
+                        creditsDialogData.value = CreditsDialogData(true,"Credits:",
+                        ) {
+                            creditsDialogData.value = CreditsDialogData()
+                        }
+                    })
+                }
             }
         }
     }
