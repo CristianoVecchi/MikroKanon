@@ -46,18 +46,19 @@ fun SequenceSelector(model: AppViewModel,
     Column(modifier = Modifier.fillMaxHeight().background(MaterialTheme.colors.drawerBackgroundColor)) {
         val modifier3 = Modifier
             .fillMaxWidth().background(backgroundColor)
-            .weight(3f)
+            .weight(10f)
         val modifier1 = Modifier
             .fillMaxSize().background(buttonsBackgroundColor)
             .fillMaxWidth()
-            .weight(1f)
+            .weight(6f)
         val selected by model.selectedSequence.observeAsState(initial = -1)
         val sequences by model.sequences.observeAsState(emptyList())
         //val snackbarVisibleState = remember { mutableStateOf(false) }
         val dialogState by lazy { mutableStateOf(false) }
-        val buttonSize = 54.dp
+        val dimensions = model.dimensions
+        val buttonSize = dimensions.selectorButtonSize
 
-        SequencesDialog(dialogState = dialogState,
+        SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
             sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames) },
             onSubmitButtonClick = { index, repeat ->
                 dialogState.value = false
@@ -85,7 +86,7 @@ fun SequenceSelector(model: AppViewModel,
                 MikroKanonsButtons(
                     model = model, isActive = activeButtons.mikrokanon,
                     buttonSize = buttonSize,
-                    fontSize = 18,
+                    fontSize = dimensions.selectorMKbuttonFontSize,
                     onMK2Click = {
                         onMikroKanons2(sequences[selected])
                     },
@@ -102,7 +103,7 @@ fun SequenceSelector(model: AppViewModel,
                     }
 
                 FreePartsButtons(
-                    fontSize = 22, isActive = activeButtons.freeparts,
+                    fontSize = dimensions.selectorFPbuttonFontSize, isActive = activeButtons.freeparts,
                     onAscDynamicClick = { onFreePart(sequences[selected], TREND.ASCENDANT_DYNAMIC ) },
                     onAscStaticClick = { onFreePart( sequences[selected], TREND.ASCENDANT_STATIC) },
                     onDescDynamicClick = { onFreePart( sequences[selected], TREND.DESCENDANT_DYNAMIC ) },

@@ -3,10 +3,7 @@ package com.cristianovecchi.mikrokanon.composables
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -24,7 +21,9 @@ import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.ui.*
 
 @Composable
-fun CustomButton(iconId: Int = -1, text: String = "", isActive: Boolean = true, buttonSize: Dp = 60.dp, fontSize: Int = 16,
+fun CustomButton(iconId: Int = -1, text: String = "",
+                 isActive: Boolean = true, buttonSize: Dp = 60.dp, adaptSizeToIconButton: Boolean = false,
+                 fontSize: Int = 16,
                  borderColor: Color = MaterialTheme.colors.iconButtonBorderColor,
                  iconColor: Color = MaterialTheme.colors.iconButtonIconColor,
                  backgroundColor: Color = MaterialTheme.colors.iconButtonBackgroundColor,
@@ -83,9 +82,10 @@ fun CustomButton(iconId: Int = -1, text: String = "", isActive: Boolean = true, 
         }
     } else {
         if (text.isNotEmpty()) { // text button
-            Button(modifier = Modifier
-                .padding(2.dp)
-                .border(2.dp, actualBorderColor),
+            val actualModifier = if (adaptSizeToIconButton)
+                Modifier.padding(2.dp).border(2.dp, actualBorderColor).width(buttonSize).height(buttonSize)
+            else Modifier.padding(2.dp).border(2.dp, actualBorderColor)
+            Button(modifier = actualModifier,
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = actualBackgroundColor,
                     contentColor = iconColor

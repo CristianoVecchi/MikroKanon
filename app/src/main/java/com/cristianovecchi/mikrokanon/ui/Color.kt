@@ -62,3 +62,7 @@ val Colors.buttonsDisplayBackgroundColor: Color
 val Colors.drawerBackgroundColor: Color
     @Composable
     get() = if (isLight) Color(0.2f,0.2f,1.0f,1.0f) else Color(0.4f,0.4f,1.0f,1.0f)
+
+val Colors.inputBackgroundColor: Color
+    @Composable
+    get() = if (isLight) Color(0.3f,0.3f,0.6f,1.0f) else Color(0.4f,0.4f,1.0f,1.0f)

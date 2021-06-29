@@ -11,6 +11,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
@@ -21,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -43,7 +45,12 @@ fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>,
             fontSize = 20.sp,
             color = Color.Blue)
         val uriHandler = LocalUriHandler.current
-        val youtubeChannelUri: String = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
+        val youtubeChannelUri = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
+        val youtubeMikroKanonExamplesUri = "https://www.youtube.com/watch?v=zaa3d3FVqA4&list=PLO0dKPP71phouGDmrOQA_yXEp0Z1L1PLV&index=2"
+        val instagramUri = "https://www.instagram.com/cristiano.vecchi"
+        val linkedinUri = "https://www.linkedin.com/in/cristiano-vecchi-ba1a311a"
+        val githubUri = "https://github.com/CristianoVecchi"
+        val githubLeffelManiaUri = "https://github.com/LeffelMania"
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier.width(300.dp),
@@ -72,28 +79,28 @@ fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>,
                             append("Youtube MK examples")
                         }
                     },onClick = {
-                        uriHandler.openUri("https://www.youtube.com/watch?v=zaa3d3FVqA4&list=PLO0dKPP71phouGDmrOQA_yXEp0Z1L1PLV&index=2")
+                        uriHandler.openUri(youtubeMikroKanonExamplesUri)
                     })
                     ClickableText(text = buildAnnotatedString {
                         withStyle(uriStyle){
                             append("Instagram")
                         }
                     },onClick = {
-                        uriHandler.openUri("https://www.instagram.com/cristiano.vecchi/")
+                        uriHandler.openUri(instagramUri)
                     })
                     ClickableText(text = buildAnnotatedString {
                         withStyle(uriStyle){
                             append("Linkedin")
                         }
                     },onClick = {
-                        uriHandler.openUri("https://www.linkedin.com/in/cristiano-vecchi-ba1a311a/")
+                        uriHandler.openUri(linkedinUri)
                     })
                     ClickableText(text = buildAnnotatedString {
                         withStyle(uriStyle){
                             append("GitHub")
                         }
                     },onClick = {
-                        uriHandler.openUri("https://github.com/CristianoVecchi")
+                        uriHandler.openUri(githubUri)
                     })
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(text = buildAnnotatedString {
@@ -109,7 +116,7 @@ fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>,
                             append("GitHub")
                         }
                     },onClick = {
-                        uriHandler.openUri("https://github.com/LeffelMania")
+                        uriHandler.openUri(githubLeffelManiaUri)
                     })
                     Spacer(modifier = Modifier.height(10.dp))
                     Button(
@@ -301,17 +308,17 @@ fun NumberDialog(numberDialogData: MutableState<NumberDialogData>, onDismissRequ
     }
 }
 @Composable
-fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>) {
+fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>, fontSize: TextUnit) {
     MultiSelectListDialog(
         listDialogData = listDialogData,
-        submitButtonText = "Select",
+        submitButtonText = "Select", fontSize = fontSize,
         onDismissRequest = { listDialogData.value = MultiListDialogData(itemList = listDialogData.value.itemList)  }
     )
 }
 @Composable
 fun MultiSelectListDialog(
     listDialogData: MutableState<MultiListDialogData>,
-    submitButtonText: String,
+    submitButtonText: String, fontSize: TextUnit,
     onDismissRequest: () -> Unit
 ) {
     if (listDialogData.value.dialogState) {
@@ -327,7 +334,7 @@ fun MultiSelectListDialog(
                     val listState = rememberLazyListState()
                     if(listDialogData.value.itemList.isNotEmpty()){
                         LazyColumn( state = listState,
-                            modifier = Modifier.height(500.dp)
+                            modifier = Modifier.height(420.dp)
                         ) { items(listDialogData.value.itemList) { item ->
                             val selected = if (selectedOptions.isEmpty()) {
                                 listOf<String>()
@@ -335,8 +342,8 @@ fun MultiSelectListDialog(
                                 listDialogData.value.itemList.filterIndexed{ index, _ -> selectedOptions.contains(index)}
                                 //sequencesList[selectedOption.value]
                             }
-
-                            MultiRadioButton(item, selected) { selectedValue ->
+                            Spacer(modifier = Modifier.height(2.dp))
+                            MultiRadioButton(item, selected, fontSize) { selectedValue ->
                                 val index = listDialogData.value.itemList.indexOf(selectedValue)
                                 selectedOptions = if(selectedOptions.contains(index)){
                                     selectedOptions.toMutableSet().also{
@@ -369,7 +376,7 @@ fun MultiSelectListDialog(
     }
 }
 @Composable
-fun MultiRadioButton(text: String, selectedValues: List<String>, onClickListener: (String) -> Unit) {
+fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextUnit, onClickListener: (String) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -379,7 +386,7 @@ fun MultiRadioButton(text: String, selectedValues: List<String>, onClickListener
                     onClickListener(text)
                 }
             )
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically
     ) {
         // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.
         // So have Text Composable to show text.
@@ -391,18 +398,18 @@ fun MultiRadioButton(text: String, selectedValues: List<String>, onClickListener
         )
         Text(
             text = text,
-            style = MaterialTheme.typography.body1.merge(),
+            style = MaterialTheme.typography.body1.merge().copy(fontSize = fontSize),
             modifier = Modifier.padding(start = 16.dp)
         )
     }
 }
 
 @Composable
-fun ListDialog(listDialogData: MutableState<ListDialogData>) {
+fun ListDialog(listDialogData: MutableState<ListDialogData>, fontSize: TextUnit) {
     SingleSelectListDialog(
         listDialogData = listDialogData,
         submitButtonText = "Select",
-
+        fontSize = fontSize,
         onDismissRequest = { listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)  }
     )
 }
@@ -410,7 +417,7 @@ fun ListDialog(listDialogData: MutableState<ListDialogData>) {
 fun SingleSelectListDialog(
     listDialogData: MutableState<ListDialogData>,
     submitButtonText: String,
-
+    fontSize: TextUnit,
     onDismissRequest: () -> Unit
 ) {
     if (listDialogData.value.dialogState) {
@@ -426,7 +433,7 @@ fun SingleSelectListDialog(
                     val listState = rememberLazyListState()
                     if(listDialogData.value.itemList.isNotEmpty()){
                         LazyColumn( state = listState,
-                            modifier = Modifier.height(500.dp)
+                            modifier = Modifier.height(420.dp)
                         ) { items(listDialogData.value.itemList) { item ->
                             val selected = if (selectedOption == -1) {
                                 ""
@@ -434,8 +441,8 @@ fun SingleSelectListDialog(
                                 listDialogData.value.itemList[selectedOption]
                                 //sequencesList[selectedOption.value]
                             }
-
-                            RadioButton(item, selected) { selectedValue ->
+                            Spacer(modifier = Modifier.height(3.dp))
+                            RadioButton(item, selected, fontSize) { selectedValue ->
                                 selectedOption = listDialogData.value.itemList.indexOf(selectedValue)
                             }
                         }
@@ -460,7 +467,7 @@ fun SingleSelectListDialog(
     }
 }
 @Composable
-fun RadioButton(text: String, selectedValue: String, onClickListener: (String) -> Unit) {
+fun RadioButton(text: String, selectedValue: String, fontSize: TextUnit, onClickListener: (String) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -470,7 +477,7 @@ fun RadioButton(text: String, selectedValue: String, onClickListener: (String) -
                     onClickListener(text)
                 }
             )
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically
     ) {
         // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.
         // So have Text Composable to show text.
@@ -482,7 +489,7 @@ fun RadioButton(text: String, selectedValue: String, onClickListener: (String) -
         )
         Text(
             text = text,
-            style = MaterialTheme.typography.body1.merge(),
+            style = MaterialTheme.typography.body1.merge().copy(fontSize = fontSize),
             modifier = Modifier.padding(start = 16.dp)
         )
     }

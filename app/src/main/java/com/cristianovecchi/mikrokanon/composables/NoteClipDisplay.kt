@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
@@ -29,8 +30,8 @@ import kotlin.random.Random
 
 @Composable
 fun NoteClipDisplay(
-    modifier: Modifier, clips: List<Clip>, notesNames: List<String>,
-    cursor: MutableState<Int> = mutableStateOf(-1),
+    modifier: Modifier, clips: List<Clip>, notesNames: List<String>, backgroundColor: Color = Color.White,
+    cursor: MutableState<Int> = mutableStateOf(-1), fontSize: TextUnit = 18.sp,
     nCols: Int = 6, dispatch: (Int) -> Unit) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -40,15 +41,14 @@ fun NoteClipDisplay(
     val unselectionBackColor = Color.LightGray
     val unselectionTextColor = Color.Blue
     val unselectionBorderColor = Color.DarkGray
-    val fontSize = 18.sp
     val intervalPadding = 4.dp
     val innerPadding = 10.dp
 
-    if (clips.isEmpty()) {
+    if (clips.isEmpty() or notesNames.isEmpty()) {
         Text(text = "ENTER SOME NOTES", modifier = Modifier.padding(16.dp))
 
     } else {
-        Column(modifier = modifier) {
+        Column(modifier = modifier.background(backgroundColor)) {
             //Text(text= "${ArrayList(noteClips).toStringAll()}", modifier = Modifier.padding(16.dp))
             val nRows = (clips.size / nCols) + 1
             val rows = (0 until nRows).toList()
@@ -67,7 +67,7 @@ fun NoteClipDisplay(
 
                                 Card(
                                     modifier = Modifier
-                                        .background(Color.White)
+                                        .background(backgroundColor)
                                         .clip(RoundedCornerShape(6.dp))
                                         .padding(intervalPadding)
                                         .clickable { dispatch(clip.id) },

@@ -63,9 +63,9 @@ fun IntervalSetSelector(model: AppViewModel, fontSize: Int, callback: () -> Unit
             SelectableCard(text = "4a\n5d", fontSize,isSelected = false,  onClick = {addIntervalsAndRefresh(listOf(6))})
         }
         if(intervals.contains(0)){
-            SelectableCard(text = "1\n8", fontSize + 2, isSelected = true, onClick = {removeIntervalsAndRefresh(listOf(0))})
+            SelectableCard(text = "u\n8", fontSize + 2, isSelected = true, onClick = {removeIntervalsAndRefresh(listOf(0))})
         } else {
-            SelectableCard(text = "1\n8", fontSize,isSelected = false,  onClick = {addIntervalsAndRefresh(listOf(0))})
+            SelectableCard(text = "u\n8", fontSize,isSelected = false,  onClick = {addIntervalsAndRefresh(listOf(0))})
         }
     }
 }

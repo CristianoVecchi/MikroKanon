@@ -14,18 +14,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.RadioButton
 
 @Composable
 fun SequencesDialog(dialogState: MutableState<Boolean>, sequencesList: List<String>,
+                    fontSize: TextUnit,
                     onSubmitButtonClick: (Int, Boolean) -> Unit) {
     SingleSelectDialog(
         dialogState = dialogState,
         title = "Choose the second Sequence",
         sequencesList = sequencesList,
         submitButtonText = "Select",
+        fontSize = fontSize,
         onSubmitButtonClick = {  index, repeated -> onSubmitButtonClick(index, repeated)},
         onDismissRequest = { dialogState.value = false }
     )
@@ -37,6 +41,7 @@ fun SingleSelectDialog(
     sequencesList: List<String>,
     defaultSelected: Int = -1,
     submitButtonText: String,
+    fontSize: TextUnit,
     onSubmitButtonClick: (Int, Boolean) -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -53,7 +58,7 @@ fun SingleSelectDialog(
                     Spacer(modifier = Modifier.height(10.dp))
                     val listState = rememberLazyListState()
                     LazyColumn( state = listState,
-                        modifier = Modifier.height(500.dp)
+                        modifier = Modifier.height(420.dp)
                     ) { items(sequencesList) { sequence ->
                         val selected = if (selectedOption == -1) {
                             ""
@@ -61,8 +66,8 @@ fun SingleSelectDialog(
                             sequencesList[selectedOption]
                             //sequencesList[selectedOption.value]
                         }
-
-                        RadioButton(sequence, selected) { selectedValue ->
+                        Spacer(modifier = Modifier.height(6.dp))
+                        RadioButton(sequence, selected, fontSize = fontSize) { selectedValue ->
                             selectedOption = sequencesList.indexOf(selectedValue)
                         }
                     }
@@ -85,7 +90,7 @@ fun SingleSelectDialog(
                         },
                         shape = MaterialTheme.shapes.medium
                     ) {
-                        Text(text = submitButtonText)
+                        Text(text = submitButtonText, style = TextStyle(fontSize = fontSize))
                     }
                 }
             }

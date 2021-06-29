@@ -44,7 +44,6 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
     val creditStyle = SpanStyle(
         fontSize = 14.sp,
         color = Color.LightGray)
-    val uriHandler = LocalUriHandler.current
 
     Scaffold(
         modifier = Modifier
@@ -134,8 +133,9 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
 
-    ListDialog(listDialogData)
-    MultiListDialog(multiListDialogData)
+    val dimensions = model.dimensions
+    ListDialog(listDialogData, dimensions.sequenceDialogFontSize)
+    MultiListDialog(multiListDialogData, dimensions.sequenceDialogFontSize)
     BpmDialog(bpmDialogData)
     ExportDialog(exportDialogData)
     CreditsDialog(creditsDialogData)
@@ -160,7 +160,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
             .background(MaterialTheme.colors.drawerBackgroundColor),
         state = listState,
     ) { items(optionNames) { optionName ->
-            val fontSize = 18
+            val fontSize = dimensions.optionsFontSize
             when(optionName){
                 "Ensemble" -> {
                     val ensNames: List<String> = EnsembleType.values().map{ it.toString()}

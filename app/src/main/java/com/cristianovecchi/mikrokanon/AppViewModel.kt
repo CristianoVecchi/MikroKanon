@@ -6,7 +6,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.awaitAll
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.content.Intent
+import android.graphics.Point
 import androidx.lifecycle.*
 import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.db.SequenceData
@@ -19,6 +21,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import android.media.MediaPlayer
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
@@ -30,9 +33,8 @@ import java.io.File
 import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.OnLifecycleEvent
-
-
-
+import android.view.WindowManager
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 
 sealed class Computation {
@@ -66,9 +68,7 @@ class AppViewModel(
         onStop()
     }
 
-
-    val creditsUri: String = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
-
+    var dimensions: Dimensions
     val iconMap = mapOf(
 
         "mikrokanon" to R.drawable.ic_baseline_clear_all_24,
@@ -165,6 +165,28 @@ class AppViewModel(
 //     else {
 //        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
 //    }
+init{
+    val size = getDeviceResolution()
+    dimensions = Dimensions.provideDimensions(size.x, size.y)
+}
+    private fun getDeviceResolution(): Point {
+        val windowManager: WindowManager = getApplication<MikroKanonApplication>()
+            .applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            val windowMetrics = windowManager.currentWindowMetrics
+            val w = windowMetrics.bounds.width()
+            val h = windowMetrics.bounds.height()
+            println("BOUNDS: WIDTH = $w HEIGHT = $h")
+            Point(w,h)
+        } else {
+            val size = Point()
+            windowManager.defaultDisplay.getRealSize(size)
+            val w = size.x
+            val h = size.y
+            println("SIZE X = $w   SIZE Y = $h")
+            size
+        }
+    }
 
     // macro Functions called by fragments -----------------------------------------------------
     val onStop = {
@@ -299,6 +321,7 @@ class AppViewModel(
         }
     }
     //-------------end macro functions--------------------
+
 
     fun shareMidi(file: File){
         try {

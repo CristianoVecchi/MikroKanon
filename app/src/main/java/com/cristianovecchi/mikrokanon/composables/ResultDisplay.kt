@@ -51,7 +51,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
         if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
-
+    val dimensions = model.dimensions
 
         Column(
             modifier = Modifier
@@ -65,7 +65,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 .fillMaxSize()
                 .background(buttonsBackgroundColor)
                 .weight(1f)
-            val buttonSize = 60.dp
+            val buttonSize = dimensions.outputButtonSize
             Box(modifier = modifier4) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), state = listState)
                 {
@@ -86,7 +86,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                             model,
                             counterpoint,
                             clipsText,
-                            16,
+                            dimensions.outputNoteTableFontSize,
                             onClick = { onClick(counterpoint) })
 
                        // if(model.selectedCounterpoint.value!! == counterpoint) indexSelected = index
@@ -119,7 +119,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 
                 val dialogState by lazy { mutableStateOf(false) }
 
-                SequencesDialog(dialogState = dialogState,
+                SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
                     sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames) },
                     onSubmitButtonClick = { index, repeat ->
                         dialogState.value = false
@@ -155,7 +155,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     }
 
                     FreePartsButtons(
-                        fontSize = 22, isActive = activeButtons.freeparts,
+                        fontSize = dimensions.outputFPbuttonFontSize,
+                        isActive = activeButtons.freeparts,
                         onAscDynamicClick = {
                             if (!elaborating) onFreePart(TREND.ASCENDANT_DYNAMIC);
                             scrollToTopList = true
@@ -204,7 +205,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 IntervalSetSelector(
-                    model, fontSize = 10
+                    model, fontSize = dimensions.outputIntervalSetFontSize
                 ) { scrollToTopList = true }
             }
         }

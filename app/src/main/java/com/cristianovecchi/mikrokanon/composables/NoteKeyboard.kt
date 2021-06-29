@@ -4,10 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.ui.iconButtonIconColor
 
 enum class NoteNamesEn(val abs:Int) {
     C(0),D(2),E(4),F(5),G(7),A(9),B(11),EMPTY(-1)
@@ -60,8 +58,9 @@ fun NoteKeyboard(
     dispatch : (Out) -> Unit ) {
     val names by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
     val playing by model.playing.asFlow().collectAsState(initial = false)
-    val buttonSize = 60.dp
-    val fontSize = 14.sp
+    val dimensions = model.dimensions
+    val buttonSize = dimensions.inputButtonSize
+    val fontSize = dimensions.inputButtonFontSize
     val buttonInfos = listOf(
             ButtonInfo(text = Accidents.D_FLAT.ax, output = Out.Accident(Accidents.D_FLAT)),
             ButtonInfo(text = Accidents.D_SHARP.ax, output = Out.Accident(Accidents.D_SHARP)),
@@ -91,8 +90,8 @@ fun NoteKeyboard(
 
     )
     var buttonIndex = 0
-    Column(modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,){
+    Column(modifier = Modifier.fillMaxSize().padding(top = 8.dp, bottom = 8.dp),
+            verticalArrangement = Arrangement.Bottom){
 
         for (i in 0 until nRows){
             Row(modifier = Modifier.fillMaxWidth(),
@@ -104,31 +103,19 @@ fun NoteKeyboard(
                     } else
                     {
                         val buttonInfo = buttonInfos[buttonIndex++]
-                        val text = buttonInfo.text
                         val resId = buttonInfo.resId
-                        if(resId != -1) {
-
-                            IconButton(modifier = Modifier.padding(2.dp).
-                                                    background(Color.White, RoundedCornerShape(4.dp))
-                                .then(Modifier.size(buttonSize).border(2.dp, Color.Black)),
-                                        onClick = {dispatch(buttonInfo.output)})
-                            {
-                                Icon(
-                                    painter = painterResource(id = resId),
-                                    contentDescription = null, // decorative element
-                                    tint = if(text == "OK") Color.Green else Color.Blue )
-                            }
-                        } else
-                        {
-                            Button(modifier = Modifier.padding(2.dp).
-                                    background(Color.White, RoundedCornerShape(4.dp))
-                                        .then(Modifier.size(buttonSize).border(2.dp, Color.Black)),
-                                    onClick = {dispatch(buttonInfo.output)})
-                            {
-                                Text(text = text, color = Color.Cyan,
-                                        style = TextStyle(fontSize = fontSize,
-                                        fontWeight = FontWeight.Bold) )
-                            }
+                        val onClick = {dispatch(buttonInfo.output)}
+                        val color = if(buttonInfo.text == "OK") Color.Green else {
+                            if(resId == -1 ) Color.Black else MaterialTheme.colors.iconButtonIconColor
+                        }
+                        CustomButton(
+                            adaptSizeToIconButton = true,
+                            text = if (resId == -1) buttonInfo.text else "",
+                            iconId = resId,
+                            buttonSize = buttonSize,
+                            iconColor = color
+                        ) {
+                            onClick()
                         }
                     }
                 }
