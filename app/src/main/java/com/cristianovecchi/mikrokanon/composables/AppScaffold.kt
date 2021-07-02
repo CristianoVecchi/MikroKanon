@@ -31,6 +31,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
 import com.cristianovecchi.mikrokanon.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.drawerBackgroundColor
 import kotlinx.coroutines.flow.Flow
 
@@ -122,11 +123,6 @@ fun convertFlagsToInts(flags: Int): Set<Int>{
 @Composable
 fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>){
 
-    val doubling_en = listOf("minor 2nd","Major 2nd", "minor 3rd", "Major 3rd", "4th",
-                            "Augm. 4th", "5th", "minor 6th", "Major 6th", "minor 7th", "Major 7th",
-                            "Octave", "minor 9th", "Major 9th", "minor 10th", "Major 10th", "11th",
-                            "Augm. 11th", "12th", "minor 13th", "Major 13th", "minor 14th", "Major 14th", "Double Octave")
-
     val listDialogData by lazy { mutableStateOf(ListDialogData())}
     val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
     val multiListDialogData by lazy { mutableStateOf(MultiListDialogData())}
@@ -134,21 +130,22 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
 
     val dimensions = model.dimensions
-    ListDialog(listDialogData, dimensions.sequenceDialogFontSize)
-    MultiListDialog(multiListDialogData, dimensions.sequenceDialogFontSize)
-    BpmDialog(bpmDialogData)
-    ExportDialog(exportDialogData)
-    CreditsDialog(creditsDialogData)
-
     val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Retrograde", "Inverse",  "Inv-Retrograde", "Doubling",
-        "Spread where possible", "Deep Search in 4 parts MK",
+        "Spread where possible", "Deep Search in 4 part MK",
         "Export MIDI","Language", "Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionData()
                         else userOptionsData[0]
+    val lang by model.language.asFlow().collectAsState(initial = Lang())
     val listState = rememberLazyListState()
+
+    ListDialog(listDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize)
+    MultiListDialog(multiListDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
+    BpmDialog(bpmDialogData, lang.OKbutton)
+    ExportDialog(exportDialogData, lang.OKbutton)
+    CreditsDialog(creditsDialogData, lang.OKbutton)
 
 //    userOptionsData.forEach{
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
@@ -163,10 +160,10 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
             val fontSize = dimensions.optionsFontSize
             when(optionName){
                 "Ensemble" -> {
-                    val ensNames: List<String> = EnsembleType.values().map{ it.toString()}
+                    val ensNames: List<String> = lang.ensembleNames
                     val ensIndex = userOptions.ensembleType
-                        SelectableCard(text = "Ensemble: ${ensNames[ensIndex]}", fontSize = fontSize, isSelected = true, onClick = { _ ->
-                            listDialogData.value = ListDialogData(true,ensNames,ensIndex,"Select an Ensemble!"
+                        SelectableCard(text = "${lang.ensemble}: ${ensNames[ensIndex]}", fontSize = fontSize, isSelected = true, onClick = { _ ->
+                            listDialogData.value = ListDialogData(true,ensNames,ensIndex,lang.selectEnsemble
                             ) { index ->
                                 model.updateUserOptions(
                                     "ensemble_type",
@@ -178,9 +175,9 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                     }
                 "BPM" -> {
                     val bpm = userOptions.bpm
-                    SelectableCard(text = "BPM: $bpm", fontSize = fontSize, isSelected = true, onClick = { _ ->
+                    SelectableCard(text = "${lang.bpm}: $bpm", fontSize = fontSize, isSelected = true, onClick = { _ ->
                         bpmDialogData.value = NumberDialogData(
-                            true, "Beats Per Measure:", bpm, 18, 360
+                            true, "${lang.beatPerMinute}:", bpm, 18, 360
                         ) { bpm ->
                             model.updateUserOptions(
                                 "bpm",
@@ -194,8 +191,8 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                 "Rhythm" -> {
                     val rhythmNames = RhythmPatterns.getTitles()
                     val rhythmIndex = userOptions.rhythm
-                    SelectableCard(text = "Rhythm: ${rhythmNames[rhythmIndex]}", fontSize = fontSize, isSelected = true,onClick = { _ ->
-                        listDialogData.value = ListDialogData(true,rhythmNames,rhythmIndex,"Select a Rhythm!"
+                    SelectableCard(text = "${lang.rhythm}: ${rhythmNames[rhythmIndex]}", fontSize = fontSize, isSelected = true,onClick = { _ ->
+                        listDialogData.value = ListDialogData(true,rhythmNames,rhythmIndex,lang.selectRhythm
                         ) { index ->
                             model.updateUserOptions(
                                 "rhythm",
@@ -207,7 +204,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                 }
                 "Rhythm Shuffle" -> {
                     var isOn = userOptions.rhythmShuffle != 0
-                    SelectableCard(text = "Rhythm Shuffle", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                    SelectableCard(text = lang.rhythmShuffle, fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         isOn = !isOn
                         model.updateUserOptions(
                             "rhythmShuffle",
@@ -217,7 +214,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                 }
                 "Parts Shuffle" -> {
                     var isOn = userOptions.partsShuffle != 0
-                    SelectableCard(text = "Parts Shuffle", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                    SelectableCard(text = lang.partsShuffle, fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         isOn = !isOn
                         model.updateUserOptions(
                             "partsShuffle",
@@ -228,7 +225,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                 "Inverse" -> {
                     val flags = userOptions.rowFormsFlags
                     val isOn = flags and RowForm.INVERSE.flag != 0
-                    SelectableCard(text = "Inverse", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                    SelectableCard(text = lang.inverse, fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         val newFlags = flags xor RowForm.INVERSE.flag // ^ toggles the flag
                         model.updateUserOptions(
                             "rowFormsFlags",
@@ -239,7 +236,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                 "Retrograde" -> {
                     val flags = userOptions.rowFormsFlags
                     val isOn = flags and RowForm.RETROGRADE.flag != 0
-                    SelectableCard(text = "Retrograde", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                    SelectableCard(text = lang.retrograde, fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         val newFlags = flags xor RowForm.RETROGRADE.flag // ^ toggles the flag
                         model.updateUserOptions(
                             "rowFormsFlags",
@@ -250,7 +247,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                 "Inv-Retrograde" -> {
                     val flags = userOptions.rowFormsFlags
                     val isOn = flags and RowForm.INV_RETROGRADE.flag != 0
-                    SelectableCard(text = "Inv-Retrograde", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                    SelectableCard(text = lang.invRetrograde, fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         val newFlags = flags xor RowForm.INV_RETROGRADE.flag // ^ toggles the flag
                         model.updateUserOptions(
                             "rowFormsFlags",
@@ -262,13 +259,13 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                     val flags = userOptions.doublingFlags
                     val intsFromFlags = convertFlagsToInts(flags).map{ it - 1 }
                     val isOn = flags > 0
-                    val text = if(!isOn) "Doubling" else "Doubling at ${
+                    val text = if(!isOn) lang.doubling else "${lang.doubling}: ${
                         intsFromFlags.joinToString(
                             separator = ", "
-                        ) { doubling_en[it] }
+                        ) { lang.doublingNames[it] }
                     }"
                     SelectableCard(text = text, fontSize = fontSize, isSelected = isOn, onClick = { _ ->
-                        multiListDialogData.value = MultiListDialogData(true, doubling_en, intsFromFlags.toSet() ,"Select intervals for doubling!"
+                        multiListDialogData.value = MultiListDialogData(true, lang.doublingNames, intsFromFlags.toSet() ,lang.selectDoubling
                         ) { indexes ->
                             model.updateUserOptions(
                                 "doublingFlags",
@@ -280,7 +277,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                 }
                 "Spread where possible" -> {
                     var isOn = userOptions.spread != 0
-                    SelectableCard(text = "Spread where possible", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                    SelectableCard(text = lang.spreadWherePossible, fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         isOn = !isOn
                         model.updateUserOptions(
                             "spread",
@@ -288,9 +285,9 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                         )
                     })
                 }
-                "Deep Search in 4 parts MK" -> {
+                "Deep Search in 4 part MK" -> {
                     var isOn = userOptions.deepSearch != 0
-                    SelectableCard(text = "Deep Search in 4 parts MK", fontSize = fontSize, isSelected = isOn, onClick = { _ ->
+                    SelectableCard(text = lang.deepSearch, fontSize = fontSize, isSelected = isOn, onClick = { _ ->
                         isOn = !isOn
                         model.updateUserOptions(
                             "deepSearch",
@@ -299,7 +296,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                     })
                 }
                 "Export MIDI" -> {
-                    SelectableCard(text = "Export MIDI", fontSize = fontSize, isSelected = true, onClick = { _ ->
+                    SelectableCard(text = lang.exportMidi, fontSize = fontSize, isSelected = true, onClick = { _ ->
                         val path = model.midiPath.absolutePath.toString()
                         var error = model.onPlay(false)
                         if (error.isEmpty()){
@@ -325,7 +322,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                     }
                     val languageIndex= languages.indexOf(languageName)
 
-                        SelectableCard(text = "Language: $languageName", fontSize = fontSize, isSelected = true,onClick = { _ ->
+                        SelectableCard(text = "${lang.language}: $languageName", fontSize = fontSize, isSelected = true,onClick = { _ ->
                             listDialogData.value = ListDialogData(true,languages,languageIndex,"Select a Language!"
                             ) { index ->
                                 model.updateUserOptions(
@@ -337,7 +334,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                         })
                     }
                 "Credits" -> {
-                    SelectableCard(text = "Credits", fontSize = fontSize, isSelected = true, onClick = { _ ->
+                    SelectableCard(text = lang.credits, fontSize = fontSize, isSelected = true, onClick = { _ ->
                         creditsDialogData.value = CreditsDialogData(true,"Credits:",
                         ) {
                             creditsDialogData.value = CreditsDialogData()

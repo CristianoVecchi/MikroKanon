@@ -32,7 +32,7 @@ class SequencesFragment(): Fragment() {
             else ActiveButtons() )
         }
         model.userOptionsData.observe(viewLifecycleOwner){
-            model.selectNotesNames()
+            model.selectLanguage(model.getUserLangDef())
         }
         model.setInitialBlankState()
         return ComposeView(requireContext()).apply {

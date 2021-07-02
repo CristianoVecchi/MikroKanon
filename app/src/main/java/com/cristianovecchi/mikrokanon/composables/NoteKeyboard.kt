@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.iconButtonIconColor
 
 enum class NoteNamesEn(val abs:Int) {
@@ -56,7 +57,8 @@ fun NoteKeyboard(
     model: AppViewModel,
     nRows: Int = 5, nCols: Int = 4, iconMap: Map<String,Int> = HashMap<String,Int>(),
     dispatch : (Out) -> Unit ) {
-    val names by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
+    val language by model.language.asFlow().collectAsState(initial = Lang())
+    val names = language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)
     val dimensions = model.dimensions
     val buttonSize = dimensions.inputButtonSize
@@ -112,6 +114,7 @@ fun NoteKeyboard(
                             adaptSizeToIconButton = true,
                             text = if (resId == -1) buttonInfo.text else "",
                             iconId = resId,
+                            fontSize = fontSize,
                             buttonSize = buttonSize,
                             iconColor = color
                         ) {

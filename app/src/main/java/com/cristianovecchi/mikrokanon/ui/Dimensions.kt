@@ -13,7 +13,7 @@ data class Dimensions( // 1600px width and over
     val inputNclipColumns: Int = 8, // 6
     val inputClipFontSize: TextUnit = 18.sp,
     val inputButtonSize: Dp = 80.dp,
-    val inputButtonFontSize: TextUnit = 20.sp, // 14
+    val inputButtonFontSize: Int = 20, // 14
 
     val outputNoteTableFontSize: Int = 16,
     val outputButtonSize: Dp = 70.dp, // 60
@@ -28,13 +28,13 @@ data class Dimensions( // 1600px width and over
         fun provideDimensions(width: Int, height: Int) : Dimensions {
             return if (width == 1080 && height in 1920..2159){
                 // with short height
-                Dimensions.res1080x1920() // 1080x1920 xxh |
+                res1080x1920() // 1080x1920 xxh |
             } else {
                 when(width) {
-                    in Int.MIN_VALUE..1079 -> Dimensions.micro() // 720x1280 xh |
-                    in 1080..1439 -> Dimensions.mini() // 1080x2160 xxh |
-                    in 1440..1535 -> Dimensions.medium() // 1440x2880 | 1440x2560 |
-                    in 1536..Int.MAX_VALUE -> Dimensions.maxi() // 1600x2426
+                    in Int.MIN_VALUE..1079 -> micro() // 720x1280 xh |
+                    in 1080..1439 -> mini() // 1080x2160 xxh |
+                    in 1440..1535 -> medium() // 1440x2880 | 1440x2560 |
+                    in 1536..Int.MAX_VALUE -> maxi() // 1600x2426
                     else -> Dimensions()
                 }
             }
@@ -43,22 +43,22 @@ data class Dimensions( // 1600px width and over
             return Dimensions()
         }
         fun medium() : Dimensions {
-            return Dimensions().copy(
+            return Dimensions(
                 selectorButtonSize = 58.dp,
                 inputNclipColumns = 6,
                 inputButtonSize = 56.dp,
-                inputButtonFontSize = 16.sp,
+                inputButtonFontSize = 16,
                 outputButtonSize = 52.dp,
                 outputFPbuttonFontSize = 20,
                 outputIntervalSetFontSize = 10
             )
         }
         fun mini() : Dimensions {
-            return Dimensions().copy(
+            return Dimensions(
                 selectorButtonSize = 54.dp,
                 inputNclipColumns = 6,
                 inputButtonSize = 56.dp,
-                inputButtonFontSize = 17.sp,
+                inputButtonFontSize = 17,
                 outputButtonSize =56.dp,
                 outputFPbuttonFontSize = 22,
                 outputIntervalSetFontSize = 10
@@ -66,12 +66,12 @@ data class Dimensions( // 1600px width and over
 
         }
         fun micro() : Dimensions {
-            return Dimensions().copy(
+            return Dimensions(
                 selectorButtonSize = 50.dp,
                 selectorFPbuttonFontSize= 20,
                 inputNclipColumns = 6,
                 inputButtonSize = 56.dp,
-                inputButtonFontSize = 3.sp,
+                inputButtonFontSize = 3,
                 outputNoteTableFontSize = 12,
                 outputButtonSize = 38.dp,
                 outputFPbuttonFontSize = 16,
@@ -79,12 +79,12 @@ data class Dimensions( // 1600px width and over
             )
         }
         fun res1080x1920() : Dimensions {
-            return Dimensions().copy(
+            return Dimensions(
                 selectorButtonSize = 50.dp,
                 selectorFPbuttonFontSize= 20,
                 inputNclipColumns = 6,
                 inputButtonSize = 56.dp,
-                inputButtonFontSize = 3.sp,
+                inputButtonFontSize = 3,
                 outputNoteTableFontSize = 12,
                 outputButtonSize = 38.dp,
                 outputFPbuttonFontSize = 16,

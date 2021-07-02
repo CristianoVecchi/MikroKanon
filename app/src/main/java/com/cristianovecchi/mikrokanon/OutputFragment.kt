@@ -21,7 +21,7 @@ class OutputFragment: Fragment() {
     ): View {
         val model = (activity as MainActivity).model
         model.userOptionsData.observe(viewLifecycleOwner){
-            model.selectNotesNames()
+            model.selectLanguage(model.getUserLangDef())
         }
         model.selectedCounterpoint.observe(viewLifecycleOwner){
             if(model.selectedCounterpoint.value!!.parts.isNotEmpty()) {
@@ -30,7 +30,6 @@ class OutputFragment: Fragment() {
                 else model.activeButtons.value!!.copy(counterpoint = true, freeparts = true)
                 )
             }
-
         }
         model.stackSize.observe(viewLifecycleOwner){
             model.changeActiveButtons(  if(model.stackSize.value!! <= 1)

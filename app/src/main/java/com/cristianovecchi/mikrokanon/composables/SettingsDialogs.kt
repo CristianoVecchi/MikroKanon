@@ -30,7 +30,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.composables.RadioButton
 
 @Composable
-fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>,
+fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>, okText: String = "OK",
                  onDismissRequest: () -> Unit = {creditsDialogData.value = CreditsDialogData()})
 {
     if (creditsDialogData.value.dialogState) {
@@ -126,7 +126,7 @@ fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>,
                         },
                         shape = MaterialTheme.shapes.large
                     ) {
-                        Text(text = "Done")
+                        Text(text = okText)
                     }
                 }
             }
@@ -135,7 +135,7 @@ fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>,
 
 }
 @Composable
-fun ExportDialog(exportDialogData: MutableState<ExportDialogData>,
+fun ExportDialog(exportDialogData: MutableState<ExportDialogData>, okText: String = "OK",
                  onDismissRequest: () -> Unit = { exportDialogData.value = ExportDialogData(path = exportDialogData.value.path, error = exportDialogData.value.error)})
 {
     if (exportDialogData.value.dialogState) {
@@ -172,7 +172,7 @@ fun ExportDialog(exportDialogData: MutableState<ExportDialogData>,
                         },
                         shape = MaterialTheme.shapes.large
                     ) {
-                        Text(text = "Done")
+                        Text(text = okText)
                     }
                 }
             }
@@ -181,7 +181,8 @@ fun ExportDialog(exportDialogData: MutableState<ExportDialogData>,
 
 }
 @Composable
-fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, onDismissRequest: () -> Unit = { numberDialogData.value = NumberDialogData(value = numberDialogData.value.value)})
+fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String = "OK",
+              onDismissRequest: () -> Unit = { numberDialogData.value = NumberDialogData(value = numberDialogData.value.value)})
 {
     if (numberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
@@ -261,7 +262,7 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, onDismissRequest
                         },
                         shape = MaterialTheme.shapes.large
                     ) {
-                        Text(text = "Select")
+                        Text(text = okText)
                     }
                 }
             }
@@ -269,7 +270,8 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, onDismissRequest
     }
 }
 @Composable
-fun NumberDialog(numberDialogData: MutableState<NumberDialogData>, onDismissRequest: () -> Unit = { numberDialogData.value = NumberDialogData(value = numberDialogData.value.value)})
+fun NumberDialog(numberDialogData: MutableState<NumberDialogData>, okText: String = "OK",
+                 onDismissRequest: () -> Unit = { numberDialogData.value = NumberDialogData(value = numberDialogData.value.value)})
 {
     if (numberDialogData.value.dialogState) {
        // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
@@ -300,7 +302,7 @@ fun NumberDialog(numberDialogData: MutableState<NumberDialogData>, onDismissRequ
                         },
                         shape = MaterialTheme.shapes.medium
                     ) {
-                        Text(text = "Select")
+                        Text(text = okText)
                     }
                 }
             }
@@ -308,17 +310,17 @@ fun NumberDialog(numberDialogData: MutableState<NumberDialogData>, onDismissRequ
     }
 }
 @Composable
-fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>, fontSize: TextUnit) {
+fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>, fontSize: TextUnit, okText: String = "OK") {
     MultiSelectListDialog(
         listDialogData = listDialogData,
-        submitButtonText = "Select", fontSize = fontSize,
+        fontSize = fontSize, okText = okText,
         onDismissRequest = { listDialogData.value = MultiListDialogData(itemList = listDialogData.value.itemList)  }
     )
 }
 @Composable
 fun MultiSelectListDialog(
     listDialogData: MutableState<MultiListDialogData>,
-    submitButtonText: String, fontSize: TextUnit,
+    fontSize: TextUnit, okText: String = "OK",
     onDismissRequest: () -> Unit
 ) {
     if (listDialogData.value.dialogState) {
@@ -366,7 +368,7 @@ fun MultiSelectListDialog(
                             },
                             shape = MaterialTheme.shapes.medium
                         ) {
-                            Text(text = submitButtonText)
+                            Text(text = okText)
                         }
                     }
 
@@ -376,7 +378,8 @@ fun MultiSelectListDialog(
     }
 }
 @Composable
-fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextUnit, onClickListener: (String) -> Unit) {
+fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextUnit,
+                     onClickListener: (String) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -405,19 +408,17 @@ fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextU
 }
 
 @Composable
-fun ListDialog(listDialogData: MutableState<ListDialogData>, fontSize: TextUnit) {
+fun ListDialog(listDialogData: MutableState<ListDialogData>, okText: String = "OK", fontSize: TextUnit) {
     SingleSelectListDialog(
         listDialogData = listDialogData,
-        submitButtonText = "Select",
-        fontSize = fontSize,
+        fontSize = fontSize, okText = okText,
         onDismissRequest = { listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)  }
     )
 }
 @Composable
 fun SingleSelectListDialog(
     listDialogData: MutableState<ListDialogData>,
-    submitButtonText: String,
-    fontSize: TextUnit,
+    fontSize: TextUnit, okText: String = "OK",
     onDismissRequest: () -> Unit
 ) {
     if (listDialogData.value.dialogState) {
@@ -457,7 +458,7 @@ fun SingleSelectListDialog(
                             },
                             shape = MaterialTheme.shapes.medium
                         ) {
-                            Text(text = submitButtonText)
+                            Text(text = okText)
                         }
                     }
 

@@ -35,7 +35,7 @@ class InputFragment(): Fragment() {
     ): View {
         val model = (activity as MainActivity).model
         model.userOptionsData.observe(viewLifecycleOwner){
-            model.selectNotesNames()
+            model.selectLanguage(model.getUserLangDef())
         }
         return ComposeView(requireContext()).apply {
             setContent {

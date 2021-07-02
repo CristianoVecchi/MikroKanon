@@ -30,7 +30,7 @@ import kotlin.random.Random
 
 @Composable
 fun NoteClipDisplay(
-    modifier: Modifier, clips: List<Clip>, notesNames: List<String>, backgroundColor: Color = Color.White,
+    modifier: Modifier, clips: List<Clip>, notesNames: List<String>, backgroundColor: Color = Color.White, hintText: String = "",
     cursor: MutableState<Int> = mutableStateOf(-1), fontSize: TextUnit = 18.sp,
     nCols: Int = 6, dispatch: (Int) -> Unit) {
     val listState = rememberLazyListState()
@@ -45,7 +45,7 @@ fun NoteClipDisplay(
     val innerPadding = 10.dp
 
     if (clips.isEmpty() or notesNames.isEmpty()) {
-        Text(text = "ENTER SOME NOTES", modifier = Modifier.padding(16.dp))
+        Text(text = hintText, modifier = Modifier.padding(22.dp))
 
     } else {
         Column(modifier = modifier.background(backgroundColor)) {

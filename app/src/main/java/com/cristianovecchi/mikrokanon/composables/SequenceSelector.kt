@@ -24,6 +24,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.*
 
@@ -42,7 +43,8 @@ fun SequenceSelector(model: AppViewModel,
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
     val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons())
-    val notesNames by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
+    val language by model.language.asFlow().collectAsState(initial = Lang())
+    val notesNames = language.noteNames
     Column(modifier = Modifier.fillMaxHeight().background(MaterialTheme.colors.drawerBackgroundColor)) {
         val modifier3 = Modifier
             .fillMaxWidth().background(backgroundColor)
@@ -59,6 +61,7 @@ fun SequenceSelector(model: AppViewModel,
         val buttonSize = dimensions.selectorButtonSize
 
         SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
+            title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
             sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames) },
             onSubmitButtonClick = { index, repeat ->
                 dialogState.value = false

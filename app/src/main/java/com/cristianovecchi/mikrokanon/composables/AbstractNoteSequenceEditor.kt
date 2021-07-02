@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.ui.inputBackgroundColor
@@ -19,7 +20,8 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
     val dimensions = model.dimensions
     val nClipCols = dimensions.inputNclipColumns
     val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
-    val notesNames by model.notesNames.asFlow().collectAsState(initial = listOf())
+    val language by model.language.asFlow().collectAsState(initial = Lang())
+    val notesNames = language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)
     val cursor = remember { mutableStateOf(clips.size -1) }
     val id = remember { mutableStateOf(0) }
@@ -29,13 +31,15 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
     data class Undo(val list: MutableList<Clip>, val cursor: Int)
     val stack: java.util.Stack<Undo> by remember { mutableStateOf( java.util.Stack<Undo>()) }
     val backgroundColor = MaterialTheme.colors.inputBackgroundColor
-    Column(modifier = Modifier.fillMaxHeight().background(backgroundColor)) {
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .background(backgroundColor)) {
         val modifier1 = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+            .fillMaxWidth()
+            .weight(1f)
         val modifier3 = Modifier
-                .fillMaxSize()
-                .weight(3f)
+            .fillMaxSize()
+            .weight(3f)
         val modifier5 = Modifier
             .fillMaxSize()
             .weight(7f)
@@ -45,7 +49,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
         Row(modifier3) {
 
             NoteClipDisplay(
-                modifier = Modifier.fillMaxWidth(),  clips = clips.toList(),
+                modifier = Modifier.fillMaxWidth(),  clips = clips.toList(), hintText = language.enterSomeNotes,
                 notesNames = notesNames, backgroundColor = backgroundColor,
                 cursor = mutableStateOf(cursor.value), nCols = nClipCols, fontSize = dimensions.inputClipFontSize
             ) { id ->

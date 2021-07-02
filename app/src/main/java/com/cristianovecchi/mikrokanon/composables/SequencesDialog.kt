@@ -22,13 +22,13 @@ import com.cristianovecchi.mikrokanon.composables.RadioButton
 
 @Composable
 fun SequencesDialog(dialogState: MutableState<Boolean>, sequencesList: List<String>,
-                    fontSize: TextUnit,
+                    fontSize: TextUnit, title: String, repeatText: String, okText: String = "OK",
                     onSubmitButtonClick: (Int, Boolean) -> Unit) {
     SingleSelectDialog(
         dialogState = dialogState,
-        title = "Choose the second Sequence",
+        title = title,
+        repeatText = repeatText, okText = okText,
         sequencesList = sequencesList,
-        submitButtonText = "Select",
         fontSize = fontSize,
         onSubmitButtonClick = {  index, repeated -> onSubmitButtonClick(index, repeated)},
         onDismissRequest = { dialogState.value = false }
@@ -37,10 +37,10 @@ fun SequencesDialog(dialogState: MutableState<Boolean>, sequencesList: List<Stri
 @Composable
 fun SingleSelectDialog(
     dialogState: MutableState<Boolean>,
-    title: String,
+    title: String, repeatText: String, okText: String = "OK",
     sequencesList: List<String>,
     defaultSelected: Int = -1,
-    submitButtonText: String,
+
     fontSize: TextUnit,
     onSubmitButtonClick: (Int, Boolean) -> Unit,
     onDismissRequest: () -> Unit
@@ -80,7 +80,7 @@ fun SingleSelectDialog(
                                 repeated = !repeated
                             }
                         )
-                        Text(text="repeat sequence")
+                        Text(text = repeatText)
                     }
                     Spacer(modifier = Modifier.height(10.dp))
                     Button(
@@ -90,7 +90,7 @@ fun SingleSelectDialog(
                         },
                         shape = MaterialTheme.shapes.medium
                     ) {
-                        Text(text = submitButtonText, style = TextStyle(fontSize = fontSize))
+                        Text(text = okText, style = TextStyle(fontSize = fontSize))
                     }
                 }
             }

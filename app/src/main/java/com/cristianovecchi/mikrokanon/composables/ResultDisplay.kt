@@ -19,6 +19,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.buttonsDisplayBackgroundColor
 import com.cristianovecchi.mikrokanon.ui.sequencesListBackgroundColor
@@ -38,7 +39,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    val notesNames by model.notesNames.asFlow().collectAsState(initial = listOf("do","re","mi","fa","sol","la","si"))
+    val language by model.language.asFlow().collectAsState(initial = Lang())
+    val notesNames = language.noteNames
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames))}
 
@@ -120,6 +122,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 val dialogState by lazy { mutableStateOf(false) }
 
                 SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
+                    title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
                     sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames) },
                     onSubmitButtonClick = { index, repeat ->
                         dialogState.value = false

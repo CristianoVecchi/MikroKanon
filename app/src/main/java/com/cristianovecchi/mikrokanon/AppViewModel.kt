@@ -34,6 +34,7 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 
@@ -113,8 +114,8 @@ class AppViewModel(
     private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
     val sequences : LiveData<List<ArrayList<Clip>>> = _sequences
 
-    private var _notesNames = MutableLiveData<List<String>>(listOf("do","re","mi","fa","sol","la","si"))
-    var notesNames: LiveData<List<String>> = _notesNames
+    private var _language = MutableLiveData(Lang())
+    var language: LiveData<Lang> = _language
 
 //    private var _deepSearch = MutableLiveData<Boolean>(false)
 //    var deepSearch: LiveData<Boolean> = _deepSearch
@@ -168,6 +169,7 @@ class AppViewModel(
 init{
     val size = getDeviceResolution()
     dimensions = Dimensions.provideDimensions(size.x, size.y)
+
 }
     private fun getDeviceResolution(): Point {
         val windowManager: WindowManager = getApplication<MikroKanonApplication>()
@@ -824,31 +826,17 @@ init{
             }
         }
     }
-    fun selectNotesNames(): List<String> {
+
+    fun selectLanguage(userLangDef: String): Lang {
+        val newLanguage = Lang.provideLanguage(userLangDef)
+        _language.value = newLanguage
+        return newLanguage
+    }
+    fun getUserLangDef(): String {
         val systemLangDef = Locale.getDefault().language
-        val userLangDef = if(userOptionsData.value != null && userOptionsData.value!!.isNotEmpty()) {
+        return if(userOptionsData.value != null && userOptionsData.value!!.isNotEmpty()) {
             if(userOptionsData.value!![0].language == "System") systemLangDef else userOptionsData.value!![0].language
         } else systemLangDef
-
-        val newNotesNames =
-             when(userLangDef) {
-                 "en" -> NoteNamesEn.values().map { it.toString() }
-                 "it" -> NoteNamesIt.values().map { it.toString() }
-                 "fr" -> NoteNamesFr.values().map { it.toString() }
-                 else -> NoteNamesEn.values().map { it.toString() }
-             }
-        //println("new notes names: ${newNotesNames.toString()}")
-        _notesNames.value = newNotesNames
-        return newNotesNames
-    }
-
-    fun getSystemLanguage(): String {
-        return when (Locale.getDefault().language){
-            "en" -> "English"
-            "fr" -> "Français"
-            "it" -> "Italiano"
-            else -> "English"
-        }
     }
     fun getSystemLangDef(): String {
         return Locale.getDefault().language
