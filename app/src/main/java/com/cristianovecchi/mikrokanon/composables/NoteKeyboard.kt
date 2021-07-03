@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.iconButtonIconColor
 
@@ -30,6 +31,9 @@ enum class NoteNamesIt {
 }
 enum class NoteNamesFr {
     Ut,Ré,Mi,Fa,Sol,La,Si,EMPTY
+}
+enum class NoteNamesRu {
+    До,Ре,Ми,Фа,Соль,Ля,Си,EMPTY
 }
 enum class Accidents(val ax : String, val sum : Int){
     //SHARP("\uF023"), FLAT("\uF062") , D_SHARP("\uF045"), D_FLAT("\uF0BA"), NATURAL("\uF06E")
@@ -57,7 +61,9 @@ fun NoteKeyboard(
     model: AppViewModel,
     nRows: Int = 5, nCols: Int = 4, iconMap: Map<String,Int> = HashMap<String,Int>(),
     dispatch : (Out) -> Unit ) {
-    val language by model.language.asFlow().collectAsState(initial = Lang())
+    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+        .also{ val forceRecomposing = it.value.isEmpty()} // to force recomposing when options change
+    val language = Lang.provideLanguage(model.getUserLangDef())
     val names = language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)
     val dimensions = model.dimensions

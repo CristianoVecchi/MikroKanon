@@ -20,9 +20,9 @@ class OutputFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val model = (activity as MainActivity).model
-        model.userOptionsData.observe(viewLifecycleOwner){
-            model.selectLanguage(model.getUserLangDef())
-        }
+//        model.userOptionsData.observe(viewLifecycleOwner){
+//            //model.selectLanguage(model.getUserLangDef())
+//        }
         model.selectedCounterpoint.observe(viewLifecycleOwner){
             if(model.selectedCounterpoint.value!!.parts.isNotEmpty()) {
                 model.changeActiveButtons( if(model.selectedCounterpoint.value!!.parts.size >= 12)

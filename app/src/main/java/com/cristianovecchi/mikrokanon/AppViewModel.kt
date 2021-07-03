@@ -46,13 +46,10 @@ sealed class Computation {
     data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int) : Computation()
 }
-enum class LANGUAGES(val language:String){
-    en("English"), fr("Français"), it("Italiano")
-}
+
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
                          val undo: Boolean = false, val expand: Boolean = true,
                          val counterpoint: Boolean = false, val freeparts: Boolean = false, val playOrStop: Boolean = true)
-
 
 class AppViewModel(
     application: Application,
@@ -113,9 +110,6 @@ class AppViewModel(
 
     private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
     val sequences : LiveData<List<ArrayList<Clip>>> = _sequences
-
-    private var _language = MutableLiveData(Lang())
-    var language: LiveData<Lang> = _language
 
 //    private var _deepSearch = MutableLiveData<Boolean>(false)
 //    var deepSearch: LiveData<Boolean> = _deepSearch
@@ -826,14 +820,8 @@ init{
             }
         }
     }
-
-    fun selectLanguage(userLangDef: String): Lang {
-        val newLanguage = Lang.provideLanguage(userLangDef)
-        _language.value = newLanguage
-        return newLanguage
-    }
     fun getUserLangDef(): String {
-        val systemLangDef = Locale.getDefault().language
+        val systemLangDef = getSystemLangDef()
         return if(userOptionsData.value != null && userOptionsData.value!!.isNotEmpty()) {
             if(userOptionsData.value!![0].language == "System") systemLangDef else userOptionsData.value!![0].language
         } else systemLangDef

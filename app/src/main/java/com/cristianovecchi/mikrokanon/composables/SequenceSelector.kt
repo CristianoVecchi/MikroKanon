@@ -24,6 +24,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.*
@@ -43,14 +44,21 @@ fun SequenceSelector(model: AppViewModel,
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
     val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons())
-    val language by model.language.asFlow().collectAsState(initial = Lang())
+
+    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+        .also{ val forceRecomposing = it.value.isEmpty()} // to force recomposing when options change
+    val language = Lang.provideLanguage(model.getUserLangDef())
     val notesNames = language.noteNames
-    Column(modifier = Modifier.fillMaxHeight().background(MaterialTheme.colors.drawerBackgroundColor)) {
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .background(MaterialTheme.colors.drawerBackgroundColor)) {
         val modifier3 = Modifier
-            .fillMaxWidth().background(backgroundColor)
+            .fillMaxWidth()
+            .background(backgroundColor)
             .weight(10f)
         val modifier1 = Modifier
-            .fillMaxSize().background(buttonsBackgroundColor)
+            .fillMaxSize()
+            .background(buttonsBackgroundColor)
             .fillMaxWidth()
             .weight(6f)
         val selected by model.selectedSequence.observeAsState(initial = -1)

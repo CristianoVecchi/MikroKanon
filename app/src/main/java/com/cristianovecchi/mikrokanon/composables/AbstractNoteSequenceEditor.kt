@@ -10,6 +10,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.ui.inputBackgroundColor
 import com.cristianovecchi.mikrokanon.ui.sequencesListBackgroundColor
 import kotlin.collections.HashMap
@@ -20,7 +21,9 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
     val dimensions = model.dimensions
     val nClipCols = dimensions.inputNclipColumns
     val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
-    val language by model.language.asFlow().collectAsState(initial = Lang())
+    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+        .also{ val forceRecomposing = it.value.isEmpty()} // to force recomposing when options change
+    val language = Lang.provideLanguage(model.getUserLangDef())
     val notesNames = language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)
     val cursor = remember { mutableStateOf(clips.size -1) }

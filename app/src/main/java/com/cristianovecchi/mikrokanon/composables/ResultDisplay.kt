@@ -19,6 +19,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.buttonsDisplayBackgroundColor
@@ -39,7 +40,9 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    val language by model.language.asFlow().collectAsState(initial = Lang())
+    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+        .also{ val forceRecomposing = it.value.isEmpty()} // to force recomposing when options change
+    val language = Lang.provideLanguage(model.getUserLangDef())
     val notesNames = language.noteNames
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames))}

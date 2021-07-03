@@ -34,9 +34,9 @@ class InputFragment(): Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val model = (activity as MainActivity).model
-        model.userOptionsData.observe(viewLifecycleOwner){
-            model.selectLanguage(model.getUserLangDef())
-        }
+//        model.userOptionsData.observe(viewLifecycleOwner){
+//            //model.selectLanguage(model.getUserLangDef())
+//        }
         return ComposeView(requireContext()).apply {
             setContent {
                 MikroKanonTheme {

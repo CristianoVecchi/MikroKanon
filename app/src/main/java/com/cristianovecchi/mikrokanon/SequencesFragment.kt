@@ -31,9 +31,9 @@ class SequencesFragment(): Fragment() {
                 ActiveButtons(editing = true, mikrokanon = true, counterpoint = true, freeparts = true)
             else ActiveButtons() )
         }
-        model.userOptionsData.observe(viewLifecycleOwner){
-            model.selectLanguage(model.getUserLangDef())
-        }
+//        model.userOptionsData.observe(viewLifecycleOwner){
+//            //model.selectLanguage(model.getUserLangDef())
+//        }
         model.setInitialBlankState()
         return ComposeView(requireContext()).apply {
             setContent {

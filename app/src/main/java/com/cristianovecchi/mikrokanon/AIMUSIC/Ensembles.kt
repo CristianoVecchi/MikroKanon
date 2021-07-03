@@ -3,12 +3,18 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES, DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS,  PIANO
 }
+val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente", "Saxophone", "Flauti",
+    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier")
 val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Saxophones", "Flutes",
     "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano")
+val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal", "Saxofones", "Flautas",
+    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano")
 val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni", "Saxofoni", "Flauti",
     "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte")
 val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Saxophones", "Flûtes",
     "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano")
+val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты", "Саксофоны", "Флейты",
+    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано")
 
 object Ensembles {
     fun getEnsemble(nParts: Int, type: EnsembleType): List<EnsemblePart> {

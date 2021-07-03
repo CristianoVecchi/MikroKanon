@@ -59,7 +59,7 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: Mutabl
         {
             itemsIndexed(clipsText) { i, col ->
                 Column(
-                    Modifier.width(65.dp)
+                    Modifier.width(70.dp)
                 ) {
                     for (j in col.indices) {
                         val clipText = col[j]
