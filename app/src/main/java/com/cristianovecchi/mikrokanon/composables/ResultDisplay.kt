@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,8 +41,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-        .also{ val forceRecomposing = it.value.isEmpty()} // to force recomposing when options change
+    model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val language = Lang.provideLanguage(model.getUserLangDef())
     val notesNames = language.noteNames
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())

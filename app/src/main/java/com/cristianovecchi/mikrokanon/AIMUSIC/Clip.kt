@@ -51,16 +51,16 @@ data class Clip(
         fun convertAbsToClipText(absPitch: Int, notesNames: List<String> ): String {
             return when (absPitch) {
                 0 -> notesNames[0]
-                1 -> "${notesNames[0]}#" //C#
+                1 -> "${notesNames[0]}♯" //C#
                 2 -> notesNames[1]
-                3 -> "${notesNames[2]}b" //Eb
+                3 -> "${notesNames[2]}♭" //Eb
                 4 -> notesNames[2]
                 5 -> notesNames[3]
-                6 -> "${notesNames[3]}#"//F#
+                6 -> "${notesNames[3]}♯"//F#
                 7 -> notesNames[4]
-                8 -> "${notesNames[4]}#"//G#
+                8 -> "${notesNames[4]}♯"//G#
                 9 -> notesNames[5]
-                10 -> "${notesNames[6]}b" //Bb
+                10 -> "${notesNames[6]}♭" //Bb
                 11 -> notesNames[6]
                 else -> ""
             }

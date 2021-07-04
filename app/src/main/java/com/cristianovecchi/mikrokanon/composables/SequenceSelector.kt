@@ -44,10 +44,13 @@ fun SequenceSelector(model: AppViewModel,
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
     val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons())
+    model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
+    var language = Lang.provideLanguage(model.getUserLangDef())
 
-    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-        .also{ val forceRecomposing = it.value.isEmpty()} // to force recomposing when options change
-    val language = Lang.provideLanguage(model.getUserLangDef())
+
+//    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+//        .also{ val forceRecomposing = it.value.isEmpty()} // to force recomposing when options change
+//
     val notesNames = language.noteNames
     Column(modifier = Modifier
         .fillMaxHeight()

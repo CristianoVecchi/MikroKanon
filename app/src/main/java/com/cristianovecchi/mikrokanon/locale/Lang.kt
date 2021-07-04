@@ -1,16 +1,37 @@
 package com.cristianovecchi.mikrokanon.locale
 
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
-import com.cristianovecchi.mikrokanon.AIMUSIC.ensembleNamesIt
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
-import com.cristianovecchi.mikrokanon.composables.NoteNamesFr
-import com.cristianovecchi.mikrokanon.composables.NoteNamesIt
-import com.cristianovecchi.mikrokanon.composables.NoteNamesRu
 
 enum class LANGUAGES(val language:String){
     de("Deutsch"), en("English"),es("Español"),
-    fr("Français"), it("Italiano"), ru("Русский")
+    fr("Français"), jp("日本語"),it("Italiano"), ru("Русский")
 }
+enum class NoteNamesIt {
+    Do,Re,Mi,Fa,Sol,La,Si,EMPTY
+}
+enum class NoteNamesFr {
+    Ut,Ré,Mi,Fa,Sol,La,Si,EMPTY
+}
+enum class NoteNamesRu {
+    До,Ре,Ми,Фа,Соль,Ля,Си,EMPTY
+}
+
+val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente", "Saxophone", "Flauti",
+    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier")
+val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Saxophones", "Flutes",
+    "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano")
+val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal", "Saxofones", "Flautas",
+    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano")
+val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器", "サックス", "フルート",
+    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ")
+val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni", "Saxofoni", "Flauti",
+    "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte")
+val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Saxophones", "Flûtes",
+    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano")
+val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты", "Саксофоны", "Флейты",
+    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано")
+
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
     "übermäßige Quarte", "Quinte", "kleine Sexte", "große Sexte", "kleine Septime", "große Septime",
     "Oktave", "kleine None", "große None", "kleine Dezime", "große Dezime", "Undezime",
@@ -36,6 +57,14 @@ val doublingRu = listOf("Секунда малая", "Секунда больш�
 "Октава", "Нона малая", "Нона большая", "Децима малая", "Децима большая", "Ундецима",
 "Ундецима увеличенная", "Дуодецима", "Терцдецима малая", "Терцдецима большая",
     "Квартдецима малая", "Квартдецима большая", "Квинтдецима ")
+val doublingJp = listOf("短2度","長2度","短3度","長3度","4度",
+"増4度","5度","短6度","長6度","短7度","長7度",
+"8度","短9度","長9度","短10度","長10度","11度",
+    "増11度","12度","短13度","長13度","短14度","長14度","15度")
+
+
+
+
 data class Lang( // English by default
     val noteNames: List<String> = NoteNamesEn.values().map { it.toString() },
     val enterSomeNotes: String = "Enter some notes!",
@@ -70,6 +99,7 @@ data class Lang( // English by default
                 "en" -> english()
                 "es" -> spanish()
                 "fr" -> french()
+                "jp" -> japanese()
                 "it" -> italian()
                 "ru" -> russian()
                 else -> Lang()
@@ -203,8 +233,34 @@ data class Lang( // English by default
                 doubling  = "Двойной",
                 spreadWherePossible  = "По возможности расширяйте",
                 deepSearch  = "Глубокий поиск в четырехголосых канонах",
-                exportMidi  = "Экспорт файла MIDI",
+                exportMidi  = "Экспорт файла МИДИ",
                 language  = "Язык",
+            )
+        }
+        fun japanese(): Lang {
+            return Lang(
+                noteNames = NoteNamesIt.values().map { it.toString() },
+                enterSomeNotes = "メモを入力してください！",
+                choose2ndSequence = "2番目のシーケンスを選択してください！",
+                repeatSequence = "シーケンスを繰り返します",
+                selectEnsemble = "アンサんブルを選いしてください！",
+                ensembleNames = ensembleNamesJp,
+                beatsPerMinute = "分あたりの拍数",
+                ensemble = "アンサンブル",
+                selectRhythm = "リズムを選んでください！",
+                selectDoubling = "倍増の間隔を選択してください！",
+                doublingNames = doublingJp,
+                rhythm = "リズム",
+                rhythmShuffle  = "混合リズム",
+                partsShuffle  = "混合声",
+                retrograde  = "後ろ向きに歩く",
+                inverse  = "間隔の反転",
+                invRetrograde  = "後ろ向きに歩くことで間隔を逆にする",
+                doubling  = "ダブルス",
+                spreadWherePossible  = "可能な場合は延長する",
+                deepSearch  = "4つの音声カノンでの詳細検索",
+                exportMidi  = "MIDIファイルをエクスポートする",
+                language  = "言語",
             )
         }
     }

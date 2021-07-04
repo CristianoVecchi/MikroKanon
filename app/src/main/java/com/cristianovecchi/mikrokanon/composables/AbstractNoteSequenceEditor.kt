@@ -6,6 +6,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
@@ -21,8 +22,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
     val dimensions = model.dimensions
     val nClipCols = dimensions.inputNclipColumns
     val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
-    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-        .also{ val forceRecomposing = it.value.isEmpty()} // to force recomposing when options change
+    model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val language = Lang.provideLanguage(model.getUserLangDef())
     val notesNames = language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)

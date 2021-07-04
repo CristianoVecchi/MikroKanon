@@ -319,6 +319,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                         "en" -> LANGUAGES.en.language
                         "es" -> LANGUAGES.es.language
                         "fr" -> LANGUAGES.fr.language
+                        "jp" -> LANGUAGES.jp.language
                         "it" -> LANGUAGES.it.language
                         "ru" -> LANGUAGES.ru.language
                         else -> LANGUAGES.en.language

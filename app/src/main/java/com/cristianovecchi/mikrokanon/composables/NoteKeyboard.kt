@@ -1,5 +1,9 @@
 package com.cristianovecchi.mikrokanon.composables
 
+
+import android.icu.lang.UCharacter
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -8,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -26,18 +31,15 @@ import com.cristianovecchi.mikrokanon.ui.iconButtonIconColor
 enum class NoteNamesEn(val abs:Int) {
     C(0),D(2),E(4),F(5),G(7),A(9),B(11),EMPTY(-1)
 }
-enum class NoteNamesIt {
-    Do,Re,Mi,Fa,Sol,La,Si,EMPTY
-}
-enum class NoteNamesFr {
-    Ut,Ré,Mi,Fa,Sol,La,Si,EMPTY
-}
-enum class NoteNamesRu {
-    До,Ре,Ми,Фа,Соль,Ля,Си,EMPTY
-}
+val doubleSharp = if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O) String(Character.toChars(0x1D12A)) else "♯"+"♯"
+val doubleFlat = if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O) String(Character.toChars(0x1D12B)) else "\u266D" + "\u266D"
 enum class Accidents(val ax : String, val sum : Int){
     //SHARP("\uF023"), FLAT("\uF062") , D_SHARP("\uF045"), D_FLAT("\uF0BA"), NATURAL("\uF06E")
-    SHARP("#", 1), FLAT("b", -1) , D_SHARP("x",2), D_FLAT("bb",-2), NATURAL("§",0), EMPTY("",0)
+    SHARP("\u266F", 1), FLAT("\u266D", -1) ,
+    D_SHARP(doubleSharp,2),D_FLAT(doubleFlat,-2), NATURAL("\u266E",0), EMPTY("",0)
+    //D_SHARP("𝄪",2),D_FLAT("𝄫",-2), NATURAL("\u266E",0), EMPTY("",0)
+
+
 }
 // Maestro Regular font
 // SHARP 61475 0xF023 // FLAT 61538 0xF062 // D_SHARP 61517 0xF045 //D_FLAT 61626 0xF0BA // NATURAL 61550 0xF06E
@@ -61,8 +63,7 @@ fun NoteKeyboard(
     model: AppViewModel,
     nRows: Int = 5, nCols: Int = 4, iconMap: Map<String,Int> = HashMap<String,Int>(),
     dispatch : (Out) -> Unit ) {
-    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-        .also{ val forceRecomposing = it.value.isEmpty()} // to force recomposing when options change
+    model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val language = Lang.provideLanguage(model.getUserLangDef())
     val names = language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)
