@@ -5,7 +5,8 @@ import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 
 enum class LANGUAGES(val language:String){
     de("Deutsch"), en("English"),es("Español"),
-    fr("Français"), jp("日本語"),it("Italiano"), ru("Русский")
+    fr("Français"), jp("日本語"),it("Italiano"),
+    ru("Русский"), zh("中文")
 }
 enum class NoteNamesIt {
     Do,Re,Mi,Fa,Sol,La,Si,EMPTY
@@ -31,6 +32,8 @@ val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres",
     "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano")
 val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты", "Саксофоны", "Флейты",
     "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано")
+val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器", "薩氏管", "长笛",
+    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴")
 
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
     "übermäßige Quarte", "Quinte", "kleine Sexte", "große Sexte", "kleine Septime", "große Septime",
@@ -61,7 +64,11 @@ val doublingJp = listOf("短2度","長2度","短3度","長3度","4度",
 "増4度","5度","短6度","長6度","短7度","長7度",
 "8度","短9度","長9度","短10度","長10度","11度",
     "増11度","12度","短13度","長13度","短14度","長14度","15度")
-
+val doublingZh = listOf("小二度","大二度","小三度","大三度","纯四度",
+    "增四度","纯五度","小六度","大六度","小七度","大七度",
+    "纯八度","小九度","大九度","小十度","大十度","纯十一度",
+    "增十一度","纯十二度","小十三度","大十三度","小十四度","大十四度",
+    "纯十五度")
 
 
 
@@ -102,6 +109,7 @@ data class Lang( // English by default
                 "jp" -> japanese()
                 "it" -> italian()
                 "ru" -> russian()
+                "zh" -> chinese()
                 else -> Lang()
             }
         }
@@ -240,7 +248,7 @@ data class Lang( // English by default
         fun japanese(): Lang {
             return Lang(
                 noteNames = NoteNamesIt.values().map { it.toString() },
-                enterSomeNotes = "メモを入力してください！",
+                enterSomeNotes = "音符を入力してください！",
                 choose2ndSequence = "2番目のシーケンスを選択してください！",
                 repeatSequence = "シーケンスを繰り返します",
                 selectEnsemble = "アンサんブルを選いしてください！",
@@ -261,6 +269,32 @@ data class Lang( // English by default
                 deepSearch  = "4つの音声カノンでの詳細検索",
                 exportMidi  = "MIDIファイルをエクスポートする",
                 language  = "言語",
+            )
+        }
+        fun chinese(): Lang {
+            return Lang(
+                noteNames = NoteNamesIt.values().map { it.toString() },
+                enterSomeNotes = "键入一些音符时间",
+                choose2ndSequence = "选择第二个序列！",
+                repeatSequence = "重复序列",
+                selectEnsemble = "选择合奏！",
+                ensembleNames = ensembleNamesZh,
+                beatsPerMinute = "每分钟节拍",
+                ensemble = "合奏",
+                selectRhythm = "选择节奏！",
+                selectDoubling = "选择度数加倍！",
+                doublingNames = doublingZh,
+                rhythm = "韵律",
+                rhythmShuffle  = "混合节奏",
+                partsShuffle  = "混合的声音",
+                retrograde  = "向后走",
+                inverse  = "反转间隔",
+                invRetrograde  = "向后走并反转间隔",
+                doubling  = "双打",
+                spreadWherePossible  = "尽可能延长",
+                deepSearch  = "四个语音标准中的深度搜索",
+                exportMidi  = "导出 MIDI 文件",
+                language  = "语",
             )
         }
     }

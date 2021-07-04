@@ -322,6 +322,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                         "jp" -> LANGUAGES.jp.language
                         "it" -> LANGUAGES.it.language
                         "ru" -> LANGUAGES.ru.language
+                        "zh" -> LANGUAGES.zh.language
                         else -> LANGUAGES.en.language
                     }
                     val languageIndex= languages.indexOf(languageName)
