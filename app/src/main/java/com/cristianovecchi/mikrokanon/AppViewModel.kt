@@ -1,10 +1,5 @@
 package com.cristianovecchi.mikrokanon
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.awaitAll
-import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -14,19 +9,13 @@ import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.db.SequenceData
 import com.cristianovecchi.mikrokanon.db.SequenceDataRepository
 import com.cristianovecchi.mikrokanon.midi.Player
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import android.media.MediaPlayer
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.collectAsState
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import androidx.core.content.FileProvider
-import androidx.lifecycle.Observer
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.db.UserOptionsDataRepository
 import java.io.File
@@ -34,8 +23,8 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
-import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.Dimensions
+import kotlinx.coroutines.*
 
 
 sealed class Computation {
@@ -100,6 +89,7 @@ class AppViewModel(
     }
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
+    var MKjob: Job? = null
 
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 36
     private var ensembleTypeSelected: EnsembleType = EnsembleType.STRING_ORCHESTRA
@@ -488,7 +478,7 @@ init{
         return newList
     }
     private fun findCounterpointsByMikroKanons4(){
-        viewModelScope.launch(Dispatchers.Main){
+        MKjob = viewModelScope.launch(Dispatchers.Main){
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
@@ -524,16 +514,16 @@ init{
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
             val emptinessGate = if(deepSearch) 0.5f else 1.0f
             val deepness = if(deepSearch) 3 else 2
-            var counterpoints = MikroKanon.findAll4AbsPartMikroKanons(
+            var counterpoints = MikroKanon.findAll4AbsPartMikroKanonsParallel(
                 sequence,  intervalSet.value!!, deepness, emptinessGate
-            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
+            ).pmap { it.toCounterpoint() }.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
             if(spreadWherePossible){
-                counterpoints = counterpoints.map{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                counterpoints = counterpoints.pmap{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             return counterpoints
     }
     private fun findCounterpointsByMikroKanons3(){
-        viewModelScope.launch(Dispatchers.Main){
+        MKjob = viewModelScope.launch(Dispatchers.Main){
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
                 val key = CacheKey(sequence, intervalSet.value!!)
@@ -557,11 +547,11 @@ init{
     private suspend fun findCpByMikroKanons3(): List<Counterpoint>{
         val spreadWherePossible = userOptionsData.value!![0].spread != 0
         val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
-        var counterpoints = MikroKanon.findAll3AbsPartMikroKanons(
-            sequence, intervalSet.value!!, 5
-            ).map { it.toCounterpoint() }.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
+        var counterpoints = MikroKanon.findAll3AbsPartMikroKanonsParallel(
+            sequence, intervalSet.value!!, 6
+            ).pmap { it.toCounterpoint() }.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
         if(spreadWherePossible){
-            counterpoints = counterpoints.map{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+            counterpoints = counterpoints.pmap{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
         }
         return counterpoints
     }
@@ -667,8 +657,10 @@ init{
         val newCounterpoint = Counterpoint.counterpointFromClipList(firstSequence.value!!)
         _selectedCounterpoint.value = newCounterpoint
     }
-
     fun setInitialBlankState() {
+        viewModelScope.launch {
+            MKjob?.cancelAndJoin()
+        }
         onStop()
         computationStack.clearAndDispatch()
         changeCounterPoints(listOf())
@@ -842,3 +834,4 @@ fun ArrayList<Clip>.toStringAll(notesNames: List<String>): String {
 suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
     map { async { f(it) } }.awaitAll()
 }
+

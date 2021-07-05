@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import android.os.Parcelable
+import com.cristianovecchi.mikrokanon.pmap
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
@@ -318,7 +319,7 @@ data class MikroKanon(val parts: List<AbsPart>,
             return result
         }
 
-        fun findAll3AbsPartMikroKanons(
+        suspend fun findAll3AbsPartMikroKanons(
             absPitches: List<Int>,
             intervalSet: List<Int>,
             deepness: Int
@@ -351,8 +352,117 @@ data class MikroKanon(val parts: List<AbsPart>,
             }
             return result
         }
+        suspend fun findAll3AbsPartMikroKanonsParallel(
+            absPitches: List<Int>,
+            intervalSet: List<Int>,
+            deepness: Int
+        ): List<MikroKanon> {
+            data class Params(
+                              val delay1: Int, val transpose1: Int, val form1: Int,
+                              val delay2: Int, val transpose2: Int, val form2: Int)
+            val paramsList = mutableListOf<Params>()
+            //val result = mutableListOf<MikroKanon>()
+            // delay = 0 CASE requires another algorhythm
+            for (delay1 in 1 until deepness) {
+                for (delay2 in delay1 + 1 until deepness + delay1) {
+                    var mikroKanon: MikroKanon
+                    for (tr1 in 0 until 12) {
+                        for (form1 in 0 until 4) {
+                            for (tr2 in 0 until 12) {
+                                for (form2 in 0 until 4) {
+                                    paramsList.add(Params(delay1, tr1, form1, delay2, tr2, form2))
+//                                    mikroKanon = find3AbsPartMikroKanon(
+//                                        absPitches,
+//                                        intervalSet,
+//                                        delay1,
+//                                        tr1,
+//                                        form1,
+//                                        delay2,
+//                                        tr2,
+//                                        form2
+//                                    )
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return paramsList.pmap {  find3AbsPartMikroKanon(absPitches, intervalSet,
+                it.delay1,it.transpose1, it.form1,it.delay2, it.transpose2, it.form2)}
+        }
 
 
+        suspend fun findAll4AbsPartMikroKanonsParallel(
+            absPitches: List<Int>,
+            intervalSet: List<Int>,
+            deepness: Int,
+            emptinessGate: Float = 1.0f // no check
+        ): List<MikroKanon> {
+            data class Params(
+                val delay1: Int, val transpose1: Int, val form1: Int,
+                val delay2: Int, val transpose2: Int, val form2: Int,
+                val delay3: Int, val transpose3: Int, val form3: Int
+                )
+            val paramsList = mutableListOf<Params>()
+            //val result = mutableListOf<MikroKanon>()
+            // delay = 0 CASE requires another algorhythm
+            try{
+                for (delay1 in 1 until deepness) {
+                    for (delay2 in delay1 + 1 until deepness + delay1) {
+                        for (delay3 in delay2 + 1 until deepness + delay2) {
+
+                            var mikroKanon: MikroKanon
+                            for (tr1 in 0 until 12) {
+                                for (form1 in 0 until 4) {
+                                    for (tr2 in 0 until 12) {
+                                        for (form2 in 0 until 4) {
+                                            for (tr3 in 0 until 12) {
+                                                for (form3 in 0 until 4) {
+                                                    paramsList.add(Params(delay1, tr1, form1, delay2, tr2, form2,delay3, tr3, form3))
+//                                                    mikroKanon = find4AbsPartMikroKanon(
+//                                                        absPitches,
+//                                                        intervalSet,
+//                                                        delay1,
+//                                                        tr1,
+//                                                        form1,
+//                                                        delay2,
+//                                                        tr2,
+//                                                        form2,
+//                                                        delay3,
+//                                                        tr3,
+//                                                        form3
+//                                                    )
+//                                                    if(emptinessGate < 1.0f){
+//                                                        if(mikroKanon.findEmptiness() < emptinessGate) result.add(mikroKanon)
+//                                                    } else {
+//                                                        result.add(mikroKanon)
+//                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (ex: OutOfMemoryError){
+                return MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
+            }
+
+            try{
+                return paramsList.pmap {
+                    val mk = find4AbsPartMikroKanon(absPitches, intervalSet,
+                    it.delay1,it.transpose1, it.form1,it.delay2, it.transpose2, it.form2, it.delay3, it.transpose3, it.form3)
+                    if(mk.findEmptiness() < emptinessGate) mk else null
+                }.mapNotNull { it }
+            }catch (ex: OutOfMemoryError){
+                return MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
+            }
+
+        }
         fun findAll4AbsPartMikroKanons(
             absPitches: List<Int>,
             intervalSet: List<Int>,
@@ -407,7 +517,9 @@ data class MikroKanon(val parts: List<AbsPart>,
 
             return result
         }
+
     }
+
 }
 
 
