@@ -314,19 +314,8 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                 "Language" -> {
                     val languages = LANGUAGES.values().map{ it.language }
                     val langDef: String = if(userOptions.language == "System") model.getSystemLangDef() else userOptions.language
-                    val languageName = when(langDef){
-                        "de" -> LANGUAGES.de.language
-                        "en" -> LANGUAGES.en.language
-                        "es" -> LANGUAGES.es.language
-                        "fr" -> LANGUAGES.fr.language
-                        "jp" -> LANGUAGES.jp.language
-                        "it" -> LANGUAGES.it.language
-                        "ru" -> LANGUAGES.ru.language
-                        "zh" -> LANGUAGES.zh.language
-                        else -> LANGUAGES.en.language
-                    }
+                    val languageName = LANGUAGES.languageNameFromDef(langDef)
                     val languageIndex= languages.indexOf(languageName)
-
                         SelectableCard(text = "${lang.language}: $languageName", fontSize = fontSize, isSelected = true,onClick = {
                             listDialogData.value = ListDialogData(true,languages,languageIndex,"Select a Language!"
                             ) { index ->

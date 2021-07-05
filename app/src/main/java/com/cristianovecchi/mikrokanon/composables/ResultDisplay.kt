@@ -97,9 +97,9 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                        // if(model.selectedCounterpoint.value!! == counterpoint) indexSelected = index
                     }
                 }
-                if(scrollToTopList) {
+                if(scrollToTopList && !elaborating) {
                     coroutineScope.launch {
-                        delay(150)
+                        delay(200)
                         listState.animateScrollToItem(0)
                         scrollToTopList = false
                     }

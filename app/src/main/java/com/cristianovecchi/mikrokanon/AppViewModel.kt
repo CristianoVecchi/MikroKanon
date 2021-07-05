@@ -23,6 +23,7 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.*
 
@@ -461,7 +462,9 @@ init{
                 newList = findFreePts(trend)
             }
             changeCounterPoints(newList)
-            counterpoints.value?.get(0)?.let {changeSelectedCounterpoint(it)}
+            counterpoints.value?.let{
+                if(it.isNotEmpty()) changeSelectedCounterpoint(it[0])
+            }
             // println("STACK SIZE: ${counterpointStack.size}")
         }
     }
@@ -502,17 +505,29 @@ init{
                     }
                     _elaborating.value = false
                     changeCounterPoints(newList)
-                    counterpoints.value?.get(0)?.let { changeSelectedCounterpoint(it) }
+                    counterpoints.value?.let{
+                        if(it.isNotEmpty()) changeSelectedCounterpoint(it[0])
+                    }
                 }
             }
         }
     }
 
+
     private suspend fun findCpByMikroKanons4(): List<Counterpoint> {
         val spreadWherePossible = userOptionsData.value!![0].spread != 0
             val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
-            val emptinessGate = if(deepSearch) 0.5f else 1.0f
+            val emptinessGate = if(!deepSearch) 1.0f else when (intervalSet.value!!.size) {
+                                                                        0 -> 0.69f
+                                                                        in 1..2 -> 0.66f
+                                                                        in 3..4 -> 0.63f
+                                                                        in 5..6 -> 0.60f
+                                                                        in 7..8 -> 0.55f
+                                                                        in 9..10 -> 0.25f
+                                                                        in 11..12 -> 0.15f
+                                                                        else -> 0.001f
+                                                                    }
             val deepness = if(deepSearch) 3 else 2
             var counterpoints = MikroKanon.findAll4AbsPartMikroKanonsParallel(
                 sequence,  intervalSet.value!!, deepness, emptinessGate
@@ -539,7 +554,9 @@ init{
                     mk3cache[key] = newList
                     _elaborating.value = false
                     changeCounterPoints(newList)
-                    counterpoints.value?.get(0)?.let { changeSelectedCounterpoint(it) }
+                    counterpoints.value?.let{
+                        if(it.isNotEmpty()) changeSelectedCounterpoint(it[0])
+                    }
                 }
             }
         }

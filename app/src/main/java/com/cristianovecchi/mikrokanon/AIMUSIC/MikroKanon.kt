@@ -1,9 +1,13 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import android.os.Build
 import android.os.Parcelable
+import androidx.annotation.RequiresApi
 import com.cristianovecchi.mikrokanon.pmap
 import kotlinx.android.parcel.Parcelize
 import java.util.*
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
 @Parcelize
 data class MikroKanon(val parts: List<AbsPart>,
@@ -388,9 +392,15 @@ data class MikroKanon(val parts: List<AbsPart>,
                     }
                 }
             }
-            return paramsList.pmap {  find3AbsPartMikroKanon(absPitches, intervalSet,
-                it.delay1,it.transpose1, it.form1,it.delay2, it.transpose2, it.form2)}
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                paramsList.parallelStream().map {  find3AbsPartMikroKanon(absPitches, intervalSet,
+                    it.delay1,it.transpose1, it.form1,it.delay2, it.transpose2, it.form2)}.collect(Collectors.toList<MikroKanon>())
+            } else {
+                paramsList.pmap {  find3AbsPartMikroKanon(absPitches, intervalSet,
+                    it.delay1,it.transpose1, it.form1,it.delay2, it.transpose2, it.form2)}
+            }
         }
+
 
 
         suspend fun findAll4AbsPartMikroKanonsParallel(
@@ -453,11 +463,19 @@ data class MikroKanon(val parts: List<AbsPart>,
             }
 
             try{
-                return paramsList.pmap {
-                    val mk = find4AbsPartMikroKanon(absPitches, intervalSet,
-                    it.delay1,it.transpose1, it.form1,it.delay2, it.transpose2, it.form2, it.delay3, it.transpose3, it.form3)
-                    if(mk.findEmptiness() < emptinessGate) mk else null
-                }.mapNotNull { it }
+                return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    paramsList.parallelStream().map{
+                        val mk = find4AbsPartMikroKanon(absPitches, intervalSet,
+                        it.delay1,it.transpose1, it.form1,it.delay2, it.transpose2, it.form2, it.delay3, it.transpose3, it.form3)
+                        if(mk.findEmptiness() < emptinessGate) mk else null
+                    }.filter{ it != null }.collect(Collectors.toList<MikroKanon>())
+                } else {
+                    return paramsList.pmap {
+                        val mk = find4AbsPartMikroKanon(absPitches, intervalSet,
+                            it.delay1,it.transpose1, it.form1,it.delay2, it.transpose2, it.form2, it.delay3, it.transpose3, it.form3)
+                        if(mk.findEmptiness() < emptinessGate) mk else null
+                    }.mapNotNull { it }
+                }
             }catch (ex: OutOfMemoryError){
                 return MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
             }

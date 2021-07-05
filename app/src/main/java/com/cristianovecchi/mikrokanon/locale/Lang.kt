@@ -5,8 +5,24 @@ import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 
 enum class LANGUAGES(val language:String){
     de("Deutsch"), en("English"),es("Español"),
-    fr("Français"), jp("日本語"),it("Italiano"),
-    ru("Русский"), zh("中文")
+    fr("Français"), ko("한국어") ,jp("日本語"),
+    it("Italiano"), ru("Русский"), zh("中文");
+    companion object {
+        fun languageNameFromDef(langDef: String): String {
+            return when (langDef) {
+                "de" -> LANGUAGES.de.language
+                "en" -> LANGUAGES.en.language
+                "es" -> LANGUAGES.es.language
+                "fr" -> LANGUAGES.fr.language
+                "ko" -> LANGUAGES.ko.language
+                "jp" -> LANGUAGES.jp.language
+                "it" -> LANGUAGES.it.language
+                "ru" -> LANGUAGES.ru.language
+                "zh" -> LANGUAGES.zh.language
+                else -> LANGUAGES.en.language
+            }
+        }
+    }
 }
 enum class NoteNamesIt {
     Do,Re,Mi,Fa,Sol,La,Si,EMPTY
@@ -24,6 +40,8 @@ val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass"
     "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano")
 val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal", "Saxofones", "Flautas",
     "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano")
+val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기", "색소폰", "플루트",
+    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노")
 val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器", "サックス", "フルート",
     "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ")
 val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni", "Saxofoni", "Flauti",
@@ -60,6 +78,11 @@ val doublingRu = listOf("Секунда малая", "Секунда больш�
 "Октава", "Нона малая", "Нона большая", "Децима малая", "Децима большая", "Ундецима",
 "Ундецима увеличенная", "Дуодецима", "Терцдецима малая", "Терцдецима большая",
     "Квартдецима малая", "Квартдецима большая", "Квинтдецима ")
+val doublingKo = listOf("단2도","장2도","단3도","장3도","완전4도",
+    "트라이톤","완전5도","단6도","장6도","단7도","장7도",
+    "완전8도","단9도","장9도","단10도","장10도","완전11도",
+    "완전8도+트라이톤","완전12도","단13도","장13도","단14도","장14도",
+    "완전15도")
 val doublingJp = listOf("短2度","長2度","短3度","長3度","4度",
 "増4度","5度","短6度","長6度","短7度","長7度",
 "8度","短9度","長9度","短10度","長10度","11度",
@@ -69,8 +92,6 @@ val doublingZh = listOf("小二度","大二度","小三度","大三度","纯四�
     "纯八度","小九度","大九度","小十度","大十度","纯十一度",
     "增十一度","纯十二度","小十三度","大十三度","小十四度","大十四度",
     "纯十五度")
-
-
 
 data class Lang( // English by default
     val noteNames: List<String> = NoteNamesEn.values().map { it.toString() },
@@ -106,6 +127,7 @@ data class Lang( // English by default
                 "en" -> english()
                 "es" -> spanish()
                 "fr" -> french()
+                "ko" -> korean()
                 "jp" -> japanese()
                 "it" -> italian()
                 "ru" -> russian()
@@ -243,6 +265,32 @@ data class Lang( // English by default
                 deepSearch  = "Глубокий поиск в четырехголосых канонах",
                 exportMidi  = "Экспорт файла МИДИ",
                 language  = "Язык",
+            )
+        }
+        fun korean(): Lang {
+            return Lang(
+                noteNames = NoteNamesIt.values().map { it.toString() },
+                enterSomeNotes = "음표를 입력하세요!",
+                choose2ndSequence = "두 번째 시퀀스를 선택하십시오!",
+                repeatSequence = "순서를 반복하십시오",
+                selectEnsemble = "앙상블을 선택하십시오!",
+                ensembleNames = ensembleNamesKo,
+                beatsPerMinute = "분당 박동",
+                ensemble = "앙상블",
+                selectRhythm = "리듬을 선택하세요!",
+                selectDoubling = "배가 간격을 선택하십시오!",
+                doublingNames = doublingKo,
+                rhythm = "율",
+                rhythmShuffle  = "혼합 된 리듬",
+                partsShuffle  = "혼성",
+                retrograde  = "뒤로 걷다",
+                inverse  = "역 동작",
+                invRetrograde  = "움직임을 뒤집고 뒤로 걸어",
+                doubling  = "복식",
+                spreadWherePossible  = "가능한 한 확장",
+                deepSearch  = "네 가지 음성 음악 캐논에서 심층 검색",
+                exportMidi  = "MIDI 파일 내보내기",
+                language  = "언어",
             )
         }
         fun japanese(): Lang {
