@@ -23,10 +23,8 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
-import androidx.annotation.RequiresApi
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.asFlow
 
 
 sealed class Computation {
@@ -35,7 +33,7 @@ sealed class Computation {
     data class FurtherFromKP(val counterpoint: Counterpoint,val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
     data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
-    data class Expand(val counterpoints: List<Counterpoint>, val index: Int) : Computation()
+    data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2 ) : Computation()
 }
 
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
@@ -241,13 +239,13 @@ init{
             refreshComputation(false)
     }
     val onExpand = {
-        val counterpointsClone = counterpoints.value!!.map{
-            it.clone()
-        }
+        val lastComputation = computationStack.peek()
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
-        computationStack.pushAndDispatch(Computation.Expand(counterpointsClone, index))
-        expandCounterpoints(index)
-        println("ON EXPAND")
+        val originalCounterpoints = if(lastComputation is Computation.Expand) lastComputation.counterpoints
+                                    else counterpoints.value!!.map{ it.clone() }
+        val expansion = if(lastComputation is Computation.Expand) lastComputation.extension + 1 else 2
+        computationStack.pushAndDispatch(Computation.Expand(originalCounterpoints, index, expansion))
+        expandCounterpoints(originalCounterpoints, index, expansion)
     }
     val onKPfurtherSelections = {index: Int , repeat: Boolean->
         computationStack.pushAndDispatch(Computation.FurtherFromKP(selectedCounterpoint.value!!.clone(), index, repeat))
@@ -391,8 +389,8 @@ init{
                     is Computation.Expand -> {
                         //val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
                         if(stepBack){
-                            changeCounterPoints(previousComputation.counterpoints)
-                            expandCounterpoints(previousComputation.index)
+                            expandCounterpoints(previousComputation.counterpoints,
+                                                previousComputation.index, previousComputation.extension)
                         } else {
                             _elaborating.value = false
                             var count = 0
@@ -529,9 +527,9 @@ init{
                                                                         in 11..12 -> 0.15f
                                                                         else -> 0.001f
                                                                     }
-            val deepness = if(deepSearch) 3 else 2
+            val depth = if(deepSearch) 4 else 2
             var counterpoints = MikroKanon.findAll4AbsPartMikroKanonsParallel(
-                sequence,  intervalSet.value!!, deepness, emptinessGate
+                sequence,  intervalSet.value!!, depth, emptinessGate
             ).pmap { it.toCounterpoint() }.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
             if(spreadWherePossible){
                 counterpoints = counterpoints.pmap{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
@@ -600,12 +598,12 @@ init{
         }
         return counterpoints
     }
-    private fun expandCounterpoints(index: Int){
+    private fun expandCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int, extension: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
-                    newList = expandCps()
+                    newList = expandCps(originalCounterpoints, extension)
                 }
                 changeCounterPoints(newList)
                 if(index in counterpoints.value!!.indices){
@@ -617,9 +615,9 @@ init{
             }
         }
     }
-    private suspend fun expandCps(): List<Counterpoint>{
-        return counterpoints.value!!.map{
-            Counterpoint.expand(it,2)
+    private suspend fun expandCps(originalCounterpoints: List<Counterpoint>, extension: Int): List<Counterpoint>{
+        return originalCounterpoints.map{
+            Counterpoint.expand(it,extension)
         }
     }
     private fun addRepeatedSequenceToCounterpoint(){

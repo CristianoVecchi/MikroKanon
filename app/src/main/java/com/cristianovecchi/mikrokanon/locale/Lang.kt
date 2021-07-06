@@ -4,22 +4,24 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 
 enum class LANGUAGES(val language:String){
+    ar("العربية"),
     de("Deutsch"), en("English"),es("Español"),
     fr("Français"), ko("한국어") ,jp("日本語"),
     it("Italiano"), ru("Русский"), zh("中文");
     companion object {
         fun languageNameFromDef(langDef: String): String {
             return when (langDef) {
-                "de" -> LANGUAGES.de.language
-                "en" -> LANGUAGES.en.language
-                "es" -> LANGUAGES.es.language
-                "fr" -> LANGUAGES.fr.language
-                "ko" -> LANGUAGES.ko.language
-                "jp" -> LANGUAGES.jp.language
-                "it" -> LANGUAGES.it.language
-                "ru" -> LANGUAGES.ru.language
-                "zh" -> LANGUAGES.zh.language
-                else -> LANGUAGES.en.language
+                "ar" -> ar.language
+                "de" -> de.language
+                "en" -> en.language
+                "es" -> es.language
+                "fr" -> fr.language
+                "ko" -> ko.language
+                "jp" -> jp.language
+                "it" -> it.language
+                "ru" -> ru.language
+                "zh" -> zh.language
+                else -> en.language
             }
         }
     }
@@ -33,25 +35,30 @@ enum class NoteNamesFr {
 enum class NoteNamesRu {
     До,Ре,Ми,Фа,Соль,Ля,Си,EMPTY
 }
-
+//enum class NoteNamesAr {
+//    دو, ري, مي, فا, صول, لا,سي , EMPTY
+//}
+val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية", "ساكسفون", "فلوت",
+    "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","بييرو")
 val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente", "Saxophone", "Flauti",
-    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier")
+    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Pierrot")
 val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Saxophones", "Flutes",
-    "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano")
+    "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","Pierrot")
 val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal", "Saxofones", "Flautas",
-    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano")
+    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Pierrot")
 val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기", "색소폰", "플루트",
-    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노")
+    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","피에로")
 val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器", "サックス", "フルート",
-    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ")
+    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ピエロ")
 val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni", "Saxofoni", "Flauti",
-    "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte")
+    "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte","Pierrot")
 val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Saxophones", "Flûtes",
-    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano")
+    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Pierrot")
 val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты", "Саксофоны", "Флейты",
-    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано")
+    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано","Пьеро")
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器", "薩氏管", "长笛",
-    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴")
+    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","皮埃罗")
+
 
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
     "übermäßige Quarte", "Quinte", "kleine Sexte", "große Sexte", "kleine Septime", "große Septime",
@@ -123,6 +130,7 @@ data class Lang( // English by default
     companion object {
         fun provideLanguage(lang: String): Lang {
             return when (lang){
+                "ar" -> arabian()
                 "de" -> german()
                 "en" -> english()
                 "es" -> spanish()
@@ -343,6 +351,33 @@ data class Lang( // English by default
                 deepSearch  = "四个语音标准中的深度搜索",
                 exportMidi  = "导出 MIDI 文件",
                 language  = "语",
+            )
+        }
+
+        fun arabian(): Lang {
+            return Lang(
+                noteNames = listOf("دو","ري","مي","فا","صول","لا","سي"),
+                enterSomeNotes = "!اكتب بعض النوتات الموسيقية",
+                choose2ndSequence = "!اختر التسلسل الثاني",
+                repeatSequence = "كرر التسلسل",
+                ensemble ="الفرقة",
+                selectEnsemble = "!اختر مجموعة",
+                ensembleNames = ensembleNamesAr,
+                beatsPerMinute = "نبضة في الدقيقة",
+                selectRhythm = "!اختر إيقاعًا",
+                selectDoubling = "!اختر فترات لمضاعفة",
+                doublingNames = doublingIt,
+                rhythm = "إيقاع",
+                rhythmShuffle  = "إيقاع مختلط",
+                partsShuffle  = "اصوات مختلطة",
+                retrograde  = "المشي إلى الخلف",
+                inverse  = "اعكس الحركات",
+                invRetrograde  = "اعكس الحركات وامش للخلف",
+                doubling  = "الزوجي",
+                spreadWherePossible  = "قم بالتمديد حيثما أمكن ذلك",
+                deepSearch  = "بحث عميق في أربعة شرائع صوتية",
+                exportMidi  = "تصدير ملف MIDI",
+                language  = "لغة",
             )
         }
     }

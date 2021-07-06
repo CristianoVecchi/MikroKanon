@@ -1,7 +1,8 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 enum class EnsembleType {
-    STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES, DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS,  PIANO
+    STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES,
+    DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, PIERROT
 }
 
 
@@ -19,6 +20,7 @@ object Ensembles {
             EnsembleType.BASSOONS -> getBassoons(nParts)
             EnsembleType.CELLOS -> getCellos(nParts)
             EnsembleType.PIANO -> getPiano(nParts)
+            EnsembleType.PIERROT -> getPierrot(nParts)
         }
     }
 
@@ -734,5 +736,72 @@ object Ensembles {
             else -> listOf()
         }
     }
+    fun getPierrot(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            1, 2, 3 -> listOf(
+                EnsemblePart(FLUTE, 4),
+                EnsemblePart(PIANO, 3),
+                EnsemblePart(CELLO, 2)
+            )
+            in (4..6) -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 4),
+                EnsemblePart(PIANO, 4),
+                EnsemblePart(CLARINET, 3),
+                EnsemblePart(CELLO, 2),
+                EnsemblePart(PIANO, 1),
+            )
+            7 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 4),
+                EnsemblePart(CLARINET, 4),
+                EnsemblePart(PIANO, 4),
+                EnsemblePart(CELLO, 3),
+                EnsemblePart(PIANO, 2),
+                EnsemblePart(PIANO, 1),
+            )
+            8 -> listOf(
+                EnsemblePart(PIANO, 6),
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 4),
+                EnsemblePart(CLARINET, 4),
+                EnsemblePart(PIANO, 3),
+                EnsemblePart(CELLO, 3),
+                EnsemblePart(PIANO, 2),
+                EnsemblePart(PIANO, 1),
+            )
+            9 -> listOf(
+                EnsemblePart(PIANO, 6),
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 4),
+                EnsemblePart(CLARINET, 4),
+                EnsemblePart(PIANO, 4),
+                EnsemblePart(PIANO, 3),
+                EnsemblePart(CELLO, 3),
+                EnsemblePart(PIANO, 2),
+                EnsemblePart(PIANO, 1),
+            )
+            in 10..12 -> listOf(
+                EnsemblePart(PIANO, 7),
+                EnsemblePart(PIANO, 6),
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(PIANO, 5),
+                EnsemblePart(VIOLIN, 4),
+                EnsemblePart(CLARINET, 4),
+                EnsemblePart(PIANO, 4),
+                EnsemblePart(PIANO, 3),
+                EnsemblePart(CELLO, 3),
+                EnsemblePart(PIANO, 2),
+                EnsemblePart(PIANO, 2),
+                EnsemblePart(PIANO, 1),
+            )
+            else -> listOf()
+        }
+    }
 }
 data class EnsemblePart( val instrument: Int, val octave: Int)
+const val PIANO = 0
+const val VIOLIN = 40
+const val CELLO = 42
+const val FLUTE = 73
+const val CLARINET = 71
