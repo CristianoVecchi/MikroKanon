@@ -26,6 +26,7 @@ import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.asFlow
 
 
 sealed class Computation {
@@ -849,6 +850,7 @@ fun ArrayList<Clip>.toStringAll(notesNames: List<String>): String {
 
 //TODO: implement in CounterpointInterpreter
 suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
-    map { async { f(it) } }.awaitAll()
+        map { async() { f(it) } }.awaitAll()
 }
+
 

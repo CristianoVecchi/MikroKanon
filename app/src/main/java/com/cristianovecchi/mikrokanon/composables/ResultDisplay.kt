@@ -20,7 +20,6 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
-import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.buttonsDisplayBackgroundColor
@@ -74,7 +73,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
             Box(modifier = modifier4) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), state = listState)
                 {
-                    itemsIndexed(counterpointsData) { index, counterpointsData ->
+                    itemsIndexed(counterpointsData) { _ , counterpointsData ->
                         val counterpoint = counterpointsData.first
                         val parts = counterpointsData.second
                         val maxSize = parts.maxOf { it.size }
@@ -100,7 +99,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 if(scrollToTopList && !elaborating) {
                     coroutineScope.launch {
                         delay(200)
-                        listState.animateScrollToItem(0)
+                        if(counterpointsData.isNotEmpty()) listState.animateScrollToItem(0)
                         scrollToTopList = false
                     }
                 }
@@ -164,21 +163,21 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         fontSize = dimensions.outputFPbuttonFontSize,
                         isActive = activeButtons.freeparts,
                         onAscDynamicClick = {
-                            if (!elaborating) onFreePart(TREND.ASCENDANT_DYNAMIC);
+                            if (!elaborating) onFreePart(TREND.ASCENDANT_DYNAMIC)
                             scrollToTopList = true
                         },
                         onAscStaticClick = {
-                            if (!elaborating) onFreePart(TREND.ASCENDANT_STATIC);
+                            if (!elaborating) onFreePart(TREND.ASCENDANT_STATIC)
                             scrollToTopList = true
 
                         },
                         onDescDynamicClick = {
-                            if (!elaborating) onFreePart(TREND.DESCENDANT_DYNAMIC);
+                            if (!elaborating) onFreePart(TREND.DESCENDANT_DYNAMIC)
                             scrollToTopList = true
 
                         },
                         onDescStaticClick = {
-                            if (!elaborating) onFreePart(TREND.DESCENDANT_STATIC);
+                            if (!elaborating) onFreePart(TREND.DESCENDANT_STATIC)
                             scrollToTopList = true
                         }
                     )
