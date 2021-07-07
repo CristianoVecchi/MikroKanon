@@ -2,7 +2,8 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES,
-    DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, PIERROT, BAROQUE
+    DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, PIERROT,
+    BAROQUE, PLUCKED_STRINGS
 }
 
 
@@ -22,6 +23,7 @@ object Ensembles {
             EnsembleType.PIANO -> getPiano(nParts)
             EnsembleType.PIERROT -> getPierrot(nParts)
             EnsembleType.BAROQUE -> getBaroque(nParts)
+            EnsembleType.PLUCKED_STRINGS -> getPluckedStrings(nParts)
         }
     }
 
@@ -906,18 +908,134 @@ object Ensembles {
             else -> listOf()
         }
     }
+    fun getPluckedStrings(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            1, 2 -> listOf(
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 3)
+            )
+            3 -> listOf(
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 3),
+                EnsemblePart(HARP, 3)
+            )
+            4 -> listOf(
+                EnsemblePart(HARP, 5),
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 3),
+                EnsemblePart(HARP, 3)
+            )
+            5 -> listOf(
+                EnsemblePart(HARP, 5),
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 3),
+                EnsemblePart(HARP, 3)
+            )
+            6 -> listOf(
+                EnsemblePart(HARP, 5),
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 4),
+                EnsemblePart(HARP, 4),
+                EnsemblePart(NYLON_GUITAR, 3),
+                EnsemblePart(HARP, 3)
+            )
+            7 -> listOf(
+                EnsemblePart(GUITAR_HARMONICS, 6),
+                EnsemblePart(HARP, 5),
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 4),
+                EnsemblePart(HARP, 4),
+                EnsemblePart(NYLON_GUITAR, 3),
+                EnsemblePart(HARP, 3)
+            )
+            8 -> listOf(
+                EnsemblePart(GUITAR_HARMONICS, 6),
+                EnsemblePart(HARP, 5),
+                EnsemblePart(BANJO, 5),
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 4),
+                EnsemblePart(HARP, 4),
+                EnsemblePart(NYLON_GUITAR, 3),
+                EnsemblePart(HARP, 3)
+            )
+            9 -> listOf(
+                EnsemblePart(GUITAR_HARMONICS, 6),
+                EnsemblePart(HARP, 5),
+                EnsemblePart(BANJO, 5),
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 4),
+                EnsemblePart(SITAR, 4),
+                EnsemblePart(HARP, 3),
+                EnsemblePart(NYLON_GUITAR, 3),
+                EnsemblePart(HARP, 3)
+            )
+            10 -> listOf(
+                EnsemblePart(GUITAR_HARMONICS, 6),
+                EnsemblePart(HARP, 5),
+                EnsemblePart(BANJO, 5),
+                EnsemblePart(KOTO, 5),
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 4),
+                EnsemblePart(SITAR, 4),
+                EnsemblePart(HARP, 3),
+                EnsemblePart(NYLON_GUITAR, 3),
+                EnsemblePart(HARP, 3)
+            )
+            11 -> listOf(
+                EnsemblePart(GUITAR_HARMONICS, 6),
+                EnsemblePart(HARP, 5),
+                EnsemblePart(BANJO, 5),
+                EnsemblePart(KOTO, 5),
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 4),
+                EnsemblePart(SITAR, 4),
+                EnsemblePart(HARP, 3),
+                EnsemblePart(SHAMISEN, 3),
+                EnsemblePart(NYLON_GUITAR, 3),
+                EnsemblePart(HARP, 3)
+            )
+            12 -> listOf(
+                EnsemblePart(GUITAR_HARMONICS, 6),
+                EnsemblePart(HARP, 5),
+                EnsemblePart(BANJO, 5),
+                EnsemblePart(KOTO, 5),
+                EnsemblePart(CLEAN_GUITAR, 4),
+                EnsemblePart(NYLON_GUITAR, 4),
+                EnsemblePart(SITAR, 4),
+                EnsemblePart(HARP, 3),
+                EnsemblePart(CLEAN_GUITAR, 3),
+                EnsemblePart(SHAMISEN, 3),
+                EnsemblePart(NYLON_GUITAR, 3),
+                EnsemblePart(HARP, 3)
+            )
+            else -> listOf()
+        }
+    }
 }
 data class EnsemblePart( val instrument: Int, val octave: Int)
 const val PIANO = 0
 const val HARPSICHORD = 6
+const val NYLON_GUITAR = 24
+const val STEEL_GUITAR = 25
+const val CLEAN_GUITAR = 27
+const val GUITAR_HARMONICS= 31
+const val ACOUSTIC_BASS= 32
 const val VIOLIN = 40
 const val VIOLA = 41
 const val CELLO = 42
 const val DOUBLEBASS = 43
 const val PIZZICATO = 45
+const val HARP = 46
 const val STRING_ORCHESTRA = 48
 const val OBOE = 68
 const val BASSOON = 70
 const val FLUTE = 73
 const val RECORDER = 74
 const val CLARINET = 71
+const val SITAR = 104
+const val BANJO = 105
+const val SHAMISEN = 106
+const val KOTO = 107
+
+

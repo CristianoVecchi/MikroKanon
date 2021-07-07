@@ -7,7 +7,8 @@ enum class LANGUAGES(val language:String){
     ar("العربية"),
     de("Deutsch"), el("Ελληνικά"),en("English"),es("Español"),
     fr("Français"), ko("한국어") ,jp("日本語"),
-    it("Italiano"), ru("Русский"), zh("中文");
+    it("Italiano"), ru("Русский"),
+    sw("Kiswahili"),zh("中文");
     companion object {
         fun languageNameFromDef(langDef: String): String {
             return when (langDef) {
@@ -21,6 +22,7 @@ enum class LANGUAGES(val language:String){
                 "jp" -> jp.language
                 "it" -> it.language
                 "ru" -> ru.language
+                "sw" -> sw.language
                 "zh" -> zh.language
                 else -> en.language
             }
@@ -43,34 +45,37 @@ enum class NoteNamesEl {
 //    دو, ري, مي, فا, صول, لا,سي , EMPTY
 //}
 val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية", "ساكسفون", "فلوت",
-    "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","بييرو","الباروك")
+    "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","بييرو","الباروك","أوتار نتف")
 val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente", "Saxophone", "Flauti",
-    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Pierrot","Barockensemble")
+    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Pierrot","Barockensemble","Zupfinstrument")
 val ensembleNamesEl = listOf("Έγχόρδα", "Ξύλινα πνευστά της συμφωνικής ορχήστρας", "Ορχήστρα εγχόρδων", "Χάλκινα πνευστά της συμφωνικής ορχήστρας", "Σαξόφωνα", "Φλάουτα",
-    "Διπλά καλάμια", "Κλαρινέτ", "Φαγκότα", "Βιολοντσέλα", "Πιάνο", "Πιερότος","Μπαρόκ")
+    "Διπλά καλάμια", "Κλαρινέτ", "Φαγκότα", "Βιολοντσέλα", "Πιάνο", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές")
 val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Saxophones", "Flutes",
-    "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","Pierrot","Baroque")
+    "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","Pierrot","Baroque","Plucked strings")
 val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal", "Saxofones", "Flautas",
-    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Pierrot","Barroco")
+    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Pierrot","Barroco","Instrumentos de cuerda pulsada")
 val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기", "색소폰", "플루트",
-    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","피에로","바로크")
+    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","피에로","바로크","발현악기")
 val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器", "サックス", "フルート",
-    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ピエロ", "バロック")
+    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ピエロ", "バロック","撥弦楽器")
 
 val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni", "Saxofoni", "Flauti",
-    "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte","Pierrot","Barocco")
+    "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte","Pierrot","Barocco", "Corde pizzicate")
 val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Saxophones", "Flûtes",
-    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Pierrot","Baroque")
+    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Pierrot","Baroque","Cordes pincées")
 val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты", "Саксофоны", "Флейты",
-    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано","Пьеро","Барокко")
+    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано","Пьеро","Барокко","Струнные щипковые инструменты")
+val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao", "Orchestra ya ala za nyuzi", "Vyombo vya upepo vya chuma",
+    "Saxophones", "Zilizimbi","Mwanzi mara mbili", "Clarinets", "Bassoons", "Cellos", "Piano",
+    "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa")
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器", "薩氏管", "长笛",
-    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","皮埃罗","巴洛克")
+    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","皮埃罗","巴洛克","撥弦樂器")
 
 
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
     "übermäßige Quarte", "Quinte", "kleine Sexte", "große Sexte", "kleine Septime", "große Septime",
     "Oktave", "kleine None", "große None", "kleine Dezime", "große Dezime", "Undezime",
-    "übermäßige Undezime", "Duodezime", "Tredezime Sexte", "Tredezime Sexte", "kleine Quartdezime", "große Quartdezime", "Doppeloktave")
+    "übermäßige Undezime", "Duodezime", "kleine Tredezime ", "große Tredezime ", "kleine Quartdezime", "große Quartdezime", "Doppeloktave")
 val doublingEl = listOf("Μικρή δευτέρα","Μεγάλη δευτέρα", "Μικρή τρίτη", "Μεγάλη τρίτη", "Καθαρή τετάρτη",
     "Αυξημένη τετάρτη", "Καθαρή πέμπτη", "Μικρή έκτη", "Μεγάλη έκτη", "Μικρή εβδόμη", "Μεγάλη εβδόμη",
     "Οκτάβα", "Μικρή ένατη", "Μεγάλη ένατη", "Μικρή δέκατη", "Μεγάλη δέκατη", "Καθαρή ενδέκατη",
@@ -110,6 +115,11 @@ val doublingZh = listOf("小二度","大二度","小三度","大三度","纯四�
     "纯八度","小九度","大九度","小十度","大十度","纯十一度",
     "增十一度","纯十二度","小十三度","大十三度","小十四度","大十四度",
     "纯十五度")
+val doublingSw = listOf("Ndogo ya pili", "Kubwa ya pili", "Ndogo ya tatu", "Kubwa ya tatu", "Ya nne",
+    "Ya nne kupindukia", "Ya tano", "Ndogo ya sita", "Kubwa ya sita", "Ndogo ya saba", "Kubwa ya saba",
+    "Octave", "Ndogo Hakuna", "Kubwa Hakuna", "Ndogo ya zaka", "Kubwa ya zaka", "Kumi na moja",
+    "Kumi na moja kupindukia", "Kumi na mbili", "Ndogo kumi na tatu", "Kubwa kumi na tatu",
+    "Ndogo kumi na nne", "Kubwa kumi na nne", "Octave mara mbili")
 
 data class Lang( // English by default
     val noteNames: List<String> = NoteNamesEn.values().map { it.toString() },
@@ -151,6 +161,7 @@ data class Lang( // English by default
                 "jp" -> japanese()
                 "it" -> italian()
                 "ru" -> russian()
+                "sw" -> kiswahili()
                 "zh" -> chinese()
                 else -> Lang()
             }
@@ -204,7 +215,7 @@ data class Lang( // English by default
              inverse  = "Inverso",
              invRetrograde  = "Inverso del retrogrado",
              doubling  = "Raddoppi",
-             spreadWherePossible  = "Spalma dove è possibile",
+             spreadWherePossible  = "Estendi dove è possibile",
              deepSearch  = "Ricerca approfondita nei canoni a quattro parti",
              exportMidi  = "Esporta il file MIDI",
              language  = "Lingua",
@@ -417,6 +428,31 @@ data class Lang( // English by default
                 deepSearch  = "Βαθιά αναζήτηση σε τέσσερις φωνητικούς κανόνες",
                 exportMidi  = "Εξαγωγή του αρχείου MIDI",
                 language  = "Γλώσσα",
+            )
+        }
+        fun kiswahili(): Lang {
+            return Lang(
+                noteNames = NoteNamesIt.values().map { it.toString() },
+                enterSomeNotes = "Chapa maelezo kadhaa!",
+                choose2ndSequence = "Chagua mlolongo wa pili!",
+                repeatSequence = "Kurudia mlolongo",
+                selectEnsemble = "Chagua mkusanyiko!",
+                ensembleNames = ensembleNamesSw,
+                beatsPerMinute = "Beats kwa dakika",
+                selectRhythm = "Chagua dansi!",
+                selectDoubling = "Chagua vipindi vya kuongezeka mara mbili!",
+                doublingNames = doublingSw,
+                rhythm = "Mdundo",
+                rhythmShuffle  = "Mdundo mchanganyiko",
+                partsShuffle  = "Sauti zilizochanganywa",
+                retrograde  = "Tembea nyuma",
+                inverse  = "Kubadili harakati",
+                invRetrograde  = "Tembea nyuma na kubadili harakati",
+                doubling  = "Maradufu",
+                spreadWherePossible  = "Panua panapowezekana",
+                deepSearch  = "Utafutaji wa kina katika kanuni nne za sauti",
+                exportMidi  = "Hamisha faili ya MIDI",
+                language  = "Lugha",
             )
         }
     }
