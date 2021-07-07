@@ -2,7 +2,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES,
-    DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, PIERROT
+    DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, PIERROT, BAROQUE
 }
 
 
@@ -21,6 +21,7 @@ object Ensembles {
             EnsembleType.CELLOS -> getCellos(nParts)
             EnsembleType.PIANO -> getPiano(nParts)
             EnsembleType.PIERROT -> getPierrot(nParts)
+            EnsembleType.BAROQUE -> getBaroque(nParts)
         }
     }
 
@@ -39,14 +40,15 @@ object Ensembles {
                 EnsemblePart(40, 5), //violin
                 EnsemblePart(40, 4), //violin
                 EnsemblePart(41, 3), //viola
-                EnsemblePart(42, 2)  // cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
             )
             5 -> listOf(
                 EnsemblePart(40, 5), //violin
                 EnsemblePart(40, 4), //violin
                 EnsemblePart(41, 4), //viola
                 EnsemblePart(41, 3), //viola
-                EnsemblePart(42, 2)  // cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+
             )
             6 -> listOf(
                 EnsemblePart(40, 5), //violin
@@ -54,7 +56,8 @@ object Ensembles {
                 EnsemblePart(41, 4), //viola
                 EnsemblePart(41, 3), //viola
                 EnsemblePart(42, 3),  // cello
-                EnsemblePart(42, 2)  // cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+
             )
             7 -> listOf(
                 EnsemblePart(40, 5), //violin
@@ -62,8 +65,8 @@ object Ensembles {
                 EnsemblePart(41, 4), //viola
                 EnsemblePart(41, 3), //viola
                 EnsemblePart(42, 3),  // cello
-                EnsemblePart(42, 2),  // cello
-                EnsemblePart(43, 1)  // double-bass
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 1),  // Doublebass
             )
             8 -> listOf(
                 EnsemblePart(40, 6), //violin
@@ -72,8 +75,8 @@ object Ensembles {
                 EnsemblePart(41, 4), //viola
                 EnsemblePart(41, 3), //viola
                 EnsemblePart(42, 3),  // cello
-                EnsemblePart(42, 2),  // cello
-                EnsemblePart(43, 1)  // double-bass
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 1),  // Doublebass
             )
             9 -> listOf(
                 EnsemblePart(40, 6), //violin
@@ -83,8 +86,8 @@ object Ensembles {
                 EnsemblePart(41, 4), //viola
                 EnsemblePart(41, 3), //viola
                 EnsemblePart(42, 3),  // cello
-                EnsemblePart(42, 2),  // cello
-                EnsemblePart(43, 1)  // double-bass
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 1),  // Doublebass
             )
             in 10..12 -> listOf(
                 EnsemblePart(40, 6), //violin
@@ -95,10 +98,10 @@ object Ensembles {
                 EnsemblePart(41, 4), //viola
                 EnsemblePart(41, 3), //viola
                 EnsemblePart(42, 3),  // cello
-                EnsemblePart(42, 2),  // cello
-                EnsemblePart(42, 2),  // cello
-                EnsemblePart(43, 1),  // double-bass
-                EnsemblePart(43, 1)  // double-bass
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 1),  // Doublebass
+                EnsemblePart(STRING_ORCHESTRA, 1),  // Doublebass
             )
             else -> listOf()
         }
@@ -636,15 +639,16 @@ object Ensembles {
             1, 2, 3 -> listOf(
                 EnsemblePart(42, 4), // Cello
                 EnsemblePart(42, 3), // Cello
-                EnsemblePart(42, 2)  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+
             )
             in (4..6) -> listOf(
                 EnsemblePart(42, 4), // Cello
                 EnsemblePart(42, 4), // Cello
                 EnsemblePart(42, 3), // Cello
                 EnsemblePart(42, 3),  // Cello
-                EnsemblePart(42, 2),  // Cello
-                EnsemblePart(42, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
             )
             in (7..9) -> listOf(
                 EnsemblePart(42, 4), // Cello
@@ -654,8 +658,8 @@ object Ensembles {
                 EnsemblePart(42, 3), // Cello
                 EnsemblePart(42, 3), // Cello
                 EnsemblePart(42, 3),  // Cello
-                EnsemblePart(42, 2),  // Cello
-                EnsemblePart(42, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
             )
             in 10..12 -> listOf(
                 EnsemblePart(42, 5), // Cello
@@ -668,8 +672,8 @@ object Ensembles {
                 EnsemblePart(42, 3), // Cello
                 EnsemblePart(42, 3), // Cello
                 EnsemblePart(42, 3),  // Cello
-                EnsemblePart(42, 2),  // Cello
-                EnsemblePart(42, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
             )
             else -> listOf()
         }
@@ -741,14 +745,14 @@ object Ensembles {
             1, 2, 3 -> listOf(
                 EnsemblePart(FLUTE, 4),
                 EnsemblePart(PIANO, 3),
-                EnsemblePart(CELLO, 2)
+                EnsemblePart(STRING_ORCHESTRA, 2)
             )
             in (4..6) -> listOf(
                 EnsemblePart(FLUTE, 5),
                 EnsemblePart(VIOLIN, 4),
                 EnsemblePart(PIANO, 4),
                 EnsemblePart(CLARINET, 3),
-                EnsemblePart(CELLO, 2),
+                EnsemblePart(STRING_ORCHESTRA, 2),
                 EnsemblePart(PIANO, 1),
             )
             7 -> listOf(
@@ -798,10 +802,122 @@ object Ensembles {
             else -> listOf()
         }
     }
+    fun getBaroque(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            1, 2 -> listOf(
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 2)
+            )
+            3 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 3)
+            )
+            4 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(STRING_ORCHESTRA, 2)
+            )
+            5 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(STRING_ORCHESTRA, 2)
+            )
+            6 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 5),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(STRING_ORCHESTRA, 2)
+            )
+            7 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 5),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(STRING_ORCHESTRA, 2)
+            )
+            8 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 5),
+                EnsemblePart(OBOE, 5),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(STRING_ORCHESTRA, 2)
+            )
+            9 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 5),
+                EnsemblePart(OBOE, 5),
+                EnsemblePart(VIOLA, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(STRING_ORCHESTRA, 2)
+            )
+            10 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 5),
+                EnsemblePart(OBOE, 5),
+                EnsemblePart(VIOLA, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(STRING_ORCHESTRA, 2)
+            )
+            11 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 5),
+                EnsemblePart(OBOE, 5),
+                EnsemblePart(VIOLA, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(BASSOON, 3),
+                EnsemblePart(STRING_ORCHESTRA, 2)
+            )
+            12 -> listOf(
+                EnsemblePart(FLUTE, 5),
+                EnsemblePart(VIOLIN, 5),
+                EnsemblePart(OBOE, 5),
+                EnsemblePart(VIOLA, 4),
+                EnsemblePart(VIOLA, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 4),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(HARPSICHORD, 3),
+                EnsemblePart(BASSOON, 3),
+                EnsemblePart(STRING_ORCHESTRA, 2)
+            )
+            else -> listOf()
+        }
+    }
 }
 data class EnsemblePart( val instrument: Int, val octave: Int)
 const val PIANO = 0
+const val HARPSICHORD = 6
 const val VIOLIN = 40
+const val VIOLA = 41
 const val CELLO = 42
+const val DOUBLEBASS = 43
+const val PIZZICATO = 45
+const val STRING_ORCHESTRA = 48
+const val OBOE = 68
+const val BASSOON = 70
 const val FLUTE = 73
+const val RECORDER = 74
 const val CLARINET = 71

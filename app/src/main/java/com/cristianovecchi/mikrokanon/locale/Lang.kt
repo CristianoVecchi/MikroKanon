@@ -5,7 +5,7 @@ import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 
 enum class LANGUAGES(val language:String){
     ar("العربية"),
-    de("Deutsch"), en("English"),es("Español"),
+    de("Deutsch"), el("Ελληνικά"),en("English"),es("Español"),
     fr("Français"), ko("한국어") ,jp("日本語"),
     it("Italiano"), ru("Русский"), zh("中文");
     companion object {
@@ -13,6 +13,7 @@ enum class LANGUAGES(val language:String){
             return when (langDef) {
                 "ar" -> ar.language
                 "de" -> de.language
+                "el" -> el.language
                 "en" -> en.language
                 "es" -> es.language
                 "fr" -> fr.language
@@ -35,35 +36,45 @@ enum class NoteNamesFr {
 enum class NoteNamesRu {
     До,Ре,Ми,Фа,Соль,Ля,Си,EMPTY
 }
+enum class NoteNamesEl {
+    Ντο, Ρε, Μι, Φα, Σολ, Λα, Σι, EMPTY
+}
 //enum class NoteNamesAr {
 //    دو, ري, مي, فا, صول, لا,سي , EMPTY
 //}
 val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية", "ساكسفون", "فلوت",
-    "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","بييرو")
+    "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","بييرو","الباروك")
 val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente", "Saxophone", "Flauti",
-    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Pierrot")
+    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Pierrot","Barockensemble")
+val ensembleNamesEl = listOf("Έγχόρδα", "Ξύλινα πνευστά της συμφωνικής ορχήστρας", "Ορχήστρα εγχόρδων", "Χάλκινα πνευστά της συμφωνικής ορχήστρας", "Σαξόφωνα", "Φλάουτα",
+    "Διπλά καλάμια", "Κλαρινέτ", "Φαγκότα", "Βιολοντσέλα", "Πιάνο", "Πιερότος","Μπαρόκ")
 val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Saxophones", "Flutes",
-    "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","Pierrot")
+    "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","Pierrot","Baroque")
 val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal", "Saxofones", "Flautas",
-    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Pierrot")
+    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Pierrot","Barroco")
 val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기", "색소폰", "플루트",
-    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","피에로")
+    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","피에로","바로크")
 val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器", "サックス", "フルート",
-    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ピエロ")
+    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ピエロ", "バロック")
+
 val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni", "Saxofoni", "Flauti",
-    "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte","Pierrot")
+    "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte","Pierrot","Barocco")
 val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Saxophones", "Flûtes",
-    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Pierrot")
+    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Pierrot","Baroque")
 val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты", "Саксофоны", "Флейты",
-    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано","Пьеро")
+    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано","Пьеро","Барокко")
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器", "薩氏管", "长笛",
-    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","皮埃罗")
+    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","皮埃罗","巴洛克")
 
 
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
     "übermäßige Quarte", "Quinte", "kleine Sexte", "große Sexte", "kleine Septime", "große Septime",
     "Oktave", "kleine None", "große None", "kleine Dezime", "große Dezime", "Undezime",
     "übermäßige Undezime", "Duodezime", "Tredezime Sexte", "Tredezime Sexte", "kleine Quartdezime", "große Quartdezime", "Doppeloktave")
+val doublingEl = listOf("Μικρή δευτέρα","Μεγάλη δευτέρα", "Μικρή τρίτη", "Μεγάλη τρίτη", "Καθαρή τετάρτη",
+    "Αυξημένη τετάρτη", "Καθαρή πέμπτη", "Μικρή έκτη", "Μεγάλη έκτη", "Μικρή εβδόμη", "Μεγάλη εβδόμη",
+    "Οκτάβα", "Μικρή ένατη", "Μεγάλη ένατη", "Μικρή δέκατη", "Μεγάλη δέκατη", "Καθαρή ενδέκατη",
+    "Αυξημένη ενδέκατη", "Καθαρή δωδέκατη", "Μικρή δέκατη τρίτη", "Μεγάλη δέκατη τρίτη", "Μικρή δέκατη τέταρτη", "Μεγάλη δέκατη τέταρτη", "Καθαρή δέκατη πέμπτη")
 val doublingEn = listOf("minor 2nd","Major 2nd", "minor 3rd", "Major 3rd", "4th",
     "Augm. 4th", "5th", "minor 6th", "Major 6th", "minor 7th", "Major 7th",
     "Octave", "minor 9th", "Major 9th", "minor 10th", "Major 10th", "11th",
@@ -132,6 +143,7 @@ data class Lang( // English by default
             return when (lang){
                 "ar" -> arabian()
                 "de" -> german()
+                "el" -> greek()
                 "en" -> english()
                 "es" -> spanish()
                 "fr" -> french()
@@ -378,6 +390,33 @@ data class Lang( // English by default
                 deepSearch  = "بحث عميق في أربعة شرائع صوتية",
                 exportMidi  = "تصدير ملف MIDI",
                 language  = "لغة",
+            )
+        }
+        fun greek(): Lang {
+            return Lang(
+                noteNames = NoteNamesEl.values().map { it.toString() },
+                enterSomeNotes = "Πληκτρολογήστε μερικές νότες!",
+                choose2ndSequence = "Επιλέξτε τη δεύτερη ακολουθία!",
+                repeatSequence = "Επαναλάβετε την ακολουθία",
+                ensemble ="Σύνολο",
+                bpm = "ΒΠΜ",
+                selectEnsemble = "Επιλέξτε ένα σύνολο!",
+                ensembleNames = ensembleNamesEl,
+                beatsPerMinute = "Χτυπάει ανά λεπτό",
+                selectRhythm = "Επιλέξτε ρυθμό!",
+                selectDoubling = "Επιλέξτε διαστήματα για διπλασιασμό!",
+                doublingNames = doublingEl,
+                rhythm = "Ρυθμός",
+                rhythmShuffle  = "Μικτός ρυθμός",
+                partsShuffle  = "Φωνές μικτές",
+                retrograde  = "Τον καρκίνο",
+                inverse  = "Την αναστροφή ",
+                invRetrograde  = "Την καρκινική αναστροφή",
+                doubling  = "Διπλασιάζω",
+                spreadWherePossible  = "Επεκτείνετε όπου είναι δυνατόν",
+                deepSearch  = "Βαθιά αναζήτηση σε τέσσερις φωνητικούς κανόνες",
+                exportMidi  = "Εξαγωγή του αρχείου MIDI",
+                language  = "Γλώσσα",
             )
         }
     }
