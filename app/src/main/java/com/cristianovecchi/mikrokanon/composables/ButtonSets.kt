@@ -143,6 +143,21 @@ fun MikroKanonsButtons(
     }
 }
 @Composable
+fun FunctionButtons(
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp,
+    onAdd: () -> Unit, onSpecialFunctions: () -> Unit
+) {
+    Column(){
+        CustomButton(iconId = model.iconMap["counterpoint"]!!, isActive = isActive, buttonSize = buttonSize) {
+            onAdd()
+        }
+        CustomButton(iconId = model.iconMap["special_functions"]!!, isActive = isActive, buttonSize = buttonSize) {
+            onSpecialFunctions()
+        }
+    }
+}
+
+@Composable
 fun FreePartsButtons(
     fontSize: Int, isActive: Boolean = true,
     onAscDynamicClick: () -> Unit, onAscStaticClick: () -> Unit,

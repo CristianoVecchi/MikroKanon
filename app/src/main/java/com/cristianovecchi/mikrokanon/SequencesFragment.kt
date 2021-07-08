@@ -49,6 +49,10 @@ class SequencesFragment(): Fragment() {
                                        bundle.putBoolean("editing", editing)
                                        findNavController().navigate(R.id.inputFragment, bundle)
                                    },
+                                   onWave = { nWaves, list ->
+                                       findNavController().navigate(R.id.outputFragment)
+                                       model.onWaveFromFirstSelection(nWaves, list)
+                                   },
                                    onKP = { list, index, repeat ->
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onKPfromFirstSelection(list, index, repeat)

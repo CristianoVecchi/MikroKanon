@@ -213,7 +213,7 @@ public class Insieme {
     public static Integer[] extractDirectionsFromIntervalSet(Integer[] intervalSet, Integer[] trend){
         Vector list = new Vector();
         Integer[] dirs = trend;
-        for (int j = 0; j < 12; j++) {
+        for (int j = 0; j < trend.length; j++) {
             for (int i = 0; i < intervalSet.length; i++) {
                 int interval = intervalSet[i];
                     if(intervalSet[i].equals(dirs[j])) {

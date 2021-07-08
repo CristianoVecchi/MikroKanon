@@ -58,6 +58,9 @@ class OutputFragment: Fragment() {
                                 onKP = { index, repeat ->
                                     model.onKPfurtherSelections(index, repeat)
                                 },
+                                onWave = { nWaves ->
+                                    model.onWaveFurtherSelection(nWaves, null)
+                                },
                                 onBack = { model.onBack() },
                                 onFreePart = { trend ->
                                     model.onFreePartFurtherSelections(trend)

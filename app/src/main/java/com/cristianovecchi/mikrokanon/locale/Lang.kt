@@ -120,12 +120,14 @@ val doublingSw = listOf("Ndogo ya pili", "Kubwa ya pili", "Ndogo ya tatu", "Kubw
     "Octave", "Ndogo Hakuna", "Kubwa Hakuna", "Ndogo ya zaka", "Kubwa ya zaka", "Kumi na moja",
     "Kumi na moja kupindukia", "Kumi na mbili", "Ndogo kumi na tatu", "Kubwa kumi na tatu",
     "Ndogo kumi na nne", "Kubwa kumi na nne", "Octave mara mbili")
-
+val functionNamesEn = listOf("Wave 3", "Wave 4", "Wave 6")
 data class Lang( // English by default
     val noteNames: List<String> = NoteNamesEn.values().map { it.toString() },
     val enterSomeNotes: String = "Enter some notes!",
     val choose2ndSequence: String = "Choose the second sequence!",
     val repeatSequence: String = "Repeat the sequence",
+    val selectSpecialFunction: String = "Select a Special Function!",
+    val specialFunctionNames: List<String> = functionNamesEn,
     val OKbutton: String = "OK",
     val selectEnsemble: String = "Select an ensemble!",
     val ensembleNames: List<String> = ensembleNamesEn,
@@ -148,6 +150,8 @@ data class Lang( // English by default
     val language: String = "Language",
     val credits: String = "Credits"
     ){
+
+
     companion object {
         fun provideLanguage(lang: String): Lang {
             return when (lang){

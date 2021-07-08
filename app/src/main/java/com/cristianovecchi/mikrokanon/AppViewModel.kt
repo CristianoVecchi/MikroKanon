@@ -30,7 +30,9 @@ import kotlinx.coroutines.*
 sealed class Computation {
     data class MikroKanonOnly(val counterpoint: Counterpoint,val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int): Computation()
     data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
+    data class FirstFromWave(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val nWaves: Int): Computation()
     data class FurtherFromKP(val counterpoint: Counterpoint,val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
+    data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int): Computation()
     data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2 ) : Computation()
@@ -72,6 +74,8 @@ class AppViewModel(
         "play" to R.drawable.ic_baseline_play_arrow_24,
         "stop" to R.drawable.ic_baseline_stop_24,
         "expand" to R.drawable.ic_baseline_sync_alt_24,
+        "waves" to R.drawable.ic_baseline_waves_24,
+        "special_functions" to R.drawable.ic_baseline_emoji_objects_24,
     )
 
 
@@ -263,6 +267,22 @@ init{
         if(!repeat) addSequenceToCounterpoint() else addRepeatedSequenceToCounterpoint()
 
     }
+    val onWaveFromFirstSelection = { nWaves: Int, list: ArrayList<Clip> ->
+        changeFirstSequence(list)
+        computationStack.pushAndDispatch(Computation.FirstFromWave(listOf(selectedCounterpoint.value!!.clone()),
+            ArrayList(firstSequence.value!!), nWaves))
+        convertFirstSequenceToSelectedCounterpoint()
+        findWavesFromSequence(nWaves)
+    }
+    val onWaveFurtherSelection = { nWaves: Int , stepBackCounterpoints: List<Counterpoint>? ->
+        val lastComputation = computationStack.peek()
+        val originalCounterpoints = stepBackCounterpoints ?: counterpoints.value!!.map{ it.clone() }
+
+        computationStack.pushAndDispatch(Computation.FurtherFromWave(originalCounterpoints, nWaves))
+        findWavesOnCounterpoints(originalCounterpoints, nWaves)
+    }
+
+
     val onFreePartFromFirstSelection = { list: ArrayList<Clip>, trend: TREND ->
         changeFirstSequence(list)
         computationStack.pushAndDispatch(Computation.FirstFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!), trend))
@@ -367,6 +387,13 @@ init{
                         changeSelectedCounterpoint(previousComputation.counterpoint)
                         onFreePartFurtherSelections(previousComputation.trend)
                     }
+                    is Computation.FirstFromWave -> onWaveFromFirstSelection(
+                        previousComputation.nWaves,
+                        previousComputation.firstSequence
+                    )
+                    is Computation.FurtherFromWave -> onWaveFurtherSelection(
+                        previousComputation.nWaves, previousComputation.counterpoints
+                    )
                     is Computation.FirstFromKP -> onKPfromFirstSelection(
                         previousComputation.firstSequence,
                         previousComputation.indexSequenceToAdd,
@@ -453,8 +480,44 @@ init{
             else -> false
         }
     }
+    private fun findWavesFromSequence(nWaves: Int){
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                newList = findWvs(listOf(Counterpoint.counterpointFromClipList(firstSequence.value!!)), nWaves)
+            }
+            changeCounterPoints(newList)
+            counterpoints.value?.let{
+                if(it.isNotEmpty()) changeSelectedCounterpoint(it[0])
+            }
+        }
+    }
+    fun findWavesOnCounterpoints(originalCounterpoints: List<Counterpoint>, nWaves: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = findWvs(originalCounterpoints, nWaves)
+                }
+                changeCounterPoints(newList)
+                counterpoints.value?.let{
+                    if(it.isNotEmpty()) changeSelectedCounterpoint(it[0])
+                }
+                // println("STACK SIZE: ${counterpointStack.size}")
+            }
+        }
+    }
+    private suspend fun findWvs(counterpoints: List<Counterpoint>, nWaves: Int) : List<Counterpoint>{
+        val spreadWherePossible = userOptionsData.value!![0].spread != 0
+        var newList = Counterpoint.findAllWithWaves(
+            counterpoints,  intervalSet.value!!, nWaves
+        ).sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+        if(spreadWherePossible){
+            newList = newList.map{it.spreadAsPossible()}.sortedBy { it.emptiness }
+        }
+        return newList
+    }
     private fun findFreeParts(trend: TREND){
-        //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
@@ -464,7 +527,6 @@ init{
             counterpoints.value?.let{
                 if(it.isNotEmpty()) changeSelectedCounterpoint(it[0])
             }
-            // println("STACK SIZE: ${counterpointStack.size}")
         }
     }
     private suspend fun findFreePts(trend: TREND) : List<Counterpoint>{
@@ -677,6 +739,7 @@ init{
         viewModelScope.launch {
             MKjob?.cancelAndJoin()
         }
+        _elaborating.value = false
         onStop()
         computationStack.clearAndDispatch()
         changeCounterPoints(listOf())

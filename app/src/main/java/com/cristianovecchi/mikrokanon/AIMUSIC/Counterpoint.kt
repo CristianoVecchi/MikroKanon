@@ -2,30 +2,32 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import android.os.Parcelable
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
+import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 fun main(args : Array<String>){
-//    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8);
-//
+//    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8)
 //    val mssq = MelodySubSequencer(pitches.toIntArray())
 //    mssq.assignVelocities(0.90f, 0.50f)
 //    mssq.printSubSequences()
-
-
-
 //    val absPitches1 = mutableListOf(-1,1,0,6,11,5,7,8,8,3,3,3,6,9)
 //    val absPitches2 = mutableListOf(1,11,2,10,3,-1,9,6)
 //    val absPitches3 = mutableListOf(1,11,2,10)
-//    val absPitches1 = mutableListOf(0, 4, 7, 11, 2, 6, 9)
-//    val absPitches2 = mutableListOf(-1, 0, 4, 7, 11, 2, 6, 9)
-//    val absPitches3 = mutableListOf(-1,2, 0, -1, -1, 10, -1, 7, 5, 9, 10, 0, 2)
-//    val absParts = listOf(
-//        AbsPart(absPitches1),
-//        AbsPart(absPitches2),
-//        AbsPart(absPitches3),
-//    )
-//    val counterpoint = Counterpoint(absParts, listOf(2, 10, 3, 9, 4, 8, 5, 7))
+    val absPitches1 = mutableListOf(0, 4, 7, 11, 2, 6, 9)
+    val absPitches2 = mutableListOf(-1, 0, 4, 7, 11, 2, 6, 9)
+    val absPitches3 = mutableListOf(-1,2, 0, -1, -1, 10, -1, 7, 5, 9, 10, 0, 2)
+    val absParts = listOf(
+        AbsPart(absPitches1),
+        AbsPart(absPitches2),
+        AbsPart(absPitches3),
+    )
+    val pentatonicIntervalSet = listOf(2, 10, 3, 9, 4, 8, 5, 7)
+    val counterpoint = Counterpoint(absParts, pentatonicIntervalSet)
+    val counterpoint2 = Counterpoint.findWave(counterpoint,pentatonicIntervalSet,3,
+        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions)
+    val counterpoint3 = Counterpoint.findWave(counterpoint2,pentatonicIntervalSet,6,
+        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions).displayInNotes()
 //    Counterpoint.expand(counterpoint, 2).display()
 //    val repeatedSequence = Collections.nCopies(3, absPitches1).flatten()
 //    println(repeatedSequence)
@@ -43,6 +45,13 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun clone(): Counterpoint {
         return Counterpoint(parts.map{it.clone()}, ArrayList(intervalSet.toList()), emptiness)
     }
+    fun cutExtraParts(nPartsLimit: Int): Counterpoint{
+        return if(this.parts.size <= nPartsLimit) this
+        else this.copy(parts = this.parts.take(nPartsLimit))
+    }
+    fun getColumnValues(index: Int): List<Int>{
+        return parts.filter{index < it.absPitches.size }.map{ it.absPitches[index] }
+    }
     fun enqueue(counterpoint: Counterpoint): Counterpoint{
         val newParts = parts.mapIndexed { index, absPart ->
             if(index<counterpoint.parts.size) absPart.enqueue( counterpoint.parts[index]) else absPart }
@@ -58,6 +67,9 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
     fun getAbsPitches(): List<List<Int>>{
         return parts.map{ it.absPitches }
+    }
+    fun addWave(intervalSet: List<Int>, startAbsPitch: Int, steps: List<Int> ): Counterpoint {
+        return findWave(this, intervalSet, startAbsPitch, steps )
     }
 
     companion object {
@@ -81,6 +93,63 @@ data class Counterpoint(val parts: List<AbsPart>,
                 parts.add(AbsPart(pitches, oldPart.rowForm, oldPart.transpose, oldPart.delay))
             }
             return Counterpoint(parts, counterpoint.intervalSet)
+        }
+        fun findWave(counterpoint: Counterpoint, intervalSet: List<Int>, startAbsPitch : Int,
+                     steps: List<Int>, trend: List<Int> = TREND.ASCENDANT_STATIC.directions ) : Counterpoint {
+            val result = mutableListOf<Int>()
+
+            var index = 0
+            val maxSize: Int = counterpoint.parts.maxOf { it.absPitches.size }
+            var lastAbsPitch = startAbsPitch
+            val absSteps = steps.map{(startAbsPitch + it) % 12}
+            while(index < maxSize){
+
+                var resultPitch = -1
+                val trendSteps = trend.map{(lastAbsPitch + it) % 12}.filter{absSteps.contains(it)}
+                trendSteps@for(step in trendSteps) {
+
+                    val matchValues = counterpoint.getColumnValues(index)
+                    val isValid = matchValues.map{
+                        it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(),it,step)
+                    }.fold(true) { acc, b ->  acc && b}
+                    if (isValid) {
+                        resultPitch= step
+                        lastAbsPitch = step
+                        break@trendSteps
+                    }
+                }
+                result.add(resultPitch)
+                index ++
+            }
+            return Counterpoint(listOf(*counterpoint.parts.toTypedArray(), AbsPart(result)), intervalSet)
+        }
+        fun findAllWithWaves(counterpoints: List<Counterpoint>, intervalSet: List<Int>, nWaves: Int) : List<Counterpoint>{
+            return counterpoints.map{ findOneWithWaves(it, intervalSet, nWaves)}
+        }
+        fun findOneWithWaves(counterpoint: Counterpoint, intervalSet: List<Int>, nWaves: Int, nPartsLimit: Int = 12) : Counterpoint{
+            val steps4 = (0..3).toList()
+            val steps3 = (0..2).toList()
+            val steps2 = (0..1).toList()
+            return when (nWaves){
+                3 -> counterpoint.addWave(intervalSet, 0, steps4)
+                                .addWave(intervalSet, 4, steps4)
+                                .addWave(intervalSet, 8, steps4)
+                                .cutExtraParts(nPartsLimit)
+                4 -> counterpoint.addWave(intervalSet, 0, steps3)
+                                .addWave(intervalSet, 3, steps3)
+                                .addWave(intervalSet, 6, steps3)
+                                .addWave(intervalSet, 9, steps3)
+                                .cutExtraParts(nPartsLimit)
+                6 -> counterpoint.addWave(intervalSet, 0, steps2)
+                                .addWave(intervalSet, 2, steps2)
+                                .addWave(intervalSet, 4, steps2)
+                                .addWave(intervalSet, 6, steps2)
+                                .addWave(intervalSet, 8, steps2)
+                                .addWave(intervalSet, 10, steps2)
+                                .cutExtraParts(nPartsLimit)
+                else -> counterpoint
+            }
+
         }
         fun findFreePart(counterpoint: Counterpoint, intervalSet: List<Int>, startAbsPitch : Int, trend: List<Int> ) : Counterpoint {
             var result = mutableListOf<Int>()
@@ -165,6 +234,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             val resultAbsPart = AbsPart(result, rowForm, transpose, delay)
             return Counterpoint(listOf(*target.parts.toTypedArray(), resultAbsPart), intervalSet)
         }
+
 
         fun findAllCounterpointsWithRepeatedSequence(target: Counterpoint, sequence: List<Int>,
                                                      intervalSet: List<Int>, deepness: Int): List<Counterpoint>{
@@ -277,6 +347,12 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun display() {
         parts.forEachIndexed { index, absPart ->
             println("Part #$index: ${Arrays.toString(absPart.absPitches.toIntArray())}")
+        }
+        println("Emptiness: $emptiness")
+    }
+    fun displayInNotes(noteNames: List<String> = NoteNamesEn.values().map{it.toString()}) {
+        parts.forEachIndexed { index, absPart ->
+            println("Part #$index: ${Clip.convertAbsPitchesToClipText(absPart.absPitches, noteNames)}")
         }
         println("Emptiness: $emptiness")
     }

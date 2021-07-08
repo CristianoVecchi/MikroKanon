@@ -48,6 +48,9 @@ data class Clip(
                 else -> Pair( NoteNamesEn.EMPTY, Accidents.NATURAL )
             }
         }
+        fun convertAbsPitchesToClipText(absPitches: List<Int>, notesNames: List<String>): String {
+            return absPitches.map{ convertAbsToClipText(it, notesNames)}.joinToString()
+        }
         fun convertAbsToClipText(absPitch: Int, notesNames: List<String> ): String {
             return when (absPitch) {
                 0 -> notesNames[0]

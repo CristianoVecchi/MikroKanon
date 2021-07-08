@@ -34,6 +34,7 @@ fun SequenceSelector(model: AppViewModel,
                      onSelect: (Int) -> Unit = model::changeSequenceSelection,
                      onDelete: (Int) -> Unit = model::deleteSequence,
                      onAdd: (ArrayList<Clip>, Boolean) -> Unit,
+                     onWave: (Int, ArrayList<Clip>) -> Unit,
                      onKP: (ArrayList<Clip>, Int, Boolean) -> Unit,
                      onFreePart: (ArrayList<Clip>, TREND) -> Unit,
                      onMikroKanons2: (ArrayList<Clip>) -> Unit,
@@ -68,6 +69,7 @@ fun SequenceSelector(model: AppViewModel,
         val sequences by model.sequences.observeAsState(emptyList())
         //val snackbarVisibleState = remember { mutableStateOf(false) }
         val dialogState by lazy { mutableStateOf(false) }
+        val listDialogData by lazy { mutableStateOf(ListDialogData())}
         val dimensions = model.dimensions
         val buttonSize = dimensions.selectorButtonSize
 
@@ -81,6 +83,8 @@ fun SequenceSelector(model: AppViewModel,
                 }
             }
         )
+        ListDialog(listDialogData, language.OKbutton,dimensions.sequenceDialogFontSize)
+
         val onSelectComposition = { index: Int ->
             onSelect(index)
         }
@@ -111,10 +115,21 @@ fun SequenceSelector(model: AppViewModel,
                        onMikroKanons4(sequences[selected])
                     }
                 )
-                // Add Counterpoint Button
-                CustomButton(iconId = model.iconMap["counterpoint"]!!, isActive = activeButtons.counterpoint, buttonSize = buttonSize) {
-                        dialogState.value = true
+                // Add and Special Functions
+                FunctionButtons(model = model, isActive = activeButtons.counterpoint, buttonSize = buttonSize,
+                    onAdd = { dialogState.value = true },
+                    onSpecialFunctions = { listDialogData.value = ListDialogData(true,language.specialFunctionNames, -1, language.selectSpecialFunction)
+                    { index ->
+                            when(index){
+                                0 -> onWave(3, sequences[selected])
+                                1 -> onWave(4, sequences[selected])
+                                2 -> onWave(6, sequences[selected])
+                                else -> listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
+                            }
+                            listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
+                        }
                     }
+                )
 
                 FreePartsButtons(
                     fontSize = dimensions.selectorFPbuttonFontSize, isActive = activeButtons.freeparts,

@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
+                  onWave: (Int) -> Unit,
                   onClick: (Counterpoint) -> Unit = {},
                   onBack: () -> Unit = {},
                   onFreePart: (TREND) -> Unit = {},
@@ -122,6 +123,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
             ) {
 
                 val dialogState by lazy { mutableStateOf(false) }
+                val listDialogData by lazy { mutableStateOf(ListDialogData())}
 
                 SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
                     title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
@@ -132,6 +134,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                             onKP(index, repeat); scrollToTopList = true
                         }
                     })
+                ListDialog(listDialogData, language.OKbutton,dimensions.sequenceDialogFontSize)
                 Row(verticalAlignment = Alignment.CenterVertically) {
 
                     // UNDO BUTTON
@@ -150,14 +153,22 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     ) {
                         if (!elaborating) onExpand();scrollToTopList = false
                     }
-                    // Add Counterpoint Button
-                    CustomButton(
-                        iconId = iconMap["counterpoint"]!!,
-                        isActive = activeButtons.counterpoint,
-                        buttonSize = buttonSize
-                    ) {
-                        if (!elaborating) dialogState.value = true
-                    }
+                    // Add and Special Functions
+                    FunctionButtons(model = model, isActive = activeButtons.counterpoint, buttonSize = buttonSize,
+                        onAdd = { if (!elaborating) dialogState.value = true },
+                        onSpecialFunctions = { listDialogData.value = ListDialogData(true,language.specialFunctionNames, -1, language.selectSpecialFunction)
+                        { index ->
+                            when(index){
+                                0 -> onWave(3)
+                                1 -> onWave(4)
+                                2 -> onWave(6)
+                                else -> listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
+                            }
+                            listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
+                            scrollToTopList = true
+                        }
+                        }
+                    )
 
                     FreePartsButtons(
                         fontSize = dimensions.outputFPbuttonFontSize,
