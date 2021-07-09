@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
+import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.composables.RadioButton
 
 @Composable
@@ -258,6 +259,43 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String =
                     Button(
                         onClick = {
                             numberDialogData.value.onSubmitButtonClick.invoke(bpm)
+                            onDismissRequest.invoke()
+                        },
+                        shape = MaterialTheme.shapes.large
+                    ) {
+                        Text(text = okText)
+                    }
+                }
+            }
+        }
+    }
+}
+@Composable
+fun ButtonsDialog(buttonsDialogData: MutableState<ButtonsDialogData>, okText: String = "OK", model: AppViewModel,
+              onDismissRequest: () -> Unit = { buttonsDialogData.value = ButtonsDialogData(model = model)})
+{
+    if (buttonsDialogData.value.dialogState) {
+        // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
+        Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
+            Surface(
+                modifier = Modifier.width(300.dp),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(text = buttonsDialogData.value.title)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    SpecialFunctionsButtons(
+                        model = buttonsDialogData.value.model,
+                        buttonSize = buttonsDialogData.value.buttonSize,
+                        fontSize = buttonsDialogData.value.fontSize,
+                        onWave3Click = buttonsDialogData.value.onWave3,
+                        onWave4Click = buttonsDialogData.value.onWave4,
+                        onWave6Click = buttonsDialogData.value.onWave6
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Button(
+                        onClick = {
+                            //buttonDialogData.value.onSubmitButtonClick.invoke(bpm)
                             onDismissRequest.invoke()
                         },
                         shape = MaterialTheme.shapes.large

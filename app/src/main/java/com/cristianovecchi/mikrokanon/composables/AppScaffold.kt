@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
@@ -101,6 +102,10 @@ data class MultiListDialogData(val dialogState: Boolean = false, val itemList: L
                           val dialogTitle: String = "", val onSubmitButtonClick: (List<Int>) -> Unit = {} )
 data class NumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:Int = 0,
                             val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
+data class ButtonsDialogData(val dialogState: Boolean = false, val title:String = "",
+                             val model: AppViewModel, val buttonSize: Dp = 60.dp, val fontSize: Int = 18,
+                             val onWave3: () -> Unit = {}, val onWave4: () -> Unit = {}, val onWave6: () -> Unit = {},
+                             val onSubmitButtonClick: () -> Unit = {})
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
                             val error:String = "", val onSubmitButtonClick: () -> Unit = {})
 data class CreditsDialogData(val dialogState: Boolean = false, val title:String = "",  val onSubmitButtonClick: () -> Unit = {})

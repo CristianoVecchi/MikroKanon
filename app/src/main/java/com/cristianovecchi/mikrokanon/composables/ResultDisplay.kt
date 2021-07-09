@@ -123,7 +123,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
             ) {
 
                 val dialogState by lazy { mutableStateOf(false) }
-                val listDialogData by lazy { mutableStateOf(ListDialogData())}
+                val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
 
                 SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
                     title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
@@ -134,7 +134,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                             onKP(index, repeat); scrollToTopList = true
                         }
                     })
-                ListDialog(listDialogData, language.OKbutton,dimensions.sequenceDialogFontSize)
+                ButtonsDialog(buttonsDialogData, language.OKbutton, model)
                 Row(verticalAlignment = Alignment.CenterVertically) {
 
                     // UNDO BUTTON
@@ -156,17 +156,16 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     // Add and Special Functions
                     FunctionButtons(model = model, isActive = activeButtons.counterpoint, buttonSize = buttonSize,
                         onAdd = { if (!elaborating) dialogState.value = true },
-                        onSpecialFunctions = { listDialogData.value = ListDialogData(true,language.specialFunctionNames, -1, language.selectSpecialFunction)
-                        { index ->
-                            when(index){
-                                0 -> onWave(3)
-                                1 -> onWave(4)
-                                2 -> onWave(6)
-                                else -> listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
+                        onSpecialFunctions = {
+                            buttonsDialogData.value = ButtonsDialogData(true,
+                                language.selectSpecialFunction,
+                                model,
+                                onWave3 = { onWave(3); scrollToTopList = true },
+                                onWave4 = { onWave(4); scrollToTopList = true  },
+                                onWave6 = { onWave(6); scrollToTopList = true  })
+                            {
+                                buttonsDialogData.value = ButtonsDialogData(model = model)
                             }
-                            listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
-                            scrollToTopList = true
-                        }
                         }
                     )
 

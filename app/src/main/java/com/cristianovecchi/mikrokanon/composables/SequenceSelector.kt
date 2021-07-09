@@ -69,7 +69,7 @@ fun SequenceSelector(model: AppViewModel,
         val sequences by model.sequences.observeAsState(emptyList())
         //val snackbarVisibleState = remember { mutableStateOf(false) }
         val dialogState by lazy { mutableStateOf(false) }
-        val listDialogData by lazy { mutableStateOf(ListDialogData())}
+        val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
         val dimensions = model.dimensions
         val buttonSize = dimensions.selectorButtonSize
 
@@ -83,8 +83,7 @@ fun SequenceSelector(model: AppViewModel,
                 }
             }
         )
-        ListDialog(listDialogData, language.OKbutton,dimensions.sequenceDialogFontSize)
-
+        ButtonsDialog(buttonsDialogData, language.OKbutton, model)
         val onSelectComposition = { index: Int ->
             onSelect(index)
         }
@@ -118,15 +117,15 @@ fun SequenceSelector(model: AppViewModel,
                 // Add and Special Functions
                 FunctionButtons(model = model, isActive = activeButtons.counterpoint, buttonSize = buttonSize,
                     onAdd = { dialogState.value = true },
-                    onSpecialFunctions = { listDialogData.value = ListDialogData(true,language.specialFunctionNames, -1, language.selectSpecialFunction)
-                    { index ->
-                            when(index){
-                                0 -> onWave(3, sequences[selected])
-                                1 -> onWave(4, sequences[selected])
-                                2 -> onWave(6, sequences[selected])
-                                else -> listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
-                            }
-                            listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
+                    onSpecialFunctions = {
+                        buttonsDialogData.value = ButtonsDialogData(true,
+                            language.selectSpecialFunction,
+                            model,
+                            onWave3 = { onWave(3, sequences[selected]) },
+                            onWave4 = { onWave(4, sequences[selected]) },
+                            onWave6 = { onWave(6, sequences[selected]) })
+                        {
+                            buttonsDialogData.value = ButtonsDialogData(model = model)
                         }
                     }
                 )

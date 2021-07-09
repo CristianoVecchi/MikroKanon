@@ -143,6 +143,23 @@ fun MikroKanonsButtons(
     }
 }
 @Composable
+fun SpecialFunctionsButtons(
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
+    onWave3Click: () -> Unit, onWave4Click: () -> Unit, onWave6Click: () -> Unit
+) {
+    Row(){
+        CustomButton(iconId = model.iconMap["waves"]!!, text = "3", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize) {
+            onWave3Click()
+        }
+        CustomButton(iconId = model.iconMap["waves"]!!, text = "4", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize) {
+            onWave4Click()
+        }
+        CustomButton(iconId = model.iconMap["waves"]!!, text = "6", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize) {
+            onWave6Click()
+        }
+    }
+}
+@Composable
 fun FunctionButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp,
     onAdd: () -> Unit, onSpecialFunctions: () -> Unit
