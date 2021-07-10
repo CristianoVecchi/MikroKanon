@@ -91,15 +91,17 @@ object Player {
     fun playCounterpoint(
         mediaPlayer: MediaPlayer, looping: Boolean,
         counterpoint: Counterpoint, bpm: Float, shuffle: Float,
-        durations: List<Int>, ensembleType: EnsembleType,
+        rhythm: RhythmPatterns, ensembleType: EnsembleType,
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
         rowFormsFlags: Int = 1, doublingFlags: Int = 0
     ) : String {
         var error = ""
-        val actualDurations = if (rhythmShuffle) listOf<Int>(*durations.toTypedArray(),*durations.toTypedArray(),*durations.toTypedArray()).shuffled() else durations
+        val durations = rhythm.values
+        val actualDurations = if (rhythmShuffle) listOf(*durations.toTypedArray(),*durations.toTypedArray(),*durations.toTypedArray()).shuffled() else durations
         val ensembleParts: List<EnsemblePart> = Ensembles.getEnsemble(counterpoint.parts.size, ensembleType)
         val actualEnsembleParts = if (partsShuffle) ensembleParts.shuffled() else ensembleParts
-        val actualCounterpoint = if (rowFormsFlags == 1) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowFormsFlags)
+        val nNotesToSkip = if(rowFormsFlags and 0b10000 != 0) rhythm.nNotesLeftInThePattern(counterpoint.nNotes()) else 0
+        val actualCounterpoint = if (rowFormsFlags == 1) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowFormsFlags, nNotesToSkip)
         val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts,true, doublingFlags)
         if (counterpointTracks.isEmpty()) return "No Tracks in Counterpoint!!!"
 
@@ -108,7 +110,8 @@ object Player {
 //        public static final int DEFAULT_METER = 24;
 //        public static final int DEFAULT_DIVISION = 8;
         val ts = TimeSignature()
-        ts.setTimeSignature(4, 4, TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION)
+        ts.setTimeSignature(rhythm.metro.first, rhythm.metro.second,
+                            TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION)
         val t = Tempo()
         t.bpm = bpm
         tempoTrack.insertEvent(ts);

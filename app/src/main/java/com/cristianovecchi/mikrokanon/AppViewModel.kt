@@ -75,7 +75,9 @@ class AppViewModel(
         "stop" to R.drawable.ic_baseline_stop_24,
         "expand" to R.drawable.ic_baseline_sync_alt_24,
         "waves" to R.drawable.ic_baseline_waves_24,
-        "special_functions" to R.drawable.ic_baseline_emoji_objects_24,
+        "special_functions" to R.drawable.ic_baseline_apps_24,
+        "horizontal_movements" to R.drawable.ic_baseline_insights_24,
+        "idea" to R.drawable.ic_baseline_emoji_objects_24,
     )
 
 
@@ -226,7 +228,7 @@ init{
                     selectedCounterpoint.value!!,
                     bpm,
                     0f,
-                    rhythm.values,
+                    rhythm,
                     ensType,
                     createAndPlay,
                     midiPath,
@@ -714,9 +716,6 @@ init{
         sequenceDataMap.clear()
         _sequences.value = allSequencesData.value!!.map{sequenceDataToSequence(it)}
     }
-    fun retrieveUserOptionsDataFromDB(){
-        createHorizontalIntervalSet(userOptionsData.value!![0].intSetHorFlags)
-    }
 
     private fun sequenceDataToSequence(sequenceData: SequenceData) : ArrayList<Clip>{
         val sequence = ArrayList(sequenceData.clips.map { Clip.clipDataToClip(it)})
@@ -755,7 +754,9 @@ init{
                 newUserOptionsData = optionsDataClone.copy(partsShuffle = value as Int)
             }
             "rowFormsFlags" -> {
-                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = value as Int)
+                var flags = value as Int
+                flags = if(flags and 0b10000 > 0 && flags and 0b1110 == 0) 1 else flags // deactivate separator if row forms are unactive
+                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = flags)
             }
             "doublingFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(doublingFlags = value as Int)

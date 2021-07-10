@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +29,8 @@ import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun SequenceSelector(model: AppViewModel,
@@ -48,10 +51,8 @@ fun SequenceSelector(model: AppViewModel,
     model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     var language = Lang.provideLanguage(model.getUserLangDef())
 
+    val listState = rememberLazyListState()
 
-//    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-//        .also{ val forceRecomposing = it.value.isEmpty()} // to force recomposing when options change
-//
     val notesNames = language.noteNames
     Column(modifier = Modifier
         .fillMaxHeight()
@@ -87,8 +88,9 @@ fun SequenceSelector(model: AppViewModel,
         val onSelectComposition = { index: Int ->
             onSelect(index)
         }
-        SequenceScrollableColumn(
-            modifier = modifier3, notesNames = notesNames, sequences = sequences, selected = selected, onSelect = onSelectComposition
+        SequenceScrollableColumn( listState = listState,
+            modifier = modifier3, notesNames = notesNames, sequences = sequences,
+            selected = selected, onSelect = onSelectComposition
         )
 
         Column(modifier1) {
@@ -153,27 +155,35 @@ fun SequenceSelector(model: AppViewModel,
 }
 @Composable
 fun SequenceScrollableColumn(
+        listState: LazyListState,
         modifier: Modifier, notesNames: List<String>,
         sequences: List<ArrayList<Clip>>, selected:Int, onSelect: (Int) -> Unit
     )
-    {
-        val listState = rememberLazyListState()
-        LazyColumn(state = listState,
-            modifier = modifier
-        )
-        {
-            itemsIndexed(items = sequences) { index, sequence ->
-                Row(modifier = Modifier.padding(8.dp)){
-                    if (index == selected) {
-                        SelectableCard(sequence.toStringAll(notesNames), 20, isSelected = true, onClick = {})
-                    } else {
-                        SelectableCard(text = sequence.toStringAll(notesNames), 18, isSelected = false,onClick = {
-                            onSelect(index)})
-                    }
-                }
+{
+val coroutineScope = rememberCoroutineScope()
+LazyColumn(state = listState,modifier = modifier)
+
+{
+    itemsIndexed(items = sequences) { index, sequence ->
+        Row(modifier = Modifier.padding(8.dp)){
+            if (index == selected) {
+                SelectableCard(sequence.toStringAll(notesNames), 20, isSelected = true, onClick = {})
+            } else {
+                SelectableCard(text = sequence.toStringAll(notesNames), 18, isSelected = false,onClick = {
+                    onSelect(index)})
             }
         }
+    }
+
+    coroutineScope.launch {
+            delay(200)
+            if(sequences.isNotEmpty() && (selected == -1 || selected >= sequences.size))
+                listState.animateScrollToItem(sequences.size -1)
+        }
+    }
 }
+
+
 
 
 

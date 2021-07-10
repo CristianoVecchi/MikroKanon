@@ -148,6 +148,7 @@ data class Lang( // English by default
     val retrograde: String = "Retrograde",
     val inverse: String = "Inverse",
     val invRetrograde: String = "Inv-Retrograde",
+    val rowFormSeparator: String = "Row form separator",
     val doubling: String = "Doubling",
     val spreadWherePossible: String = "Spread where possible",
     val deepSearch: String = "Deep search in four-part canons",

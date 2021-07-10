@@ -26,6 +26,11 @@ class SequencesFragment(): Fragment() {
         model.allSequencesData.observe(viewLifecycleOwner){
             model.retrieveSequencesFromDB()
         }
+        model.userOptionsData.observe(viewLifecycleOwner){
+            model.userOptionsData.value.let {
+                if(it!!.isNotEmpty()) model.createHorizontalIntervalSet(it[0].intSetHorFlags)
+            }
+        }
         model.selectedSequence.observe(viewLifecycleOwner){
             model.changeActiveButtons( if(model.selectedSequence.value!! != -1 )
                 ActiveButtons(editing = true, mikrokanon = true, counterpoint = true, freeparts = true)
@@ -59,7 +64,7 @@ class SequencesFragment(): Fragment() {
                                    },
                                    onFreePart = { list, trend ->
                                        findNavController().navigate(R.id.outputFragment)
-                                       model.retrieveUserOptionsDataFromDB() // get the horizontal interval set
+                                      // model.retrieveUserOptionsDataFromDB() // get the horizontal interval set
                                        model.onFreePartFromFirstSelection(list, trend)
                                    },
                                    onMikroKanons2 = { list ->

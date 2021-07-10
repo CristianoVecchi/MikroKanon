@@ -126,8 +126,8 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 
     val dimensions = model.dimensions
     val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
-        "Retrograde", "Inverse",  "Inv-Retrograde", "Doubling",
-        "Spread where possible", "Deep Search in 4 part MK","Horizontal Interval Set",
+        "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Doubling",
+        "Spread where possible", "Deep Search in 4 part MK",
         "Export MIDI","Language", "Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
@@ -251,6 +251,20 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                         )
                     })
                 }
+                "Separator" -> {
+                    val flags = userOptions.rowFormsFlags
+                    val isOn = flags and 0b10000 != 0
+                    SelectableCard(text = lang.rowFormSeparator, fontSize = fontSize, isSelected = isOn, onClick = {
+                        if(flags != 1) { // don't need a separator if row forms are unactive
+                            val newFlags = flags xor 0b10000 // ^ toggles the flag
+                            model.updateUserOptions(
+                                "rowFormsFlags",
+                                newFlags
+                            )
+                        }
+
+                    })
+                }
                 "Doubling" -> {
                     val flags = userOptions.doublingFlags
                     val intsFromFlags = convertFlagsToInts(flags).map{ it - 1 }
@@ -289,28 +303,6 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                             "deepSearch",
                             if(isOn) 1 else 0
                         )
-                    })
-                }
-                "Horizontal Interval Set" -> {
-                    val flags = userOptions.intSetHorFlags
-                    val intsFromFlags = convertFlagsToInts(flags)
-                    val isOn = flags != 0b1111111
-                    val intervalNames = lang.intervalSet.map{ it.replace("\n"," / ") }
-                    val text = if(!isOn) lang.horIntervalSet else "${lang.horIntervalSet}: ${
-                        intsFromFlags.joinToString(
-                            separator = ", "
-                        ) { intervalNames[it] }
-                    }"
-                    SelectableCard(text = text, fontSize = fontSize, isSelected = isOn, onClick = {
-                        intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
-                            intsFromFlags.toSet(), dialogTitle = lang.selectIntervalsForFP
-                        ) { indexes ->
-                            model.updateUserOptions(
-                                "intSetHorFlags",
-                                if(indexes.isEmpty()) 0b1111111 else convertIntsToFlags(indexes.toSortedSet())
-                            )
-                            intervalSetDialogData.value = MultiListDialogData(itemList = intervalSetDialogData.value.itemList)
-                        }
                     })
                 }
                 "Export MIDI" -> {

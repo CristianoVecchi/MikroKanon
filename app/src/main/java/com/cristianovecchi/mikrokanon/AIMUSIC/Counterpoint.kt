@@ -71,9 +71,16 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun addWave(intervalSet: List<Int>, startAbsPitch: Int, steps: List<Int> ): Counterpoint {
         return findWave(this, intervalSet, startAbsPitch, steps )
     }
+    fun nNotes(): Int {
+        return parts.maxOf { it.absPitches.size }
+    }
 
     companion object {
-
+        fun createSeparatorCounterpoint(nParts: Int, nNotesToSkip: Int) : Counterpoint{
+            val absPart = AbsPart( (0 until nNotesToSkip).map{ -1 }.toMutableList() )
+            val newParts = (0 until nParts).map{ absPart }
+            return Counterpoint(newParts)
+        }
         fun counterpointFromClipList(clipList: List<Clip>) : Counterpoint{
             return Counterpoint(listOf(AbsPart.absPartfromClipList(clipList)))
         }
@@ -259,12 +266,19 @@ data class Counterpoint(val parts: List<AbsPart>,
             return result
         }
 
-        fun explodeRowForms(counterpoint: Counterpoint, rowFormsFlags: Int): Counterpoint {
-
+        fun explodeRowForms(counterpoint: Counterpoint, rowFormsFlags: Int, nNotesToSkip: Int = 0): Counterpoint {
+            //val separator = rowFormsFlags and 0b10000 != 0
+            val separator = nNotesToSkip > 0
+            val separatorCounterpoint: Counterpoint? = if(separator)
+                Counterpoint.createSeparatorCounterpoint(counterpoint.parts.size, nNotesToSkip)
+                else null
             val original = counterpoint.clone().also { it.normalizePartsSize(true)}
             var result = original.clone()
+            result = if(separator) result.enqueue(separatorCounterpoint!!) else result
             result = if(rowFormsFlags and RowForm.RETROGRADE.flag != 0) result.enqueue(original.retrograde()) else result
+            result = if(separator) result.enqueue(separatorCounterpoint!!) else result
             result = if(rowFormsFlags and RowForm.INVERSE.flag != 0) result.enqueue(original.inverse()) else result
+            result = if(separator) result.enqueue(separatorCounterpoint!!) else result
             result = if(rowFormsFlags and RowForm.INV_RETROGRADE.flag != 0) result.enqueue(original.inverse().retrograde()) else result
             return result
         }

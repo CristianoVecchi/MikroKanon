@@ -36,7 +36,13 @@ class OutputFragment: Fragment() {
         }
         model.userOptionsData.observe(viewLifecycleOwner){
             model.userOptionsData.value.let {
-                if(it!!.isNotEmpty()) model.createHorizontalIntervalSet(it[0].intSetHorFlags)
+                if(it!!.isNotEmpty()) {
+                    val newIntervalSet = createIntervalSetFromFlags(it[0].intSetHorFlags)
+                    if(!newIntervalSet.equals(model.intervalSetHorizontal.value!!)){
+                        model.createHorizontalIntervalSet(it[0].intSetHorFlags)
+                        model.dispatchIntervals()
+                    }
+                }
             }
         }
 //        println("vert: ${model.intervalSet.value!!}")

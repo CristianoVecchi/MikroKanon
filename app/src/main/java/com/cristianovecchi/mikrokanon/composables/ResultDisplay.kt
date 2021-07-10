@@ -15,13 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
-import com.cristianovecchi.mikrokanon.ActiveButtons
-import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.buttonsDisplayBackgroundColor
 import com.cristianovecchi.mikrokanon.ui.sequencesListBackgroundColor
 import kotlinx.coroutines.delay
@@ -57,6 +55,10 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
     val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
     val dimensions = model.dimensions
+
+    val dialogState = remember { mutableStateOf(false) }
+    val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
+    val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
 
         Column(
             modifier = Modifier
@@ -122,8 +124,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                val dialogState by lazy { mutableStateOf(false) }
-                val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
+
 
                 SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
                     title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
@@ -134,17 +135,45 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                             onKP(index, repeat); scrollToTopList = true
                         }
                     })
-                ButtonsDialog(buttonsDialogData, language.OKbutton, model)
-                Row(verticalAlignment = Alignment.CenterVertically) {
 
-                    // UNDO BUTTON
-                    CustomButton(
-                        iconId = iconMap["undo"]!!,
-                        isActive = activeButtons.undo,
-                        buttonSize = buttonSize
-                    ) {
-                        if (!elaborating) onBack(); scrollToTopList = !model.lastComputationIsExpansion()
+                ButtonsDialog(buttonsDialogData, language.OKbutton, model)
+                MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, language.OKbutton)
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column{
+                        // UNDO BUTTON
+                        CustomButton(
+                            iconId = iconMap["undo"]!!,
+                            isActive = activeButtons.undo,
+                            buttonSize = buttonSize
+                        ) {
+                            if (!elaborating) onBack(); scrollToTopList = !model.lastComputationIsExpansion()
+                        }
+                        // HORIZONTAL INTERVAL SET DIALOG BUTTON
+                        CustomButton(
+                            iconId = iconMap["horizontal_movements"]!!,
+                            isActive = true,
+                            buttonSize = buttonSize
+                        ) {
+                            if (!elaborating) {
+                                val flags = model.userOptionsData.value!![0].intSetHorFlags
+                                val intsFromFlags = convertFlagsToInts(flags)
+                                val intervalNames = language.intervalSet.map{ it.replace("\n"," / ") }
+                                    intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
+                                        intsFromFlags.toSet(), dialogTitle = language.selectIntervalsForFP
+                                    ) { indexes ->
+                                        model.updateUserOptions(
+                                            "intSetHorFlags",
+                                            if(indexes.isEmpty()) 0b1111111 else convertIntsToFlags(indexes.toSortedSet())
+                                        )
+                                        intervalSetDialogData.value = MultiListDialogData(itemList = intervalSetDialogData.value.itemList)
+                                    }
+
+                            }
+                        }
+
                     }
+
                     // EXPAND BUTTON
                     CustomButton(
                         iconId = iconMap["expand"]!!,
@@ -157,14 +186,16 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     FunctionButtons(model = model, isActive = activeButtons.counterpoint, buttonSize = buttonSize,
                         onAdd = { if (!elaborating) dialogState.value = true },
                         onSpecialFunctions = {
-                            buttonsDialogData.value = ButtonsDialogData(true,
-                                language.selectSpecialFunction,
-                                model,
-                                onWave3 = { onWave(3); scrollToTopList = true },
-                                onWave4 = { onWave(4); scrollToTopList = true  },
-                                onWave6 = { onWave(6); scrollToTopList = true  })
-                            {
-                                buttonsDialogData.value = ButtonsDialogData(model = model)
+                            if(!elaborating) {
+                                buttonsDialogData.value = ButtonsDialogData(true,
+                                    language.selectSpecialFunction,
+                                    model,
+                                    onWave3 = { onWave(3); scrollToTopList = true },
+                                    onWave4 = { onWave(4); scrollToTopList = true },
+                                    onWave6 = { onWave(6); scrollToTopList = true })
+                                {
+                                    buttonsDialogData.value = ButtonsDialogData(model = model)
+                                }
                             }
                         }
                     )
