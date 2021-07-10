@@ -13,16 +13,14 @@ import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 
 class OutputFragment: Fragment() {
+    lateinit var model: AppViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val model = (activity as MainActivity).model
-//        model.userOptionsData.observe(viewLifecycleOwner){
-//            //model.selectLanguage(model.getUserLangDef())
-//        }
+        model = (activity as MainActivity).model
         model.selectedCounterpoint.observe(viewLifecycleOwner){
             if(model.selectedCounterpoint.value!!.parts.isNotEmpty()) {
                 model.changeActiveButtons( if(model.selectedCounterpoint.value!!.parts.size >= 12)
@@ -31,6 +29,19 @@ class OutputFragment: Fragment() {
                 )
             }
         }
+
+        if(model.userOptionsData.value!!.isNotEmpty()){
+            val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
+            model.createVerticalIntervalSet(verticalIntervalSetFlag)
+        }
+        model.userOptionsData.observe(viewLifecycleOwner){
+            model.userOptionsData.value.let {
+                if(it!!.isNotEmpty()) model.createHorizontalIntervalSet(it[0].intSetHorFlags)
+            }
+        }
+//        println("vert: ${model.intervalSet.value!!}")
+//        println("hor: ${model.intervalSetHorizontal.value!!}")
+
         model.stackSize.observe(viewLifecycleOwner){
             model.changeActiveButtons(  if(model.stackSize.value!! <= 1)
                 model.activeButtons.value!!.copy(undo = false)
@@ -76,5 +87,10 @@ class OutputFragment: Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        model.saveVerticalIntervalSet()
     }
 }

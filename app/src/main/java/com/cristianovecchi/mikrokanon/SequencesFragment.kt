@@ -59,6 +59,7 @@ class SequencesFragment(): Fragment() {
                                    },
                                    onFreePart = { list, trend ->
                                        findNavController().navigate(R.id.outputFragment)
+                                       model.retrieveUserOptionsDataFromDB() // get the horizontal interval set
                                        model.onFreePartFromFirstSelection(list, trend)
                                    },
                                    onMikroKanons2 = { list ->

@@ -95,7 +95,7 @@ class DataGenerator {
         }
         fun getUserOptionsData(): List<UserOptionsData>{
             return listOf(
-                UserOptionsData.getDefaultUserOptionData()
+                UserOptionsData.getDefaultUserOptionsData()
             )
         }
     }

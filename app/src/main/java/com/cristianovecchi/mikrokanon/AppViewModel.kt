@@ -96,7 +96,6 @@ class AppViewModel(
     var MKjob: Job? = null
 
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 36
-    private var ensembleTypeSelected: EnsembleType = EnsembleType.STRING_ORCHESTRA
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
 
     private val _activeButtons = MutableLiveData<ActiveButtons>(ActiveButtons())
@@ -134,6 +133,8 @@ class AppViewModel(
 
     private val _intervalSet = MutableLiveData<List<Int>>(listOf(2, 10, 3, 9, 4, 8, 5, 7))
     val intervalSet : LiveData<List<Int>> = _intervalSet
+    private val _intervalSetHorizontal = MutableLiveData<List<Int>>((0..11).toList())
+    val intervalSetHorizontal : LiveData<List<Int>> = _intervalSetHorizontal
 
     private var _selectedCounterpoint = MutableLiveData<Counterpoint>(Counterpoint.empty())
     val selectedCounterpoint : LiveData<Counterpoint> = _selectedCounterpoint
@@ -157,7 +158,6 @@ class AppViewModel(
 init{
     val size = getDeviceResolution()
     dimensions = Dimensions.provideDimensions(size.x, size.y)
-
 }
     private fun getDeviceResolution(): Point {
         val windowManager: WindowManager = getApplication<MikroKanonApplication>()
@@ -192,7 +192,7 @@ init{
     val onPlay = { createAndPlay: Boolean ->
             var error = "No File Created yet!!!"
             if(userOptionsData.value!!.isEmpty()){
-                insertUserOptionData(UserOptionsData.getDefaultUserOptionData())
+                insertUserOptionData(UserOptionsData.getDefaultUserOptionsData())
             }
             if(!selectedCounterpoint.value!!.isEmpty()) {
                 //mediaPlayer?.let{onStop()}
@@ -506,9 +506,11 @@ init{
     private fun findFreeParts(trend: TREND){
         var newList: List<Counterpoint>
         val spreadWherePossible = userOptionsData.value!![0].spread != 0
+        val directions = trend.directions.filter{ intervalSetHorizontal.value!!.contains(it)}
+        println("directions: $directions")
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = freeParts(selectedCounterpoint.value!!,  intervalSet.value!!, trend.directions)
+                newList = freeParts(selectedCounterpoint.value!!,  intervalSet.value!!, directions)
                     .sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
                     .mapIf(spreadWherePossible){it.spreadAsPossible()}
                     .sortedBy { it.emptiness }
@@ -712,6 +714,9 @@ init{
         sequenceDataMap.clear()
         _sequences.value = allSequencesData.value!!.map{sequenceDataToSequence(it)}
     }
+    fun retrieveUserOptionsDataFromDB(){
+        createHorizontalIntervalSet(userOptionsData.value!![0].intSetHorFlags)
+    }
 
     private fun sequenceDataToSequence(sequenceData: SequenceData) : ArrayList<Clip>{
         val sequence = ArrayList(sequenceData.clips.map { Clip.clipDataToClip(it)})
@@ -731,7 +736,7 @@ init{
     fun updateUserOptions(key: String, value: Any){
         var newUserOptionsData: UserOptionsData? = null
         val optionsDataClone = if(userOptionsData.value!!.isEmpty())
-                                UserOptionsData.getDefaultUserOptionData()
+                                UserOptionsData.getDefaultUserOptionsData()
                                 else userOptionsData.value!![0].copy()
         when(key){
             "ensemble_type" -> {
@@ -755,6 +760,12 @@ init{
             "doublingFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(doublingFlags = value as Int)
             }
+            "intSetVertFlags" -> {
+                newUserOptionsData  = optionsDataClone.copy(intSetVertFlags = value as Int)
+            }
+            "intSetHorFlags" -> {
+                newUserOptionsData  = optionsDataClone.copy(intSetHorFlags = value as Int)
+            }
             "spread" -> {
                 newUserOptionsData  = optionsDataClone.copy(spread = value as Int)
                 clearMKcaches()
@@ -775,6 +786,7 @@ init{
                 }
                 userRepository.insertUserOptions(newUserOptionsData)
             }
+            println(it)
         }
     }
     fun getUserLangDef(): String {
@@ -786,26 +798,18 @@ init{
     fun getSystemLangDef(): String {
         return Locale.getDefault().language
     }
-}
-fun ArrayList<Clip>.toStringAll(notesNames: List<String>): String {
-    return if (this.isNotEmpty()) {
-        this.map { clip -> clip.findText(notesNames = notesNames) }.reduce { acc, string -> "$acc $string" }
-    } else {
-        "empty Sequence"
+
+    fun createHorizontalIntervalSet(horizontalIntervalSetFlag: Int) {
+        _intervalSetHorizontal.value = createIntervalSetFromFlags(horizontalIntervalSetFlag)
     }
-}
+    fun createVerticalIntervalSet(verticalIntervalSetFlag: Int) {
+        _intervalSet.value = createIntervalSetFromFlags(verticalIntervalSetFlag)
+    }
 
-//TODO: implement in CounterpointInterpreter
-suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
-        map { async { f(it) } }.awaitAll()
-}
-@Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
-fun <A, B> Iterable<A>.mapIf(condition: Boolean, f: (A) -> B): List<B> =
-    map { (if(condition) f(it) else it) as B }
-
-@Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
-suspend fun <A, B> Iterable<A>.pmapIf(condition: Boolean, f: suspend (A) -> B): List<B> = coroutineScope {
-    map { async{(if (condition) f(it) else it) as B} }.awaitAll()
+    fun saveVerticalIntervalSet() {
+        val flags = createFlagsFromIntervalSet(intervalSet.value!!)
+        updateUserOptions("intSetVertFlags", flags)
+    }
 }
 
 

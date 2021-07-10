@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
+import com.cristianovecchi.mikrokanon.convertFlagsToInts
+import com.cristianovecchi.mikrokanon.convertIntsToFlags
 import com.cristianovecchi.mikrokanon.locale.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
@@ -111,20 +113,7 @@ data class ExportDialogData(val dialogState: Boolean = false, val title:String =
 data class CreditsDialogData(val dialogState: Boolean = false, val title:String = "",  val onSubmitButtonClick: () -> Unit = {})
 
 
-fun convertIntsToFlags(ints: Set<Int>): Int{
-    var flags = 0
-    ints.forEach{ flags = 1 shl it or flags }
-    return flags
-}
-fun convertFlagsToInts(flags: Int): Set<Int>{
-    val result = mutableSetOf<Int>()
-    for (i in 0..24) {
-        if (1 shl i and flags > 0) {
-            result.add(i)
-        }
-    }
-    return result.toSet()
-}
+
 @Composable
 fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>){
 
@@ -133,16 +122,17 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val multiListDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
+    val intervalSetDialogData by lazy { mutableStateOf(MultiListDialogData())}
 
     val dimensions = model.dimensions
     val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Retrograde", "Inverse",  "Inv-Retrograde", "Doubling",
-        "Spread where possible", "Deep Search in 4 part MK",
+        "Spread where possible", "Deep Search in 4 part MK","Horizontal Interval Set",
         "Export MIDI","Language", "Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val lang = Lang.provideLanguage(model.getUserLangDef())
-    val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionData()
+    val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionsData()
                         else userOptionsData[0]
     val listState = rememberLazyListState()
 
@@ -151,6 +141,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     BpmDialog(bpmDialogData, lang.OKbutton)
     ExportDialog(exportDialogData, lang.OKbutton)
     CreditsDialog(creditsDialogData, lang.OKbutton)
+    MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
 
 //    userOptionsData.forEach{
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
@@ -298,6 +289,28 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                             "deepSearch",
                             if(isOn) 1 else 0
                         )
+                    })
+                }
+                "Horizontal Interval Set" -> {
+                    val flags = userOptions.intSetHorFlags
+                    val intsFromFlags = convertFlagsToInts(flags)
+                    val isOn = flags != 0b1111111
+                    val intervalNames = lang.intervalSet.map{ it.replace("\n"," / ") }
+                    val text = if(!isOn) lang.horIntervalSet else "${lang.horIntervalSet}: ${
+                        intsFromFlags.joinToString(
+                            separator = ", "
+                        ) { intervalNames[it] }
+                    }"
+                    SelectableCard(text = text, fontSize = fontSize, isSelected = isOn, onClick = {
+                        intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
+                            intsFromFlags.toSet(), dialogTitle = lang.selectIntervalsForFP
+                        ) { indexes ->
+                            model.updateUserOptions(
+                                "intSetHorFlags",
+                                if(indexes.isEmpty()) 0b1111111 else convertIntsToFlags(indexes.toSortedSet())
+                            )
+                            intervalSetDialogData.value = MultiListDialogData(itemList = intervalSetDialogData.value.itemList)
+                        }
                     })
                 }
                 "Export MIDI" -> {

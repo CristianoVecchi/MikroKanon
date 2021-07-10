@@ -220,7 +220,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 IntervalSetSelector(
-                    model, fontSize = dimensions.outputIntervalSetFontSize
+                    model, fontSize = dimensions.outputIntervalSetFontSize,
+                    names = language.intervalSet
                 ) { scrollToTopList = true }
             }
         }

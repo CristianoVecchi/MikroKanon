@@ -121,8 +121,13 @@ val doublingSw = listOf("Ndogo ya pili", "Kubwa ya pili", "Ndogo ya tatu", "Kubw
     "Kumi na moja kupindukia", "Kumi na mbili", "Ndogo kumi na tatu", "Kubwa kumi na tatu",
     "Ndogo kumi na nne", "Kubwa kumi na nne", "Octave mara mbili")
 val functionNamesEn = listOf("Wave 3", "Wave 4", "Wave 6")
+val intervalSetIt = listOf("2m\n7M","2M\n7m","3m\n6M","3M\n6m","4\n5","4A\n5d","U\n8")
+val intervalSetEn = listOf("m2\nM7","M2\nm7","m3\nM7","M3\nm6","4\n5","A4\nd5","U\n8")
+val intervalSetDe = listOf("k2\nG7","G2\nk7","k3\nG7","G3\nk6","4\n5","Ü4\nv5","1\n8")
+val intervalSetRu = listOf("2м\n7В","2В\nм7","3м\n6В","3В\nм6","4\n5","4У\n5у","1\n8")
 data class Lang( // English by default
     val noteNames: List<String> = NoteNamesEn.values().map { it.toString() },
+    val intervalSet: List<String> = intervalSetEn,
     val enterSomeNotes: String = "Enter some notes!",
     val choose2ndSequence: String = "Choose the second sequence!",
     val repeatSequence: String = "Repeat the sequence",
@@ -146,6 +151,8 @@ data class Lang( // English by default
     val doubling: String = "Doubling",
     val spreadWherePossible: String = "Spread where possible",
     val deepSearch: String = "Deep search in four-part canons",
+    val horIntervalSet: String = "Free part intervals",
+    val selectIntervalsForFP: String = "Select the melodic intervals for the free part!",
     val exportMidi: String = "Export MIDI",
     val language: String = "Language",
     val credits: String = "Credits"
@@ -176,6 +183,7 @@ data class Lang( // English by default
         fun french(): Lang {
             return Lang(
                 noteNames = NoteNamesFr.values().map { it.toString() },
+                intervalSet = intervalSetIt,
                 ensemble = "Ensemble ", // let a space because in french [word] [_] [:|!|?] [_]
                 bpm = "BPM ",
                 enterSomeNotes = "Entrez quelques notes !",
@@ -189,13 +197,15 @@ data class Lang( // English by default
                 doublingNames = doublingFr,
                 rhythm = "Rythme ", // let a space because in french [word] [_] [:|!|?] [_]
                 rhythmShuffle  = "Mélanger le rythme",
-                partsShuffle  = "Mélanger les parties",
+                partsShuffle  = "Mélanger les voix",
                 retrograde  = "Rétrograde",
                 inverse  = "Miroir",
                 invRetrograde  = "Miroir du rétrograde",
                 doubling  = "Redoublements ", // let a space because in french [word] [_] [:|!|?] [_]
                 spreadWherePossible  = "Répandre là où c'est possible",
                 deepSearch  = "Recherche poussée dans les canons à quatre voix",
+                horIntervalSet = "Intervalles de voix libres",
+                selectIntervalsForFP = "Choisissez les intervalles mélodiques pour les voix libres!",
                 exportMidi  = "Exporter le fichier MIDI",
                 language  = "Langue ",
             )
@@ -203,6 +213,7 @@ data class Lang( // English by default
         fun italian(): Lang {
             return Lang(
                 noteNames = NoteNamesIt.values().map { it.toString() },
+                intervalSet = intervalSetIt,
                 enterSomeNotes = "Digita delle note!",
                 choose2ndSequence = "Scegli la seconda sequenza!",
                 repeatSequence = "Ripeti la sequenza",
@@ -221,6 +232,8 @@ data class Lang( // English by default
              doubling  = "Raddoppi",
              spreadWherePossible  = "Estendi dove è possibile",
              deepSearch  = "Ricerca approfondita nei canoni a quattro parti",
+                horIntervalSet = "Intervalli delle parti libere",
+                selectIntervalsForFP = "Scegli gli intervalli melodici delle parti libere!",
              exportMidi  = "Esporta il file MIDI",
              language  = "Lingua",
             )
@@ -228,6 +241,7 @@ data class Lang( // English by default
         fun spanish(): Lang {
             return Lang(
                 noteNames = NoteNamesIt.values().map { it.toString() },
+                intervalSet = intervalSetIt,
                 enterSomeNotes = "¡Escribe algunas notas!",
                 choose2ndSequence = "¡Elige la segunda secuencia!",
                 repeatSequence = "Repite la secuencia",
@@ -238,14 +252,16 @@ data class Lang( // English by default
                 selectDoubling = "¡Elija intervalos para duplicar!",
                 doublingNames = doublingEs,
                 rhythm = "Ritmo",
-                rhythmShuffle  = "Mezcla el ritmo",
-                partsShuffle  = "Mezclar las partes",
+                rhythmShuffle  = "Mezclar el ritmo",
+                partsShuffle  = "Mezclar las voces ",
                 retrograde  = "Retrógrado",
                 inverse  = "Inversión",
                 invRetrograde  = "Retrógrado de la inversión",
                 doubling  = "Duplicaciones",
                 spreadWherePossible  = "Difundir donde sea posible",
                 deepSearch  = "Búsqueda profunda en cánones de cuatro partes",
+                horIntervalSet = "Intervalos de voces libres",
+                selectIntervalsForFP = "Elige los intervalos melódicos de las voces libres!",
                 exportMidi  = "Esporta el archivo MIDI",
                 language  = "Lengua",
             )
@@ -253,6 +269,7 @@ data class Lang( // English by default
         fun german(): Lang {
             return Lang(
                 noteNames = NoteNamesEn.values().map { it.toString() },
+                intervalSet = intervalSetDe,
                 enterSomeNotes = "Tippe ein paar Noten ein!",
                 choose2ndSequence = "Wähle die zweite Sequenz!",
                 repeatSequence = "Wiederhole die Sequenz",
@@ -271,6 +288,8 @@ data class Lang( // English by default
                 doubling  = "Verdoppelungen",
                 spreadWherePossible  = "Nach Möglichkeit verlängern",
                 deepSearch  = "Tiefensuche in vierstimmigen Kanons",
+                horIntervalSet = "Intervalle freier Stimmen",
+                selectIntervalsForFP = "Wählen Sie die melodischen Intervalle der freien Stimmen!",
                 exportMidi  = "Exportieren Sie die MIDI-Datei",
                 language  = "Sprache",
             )
@@ -278,6 +297,7 @@ data class Lang( // English by default
         fun russian(): Lang {
             return Lang(
                 noteNames = NoteNamesRu.values().map { it.toString() },
+                intervalSet = intervalSetRu,
                 enterSomeNotes = "Введите ноты!",
                 choose2ndSequence = "Выберите вторую последовательность!",
                 repeatSequence = "Повторите последовательность",
@@ -298,6 +318,8 @@ data class Lang( // English by default
                 doubling  = "Двойной",
                 spreadWherePossible  = "По возможности расширяйте",
                 deepSearch  = "Глубокий поиск в четырехголосых канонах",
+                horIntervalSet = "Интервалы свободных голосов",
+                selectIntervalsForFP = "Выберите мелодические интервалы свободных голосов!",
                 exportMidi  = "Экспорт файла МИДИ",
                 language  = "Язык",
             )
@@ -324,6 +346,8 @@ data class Lang( // English by default
                 doubling  = "복식",
                 spreadWherePossible  = "가능한 한 확장",
                 deepSearch  = "네 가지 음성 음악 캐논에서 심층 검색",
+                horIntervalSet = "자유로운 목소리의 간격",
+                selectIntervalsForFP = "자유로운 목소리의 멜로디 간격을 선택하십시오!",
                 exportMidi  = "MIDI 파일 내보내기",
                 language  = "언어",
             )
@@ -350,6 +374,8 @@ data class Lang( // English by default
                 doubling  = "ダブルス",
                 spreadWherePossible  = "可能な場合は延長する",
                 deepSearch  = "4つの音声カノンでの詳細検索",
+                horIntervalSet = "自由な声の間隔",
+                selectIntervalsForFP = "フリーボイスのメロディー間隔を選択してください！",
                 exportMidi  = "MIDIファイルをエクスポートする",
                 language  = "言語",
             )
@@ -376,6 +402,8 @@ data class Lang( // English by default
                 doubling  = "双打",
                 spreadWherePossible  = "尽可能延长",
                 deepSearch  = "四个语音标准中的深度搜索",
+                horIntervalSet = "自由声音的间隔",
+                selectIntervalsForFP = "选择自由声音的旋律音程！",
                 exportMidi  = "导出 MIDI 文件",
                 language  = "语",
             )
@@ -403,6 +431,8 @@ data class Lang( // English by default
                 doubling  = "الزوجي",
                 spreadWherePossible  = "قم بالتمديد حيثما أمكن ذلك",
                 deepSearch  = "بحث عميق في أربعة شرائع صوتية",
+                horIntervalSet = "فترات من الأصوات الحرة",
+                selectIntervalsForFP = "!اختر الفترات اللحنية للأصوات المجانية",
                 exportMidi  = "تصدير ملف MIDI",
                 language  = "لغة",
             )
@@ -430,6 +460,8 @@ data class Lang( // English by default
                 doubling  = "Διπλασιάζω",
                 spreadWherePossible  = "Επεκτείνετε όπου είναι δυνατόν",
                 deepSearch  = "Βαθιά αναζήτηση σε τέσσερις φωνητικούς κανόνες",
+                horIntervalSet = "Διαστήματα ελεύθερων φωνών",
+                selectIntervalsForFP = "Επιλέξτε τα μελωδικά διαστήματα των ελεύθερων φωνών!",
                 exportMidi  = "Εξαγωγή του αρχείου MIDI",
                 language  = "Γλώσσα",
             )
@@ -437,6 +469,7 @@ data class Lang( // English by default
         fun kiswahili(): Lang {
             return Lang(
                 noteNames = NoteNamesIt.values().map { it.toString() },
+                intervalSet = intervalSetIt,
                 enterSomeNotes = "Chapa maelezo kadhaa!",
                 choose2ndSequence = "Chagua mlolongo wa pili!",
                 repeatSequence = "Kurudia mlolongo",
@@ -455,6 +488,8 @@ data class Lang( // English by default
                 doubling  = "Maradufu",
                 spreadWherePossible  = "Panua panapowezekana",
                 deepSearch  = "Utafutaji wa kina katika kanuni nne za sauti",
+                horIntervalSet = "Vipindi vya sauti za bure",
+                selectIntervalsForFP = "Chagua vipindi vya sauti ya sauti za bure!",
                 exportMidi  = "Hamisha faili ya MIDI",
                 language  = "Lugha",
             )
