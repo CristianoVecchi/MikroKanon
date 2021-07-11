@@ -4,7 +4,12 @@ import android.os.Build
 import android.os.Parcelable
 import com.cristianovecchi.mikrokanon.pmap
 import kotlinx.android.parcel.Parcelize
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.job
+import kotlinx.coroutines.withContext
 import java.util.stream.Collectors
+import kotlin.coroutines.CoroutineContext
 
 @Parcelize
 data class MikroKanon(val parts: List<AbsPart>,
@@ -17,7 +22,7 @@ data class MikroKanon(val parts: List<AbsPart>,
         println("Interval Set: ${intervalSet.toIntArray().contentToString()}" )
     }
 
-    private fun findEmptiness() : Float {
+    private fun findEmptiness2() : Float {
         val maxSize = parts.maxOf { it.absPitches.size }
         val nCells = maxSize * parts.size
         if (nCells == 0) return 1.0f
@@ -27,7 +32,15 @@ data class MikroKanon(val parts: List<AbsPart>,
         if (nEmptyNotes == 0) return 0.0f
         // (100 : X = nCells : nEmptyNotes) / 100
         return nEmptyNotes.toFloat() / nCells
-    }
+  }
+private fun findEmptiness() : Float {
+    val lastPartPitches = parts[0].absPitches
+    val nCells = lastPartPitches.size
+    val nEmptyNotes = lastPartPitches.count{ it == -1 }
+    if (nEmptyNotes == 0) return 0.0f
+    // (100 : X = nCells : nEmptyNotes) / 100
+    return nEmptyNotes.toFloat() / nCells
+}
 
     fun toCounterpoint(): Counterpoint {
         return Counterpoint(this.parts, this.intervalSet)
@@ -162,7 +175,7 @@ data class MikroKanon(val parts: List<AbsPart>,
             return MikroKanon(listOf(comes2, comes1, dux), intervalSet.toList())
         }
 
-        fun find4AbsPartMikroKanon(
+         fun find4AbsPartMikroKanon(
             absPitches: IntArray, intervalSet: IntArray,
             delay1: Int,  list2: IntArray,
             delay2: Int,  list3: IntArray,
@@ -188,37 +201,37 @@ data class MikroKanon(val parts: List<AbsPart>,
 
             var absIndex = 0
             var duxIndex = 0
-
+            //val intervalByte = convertIntervalSetToByte(intervalSet)
             while (absIndex < absPitches.size) {
                 val duxPitch = absPitches[absIndex]
                 val comes1Pitch = comes1.absPitches[duxIndex]
                 val comes2Pitch = comes2.absPitches[duxIndex]
                 val comes3Pitch = comes3.absPitches[duxIndex]
 
-                if ((comes1Pitch == -1 || Insieme.isIntervalInSet(
+                if ((comes1Pitch == -1 || isIntervalInSet(
                         intervalSet,
                         duxPitch,
                         comes1Pitch
                     ))
-                    && (comes2Pitch == -1 || Insieme.isIntervalInSet(
+                    && (comes2Pitch == -1 || isIntervalInSet(
                         intervalSet,
                         duxPitch,
                         comes2Pitch
                     ))
-                    && (comes3Pitch == -1 || Insieme.isIntervalInSet(
+                    && (comes3Pitch == -1 || isIntervalInSet(
                         intervalSet,
                         duxPitch,
                         comes3Pitch
                     ))
-                    && (comes2.absPitches[duxIndex + delay1] == -1 || Insieme.isIntervalInSet(
+                    && (comes2.absPitches[duxIndex + delay1] == -1 || isIntervalInSet(
                         intervalSet,
                         list2[absIndex], comes2.absPitches[duxIndex + delay1]
                     ))
-                    && (comes3.absPitches[duxIndex + delay1] == -1 || Insieme.isIntervalInSet(
+                    && (comes3.absPitches[duxIndex + delay1] == -1 || isIntervalInSet(
                         intervalSet,
                         list2[absIndex], comes3.absPitches[duxIndex + delay1]
                     ))
-                    && (comes3.absPitches[duxIndex + delay2] == -1 || Insieme.isIntervalInSet(
+                    && (comes3.absPitches[duxIndex + delay2] == -1 || isIntervalInSet(
                         intervalSet,
                         list3[absIndex], comes3.absPitches[duxIndex + delay2]
                     ))
@@ -335,22 +348,23 @@ data class MikroKanon(val parts: List<AbsPart>,
 
 
         suspend fun findAll4AbsPartMikroKanonsParallel(
+            context: CoroutineContext,
             absPitches: List<Int>,
             intervalSet: List<Int>,
             depth: Int,
             emptinessGate: Float = 1.0f // no check
-        ): List<MikroKanon> {
+        ) =  withContext(context){
             data class Params(
                 val delay1: Int, val transpose1: Int, val form1: Int,
                 val delay2: Int, val transpose2: Int, val form2: Int,
                 val delay3: Int, val transpose3: Int, val form3: Int
-                )
+            )
             val paramsList = mutableListOf<Params>()
             val intervalSetIntArray = intervalSet.toIntArray()
             val absPitchesIntArray = absPitches.toIntArray()
             val rowForms = listOf<IntArray>(absPitchesIntArray, Insieme.invertAbsPitches(absPitchesIntArray),
-            absPitchesIntArray.reversedArray(), Insieme.invertAbsPitches(absPitchesIntArray).reversedArray())
-                val completeForms: List<List<IntArray>> = (0..11).map { transpose ->
+                absPitchesIntArray.reversedArray(), Insieme.invertAbsPitches(absPitchesIntArray).reversedArray())
+            val completeForms: List<List<IntArray>> = (0..11).map { transpose ->
                 listOf(rowForms[0].map { pitch -> Insieme.transposeAbsPitch(pitch, transpose) }.toIntArray(),
                     rowForms[1].map { pitch -> Insieme.transposeAbsPitch(pitch, transpose) }.toIntArray(),
                     rowForms[2].map { pitch -> Insieme.transposeAbsPitch(pitch, transpose) }.toIntArray(),
@@ -359,6 +373,9 @@ data class MikroKanon(val parts: List<AbsPart>,
                 for (delay1 in 1 until depth) {
                     for (delay2 in delay1 + 1 until depth + delay1) {
                         for (delay3 in delay2 + 1 until depth + delay2) {
+//                            for (delay1 in depth downTo 2) {
+//                                for (delay2 in depth + delay1 downTo delay1 + 2) {
+//                                    for (delay3 in depth + delay2 downTo delay2 + 2) {
                             for (tr1 in 0 until 12) {
                                 for (form1 in 0 until 4) {
                                     for (tr2 in 0 until 12) {
@@ -376,31 +393,39 @@ data class MikroKanon(val parts: List<AbsPart>,
                     }
                 }
             } catch (ex: OutOfMemoryError){
-                return MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
+                 MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
             }
 
             try{
+                var count = 0
                 var gate = 1.0f
+                paramsList.shuffle()
+                val job = context.job
                 val deepSearch = emptinessGate != 1.0f
-                return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    paramsList.parallelStream().map{
-                        val mk = find4AbsPartMikroKanon(absPitchesIntArray, intervalSetIntArray,
-                            it.delay1, completeForms[it.transpose1][it.form1],
-                            it.delay2, completeForms[it.transpose2][it.form2],
-                            it.delay3, completeForms[it.transpose3][it.form3])
-                        if(deepSearch) {
-                            val emptiness = mk.findEmptiness()
-                            if(emptiness > gate) null else {
-                                println("NEW GATE: $gate")
-                                gate = emptiness
+                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    paramsList.parallelStream().filter{ job.isActive }.map{
+                        //paramsList.parallelStream().map{
+                            val mk = find4AbsPartMikroKanon(absPitchesIntArray, intervalSetIntArray,
+                                it.delay1, completeForms[it.transpose1][it.form1],
+                                it.delay2, completeForms[it.transpose2][it.form2],
+                                it.delay3, completeForms[it.transpose3][it.form3])
+                            if(deepSearch) {
+                                val emptiness = mk.findEmptiness()
+                                if(emptiness > gate){
+                                    null
+                                } else {
+                                    println("NEW GATE: $gate")
+                                    gate = emptiness
+                                    mk
+                                }
+                            } else {
                                 mk
                             }
-                        } else {
-                            mk
-                        }
+
+                        //}.filter{ it != null }.map{ it as MikroKanon}.toList()
                     }.filter{ it != null }.collect(Collectors.toList<MikroKanon>())
                 } else {
-                    return paramsList.pmap {
+                     paramsList.pmap {
                         val mk = find4AbsPartMikroKanon(absPitchesIntArray, intervalSetIntArray,
                             it.delay1, completeForms[it.transpose1][it.form1],
                             it.delay2, completeForms[it.transpose2][it.form2],
@@ -418,10 +443,11 @@ data class MikroKanon(val parts: List<AbsPart>,
                     }.mapNotNull { it }
                 }
             }catch (ex: OutOfMemoryError){
-                return MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
+                 MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
             }
-
         }
+
+
 
         fun findAll4AbsPartMikroKanons(
             absPitches: List<Int>,
@@ -480,6 +506,7 @@ data class MikroKanon(val parts: List<AbsPart>,
     }
 
 }
+
 
 
 

@@ -25,6 +25,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.*
+import kotlin.system.measureTimeMillis
 
 
 sealed class Computation {
@@ -95,7 +96,10 @@ class AppViewModel(
     }
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
-    var MKjob: Job? = null
+    var MKjob: Job = Job()
+    var MKjob2: Job = Job()
+    var MKunit: Unit = Unit
+
 
     private val MAX_VISIBLE_COUNTERPOINTS: Int = 36
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
@@ -523,7 +527,16 @@ init{
             }
         }
     }
+    fun cancelMKjob(){
+        if(MKjob.isActive) {
+            println("MKjob is active: ${MKjob.isActive}")
+            viewModelScope.launch(Dispatchers.Main) {
+                MKjob.cancelAndJoin()
+            }
+        }
+    }
     private fun findCounterpointsByMikroKanons4(){
+        //if (MKjob.isActive) cancelMKjob()
         MKjob = viewModelScope.launch(Dispatchers.Main){
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
@@ -534,27 +547,36 @@ init{
                 }else if(mk4deepSearchCache.containsKey(key) && deepSearch) {
                     changeCounterpoints(mk4deepSearchCache[key]!!, true)
                 }else {
-                    val newList: List<Counterpoint>
+                   //measureTimeMillis{
                     _elaborating.value = true
-                    withContext(Dispatchers.Default) {
-                        newList = mikroKanons4(sequenceToMikroKanons.value!!,deepSearch,intervalSet.value!!)
-                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
-                            .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible()}
-                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                    }
-                    if(deepSearch){
+                       // val def = async(Dispatchers.Default + MKjob) {
+                           val newList = withContext(Dispatchers.Default){
+                            mikroKanons4(MKjob,
+                                sequenceToMikroKanons.value!!,
+                                deepSearch,
+                                intervalSet.value!!
+                            )
+                                .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                                .take(MAX_VISIBLE_COUNTERPOINTS * 2)
+                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible() }
+                                .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                        }
+                    //val newList: List<Counterpoint> = def.await()
+                    if (deepSearch) {
                         mk4deepSearchCache[key] = newList
                     } else {
                         mk4cache[key] = newList
                     }
-                    _elaborating.value = false
                     changeCounterpoints(newList, true)
+                    _elaborating.value = false
+                   // }.also { time -> println("MK4 executed in $time ms" )}
                 }
             }
         }
     }
 
     private fun findCounterpointsByMikroKanons3(){
+        if (MKjob != null) cancelMKjob()
         MKjob = viewModelScope.launch(Dispatchers.Main){
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
@@ -622,10 +644,9 @@ init{
         val newCounterpoint = Counterpoint.counterpointFromClipList(firstSequence.value!!)
         _selectedCounterpoint.value = newCounterpoint
     }
+
     fun setInitialBlankState() {
-        viewModelScope.launch {
-            MKjob?.cancelAndJoin()
-        }
+        cancelMKjob()
         _elaborating.value = false
         onStop()
         computationStack.clearAndDispatch()
@@ -787,7 +808,7 @@ init{
                 }
                 userRepository.insertUserOptions(newUserOptionsData)
             }
-            println(it)
+            //println(it)
         }
     }
     fun getUserLangDef(): String {

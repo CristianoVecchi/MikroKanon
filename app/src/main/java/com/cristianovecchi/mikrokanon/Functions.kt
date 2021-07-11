@@ -1,9 +1,13 @@
 package com.cristianovecchi.mikrokanon
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope.coroutineContext
+import java.util.stream.Stream
+import kotlin.coroutines.CoroutineContext
+
 
 fun convertIntsToFlags(ints: Set<Int>): Int{
     var flags = 0
@@ -64,4 +68,10 @@ fun <A, B> Iterable<A>.mapIf(condition: Boolean, f: (A) -> B): List<B> =
 suspend fun <A, B> Iterable<A>.pmapIf(condition: Boolean, f: suspend (A) -> B): List<B> = coroutineScope {
     map { async{(if (condition) f(it) else it) as B} }.awaitAll()
 }
+
+
+
+
+
+
 

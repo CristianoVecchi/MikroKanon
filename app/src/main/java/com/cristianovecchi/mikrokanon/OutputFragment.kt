@@ -98,5 +98,6 @@ class OutputFragment: Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         model.saveVerticalIntervalSet()
+        model.cancelMKjob()
     }
 }
