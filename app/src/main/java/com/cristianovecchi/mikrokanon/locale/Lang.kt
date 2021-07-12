@@ -6,8 +6,8 @@ import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 enum class LANGUAGES(val language:String){
     ar("العربية"),
     de("Deutsch"), el("Ελληνικά"),en("English"),es("Español"),
-    fr("Français"), ko("한국어") ,jp("日本語"),
-    it("Italiano"), ru("Русский"),
+    fr("Français"), ko("한국어") ,jp("日本語"), id("Bahasa Indonesia"),
+    it("Italiano"), pt("Português"), ru("Русский"),
     sw("Kiswahili"),zh("中文");
     companion object {
         fun languageNameFromDef(langDef: String): String {
@@ -20,7 +20,9 @@ enum class LANGUAGES(val language:String){
                 "fr" -> fr.language
                 "ko" -> ko.language
                 "jp" -> jp.language
+                "id" -> id.language
                 "it" -> it.language
+                "pt" -> pt.language
                 "ru" -> ru.language
                 "sw" -> sw.language
                 "zh" -> zh.language
@@ -28,6 +30,9 @@ enum class LANGUAGES(val language:String){
             }
         }
     }
+}
+enum class NoteNamesPt {
+    Dó,Ré,Mi,Fá,Sol,Lá,Si,EMPTY
 }
 enum class NoteNamesIt {
     Do,Re,Mi,Fa,Sol,La,Si,EMPTY
@@ -58,9 +63,12 @@ val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단",
     "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","피에로","바로크","발현악기")
 val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器", "サックス", "フルート",
     "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ピエロ", "バロック","撥弦楽器")
-
+val ensembleNamesId = listOf("Alat musik dawai membungkuk", "Instrumen musik tiup kayu", "Orkestra dawai", "Instrumen musik tiup logam", "Saxophone", "Seruling",
+    "Alang-alang ganda", "Klarinet", "Bassoon", "Cellos", "Piano", "Pierrot", "Baroque", "Dawai yang dipetik")
 val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni", "Saxofoni", "Flauti",
     "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte","Pierrot","Barocco", "Corde pizzicate")
+val ensembleNamesPt = listOf("Cordas friccionadas", "Madeiras", "Orquestra de cordas", "Metais", "Saxofones", "Flautas",
+    "Palhetas duplas", "Clarinetes", "Fagotes", "Violoncelos", "Piano", "Pierrot", "Barroco", "Cordas dedilhadas")
 val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Saxophones", "Flûtes",
     "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Pierrot","Baroque","Cordes pincées")
 val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты", "Саксофоны", "Флейты",
@@ -84,10 +92,16 @@ val doublingEn = listOf("minor 2nd","Major 2nd", "minor 3rd", "Major 3rd", "4th"
     "Augm. 4th", "5th", "minor 6th", "Major 6th", "minor 7th", "Major 7th",
     "Octave", "minor 9th", "Major 9th", "minor 10th", "Major 10th", "11th",
     "Augm. 11th", "12th", "minor 13th", "Major 13th", "minor 14th", "Major 14th", "Double Octave")
-val doublingIt = listOf("2a minore","2a Maggiore", "3a minore", "3a Maggiore", "4a",
-    "4a Aumentata", "5a", "6a minore", "6a Maggiore", "7a minore", "7a Maggiore",
-    "Ottava", "9a minore", "9a Maggiore", "10a minore", "10a Maggiore", "11a",
-    "11a Aumentata", "12a", "13a minore", "13a Maggiore", "14a minore", "14a Maggiore", "Ottava doppia")
+val doublingId = listOf("Minor kedua","Mayor kedua", "Minor ketiga", "Mayor ketiga", "Sempurna keempat",
+    "Tambah keempat", "Sempurna kelima", "Minor keenam", "Mayor keenam", "Minor ketujuh", "Mayor ketujuh",
+    "Oktaf","Minor kedua + oktaf","Mayor kedua + oktaf", "Minor ketiga + oktaf", "Mayor ketiga + oktaf", "Sempurna keempat + oktaf",
+    "Tambah keempat + oktaf", "Sempurna kelima + oktaf", "Minor keenam + oktaf", "Mayor keenam + oktaf",
+    "Minor ketujuh + oktaf", "Mayor ketujuh + oktaf",
+    "Oktaf ganda" )
+val doublingIt = listOf("2ª minore","2ª Maggiore", "3ª minore", "3ª Maggiore", "4ª",
+    "4ª Aumentata", "5ª", "6ª minore", "6ª Maggiore", "7ª minore", "7ª Maggiore",
+    "Ottava", "9ª minore", "9ª Maggiore", "10ª minore", "10ª Maggiore", "11ª",
+    "11ª Aumentata", "12ª", "13ª minore", "13ª Maggiore", "14ª minore", "14ª Maggiore", "Ottava doppia")
 val doublingFr = listOf("2ème mineur", "2ème Majeur", "3ème mineur", "3ème Majeur", "4e",
     "4e Augmentée", "5e", "6e mineure", "6e Majeure", "7ème mineure", "7ème Majeure",
     "Octave", "9ème mineur", "9ème Majeur", "10ème mineur", "10ème Majeur", "11ème",
@@ -120,6 +134,10 @@ val doublingSw = listOf("Ndogo ya pili", "Kubwa ya pili", "Ndogo ya tatu", "Kubw
     "Octave", "Ndogo Hakuna", "Kubwa Hakuna", "Ndogo ya zaka", "Kubwa ya zaka", "Kumi na moja",
     "Kumi na moja kupindukia", "Kumi na mbili", "Ndogo kumi na tatu", "Kubwa kumi na tatu",
     "Ndogo kumi na nne", "Kubwa kumi na nne", "Octave mara mbili")
+val doublingPt = listOf("2ª menor","2ª Maior", "3ª menor", "3ª Maior", "4ª",
+    "4ª Aumentada", "5ª", "6ª menor", "6ª Maior", "7ª menor", "7ª Maior",
+    "Oitava", "9ª menor", "9ª Maior", "10ª menor", "10ª Maior", "11ª",
+    "11ª Aumentada", "12ª", "13ª menor", "13ª Maior", "14ª menor", "14ª Maior", "Oitava dupla")
 val functionNamesEn = listOf("Wave 3", "Wave 4", "Wave 6")
 val intervalSetIt = listOf("2m\n7M","2M\n7m","3m\n6M","3M\n6m","4\n5","4A\n5d","U\n8")
 val intervalSetEn = listOf("m2\nM7","M2\nm7","m3\nM7","M3\nm6","4\n5","A4\nd5","U\n8")
@@ -154,6 +172,7 @@ data class Lang( // English by default
     val deepSearch: String = "Deep search in four-part canons",
     val horIntervalSet: String = "Free part intervals",
     val selectIntervalsForFP: String = "Select the melodic intervals for the free part!",
+    val FPremember: String = "(  ∼➚  ∼➘  -➚  -➘  )",
     val exportMidi: String = "Export MIDI",
     val language: String = "Language",
     val credits: String = "Credits"
@@ -171,7 +190,9 @@ data class Lang( // English by default
                 "fr" -> french()
                 "ko" -> korean()
                 "jp" -> japanese()
+                "id" -> bahasa()
                 "it" -> italian()
+                "pt" -> portugues()
                 "ru" -> russian()
                 "sw" -> kiswahili()
                 "zh" -> chinese()
@@ -202,6 +223,7 @@ data class Lang( // English by default
                 retrograde  = "Rétrograde",
                 inverse  = "Miroir",
                 invRetrograde  = "Miroir du rétrograde",
+                rowFormSeparator = "Séparateur de forme série",
                 doubling  = "Redoublements ", // let a space because in french [word] [_] [:|!|?] [_]
                 spreadWherePossible  = "Répandre là où c'est possible",
                 deepSearch  = "Recherche poussée dans les canons à quatre voix",
@@ -230,6 +252,7 @@ data class Lang( // English by default
              retrograde  = "Retrogrado",
              inverse  = "Inverso",
              invRetrograde  = "Inverso del retrogrado",
+             rowFormSeparator = "Separatore delle forme seriali",
              doubling  = "Raddoppi",
              spreadWherePossible  = "Estendi dove è possibile",
              deepSearch  = "Ricerca approfondita nei canoni a quattro parti",
@@ -258,6 +281,7 @@ data class Lang( // English by default
                 retrograde  = "Retrógrado",
                 inverse  = "Inversión",
                 invRetrograde  = "Retrógrado de la inversión",
+                rowFormSeparator = "Separador de forma de serie",
                 doubling  = "Duplicaciones",
                 spreadWherePossible  = "Difundir donde sea posible",
                 deepSearch  = "Búsqueda profunda en cánones de cuatro partes",
@@ -286,6 +310,7 @@ data class Lang( // English by default
                 retrograde  = "Krebs",
                 inverse  = "Umkehrung",
                 invRetrograde  = "Krebsumkehrung",
+                rowFormSeparator = "Trennzeichen für serielle Formulare",
                 doubling  = "Verdoppelungen",
                 spreadWherePossible  = "Nach Möglichkeit verlängern",
                 deepSearch  = "Tiefensuche in vierstimmigen Kanons",
@@ -316,6 +341,7 @@ data class Lang( // English by default
                 retrograde  = "Ракоход",
                 inverse  = "Инверсия",
                 invRetrograde  = "Ракоход-инверсия",
+                rowFormSeparator = "Разделитель серийных форм",
                 doubling  = "Двойной",
                 spreadWherePossible  = "По возможности расширяйте",
                 deepSearch  = "Глубокий поиск в четырехголосых канонах",
@@ -344,6 +370,7 @@ data class Lang( // English by default
                 retrograde  = "뒤로 걷다",
                 inverse  = "역 동작",
                 invRetrograde  = "움직임을 뒤집고 뒤로 걸어",
+                rowFormSeparator = "직렬 형식 구분 기호",
                 doubling  = "복식",
                 spreadWherePossible  = "가능한 한 확장",
                 deepSearch  = "네 가지 음성 음악 캐논에서 심층 검색",
@@ -372,6 +399,7 @@ data class Lang( // English by default
                 retrograde  = "後ろ向きに歩く",
                 inverse  = "間隔の反転",
                 invRetrograde  = "後ろ向きに歩くことで間隔を逆にする",
+                rowFormSeparator = "シリアルフォームセパレータ",
                 doubling  = "ダブルス",
                 spreadWherePossible  = "可能な場合は延長する",
                 deepSearch  = "4つの音声カノンでの詳細検索",
@@ -400,6 +428,7 @@ data class Lang( // English by default
                 retrograde  = "向后走",
                 inverse  = "反转间隔",
                 invRetrograde  = "向后走并反转间隔",
+                rowFormSeparator = "序列表分隔符",
                 doubling  = "双打",
                 spreadWherePossible  = "尽可能延长",
                 deepSearch  = "四个语音标准中的深度搜索",
@@ -429,6 +458,7 @@ data class Lang( // English by default
                 retrograde  = "المشي إلى الخلف",
                 inverse  = "اعكس الحركات",
                 invRetrograde  = "اعكس الحركات وامش للخلف",
+                rowFormSeparator = "فاصل الشكل التسلسلي",
                 doubling  = "الزوجي",
                 spreadWherePossible  = "قم بالتمديد حيثما أمكن ذلك",
                 deepSearch  = "بحث عميق في أربعة شرائع صوتية",
@@ -441,6 +471,7 @@ data class Lang( // English by default
         fun greek(): Lang {
             return Lang(
                 noteNames = NoteNamesEl.values().map { it.toString() },
+                intervalSet = intervalSetEn,
                 enterSomeNotes = "Πληκτρολογήστε μερικές νότες!",
                 choose2ndSequence = "Επιλέξτε τη δεύτερη ακολουθία!",
                 repeatSequence = "Επαναλάβετε την ακολουθία",
@@ -458,6 +489,7 @@ data class Lang( // English by default
                 retrograde  = "Τον καρκίνο",
                 inverse  = "Την αναστροφή ",
                 invRetrograde  = "Την καρκινική αναστροφή",
+                rowFormSeparator = "Διαχωριστικό σειριακής φόρμας",
                 doubling  = "Διπλασιάζω",
                 spreadWherePossible  = "Επεκτείνετε όπου είναι δυνατόν",
                 deepSearch  = "Βαθιά αναζήτηση σε τέσσερις φωνητικούς κανόνες",
@@ -486,6 +518,7 @@ data class Lang( // English by default
                 retrograde  = "Tembea nyuma",
                 inverse  = "Kubadili harakati",
                 invRetrograde  = "Tembea nyuma na kubadili harakati",
+                rowFormSeparator = "Separator ya fomu ya serial",
                 doubling  = "Maradufu",
                 spreadWherePossible  = "Panua panapowezekana",
                 deepSearch  = "Utafutaji wa kina katika kanuni nne za sauti",
@@ -493,6 +526,66 @@ data class Lang( // English by default
                 selectIntervalsForFP = "Chagua vipindi vya sauti ya sauti za bure!",
                 exportMidi  = "Hamisha faili ya MIDI",
                 language  = "Lugha",
+            )
+        }
+        fun portugues(): Lang {
+            return Lang(
+                noteNames = NoteNamesPt.values().map { it.toString() },
+                intervalSet = intervalSetIt,
+                enterSomeNotes = "Digite algumas notas!",
+                choose2ndSequence = "Escolha a segunda sequência!",
+                repeatSequence = "Repita a sequência",
+                ensemble ="Conjunto",
+                selectEnsemble = "Escolha um conjunto!",
+                ensembleNames = ensembleNamesPt,
+                beatsPerMinute = "Batimentos por minuto",
+                selectRhythm = "Escolha um ritmo!",
+                selectDoubling = "Escolha intervalos para dobrar!",
+                doublingNames = doublingPt,
+                rhythm = "Ritmo",
+                rhythmShuffle  = "Misture o ritmo",
+                partsShuffle  = "Misture as vozes ",
+                retrograde  = "Retrogradação",
+                inverse  = "Inversão",
+                invRetrograde  = "Inverso de retrogradação",
+                rowFormSeparator = "Separador de forma serial",
+                doubling  = "Duplas",
+                spreadWherePossible  = "Estenda onde for possível",
+                deepSearch  = "Pesquisa profunda em cânones de quatro vozes",
+                horIntervalSet = "Intervalos de vozes livres",
+                selectIntervalsForFP = "Escolha os intervalos melódicos de vozes livres",
+                exportMidi  = "Exporte o arquivo MIDI",
+                language  = "Língua",
+            )
+        }
+        fun bahasa(): Lang {
+            return Lang(
+                noteNames = NoteNamesIt.values().map { it.toString() },
+                intervalSet = intervalSetEn,
+                enterSomeNotes = "Ketik beberapa not!",
+                choose2ndSequence = "Scegli la seconda sequenza!",
+                repeatSequence = "Pilih urutan kedua!",
+                ensemble = "Ansambel",
+                selectEnsemble = "Pilih ansambel!",
+                ensembleNames = ensembleNamesId,
+                beatsPerMinute = "Detak per menit",
+                selectRhythm = "Pilih irama!",
+                selectDoubling = "Pilih interval untuk menggandakan!",
+                doublingNames = doublingId,
+                rhythm = "Irama",
+                rhythmShuffle  = "Campurkan irama",
+                partsShuffle  = "Campur suara",
+                retrograde  = "Berjalan mundur",
+                inverse  = "Membalikkan gerakan",
+                invRetrograde  = "Membalikkan gerakan dan berjalan mundur",
+                rowFormSeparator = "Pemisah bentuk serial",
+                doubling  = "Ganda",
+                spreadWherePossible  = "Perluas jika memungkinkan",
+                deepSearch  = "Pencarian mendalam dalam empat kanon suara",
+                horIntervalSet = "Interval suara bebas",
+                selectIntervalsForFP = "Pilih interval melodi dari suara bebas!",
+                exportMidi  = "Ekspor file MIDI",
+                language  = "Bahasa",
             )
         }
     }

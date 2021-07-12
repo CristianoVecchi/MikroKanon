@@ -160,7 +160,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                 val intsFromFlags = convertFlagsToInts(flags)
                                 val intervalNames = language.intervalSet.map{ it.replace("\n"," / ") }
                                     intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
-                                        intsFromFlags.toSet(), dialogTitle = language.selectIntervalsForFP
+                                        intsFromFlags.toSet(), dialogTitle = "${language.selectIntervalsForFP}\n${language.FPremember}"
                                     ) { indexes ->
                                         model.updateUserOptions(
                                             "intSetHorFlags",

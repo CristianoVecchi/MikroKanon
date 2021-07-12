@@ -30,7 +30,7 @@ class OutputFragment: Fragment() {
             }
         }
 
-        if(model.userOptionsData.value!!.isNotEmpty()){
+        if(model.userOptionsData.value != null && model.userOptionsData.value!!.isNotEmpty()){
             val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
             model.createVerticalIntervalSet(verticalIntervalSetFlag)
         }
@@ -98,6 +98,5 @@ class OutputFragment: Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         model.saveVerticalIntervalSet()
-        model.cancelMKjob()
     }
 }

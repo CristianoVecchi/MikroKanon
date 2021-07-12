@@ -96,27 +96,20 @@ class AppViewModel(
     }
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
-    var MKjob: Job = Job()
-    var MKjob2: Job = Job()
-    var MKunit: Unit = Unit
 
-
-    private val MAX_VISIBLE_COUNTERPOINTS: Int = 36
+    private val  maxVisibleCounterpoints: Int = 74
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
 
-    private val _activeButtons = MutableLiveData<ActiveButtons>(ActiveButtons())
+    private val _activeButtons = MutableLiveData(ActiveButtons())
     val activeButtons : LiveData<ActiveButtons> = _activeButtons
 
     private val _sequences = MutableLiveData<List<ArrayList<Clip>>>(listOf())
     val sequences : LiveData<List<ArrayList<Clip>>> = _sequences
 
-//    private var _deepSearch = MutableLiveData<Boolean>(false)
-//    var deepSearch: LiveData<Boolean> = _deepSearch
-
-    private var _elaborating = MutableLiveData<Boolean>(false)
+    private var _elaborating = MutableLiveData(false)
     var elaborating: LiveData<Boolean> = _elaborating
 
-    private var _playing = MutableLiveData<Boolean>(false)
+    private var _playing = MutableLiveData(false)
     var playing: LiveData<Boolean> = _playing
 
     private var _firstSequence= MutableLiveData<List<Clip>>(listOf())
@@ -125,10 +118,10 @@ class AppViewModel(
     private var _sequenceToAdd = MutableLiveData<List<Clip>>(listOf())
     val sequenceToAdd : LiveData<List<Clip>> = _sequenceToAdd
 
-    private val _selectedSequence = MutableLiveData<Int>(-1)
+    private val _selectedSequence = MutableLiveData(-1)
     val selectedSequence : LiveData<Int> = _selectedSequence
 
-    private val _stackSize = MutableLiveData<Int>(1)
+    private val _stackSize = MutableLiveData(1)
     val stackSize : LiveData<Int> = _stackSize
 
     private var _sequenceToMikroKanons = MutableLiveData<List<Clip>>(listOf())
@@ -137,12 +130,12 @@ class AppViewModel(
     private val _counterpoints = MutableLiveData<List<Counterpoint>>(listOf())
     val counterpoints : LiveData<List<Counterpoint>> = _counterpoints
 
-    private val _intervalSet = MutableLiveData<List<Int>>(listOf(2, 10, 3, 9, 4, 8, 5, 7))
+    private val _intervalSet = MutableLiveData(listOf(2, 10, 3, 9, 4, 8, 5, 7))
     val intervalSet : LiveData<List<Int>> = _intervalSet
-    private val _intervalSetHorizontal = MutableLiveData<List<Int>>((0..11).toList())
+    private val _intervalSetHorizontal = MutableLiveData((0..11).toList())
     val intervalSetHorizontal : LiveData<List<Int>> = _intervalSetHorizontal
 
-    private var _selectedCounterpoint = MutableLiveData<Counterpoint>(Counterpoint.empty())
+    private var _selectedCounterpoint = MutableLiveData(Counterpoint.empty())
     val selectedCounterpoint : LiveData<Counterpoint> = _selectedCounterpoint
     val allSequencesData: LiveData<List<SequenceData>> = sequenceRepository.allSequences.asLiveData()
     val userOptionsData: LiveData<List<UserOptionsData>> = userRepository.userOptions.asLiveData()
@@ -153,7 +146,6 @@ class AppViewModel(
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4deepSearchCache = HashMap<CacheKey, List<Counterpoint>>()
-
 
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -196,12 +188,11 @@ init{
         onPlay(true)
     }
     val onPlay = { createAndPlay: Boolean ->
-            var error = "No File Created yet!!!"
+            var error = "ERROR: NO FILE"
             if(userOptionsData.value!!.isEmpty()){
                 insertUserOptionData(UserOptionsData.getDefaultUserOptionsData())
             }
             if(!selectedCounterpoint.value!!.isEmpty()) {
-                //mediaPlayer?.let{onStop()}
                 if (mediaPlayer == null) {
                     mediaPlayer = MediaPlayer()
                     mediaPlayer?.setOnCompletionListener { onStop() }
@@ -246,6 +237,7 @@ init{
             error
     }
     val dispatchIntervals = {
+        if(computationStack.isNotEmpty())
             refreshComputation(false)
     }
     val onExpand = {
@@ -280,14 +272,10 @@ init{
         findWavesFromSequence(nWaves)
     }
     val onWaveFurtherSelection = { nWaves: Int , stepBackCounterpoints: List<Counterpoint>? ->
-        val lastComputation = computationStack.peek()
         val originalCounterpoints = stepBackCounterpoints ?: counterpoints.value!!.map{ it.clone() }
-
         computationStack.pushAndDispatch(Computation.FurtherFromWave(originalCounterpoints, nWaves))
         findWavesOnCounterpoints(originalCounterpoints, nWaves)
     }
-
-
     val onFreePartFromFirstSelection = { list: ArrayList<Clip>, trend: TREND ->
         changeFirstSequence(list)
         computationStack.pushAndDispatch(Computation.FirstFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!), trend))
@@ -305,16 +293,12 @@ init{
 
     }
     val onMikroKanons3 = {list: ArrayList<Clip> ->
-       // if(!elaborating.value!!) {
             computationStack.pushAndDispatch(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),
                 ArrayList(sequenceToMikroKanons.value!!),3))
             if(list.isNotEmpty()) changeSequenceToMikroKanons(list)
             findCounterpointsByMikroKanons3()
-       // }
-
     }
     val onMikroKanons4 = {list: ArrayList<Clip> ->
-        //if(!elaborating.value!!) {
             computationStack.pushAndDispatch(
                 Computation.MikroKanonOnly(
                     selectedCounterpoint.value!!.clone(),
@@ -323,16 +307,13 @@ init{
             )
             if (list.isNotEmpty()) changeSequenceToMikroKanons(list)
             findCounterpointsByMikroKanons4()
-        //}
     }
     val onBack = {
         if(computationStack.size > 1) {
-            println("ON BACK")
             refreshComputation(true)
         }
     }
     //-------------end macro functions--------------------
-
 
     fun shareMidi(file: File){
         try {
@@ -410,7 +391,6 @@ init{
                     }
                     is Computation.MikroKanonOnly -> {
                         println(sequenceToMikroKanons.value!!)
-                        //changeSequenceToMikroKanons(previousComputation.sequenceToMikroKanon)
                         when (previousComputation.nParts) {
                             2 -> onMikroKanons2(ArrayList(sequenceToMikroKanons.value!!))
                             3 -> onMikroKanons3(ArrayList(sequenceToMikroKanons.value!!))
@@ -419,65 +399,25 @@ init{
                         }
                     }
                     is Computation.Expand -> {
-                        //val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
                         if(stepBack){
                             expandCounterpoints(previousComputation.counterpoints,
                                                 previousComputation.index, previousComputation.extension)
                         } else {
                             _elaborating.value = false
-                            var count = 0
                             var originalComputation: Computation
-
                             viewModelScope.launch(Dispatchers.Unconfined){
                                 do {
-
                                     onBack()
                                     originalComputation = computationStack.lastElement()
-//                                    if (originalComputation is Computation.Expand) {
-//                                        counterpointStack.pop()
-//                                        counterpointStack.pop()
-//                                    }
-                                    count++
                                 } while(originalComputation is Computation.Expand )
-                                //for(i in 0 until count) {println("count: $i"); onExpand() }
                             }
-                            count = 0
-//                            when(originalComputation){
-//                                is Computation.MikroKanonOnly -> {
-//                                    when (originalComputation.nParts) {
-//                                        2 -> onMikroKanons(ArrayList(sequenceToMikroKanons.value!!))
-//                                        3 -> onMikroKanons3(ArrayList(sequenceToMikroKanons.value!!))
-//                                        4 -> onMikroKanons4(ArrayList(sequenceToMikroKanons.value!!))
-//                                        else -> Unit
-//                                    }
-//                                }
-//                                is Computation.FirstFromFreePart -> onFreePartFromFirstSelection(
-//                                    originalComputation.firstSequence, originalComputation.trend
-//                                )
-//                                is Computation.FirstFromKP -> onKPfromFirstSelection(
-//                                    originalComputation.firstSequence,
-//                                    originalComputation.indexSequenceToAdd
-//                                )
-//                                is Computation.FurtherFromFreePart -> {
-//                                    changeSelectedCounterpoint(originalComputation.counterpoint)
-//                                    onFreePartFurtherSelections(originalComputation.trend)
-//                                }
-//                                is Computation.FurtherFromKP -> {
-//                                    changeSelectedCounterpoint(originalComputation.counterpoint)
-//                                    onKPfurtherSelections(originalComputation.indexSequenceToAdd)
-//                                }
-//                                else -> Unit
-//                            }
-//                            //elaborating = false
-//                            println("REEXPANDE count=$count")
-
                         }
                     }
                 }
                 _elaborating.value = false
             }
-
     }
+
     fun lastComputationIsExpansion(): Boolean{
         if (computationStack.isEmpty()) return true
         return when (computationStack.lastElement()) {
@@ -485,6 +425,7 @@ init{
             else -> false
         }
     }
+
     private fun findWavesFromSequence(nWaves: Int){
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
@@ -494,13 +435,14 @@ init{
             changeCounterpoints(newList, true)
         }
     }
+
     fun findWavesOnCounterpoints(originalCounterpoints: List<Counterpoint>, nWaves: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = waves(originalCounterpoints,intervalSet.value!!, nWaves)
-                            .sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+                            .sortedBy { it.emptiness }.take(maxVisibleCounterpoints)
                             .mapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible()}
                             .sortedBy { it.emptiness }
                 }
@@ -517,7 +459,7 @@ init{
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = freeParts(selectedCounterpoint.value!!,  intervalSet.value!!, directions)
-                    .sortedBy { it.emptiness }.take(MAX_VISIBLE_COUNTERPOINTS)
+                    .sortedBy { it.emptiness }.take(maxVisibleCounterpoints)
                     .mapIf(spreadWherePossible){it.spreadAsPossible()}
                     .sortedBy { it.emptiness }
             }
@@ -527,17 +469,20 @@ init{
             }
         }
     }
-    fun cancelMKjob(){
-        if(MKjob.isActive) {
-            println("MKjob is active: ${MKjob.isActive}")
+
+    private val jobQueue = java.util.LinkedList<Job>()
+    private fun cancelPreviousMKjobs() {
+        if(jobQueue.isNotEmpty()) {
             viewModelScope.launch(Dispatchers.Main) {
-                MKjob.cancelAndJoin()
+                while ( jobQueue.isNotEmpty()){
+                    val job = jobQueue.poll()
+                    job?.cancel()
+                }
             }
         }
     }
     private fun findCounterpointsByMikroKanons4(){
-        //if (MKjob.isActive) cancelMKjob()
-        MKjob = viewModelScope.launch(Dispatchers.Main){
+        viewModelScope.launch(Dispatchers.Main){
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
@@ -547,17 +492,17 @@ init{
                 }else if(mk4deepSearchCache.containsKey(key) && deepSearch) {
                     changeCounterpoints(mk4deepSearchCache[key]!!, true)
                 }else {
-                   //measureTimeMillis{
+                   measureTimeMillis{
                     _elaborating.value = true
                        // val def = async(Dispatchers.Default + MKjob) {
                            val newList = withContext(Dispatchers.Default){
-                            mikroKanons4(MKjob,
+                            mikroKanons4(this.coroutineContext.job,
                                 sequenceToMikroKanons.value!!,
                                 deepSearch,
                                 intervalSet.value!!
                             )
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                                .take(MAX_VISIBLE_COUNTERPOINTS * 2)
+                                .take(maxVisibleCounterpoints)
                                 .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible() }
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
@@ -569,15 +514,14 @@ init{
                     }
                     changeCounterpoints(newList, true)
                     _elaborating.value = false
-                   // }.also { time -> println("MK4 executed in $time ms" )}
+                    }.also { time -> println("MK4 executed in $time ms" )}
                 }
             }
-        }
+        }.also{  jobQueue.add(it)  }
     }
 
     private fun findCounterpointsByMikroKanons3(){
-        if (MKjob != null) cancelMKjob()
-        MKjob = viewModelScope.launch(Dispatchers.Main){
+         viewModelScope.launch(Dispatchers.Main){
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
                 val key = CacheKey(sequence, intervalSet.value!!)
@@ -588,7 +532,7 @@ init{
                     _elaborating.value = true
                     withContext(Dispatchers.Default) {
                         newList = mikroKanons3(sequenceToMikroKanons.value!!,intervalSet.value!!, 6)
-                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
+                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(maxVisibleCounterpoints)
                             .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible()}
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                     }
@@ -597,21 +541,22 @@ init{
                     changeCounterpoints(newList, true)
                 }
             }
-        }
+        }.also{  jobQueue.add(it)  }
     }
+
     private fun findCounterpointsByMikroKanons2(){
-        //_counterpoints.value = emptyList()
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = mikroKanons2(sequenceToMikroKanons.value!!,intervalSet.value!!, 7)
-                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(maxVisibleCounterpoints)
                     .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible()}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpoints(newList, true)
         }
     }
+
     private fun expandCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int, extension: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
@@ -631,7 +576,7 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = addSequence(selectedCounterpoint.value!! , sequenceToAdd.value!!, intervalSet.value!! ,repeat, 7)
-                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(MAX_VISIBLE_COUNTERPOINTS * 2)
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(maxVisibleCounterpoints)
                         .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible()}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
@@ -646,7 +591,7 @@ init{
     }
 
     fun setInitialBlankState() {
-        cancelMKjob()
+        cancelPreviousMKjobs()
         _elaborating.value = false
         onStop()
         computationStack.clearAndDispatch()
@@ -808,7 +753,6 @@ init{
                 }
                 userRepository.insertUserOptions(newUserOptionsData)
             }
-            //println(it)
         }
     }
     fun getUserLangDef(): String {

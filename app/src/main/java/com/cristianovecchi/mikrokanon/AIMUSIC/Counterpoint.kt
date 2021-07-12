@@ -436,4 +436,12 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = UNRE
         }
         return AbsPart(newAbsPitches, this.rowForm, this.transpose, this.delay)
     }
+
+    fun findEmptiness(): Float {
+            val absPitches = this.absPitches
+            val nEmptyNotes = absPitches.count{ it == -1 }
+            if (nEmptyNotes == 0) return 0.0f
+            // (100 : X = nCells : nEmptyNotes) / 100
+            return nEmptyNotes.toFloat() / absPitches.size
+    }
 }

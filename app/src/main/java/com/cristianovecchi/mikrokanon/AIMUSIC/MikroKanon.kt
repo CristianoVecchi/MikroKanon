@@ -10,6 +10,7 @@ import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import java.util.stream.Collectors
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 
 @Parcelize
 data class MikroKanon(val parts: List<AbsPart>,
@@ -32,15 +33,15 @@ data class MikroKanon(val parts: List<AbsPart>,
         if (nEmptyNotes == 0) return 0.0f
         // (100 : X = nCells : nEmptyNotes) / 100
         return nEmptyNotes.toFloat() / nCells
-  }
-private fun findEmptiness() : Float {
-    val lastPartPitches = parts[0].absPitches
-    val nCells = lastPartPitches.size
-    val nEmptyNotes = lastPartPitches.count{ it == -1 }
-    if (nEmptyNotes == 0) return 0.0f
-    // (100 : X = nCells : nEmptyNotes) / 100
-    return nEmptyNotes.toFloat() / nCells
-}
+    }
+    private fun findEmptiness() : Float {
+        val lastPartPitches = parts[0].absPitches
+        val nCells = lastPartPitches.size
+        val nEmptyNotes = lastPartPitches.count{ it == -1 }
+        if (nEmptyNotes == 0) return 0.0f
+        // (100 : X = nCells : nEmptyNotes) / 100
+        return nEmptyNotes.toFloat() / nCells
+    }
 
     fun toCounterpoint(): Counterpoint {
         return Counterpoint(this.parts, this.intervalSet)
@@ -175,7 +176,7 @@ private fun findEmptiness() : Float {
             return MikroKanon(listOf(comes2, comes1, dux), intervalSet.toList())
         }
 
-         fun find4AbsPartMikroKanon(
+        fun find4AbsPartMikroKanon(
             absPitches: IntArray, intervalSet: IntArray,
             delay1: Int,  list2: IntArray,
             delay2: Int,  list3: IntArray,
@@ -315,8 +316,8 @@ private fun findEmptiness() : Float {
             depth: Int
         ): List<MikroKanon> {
             data class Params(
-                              val delay1: Int, val transpose1: Int, val form1: Int,
-                              val delay2: Int, val transpose2: Int, val form2: Int)
+                val delay1: Int, val transpose1: Int, val form1: Int,
+                val delay2: Int, val transpose2: Int, val form2: Int)
             val paramsList = mutableListOf<Params>()
             val intervalSetIntArray = intervalSet.toIntArray()
             val absPitchesIntArray = absPitches.toIntArray()
@@ -393,45 +394,48 @@ private fun findEmptiness() : Float {
                     }
                 }
             } catch (ex: OutOfMemoryError){
-                 MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
+                MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
             }
 
             try{
-                var count = 0
                 var gate = 1.0f
                 paramsList.shuffle()
                 val job = context.job
                 val deepSearch = emptinessGate != 1.0f
-                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     paramsList.parallelStream().filter{ job.isActive }.map{
                         //paramsList.parallelStream().map{
-                            val mk = find4AbsPartMikroKanon(absPitchesIntArray, intervalSetIntArray,
-                                it.delay1, completeForms[it.transpose1][it.form1],
-                                it.delay2, completeForms[it.transpose2][it.form2],
-                                it.delay3, completeForms[it.transpose3][it.form3])
-                            if(deepSearch) {
-                                val emptiness = mk.findEmptiness()
-                                if(emptiness > gate){
-                                    null
-                                } else {
-                                    println("NEW GATE: $gate")
-                                    gate = emptiness
-                                    mk
-                                }
-                            } else {
-                                mk
-                            }
-
-                        //}.filter{ it != null }.map{ it as MikroKanon}.toList()
-                    }.filter{ it != null }.collect(Collectors.toList<MikroKanon>())
-                } else {
-                     paramsList.pmap {
                         val mk = find4AbsPartMikroKanon(absPitchesIntArray, intervalSetIntArray,
                             it.delay1, completeForms[it.transpose1][it.form1],
                             it.delay2, completeForms[it.transpose2][it.form2],
                             it.delay3, completeForms[it.transpose3][it.form3])
                         if(deepSearch) {
                             val emptiness = mk.findEmptiness()
+//                            val emptiness = mk.parts[0].absPitches // Comes III
+//                                        //.dropWhile{pitch -> pitch == -1}
+//                                            .count{ pitch -> pitch == -1}
+                            if(emptiness > gate){
+                                null
+                            } else {
+                                println("NEW GATE: $gate")
+                                gate = emptiness
+                                mk
+                            }
+                        } else {
+                            mk
+                        }
+
+                        //}.filter{ it != null }.map{ it as MikroKanon}.toList()
+                    }.filter{ it != null }.collect(Collectors.toList<MikroKanon>())
+                } else {
+                    paramsList.pmap {
+                        val mk = find4AbsPartMikroKanon(absPitchesIntArray, intervalSetIntArray,
+                            it.delay1, completeForms[it.transpose1][it.form1],
+                            it.delay2, completeForms[it.transpose2][it.form2],
+                            it.delay3, completeForms[it.transpose3][it.form3])
+                        if(deepSearch) {
+                            val emptiness = mk.findEmptiness()
+                           // val emptiness = mk.parts[0].absPitches.count{ pitch -> pitch == -1}
                             if(emptiness > gate) null else {
                                 println("NEW GATE: $gate")
                                 gate = emptiness
@@ -443,7 +447,7 @@ private fun findEmptiness() : Float {
                     }.mapNotNull { it }
                 }
             }catch (ex: OutOfMemoryError){
-                 MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
+                MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
             }
         }
 
