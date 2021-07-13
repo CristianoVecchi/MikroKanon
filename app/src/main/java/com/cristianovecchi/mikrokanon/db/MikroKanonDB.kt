@@ -51,7 +51,7 @@ class DataGenerator {
     companion object {
         fun getSequencesData(): List<SequenceData>{
             return listOf(
-                SequenceData(0, listOf<ClipData>(
+                SequenceData(0, listOf(
                     ClipData(0,2,2,0),
                     ClipData(1,9,9,0),
                     ClipData(2,5,5,0),
@@ -65,7 +65,7 @@ class DataGenerator {
                     ClipData(10,4,4,0),
                     ClipData(11,2,2,0),
                 )),
-                SequenceData(0, listOf<ClipData>(
+                SequenceData(0, listOf(
                     ClipData(0,1,0,1),
                     ClipData(1,11,11,0),
                     ClipData(2,10,9,1),
@@ -76,8 +76,44 @@ class DataGenerator {
                     ClipData(7,11,11,0),
                     ClipData(8,0,0,0),
                     ClipData(9,1,0,1),
+                    ClipData(10,3,2,1), // Re#
+                    ClipData(11,8,7,1),
+                    ClipData(12,4,4,0),
+                    ClipData(13,8,7,1),
+                    ClipData(14,11,11,0),
+                    ClipData(15,11,11,0),
+                    ClipData(16,1,0,1),
+                    ClipData(17,10,9,1),
                 )),
-                SequenceData(0, listOf<ClipData>(
+                SequenceData(0, listOf(
+                    ClipData(0,0,0,0),
+                    ClipData(1,11,11,0),
+                    ClipData(2,0,0,0),
+                    ClipData(3,11,11,0),
+                    ClipData(4,7,7,0),
+                    ClipData(5,4,4,0),
+                    ClipData(6,11,11,0),
+                    ClipData(7,9,9,0),
+
+                    ClipData(8,0,0,0),
+                    ClipData(9,11,11,0),
+                    ClipData(10,0,0,0),
+                    ClipData(11,11,11,0),
+                    ClipData(12,9,9,0),
+                    ClipData(13,2,2,0),
+                    ClipData(14,7,7,0),
+                    ClipData(15,9,9,0),
+
+                    ClipData(16,0,0,0),
+                    ClipData(17,11,11,0),
+                    ClipData(18,0,0,0),
+                    ClipData(19,11,11,0),
+                    ClipData(20,7,7,0),
+                    ClipData(21,4,4,0),
+                    ClipData(22,11,11,0),
+                    ClipData(23,9,9,0),
+                )),
+                SequenceData(0, listOf(
                     ClipData(0,3,4,-1),
                     ClipData(1,10,11,-1),
                     ClipData(2,2,2,0),

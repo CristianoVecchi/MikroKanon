@@ -39,7 +39,10 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
+    val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
+    val detectorIntervalSet: List<Int> = if(userOptionsData.isNotEmpty())
+        createIntervalSetFromFlags(userOptionsData[0].detectorFlags)
+        else listOf()
     val language = Lang.provideLanguage(model.getUserLangDef())
     val notesNames = language.noteNames
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
@@ -80,20 +83,27 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         val counterpoint = counterpointsData.first
                         val parts = counterpointsData.second
                         val maxSize = parts.maxOf { it.size }
-                        val clipsText: MutableList<MutableList<String>> = mutableListOf()
+                        var redNotes: List<List<Boolean>>? = if(detectorIntervalSet.isNotEmpty())
+                            counterpoint.detectParallelIntervals(detectorIntervalSet) else null
+                        redNotes =  if (redNotes?.flatten()?.count{ it } ?: 0 == 0) null else redNotes
+
+                        val _clipsText: MutableList<List<String>> = mutableListOf()
                         for (i in 0 until maxSize) {
                             val col: MutableList<String> = mutableListOf()
                             for (j in parts.indices) {
                                 val text = if (i < parts[j].size) parts[j][i] else ""
                                 col.add(text)
                             }
-                            clipsText.add(col)
+                            _clipsText.add(col.toList())
                         }
+                        val clipsText = _clipsText.toList()
+
                         NoteTable(
                             model,
                             counterpoint,
                             clipsText,
                             dimensions.outputNoteTableFontSize,
+                            redNotes,
                             onClick = { onClick(counterpoint) })
 
                        // if(model.selectedCounterpoint.value!! == counterpoint) indexSelected = index
@@ -186,15 +196,16 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     FunctionButtons(model = model, isActive = activeButtons.counterpoint, buttonSize = buttonSize,
                         onAdd = { if (!elaborating) dialogState.value = true },
                         onSpecialFunctions = {
+                            val close = { buttonsDialogData.value = ButtonsDialogData(model = model) }
                             if(!elaborating) {
                                 buttonsDialogData.value = ButtonsDialogData(true,
                                     language.selectSpecialFunction,
                                     model,
-                                    onWave3 = { onWave(3); scrollToTopList = true },
-                                    onWave4 = { onWave(4); scrollToTopList = true },
-                                    onWave6 = { onWave(6); scrollToTopList = true })
+                                    onWave3 = { onWave(3); close(); scrollToTopList = true },
+                                    onWave4 = { onWave(4); close(); scrollToTopList = true },
+                                    onWave6 = { onWave(6); close(); scrollToTopList = true })
                                 {
-                                    buttonsDialogData.value = ButtonsDialogData(model = model)
+                                    close()
                                 }
                             }
                         }

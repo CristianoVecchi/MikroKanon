@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
@@ -154,15 +155,17 @@ fun ExportDialog(exportDialogData: MutableState<ExportDialogData>, okText: Strin
                     val fontSize = 26.sp
                     val fontWeight = FontWeight.Normal
                     Spacer(modifier = Modifier.height(10.dp))
+                    if(exportDialogData.value.path.isNotEmpty()){
                         Text(text = "MIDI path: ${exportDialogData.value.path}", style = TextStyle(fontSize = 12.sp,fontWeight = FontWeight.Bold) )
+                    }
 
                         if(exportDialogData.value.error.isNotEmpty()){
-                            Text(text = "error: ${exportDialogData.value.error}", style = TextStyle(fontSize = 12.sp,fontWeight = FontWeight.Bold) )
+                            Text(text = "${exportDialogData.value.error}", style = TextStyle(fontSize = 23.sp,fontWeight = FontWeight.Bold) )
                         } else {
-                            Text(
-                                text = "Here you can find your MIDI!!!",
-                                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                            )
+//                            Text(
+//                                text = "Here you can find your MIDI!!!",
+//                                style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
+//                            )
                         }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -203,6 +206,7 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String =
                     }
                     val fontSize = 26.sp
                     val fontWeight = FontWeight.Normal
+                    val buttonPadding = 4.dp
                     Spacer(modifier = Modifier.height(10.dp))
                     Row() {
                         Text(text = "$bpm", style = TextStyle(fontSize = 32.sp,fontWeight = FontWeight.Bold) )
@@ -211,49 +215,92 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String =
                     // 240 | 150 | 60
                     // +30 | +6 | +1
                     // -30 | -6 | -1
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){
-                        Button(modifier= Modifier.padding(2.dp), onClick = { setBpm(240) } )
-                        {
-                            Text(text = "240",style = TextStyle(fontSize = fontSize,fontWeight = fontWeight) )
-                        }
-                        Button(modifier= Modifier.padding(2.dp), onClick = { setBpm(150) } )
-                        {
-                            Text(text = "150",style = TextStyle(fontSize = fontSize,fontWeight = fontWeight) )
-                        }
-                        Button(modifier= Modifier.padding(2.dp), onClick = { setBpm(60) } )
-                        {
-                            Text(text = "60",style = TextStyle(fontSize = fontSize,fontWeight = fontWeight) )
-                        }
-                    }
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){
-                        Button(modifier= Modifier.padding(2.dp), onClick = { setBpm(bpm + 30) } )
-                        {
-                            Text(text = "+30",style = TextStyle(fontSize = fontSize,fontWeight = fontWeight) )
-                        }
-                        Button(modifier= Modifier.padding(2.dp), onClick = { setBpm(bpm + 6) } )
-                        {
-                            Text(text = "+6",style = TextStyle(fontSize = fontSize,fontWeight = fontWeight) )
-                        }
-                        Button(modifier= Modifier.padding(2.dp), onClick = { setBpm(bpm + 1) } )
-                        {
-                            Text(text = "+1",style = TextStyle(fontSize = fontSize,fontWeight = fontWeight) )
-                        }
-                    }
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){
-                        Button(modifier= Modifier.padding(2.dp), onClick = { setBpm(bpm - 30) } )
-                        {
-                            Text(text = "-30",style = TextStyle(fontSize = fontSize,fontWeight = fontWeight) )
-                        }
-                        Button(modifier= Modifier.padding(2.dp), onClick = { setBpm(bpm - 6) } )
-                        {
-                            Text(text = "-6",style = TextStyle(fontSize = fontSize,fontWeight = fontWeight) )
-                        }
-                        Button(modifier= Modifier.padding(2.dp), onClick = { setBpm(bpm - 1) } )
-                        {
-                            Text(text = "-1",style = TextStyle(fontSize = fontSize,fontWeight = fontWeight) )
-                        }
-                    }
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        Column(
+                            modifier = Modifier.width(IntrinsicSize.Max),
+                            verticalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(240) })
+                            {
+                                Text(
+                                    text = "240",
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
+                            Button(
+                                modifier = Modifier.fillMaxWidth().padding(buttonPadding),
+                                onClick = { setBpm(bpm + 30) })
+                            {
+                                Text(
+                                    text = "+30",
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
+                            Button(
+                                modifier = Modifier.fillMaxWidth().padding(buttonPadding),
+                                onClick = { setBpm(bpm - 30) })
+                            {
+                                Text(
+                                    text = "-30",
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
 
+                        }
+                        Column(
+                            modifier = Modifier.width(IntrinsicSize.Max),
+                            verticalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(150) })
+                            {
+                                Text(
+                                    text = "150",
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
+                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(bpm + 6) })
+                            {
+                                Text(
+                                    text = "+6",
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
+                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(bpm - 6) })
+                            {
+                                Text(
+                                    text = "-6",
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
+
+                        }
+                        Column(
+                            modifier = Modifier.width(IntrinsicSize.Max),
+                            verticalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(60) })
+                            {
+                                Text(
+                                    text = "60",
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
+                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(bpm + 1) })
+                            {
+                                Text(
+                                    text = "+1",
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
+                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(bpm - 1) })
+                            {
+                                Text(
+                                    text = "-1",
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(10.dp))
                     Button(

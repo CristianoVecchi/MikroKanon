@@ -117,11 +117,17 @@ fun NoteKeyboard(
                         val color = if(buttonInfo.text == "OK") Color.Green else {
                             if(resId == -1 ) Color.Black else MaterialTheme.colors.iconButtonIconColor
                         }
+                        val actualFontSize = when (buttonInfo.text.length){
+                            in 0..2 -> fontSize
+                            3 -> fontSize - 3
+                            4 -> fontSize - 6
+                            else -> fontSize
+                        }
                         CustomButton(
                             adaptSizeToIconButton = true,
                             text = if (resId == -1) buttonInfo.text else "",
                             iconId = resId,
-                            fontSize = fontSize,
+                            fontSize = actualFontSize,
                             buttonSize = buttonSize,
                             iconColor = color
                         ) {

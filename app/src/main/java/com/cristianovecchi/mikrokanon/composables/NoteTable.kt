@@ -28,9 +28,12 @@ import com.cristianovecchi.mikrokanon.AppViewModel
 
 
 @Composable
-fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: MutableList<MutableList<String>>, fontSize: Int,
+fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: List<List<String>>,
+              fontSize: Int, redNotes: List<List<Boolean>>? = null,
               onClick: (Counterpoint) -> Unit){
 
+    val errorColor = Color.Red
+    val error = redNotes != null
     val listState = rememberLazyListState()
     val selectedCounterpoint by model.selectedCounterpoint.observeAsState()
     val isSelected = counterpoint == selectedCounterpoint
@@ -42,9 +45,10 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: Mutabl
     val cellLightColor by animateColorAsState( if(isSelected) Color(0.3f,0.3f,1f,1.0f)
                         else Color(0.1f,0.1f,0.70f,1.0f) )
     val cellColors = listOf(cellDarkColor, cellLightColor)
-    val selectionColor = Color(0.8f,0.8f,0.9f,1.0f)
+    val selectionColor = if(error) errorColor else Color(0.8f,0.8f,0.9f,1.0f)
     val textColor by animateColorAsState( if(isSelected) Color.White
                     else Color(0.8f,0.8f,0.8f,1.0f) )
+
     val textStyle = TextStyle(
         fontSize = finalFontSize.sp,
         color = textColor, fontWeight = fontWeight
@@ -58,6 +62,7 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: Mutabl
             }, state = listState)
         {
             itemsIndexed(clipsText) { i, col ->
+
                 Column(
                     Modifier.width(70.dp)
                 ) {
@@ -67,7 +72,7 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: Mutabl
                             text = clipText,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(cellColors[(i + j) % 2])
+                                .background(if(error && redNotes!![j][i]) errorColor else cellColors[(i + j) % 2])
                                 .padding(8.dp),
                             style = textStyle
                         )

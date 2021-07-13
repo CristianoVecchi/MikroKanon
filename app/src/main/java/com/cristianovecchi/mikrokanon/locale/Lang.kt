@@ -142,7 +142,7 @@ val functionNamesEn = listOf("Wave 3", "Wave 4", "Wave 6")
 val intervalSetIt = listOf("2m\n7M","2M\n7m","3m\n6M","3M\n6m","4\n5","4A\n5d","U\n8")
 val intervalSetEn = listOf("m2\nM7","M2\nm7","m3\nM7","M3\nm6","4\n5","A4\nd5","U\n8")
 val intervalSetDe = listOf("k2\nG7","G2\nk7","k3\nG7","G3\nk6","4\n5","Ü4\nv5","1\n8")
-val intervalSetRu = listOf("2м\n7В","2В\nм7","3м\n6В","3В\nм6","4\n5","4У\n5у","1\n8")
+val intervalSetRu = listOf("2м\n7В","2В\n7м","3м\n6В","3В\n6м","4\n5","4У\n5у","1\n8")
 data class Lang( // English by default
     val noteNames: List<String> = NoteNamesEn.values().map { it.toString() },
     val intervalSet: List<String> = intervalSetEn,
@@ -173,7 +173,10 @@ data class Lang( // English by default
     val horIntervalSet: String = "Free part intervals",
     val selectIntervalsForFP: String = "Select the melodic intervals for the free part!",
     val FPremember: String = "(  ∼➚  ∼➘  -➚  -➘  )",
+    val detector: String = "Detector",
+    val selectIntervalsToDetect: String = "Select intervals to detect!",
     val exportMidi: String = "Export MIDI",
+    val playToCreate: String = "Play a counterpoint to create a MIDI file!",
     val language: String = "Language",
     val credits: String = "Credits"
     ){

@@ -122,12 +122,14 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val multiListDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
-    val intervalSetDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    //val intervalSetDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    val detectorDialogData by lazy { mutableStateOf(MultiListDialogData())}
+
 
     val dimensions = model.dimensions
     val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Doubling",
-        "Spread where possible", "Deep Search in 4 part MK",
+        "Spread where possible", "Deep Search in 4 part MK", "Detector",
         "Export MIDI","Language", "Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
@@ -141,7 +143,8 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     BpmDialog(bpmDialogData, lang.OKbutton)
     ExportDialog(exportDialogData, lang.OKbutton)
     CreditsDialog(creditsDialogData, lang.OKbutton)
-    MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
+    //MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
+    MultiListDialog(detectorDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
 
 //    userOptionsData.forEach{
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
@@ -305,19 +308,41 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                         )
                     })
                 }
+                "Detector" -> {
+                    val flags = userOptions.detectorFlags
+                    val intsFromFlags = convertFlagsToInts(flags)
+                    val isOn = flags != 0
+                    val intervalNames = lang.intervalSet.map{ it.replace("\n"," / ") }
+                    val text = if(!isOn) lang.detector else "${lang.detector}: ${
+                        intsFromFlags.joinToString(
+                            separator = ", "
+                        ) { intervalNames[it] }
+                    }"
+                    SelectableCard(text = text, fontSize = fontSize, isSelected = isOn, onClick = {
+                        detectorDialogData.value = MultiListDialogData(true, intervalNames,
+                            intsFromFlags.toSet(), dialogTitle = lang.selectIntervalsToDetect
+                        ) { indexes ->
+                            model.updateUserOptions(
+                                "detectorFlags",
+                                convertIntsToFlags(indexes.toSortedSet())
+                            )
+                            detectorDialogData.value = MultiListDialogData(itemList = detectorDialogData.value.itemList)
+                        }
+                    })
+                }
                 "Export MIDI" -> {
                     SelectableCard(text = lang.exportMidi, fontSize = fontSize, isSelected = true, onClick = {
                         val path = model.midiPath.absolutePath.toString()
                         var error = model.onPlay(false)
                         if (error.isEmpty()){
                             model.shareMidi(model.midiPath)
-                        }
+                        } else {
+                            exportDialogData.value = ExportDialogData(true,"EXPORT MIDI",
+                                "", error = lang.playToCreate
+                            ) {
 
-                        exportDialogData.value = ExportDialogData(true,"Exporting MIDI File:",
-                            path = model.midiPath.absolutePath.toString(), error = error
-                        ) {
-
-                            exportDialogData.value = ExportDialogData(path = path, error = error)
+                                exportDialogData.value = ExportDialogData(path = path, error = error)
+                            }
                         }
                     })
                 }

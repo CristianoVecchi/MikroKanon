@@ -741,6 +741,9 @@ init{
                 newUserOptionsData  = optionsDataClone.copy(deepSearch = value as Int)
                 clearMKcaches()
             }
+            "detectorFlags" -> {
+                newUserOptionsData  = optionsDataClone.copy(detectorFlags = value as Int)
+            }
             "language" -> {
                 newUserOptionsData  = optionsDataClone.copy(language = value as String)
             }

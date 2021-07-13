@@ -161,27 +161,32 @@ fun SequenceScrollableColumn(
     )
 {
 val coroutineScope = rememberCoroutineScope()
-LazyColumn(state = listState,modifier = modifier)
+if(sequences.isNotEmpty()){
+        LazyColumn(state = listState,modifier = modifier)
 
-{
-    itemsIndexed(items = sequences) { index, sequence ->
-        Row(modifier = Modifier.padding(8.dp)){
-            if (index == selected) {
-                SelectableCard(sequence.toStringAll(notesNames), 20, isSelected = true, onClick = {})
-            } else {
-                SelectableCard(text = sequence.toStringAll(notesNames), 18, isSelected = false,onClick = {
-                    onSelect(index)})
+        {
+            itemsIndexed(items = sequences) { index, sequence ->
+                Row(modifier = Modifier.padding(8.dp)){
+                    if (index == selected) {
+                        SelectableCard(sequence.toStringAll(notesNames), 20, isSelected = true, onClick = {})
+                    } else {
+                        SelectableCard(text = sequence.toStringAll(notesNames), 18, isSelected = false,onClick = {
+                            onSelect(index)})
+                    }
+                }
+            }
+
+            coroutineScope.launch {
+                delay(200)
+                if(sequences.isNotEmpty() && (selected == -1 || selected >= sequences.size))
+                    listState.animateScrollToItem(sequences.size -1)
             }
         }
-    }
-
-    coroutineScope.launch {
-            delay(200)
-            if(sequences.isNotEmpty() && (selected == -1 || selected >= sequences.size))
-                listState.animateScrollToItem(sequences.size -1)
-        }
+    } else {
+        Column(modifier){}
     }
 }
+
 
 
 

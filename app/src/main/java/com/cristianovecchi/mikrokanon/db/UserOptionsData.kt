@@ -45,6 +45,9 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "deep_search")
         val deepSearch: Int,
 
+        @ColumnInfo(name = "detector_flags")
+        val detectorFlags: Int,
+
         @ColumnInfo(name = "language")
         val language: String,
     ){
@@ -53,7 +56,7 @@ import androidx.room.PrimaryKey
                 return UserOptionsData(0,2,90,3,
                     0,0, 1,
                     0,0b0011110, 0b1111111,
-                    0,0,"System" )
+                    0,0,0,"System" )
             }
         }
     }

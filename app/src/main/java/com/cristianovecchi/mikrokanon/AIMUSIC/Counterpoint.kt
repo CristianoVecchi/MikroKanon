@@ -5,6 +5,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import kotlinx.android.parcel.Parcelize
 import java.util.*
+import kotlin.math.abs
 
 fun main(args : Array<String>){
 //    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8)
@@ -383,6 +384,58 @@ data class Counterpoint(val parts: List<AbsPart>,
         if (nEmptyNotes == 0) return 0.0f
         // (100 : X = nCells : nEmptyNotes) / 100
         return nEmptyNotes.toFloat() / nCells
+    }
+    data class Match(val row1: Int, val row2: Int, val pitch1: Int, val pitch2: Int)
+    fun detectParallelIntervals(detectorIntervalSet: List<Int>): List<List<Boolean>> {
+        this.display()
+        val maxSize = parts.maxOf { it.absPitches.size }
+        val result = parts.map{  (0 until maxSize).map{ false }.toMutableList() }
+        for (index in 0 until maxSize-1) {
+            var matches: List<Match>
+            for(interval in detectorIntervalSet){
+                matches = detectIntervalInColumn(index, interval)
+                for(match in matches) {
+                   // val check = getIntervalInPositions(index+1, triple.first, index+1, triple.second )
+                       val nextPitch1 = getAbsPitchInPosition(index +1, match.row1)
+                       val nextPitch2 = getAbsPitchInPosition(index +1, match.row2)
+                    if (nextPitch1 != -1 && nextPitch2 != -1){
+                        if( abs(nextPitch2 - nextPitch1 ) == interval
+                            && match.pitch1 != nextPitch1 && match.pitch2 != nextPitch2
+                            && abs(match.pitch1 - nextPitch1) == abs(match.pitch2 - nextPitch2)) {
+                            result[match.row1][index] = true
+                            result[match.row2][index] = true
+                            result[match.row1][index +1] = true
+                            result[match.row2][index +1] = true
+                        }
+                    }
+                }
+            }
+        }
+        return result.map{ it.toList()}
+    }
+    fun getAbsPitchInPosition(col: Int, row: Int): Int {
+        if(col >= parts[row].absPitches.size) return -1
+        return parts[row].absPitches[col]
+    }
+//    fun getIntervalInPositions(col1: Int, row1: Int, col2: Int, row2: Int): Match{
+//        if(col1 >= parts[row1].absPitches.size || col2 >= parts[row2].absPitches.size) return Match(-1,-1,-1,-1)
+//        if( parts[row2].absPitches[col2] == -1 || parts[row1].absPitches[col1] == -1) return Match(-1,-1,-1,-1)
+//        return Match(abs(parts[row2].absPitches[col2] - parts[row1].absPitches[col1]), parts[row1].absPitches[col1])
+////    }
+    fun detectIntervalInColumn(index: Int, interval: Int): List<Match> {
+        val result = mutableListOf<Match>()
+        for(i in 0 until parts.size-1) {
+                if(index >= parts[i].absPitches.size) continue
+                val pitch1 = parts[i].absPitches[index]
+                if (pitch1 == -1) continue
+            for (j in i+1 until parts.size){
+                if(index >= parts[j].absPitches.size) continue
+                val pitch2 = parts[j].absPitches[index]
+                if (pitch2 == -1) continue
+                if( abs(pitch2 - pitch1) == interval ) result.add( Match(i, j, pitch1, pitch2))
+            }
+        }
+        return result
     }
 }
 
