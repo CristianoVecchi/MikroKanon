@@ -403,14 +403,15 @@ data class MikroKanon(val parts: List<AbsPart>,
                 val job = context.job
                 val deepSearch = emptinessGate != 1.0f
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    paramsList.parallelStream().filter{ job.isActive }.map{
+                    paramsList.parallelStream().filter{ job.isActive }
+                      .map{
                         //paramsList.parallelStream().map{
                         val mk = find4AbsPartMikroKanon(absPitchesIntArray, intervalSetIntArray,
                             it.delay1, completeForms[it.transpose1][it.form1],
                             it.delay2, completeForms[it.transpose2][it.form2],
                             it.delay3, completeForms[it.transpose3][it.form3])
                         if(deepSearch) {
-                            val emptiness = mk.findEmptiness()
+                            val emptiness = mk.findEmptiness() // and wait for Godot...
 //                            val emptiness = mk.parts[0].absPitches // Comes III
 //                                        //.dropWhile{pitch -> pitch == -1}
 //                                            .count{ pitch -> pitch == -1}

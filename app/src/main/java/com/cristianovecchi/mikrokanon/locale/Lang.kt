@@ -175,6 +175,8 @@ data class Lang( // English by default
     val FPremember: String = "(  ∼➚  ∼➘  -➚  -➘  )",
     val detector: String = "Detector",
     val selectIntervalsToDetect: String = "Select intervals to detect!",
+    val detectorExtension: String = "Detector extension",
+    val selectDetectorExtension: String = "Select the extension for the detector!",
     val exportMidi: String = "Export MIDI",
     val playToCreate: String = "Play a counterpoint to create a MIDI file!",
     val language: String = "Language",

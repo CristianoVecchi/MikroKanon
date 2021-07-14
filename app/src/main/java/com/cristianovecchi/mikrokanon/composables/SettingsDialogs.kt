@@ -1,8 +1,10 @@
 package com.cristianovecchi.mikrokanon.composables
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -493,17 +495,17 @@ fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextU
 }
 
 @Composable
-fun ListDialog(listDialogData: MutableState<ListDialogData>, okText: String = "OK", fontSize: TextUnit) {
+fun ListDialog(listDialogData: MutableState<ListDialogData>, okText: String = "OK", fontSize: TextUnit, fillPrevious: Boolean = false) {
     SingleSelectListDialog(
         listDialogData = listDialogData,
-        fontSize = fontSize, okText = okText,
+        fontSize = fontSize, okText = okText, fillPrevious,
         onDismissRequest = { listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)  }
     )
 }
 @Composable
 fun SingleSelectListDialog(
     listDialogData: MutableState<ListDialogData>,
-    fontSize: TextUnit, okText: String = "OK",
+    fontSize: TextUnit, okText: String = "OK", fillPrevious: Boolean = false,
     onDismissRequest: () -> Unit
 ) {
     if (listDialogData.value.dialogState) {
@@ -520,7 +522,7 @@ fun SingleSelectListDialog(
                     if(listDialogData.value.itemList.isNotEmpty()){
                         LazyColumn( state = listState,
                             modifier = Modifier.height(420.dp)
-                        ) { items(listDialogData.value.itemList) { item ->
+                        ) { itemsIndexed(listDialogData.value.itemList) { index, item ->
                             val selected = if (selectedOption == -1) {
                                 ""
                             } else {
@@ -528,7 +530,9 @@ fun SingleSelectListDialog(
                                 //sequencesList[selectedOption.value]
                             }
                             Spacer(modifier = Modifier.height(3.dp))
-                            RadioButton(item, selected, fontSize) { selectedValue ->
+                            val showAsSelected = if (!fillPrevious) false
+                               else index <= listDialogData.value.itemList.indexOf(selected)
+                            RadioButton(item, selected, showAsSelected, fontSize) { selectedValue ->
                                 selectedOption = listDialogData.value.itemList.indexOf(selectedValue)
                             }
                         }
@@ -553,7 +557,7 @@ fun SingleSelectListDialog(
     }
 }
 @Composable
-fun RadioButton(text: String, selectedValue: String, fontSize: TextUnit, onClickListener: (String) -> Unit) {
+fun RadioButton(text: String, selectedValue: String, showAsSelected: Boolean = false, fontSize: TextUnit, onClickListener: (String) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -563,6 +567,7 @@ fun RadioButton(text: String, selectedValue: String, fontSize: TextUnit, onClick
                     onClickListener(text)
                 }
             )
+            .background(if(showAsSelected) Color.LightGray else Color.White)
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically
     ) {
         // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.

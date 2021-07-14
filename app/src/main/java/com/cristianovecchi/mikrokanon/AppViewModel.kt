@@ -455,7 +455,6 @@ init{
         var newList: List<Counterpoint>
         val spreadWherePossible = userOptionsData.value!![0].spread != 0
         val directions = trend.directions.filter{ intervalSetHorizontal.value!!.contains(it)}
-        println("directions: $directions")
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = freeParts(selectedCounterpoint.value!!,  intervalSet.value!!, directions)
@@ -743,6 +742,9 @@ init{
             }
             "detectorFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(detectorFlags = value as Int)
+            }
+            "detectorExtension" -> {
+                newUserOptionsData  = optionsDataClone.copy(detectorExtension = value as Int)
             }
             "language" -> {
                 newUserOptionsData  = optionsDataClone.copy(language = value as String)

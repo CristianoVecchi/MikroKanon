@@ -363,13 +363,11 @@ data class Counterpoint(val parts: List<AbsPart>,
         parts.forEachIndexed { index, absPart ->
             println("Part #$index: ${Arrays.toString(absPart.absPitches.toIntArray())}")
         }
-        println("Emptiness: $emptiness")
     }
     fun displayInNotes(noteNames: List<String> = NoteNamesEn.values().map{it.toString()}) {
         parts.forEachIndexed { index, absPart ->
             println("Part #$index: ${Clip.convertAbsPitchesToClipText(absPart.absPitches, noteNames)}")
         }
-        println("Emptiness: $emptiness")
     }
 
 
@@ -385,27 +383,31 @@ data class Counterpoint(val parts: List<AbsPart>,
         // (100 : X = nCells : nEmptyNotes) / 100
         return nEmptyNotes.toFloat() / nCells
     }
+
     data class Match(val row1: Int, val row2: Int, val pitch1: Int, val pitch2: Int)
-    fun detectParallelIntervals(detectorIntervalSet: List<Int>): List<List<Boolean>> {
-        this.display()
+
+    fun detectParallelIntervals(detectorIntervalSet: List<Int>, delays: List<Int> = listOf(1)): List<List<Boolean>> {
         val maxSize = parts.maxOf { it.absPitches.size }
         val result = parts.map{  (0 until maxSize).map{ false }.toMutableList() }
-        for (index in 0 until maxSize-1) {
-            var matches: List<Match>
-            for(interval in detectorIntervalSet){
-                matches = detectIntervalInColumn(index, interval)
-                for(match in matches) {
-                   // val check = getIntervalInPositions(index+1, triple.first, index+1, triple.second )
-                       val nextPitch1 = getAbsPitchInPosition(index +1, match.row1)
-                       val nextPitch2 = getAbsPitchInPosition(index +1, match.row2)
-                    if (nextPitch1 != -1 && nextPitch2 != -1){
-                        if( abs(nextPitch2 - nextPitch1 ) == interval
-                            && match.pitch1 != nextPitch1 && match.pitch2 != nextPitch2
-                            && abs(match.pitch1 - nextPitch1) == abs(match.pitch2 - nextPitch2)) {
-                            result[match.row1][index] = true
-                            result[match.row2][index] = true
-                            result[match.row1][index +1] = true
-                            result[match.row2][index +1] = true
+        for (delay in delays) {
+            for (index in 0 until maxSize - 1) {
+                var matches: List<Match>
+                for (interval in detectorIntervalSet) {
+                    matches = detectIntervalInColumn(index, interval)
+                    for (match in matches) {
+                        // val check = getIntervalInPositions(index+1, triple.first, index+1, triple.second )
+                        val nextPitch1 = getAbsPitchInPosition(index + delay, match.row1)
+                        val nextPitch2 = getAbsPitchInPosition(index + delay, match.row2)
+                        if (nextPitch1 != -1 && nextPitch2 != -1) {
+                            if (abs(nextPitch2 - nextPitch1) == interval
+                                && match.pitch1 != nextPitch1 && match.pitch2 != nextPitch2
+                                && abs(match.pitch1 - nextPitch1) == abs(match.pitch2 - nextPitch2)
+                            ) {
+                                result[match.row1][index] = true
+                                result[match.row2][index] = true
+                                result[match.row1][index + delay] = true
+                                result[match.row2][index + delay] = true
+                            }
                         }
                     }
                 }
@@ -436,6 +438,10 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
         }
         return result
+    }
+
+    fun findStabilities(): List<Float> {
+        return parts.map{ it.findStability() }
     }
 }
 
@@ -496,5 +502,15 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = UNRE
             if (nEmptyNotes == 0) return 0.0f
             // (100 : X = nCells : nEmptyNotes) / 100
             return nEmptyNotes.toFloat() / absPitches.size
+    }
+
+    fun findStability(): Float {
+        var count = 0
+        val pitches = absPitches.dropWhile { it == -1 }.dropLastWhile { it == -1 }
+        for(i in 0 until pitches.size-1){
+            if (pitches[i] == pitches[i+1]) count ++
+        }
+        if (count == 0) return 0f
+        return count.toFloat() / pitches.size
     }
 }

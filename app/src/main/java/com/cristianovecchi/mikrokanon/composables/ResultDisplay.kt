@@ -43,6 +43,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val detectorIntervalSet: List<Int> = if(userOptionsData.isNotEmpty())
         createIntervalSetFromFlags(userOptionsData[0].detectorFlags)
         else listOf()
+    val detectorExtensions: List<Int> = if(userOptionsData.isNotEmpty()) (1..userOptionsData[0].detectorExtension).toList()
+    else listOf()
     val language = Lang.provideLanguage(model.getUserLangDef())
     val notesNames = language.noteNames
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
@@ -83,8 +85,9 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         val counterpoint = counterpointsData.first
                         val parts = counterpointsData.second
                         val maxSize = parts.maxOf { it.size }
+
                         var redNotes: List<List<Boolean>>? = if(detectorIntervalSet.isNotEmpty())
-                            counterpoint.detectParallelIntervals(detectorIntervalSet) else null
+                            counterpoint.detectParallelIntervals(detectorIntervalSet, detectorExtensions) else null
                         redNotes =  if (redNotes?.flatten()?.count{ it } ?: 0 == 0) null else redNotes
 
                         val _clipsText: MutableList<List<String>> = mutableListOf()

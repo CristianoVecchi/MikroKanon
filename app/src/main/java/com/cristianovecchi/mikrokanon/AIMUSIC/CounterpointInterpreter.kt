@@ -9,6 +9,13 @@ import com.leff.midi.event.NoteOn
 import com.leff.midi.event.ProgramChange
 import java.lang.Math.abs
 
+fun findTopNuances(stabilities: List<Float>, minNuance: Float, maxNuance: Float) : List<Float>{
+    val n = stabilities.size
+    val step = (maxNuance - minNuance) / n
+    val steps = (0 until n).map{ maxNuance - (step * it)}
+    val orderedStabilities = stabilities.sorted()
+    return (0 until n).map{ steps[orderedStabilities.indexOf(stabilities[it])]}
+}
 object CounterpointInterpreter {
     fun doTheMagic(counterpoint: Counterpoint,
                    durations: List<Int> = listOf(240), // 1/8
@@ -16,10 +23,14 @@ object CounterpointInterpreter {
                    nuances: Boolean,
                    doublingFlags: Int): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
-
+        val stabilities = counterpoint.findStabilities()
+        val topNuances = findTopNuances(stabilities, 0.52f, 0.95f)
+//        println("Stabilities: $stabilities")
+//        println("Top Nuances: $topNuances")
         if(counterpoint.parts.size > 15) {
             println("WARNING: Counterpoint n. parts: ${counterpoint.parts.size}")
         }
+
         counterpoint.parts.forEachIndexed { partIndex, part ->
             val channel =
                 if (partIndex < 9) partIndex else partIndex + 1 // skip percussion midi channel
@@ -39,7 +50,7 @@ object CounterpointInterpreter {
             )
             val velocities: IntArray = if (nuances) {
                 val mssq = MelodySubSequencer(actualPitches)
-                mssq.assignVelocities(0.95f, 0.45f)
+                mssq.assignVelocities(topNuances[partIndex], 0.45f)
                 mssq.velocities
             } else IntArray(actualPitches.size) { 100 }
 //            println("PART: #$partIndex")
@@ -86,7 +97,6 @@ object CounterpointInterpreter {
                 while (index < actualPitches.size) {
                     val pitch = actualPitches[index]
                     val velocity = velocities[index]
-                    //println("pitch: $pitch vel: $velocity")
                     var dur = durations[durIndex % durations.size]
                     if (dur < 0) { // negative values are considered as rests
                         dur *= -1

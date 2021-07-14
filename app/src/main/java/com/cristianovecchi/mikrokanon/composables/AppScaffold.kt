@@ -124,12 +124,13 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
     //val intervalSetDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val detectorDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    val detExtensionDialogData by lazy { mutableStateOf(ListDialogData())}
 
 
     val dimensions = model.dimensions
     val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Doubling",
-        "Spread where possible", "Deep Search in 4 part MK", "Detector",
+        "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
         "Export MIDI","Language", "Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
@@ -145,6 +146,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     CreditsDialog(creditsDialogData, lang.OKbutton)
     //MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     MultiListDialog(detectorDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
+    ListDialog(detExtensionDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize, fillPrevious = true)
 
 //    userOptionsData.forEach{
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
@@ -328,6 +330,24 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                             )
                             detectorDialogData.value = MultiListDialogData(itemList = detectorDialogData.value.itemList)
                         }
+                    })
+                }
+                "Detector Extension" -> {
+                    val extensions: List<String> = (1..16).map{ it.toString()}
+                    val extIndex = userOptions.detectorExtension
+                    val isOn = userOptions.detectorFlags != 0
+                    SelectableCard(text = "${lang.detectorExtension}: ${extensions[extIndex-1]}", fontSize = fontSize, isSelected = isOn, onClick = {
+                        if(isOn){
+                            detExtensionDialogData.value = ListDialogData(true,extensions,extIndex-1,lang.selectDetectorExtension
+                            ) { index ->
+                                model.updateUserOptions(
+                                    "detectorExtension",
+                                    index +1
+                                )
+                                detExtensionDialogData.value = ListDialogData(itemList = detExtensionDialogData.value.itemList)
+                            }
+                        }
+
                     })
                 }
                 "Export MIDI" -> {
