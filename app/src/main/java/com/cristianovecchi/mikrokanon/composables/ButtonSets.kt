@@ -143,7 +143,7 @@ fun MikroKanonsButtons(
     }
 }
 @Composable
-fun SpecialFunctionsButtons(
+fun WavesButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
     onWave3Click: () -> Unit, onWave4Click: () -> Unit, onWave6Click: () -> Unit
 ) {

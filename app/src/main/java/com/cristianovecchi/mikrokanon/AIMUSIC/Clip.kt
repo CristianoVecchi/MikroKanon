@@ -5,6 +5,7 @@ import com.cristianovecchi.mikrokanon.composables.Accidents
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.db.ClipData
 import kotlinx.android.parcel.Parcelize
+import kotlin.math.abs
 import kotlin.random.Random
 
 @Parcelize // remove?
@@ -17,6 +18,18 @@ data class Clip(
     fun findText(notesNames: List<String>): String{
         val actualAx = if(ax == Accidents.NATURAL) "" else ax.ax
         return if (name == NoteNamesEn.EMPTY ) "" else "${notesNames[name.ordinal]}$actualAx"
+    }
+
+    fun tritoneSubstitution(): Clip{
+        return when (abstractNote){
+            1 ->  copy(abstractNote = 7, name = NoteNamesEn.G, ax = Accidents.EMPTY)
+            3 -> copy(abstractNote = 9, name = NoteNamesEn.A, ax = Accidents.EMPTY)
+            5 -> copy(abstractNote = 11, name = NoteNamesEn.B, ax = Accidents.EMPTY)
+            7 -> copy(abstractNote = 1, name = NoteNamesEn.C, ax = Accidents.SHARP)
+            9 -> copy(abstractNote = 3, name = NoteNamesEn.E, ax = Accidents.FLAT)
+            11 -> copy(abstractNote = 5, name = NoteNamesEn.F, ax = Accidents.EMPTY)
+            else -> copy()
+        }
     }
 
     companion object {

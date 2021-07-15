@@ -58,6 +58,9 @@ class SequencesFragment(): Fragment() {
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onWaveFromFirstSelection(nWaves, list)
                                    },
+                                   onTritoneSubstitution = { index ->
+                                       model.onTritoneSubstitutionFromSelector(index)
+                                   },
                                    onKP = { list, index, repeat ->
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onKPfromFirstSelection(list, index, repeat)

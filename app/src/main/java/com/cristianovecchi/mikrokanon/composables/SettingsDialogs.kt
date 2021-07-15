@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
@@ -29,9 +28,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.AppViewModel
-import com.cristianovecchi.mikrokanon.composables.RadioButton
 
 @Composable
 fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>, okText: String = "OK",
@@ -333,14 +330,28 @@ fun ButtonsDialog(buttonsDialogData: MutableState<ButtonsDialogData>, okText: St
                 Column(modifier = Modifier.padding(10.dp)) {
                     Text(text = buttonsDialogData.value.title)
                     Spacer(modifier = Modifier.height(10.dp))
-                    SpecialFunctionsButtons(
-                        model = buttonsDialogData.value.model,
-                        buttonSize = buttonsDialogData.value.buttonSize,
-                        fontSize = buttonsDialogData.value.fontSize,
-                        onWave3Click = buttonsDialogData.value.onWave3,
-                        onWave4Click = buttonsDialogData.value.onWave4,
-                        onWave6Click = buttonsDialogData.value.onWave6
-                    )
+                    val listState = rememberLazyListState()
+                    LazyColumn( state = listState,
+                        modifier = Modifier.height(420.dp)
+                    ) {
+                        items((0..1).toList()) { item ->
+                            when (item) {
+                                0 -> WavesButtons(
+                                    model = buttonsDialogData.value.model,
+                                    buttonSize = buttonsDialogData.value.buttonSize,
+                                    fontSize = buttonsDialogData.value.fontSize,
+                                    onWave3Click = buttonsDialogData.value.onWave3,
+                                    onWave4Click = buttonsDialogData.value.onWave4,
+                                    onWave6Click = buttonsDialogData.value.onWave6
+                                )
+                                1 -> CustomButton(iconId = model.iconMap["tritone_substitution"]!!,
+                                                    buttonSize = buttonsDialogData.value.buttonSize){
+                                    buttonsDialogData.value.onTritoneSubstitution()
+                                }
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(10.dp))
                     Button(
                         onClick = {

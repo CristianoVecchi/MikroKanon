@@ -13,6 +13,36 @@ import java.util.stream.Stream
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
+fun tritoneSubstitution(absPitch: Int): Int {
+    return when (absPitch) {
+        1 -> 7
+        3 -> 9
+        5 -> 11
+        7 -> 1
+        9 -> 3
+        11 -> 5
+        else -> absPitch
+    }
+}
+fun tritoneSubstitutionOnIntervalSet(intervalSet: List<Int>): List<Int> {
+
+    intervalSet.toMutableList().apply {
+        if (containsAll(listOf(1, 11, 5, 7))) return intervalSet
+
+        if (containsAll(listOf(1, 11))) {
+            removeAll(listOf(1, 11))
+            return also { addAll(listOf(5, 7)) }.toList()
+        }
+        if (containsAll(listOf(5, 7))) {
+            removeAll(listOf(5, 7))
+            return also { addAll(listOf(1, 11)) }.toList()
+        }
+    }
+    return intervalSet
+}
+
+
+
 
 fun convertIntsToFlags(ints: Set<Int>): Int{
     var flags = 0
@@ -34,6 +64,12 @@ fun ArrayList<Clip>.toStringAll(notesNames: List<String>): String {
     } else {
         "empty Sequence"
     }
+}
+fun ArrayList<Clip>.toAbsPitches(): List<Int> {
+    return this.map { it.abstractNote }
+}
+fun List<Int>.toSequence(): ArrayList<Clip>{
+    return ArrayList<Clip>( this.mapIndexed{index, pitch -> Clip(index,pitch)} ) // not complete
 }
 fun createIntervalSetFromFlags(flags: Int): List<Int>{
     val result = mutableSetOf<Int>()

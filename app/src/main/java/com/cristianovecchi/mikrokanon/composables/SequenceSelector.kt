@@ -1,31 +1,22 @@
 package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
-import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.*
@@ -38,6 +29,7 @@ fun SequenceSelector(model: AppViewModel,
                      onDelete: (Int) -> Unit = model::deleteSequence,
                      onAdd: (ArrayList<Clip>, Boolean) -> Unit,
                      onWave: (Int, ArrayList<Clip>) -> Unit,
+                     onTritoneSubstitution: (Int) -> Unit,
                      onKP: (ArrayList<Clip>, Int, Boolean) -> Unit,
                      onFreePart: (ArrayList<Clip>, TREND) -> Unit,
                      onMikroKanons2: (ArrayList<Clip>) -> Unit,
@@ -125,7 +117,9 @@ fun SequenceSelector(model: AppViewModel,
                             model,
                             onWave3 = { onWave(3, sequences[selected]) },
                             onWave4 = { onWave(4, sequences[selected]) },
-                            onWave6 = { onWave(6, sequences[selected]) })
+                            onWave6 = { onWave(6, sequences[selected]) },
+                            onTritoneSubstitution = { onTritoneSubstitution(selected) }
+                        )
                         {
                             buttonsDialogData.value = ButtonsDialogData(model = model)
                         }

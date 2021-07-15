@@ -37,6 +37,7 @@ sealed class Computation {
     data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2 ) : Computation()
+    data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int) : Computation()
 }
 
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
@@ -79,6 +80,7 @@ class AppViewModel(
         "special_functions" to R.drawable.ic_baseline_apps_24,
         "horizontal_movements" to R.drawable.ic_baseline_insights_24,
         "idea" to R.drawable.ic_baseline_emoji_objects_24,
+        "tritone_substitution" to R.drawable.ic_baseline_360_24,
     )
 
 
@@ -240,6 +242,23 @@ init{
         if(computationStack.isNotEmpty())
             refreshComputation(false)
     }
+    val onTritoneSubstitutionFromSelector = { index: Int ->
+        changeSequenceSelection(-1)
+        updateSequence(index, ArrayList(sequences.value!![index].map{ it.tritoneSubstitution() }) )
+    }
+    val onTritoneSubstitution = {
+        val previousComputation = computationStack.peek()!!
+        if(previousComputation is Computation.TritoneSubstitution) {
+            viewModelScope.launch(Dispatchers.Unconfined){
+                onBack()
+            } //calling twice is like not calling it at all
+        } else {
+            val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+            val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+            computationStack.pushAndDispatch(Computation.TritoneSubstitution(originalCounterpoints, intervalSet.value!!.toList(),index))
+            tritoneSubstitutionOnCounterpoints(originalCounterpoints, index)
+        }
+    }
     val onExpand = {
         val lastComputation = computationStack.peek()
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
@@ -360,11 +379,19 @@ init{
     private fun refreshComputation(stepBack: Boolean){
             if (!elaborating.value!!) {
                 _elaborating.value = true
+                val previousIntervalSet: List<Int>? = if (computationStack.lastElement() is Computation.TritoneSubstitution)
+                    (computationStack.lastElement() as Computation.TritoneSubstitution).intervalSet
+                    else null
                 if (stepBack ) computationStack.popAndDispatch()
                 val previousComputation = when(computationStack.lastElement()){
                     is Computation.Expand -> computationStack.lastElement()
+                    is Computation.TritoneSubstitution -> {
+                        computationStack.lastElement()
+
+                    }
                     else -> computationStack.pop() // do not Dispatch!!!
                 }
+                previousIntervalSet?.let { changeIntervalSet(previousIntervalSet)}
                 when (previousComputation) {
                     is Computation.FirstFromFreePart -> onFreePartFromFirstSelection(
                         previousComputation.firstSequence, previousComputation.trend
@@ -397,6 +424,10 @@ init{
                             4 -> onMikroKanons4(ArrayList(sequenceToMikroKanons.value!!))
                             else -> Unit
                         }
+                    }
+                    is Computation.TritoneSubstitution -> {
+
+                            tritoneSubstitutionOnCounterpoints(previousComputation.counterpoints, previousComputation.index)
                     }
                     is Computation.Expand -> {
                         if(stepBack){
@@ -563,6 +594,19 @@ init{
                 withContext(Dispatchers.Default){
                     newList = expand(originalCounterpoints, extension)
                 }
+                changeCounterpoints(newList, false)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
+    private fun tritoneSubstitutionOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = originalCounterpoints.map{ it.tritoneSubstitution() }
+                }
+                changeIntervalSet(tritoneSubstitutionOnIntervalSet(intervalSet.value!!))
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }

@@ -78,6 +78,9 @@ class OutputFragment: Fragment() {
                                 onWave = { nWaves ->
                                     model.onWaveFurtherSelection(nWaves, null)
                                 },
+                                onTritoneSubstitution = {
+                                    model.onTritoneSubstitution()
+                                },
                                 onBack = { model.onBack() },
                                 onFreePart = { trend ->
                                     model.onFreePartFurtherSelections(trend)

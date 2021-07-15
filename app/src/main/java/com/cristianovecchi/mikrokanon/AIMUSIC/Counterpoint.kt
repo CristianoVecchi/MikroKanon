@@ -3,6 +3,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 import android.os.Parcelable
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
+import com.cristianovecchi.mikrokanon.tritoneSubstitutionOnIntervalSet
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 import kotlin.math.abs
@@ -443,6 +444,11 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun findStabilities(): List<Float> {
         return parts.map{ it.findStability() }
     }
+
+    fun tritoneSubstitution(): Counterpoint {
+        return Counterpoint(parts.map{ it.tritoneSubstitution()}, tritoneSubstitutionOnIntervalSet(intervalSet))
+    }
+
 }
 
 enum class TREND(val directions: List<Int>){
@@ -472,6 +478,9 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = UNRE
         absPitches.map{ pitch -> if (pitch == -1) newAbsPitches.add(pitch)
                                 else newAbsPitches.add(INVERTED_PITCHES[pitch]) }
         return AbsPart(newAbsPitches, newRowForm, transpose, delay)
+    }
+    fun tritoneSubstitution(): AbsPart {
+        return copy(absPitches = absPitches.map{ com.cristianovecchi.mikrokanon.tritoneSubstitution(it) }.toMutableList())
     }
     fun retrograde(): AbsPart {
         val newAbsPitches = absPitches.asReversed()

@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
                   onWave: (Int) -> Unit,
+                  onTritoneSubstitution: () -> Unit = {},
                   onClick: (Counterpoint) -> Unit = {},
                   onBack: () -> Unit = {},
                   onFreePart: (TREND) -> Unit = {},
@@ -206,7 +207,9 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                     model,
                                     onWave3 = { onWave(3); close(); scrollToTopList = true },
                                     onWave4 = { onWave(4); close(); scrollToTopList = true },
-                                    onWave6 = { onWave(6); close(); scrollToTopList = true })
+                                    onWave6 = { onWave(6); close(); scrollToTopList = true },
+                                    onTritoneSubstitution = { onTritoneSubstitution(); close() },
+                                    )
                                 {
                                     close()
                                 }

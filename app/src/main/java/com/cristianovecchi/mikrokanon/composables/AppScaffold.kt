@@ -13,21 +13,18 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
 import com.cristianovecchi.mikrokanon.AppViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
@@ -104,10 +101,12 @@ data class MultiListDialogData(val dialogState: Boolean = false, val itemList: L
                           val dialogTitle: String = "", val onSubmitButtonClick: (List<Int>) -> Unit = {} )
 data class NumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:Int = 0,
                             val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
-data class ButtonsDialogData(val dialogState: Boolean = false, val title:String = "",
-                             val model: AppViewModel, val buttonSize: Dp = 60.dp, val fontSize: Int = 18,
-                             val onWave3: () -> Unit = {}, val onWave4: () -> Unit = {}, val onWave6: () -> Unit = {},
-                             val onSubmitButtonClick: () -> Unit = {})
+data class ButtonsDialogData(
+    val dialogState: Boolean = false, val title:String = "",
+    val model: AppViewModel, val buttonSize: Dp = 60.dp, val fontSize: Int = 18,
+    val onWave3: () -> Unit = {}, val onWave4: () -> Unit = {}, val onWave6: () -> Unit = {},
+    val onTritoneSubstitution: () -> Unit = {},
+    val onSubmitButtonClick: () -> Unit = {})
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
                             val error:String = "", val onSubmitButtonClick: () -> Unit = {})
 data class CreditsDialogData(val dialogState: Boolean = false, val title:String = "",  val onSubmitButtonClick: () -> Unit = {})
