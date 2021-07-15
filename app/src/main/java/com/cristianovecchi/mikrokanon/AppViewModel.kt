@@ -790,10 +790,15 @@ init{
             "detectorExtension" -> {
                 newUserOptionsData  = optionsDataClone.copy(detectorExtension = value as Int)
             }
+            "colors" -> {
+                newUserOptionsData  = optionsDataClone.copy(colors = value as String)
+            }
+            "customColors" -> {
+                newUserOptionsData  = optionsDataClone.copy(customColors = value as Int)
+            }
             "language" -> {
                 newUserOptionsData  = optionsDataClone.copy(language = value as String)
             }
-
         }
         newUserOptionsData?.let {
             viewModelScope.launch(Dispatchers.IO) {

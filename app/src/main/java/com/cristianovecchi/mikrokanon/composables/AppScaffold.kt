@@ -124,13 +124,13 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     //val intervalSetDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val detectorDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val detExtensionDialogData by lazy { mutableStateOf(ListDialogData())}
-
+    val colorsDialogData by lazy { mutableStateOf(ListDialogData())}
 
     val dimensions = model.dimensions
     val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Doubling",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
-        "Export MIDI","Language", "Credits")
+        "Export MIDI", "Colors", "Custom Colors","Language","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val lang = Lang.provideLanguage(model.getUserLangDef())
@@ -146,6 +146,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     //MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     MultiListDialog(detectorDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     ListDialog(detExtensionDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize, fillPrevious = true)
+    ListDialog(colorsDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize)
 
 //    userOptionsData.forEach{
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
@@ -364,6 +365,12 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                             }
                         }
                     })
+                }
+                "Colors" -> {
+
+                }
+                "Custom Colors"-> {
+
                 }
                 "Language" -> {
                     val languages = LANGUAGES.values().map{ it.language }
