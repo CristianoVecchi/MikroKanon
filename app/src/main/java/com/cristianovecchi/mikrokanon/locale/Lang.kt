@@ -31,6 +31,8 @@ enum class LANGUAGES(val language:String){
         }
     }
 }
+
+
 enum class NoteNamesPt {
     Dó,Ré,Mi,Fá,Sol,Lá,Si,EMPTY
 }
@@ -167,6 +169,9 @@ data class Lang( // English by default
     val inverse: String = "Inverse",
     val invRetrograde: String = "Inv-Retrograde",
     val rowFormSeparator: String = "Row form separator",
+    val ritornello: String = if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O) String(Character.toChars(0x1D106)) + "  " + String(Character.toChars(0x1D107))
+                            else "Ritornello",
+    val selectRitornello: String = "Select how many repetitions!",
     val doubling: String = "Doubling",
     val spreadWherePossible: String = "Spread where possible",
     val deepSearch: String = "Deep search in four-part canons",

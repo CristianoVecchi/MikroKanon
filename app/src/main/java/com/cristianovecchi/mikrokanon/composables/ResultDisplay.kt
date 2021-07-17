@@ -133,8 +133,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 }
             }
             Column(
-                modifier1,
-                verticalArrangement = Arrangement.SpaceEvenly,
+                modifier1.padding(top = 6.dp),
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 

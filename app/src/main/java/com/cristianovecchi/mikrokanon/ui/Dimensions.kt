@@ -16,7 +16,7 @@ data class Dimensions( // 1600px width and over
     val inputButtonFontSize: Int = 20, // 14
 
     val outputNoteTableFontSize: Int = 16,
-    val outputButtonSize: Dp = 70.dp, // 60
+    val outputButtonSize: Dp = 64.dp, // 60
     val outputFPbuttonFontSize: Int = 28, // 22
     val outputIntervalSetFontSize: Int = 16, //10
 

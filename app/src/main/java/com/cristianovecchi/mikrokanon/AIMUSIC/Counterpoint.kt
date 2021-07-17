@@ -268,7 +268,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             return result
         }
 
-        fun explodeRowForms(counterpoint: Counterpoint, rowFormsFlags: Int, nNotesToSkip: Int = 0): Counterpoint {
+        fun explodeRowForms(counterpoint: Counterpoint, rowFormsFlags: Int, nNotesToSkip: Int = 0, addFinal: Boolean = false): Counterpoint {
             //val separator = rowFormsFlags and 0b10000 != 0
             val separator = nNotesToSkip > 0
             val separatorCounterpoint: Counterpoint? = if(separator)
@@ -282,6 +282,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             result = if(rowFormsFlags and RowForm.INVERSE.flag != 0) result.enqueue(original.inverse()) else result
             result = if(separator) result.enqueue(separatorCounterpoint!!) else result
             result = if(rowFormsFlags and RowForm.INV_RETROGRADE.flag != 0) result.enqueue(original.inverse().retrograde()) else result
+            result = if(separator && addFinal) result.enqueue(separatorCounterpoint!!) else result
             return result
         }
     }
@@ -447,6 +448,15 @@ data class Counterpoint(val parts: List<AbsPart>,
 
     fun tritoneSubstitution(): Counterpoint {
         return Counterpoint(parts.map{ it.tritoneSubstitution()}, tritoneSubstitutionOnIntervalSet(intervalSet))
+    }
+
+    fun ritornello(ritornello: Int): Counterpoint {
+        if (ritornello == 0) return this
+        var newCounterpoint = this.copy()
+        for (i in 0 until ritornello){
+            newCounterpoint = this.enqueue(newCounterpoint)
+        }
+        return newCounterpoint
     }
 
 }

@@ -125,10 +125,11 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val detectorDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val detExtensionDialogData by lazy { mutableStateOf(ListDialogData())}
     val colorsDialogData by lazy { mutableStateOf(ListDialogData())}
+    val ritornelloDialogData by lazy {mutableStateOf(ListDialogData())}
 
     val dimensions = model.dimensions
     val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
-        "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Doubling",
+        "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Ritornello","Doubling",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
         "Export MIDI", "Colors", "Custom Colors","Language","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
@@ -147,6 +148,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     MultiListDialog(detectorDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     ListDialog(detExtensionDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize, fillPrevious = true)
     ListDialog(colorsDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize)
+    ListDialog(ritornelloDialogData, lang.OKbutton, dimensions.sequenceDialogFontSize, fillPrevious = true)
 
 //    userOptionsData.forEach{
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
@@ -268,6 +270,22 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                             )
                         }
 
+                    })
+                }
+                "Ritornello" -> {
+                    val timeIndices: List<String> = (0..127).map{ it.toString()}
+                    val nTimes = userOptions.ritornello
+                    val isOn = nTimes != 0
+                    val text = if(nTimes == 0) lang.ritornello else "${lang.ritornello} x $nTimes"
+                    SelectableCard(text = text, fontSize = fontSize, isSelected = isOn, onClick = {
+                            ritornelloDialogData.value = ListDialogData(true, timeIndices,nTimes, lang.selectRitornello
+                            ) { index ->
+                                model.updateUserOptions(
+                                    "ritornello",
+                                    index
+                                )
+                                ritornelloDialogData.value = ListDialogData(itemList = ritornelloDialogData.value.itemList)
+                            }
                     })
                 }
                 "Doubling" -> {

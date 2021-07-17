@@ -218,7 +218,10 @@ init{
                         ?: 1 // ORIGINAL by default
                 val doublingFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].doublingFlags }
-                        ?: 1 // ORIGINAL by default
+                        ?: 0
+                val ritornello: Int =
+                    userOptionsData.value?.let { userOptionsData.value!![0].ritornello }
+                        ?: 0
                 error = Player.playCounterpoint(
                     mediaPlayer!!,
                     false,
@@ -232,6 +235,7 @@ init{
                     rhythmShuffle,
                     partsShuffle,
                     rowFormsFlags,
+                    ritornello,
                     doublingFlags
                 )
             }
@@ -766,6 +770,9 @@ init{
                 var flags = value as Int
                 flags = if(flags and 0b10000 > 0 && flags and 0b1110 == 0) 1 else flags // deactivate separator if row forms are unactive
                 newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = flags)
+            }
+            "ritornello" -> {
+                newUserOptionsData  = optionsDataClone.copy(ritornello = value as Int)
             }
             "doublingFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(doublingFlags = value as Int)
