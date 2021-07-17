@@ -86,6 +86,7 @@ class OutputFragment: Fragment() {
                                     model.onFreePartFurtherSelections(trend)
                                 },
                                 onExpand = { model.onExpand() },
+                                onFlourish = { model.onFlourish() },
                                 onPlay = {
                                     model.onPlay(true)
                                 },

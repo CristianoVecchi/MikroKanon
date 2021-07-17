@@ -34,6 +34,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onBack: () -> Unit = {},
                   onFreePart: (TREND) -> Unit = {},
                   onExpand: () -> Unit = {},
+                  onFlourish: () -> Unit = {},
                   onPlay: () -> Unit = {},
                   onStop: () -> Unit = {}
                   )
@@ -187,15 +188,11 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         }
 
                     }
+                    ExtensionButtons(model = model, isActive = activeButtons.expand, buttonSize = buttonSize,
+                         onExpand = { if (!elaborating) onExpand();scrollToTopList = false },
+                         onFlourish ={ if (!elaborating) onFlourish();scrollToTopList = false }
+                    )
 
-                    // EXPAND BUTTON
-                    CustomButton(
-                        iconId = iconMap["expand"]!!,
-                        isActive = activeButtons.expand,
-                        buttonSize = buttonSize
-                    ) {
-                        if (!elaborating) onExpand();scrollToTopList = false
-                    }
                     // Add and Special Functions
                     FunctionButtons(model = model, isActive = activeButtons.counterpoint, buttonSize = buttonSize,
                         onAdd = { if (!elaborating) dialogState.value = true },

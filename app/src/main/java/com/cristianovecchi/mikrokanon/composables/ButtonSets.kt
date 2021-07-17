@@ -173,6 +173,30 @@ fun FunctionButtons(
         }
     }
 }
+@Composable
+fun ExtensionButtons(
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp,
+    onExpand: () -> Unit, onFlourish: () -> Unit
+) {
+    Column(){
+        CustomButton(
+            iconId = model.iconMap["expand"]!!,
+            isActive = isActive,
+            buttonSize = buttonSize
+        ) {
+            onExpand()
+        }
+        CustomButton(
+            iconId = model.iconMap["fioritura"]!!,
+            isActive = isActive,
+            buttonSize = buttonSize
+        ) {
+            onFlourish()
+        }
+
+
+    }
+}
 
 @Composable
 fun FreePartsButtons(

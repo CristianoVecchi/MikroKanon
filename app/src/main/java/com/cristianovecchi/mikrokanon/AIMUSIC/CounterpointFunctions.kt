@@ -52,6 +52,9 @@ suspend fun mikroKanons2(sequence: List<Clip>, intervalSet: List<Int>, depth: In
      return MikroKanon.findAll2AbsPartMikroKanons(sequence.map { it.abstractNote }, intervalSet, depth)
           .pmap { it.toCounterpoint() }
 }
+suspend fun flourish(originalCounterpoints: List<Counterpoint>, intervalSet: List<Int>, horIntervalSet: List<Int>): List<Counterpoint>{
+     return originalCounterpoints.map{Counterpoint.flourish(it, intervalSet, horIntervalSet)}
+}
 suspend fun expand(originalCounterpoints: List<Counterpoint>, extension: Int): List<Counterpoint>{
      return originalCounterpoints.map{Counterpoint.expand(it,extension)}
 }

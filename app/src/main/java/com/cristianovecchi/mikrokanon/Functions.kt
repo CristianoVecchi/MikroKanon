@@ -71,6 +71,9 @@ fun ArrayList<Clip>.toAbsPitches(): List<Int> {
 fun List<Int>.toSequence(): ArrayList<Clip>{
     return ArrayList<Clip>( this.mapIndexed{index, pitch -> Clip(index,pitch)} ) // not complete
 }
+fun MutableList<Int>.getIntOrEmptyValue(index: Int): Int {
+    return if(index < this.size) this[index] else -1
+}
 fun createIntervalSetFromFlags(flags: Int): List<Int>{
     val result = mutableSetOf<Int>()
     if(flags and 1 > 0) result.addAll(listOf(1,11))

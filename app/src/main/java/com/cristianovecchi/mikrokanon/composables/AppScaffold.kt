@@ -180,7 +180,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                     val bpm = userOptions.bpm
                     SelectableCard(text = "${lang.bpm}: $bpm", fontSize = fontSize, isSelected = true, onClick = {
                         bpmDialogData.value = NumberDialogData(
-                            true, "${lang.beatsPerMinute}:", bpm, 18, 360
+                            true, "${lang.beatsPerMinute}:", bpm, 18, 600
                         ) { bpm ->
                             model.updateUserOptions(
                                 "bpm",

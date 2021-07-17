@@ -5,8 +5,16 @@ package com.cristianovecchi.mikrokanon.AIMUSIC;
  */
 // Altro approccio: Oggetto Insieme ( set di note ), e tutte le azioni che si possono fare su un set di note
 
+import androidx.compose.ui.text.android.animation.SegmentType;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 public class Insieme {
     int insieme;
@@ -231,6 +239,44 @@ public class Insieme {
             if (interval == i) return true;
         }
         return false;
+    }
+    @NotNull
+    public static Integer[] getPossibleAbsPitches(@NotNull int[] otherPitches, @NotNull int[] intervalSet) {
+        Set<Integer> set = new LinkedHashSet<>();
+        check: for (int i=0 ; i < 12 ; i++){
+            for (int otherPitch : otherPitches) {
+                if (!isIntervalInSet(intervalSet, otherPitch, i)) {
+                    continue check;
+                }
+            }
+            set.add(i);
+        }
+        return  (Integer[]) set.toArray(new Integer[0]);
+    }
+    @NotNull
+    public static Integer[] orderAbsPitchesByTrend(@NotNull Integer[] pitches, @NotNull int start, Integer[] trend) {
+        Vector<Integer> list = new Vector<>();
+        int newStart = start;
+       int count = 0;
+       while (count < pitches.length){
+
+           check:   for (Integer interval : trend) {
+               for (int j = 0; j < pitches.length; j++) {
+                   Integer note = pitches[j];
+                   if(note == null) continue;
+                   if (Math.abs(newStart - note) == interval) {
+                       list.add(note);
+                       newStart = note;
+                       pitches[j] = null;
+                       count++;
+                       break check;
+                   }
+               }
+           }
+           count++;
+       }
+
+        return  (Integer[]) list.toArray(new Integer[0]);
     }
     // NOT -1 allowed
     public static int[] invertAbsPitches(int[] pitches){
@@ -842,7 +888,6 @@ public class Insieme {
         if(pitch < 0) return pitch + 12;
         return pitch;
     }
-
 
 
 

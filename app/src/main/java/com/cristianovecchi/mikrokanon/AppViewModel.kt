@@ -36,6 +36,7 @@ sealed class Computation {
     data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int): Computation()
     data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
+    data class Fioritura(val counterpoints: List<Counterpoint>, val index: Int): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2 ) : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int) : Computation()
 }
@@ -81,6 +82,7 @@ class AppViewModel(
         "horizontal_movements" to R.drawable.ic_baseline_insights_24,
         "idea" to R.drawable.ic_baseline_emoji_objects_24,
         "tritone_substitution" to R.drawable.ic_baseline_360_24,
+        "fioritura" to R.drawable.ic_baseline_wb_sunny_24
     )
 
 
@@ -263,6 +265,12 @@ init{
             tritoneSubstitutionOnCounterpoints(originalCounterpoints, index)
         }
     }
+    val onFlourish = {
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        computationStack.pushAndDispatch(Computation.Fioritura(originalCounterpoints, index))
+        flourishCounterpoints(originalCounterpoints, index)
+    }
     val onExpand = {
         val lastComputation = computationStack.peek()
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
@@ -388,11 +396,9 @@ init{
                     else null
                 if (stepBack ) computationStack.popAndDispatch()
                 val previousComputation = when(computationStack.lastElement()){
+                    is Computation.Fioritura -> computationStack.lastElement()
                     is Computation.Expand -> computationStack.lastElement()
-                    is Computation.TritoneSubstitution -> {
-                        computationStack.lastElement()
-
-                    }
+                    is Computation.TritoneSubstitution -> computationStack.lastElement()
                     else -> computationStack.pop() // do not Dispatch!!!
                 }
                 previousIntervalSet?.let { changeIntervalSet(previousIntervalSet)}
@@ -430,8 +436,22 @@ init{
                         }
                     }
                     is Computation.TritoneSubstitution -> {
-
                             tritoneSubstitutionOnCounterpoints(previousComputation.counterpoints, previousComputation.index)
+                    }
+                    is Computation.Fioritura -> {
+                        if(stepBack){
+                            flourishCounterpoints(previousComputation.counterpoints, previousComputation.index)
+                        } else {
+                            _elaborating.value = false
+                            var originalComputation: Computation
+                            viewModelScope.launch(Dispatchers.Unconfined){
+                                do {
+                                    computationStack.pop()
+                                    originalComputation = computationStack.lastElement()
+                                } while(originalComputation is Computation.Fioritura )
+                                refreshComputation(false)
+                            }
+                        }
                     }
                     is Computation.Expand -> {
                         if(stepBack){
@@ -442,9 +462,10 @@ init{
                             var originalComputation: Computation
                             viewModelScope.launch(Dispatchers.Unconfined){
                                 do {
-                                    onBack()
+                                    computationStack.pop()
                                     originalComputation = computationStack.lastElement()
                                 } while(originalComputation is Computation.Expand )
+                                refreshComputation(false)
                             }
                         }
                     }
@@ -590,7 +611,18 @@ init{
             changeCounterpoints(newList, true)
         }
     }
-
+    private fun flourishCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = flourish(originalCounterpoints, intervalSet.value!!, intervalSetHorizontal.value!!.toList())
+                }
+                changeCounterpoints(newList, false)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
     private fun expandCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int, extension: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>

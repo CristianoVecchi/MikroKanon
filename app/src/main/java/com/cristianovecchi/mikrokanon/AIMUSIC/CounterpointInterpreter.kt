@@ -24,7 +24,7 @@ object CounterpointInterpreter {
                    doublingFlags: Int): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
         val stabilities = counterpoint.findStabilities()
-        val topNuances = findTopNuances(stabilities, 0.52f, 0.95f)
+        val topNuances = findTopNuances(stabilities, 0.48f, 0.95f)
 //        println("Stabilities: $stabilities")
 //        println("Top Nuances: $topNuances")
         if(counterpoint.parts.size > 15) {
@@ -50,7 +50,7 @@ object CounterpointInterpreter {
             )
             val velocities: IntArray = if (nuances) {
                 val mssq = MelodySubSequencer(actualPitches)
-                mssq.assignVelocities(topNuances[partIndex], 0.45f)
+                mssq.assignVelocities(topNuances[partIndex], 0.40f)
                 mssq.velocities
             } else IntArray(actualPitches.size) { 100 }
 //            println("PART: #$partIndex")
