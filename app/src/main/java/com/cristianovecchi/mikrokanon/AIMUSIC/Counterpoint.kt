@@ -87,6 +87,27 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun nNotes(): Int {
         return parts.maxOf { it.absPitches.size }
     }
+    fun buildRound(): Counterpoint {
+        val nParts = parts.size
+        var counterpoint = this.copy()
+        if(nParts == 0) return this
+        if(nParts == 1) {
+            counterpoint = addEmptyPart()
+            val newParts: List<AbsPart> = listOf(counterpoint.parts[1].copy(), counterpoint.parts[0].copy())
+            return counterpoint.enqueue(counterpoint.copy(parts = newParts))
+        }
+        (1 until nParts  ).forEach{ count ->
+            val newParts: List<AbsPart> = (0 until nParts).map{ partIndex ->
+                parts[(partIndex + count) % nParts].copy()
+            }
+            counterpoint = counterpoint.enqueue(counterpoint.copy(parts = newParts))
+        }
+        return counterpoint
+    }
+    fun addEmptyPart(): Counterpoint {
+        val newParts = listOf(parts, listOf( AbsPart.emptyPart(maxSize()) )).flatten()
+        return this.copy(parts = newParts)
+    }
 
     companion object {
         fun createSeparatorCounterpoint(nParts: Int, nNotesToSkip: Int) : Counterpoint{
@@ -520,6 +541,12 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = UNRE
         fun absPartfromClipList(clipList: List<Clip>) : AbsPart {
             return AbsPart(clipList.map { it.abstractNote }.toMutableList())
         }
+
+        fun emptyPart(nNotes: Int = 0): AbsPart {
+            val emptyPart = (0 until nNotes).map{ -1 }.toMutableList()
+            return AbsPart(emptyPart)
+        }
+
         val INVERTED_PITCHES = (11 downTo 0).toList()
     }
     fun inverse(): AbsPart{

@@ -219,7 +219,9 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String =
                             modifier = Modifier.width(IntrinsicSize.Max),
                             verticalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(240) })
+                            Button(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(buttonPadding), onClick = { setBpm(240) })
                             {
                                 Text(
                                     text = "240",
@@ -227,7 +229,9 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String =
                                 )
                             }
                             Button(
-                                modifier = Modifier.fillMaxWidth().padding(buttonPadding),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(buttonPadding),
                                 onClick = { setBpm(bpm + 30) })
                             {
                                 Text(
@@ -236,7 +240,9 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String =
                                 )
                             }
                             Button(
-                                modifier = Modifier.fillMaxWidth().padding(buttonPadding),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(buttonPadding),
                                 onClick = { setBpm(bpm - 30) })
                             {
                                 Text(
@@ -250,21 +256,27 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String =
                             modifier = Modifier.width(IntrinsicSize.Max),
                             verticalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(150) })
+                            Button(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(buttonPadding), onClick = { setBpm(150) })
                             {
                                 Text(
                                     text = "150",
                                     style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
                                 )
                             }
-                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(bpm + 6) })
+                            Button(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(buttonPadding), onClick = { setBpm(bpm + 6) })
                             {
                                 Text(
                                     text = "+6",
                                     style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
                                 )
                             }
-                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(bpm - 6) })
+                            Button(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(buttonPadding), onClick = { setBpm(bpm - 6) })
                             {
                                 Text(
                                     text = "-6",
@@ -277,21 +289,27 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String =
                             modifier = Modifier.width(IntrinsicSize.Max),
                             verticalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(60) })
+                            Button(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(buttonPadding), onClick = { setBpm(60) })
                             {
                                 Text(
                                     text = "60",
                                     style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
                                 )
                             }
-                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(bpm + 1) })
+                            Button(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(buttonPadding), onClick = { setBpm(bpm + 1) })
                             {
                                 Text(
                                     text = "+1",
                                     style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
                                 )
                             }
-                            Button(modifier = Modifier.fillMaxWidth().padding(buttonPadding), onClick = { setBpm(bpm - 1) })
+                            Button(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(buttonPadding), onClick = { setBpm(bpm - 1) })
                             {
                                 Text(
                                     text = "-1",
@@ -336,18 +354,22 @@ fun ButtonsDialog(buttonsDialogData: MutableState<ButtonsDialogData>, okText: St
                     ) {
                         items((0..1).toList()) { item ->
                             when (item) {
-                                0 -> WavesButtons(
+                                0 -> SpecialFunctions1Buttons(
                                     model = buttonsDialogData.value.model,
+                                    buttonSize = buttonsDialogData.value.buttonSize,
+                                    fontSize = buttonsDialogData.value.fontSize,
+                                    onRound = { buttonsDialogData.value.onRound() },
+                                    onTritoneSubstitution = { buttonsDialogData.value.onTritoneSubstitution() })
+                                1 -> WavesButtons(
+                                    model = buttonsDialogData.value.model,
+                                    isActive = buttonsDialogData.value.isActiveWaves,
                                     buttonSize = buttonsDialogData.value.buttonSize,
                                     fontSize = buttonsDialogData.value.fontSize,
                                     onWave3Click = buttonsDialogData.value.onWave3,
                                     onWave4Click = buttonsDialogData.value.onWave4,
                                     onWave6Click = buttonsDialogData.value.onWave6
                                 )
-                                1 -> CustomButton(iconId = model.iconMap["tritone_substitution"]!!,
-                                                    buttonSize = buttonsDialogData.value.buttonSize){
-                                    buttonsDialogData.value.onTritoneSubstitution()
-                                }
+
                             }
                         }
                     }
@@ -578,7 +600,7 @@ fun RadioButton(text: String, selectedValue: String, showAsSelected: Boolean = f
                     onClickListener(text)
                 }
             )
-            .background(if(showAsSelected) Color.LightGray else Color.White)
+            .background(if (showAsSelected) Color.LightGray else Color.White)
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically
     ) {
         // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.

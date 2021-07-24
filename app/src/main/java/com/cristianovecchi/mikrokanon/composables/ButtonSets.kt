@@ -143,6 +143,20 @@ fun MikroKanonsButtons(
     }
 }
 @Composable
+fun SpecialFunctions1Buttons(
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
+    onTritoneSubstitution: () -> Unit, onRound: () -> Unit
+) {
+    Row {
+        CustomButton(iconId = model.iconMap["tritone_substitution"]!!, isActive = isActive, buttonSize = buttonSize) {
+            onTritoneSubstitution()
+        }
+        CustomButton(iconId = model.iconMap["round"]!!, isActive = isActive, buttonSize = buttonSize) {
+            onRound()
+        }
+    }
+}
+@Composable
 fun WavesButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
     onWave3Click: () -> Unit, onWave4Click: () -> Unit, onWave6Click: () -> Unit
@@ -161,14 +175,14 @@ fun WavesButtons(
 }
 @Composable
 fun FunctionButtons(
-    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp,
+    model: AppViewModel, isActiveCounterpoint: Boolean = true, isActiveSpecialFunctions: Boolean = true, buttonSize: Dp,
     onAdd: () -> Unit, onSpecialFunctions: () -> Unit
 ) {
     Column(){
-        CustomButton(iconId = model.iconMap["counterpoint"]!!, isActive = isActive, buttonSize = buttonSize) {
+        CustomButton(iconId = model.iconMap["counterpoint"]!!, isActive = isActiveCounterpoint, buttonSize = buttonSize) {
             onAdd()
         }
-        CustomButton(iconId = model.iconMap["special_functions"]!!, isActive = isActive, buttonSize = buttonSize) {
+        CustomButton(iconId = model.iconMap["special_functions"]!!, isActive = isActiveSpecialFunctions, buttonSize = buttonSize) {
             onSpecialFunctions()
         }
     }

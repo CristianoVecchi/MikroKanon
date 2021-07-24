@@ -37,13 +37,16 @@ sealed class Computation {
     data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class Fioritura(val counterpoints: List<Counterpoint>, val index: Int): Computation()
+    data class Round(val counterpoints: List<Counterpoint>, val index: Int): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2 ) : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int) : Computation()
 }
 
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
-                         val undo: Boolean = false, val expand: Boolean = true,
-                         val counterpoint: Boolean = false, val freeparts: Boolean = false, val playOrStop: Boolean = true)
+                         val undo: Boolean = false, val expand: Boolean = true, val waves: Boolean = false,
+                         val counterpoint: Boolean = false, val specialFunctions: Boolean = false,
+                         val freeparts: Boolean = false, val playOrStop: Boolean = true) {
+}
 
 class AppViewModel(
     application: Application,
@@ -82,7 +85,8 @@ class AppViewModel(
         "horizontal_movements" to R.drawable.ic_baseline_insights_24,
         "idea" to R.drawable.ic_baseline_emoji_objects_24,
         "tritone_substitution" to R.drawable.ic_baseline_360_24,
-        "fioritura" to R.drawable.ic_baseline_wb_sunny_24
+        "fioritura" to R.drawable.ic_baseline_wb_sunny_24,
+        "round" to R.drawable.ic_baseline_directions_boat_24
     )
 
 
@@ -252,6 +256,7 @@ init{
         changeSequenceSelection(-1)
         updateSequence(index, ArrayList(sequences.value!![index].map{ it.tritoneSubstitution() }) )
     }
+
     val onTritoneSubstitution = {
         val previousComputation = computationStack.peek()!!
         if(previousComputation is Computation.TritoneSubstitution) {
@@ -264,6 +269,19 @@ init{
             computationStack.pushAndDispatch(Computation.TritoneSubstitution(originalCounterpoints, intervalSet.value!!.toList(),index))
             tritoneSubstitutionOnCounterpoints(originalCounterpoints, index)
         }
+    }
+    val onRoundFromSelector = { list: ArrayList<Clip> ->
+        changeFirstSequence(list)
+        convertFirstSequenceToSelectedCounterpoint()
+        computationStack.pushAndDispatch(Computation.Round(listOf(selectedCounterpoint.value!!.clone()),0))
+        //changeCounterpoints(listOf(selectedCounterpoint.value!!.clone()), true)
+        roundOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+    }
+    val onRound = {
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        computationStack.pushAndDispatch(Computation.Round(originalCounterpoints,index))
+        roundOnCounterpoints(originalCounterpoints, index)
     }
     val onFlourish = {
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
@@ -293,7 +311,6 @@ init{
         convertFirstSequenceToSelectedCounterpoint()
         changeSequenceToAdd(sequences.value!![index])
         addSequenceToCounterpoint(repeat)
-
     }
     val onWaveFromFirstSelection = { nWaves: Int, list: ArrayList<Clip> ->
         changeFirstSequence(list)
@@ -398,6 +415,7 @@ init{
                 val previousComputation = when(computationStack.lastElement()){
                     is Computation.Fioritura -> computationStack.lastElement()
                     is Computation.Expand -> computationStack.lastElement()
+                    is Computation.Round -> computationStack.lastElement()
                     is Computation.TritoneSubstitution -> computationStack.lastElement()
                     else -> computationStack.pop() // do not Dispatch!!!
                 }
@@ -449,6 +467,21 @@ init{
                                     computationStack.pop()
                                     originalComputation = computationStack.lastElement()
                                 } while(originalComputation is Computation.Fioritura )
+                                refreshComputation(false)
+                            }
+                        }
+                    }
+                    is Computation.Round -> {
+                        if(stepBack){
+                            roundOnCounterpoints(previousComputation.counterpoints, previousComputation.index)
+                        } else {
+                            _elaborating.value = false
+                            var originalComputation: Computation
+                            viewModelScope.launch(Dispatchers.Unconfined){
+                                do {
+                                    computationStack.pop()
+                                    originalComputation = computationStack.lastElement()
+                                } while(originalComputation is Computation.Round )
                                 refreshComputation(false)
                             }
                         }
@@ -617,6 +650,18 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = flourish(originalCounterpoints, intervalSet.value!!, intervalSetHorizontal.value!!.toList())
+                }
+                changeCounterpoints(newList, false)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
+    private fun roundOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = buildRound(originalCounterpoints)
                 }
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])

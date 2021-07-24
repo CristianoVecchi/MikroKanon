@@ -55,6 +55,9 @@ suspend fun mikroKanons2(sequence: List<Clip>, intervalSet: List<Int>, depth: In
 suspend fun flourish(originalCounterpoints: List<Counterpoint>, intervalSet: List<Int>, horIntervalSet: List<Int>): List<Counterpoint>{
      return originalCounterpoints.map{Counterpoint.flourish(it, intervalSet, horIntervalSet)}
 }
+suspend fun buildRound(originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
+     return originalCounterpoints.map{it.buildRound()}
+}
 suspend fun expand(originalCounterpoints: List<Counterpoint>, extension: Int): List<Counterpoint>{
      return originalCounterpoints.map{Counterpoint.expand(it,extension)}
 }

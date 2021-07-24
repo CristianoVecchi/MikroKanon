@@ -30,6 +30,7 @@ fun SequenceSelector(model: AppViewModel,
                      onAdd: (ArrayList<Clip>, Boolean) -> Unit,
                      onWave: (Int, ArrayList<Clip>) -> Unit,
                      onTritoneSubstitution: (Int) -> Unit,
+                     onRound: (ArrayList<Clip>) -> Unit,
                      onKP: (ArrayList<Clip>, Int, Boolean) -> Unit,
                      onFreePart: (ArrayList<Clip>, TREND) -> Unit,
                      onMikroKanons2: (ArrayList<Clip>) -> Unit,
@@ -109,16 +110,20 @@ fun SequenceSelector(model: AppViewModel,
                     }
                 )
                 // Add and Special Functions
-                FunctionButtons(model = model, isActive = activeButtons.counterpoint, buttonSize = buttonSize,
+                FunctionButtons(model = model,
+                    isActiveCounterpoint = activeButtons.counterpoint,
+                    isActiveSpecialFunctions = activeButtons.specialFunctions,
+                    buttonSize = buttonSize,
                     onAdd = { dialogState.value = true },
                     onSpecialFunctions = {
                         buttonsDialogData.value = ButtonsDialogData(true,
                             language.selectSpecialFunction,
-                            model,
+                            model, isActiveWaves = activeButtons.waves,
                             onWave3 = { onWave(3, sequences[selected]) },
                             onWave4 = { onWave(4, sequences[selected]) },
                             onWave6 = { onWave(6, sequences[selected]) },
-                            onTritoneSubstitution = { onTritoneSubstitution(selected) }
+                            onTritoneSubstitution = { onTritoneSubstitution(selected) },
+                            onRound = { onRound(sequences[selected]) }
                         )
                         {
                             buttonsDialogData.value = ButtonsDialogData(model = model)

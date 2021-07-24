@@ -30,6 +30,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
                   onWave: (Int) -> Unit,
                   onTritoneSubstitution: () -> Unit = {},
+                  onRound: () -> Unit = {},
                   onClick: (Counterpoint) -> Unit = {},
                   onBack: () -> Unit = {},
                   onFreePart: (TREND) -> Unit = {},
@@ -194,18 +195,20 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     )
 
                     // Add and Special Functions
-                    FunctionButtons(model = model, isActive = activeButtons.counterpoint, buttonSize = buttonSize,
+                    FunctionButtons(model = model, isActiveCounterpoint = activeButtons.counterpoint,
+                        isActiveSpecialFunctions = activeButtons.specialFunctions, buttonSize = buttonSize,
                         onAdd = { if (!elaborating) dialogState.value = true },
                         onSpecialFunctions = {
                             val close = { buttonsDialogData.value = ButtonsDialogData(model = model) }
                             if(!elaborating) {
                                 buttonsDialogData.value = ButtonsDialogData(true,
                                     language.selectSpecialFunction,
-                                    model,
+                                    model, isActiveWaves = activeButtons.waves,
                                     onWave3 = { onWave(3); close(); scrollToTopList = true },
                                     onWave4 = { onWave(4); close(); scrollToTopList = true },
                                     onWave6 = { onWave(6); close(); scrollToTopList = true },
                                     onTritoneSubstitution = { onTritoneSubstitution(); close() },
+                                    onRound = { onRound(); close() },
                                     )
                                 {
                                     close()

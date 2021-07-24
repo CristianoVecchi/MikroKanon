@@ -33,7 +33,8 @@ class SequencesFragment(): Fragment() {
         }
         model.selectedSequence.observe(viewLifecycleOwner){
             model.changeActiveButtons( if(model.selectedSequence.value!! != -1 )
-                ActiveButtons(editing = true, mikrokanon = true, counterpoint = true, freeparts = true)
+                ActiveButtons(editing = true, mikrokanon = true, counterpoint = true,
+                    specialFunctions = true, freeparts = true, waves = true)
             else ActiveButtons() )
         }
 //        model.userOptionsData.observe(viewLifecycleOwner){
@@ -60,6 +61,10 @@ class SequencesFragment(): Fragment() {
                                    },
                                    onTritoneSubstitution = { index ->
                                        model.onTritoneSubstitutionFromSelector(index)
+                                   },
+                                   onRound = { list ->
+                                       findNavController().navigate(R.id.outputFragment)
+                                       model.onRoundFromSelector(list)
                                    },
                                    onKP = { list, index, repeat ->
                                        findNavController().navigate(R.id.outputFragment)
