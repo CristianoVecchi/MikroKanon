@@ -34,7 +34,7 @@ class SequencesFragment(): Fragment() {
         model.selectedSequence.observe(viewLifecycleOwner){
             model.changeActiveButtons( if(model.selectedSequence.value!! != -1 )
                 ActiveButtons(editing = true, mikrokanon = true, counterpoint = true,
-                    specialFunctions = true, freeparts = true, waves = true, pedal = true)
+                    specialFunctions = true, freeparts = true, waves = true, pedals = true)
             else ActiveButtons() )
         }
 //        model.userOptionsData.observe(viewLifecycleOwner){
@@ -66,9 +66,9 @@ class SequencesFragment(): Fragment() {
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onRoundFromSelector(list)
                                    },
-                                   onPedal = { list ->
+                                   onPedal = { nPedals, list ->
                                        findNavController().navigate(R.id.outputFragment)
-                                       model.onPedalFromSelector(list)
+                                       model.onPedalFromSelector(nPedals, list)
                                    },
                                    onKP = { list, index, repeat ->
                                        findNavController().navigate(R.id.outputFragment)

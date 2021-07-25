@@ -32,7 +32,7 @@ sealed class Computation {
     data class MikroKanonOnly(val counterpoint: Counterpoint,val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int): Computation()
     data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
     data class FirstFromWave(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val nWaves: Int): Computation()
-    data class Pedal(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, val intervalSet: List<Int>): Computation()
+    data class Pedal(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, val intervalSet: List<Int>, val nPedals: Int): Computation()
     data class FurtherFromKP(val counterpoint: Counterpoint,val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
     data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int): Computation()
     data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
@@ -45,7 +45,7 @@ sealed class Computation {
 
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
                          val undo: Boolean = false, val expand: Boolean = true,
-                         val waves: Boolean = false, val pedal: Boolean = true,
+                         val waves: Boolean = false, val pedals: Boolean = true,
                          val counterpoint: Boolean = false, val specialFunctions: Boolean = false,
                          val freeparts: Boolean = false, val playOrStop: Boolean = true) {
 }
@@ -327,17 +327,17 @@ init{
         computationStack.pushAndDispatch(Computation.FurtherFromWave(originalCounterpoints, nWaves))
         findWavesOnCounterpoints(originalCounterpoints, nWaves)
     }
-    val onPedalFromSelector = { list: ArrayList<Clip>->
+    val onPedalFromSelector = { nPedals: Int, list: ArrayList<Clip>->
         changeFirstSequence(list)
         computationStack.pushAndDispatch(Computation.Pedal(selectedCounterpoint.value!!.clone(),
-            ArrayList(firstSequence.value!!), intervalSet.value!!.toList()))
+            ArrayList(firstSequence.value!!), intervalSet.value!!.toList(), nPedals))
         convertFirstSequenceToSelectedCounterpoint()
-        findPedal(list)
+        findPedal(nPedals, list)
     }
-    val onPedal= {
+    val onPedal= { nPedals: Int ->
         computationStack.pushAndDispatch(Computation.Pedal(selectedCounterpoint.value!!.clone(),
-            null,intervalSet.value!!.toList()))
-        findPedal(null)
+            null,intervalSet.value!!.toList(), nPedals))
+        findPedal(nPedals,null)
     }
     val onFreePartFromFirstSelection = { list: ArrayList<Clip>, trend: TREND ->
         changeFirstSequence(list)
@@ -507,7 +507,7 @@ init{
                     is Computation.Pedal -> {
 //                        if(stepBack){
                             changeSelectedCounterpoint(previousComputation.counterpoint)
-                            findPedal(previousComputation.firstSequence)
+                            findPedal(previousComputation.nPedals, previousComputation.firstSequence)
 //                        } else {
 //                            _elaborating.value = false
 //                            var originalComputation: Computation
@@ -550,14 +550,14 @@ init{
             else -> false
         }
     }
-    private fun findPedal(list: ArrayList<Clip>?){
+    private fun findPedal(nPedals: Int, list: ArrayList<Clip>?){
         var newList: List<Counterpoint>
         //var newIntervalSet: List<Int>
         val counterpoint = list?.let{ Counterpoint.counterpointFromClipList(list)} ?: selectedCounterpoint.value!!
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                val pair = findPedalOnCounterpoint(counterpoint, intervalSet.value!!)
-                newList = listOf(pair.first)
+                newList = listOf(findPedalsOnCounterpoint(nPedals, counterpoint, intervalSet.value!!))
+
                 //newIntervalSet = pair.second
             }
             //changeIntervalSet(newIntervalSet)

@@ -104,11 +104,11 @@ data class NumberDialogData(val dialogState: Boolean = false, val title:String =
 data class ButtonsDialogData(
     val dialogState: Boolean = false, val title:String = "",
     val model: AppViewModel, val buttonSize: Dp = 60.dp, val fontSize: Int = 18,
-    val isActiveWaves: Boolean = false, val isActivePedal: Boolean = false,
+    val isActiveWaves: Boolean = false, val isActivePedals: Boolean = false,
     val onWave3: () -> Unit = {}, val onWave4: () -> Unit = {}, val onWave6: () -> Unit = {},
+    val onPedal1: () -> Unit = {}, val onPedal3: () -> Unit = {}, val onPedal5: () -> Unit = {},
     val onTritoneSubstitution: () -> Unit = {}, val onRound: () -> Unit = {}, val onPedal: () -> Unit = {},
-    val onSubmitButtonClick: () -> Unit = {}, ) {
-}
+    val onSubmitButtonClick: () -> Unit = {}, )
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
                             val error:String = "", val onSubmitButtonClick: () -> Unit = {})

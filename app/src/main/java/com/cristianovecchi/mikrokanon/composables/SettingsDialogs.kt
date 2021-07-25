@@ -352,15 +352,13 @@ fun ButtonsDialog(buttonsDialogData: MutableState<ButtonsDialogData>, okText: St
                     LazyColumn( state = listState,
                         modifier = Modifier.height(420.dp)
                     ) {
-                        items((0..1).toList()) { item ->
+                        items((0..2).toList()) { item ->
                             when (item) {
                                 0 -> SpecialFunctions1Buttons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonsDialogData.value.buttonSize,
                                     fontSize = buttonsDialogData.value.fontSize,
-                                    isActivePedal = buttonsDialogData.value.isActivePedal,
                                     onRound = { buttonsDialogData.value.onRound() },
-                                    onPedal = { buttonsDialogData.value.onPedal() },
                                     onTritoneSubstitution = { buttonsDialogData.value.onTritoneSubstitution() })
                                 1 -> WavesButtons(
                                     model = buttonsDialogData.value.model,
@@ -370,6 +368,15 @@ fun ButtonsDialog(buttonsDialogData: MutableState<ButtonsDialogData>, okText: St
                                     onWave3Click = buttonsDialogData.value.onWave3,
                                     onWave4Click = buttonsDialogData.value.onWave4,
                                     onWave6Click = buttonsDialogData.value.onWave6
+                                )
+                                2 -> PedalsButtons(
+                                    model = buttonsDialogData.value.model,
+                                    isActive = buttonsDialogData.value.isActivePedals,
+                                    buttonSize = buttonsDialogData.value.buttonSize,
+                                    fontSize = buttonsDialogData.value.fontSize,
+                                    onPedal1Click = buttonsDialogData.value.onPedal1,
+                                    onPedal3Click = buttonsDialogData.value.onPedal3,
+                                    onPedal5Click = buttonsDialogData.value.onPedal5
                                 )
 
                             }

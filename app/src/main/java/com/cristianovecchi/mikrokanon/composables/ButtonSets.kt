@@ -145,7 +145,7 @@ fun MikroKanonsButtons(
 @Composable
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, isActivePedal:Boolean = true, buttonSize: Dp, fontSize: Int,
-    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onPedal: () -> Unit
+    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onPedal: () -> Unit = {}
 ) {
     Row {
         CustomButton(iconId = model.iconMap["tritone_substitution"]!!, isActive = isActive, buttonSize = buttonSize) {
@@ -154,9 +154,9 @@ fun SpecialFunctions1Buttons(
         CustomButton(iconId = model.iconMap["round"]!!, isActive = isActive, buttonSize = buttonSize) {
             onRound()
         }
-        CustomButton(iconId = model.iconMap["pedal"]!!, isActive = isActivePedal, buttonSize = buttonSize) {
-            onPedal()
-        }
+//        CustomButton(iconId = model.iconMap["pedal"]!!, isActive = isActivePedal, buttonSize = buttonSize) {
+//            onPedal()
+//        }
     }
 }
 @Composable
@@ -173,6 +173,23 @@ fun WavesButtons(
         }
         CustomButton(iconId = model.iconMap["waves"]!!, text = "6", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize) {
             onWave6Click()
+        }
+    }
+}
+@Composable
+fun PedalsButtons(
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
+    onPedal1Click: () -> Unit, onPedal3Click: () -> Unit, onPedal5Click: () -> Unit
+) {
+    Row(){
+        CustomButton(iconId = model.iconMap["pedal"]!!, text = "1",isActive = isActive, buttonSize = buttonSize, fontSize = fontSize) {
+            onPedal1Click()
+        }
+        CustomButton(iconId = model.iconMap["pedal"]!!, text = "3", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize) {
+            onPedal3Click()
+        }
+        CustomButton(iconId = model.iconMap["pedal"]!!, text = "5", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize) {
+            onPedal5Click()
         }
     }
 }
