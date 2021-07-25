@@ -32,6 +32,7 @@ sealed class Computation {
     data class MikroKanonOnly(val counterpoint: Counterpoint,val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int): Computation()
     data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
     data class FirstFromWave(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val nWaves: Int): Computation()
+    data class Pedal(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, val intervalSet: List<Int>): Computation()
     data class FurtherFromKP(val counterpoint: Counterpoint,val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
     data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int): Computation()
     data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
@@ -43,7 +44,8 @@ sealed class Computation {
 }
 
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
-                         val undo: Boolean = false, val expand: Boolean = true, val waves: Boolean = false,
+                         val undo: Boolean = false, val expand: Boolean = true,
+                         val waves: Boolean = false, val pedal: Boolean = true,
                          val counterpoint: Boolean = false, val specialFunctions: Boolean = false,
                          val freeparts: Boolean = false, val playOrStop: Boolean = true) {
 }
@@ -86,7 +88,8 @@ class AppViewModel(
         "idea" to R.drawable.ic_baseline_emoji_objects_24,
         "tritone_substitution" to R.drawable.ic_baseline_360_24,
         "fioritura" to R.drawable.ic_baseline_wb_sunny_24,
-        "round" to R.drawable.ic_baseline_directions_boat_24
+        "round" to R.drawable.ic_baseline_directions_boat_24,
+        "pedal" to R.drawable.ic_baseline_anchor_24
     )
 
 
@@ -324,6 +327,18 @@ init{
         computationStack.pushAndDispatch(Computation.FurtherFromWave(originalCounterpoints, nWaves))
         findWavesOnCounterpoints(originalCounterpoints, nWaves)
     }
+    val onPedalFromSelector = { list: ArrayList<Clip>->
+        changeFirstSequence(list)
+        computationStack.pushAndDispatch(Computation.Pedal(selectedCounterpoint.value!!.clone(),
+            ArrayList(firstSequence.value!!), intervalSet.value!!.toList()))
+        convertFirstSequenceToSelectedCounterpoint()
+        findPedal(list)
+    }
+    val onPedal= {
+        computationStack.pushAndDispatch(Computation.Pedal(selectedCounterpoint.value!!.clone(),
+            null,intervalSet.value!!.toList()))
+        findPedal(null)
+    }
     val onFreePartFromFirstSelection = { list: ArrayList<Clip>, trend: TREND ->
         changeFirstSequence(list)
         computationStack.pushAndDispatch(Computation.FirstFromFreePart(selectedCounterpoint.value!!.clone(),ArrayList(firstSequence.value!!), trend))
@@ -410,12 +425,15 @@ init{
                 _elaborating.value = true
                 val previousIntervalSet: List<Int>? = if (computationStack.lastElement() is Computation.TritoneSubstitution)
                     (computationStack.lastElement() as Computation.TritoneSubstitution).intervalSet
+//                    else if (computationStack.lastElement() is Computation.Pedal)
+//                    (computationStack.lastElement() as Computation.Pedal).intervalSet
                     else null
                 if (stepBack ) computationStack.popAndDispatch()
                 val previousComputation = when(computationStack.lastElement()){
                     is Computation.Fioritura -> computationStack.lastElement()
                     is Computation.Expand -> computationStack.lastElement()
                     is Computation.Round -> computationStack.lastElement()
+                    is Computation.Pedal -> computationStack.lastElement()
                     is Computation.TritoneSubstitution -> computationStack.lastElement()
                     else -> computationStack.pop() // do not Dispatch!!!
                 }
@@ -486,6 +504,24 @@ init{
                             }
                         }
                     }
+                    is Computation.Pedal -> {
+//                        if(stepBack){
+                            changeSelectedCounterpoint(previousComputation.counterpoint)
+                            findPedal(previousComputation.firstSequence)
+//                        } else {
+//                            _elaborating.value = false
+//                            var originalComputation: Computation
+//                            if(computationStack.size > 1){
+//                                viewModelScope.launch(Dispatchers.Unconfined){
+//                                    do {
+//                                        computationStack.pop()
+//                                        originalComputation = computationStack.lastElement()
+//                                    } while(computationStack.size > 1  && originalComputation is Computation.Pedal )
+//                                    refreshComputation(false)
+//                                }
+//                            }
+//                        }
+                    }
                     is Computation.Expand -> {
                         if(stepBack){
                             expandCounterpoints(previousComputation.counterpoints,
@@ -514,6 +550,22 @@ init{
             else -> false
         }
     }
+    private fun findPedal(list: ArrayList<Clip>?){
+        var newList: List<Counterpoint>
+        //var newIntervalSet: List<Int>
+        val counterpoint = list?.let{ Counterpoint.counterpointFromClipList(list)} ?: selectedCounterpoint.value!!
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                val pair = findPedalOnCounterpoint(counterpoint, intervalSet.value!!)
+                newList = listOf(pair.first)
+                //newIntervalSet = pair.second
+            }
+            //changeIntervalSet(newIntervalSet)
+            changeCounterpoints(newList, true)
+        }
+    }
+
+
 
     private fun findWavesFromSequence(nWaves: Int){
         var newList: List<Counterpoint>

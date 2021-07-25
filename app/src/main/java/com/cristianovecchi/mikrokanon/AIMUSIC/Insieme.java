@@ -9,12 +9,16 @@ import androidx.compose.ui.text.android.animation.SegmentType;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.Vector;
 public class Insieme {
     int insieme;
@@ -889,6 +893,50 @@ public class Insieme {
         return pitch;
     }
 
+    // 2m/7M 2M/7m 3m/6M 3M/6m 4/5 4e 8
+    static int[] positionOfIntervals = {6, 0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0};
+    public static void incrementIntervalCount(@NotNull ArrayList<Integer> intervalCount, int pitchToCheck, @NotNull List<Integer> absPitches) {
+        for(int i=0; i<absPitches.size(); i++){
+            int absPitch = absPitches.get(i);
+            if( absPitch == -1) continue;
+            int interval = Math.abs(absPitch - pitchToCheck);
+            int intervalPosition = positionOfIntervals[interval];
+            intervalCount.set(intervalPosition, intervalCount.get(intervalPosition) + 1);
+        }
+    }
+    public static int intervalSetDifference(@NotNull ArrayList<Integer> intervalCount, @NotNull List<Integer> intervalSet){
+        int difference = 0;
+        if(intervalCount.get(0) != 0 && !intervalSet.containsAll(Arrays.asList(1, 11))) difference++;
+        if(intervalCount.get(1) != 0 && !intervalSet.containsAll(Arrays.asList(2, 10))) difference++;
+        if(intervalCount.get(2) != 0 && !intervalSet.containsAll(Arrays.asList(3, 9))) difference++;
+        if(intervalCount.get(3) != 0 && !intervalSet.containsAll(Arrays.asList(4, 8))) difference++;
+        if(intervalCount.get(4) != 0 && !intervalSet.containsAll(Arrays.asList(5, 7))) difference++;
+        if(intervalCount.get(5) != 0 && !intervalSet.contains(6)) difference++;
+        if(intervalCount.get(6) != 0 && !intervalSet.contains(0)) difference++;
+        return difference;
+    }
+    public static int intervalSetDifferenceCount(@NotNull ArrayList<Integer> intervalCount, @NotNull List<Integer> intervalSet){
+        int count = 0;
+        if(intervalCount.get(0) != 0 && !intervalSet.containsAll(Arrays.asList(1, 11))) count = count + intervalCount.get(0) ;
+        if(intervalCount.get(1) != 0 && !intervalSet.containsAll(Arrays.asList(2, 10))) count = count + intervalCount.get(1) ;
+        if(intervalCount.get(2) != 0 && !intervalSet.containsAll(Arrays.asList(3, 9))) count = count + intervalCount.get(2) ;
+        if(intervalCount.get(3) != 0 && !intervalSet.containsAll(Arrays.asList(4, 8))) count = count + intervalCount.get(3) ;
+        if(intervalCount.get(4) != 0 && !intervalSet.containsAll(Arrays.asList(5, 7))) count = count + intervalCount.get(4) ;
+        if(intervalCount.get(5) != 0 && !intervalSet.contains(6)) count = count + intervalCount.get(5) ;
+        if(intervalCount.get(6) != 0 && !intervalSet.contains(0)) count = count + intervalCount.get(6) ;
+        return count;
+    }
 
-
+    @NotNull
+    public static Integer[] convertIntervalCountToIntervalSet(@NotNull ArrayList<Integer> intervalCount) {
+        Set<Integer> intervalSet = new TreeSet<>();
+        if(intervalCount.get(0) != 0 ) intervalSet.addAll(Arrays.asList(0,11));
+        if(intervalCount.get(1) != 0 ) intervalSet.addAll(Arrays.asList(2,10));
+        if(intervalCount.get(2) != 0 ) intervalSet.addAll(Arrays.asList(3,9));
+        if(intervalCount.get(3) != 0 ) intervalSet.addAll(Arrays.asList(4,8));
+        if(intervalCount.get(4) != 0 ) intervalSet.addAll(Arrays.asList(5,7));
+        if(intervalCount.get(5) != 0 ) intervalSet.addAll(Arrays.asList(6));
+        if(intervalCount.get(6) != 0 ) intervalSet.addAll(Arrays.asList(0));
+        return (Integer[]) intervalSet.toArray(new Integer[0]);
+    }
 }

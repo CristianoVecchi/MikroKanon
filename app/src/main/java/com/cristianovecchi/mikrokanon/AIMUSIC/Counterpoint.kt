@@ -31,6 +31,12 @@ fun main(args : Array<String>){
         listOf(0,1,2),TREND.ASCENDANT_STATIC.directions)
     val counterpoint3 = Counterpoint.findWave(counterpoint2,pentatonicIntervalSet,6,
         listOf(0,1,2),TREND.ASCENDANT_STATIC.directions).displayInNotes()
+    counterpoint.normalizePartsSize(true).display()
+    println("emptiness: ${counterpoint.emptiness}")
+    val counterpointRound = counterpoint.normalizePartsSize(true).buildRound()
+    counterpointRound.display()
+    println("emptiness: ${counterpointRound.emptiness}")
+    println("emptiness: ${counterpointRound.findEmptiness()}")
 //    Counterpoint.expand(counterpoint, 2).display()
 //    val repeatedSequence = Collections.nCopies(3, absPitches1).flatten()
 //    println(repeatedSequence)
@@ -89,7 +95,8 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
     fun buildRound(): Counterpoint {
         val nParts = parts.size
-        var counterpoint = this.copy()
+        val normalizedCounterpoint = this.normalizePartsSize(false)
+        var counterpoint = normalizedCounterpoint.copy()
         if(nParts == 0) return this
         if(nParts == 1) {
             counterpoint = addEmptyPart()
@@ -98,7 +105,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         (1 until nParts  ).forEach{ count ->
             val newParts: List<AbsPart> = (0 until nParts).map{ partIndex ->
-                parts[(partIndex + count) % nParts].copy()
+                normalizedCounterpoint.parts[(partIndex + count) % nParts].copy()
             }
             counterpoint = counterpoint.enqueue(counterpoint.copy(parts = newParts))
         }
@@ -343,7 +350,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             val separatorCounterpoint: Counterpoint? = if(separator)
                 Counterpoint.createSeparatorCounterpoint(counterpoint.parts.size, nNotesToSkip)
                 else null
-            val original = counterpoint.clone().also { it.normalizePartsSize(true)}
+            val original = counterpoint.normalizePartsSize(true)
             var result = original.clone()
             result = if(separator) result.enqueue(separatorCounterpoint!!) else result
             result = if(rowFormsFlags and RowForm.RETROGRADE.flag != 0) result.enqueue(original.retrograde()) else result
@@ -354,24 +361,64 @@ data class Counterpoint(val parts: List<AbsPart>,
             result = if(separator && addFinal) result.enqueue(separatorCounterpoint!!) else result
             return result
         }
+
+        fun addBestPedal(counterpoint: Counterpoint, intervalSet: List<Int>): Pair<Counterpoint, List<Int>> {
+            val alreadyPresentPedals: List<Int> = (0..11).filter{ pitch ->
+                counterpoint.parts.map{ it.absPitches}.any{ it.all { it == pitch }}
+            }
+            data class Pedal(val pitch: Int, val intervalCounts: ArrayList<Int>)
+            val pedals = mutableListOf<Pedal>()
+            val nSize = counterpoint.maxSize()
+            for(pitch in 0..11){
+                if (alreadyPresentPedals.contains(pitch)) continue
+                var intervalCount = ArrayList(listOf(0,0,0,0,0,0,0))
+                for(part in counterpoint.parts){
+                    Insieme.incrementIntervalCount(intervalCount, pitch, part.absPitches)
+                }
+                pedals.add(Pedal(pitch, intervalCount))
+            }
+            return if(pedals.isNotEmpty()){
+                val sortedPedals = pedals.sortedBy { Insieme.intervalSetDifference(it.intervalCounts, intervalSet) }
+                val minDifference = sortedPedals.take(1).map { Insieme.intervalSetDifference(it.intervalCounts, intervalSet) }[0]
+                val bestPedal: Pedal =
+                    sortedPedals.filter{Insieme.intervalSetDifference(it.intervalCounts, intervalSet) == minDifference }
+                    .minByOrNull { Insieme.intervalSetDifferenceCount(it.intervalCounts, intervalSet) }
+                    ?: sortedPedals.take(1)[0]
+                Pair(counterpoint.addPedal(bestPedal.pitch),
+                    Insieme.convertIntervalCountToIntervalSet(bestPedal.intervalCounts).toList())
+            } else {
+                Pair(counterpoint, intervalSet)
+            }
+        }
+
     }
-    fun normalizePartsSize(refreshEmptiness: Boolean){
+
+    private fun addPedal(pitch: Int): Counterpoint {
+        val pedalPart = AbsPart.fill(pitch, maxSize())
+        return this.copy(parts = listOf(parts, listOf(pedalPart)).flatten())
+    }
+
+    fun normalizePartsSize(refreshEmptiness: Boolean): Counterpoint{
         val maxSize: Int = parts.maxOf { it.absPitches.size }
+        val newParts = mutableListOf<AbsPart>()
         parts.forEach{ absPart ->
+            val newPart = absPart.copy()
             if(absPart.absPitches.size != maxSize){
                 val diff = maxSize - absPart.absPitches.size
                 (0 until diff).forEach{ _ ->
-                    absPart.absPitches.add(-1)
+                    newPart.absPitches.add(-1)
                 }
             }
+            newParts.add(newPart)
         }
-        if(refreshEmptiness) this.emptiness = findEmptiness()
+        val newCounterpoint = this.copy(parts = newParts)
+        if(refreshEmptiness) newCounterpoint.emptiness = findEmptiness()
+        return newCounterpoint
     }
 
 
     fun spreadAsPossible() : Counterpoint {
-        val clone = this.clone() // cloning is necessary in a coroutine context
-        clone.normalizePartsSize(false)
+        val clone = this.normalizePartsSize(false)// cloning is necessary in a coroutine context
         for(partIndex in clone.parts.indices){
             val part = clone.parts[partIndex]
             for(pitchIndex in part.absPitches.indices)
@@ -438,7 +485,7 @@ data class Counterpoint(val parts: List<AbsPart>,
 
 
 
-    private fun findEmptiness() : Float {
+    fun findEmptiness() : Float {
         val maxSize = parts.maxOf { it.absPitches.size }
         val nCells = maxSize * parts.size
         if (nCells == 0) return 1.0f
@@ -545,6 +592,10 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = UNRE
         fun emptyPart(nNotes: Int = 0): AbsPart {
             val emptyPart = (0 until nNotes).map{ -1 }.toMutableList()
             return AbsPart(emptyPart)
+        }
+
+        fun fill(pitch: Int, size: Int): AbsPart {
+            return AbsPart((0 until size).map{pitch}.toMutableList())
         }
 
         val INVERTED_PITCHES = (11 downTo 0).toList()

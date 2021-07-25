@@ -31,6 +31,7 @@ fun SequenceSelector(model: AppViewModel,
                      onWave: (Int, ArrayList<Clip>) -> Unit,
                      onTritoneSubstitution: (Int) -> Unit,
                      onRound: (ArrayList<Clip>) -> Unit,
+                     onPedal: (ArrayList<Clip>) -> Unit,
                      onKP: (ArrayList<Clip>, Int, Boolean) -> Unit,
                      onFreePart: (ArrayList<Clip>, TREND) -> Unit,
                      onMikroKanons2: (ArrayList<Clip>) -> Unit,
@@ -119,11 +120,13 @@ fun SequenceSelector(model: AppViewModel,
                         buttonsDialogData.value = ButtonsDialogData(true,
                             language.selectSpecialFunction,
                             model, isActiveWaves = activeButtons.waves,
+                            isActivePedal = activeButtons.pedal,
                             onWave3 = { onWave(3, sequences[selected]) },
                             onWave4 = { onWave(4, sequences[selected]) },
                             onWave6 = { onWave(6, sequences[selected]) },
                             onTritoneSubstitution = { onTritoneSubstitution(selected) },
-                            onRound = { onRound(sequences[selected]) }
+                            onRound = { onRound(sequences[selected]) },
+                            onPedal = { onPedal(sequences[selected]) },
                         )
                         {
                             buttonsDialogData.value = ButtonsDialogData(model = model)

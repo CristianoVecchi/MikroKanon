@@ -24,8 +24,8 @@ class OutputFragment: Fragment() {
         model.selectedCounterpoint.observe(viewLifecycleOwner){
             if(model.selectedCounterpoint.value!!.parts.isNotEmpty()) {
                 model.changeActiveButtons( if(model.selectedCounterpoint.value!!.parts.size >= 12)
-                    model.activeButtons.value!!.copy(counterpoint = false, freeparts = false, waves = false)
-                else model.activeButtons.value!!.copy(counterpoint = true, freeparts = true, waves = true)
+                    model.activeButtons.value!!.copy(counterpoint = false, freeparts = false, waves = false, pedal = false)
+                else model.activeButtons.value!!.copy(counterpoint = true, freeparts = true, waves = true, pedal = true)
                 )
             }
         }
@@ -83,6 +83,9 @@ class OutputFragment: Fragment() {
                                 },
                                 onRound = {
                                     model.onRound()
+                                },
+                                onPedal = {
+                                    model.onPedal()
                                 },
                                 onBack = { model.onBack() },
                                 onFreePart = { trend ->

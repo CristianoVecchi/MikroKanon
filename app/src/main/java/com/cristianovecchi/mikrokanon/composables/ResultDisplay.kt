@@ -31,6 +31,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onWave: (Int) -> Unit,
                   onTritoneSubstitution: () -> Unit = {},
                   onRound: () -> Unit = {},
+                  onPedal: () -> Unit = {},
                   onClick: (Counterpoint) -> Unit = {},
                   onBack: () -> Unit = {},
                   onFreePart: (TREND) -> Unit = {},
@@ -196,19 +197,21 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 
                     // Add and Special Functions
                     FunctionButtons(model = model, isActiveCounterpoint = activeButtons.counterpoint,
-                        isActiveSpecialFunctions = activeButtons.specialFunctions, buttonSize = buttonSize,
+                        isActiveSpecialFunctions = activeButtons.specialFunctions,
+                        buttonSize = buttonSize,
                         onAdd = { if (!elaborating) dialogState.value = true },
                         onSpecialFunctions = {
                             val close = { buttonsDialogData.value = ButtonsDialogData(model = model) }
                             if(!elaborating) {
                                 buttonsDialogData.value = ButtonsDialogData(true,
                                     language.selectSpecialFunction,
-                                    model, isActiveWaves = activeButtons.waves,
+                                    model, isActiveWaves = activeButtons.waves, isActivePedal = activeButtons.pedal,
                                     onWave3 = { onWave(3); close(); scrollToTopList = true },
                                     onWave4 = { onWave(4); close(); scrollToTopList = true },
                                     onWave6 = { onWave(6); close(); scrollToTopList = true },
                                     onTritoneSubstitution = { onTritoneSubstitution(); close() },
                                     onRound = { onRound(); close() },
+                                    onPedal = { onPedal(); close() },
                                     )
                                 {
                                     close()
@@ -227,12 +230,10 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         onAscStaticClick = {
                             if (!elaborating) onFreePart(TREND.ASCENDANT_STATIC)
                             scrollToTopList = true
-
                         },
                         onDescDynamicClick = {
                             if (!elaborating) onFreePart(TREND.DESCENDANT_DYNAMIC)
                             scrollToTopList = true
-
                         },
                         onDescStaticClick = {
                             if (!elaborating) onFreePart(TREND.DESCENDANT_STATIC)

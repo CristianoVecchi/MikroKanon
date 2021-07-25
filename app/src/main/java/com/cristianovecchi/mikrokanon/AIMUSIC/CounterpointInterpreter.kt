@@ -24,9 +24,7 @@ object CounterpointInterpreter {
                    doublingFlags: Int): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
         val stabilities = counterpoint.findStabilities()
-        val topNuances = findTopNuances(stabilities, 0.48f, 0.95f)
-//        println("Stabilities: $stabilities")
-//        println("Top Nuances: $topNuances")
+        val topNuances = findTopNuances(stabilities, 0.51f, 0.95f)
         if(counterpoint.parts.size > 15) {
             println("WARNING: Counterpoint n. parts: ${counterpoint.parts.size}")
         }
