@@ -87,6 +87,9 @@ class OutputFragment: Fragment() {
                                 onCadenza = {
                                     model.onCadenza()
                                 },
+                                onSingle = {
+                                    model.onSingle()
+                                },
                                 onPedal = { nPedals ->
                                     model.onPedal(nPedals)
                                 },

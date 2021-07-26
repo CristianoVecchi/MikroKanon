@@ -40,6 +40,7 @@ sealed class Computation {
     data class Fioritura(val counterpoints: List<Counterpoint>, val index: Int): Computation()
     data class Round(val counterpoints: List<Counterpoint>, val index: Int): Computation()
     data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
+    data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2 ) : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int) : Computation()
 }
@@ -91,7 +92,8 @@ class AppViewModel(
         "fioritura" to R.drawable.ic_baseline_wb_sunny_24,
         "round" to R.drawable.ic_baseline_directions_boat_24,
         "pedal" to R.drawable.ic_baseline_anchor_24,
-        "cadenza" to R.drawable.ic_baseline_autofps_select_24
+        "cadenza" to R.drawable.ic_baseline_autofps_select_24,
+        "single" to R.drawable.ic_baseline_single_24
     )
 
 
@@ -281,11 +283,23 @@ init{
         computationStack.pushAndDispatch(Computation.Cadenza(listOf(selectedCounterpoint.value!!.clone()), list,0))
         cadenzasOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
     }
-    val onCadenza= {
+    val onCadenza = {
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
         computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, index))
         cadenzasOnCounterpoints(originalCounterpoints, index)
+    }
+    val onSingleFromSelector = { list: ArrayList<Clip> ->
+        changeFirstSequence(list)
+        convertFirstSequenceToSelectedCounterpoint()
+        computationStack.pushAndDispatch(Computation.Single(listOf(selectedCounterpoint.value!!.clone()), list,0))
+        singleOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+    }
+    val onSingle= {
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        computationStack.pushAndDispatch(Computation.Single(originalCounterpoints, null, index))
+        singleOnCounterpoints(originalCounterpoints, index)
     }
     val onRoundFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
@@ -448,6 +462,7 @@ init{
                     is Computation.Expand -> computationStack.lastElement()
                     is Computation.Round -> computationStack.lastElement()
                     is Computation.Cadenza -> computationStack.lastElement()
+                    is Computation.Single-> computationStack.lastElement()
                     is Computation.Pedal -> computationStack.lastElement()
                     is Computation.TritoneSubstitution -> computationStack.lastElement()
                     else -> computationStack.pop() // do not Dispatch!!!
@@ -521,6 +536,9 @@ init{
                     }
                     is Computation.Cadenza -> {
                         cadenzasOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
+                    }
+                    is Computation.Single -> {
+                        singleOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
                     }
                     is Computation.Pedal -> {
 //                        if(stepBack){
@@ -744,6 +762,18 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = addCadenzasOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints)
+                }
+                changeCounterpoints(newList, false)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
+    private fun singleOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = reduceCounterpointsToSinglePart(originalCounterpoints)
                 }
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])

@@ -259,6 +259,10 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         return result
     }
+    fun reduceToSinglePart(): Counterpoint{
+        val reducedAbsPitches = (0 until maxSize()).map{ this.getColumnValuesWithEmptyValues(it)}.flatten().toMutableList()
+        return this.copy(parts = listOf(parts[0].copy(absPitches = reducedAbsPitches)))
+    }
     fun detectIntervalsInColumns(detectorIntervalSet: List<Int>): List<Boolean> {
         val result = mutableListOf<Boolean>()
         val maxSize = maxSize()

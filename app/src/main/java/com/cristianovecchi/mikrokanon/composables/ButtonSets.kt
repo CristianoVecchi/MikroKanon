@@ -145,7 +145,7 @@ fun MikroKanonsButtons(
 @Composable
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
-    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit = {}
+    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onSingle: () -> Unit,
 ) {
     Row {
         CustomButton(iconId = model.iconMap["tritone_substitution"]!!, isActive = isActive, buttonSize = buttonSize) {
@@ -156,6 +156,9 @@ fun SpecialFunctions1Buttons(
         }
         CustomButton(iconId = model.iconMap["cadenza"]!!, isActive = isActive, buttonSize = buttonSize) {
             onCadenza()
+        }
+        CustomButton(iconId = model.iconMap["single"]!!, isActive = isActive, buttonSize = buttonSize) {
+            onSingle()
         }
     }
 }
