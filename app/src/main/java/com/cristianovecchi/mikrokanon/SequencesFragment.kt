@@ -66,6 +66,10 @@ class SequencesFragment(): Fragment() {
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onRoundFromSelector(list)
                                    },
+                                   onCadenza = { list ->
+                                       findNavController().navigate(R.id.outputFragment)
+                                       model.onCadenzaFromSelector(list)
+                                   },
                                    onPedal = { nPedals, list ->
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onPedalFromSelector(nPedals, list)

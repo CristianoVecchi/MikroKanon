@@ -107,7 +107,7 @@ data class ButtonsDialogData(
     val isActiveWaves: Boolean = false, val isActivePedals: Boolean = false,
     val onWave3: () -> Unit = {}, val onWave4: () -> Unit = {}, val onWave6: () -> Unit = {},
     val onPedal1: () -> Unit = {}, val onPedal3: () -> Unit = {}, val onPedal5: () -> Unit = {},
-    val onTritoneSubstitution: () -> Unit = {}, val onRound: () -> Unit = {}, val onPedal: () -> Unit = {},
+    val onTritoneSubstitution: () -> Unit = {}, val onRound: () -> Unit = {}, val onCadenza: () -> Unit = {},
     val onSubmitButtonClick: () -> Unit = {}, )
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",

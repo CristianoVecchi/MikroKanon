@@ -39,6 +39,7 @@ sealed class Computation {
     data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
     data class Fioritura(val counterpoints: List<Counterpoint>, val index: Int): Computation()
     data class Round(val counterpoints: List<Counterpoint>, val index: Int): Computation()
+    data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2 ) : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int) : Computation()
 }
@@ -89,7 +90,8 @@ class AppViewModel(
         "tritone_substitution" to R.drawable.ic_baseline_360_24,
         "fioritura" to R.drawable.ic_baseline_wb_sunny_24,
         "round" to R.drawable.ic_baseline_directions_boat_24,
-        "pedal" to R.drawable.ic_baseline_anchor_24
+        "pedal" to R.drawable.ic_baseline_anchor_24,
+        "cadenza" to R.drawable.ic_baseline_autofps_select_24
     )
 
 
@@ -273,6 +275,18 @@ init{
             tritoneSubstitutionOnCounterpoints(originalCounterpoints, index)
         }
     }
+    val onCadenzaFromSelector = { list: ArrayList<Clip> ->
+        changeFirstSequence(list)
+        convertFirstSequenceToSelectedCounterpoint()
+        computationStack.pushAndDispatch(Computation.Cadenza(listOf(selectedCounterpoint.value!!.clone()), list,0))
+        cadenzasOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+    }
+    val onCadenza= {
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, index))
+        cadenzasOnCounterpoints(originalCounterpoints, index)
+    }
     val onRoundFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
@@ -433,6 +447,7 @@ init{
                     is Computation.Fioritura -> computationStack.lastElement()
                     is Computation.Expand -> computationStack.lastElement()
                     is Computation.Round -> computationStack.lastElement()
+                    is Computation.Cadenza -> computationStack.lastElement()
                     is Computation.Pedal -> computationStack.lastElement()
                     is Computation.TritoneSubstitution -> computationStack.lastElement()
                     else -> computationStack.pop() // do not Dispatch!!!
@@ -503,6 +518,9 @@ init{
                                 refreshComputation(false)
                             }
                         }
+                    }
+                    is Computation.Cadenza -> {
+                        cadenzasOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
                     }
                     is Computation.Pedal -> {
 //                        if(stepBack){
@@ -714,6 +732,18 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = buildRound(originalCounterpoints)
+                }
+                changeCounterpoints(newList, false)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
+    private fun cadenzasOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = addCadenzasOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints)
                 }
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])

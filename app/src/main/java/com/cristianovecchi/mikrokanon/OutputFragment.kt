@@ -84,6 +84,9 @@ class OutputFragment: Fragment() {
                                 onRound = {
                                     model.onRound()
                                 },
+                                onCadenza = {
+                                    model.onCadenza()
+                                },
                                 onPedal = { nPedals ->
                                     model.onPedal(nPedals)
                                 },

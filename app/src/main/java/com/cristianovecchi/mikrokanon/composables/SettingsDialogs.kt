@@ -358,8 +358,9 @@ fun ButtonsDialog(buttonsDialogData: MutableState<ButtonsDialogData>, okText: St
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonsDialogData.value.buttonSize,
                                     fontSize = buttonsDialogData.value.fontSize,
-                                    onRound = { buttonsDialogData.value.onRound() },
-                                    onTritoneSubstitution = { buttonsDialogData.value.onTritoneSubstitution() })
+                                    onRound = buttonsDialogData.value.onRound,
+                                    onCadenza = buttonsDialogData.value.onCadenza ,
+                                    onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution)
                                 1 -> WavesButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActiveWaves,

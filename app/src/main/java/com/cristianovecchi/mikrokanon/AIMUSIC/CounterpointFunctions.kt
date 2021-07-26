@@ -58,6 +58,9 @@ suspend fun flourish(originalCounterpoints: List<Counterpoint>, intervalSet: Lis
 suspend fun buildRound(originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{it.buildRound()}
 }
+suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
+     return originalCounterpoints.map{it.addCadenzas(horIntervalSet)}
+}
 suspend fun findPedalsOnCounterpoint(nPedals:Int, counterpoint: Counterpoint, intervalSet: List<Int>): Counterpoint{
      return Counterpoint.addPedals(nPedals, counterpoint,  intervalSet)
 }
