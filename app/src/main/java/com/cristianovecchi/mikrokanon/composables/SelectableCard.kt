@@ -29,10 +29,10 @@ import com.cristianovecchi.mikrokanon.ui.*
 
 
 @Composable
-fun SelectableCard(text: String, fontSize: Int, isSelected: Boolean, onClick: (Int) -> Unit ){
-    val colors = MaterialTheme.colors
-    val backColor by animateColorAsState( if(isSelected) colors.selCardBackColorSelected else colors.selCardBackColorUnselected )
-    val textColor  by animateColorAsState( if(isSelected) colors.selCardTextColorSelected else colors.selCardTextColorUnselected )
+fun SelectableCard(text: String, fontSize: Int, colors:AppColors, isSelected: Boolean, onClick: (Int) -> Unit ){
+
+    val backColor by animateColorAsState( if(isSelected) colors.selCardBackColorSelected.shift(-0.1f) else colors.selCardBackColorUnselected.shift(-0.2f) )
+    val textColor  by animateColorAsState( if(isSelected) colors.selCardTextColorSelected.shift(0.1f) else colors.selCardTextColorUnselected )
     val borderColor by animateColorAsState( if(isSelected) colors.selCardBorderColorSelected else colors.selCardBorderColorUnselected )
     val padding by animateDpAsState( if(isSelected) 3.dp else 2.dp )
     Card(backgroundColor = backColor,

@@ -26,7 +26,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.ui.iconButtonIconColor
+import com.cristianovecchi.mikrokanon.ui.AppColors
 
 enum class NoteNamesEn(val abs:Int) {
     C(0),D(2),E(4),F(5),G(7),A(9),B(11),EMPTY(-1)
@@ -60,7 +60,7 @@ private data class ButtonInfo(val text: String, val output: Out, val resId: Int 
 
 @Composable
 fun NoteKeyboard(
-    model: AppViewModel,
+    model: AppViewModel, colors: AppColors,
     nRows: Int = 5, nCols: Int = 4, iconMap: Map<String,Int> = HashMap<String,Int>(),
     dispatch : (Out) -> Unit ) {
     model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
@@ -115,7 +115,7 @@ fun NoteKeyboard(
                         val resId = buttonInfo.resId
                         val onClick = {dispatch(buttonInfo.output)}
                         val color = if(buttonInfo.text == "OK") Color.Green else {
-                            if(resId == -1 ) Color.Black else MaterialTheme.colors.iconButtonIconColor
+                            if(resId == -1 ) Color.Black else colors.iconButtonIconColor
                         }
                         val actualFontSize = when (buttonInfo.text.length){
                             in 0..2 -> fontSize
@@ -129,7 +129,8 @@ fun NoteKeyboard(
                             iconId = resId,
                             fontSize = actualFontSize,
                             buttonSize = buttonSize,
-                            iconColor = color
+                            iconColor = color,
+                            colors = colors
                         ) {
                             onClick()
                         }

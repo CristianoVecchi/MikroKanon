@@ -41,18 +41,19 @@ fun SequenceSelector(model: AppViewModel,
                      onMikroKanons4: (ArrayList<Clip>) -> Unit
                     )
 {
-    val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
-    val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
+
     val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons())
     model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
+    var appColors = model.appColors
     var language = Lang.provideLanguage(model.getUserLangDef())
-
+    val backgroundColor = appColors.sequencesListBackgroundColor
+    val buttonsBackgroundColor = appColors.buttonsDisplayBackgroundColor
     val listState = rememberLazyListState()
 
     val notesNames = language.noteNames
     Column(modifier = Modifier
         .fillMaxHeight()
-        .background(MaterialTheme.colors.drawerBackgroundColor)) {
+        .background(appColors.drawerBackgroundColor)) {
         val modifier3 = Modifier
             .fillMaxWidth()
             .background(backgroundColor)
@@ -84,7 +85,7 @@ fun SequenceSelector(model: AppViewModel,
         val onSelectComposition = { index: Int ->
             onSelect(index)
         }
-        SequenceScrollableColumn( listState = listState,
+        SequenceScrollableColumn( listState = listState, colors = appColors,
             modifier = modifier3, notesNames = notesNames, sequences = sequences,
             selected = selected, onSelect = onSelectComposition
         )
@@ -93,14 +94,14 @@ fun SequenceSelector(model: AppViewModel,
             Row(modifier = Modifier.fillMaxSize(),horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                 SequenceEditingButtons(
                     model = model, isActive = activeButtons.editing,
-                    buttonSize = buttonSize,
+                    buttonSize = buttonSize, colors = appColors,
                     onDelete = { onDelete(selected) },
                     onEdit = { onAdd(sequences[selected], true) },
                     onAdd= { onAdd(ArrayList<Clip>(), false) }
                 )
                 MikroKanonsButtons(
                     model = model, isActive = activeButtons.mikrokanon,
-                    buttonSize = buttonSize,
+                    buttonSize = buttonSize, colors = appColors,
                     fontSize = dimensions.selectorMKbuttonFontSize,
                     onMK2Click = {
                         onMikroKanons2(sequences[selected])
@@ -113,7 +114,7 @@ fun SequenceSelector(model: AppViewModel,
                     }
                 )
                 // Add and Special Functions
-                FunctionButtons(model = model,
+                FunctionButtons(model = model, colors = appColors,
                     isActiveCounterpoint = activeButtons.counterpoint,
                     isActiveSpecialFunctions = activeButtons.specialFunctions,
                     buttonSize = buttonSize,
@@ -141,6 +142,7 @@ fun SequenceSelector(model: AppViewModel,
                 )
 
                 FreePartsButtons(
+                    colors = appColors,
                     fontSize = dimensions.selectorFPbuttonFontSize, isActive = activeButtons.freeparts,
                     onAscDynamicClick = { onFreePart(sequences[selected], TREND.ASCENDANT_DYNAMIC ) },
                     onAscStaticClick = { onFreePart( sequences[selected], TREND.ASCENDANT_STATIC) },
@@ -164,7 +166,7 @@ fun SequenceSelector(model: AppViewModel,
 @Composable
 fun SequenceScrollableColumn(
         listState: LazyListState,
-        modifier: Modifier, notesNames: List<String>,
+        modifier: Modifier, notesNames: List<String>, colors: AppColors,
         sequences: List<ArrayList<Clip>>, selected:Int, onSelect: (Int) -> Unit
     )
 {
@@ -176,9 +178,9 @@ if(sequences.isNotEmpty()){
             itemsIndexed(items = sequences) { index, sequence ->
                 Row(modifier = Modifier.padding(8.dp)){
                     if (index == selected) {
-                        SelectableCard(sequence.toStringAll(notesNames), 20, isSelected = true, onClick = {})
+                        SelectableCard(sequence.toStringAll(notesNames), 20, isSelected = true, colors = colors, onClick = {})
                     } else {
-                        SelectableCard(text = sequence.toStringAll(notesNames), 18, isSelected = false,onClick = {
+                        SelectableCard(text = sequence.toStringAll(notesNames), 18, isSelected = false,colors = colors, onClick = {
                             onSelect(index)})
                     }
                 }

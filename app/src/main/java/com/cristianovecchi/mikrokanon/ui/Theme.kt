@@ -5,7 +5,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.Color
+import com.cristianovecchi.mikrokanon.AppViewModel
 
 private val DarkColorPalette = darkColors(
         primary = purple200,
@@ -31,14 +33,18 @@ private val LightColorPalette = lightColors(
 )
 
 @Composable
-fun MikroKanonTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
-   // val colors = LightColorPalette
-
+fun MikroKanonTheme(model: AppViewModel, darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
+//    val colors = if (darkTheme) {
+//        DarkColorPalette
+//    } else {
+//        LightColorPalette
+//    }
+//   // val colors = LightColorPalette
+    val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
+    val overridingColor = model.appColors.selCardBorderColorSelected
+    val colors = lightColors(primary = overridingColor,
+                                primaryVariant = overridingColor,
+                                secondary = overridingColor)
     MaterialTheme(
             colors = colors,
             typography = typography,

@@ -42,6 +42,7 @@ class OutputFragment: Fragment() {
                         model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                         model.dispatchIntervals()
                     }
+                    model.setAppColors(it[0].colors)
                 }
             }
         }
@@ -57,7 +58,7 @@ class OutputFragment: Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                MikroKanonTheme {
+                MikroKanonTheme(model) {
                     Surface(color = MaterialTheme.colors.background) {
                        AppScaffold(model = model, model.userOptionsData.asFlow()) {
                             ResultDisplay(

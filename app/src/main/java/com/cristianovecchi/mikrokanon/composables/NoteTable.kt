@@ -25,10 +25,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.ui.AppColors
 
 
 @Composable
-fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: List<List<String>>,
+fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: List<List<String>>, colors: AppColors,
               fontSize: Int, redNotes: List<List<Boolean>>? = null,
               onClick: (Counterpoint) -> Unit){
 
@@ -40,14 +41,12 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: List<L
     val borderWidth by animateIntAsState(if(isSelected) 10 else 0)
     val fontWeight = if(isSelected) FontWeight.ExtraBold else FontWeight.Normal
     val finalFontSize by animateIntAsState(if (isSelected) (fontSize  ) else fontSize)
-    val cellDarkColor by animateColorAsState( if(isSelected) Color(0.3f,0.3f,0.9f,1.0f)
-                        else Color(0.1f,0.1f,0.65f,1.0f) )
-    val cellLightColor by animateColorAsState( if(isSelected) Color(0.3f,0.3f,1f,1.0f)
-                        else Color(0.1f,0.1f,0.70f,1.0f) )
+    val cellDarkColor by animateColorAsState( if(isSelected) colors.cellDarkColorSelected else colors.cellDarkColorUnselected )
+    val cellLightColor by animateColorAsState( if(isSelected) colors.cellLightColorSelected else colors.cellLightColorUnselected )
     val cellColors = listOf(cellDarkColor, cellLightColor)
-    val selectionColor = if(error) errorColor else Color(0.8f,0.8f,0.9f,1.0f)
-    val textColor by animateColorAsState( if(isSelected) Color.White
-                    else Color(0.8f,0.8f,0.8f,1.0f) )
+    val selectionColor = if(error) errorColor else colors.selectionBorderColor
+    val textColor by animateColorAsState( if(isSelected) colors.cellTextColorSelected else colors.cellTextColorUnselected )
+
 
     val textStyle = TextStyle(
         fontSize = finalFontSize.sp,

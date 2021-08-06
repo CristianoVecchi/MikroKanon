@@ -57,9 +57,6 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "colors")
         val colors: String,
 
-        @ColumnInfo(name = "custom_colors")
-        val customColors: Int,
-
         @ColumnInfo(name = "language")
         val language: String,
     ){
@@ -69,7 +66,7 @@ import androidx.room.PrimaryKey
                     0,0, 1,0,
                     0,0b0011110, 0b1111111,
                     0,0,0,1,
-                     "System" ,-1,"System" )
+                     "System||0" ,"System" )
             }
         }
     }

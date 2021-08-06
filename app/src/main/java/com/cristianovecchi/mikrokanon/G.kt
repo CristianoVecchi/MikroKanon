@@ -38,7 +38,7 @@ class G {
                  counter++
              } while (field != null)
          } catch (e: Exception) {
-             // e.printStackTrace();
+             e.printStackTrace();
          } finally {
              return array
          }
@@ -68,6 +68,13 @@ class G {
              radarColorEditor = isActive
          }
      }
+     fun loadColorArrays(context: Context): Boolean{
+       //  if (colorArrays == null || colorArrays!!.isEmpty()){
+                 colorArrays = AIColor.getMultiTypedArray(context, "colors")
+       //      }
+         println("ArraYColors = ${colorArrays?.size}")
+         return colorArrays?.isNotEmpty() ?: false
+     }
 
      fun setColorArrayBySearch(context: Context, desiredColor: Int) {
          var max = Int.MAX_VALUE
@@ -91,7 +98,8 @@ class G {
          indexColorArray = index
          var i = 0
          if (index < 0) index = 0
-         val arrays = getMultiTypedArray(context, "colors")
+         //val arrays = AIColor.getMultiTypedArray(context, "colors")
+         val arrays = colorArrays!!
          val array = arrays[index % arrays.size]
          colorFont = array.getColor(i++, 0)
          colorBackground1 = array.getColor(i++, 0)

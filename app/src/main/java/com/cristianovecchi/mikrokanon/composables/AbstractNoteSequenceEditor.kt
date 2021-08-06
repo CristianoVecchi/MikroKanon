@@ -12,8 +12,6 @@ import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
-import com.cristianovecchi.mikrokanon.ui.inputBackgroundColor
-import com.cristianovecchi.mikrokanon.ui.sequencesListBackgroundColor
 import kotlin.collections.HashMap
 
 @Composable
@@ -23,6 +21,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
     val nClipCols = dimensions.inputNclipColumns
     val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
     model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
+    val appColors = model.appColors
     val language = Lang.provideLanguage(model.getUserLangDef())
     val notesNames = language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)
@@ -31,12 +30,13 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
     val lastOutIsNotUndo = remember { mutableStateOf(true) }
     val lastIsCursorChanged = remember { mutableStateOf(false) }
 
+
     data class Undo(val list: MutableList<Clip>, val cursor: Int)
     val stack: java.util.Stack<Undo> by remember { mutableStateOf( java.util.Stack<Undo>()) }
-    val backgroundColor = MaterialTheme.colors.inputBackgroundColor
+
     Column(modifier = Modifier
         .fillMaxHeight()
-        .background(backgroundColor)) {
+        .background(appColors.inputBackgroundColor)) {
         val modifier1 = Modifier
             .fillMaxWidth()
             .weight(1f)
@@ -53,7 +53,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
 
             NoteClipDisplay(
                 modifier = Modifier.fillMaxWidth(),  clips = clips.toList(), hintText = language.enterSomeNotes,
-                notesNames = notesNames, backgroundColor = backgroundColor,
+                notesNames = notesNames,  colors = appColors,
                 cursor = mutableStateOf(cursor.value), nCols = nClipCols, fontSize = dimensions.inputClipFontSize
             ) { id ->
                 clips.forEachIndexed { index, clip ->
@@ -67,7 +67,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
             }
         }
         Row(modifier5) {
-            NoteKeyboard(model, iconMap = iconMap
+            NoteKeyboard(model, iconMap = iconMap, colors = appColors
             ) { out ->
                 when (out) {
                     is Out.Note -> {

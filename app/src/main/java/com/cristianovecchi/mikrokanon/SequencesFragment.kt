@@ -28,7 +28,10 @@ class SequencesFragment(): Fragment() {
         }
         model.userOptionsData.observe(viewLifecycleOwner){
             model.userOptionsData.value.let {
-                if(it!!.isNotEmpty()) model.createHorizontalIntervalSet(it[0].intSetHorFlags)
+                if(it!!.isNotEmpty()) {
+                    model.createHorizontalIntervalSet(it[0].intSetHorFlags)
+                    model.setAppColors(it[0].colors)
+                }
             }
         }
         model.selectedSequence.observe(viewLifecycleOwner){
@@ -43,7 +46,7 @@ class SequencesFragment(): Fragment() {
         model.setInitialBlankState()
         return ComposeView(requireContext()).apply {
             setContent {
-                MikroKanonTheme {
+                MikroKanonTheme(model) {
                     // A surface container using the 'background' color from the theme
                     Surface(color = MaterialTheme.colors.background) {
 

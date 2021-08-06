@@ -23,7 +23,10 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
+import com.cristianovecchi.mikrokanon.ui.AppColorThemes
+import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
+import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
 
@@ -172,6 +175,10 @@ init{
     val size = getDeviceResolution()
     dimensions = Dimensions.provideDimensions(size.x, size.y)
 }
+    fun getContext(): Context {
+        return getApplication<MikroKanonApplication>()
+            .applicationContext
+    }
     private fun getDeviceResolution(): Point {
         val windowManager: WindowManager = getApplication<MikroKanonApplication>()
             .applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -989,9 +996,6 @@ init{
             "colors" -> {
                 newUserOptionsData  = optionsDataClone.copy(colors = value as String)
             }
-            "customColors" -> {
-                newUserOptionsData  = optionsDataClone.copy(customColors = value as Int)
-            }
             "language" -> {
                 newUserOptionsData  = optionsDataClone.copy(language = value as String)
             }
@@ -1003,6 +1007,22 @@ init{
                 }
                 userRepository.insertUserOptions(newUserOptionsData)
             }
+        }
+    }
+    var usingCustomColors: Boolean = false
+    var appColors: AppColors = AppColors()
+    var lastIndexColors = -1
+    fun setAppColors(defs: String){
+        val colorDefs = extractColorDefs(defs)
+        println("$colorDefs")
+        if(colorDefs.isCustom){
+            if(lastIndexColors != colorDefs.custom) {
+                lastIndexColors = colorDefs.custom
+                appColors = AppColors.getCustomColorsFromIndex(getContext(),colorDefs.custom)
+            }
+        } else {
+            appColors = if(colorDefs.app == "System") AppColors.provideAppColors(AppColorThemes.GEMINI_BLUE)
+            else AppColors.provideAppColors(AppColorThemes.values().first{ it.title == colorDefs.app })
         }
     }
     fun getUserLangDef(): String {

@@ -20,8 +20,6 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.ui.buttonsDisplayBackgroundColor
-import com.cristianovecchi.mikrokanon.ui.sequencesListBackgroundColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -53,6 +51,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     else listOf()
     val language = Lang.provideLanguage(model.getUserLangDef())
     val notesNames = language.noteNames
+    val colors = model.appColors
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames))}
 
@@ -63,8 +62,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 
     val elaboratingBackgroundColor by animateColorAsState(
         if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
-    val backgroundColor = MaterialTheme.colors.sequencesListBackgroundColor
-    val buttonsBackgroundColor = MaterialTheme.colors.buttonsDisplayBackgroundColor
+    val backgroundColor = colors.sequencesListBackgroundColor
+    val buttonsBackgroundColor = colors.buttonsDisplayBackgroundColor
     val dimensions = model.dimensions
 
     val dialogState = remember { mutableStateOf(false) }
@@ -110,7 +109,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         NoteTable(
                             model,
                             counterpoint,
-                            clipsText,
+                            clipsText, colors,
                             dimensions.outputNoteTableFontSize,
                             redNotes,
                             onClick = { onClick(counterpoint) })
@@ -164,7 +163,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         CustomButton(
                             iconId = iconMap["undo"]!!,
                             isActive = activeButtons.undo,
-                            buttonSize = buttonSize
+                            buttonSize = buttonSize, colors = colors
                         ) {
                             if (!elaborating) onBack(); scrollToTopList = !model.lastComputationIsExpansion()
                         }
@@ -172,7 +171,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         CustomButton(
                             iconId = iconMap["horizontal_movements"]!!,
                             isActive = true,
-                            buttonSize = buttonSize
+                            buttonSize = buttonSize, colors = colors
                         ) {
                             if (!elaborating) {
                                 val flags = model.userOptionsData.value!![0].intSetHorFlags
@@ -192,7 +191,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         }
 
                     }
-                    ExtensionButtons(model = model, isActive = activeButtons.expand, buttonSize = buttonSize,
+                    ExtensionButtons(model = model, isActive = activeButtons.expand, buttonSize = buttonSize, colors = colors,
                          onExpand = { if (!elaborating) onExpand();scrollToTopList = false },
                          onFlourish ={ if (!elaborating) onFlourish();scrollToTopList = false }
                     )
@@ -200,7 +199,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     // Add and Special Functions
                     FunctionButtons(model = model, isActiveCounterpoint = activeButtons.counterpoint,
                         isActiveSpecialFunctions = activeButtons.specialFunctions,
-                        buttonSize = buttonSize,
+                        buttonSize = buttonSize, colors = colors,
                         onAdd = { if (!elaborating) dialogState.value = true },
                         onSpecialFunctions = {
                             val close = { buttonsDialogData.value = ButtonsDialogData(model = model) }
@@ -227,6 +226,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     )
 
                     FreePartsButtons(
+                        colors = colors,
                         fontSize = dimensions.outputFPbuttonFontSize,
                         isActive = activeButtons.freeparts,
                         onAscDynamicClick = {
@@ -251,7 +251,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         CustomButton(
                             iconId = iconMap["play"]!!,
                             isActive = activeButtons.playOrStop,
-                            buttonSize = buttonSize
+                            buttonSize = buttonSize, colors = colors
                         ) {
                             if (!elaborating) {
                                 onPlay(); scrollToTopList = false
@@ -261,7 +261,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         CustomButton(
                             iconId = iconMap["stop"]!!,
                             isActive = activeButtons.playOrStop,
-                            buttonSize = buttonSize
+                            buttonSize = buttonSize, colors = colors
                         ) {
                             onStop(); scrollToTopList = false
                         }
@@ -276,7 +276,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
             ) {
                 IntervalSetSelector(
                     model, fontSize = dimensions.outputIntervalSetFontSize,
-                    names = language.intervalSet
+                    names = language.intervalSet, colors = colors
                 ) { scrollToTopList = true }
             }
         }

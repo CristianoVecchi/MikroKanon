@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.composables
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -29,6 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.G
+import com.cristianovecchi.mikrokanon.toDp
+import com.cristianovecchi.mikrokanon.toHexString
 
 @Composable
 fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>, okText: String = "OK",
@@ -183,6 +188,73 @@ fun ExportDialog(exportDialogData: MutableState<ExportDialogData>, okText: Strin
     }
 
 }
+@Composable
+fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogData>,okText: String = "OK",
+                       onDismissRequest: () -> Unit = { customColorsDialogData.value = CustomColorsDialogData(model = customColorsDialogData.value.model)})
+{
+    if(customColorsDialogData.value.dialogState){
+        Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
+            Surface(
+                modifier = Modifier.width(300.dp),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(text = customColorsDialogData.value.title)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    var customColor by remember{ mutableStateOf(customColorsDialogData.value.Color) }
+
+                    val context = customColorsDialogData.value.model.getContext()
+                    if(G.loadColorArrays(context))
+                        G.setColorArrayBySearch(context, customColor.toArgb())
+                    val fontColor = Color(G.colorFont)
+                    val back1Color = Color(G.colorBackground1)
+                    val back2Color = Color(G.colorBackground2)
+                    val beatColor = Color(G.colorBeatNotes)
+                    val pass1Color = Color(G.colorPassageNotes1)
+                    val pass2Color = Color(G.colorPassageNotes2)
+                    val radarColor = Color(G.colorRadar)
+                    val indexColors = G.indexColorArray
+                    val h = 80.dp
+                    val w = 40.dp
+                    Text(text="colorIndex = ${G.indexColorArray}")
+                    Text(text="colorFont = ${G.colorFont.toString(16)}")
+                    Row(
+
+                        Modifier
+                            .height(h)
+                            .background(customColor), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        Box(Modifier.size(w,h).background(fontColor))
+                        Box(Modifier.size(w,h).background(back1Color))
+                        Box(Modifier.size(w,h).background(back2Color))
+                        Box(Modifier.size(w,h).background(beatColor))
+                        Box(Modifier.size(w,h).background(pass1Color))
+                        Box(Modifier.size(w,h).background(pass2Color))
+                        Box(Modifier.size(w,h).background(radarColor))
+                    }
+                    Row(Modifier.fillMaxWidth()) {
+                        ColorSelector(height = 300.dp, startColor = customColor) { color ->
+                            customColor = color.copy()
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Button(
+                        onClick = {
+                            customColorsDialogData.value.onSubmitButtonClick.invoke(indexColors)
+                            onDismissRequest.invoke()
+                        },
+                        shape = MaterialTheme.shapes.large
+                    ) {
+                        Text(text = okText)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
 @Composable
 fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String = "OK",
               onDismissRequest: () -> Unit = { numberDialogData.value = NumberDialogData(value = numberDialogData.value.value)})
@@ -358,6 +430,7 @@ fun ButtonsDialog(buttonsDialogData: MutableState<ButtonsDialogData>, okText: St
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonsDialogData.value.buttonSize,
                                     fontSize = buttonsDialogData.value.fontSize,
+                                    colors = model.appColors,
                                     onRound = buttonsDialogData.value.onRound,
                                     onCadenza = buttonsDialogData.value.onCadenza,
                                     onSingle = buttonsDialogData.value.onSingle,
@@ -367,6 +440,7 @@ fun ButtonsDialog(buttonsDialogData: MutableState<ButtonsDialogData>, okText: St
                                     isActive = buttonsDialogData.value.isActiveWaves,
                                     buttonSize = buttonsDialogData.value.buttonSize,
                                     fontSize = buttonsDialogData.value.fontSize,
+                                    colors = model.appColors,
                                     onWave3Click = buttonsDialogData.value.onWave3,
                                     onWave4Click = buttonsDialogData.value.onWave4,
                                     onWave6Click = buttonsDialogData.value.onWave6
@@ -376,6 +450,7 @@ fun ButtonsDialog(buttonsDialogData: MutableState<ButtonsDialogData>, okText: St
                                     isActive = buttonsDialogData.value.isActivePedals,
                                     buttonSize = buttonsDialogData.value.buttonSize,
                                     fontSize = buttonsDialogData.value.fontSize,
+                                    colors = model.appColors,
                                     onPedal1Click = buttonsDialogData.value.onPedal1,
                                     onPedal3Click = buttonsDialogData.value.onPedal3,
                                     onPedal5Click = buttonsDialogData.value.onPedal5

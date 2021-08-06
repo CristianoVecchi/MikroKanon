@@ -24,23 +24,24 @@ import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.db.ClipData
+import com.cristianovecchi.mikrokanon.ui.AppColors
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 @Composable
 fun NoteClipDisplay(
-    modifier: Modifier, clips: List<Clip>, notesNames: List<String>, backgroundColor: Color = Color.White, hintText: String = "",
+    modifier: Modifier, clips: List<Clip>, notesNames: List<String>, colors: AppColors, hintText: String = "",
     cursor: MutableState<Int> = mutableStateOf(-1), fontSize: TextUnit = 18.sp,
     nCols: Int = 6, dispatch: (Int) -> Unit) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    val selectionBackColor = Color.White
-    val selectionTextColor = Color.Red
-    val selectionBorderColor = Color.Black
-    val unselectionBackColor = Color.LightGray
-    val unselectionTextColor = Color.Blue
-    val unselectionBorderColor = Color.DarkGray
+    val selectionBackColor = colors.selCardBackColorSelected
+    val selectionTextColor = colors.selCardTextColorSelected
+    val selectionBorderColor = colors.selCardBorderColorSelected
+    val unselectionBackColor = colors.selCardBackColorUnselected
+    val unselectionTextColor = colors.selCardTextColorUnselected
+    val unselectionBorderColor = colors.selCardBorderColorUnselected
     val intervalPadding = 4.dp
     val innerPadding = 10.dp
 
@@ -48,7 +49,7 @@ fun NoteClipDisplay(
         Text(text = hintText, modifier = Modifier.padding(22.dp))
 
     } else {
-        Column(modifier = modifier.background(backgroundColor)) {
+        Column(modifier = modifier.background(colors.inputBackgroundColor)) {
             //Text(text= "${ArrayList(noteClips).toStringAll()}", modifier = Modifier.padding(16.dp))
             val nRows = (clips.size / nCols) + 1
             val rows = (0 until nRows).toList()
@@ -67,7 +68,7 @@ fun NoteClipDisplay(
 
                                 Card(
                                     modifier = Modifier
-                                        .background(backgroundColor)
+                                        .background(colors.inputBackgroundColor)
                                         .clip(RoundedCornerShape(6.dp))
                                         .padding(intervalPadding)
                                         .clickable { dispatch(clip.id) },

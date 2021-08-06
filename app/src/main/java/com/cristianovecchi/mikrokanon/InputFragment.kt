@@ -34,12 +34,16 @@ class InputFragment(): Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val model = (activity as MainActivity).model
-//        model.userOptionsData.observe(viewLifecycleOwner){
-//            //model.selectLanguage(model.getUserLangDef())
-//        }
+        model.userOptionsData.observe(viewLifecycleOwner){
+            model.userOptionsData.value.let {
+                if(it!!.isNotEmpty()) {
+                    model.setAppColors(it[0].colors)
+                }
+            }
+        }
         return ComposeView(requireContext()).apply {
             setContent {
-                MikroKanonTheme {
+                MikroKanonTheme(model) {
                     Surface(color = MaterialTheme.colors.background) {
                         AppScaffold(model = model, model.userOptionsData.asFlow()) {
                             AbstractNoteSequenceEditor(list,

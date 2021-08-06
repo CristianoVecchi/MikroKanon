@@ -1,7 +1,9 @@
 package com.cristianovecchi.mikrokanon
 
+import android.content.res.Resources
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import kotlinx.coroutines.*
 import kotlinx.coroutines.GlobalScope.coroutineContext
@@ -131,6 +133,18 @@ fun <T, R> Iterable<T>.tmap(
 
     return ArrayList<R>(destination)
 }
+
+fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
+fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+
+fun Color.toHexString(): String {
+    return "#${this.red.toColorHexString()}${this.green.toColorHexString()}${this.blue.toColorHexString()}"
+}
+
+fun Float.toColorHexString(): String {
+    return (256 * this).toInt().toString(16)
+}
+
 
 
 

@@ -1,6 +1,35 @@
 package com.cristianovecchi.mikrokanon.ui;
 
+import android.content.Context;
+import android.content.res.TypedArray;
+
+import com.cristianovecchi.mikrokanon.R;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 public class AIColor {
+
+    public static List<TypedArray> getMultiTypedArray(Context context, String key) {
+        List<TypedArray> array = new ArrayList<>();
+
+        try {
+            Class<R.array> res = R.array.class;
+            Field field;
+            int counter = 0;
+
+            do {
+                field = res.getField(key + "_" + counter);
+                array.add(context.getResources().obtainTypedArray(field.getInt(null)));
+                counter++;
+            } while (field != null);
+        } catch (Exception e) {
+            // e.printStackTrace();
+        } finally {
+            return array;
+        }
+    }
 
     public static int colorDistance(int startColor, int aimColor){
         int R1 = (startColor >> 16) & 0xff;
