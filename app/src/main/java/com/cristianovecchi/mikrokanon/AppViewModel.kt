@@ -71,6 +71,7 @@ class AppViewModel(
     }
 
     var dimensions: Dimensions
+    var isFirstTab = true
     val iconMap = mapOf(
 
         "mikrokanon" to R.drawable.ic_baseline_clear_all_24,
@@ -96,7 +97,9 @@ class AppViewModel(
         "round" to R.drawable.ic_baseline_directions_boat_24,
         "pedal" to R.drawable.ic_baseline_anchor_24,
         "cadenza" to R.drawable.ic_baseline_autofps_select_24,
-        "single" to R.drawable.ic_baseline_single_24
+        "single" to R.drawable.ic_baseline_single_24,
+        "music" to R.drawable.ic_baseline_music_note_24,
+        "settings" to R.drawable.ic_baseline_settings_24
     )
 
 
@@ -1019,6 +1022,7 @@ init{
             if(lastIndexColors != colorDefs.custom) {
                 lastIndexColors = colorDefs.custom
                 appColors = AppColors.getCustomColorsFromIndex(getContext(),colorDefs.custom)
+                G.deleteColorArrays()
             }
         } else {
             appColors = if(colorDefs.app == "System") AppColors.provideAppColors(AppColorThemes.GEMINI_BLUE)

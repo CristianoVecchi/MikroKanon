@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -199,41 +201,93 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = customColorsDialogData.value.title)
                     Spacer(modifier = Modifier.height(10.dp))
-                    var customColor by remember{ mutableStateOf(customColorsDialogData.value.Color) }
-
+                    var firstRendering by remember{ mutableStateOf(true)}
+                    val fontColor: Color
+                    val back1Color: Color
+                    val back2Color: Color
+                    val beatColor: Color
+                    val pass1Color: Color
+                    val pass2Color: Color
+                    val radarColor: Color
+                    var indexColors = customColorsDialogData.value.arrayColorIndex
+                    var customColor by remember{ mutableStateOf(Color.Black) }
                     val context = customColorsDialogData.value.model.getContext()
-                    if(G.loadColorArrays(context))
-                        G.setColorArrayBySearch(context, customColor.toArgb())
-                    val fontColor = Color(G.colorFont)
-                    val back1Color = Color(G.colorBackground1)
-                    val back2Color = Color(G.colorBackground2)
-                    val beatColor = Color(G.colorBeatNotes)
-                    val pass1Color = Color(G.colorPassageNotes1)
-                    val pass2Color = Color(G.colorPassageNotes2)
-                    val radarColor = Color(G.colorRadar)
-                    val indexColors = G.indexColorArray
-                    val h = 80.dp
-                    val w = 40.dp
-                    Text(text="colorIndex = ${G.indexColorArray}")
-                    Text(text="colorFont = ${G.colorFont.toString(16)}")
-                    Row(
-
-                        Modifier
-                            .height(h)
-                            .background(customColor), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        Box(Modifier.size(w,h).background(fontColor))
-                        Box(Modifier.size(w,h).background(back1Color))
-                        Box(Modifier.size(w,h).background(back2Color))
-                        Box(Modifier.size(w,h).background(beatColor))
-                        Box(Modifier.size(w,h).background(pass1Color))
-                        Box(Modifier.size(w,h).background(pass2Color))
-                        Box(Modifier.size(w,h).background(radarColor))
+                    if(firstRendering){
+                        if(G.loadColorArrays(context)) G.setColorArray(context,indexColors)
+                            fontColor = Color(G.colorFont)
+                            back1Color = Color(G.colorBackground1)
+                            back2Color = Color(G.colorBackground2)
+                            beatColor = Color(G.colorBeatNotes)
+                            pass1Color = Color(G.colorPassageNotes1)
+                            pass2Color = Color(G.colorPassageNotes2)
+                            radarColor = Color(G.colorRadar)
+                            indexColors = G.indexColorArray
+                            firstRendering = false
+                    } else {
+                        if(G.loadColorArrays(context))
+                            G.setColorArrayBySearch(context, customColor.toArgb())
+                        fontColor = Color(G.colorFont)
+                        back1Color = Color(G.colorBackground1)
+                        back2Color = Color(G.colorBackground2)
+                        beatColor = Color(G.colorBeatNotes)
+                        pass1Color = Color(G.colorPassageNotes1)
+                        pass2Color = Color(G.colorPassageNotes2)
+                        radarColor = Color(G.colorRadar)
+                        indexColors = G.indexColorArray
                     }
+                    val h = 80.dp
+                    var size by remember { mutableStateOf(IntSize.Zero) }
+                    val w = if (size.width == 0) 0.dp else (size.width / 6).toDp().dp + 1.dp
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(h)
+                            .onGloballyPositioned { coordinates ->
+                                size = coordinates.size
+                            }){
+                        Row(
+                            Modifier
+                                .height(h)
+                                .background(customColor), horizontalArrangement = Arrangement.SpaceEvenly) {
+                            Box(
+                                Modifier
+                                    .size(w, h)
+                                    .background(radarColor))
+                            Box(
+                                Modifier
+                                    .size(w, h)
+                                    .background(beatColor))
+                            Box(
+                                Modifier
+                                    .size(w, h)
+                                    .background(back1Color))
+                            Box(
+                                Modifier
+                                    .size(w, h)
+                                    .background(back2Color))
+                            Box(
+                                Modifier
+                                    .size(w, h)
+                                    .background(pass1Color))
+                            Box(
+                                Modifier
+                                    .size(w, h)
+                                    .background(pass2Color))
+                        }
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(h),
+                            horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
+                            Text( text = "$indexColors",
+                                style = TextStyle(fontSize = 42.sp, fontWeight = FontWeight.ExtraBold, color = fontColor) )
+                        }
+                    }
+
                     Row(Modifier.fillMaxWidth()) {
-                        ColorSelector(height = 300.dp, startColor = customColor) { color ->
-                            customColor = color.copy()
+                        ColorSelector(height = 300.dp, startColor = back1Color) { color ->
+                            customColor =  color.copy()
                         }
                     }
                     Spacer(modifier = Modifier.height(10.dp))

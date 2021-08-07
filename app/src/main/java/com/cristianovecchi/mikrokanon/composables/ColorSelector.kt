@@ -41,9 +41,9 @@ fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, dispatch
         if (sizeB.height == 0) 0f else (1f - (blueY / (sizeB.height - barHeight))).coerceIn(0f, 1f)
     if(firstColor && sizeR.height != 0 && sizeG.height != 0 && sizeB.height != 0){
         firstColor = false
-        redY = startColor.red * (sizeR.height - barHeight)
-        greenY = startColor.green * (sizeR.height - barHeight)
-        blueY = startColor.blue * (sizeR.height - barHeight)
+        redY = (1f - startColor.red) * (sizeR.height - barHeight)
+        greenY = (1f - startColor.green) * (sizeR.height - barHeight)
+        blueY = (1f - startColor.blue) * (sizeR.height - barHeight)
     }
    if(sizeR.height == 0 || sizeG.height == 0 || sizeB.height == 0) dispatchColor(startColor)
        else dispatchColor(Color(red,green,blue))

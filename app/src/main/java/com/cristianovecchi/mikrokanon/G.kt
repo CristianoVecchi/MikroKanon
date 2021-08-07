@@ -75,6 +75,9 @@ class G {
          println("ArraYColors = ${colorArrays?.size}")
          return colorArrays?.isNotEmpty() ?: false
      }
+     fun deleteColorArrays(){
+         colorArrays = null
+     }
 
      fun setColorArrayBySearch(context: Context, desiredColor: Int) {
          var max = Int.MAX_VALUE

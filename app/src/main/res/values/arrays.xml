@@ -373,12 +373,12 @@
 
         <item>#eeefad</item>
         <item>#dedf9d</item>
+        <item>#fff86c</item>
 
-        <item>#4184e5</item>
 
         <item>#2164c5</item>
         <item>#013495</item>
-        <item>#fff86c</item>
+        <item>#4184e5</item>
 
     </array>
     <array name="colors_28">
@@ -994,7 +994,8 @@
         <item>#8e5129</item>
     </array>
     <array name="colors_74">
-        <item>#f21a1a</item>
+        <item>#5e3015</item>
+
         <item>#bc1212</item>
         <item>#ac0202</item>
 
@@ -1002,7 +1003,7 @@
 
         <item>#9c2020</item>
         <item>#7c0000</item>
-        <item>#5e3015</item>
+        <item>#f21a1a</item>
     </array>
     <array name="colors_75">
         <item>#878abc</item>
@@ -2897,15 +2898,15 @@
         <item>#b4e55c</item>
     </array>
     <array name="colors_247">
-        <item>#f27b3b</item>
+        <item>#ffffff</item>
         <item>#ec5d10</item>
         <item>#dc4d00</item>
+        <item>#f8eee4</item>
 
-        <item>#ffffff</item>
 
         <item>#dfdfdf</item>
         <item>#bfbfbf</item>
-        <item>#f8eee4</item>
+        <item>#f27b3b</item>
     </array>
     <array name="colors_248">
         <item>#ffffff</item>
@@ -5329,11 +5330,11 @@
         <item>#ec1010</item>
         <item>#dc0000</item>
 
-        <item>#578280</item>
+        <item>#f9faf5</item>
 
         <item>#376260</item>
         <item>#174240</item>
-        <item>#f9faf5</item>
+        <item>#578280</item>
     </array>
     <array name="colors_460">
         <item>#174240</item>
@@ -6049,11 +6050,11 @@
         <item>#a1346b</item>
         <item>#91245b</item>
 
-        <item>#85a98e</item>
+        <item>#fb6583</item>
 
         <item>#4e363d</item>
         <item>#2e161d</item>
-        <item>#fb6583</item>
+        <item>#85a98e</item>
     </array>
     <array name="colors_520">
         <item>#85a98e</item>
