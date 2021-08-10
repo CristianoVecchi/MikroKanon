@@ -26,6 +26,7 @@ class G {
          return ret
      }
 
+     //doesn't work
      fun getMultiTypedArray(context: Context, key: String): List<TypedArray> {
          val array: MutableList<TypedArray> = ArrayList()
          try {
@@ -53,7 +54,7 @@ class G {
      var colorRadar = 0
      var indexColorArray = 534
      private var radarColorEditor = false
-     private var colorArrays: List<TypedArray>? = null
+     private var colorArrays: List<IntArray>? = null
 
      fun isRadarColorEditor(): Boolean {
          return radarColorEditor
@@ -61,7 +62,7 @@ class G {
 
      fun setRadarColorEditor(isActive: Boolean, context: Context) {
          if (isActive) {
-             colorArrays = getMultiTypedArray(context, "colors")
+             //colorArrays = getMultiTypedArray(context, "colors")
              radarColorEditor = isActive
          } else {
              colorArrays = null
@@ -69,9 +70,7 @@ class G {
          }
      }
      fun loadColorArrays(context: Context): Boolean{
-       //  if (colorArrays == null || colorArrays!!.isEmpty()){
-                 colorArrays = AIColor.getMultiTypedArray(context, "colors")
-       //      }
+         colorArrays = AIColor.getMultiTypedArray(context, "colors", -0.12f).map { it.toIntArray() }
          println("ArraYColors = ${colorArrays?.size}")
          return colorArrays?.isNotEmpty() ?: false
      }
@@ -84,7 +83,7 @@ class G {
          val background1index = 1
          var choice = indexColorArray
          for (i in colorArrays!!.indices) {
-             val aimColor = colorArrays!![i].getColor(background1index, 0)
+             val aimColor = colorArrays!![i][background1index]
              val diff: Int = AIColor.colorDistance(desiredColor, aimColor)
              if (diff < max) {
                  max = diff
@@ -104,13 +103,13 @@ class G {
          //val arrays = AIColor.getMultiTypedArray(context, "colors")
          val arrays = colorArrays!!
          val array = arrays[index % arrays.size]
-         colorFont = array.getColor(i++, 0)
-         colorBackground1 = array.getColor(i++, 0)
-         colorBackground2 = array.getColor(i++, 0)
-         colorBeatNotes = array.getColor(i++, 0)
-         colorPassageNotes1 = array.getColor(i++, 0)
-         colorPassageNotes2 = array.getColor(i++, 0)
-         colorRadar = array.getColor(i++, 0)
+         colorFont = array[i++]
+         colorBackground1 = array[i++]
+         colorBackground2 = array[i++]
+         colorBeatNotes = array[i++]
+         colorPassageNotes1 = array[i++]
+         colorPassageNotes2 = array[i++]
+         colorRadar = array[i++]
          //((MainActivity)context).savePreferences();
          //G.radarMessage = "C.A.: " + index % arrays.size
      }

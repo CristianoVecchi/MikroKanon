@@ -33,20 +33,21 @@ fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, dispatch
     var blueY by remember { mutableStateOf(0f) }
     var firstColor by remember { mutableStateOf(true) }
     val barHeight = 80
+    if(firstColor && sizeR.height != 0 && sizeG.height != 0 && sizeB.height != 0){
+        false.also { firstColor = it } // LOL (instead of [firstColor = false] that gets a warning)
+        redY = (1f - startColor.red) * (sizeR.height - barHeight)
+        greenY = (1f - startColor.green) * (sizeR.height - barHeight)
+        blueY = (1f - startColor.blue) * (sizeR.height - barHeight)
+    }
     val red =
         if (sizeR.height == 0) 0f else (1f - (redY / (sizeR.height - barHeight))).coerceIn(0f, 1f)
     val green =
         if (sizeG.height == 0) 0f else (1f - (greenY / (sizeG.height - barHeight))).coerceIn(0f, 1f)
     val blue =
         if (sizeB.height == 0) 0f else (1f - (blueY / (sizeB.height - barHeight))).coerceIn(0f, 1f)
-    if(firstColor && sizeR.height != 0 && sizeG.height != 0 && sizeB.height != 0){
-        firstColor = false
-        redY = (1f - startColor.red) * (sizeR.height - barHeight)
-        greenY = (1f - startColor.green) * (sizeR.height - barHeight)
-        blueY = (1f - startColor.blue) * (sizeR.height - barHeight)
-    }
-   if(sizeR.height == 0 || sizeG.height == 0 || sizeB.height == 0) dispatchColor(startColor)
-       else dispatchColor(Color(red,green,blue))
+
+    if(sizeR.height == 0 || sizeG.height == 0 || sizeB.height == 0) dispatchColor(startColor)
+    else dispatchColor(Color(red,green,blue))
 
     Row(horizontalArrangement = Arrangement.SpaceEvenly) {
         Column(Modifier.weight(1f).onGloballyPositioned { coordinates ->
@@ -65,21 +66,15 @@ fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, dispatch
                                 change.consumeAllChanges()
                                 redY += dragAmount.y
                                 redY = redY.coerceIn(0f, (sizeR.height - barHeight).toFloat())
-
                             }
                         }
                 )
             }
         }
-
-        Column(Modifier.weight(1f).onGloballyPositioned { coordinates ->
-            sizeG = coordinates.size
-        }) {
-            Box(
-                Modifier
-                    .background(Color(0f, green, 0f)).size(sizeG.width.toDp().dp+1.dp, height )
-
-            ) {
+        Column(Modifier.weight(1f).onGloballyPositioned { coordinates -> sizeG = coordinates.size})
+         {
+            Box(Modifier.background(Color(0f, green, 0f)).size(sizeG.width.toDp().dp+1.dp, height ))
+             {
                 Box(
                     Modifier
                         .offset { IntOffset(0, greenY.roundToInt()) }
@@ -90,43 +85,28 @@ fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, dispatch
                                 change.consumeAllChanges()
                                 greenY += dragAmount.y
                                 greenY = greenY.coerceIn(0f, (sizeG.height - barHeight).toFloat())
-
                             }
                         }
                 )
             }
         }
-        Column(Modifier.weight(1f).onGloballyPositioned { coordinates ->
-            sizeB = coordinates.size
-        }){
-            Box(
-                Modifier
-                    .background(Color(0f, 0f, blue)).size(sizeB.width.toDp().dp+1.dp, height)
-
-
-            ) {
-                Box(
-                    Modifier
-                        .offset { IntOffset(0, blueY.roundToInt()) }
-                        .background(Color.White)
-                        .size(sizeB.width.toDp().dp+1.dp, barHeight.toDp().dp)
-                        .pointerInput(Unit) {
-                            detectDragGestures { change, dragAmount ->
-                                change.consumeAllChanges()
-                                blueY += dragAmount.y
-                                blueY = blueY.coerceIn(0f, (sizeB.height - barHeight).toFloat())
-
+        Column(Modifier.weight(1f).onGloballyPositioned { coordinates -> sizeB = coordinates.size })
+        {
+            Box(Modifier.background(Color(0f, 0f, blue)).size(sizeB.width.toDp().dp+1.dp, height))
+            {
+                Box(Modifier.offset { IntOffset(0, blueY.roundToInt()) }
+                            .background(Color.White)
+                            .size(sizeB.width.toDp().dp+1.dp, barHeight.toDp().dp)
+                            .pointerInput(Unit) {
+                                detectDragGestures { change, dragAmount ->
+                                    change.consumeAllChanges()
+                                    blueY += dragAmount.y
+                                    blueY = blueY.coerceIn(0f, (sizeB.height - barHeight).toFloat())
+                                }
                             }
-                        }
                 )
             }
         }
     }
-//    Column() {
-//        Text(text = "Y = $redY", color = Color.White)
-//        Text(text = "red = $red", color = Color.White)
-//        Text(text = "Y = $redY", color = Color.White)
-//        Text(text = "red = $red", color = Color.White)
-//    }
 }
 

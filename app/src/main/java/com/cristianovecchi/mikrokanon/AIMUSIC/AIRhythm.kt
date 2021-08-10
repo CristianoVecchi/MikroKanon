@@ -58,7 +58,7 @@ enum class RhythmPatterns(val title: String, val values: List<Int>,val metro: Pa
     RAGTIME("Ragtime", listOf(120,240,120,60,-180,60,-180, 120,120,120,240,120,180,-60), Pair(2,4)),
     SNARE("Snare", listOf(90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,30,-30,30,-30,30,-30,30,-30)),
     CANCAN("Cancan", listOf(listOf(360,-120),N4graziosetto, N2détaché, N4graziosetto, N2détaché, N4graziosetto, N4staccatissimo, N4staccatissimo).flatten(),Pair(4,8)),
-    TAKE5("Take Five",listOf(120,240,120,180,-60,180,-60,180,-60), Pair(5,8)),
+    GET5("Get Five",listOf(120,240,120,180,-60,180,-60,180,-60), Pair(5,8)),
     HABANERA("Habanera", listOf(360,120,60,-180,60,-180), Pair(2,4)),
     SARABANDA("Sarabanda", listOf(360,-120,480,-240,240, 360,-120, 720,-240), Pair(3,4)),
     SICILIANA("Siciliana", listOf(240,60,-60, 120,120,60,-60, 240,60,-60, 120,120,60,-60, 180,-60,60,-60, 180,-60,60,-60,  120,120,60,-180,120,60,-60,

@@ -76,6 +76,7 @@ class AppViewModel(
 
         "mikrokanon" to R.drawable.ic_baseline_clear_all_24,
         "counterpoint" to R.drawable.ic_baseline_drag_handle_24,
+        "special_functions" to R.drawable.ic_baseline_apps_24,
         "done" to R.drawable.ic_baseline_done_24,
         "add" to R.drawable.ic_baseline_add_24,
         "delete" to R.drawable.ic_baseline_delete_forever_24,
@@ -89,7 +90,6 @@ class AppViewModel(
         "stop" to R.drawable.ic_baseline_stop_24,
         "expand" to R.drawable.ic_baseline_sync_alt_24,
         "waves" to R.drawable.ic_baseline_waves_24,
-        "special_functions" to R.drawable.ic_baseline_apps_24,
         "horizontal_movements" to R.drawable.ic_baseline_insights_24,
         "idea" to R.drawable.ic_baseline_emoji_objects_24,
         "tritone_substitution" to R.drawable.ic_baseline_360_24,
@@ -1014,20 +1014,27 @@ init{
     }
     var usingCustomColors: Boolean = false
     var appColors: AppColors = AppColors()
-    var lastIndexColors = -1
+    var lastIndexCustomColors = -1
+    var lastAppColors = ""
     fun setAppColors(defs: String){
         val colorDefs = extractColorDefs(defs)
         println("$colorDefs")
         if(colorDefs.isCustom){
-            if(lastIndexColors != colorDefs.custom) {
-                lastIndexColors = colorDefs.custom
+            if(lastIndexCustomColors != colorDefs.custom) {
+                lastAppColors = ""
+                lastIndexCustomColors = colorDefs.custom
                 appColors = AppColors.getCustomColorsFromIndex(getContext(),colorDefs.custom)
-                G.deleteColorArrays()
             }
         } else {
-            appColors = if(colorDefs.app == "System") AppColors.provideAppColors(AppColorThemes.GEMINI_BLUE)
-            else AppColors.provideAppColors(AppColorThemes.values().first{ it.title == colorDefs.app })
+            if(lastAppColors != colorDefs.app){
+                lastIndexCustomColors = -1
+                appColors = if(colorDefs.app == "System") AppColors.provideAppColors(AppColorThemes.GEMINI_BLUE)
+                else AppColors.provideAppColors(AppColorThemes.values().first{ it.title == colorDefs.app })
+            }
         }
+    }
+    fun getSystemAppColorsName(): String{
+        return AppColorThemes.GEMINI_BLUE.title
     }
     fun getUserLangDef(): String {
         val systemLangDef = getSystemLangDef()

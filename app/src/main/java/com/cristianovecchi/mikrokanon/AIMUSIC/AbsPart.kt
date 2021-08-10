@@ -2,6 +2,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
+import java.lang.Math.abs
 import java.util.ArrayList
 
 @Parcelize
@@ -19,6 +20,19 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
 
         fun fill(pitch: Int, size: Int): AbsPart {
             return AbsPart((0 until size).map{pitch}.toMutableList())
+        }
+
+        fun analyzeAbsPitches(absPitches: List<Int>): List<Int> {
+            val result = mutableListOf(0,0,0,0,0,0,0)
+            if (absPitches.isEmpty()) return result
+            val intervals = listOf(listOf(1,11),listOf(2,10),listOf(3,9),listOf(4,8),listOf(5,7),listOf(6),listOf(0))
+            val size = absPitches.size
+            for(i in intervals.indices){
+                for(j in absPitches.indices){
+                    if(intervals[i].contains(abs(absPitches[ (j+1) % size ] - absPitches[j]))) result[i]++
+                }
+            }
+            return result
         }
 
         val INVERTED_PITCHES = (11 downTo 0).toList()

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -46,7 +47,9 @@ fun NoteClipDisplay(
     val innerPadding = 10.dp
 
     if (clips.isEmpty() or notesNames.isEmpty()) {
-        Text(text = hintText, modifier = Modifier.padding(22.dp))
+        Text(text = hintText, modifier = Modifier.padding(40.dp),
+        style = TextStyle(fontSize = 33.sp, fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Italic, color = colors.selCardTextColorUnselected))
 
     } else {
         Column(modifier = modifier.background(colors.inputBackgroundColor)) {

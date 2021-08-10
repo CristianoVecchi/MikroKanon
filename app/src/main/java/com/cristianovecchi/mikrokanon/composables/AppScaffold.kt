@@ -30,11 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
+import com.cristianovecchi.mikrokanon.G
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.cristianovecchi.mikrokanon.convertIntsToFlags
 import com.cristianovecchi.mikrokanon.locale.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.ui.AppColorThemes
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import com.cristianovecchi.mikrokanon.ui.shift
 import kotlinx.coroutines.flow.Flow
@@ -480,7 +482,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 }
             }
         }
-    } else {
+    } else { // Settings List
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -531,11 +533,23 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
         }
 
             "Colors" -> {
-
-        }
+                val colorDefs = extractColorDefs(userOptions.colors)
+                val appColors = AppColorThemes.values().map{ it.title }
+                val appColorsName = if(colorDefs.app == "System") model.getSystemAppColorsName() else colorDefs.app
+                val colorsIndex = appColors.indexOf(appColorsName)
+                SelectableCard(text = "Custom Colors: $appColorsName", fontSize = fontSize, colors = colors, isSelected = !colorDefs.isCustom, onClick = {
+                    colorsDialogData.value = ListDialogData(true, appColors, colorsIndex, "Choose a Color Set"){ index ->
+                        model.updateUserOptions(
+                            "colors",
+                            "${AppColorThemes.values()[index].title}||${colorDefs.custom}"
+                        )
+                        colorsDialogData.value = ListDialogData(itemList = colorsDialogData.value.itemList)
+                    }
+                })
+            }
             "Custom Colors"-> {
             val colorDefs = extractColorDefs(userOptions.colors)
-            SelectableCard(text = "Custom Colors: ${colorDefs.custom}", fontSize = fontSize, colors = colors, isSelected = true,onClick = {
+            SelectableCard(text = "Custom Colors: ${colorDefs.custom}", fontSize = fontSize, colors = colors, isSelected = colorDefs.isCustom,onClick = {
                 customColorsDialogData.value = CustomColorsDialogData(true, "Create a Color Set", colorDefs.custom, model
                 ) { colorIndex ->
                     model.updateUserOptions(

@@ -57,10 +57,10 @@ data class AppColors(
                 cellTextColorSelected = fontColor,
                 cellTextColorUnselected = fontColor.shift(-0.2f),
 
-                iconButtonBorderColor = fontColor.shift(0.05f),
+                iconButtonBorderColor = fontColor.shift(-0.15f),
                 iconButtonIconColor = fontColor.shift(0.3f),
                 iconButtonBackgroundColor = radar,
-                iconButtonInactiveBorderColor = fontColor.shift(-0.2f),
+                iconButtonInactiveBorderColor = fontColor.shift(-0.35f),
                 iconButtonInactiveIconColor = radar.shift(-0.2f),
                 iconButtonInactiveBackgroundColor = fontColor.shift(-0.3f),
 

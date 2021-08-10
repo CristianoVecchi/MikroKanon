@@ -46,13 +46,11 @@ class OutputFragment: Fragment() {
                 }
             }
         }
-//        println("vert: ${model.intervalSet.value!!}")
-//        println("hor: ${model.intervalSetHorizontal.value!!}")
 
         model.stackSize.observe(viewLifecycleOwner){
             model.changeActiveButtons(  if(model.stackSize.value!! <= 1)
                 model.activeButtons.value!!.copy(undo = false)
-            else model.activeButtons.value!!.copy(undo = true )
+            else model.activeButtons.value!!.copy(undo = true)
             )
         }
 

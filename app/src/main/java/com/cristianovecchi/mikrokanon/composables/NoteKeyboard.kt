@@ -27,6 +27,7 @@ import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.AppColors
+import com.cristianovecchi.mikrokanon.ui.shift
 
 enum class NoteNamesEn(val abs:Int) {
     C(0),D(2),E(4),F(5),G(7),A(9),B(11),EMPTY(-1)
@@ -115,8 +116,9 @@ fun NoteKeyboard(
                         val resId = buttonInfo.resId
                         val onClick = {dispatch(buttonInfo.output)}
                         val color = if(buttonInfo.text == "OK") Color.Green else {
-                            if(resId == -1 ) Color.Black else colors.iconButtonIconColor
+                            if(resId == -1 ) colors.iconButtonIconColor.shift(-0.2f) else colors.iconButtonIconColor
                         }
+                        val actualColors = if(resId == -1) colors.copy(iconButtonBackgroundColor = colors.iconButtonBackgroundColor.shift(-0.15f)) else colors
                         val actualFontSize = when (buttonInfo.text.length){
                             in 0..2 -> fontSize
                             3 -> fontSize - 3
@@ -130,7 +132,7 @@ fun NoteKeyboard(
                             fontSize = actualFontSize,
                             buttonSize = buttonSize,
                             iconColor = color,
-                            colors = colors
+                            colors = actualColors
                         ) {
                             onClick()
                         }

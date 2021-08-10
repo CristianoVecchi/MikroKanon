@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
@@ -39,16 +40,20 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
         .background(appColors.inputBackgroundColor)) {
         val modifier1 = Modifier
             .fillMaxWidth()
-            .weight(1f)
+            .padding(12.dp)
+            //.weight(1f)
         val modifier3 = Modifier
             .fillMaxSize()
+            .padding(8.dp)
             .weight(3f)
         val modifier5 = Modifier
             .fillMaxSize()
             .weight(7f)
-        Row(modifier1) {
-            Text(text = "Build a Sequence!")
-        }
+        SequenceAnalyzer(modifier = modifier1, absPitches = clips.map{it.abstractNote}, fontSize = dimensions.outputIntervalSetFontSize + 7,
+                        colors = appColors , intervalNames = language.intervalSet)
+//        Row(modifier1) {
+//            Text(text = "Build a Sequence!")
+//        }
         Row(modifier3) {
 
             NoteClipDisplay(

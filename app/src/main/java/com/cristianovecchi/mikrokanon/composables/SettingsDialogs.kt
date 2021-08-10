@@ -192,7 +192,7 @@ fun ExportDialog(exportDialogData: MutableState<ExportDialogData>, okText: Strin
 }
 @Composable
 fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogData>,okText: String = "OK",
-                       onDismissRequest: () -> Unit = { customColorsDialogData.value = CustomColorsDialogData(model = customColorsDialogData.value.model)})
+                       onDismissRequest: () -> Unit = { G.deleteColorArrays(); customColorsDialogData.value = CustomColorsDialogData(model = customColorsDialogData.value.model)})
 {
     if(customColorsDialogData.value.dialogState){
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
@@ -246,43 +246,46 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                             .onGloballyPositioned { coordinates ->
                                 size = coordinates.size
                             }){
-                        Row(
-                            Modifier
-                                .height(h)
-                                .background(customColor), horizontalArrangement = Arrangement.SpaceEvenly) {
-                            Box(
+
+                            Row(
                                 Modifier
-                                    .size(w, h)
-                                    .background(radarColor))
-                            Box(
+                                    .height(h)
+                                    .background(customColor), horizontalArrangement = Arrangement.SpaceEvenly) {
+                                Box(
+                                    Modifier
+                                        .size(w, h)
+                                        .background(radarColor))
+                                Box(
+                                    Modifier
+                                        .size(w, h)
+                                        .background(beatColor))
+                                Box(
+                                    Modifier
+                                        .size(w, h)
+                                        .background(back1Color))
+                                Box(
+                                    Modifier
+                                        .size(w, h)
+                                        .background(back2Color))
+                                Box(
+                                    Modifier
+                                        .size(w, h)
+                                        .background(pass1Color))
+                                Box(
+                                    Modifier
+                                        .size(w, h)
+                                        .background(pass2Color))
+                            }
+                            Row(
                                 Modifier
-                                    .size(w, h)
-                                    .background(beatColor))
-                            Box(
-                                Modifier
-                                    .size(w, h)
-                                    .background(back1Color))
-                            Box(
-                                Modifier
-                                    .size(w, h)
-                                    .background(back2Color))
-                            Box(
-                                Modifier
-                                    .size(w, h)
-                                    .background(pass1Color))
-                            Box(
-                                Modifier
-                                    .size(w, h)
-                                    .background(pass2Color))
-                        }
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(h),
-                            horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
-                            Text( text = "$indexColors",
-                                style = TextStyle(fontSize = 42.sp, fontWeight = FontWeight.ExtraBold, color = fontColor) )
-                        }
+                                    .fillMaxWidth()
+                                    .height(h),
+                                horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
+                                Text( text = "$indexColors",
+                                    style = TextStyle(fontSize = 35.sp, fontWeight = FontWeight.ExtraBold, color = fontColor) )
+                            }
+
+
                     }
 
                     Row(Modifier.fillMaxWidth()) {

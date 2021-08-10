@@ -58,7 +58,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
     val playing by model.playing.asFlow().collectAsState(initial = false)
     var scrollToTopList by remember{mutableStateOf(false)}
-    val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, freeparts = true))
+    val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, specialFunctions = true,freeparts = true))
 
     val elaboratingBackgroundColor by animateColorAsState(
         if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )

@@ -7,11 +7,17 @@ import com.cristianovecchi.mikrokanon.R;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class AIColor {
 
-    public static List<TypedArray> getMultiTypedArray(Context context, String key) {
+    public static List<Integer[]> getMultiTypedArray(Context context, String key ) {
+        return getMultiTypedArray(context, key, 0f);
+    }
+
+    public static List<Integer[]> getMultiTypedArray(Context context, String key, Float shiftForDoubling ) {
         List<TypedArray> array = new ArrayList<>();
 
         try {
@@ -27,8 +33,53 @@ public class AIColor {
         } catch (Exception e) {
             // e.printStackTrace();
         } finally {
-            return array;
+            int size;
+            List<Integer[]> result;
+            if(shiftForDoubling != 0f){
+                size = array.size() * 3;
+            } else {
+                size = array.size();
+            }
+            result = new ArrayList<>(size);
+            for(TypedArray el : array){
+                Integer[] intArray = new Integer[7];
+                for(int i=0; i<7; i++){
+                    intArray[i] = el.getColor(i,0);
+                }
+                result.add(intArray);
+            }
+            if(shiftForDoubling != 0f){
+                for(int i=0; i<array.size(); i++){
+                    Integer[] intArray = new Integer[7];
+                    Integer[] intArray2 = new Integer[7];
+                    Integer[] source = result.get(i);
+                    for(int q=0; q<7; q++){
+                        intArray[q] = AIColor.shiftColor(source[q],shiftForDoubling);
+                        intArray2[q] = AIColor.shiftColor(source[q],-shiftForDoubling);
+                    }
+                    result.add(intArray);
+                    result.add(intArray2);
+                }
+            }
+            return result;
         }
+    }
+
+    public static int shiftColor(int color, float shift){
+        int R = (color >> 16) & 0xff;
+        int G = (color >>  8) & 0xff;
+        int B = (color      ) & 0xff;
+        int diff = (int) (shift * 256 );
+        R += diff;
+        if(R > 255) R = 255;
+        if(R < 0) R = 0;
+        G += diff;
+        if(G > 255) G = 255;
+        if(G < 0) G = 0;
+        B += diff;
+        if(B > 255) B = 255;
+        if(B < 0) B = 0;
+        return (255 << 24) | (R << 16) | (G << 8) | (B);
     }
 
     public static int colorDistance(int startColor, int aimColor){
