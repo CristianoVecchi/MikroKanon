@@ -23,6 +23,7 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
+import com.cristianovecchi.mikrokanon.locale.zodiacPlanets
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
@@ -1002,6 +1003,9 @@ init{
             "language" -> {
                 newUserOptionsData  = optionsDataClone.copy(language = value as String)
             }
+            "zodiacFlags" -> {
+                newUserOptionsData  = optionsDataClone.copy(zodiacFlags = value as Int)
+            }
         }
         newUserOptionsData?.let {
             viewModelScope.launch(Dispatchers.IO) {
@@ -1018,7 +1022,6 @@ init{
     var lastAppColors = ""
     fun setAppColors(defs: String){
         val colorDefs = extractColorDefs(defs)
-        println("$colorDefs")
         if(colorDefs.isCustom){
             if(lastIndexCustomColors != colorDefs.custom) {
                 lastAppColors = ""
@@ -1052,10 +1055,18 @@ init{
     fun createVerticalIntervalSet(verticalIntervalSetFlag: Int) {
         _intervalSet.value = createIntervalSetFromFlags(verticalIntervalSetFlag)
     }
-
     fun saveVerticalIntervalSet() {
         val flags = createFlagsFromIntervalSet(intervalSet.value!!)
         updateUserOptions("intSetVertFlags", flags)
+    }
+    var zodiacPlanetsActive = false
+    var zodiacSignsActive = false
+    fun refreshZodiacFlags() {
+        if(userOptionsData.value != null && userOptionsData.value!!.isNotEmpty()){
+            val flags = userOptionsData.value!![0].zodiacFlags
+            zodiacPlanetsActive = (flags and 1) == 1
+            zodiacSignsActive = (flags and 2) == 2
+        }
     }
 }
 

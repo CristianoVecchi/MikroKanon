@@ -26,6 +26,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.locale.zodiacSigns
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.shift
 
@@ -66,7 +67,9 @@ fun NoteKeyboard(
     dispatch : (Out) -> Unit ) {
     model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val language = Lang.provideLanguage(model.getUserLangDef())
-    val names = language.noteNames
+    val names = if(model.zodiacSignsActive) listOf(zodiacSigns[0], zodiacSigns[2], zodiacSigns[4],
+                                    zodiacSigns[5], zodiacSigns[7], zodiacSigns[9], zodiacSigns[11])
+                else language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)
     val dimensions = model.dimensions
     val buttonSize = dimensions.inputButtonSize
@@ -125,9 +128,10 @@ fun NoteKeyboard(
                             4 -> fontSize - 6
                             else -> fontSize
                         }
+                        val text = if (resId == -1) buttonInfo.text else ""
                         CustomButton(
                             adaptSizeToIconButton = true,
-                            text = if (resId == -1) buttonInfo.text else "",
+                            text = text,
                             iconId = resId,
                             fontSize = actualFontSize,
                             buttonSize = buttonSize,

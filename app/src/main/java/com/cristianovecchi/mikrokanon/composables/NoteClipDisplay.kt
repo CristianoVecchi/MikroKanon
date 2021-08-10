@@ -32,7 +32,8 @@ import kotlin.random.Random
 
 @Composable
 fun NoteClipDisplay(
-    modifier: Modifier, clips: List<Clip>, notesNames: List<String>, colors: AppColors, hintText: String = "",
+    modifier: Modifier, clips: List<Clip>, notesNames: List<String>, zodiacSigns: Boolean = false,
+    colors: AppColors, hintText: String = "",
     cursor: MutableState<Int> = mutableStateOf(-1), fontSize: TextUnit = 18.sp,
     nCols: Int = 6, dispatch: (Int) -> Unit) {
     val listState = rememberLazyListState()
@@ -85,7 +86,8 @@ fun NoteClipDisplay(
                                 )
                                 {
                                     Text(
-                                        text = clip.findText(notesNames = notesNames), modifier = Modifier.padding(innerPadding),
+                                        text = if(zodiacSigns) clip.findZodiacSign() else clip.findText(notesNames = notesNames),
+                                        modifier = Modifier.padding(innerPadding),
                                         style = TextStyle(fontSize = if (cursor.value == index) fontSize else fontSize),
                                         fontWeight = if (cursor.value == index) FontWeight.Bold else FontWeight.Normal
                                     )

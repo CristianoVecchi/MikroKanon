@@ -60,9 +60,14 @@ fun convertFlagsToInts(flags: Int): Set<Int>{
     }
     return result.toSet()
 }
-fun ArrayList<Clip>.toStringAll(notesNames: List<String>): String {
+fun ArrayList<Clip>.toStringAll(notesNames: List<String>, zodiacSigns: Boolean): String {
     return if (this.isNotEmpty()) {
-        this.map { clip -> clip.findText(notesNames = notesNames) }.reduce { acc, string -> "$acc $string" }
+        if(zodiacSigns){
+            this.map { clip -> clip.findZodiacSign() }.reduce { acc, string -> "$acc $string" }
+        } else {
+            this.map { clip -> clip.findText(notesNames = notesNames) }.reduce { acc, string -> "$acc $string" }
+        }
+
     } else {
         "empty Sequence"
     }

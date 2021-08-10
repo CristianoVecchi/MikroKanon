@@ -43,6 +43,7 @@ class OutputFragment: Fragment() {
                         model.dispatchIntervals()
                     }
                     model.setAppColors(it[0].colors)
+                    model.refreshZodiacFlags()
                 }
             }
         }

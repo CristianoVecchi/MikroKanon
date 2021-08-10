@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.cristianovecchi.mikrokanon.composables.Accidents
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.db.ClipData
+import com.cristianovecchi.mikrokanon.locale.zodiacSigns
 import kotlinx.android.parcel.Parcelize
 import kotlin.math.abs
 import kotlin.random.Random
@@ -18,6 +19,9 @@ data class Clip(
     fun findText(notesNames: List<String>): String{
         val actualAx = if(ax == Accidents.NATURAL) "" else ax.ax
         return if (name == NoteNamesEn.EMPTY ) "" else "${notesNames[name.ordinal]}$actualAx"
+    }
+    fun findZodiacSign(): String {
+        return convertAbsToZodiacSign(abstractNote)
     }
 
     fun tritoneSubstitution(): Clip{
@@ -81,6 +85,12 @@ data class Clip(
                 else -> ""
             }
         }
+        fun convertAbsToZodiacSign(absPitch: Int): String {
+            return when (absPitch){
+                in 0..11 -> zodiacSigns[absPitch]
+                else -> ""
+            }
+        }
         fun clipDataToClip(clipData: ClipData): Clip{
             return Clip(clipData.clipId,clipData.abstractNote,
                 NoteNamesEn.values().first { it.abs == clipData.name },
@@ -105,12 +115,20 @@ data class Clip(
                     Clip(-1,absPitch,pair.first,pair.second) }.toList()
             }.toList()
         }
-        fun toClipsText(counterpoint: Counterpoint, noteNames: List<String>) : List<List<String>>{
-            return counterpoint.parts.map { part ->
-                part.absPitches.map{ absPitch ->
-                    Clip.convertAbsToClipText(absPitch, noteNames)
+        fun toClipsText(counterpoint: Counterpoint, noteNames: List<String>, zodiacSigns: Boolean = false) : List<List<String>>{
+            return if(zodiacSigns) {
+                counterpoint.parts.map { part ->
+                    part.absPitches.map{ absPitch ->
+                        convertAbsToZodiacSign(absPitch)
+                    }.toList()
                 }.toList()
-            }.toList()
+            } else {
+                counterpoint.parts.map { part ->
+                    part.absPitches.map{ absPitch ->
+                       convertAbsToClipText(absPitch, noteNames)
+                    }.toList()
+                }.toList()
+            }
         }
         fun toClips(csv: String, noteNames: List<String>) : List<Clip>{
             val array = csv.split(",")

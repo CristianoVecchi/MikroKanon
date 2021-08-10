@@ -38,6 +38,7 @@ class InputFragment(): Fragment() {
             model.userOptionsData.value.let {
                 if(it!!.isNotEmpty()) {
                     model.setAppColors(it[0].colors)
+                    model.refreshZodiacFlags()
                 }
             }
         }

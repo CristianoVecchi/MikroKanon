@@ -59,6 +59,9 @@ import androidx.room.PrimaryKey
 
         @ColumnInfo(name = "language")
         val language: String,
+
+        @ColumnInfo(name = "zodiac_flags")
+        val zodiacFlags: Int,
     ){
         companion object{
             fun getDefaultUserOptionsData(): UserOptionsData{
@@ -66,7 +69,7 @@ import androidx.room.PrimaryKey
                     0,0, 1,0,
                     0,0b0011110, 0b1111111,
                     0,0,0,1,
-                     "System||0" ,"System" )
+                     "System||0" ,"System", 0 )
             }
         }
     }

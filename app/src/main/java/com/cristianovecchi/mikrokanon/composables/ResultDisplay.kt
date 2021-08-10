@@ -20,6 +20,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.locale.zodiacPlanets
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -53,7 +54,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val notesNames = language.noteNames
     val colors = model.appColors
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
-    val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames))}
+    val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive))}
 
     val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
     val playing by model.playing.asFlow().collectAsState(initial = false)
@@ -146,7 +147,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 
                 SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
                     title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
-                    sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames) },
+                    sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames, true) },
                     onSubmitButtonClick = { index, repeat ->
                         dialogState.value = false
                         if (index != -1) {
@@ -275,8 +276,9 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 IntervalSetSelector(
-                    model, fontSize = dimensions.outputIntervalSetFontSize,
-                    names = language.intervalSet, colors = colors
+                    model,
+                    fontSize = if(model.zodiacPlanetsActive) dimensions.outputIntervalSetFontSize + 8 else dimensions.outputIntervalSetFontSize,
+                    names = if(model.zodiacPlanetsActive) zodiacPlanets else language.intervalSet, colors = colors
                 ) { scrollToTopList = true }
             }
         }

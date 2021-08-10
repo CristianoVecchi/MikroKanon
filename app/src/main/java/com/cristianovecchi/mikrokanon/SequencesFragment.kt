@@ -31,6 +31,7 @@ class SequencesFragment(): Fragment() {
                 if(it!!.isNotEmpty()) {
                     model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                     model.setAppColors(it[0].colors)
+                    model.refreshZodiacFlags()
                 }
             }
         }

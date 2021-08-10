@@ -13,6 +13,7 @@ import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
+import com.cristianovecchi.mikrokanon.locale.zodiacPlanets
 import kotlin.collections.HashMap
 
 @Composable
@@ -49,8 +50,10 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
         val modifier5 = Modifier
             .fillMaxSize()
             .weight(7f)
-        SequenceAnalyzer(modifier = modifier1, absPitches = clips.map{it.abstractNote}, fontSize = dimensions.outputIntervalSetFontSize + 7,
-                        colors = appColors , intervalNames = language.intervalSet)
+        SequenceAnalyzer(modifier = modifier1, absPitches = clips.map{it.abstractNote},
+                        fontSize = if(model.zodiacPlanetsActive) dimensions.outputIntervalSetFontSize + 7 + 10 else dimensions.outputIntervalSetFontSize + 7,
+                        colors = appColors ,
+                        intervalNames = if(model.zodiacPlanetsActive) zodiacPlanets else language.intervalSet)
 //        Row(modifier1) {
 //            Text(text = "Build a Sequence!")
 //        }
@@ -58,7 +61,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
 
             NoteClipDisplay(
                 modifier = Modifier.fillMaxWidth(),  clips = clips.toList(), hintText = language.enterSomeNotes,
-                notesNames = notesNames,  colors = appColors,
+                notesNames = notesNames,  zodiacSigns = model.zodiacSignsActive, colors = appColors,
                 cursor = mutableStateOf(cursor.value), nCols = nClipCols, fontSize = dimensions.inputClipFontSize
             ) { id ->
                 clips.forEachIndexed { index, clip ->

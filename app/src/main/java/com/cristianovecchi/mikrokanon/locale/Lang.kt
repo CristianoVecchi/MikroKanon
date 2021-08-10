@@ -81,7 +81,9 @@ val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao",
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器", "薩氏管", "长笛",
     "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","皮埃罗","巴洛克","撥弦樂器")
 
-
+var zodiacPlanets = listOf("\u2644", "\u2643", "\u2642","\u2640","\u263F","\u263D","\u2609")
+val zodiacSignsEmojis = listOf("\u2648","\u2649","\u264A","\u264B","\u264C","\u264D","\u264E","\u264F","\u2650","\u2651","\u2652","\u2653",)
+val zodiacSigns = listOf("♈︎","♉︎","♊︎","♋︎","♌︎","♍︎","♎︎","♏︎","♐︎","♑︎","♒︎","♓︎",)
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
     "übermäßige Quarte", "Quinte", "kleine Sexte", "große Sexte", "kleine Septime", "große Septime",
     "Oktave", "kleine None", "große None", "kleine Dezime", "große Dezime", "Undezime",
@@ -185,6 +187,9 @@ data class Lang( // English by default
     val exportMidi: String = "Export MIDI",
     val playToCreate: String = "Play a counterpoint to create a MIDI file!",
     val language: String = "Language",
+    val zodiac: String = "Zodiac",
+    val zodiacOptions: List<String> = listOf("Planets", "Signs"),
+    val selectZodiac: String = "Use these Zodiac Symbols: ",
     val credits: String = "Credits"
     ){
 

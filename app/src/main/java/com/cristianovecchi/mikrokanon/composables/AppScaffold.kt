@@ -141,12 +141,13 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val colorsDialogData by lazy { mutableStateOf(ListDialogData())}
     val customColorsDialogData by lazy { mutableStateOf(CustomColorsDialogData(model = model))}
     val ritornelloDialogData by lazy {mutableStateOf(ListDialogData())}
+    val zodiacDialogData by lazy{ mutableStateOf(MultiListDialogData())}
 
     val dimensions = model.dimensions
     val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Ritornello","Doubling",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
-        "Export MIDI", "Colors", "Custom Colors","Language","Credits")
+        "Export MIDI", "Colors", "Custom Colors","Language","Zodiac","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val lang = Lang.provideLanguage(model.getUserLangDef())
@@ -171,9 +172,13 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
 //    }
 Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
-    Column(Modifier.weight(1f).background(if (isFirstTab) colors.drawerBackgroundColor
-    else colors.drawerBackgroundColor.shift( -0.2f ))
-        .clickable( onClick = { isFirstTab = true; model.isFirstTab = true}), horizontalAlignment = Alignment.CenterHorizontally){
+    Column(Modifier
+        .weight(1f)
+        .background(
+            if (isFirstTab) colors.drawerBackgroundColor
+            else colors.drawerBackgroundColor.shift(-0.2f)
+        )
+        .clickable(onClick = { isFirstTab = true; model.isFirstTab = true }), horizontalAlignment = Alignment.CenterHorizontally){
         IconButton(modifier = Modifier
             .background(
                 if (isFirstTab) colors.drawerBackgroundColor else colors.drawerBackgroundColor.shift(
@@ -190,9 +195,14 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
             )
         }
     }
-    Column(Modifier.weight(1f).background(if (!isFirstTab) colors.drawerBackgroundColor
-    else colors.drawerBackgroundColor.shift( -0.2f ))
-        .clickable( onClick = { isFirstTab = false; model.isFirstTab = false}), horizontalAlignment = Alignment.CenterHorizontally,
+    Column(
+        Modifier
+            .weight(1f)
+            .background(
+                if (!isFirstTab) colors.drawerBackgroundColor
+                else colors.drawerBackgroundColor.shift(-0.2f)
+            )
+            .clickable(onClick = { isFirstTab = false; model.isFirstTab = false }), horizontalAlignment = Alignment.CenterHorizontally,
         )
            {
         IconButton(modifier = Modifier
@@ -576,6 +586,33 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 }
             })
         }
+                "Zodiac" -> {
+                    val flags = userOptions.zodiacFlags
+                    val intsFromFlags = convertFlagsToInts(flags)
+                    val isOn = flags > 0
+                    val text = if (!isOn) lang.zodiac else "${lang.zodiac}: ${
+                        intsFromFlags.joinToString(
+                            separator = ", "
+                        ) { lang.zodiacOptions[it] }
+                    }"
+                    SelectableCard(
+                        text = text,
+                        fontSize = fontSize,
+                        colors = colors,
+                        isSelected = isOn,
+                        onClick = { _ ->
+                            multiListDialogData.value = MultiListDialogData(
+                                true, lang.zodiacOptions, intsFromFlags.toSet(), lang.selectZodiac
+                            ) { indexes ->
+                                model.updateUserOptions(
+                                    "zodiacFlags",
+                                    convertIntsToFlags(indexes.toSortedSet())
+                                )
+                                multiListDialogData.value =
+                                    MultiListDialogData(itemList = multiListDialogData.value.itemList)
+                            }
+                        })
+                }
             "Credits" -> {
             SelectableCard(text = lang.credits, fontSize = fontSize, colors = colors, isSelected = true, onClick = {
                 creditsDialogData.value = CreditsDialogData(true,"Credits:",
