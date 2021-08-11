@@ -26,7 +26,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.locale.zodiacSigns
+import com.cristianovecchi.mikrokanon.locale.getZodiacSigns
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.shift
 
@@ -67,6 +67,7 @@ fun NoteKeyboard(
     dispatch : (Out) -> Unit ) {
     model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val language = Lang.provideLanguage(model.getUserLangDef())
+    val zodiacSigns = getZodiacSigns(model.zodiacEmojisActive)
     val names = if(model.zodiacSignsActive) listOf(zodiacSigns[0], zodiacSigns[2], zodiacSigns[4],
                                     zodiacSigns[5], zodiacSigns[7], zodiacSigns[9], zodiacSigns[11])
                 else language.noteNames

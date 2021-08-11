@@ -60,10 +60,10 @@ fun convertFlagsToInts(flags: Int): Set<Int>{
     }
     return result.toSet()
 }
-fun ArrayList<Clip>.toStringAll(notesNames: List<String>, zodiacSigns: Boolean): String {
+fun ArrayList<Clip>.toStringAll(notesNames: List<String>, zodiacSigns: Boolean, emoji: Boolean): String {
     return if (this.isNotEmpty()) {
         if(zodiacSigns){
-            this.map { clip -> clip.findZodiacSign() }.reduce { acc, string -> "$acc $string" }
+            this.map { clip -> clip.findZodiacSign(emoji) }.reduce { acc, string -> "$acc $string" }
         } else {
             this.map { clip -> clip.findText(notesNames = notesNames) }.reduce { acc, string -> "$acc $string" }
         }

@@ -70,10 +70,10 @@ fun SequenceSelector(model: AppViewModel,
         val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
         val dimensions = model.dimensions
         val buttonSize = dimensions.selectorButtonSize
-
+        val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
         SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
             title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
-            sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames, true) },
+            sequencesList = sequencesToString,
             onSubmitButtonClick = { index, repeat ->
                 dialogState.value = false
                 if (index != -1) {
@@ -86,7 +86,9 @@ fun SequenceSelector(model: AppViewModel,
             onSelect(index)
         }
         SequenceScrollableColumn( listState = listState, colors = appColors,
-            modifier = modifier3, notesNames = notesNames, zodiacSigns = model.zodiacSignsActive, sequences = sequences,
+            modifier = modifier3, notesNames = notesNames,
+            zodiacSigns = model.zodiacSignsActive, emoji = model.zodiacEmojisActive,
+            sequences = sequences,
             selected = selected, onSelect = onSelectComposition
         )
 
@@ -166,7 +168,7 @@ fun SequenceSelector(model: AppViewModel,
 @Composable
 fun SequenceScrollableColumn(
         listState: LazyListState,
-        modifier: Modifier, notesNames: List<String>, zodiacSigns: Boolean, colors: AppColors,
+        modifier: Modifier, notesNames: List<String>, zodiacSigns: Boolean, emoji: Boolean, colors: AppColors,
         sequences: List<ArrayList<Clip>>, selected:Int, onSelect: (Int) -> Unit
     )
 {
@@ -178,9 +180,9 @@ if(sequences.isNotEmpty()){
             itemsIndexed(items = sequences) { index, sequence ->
                 Row(modifier = Modifier.padding(8.dp)){
                     if (index == selected) {
-                        SelectableCard(sequence.toStringAll(notesNames, zodiacSigns), 20, isSelected = true, colors = colors, onClick = {})
+                        SelectableCard(sequence.toStringAll(notesNames, zodiacSigns, emoji), 20, isSelected = true, colors = colors, onClick = {})
                     } else {
-                        SelectableCard(text = sequence.toStringAll(notesNames, zodiacSigns), 18, isSelected = false,colors = colors, onClick = {
+                        SelectableCard(text = sequence.toStringAll(notesNames, zodiacSigns, emoji), 18, isSelected = false,colors = colors, onClick = {
                             onSelect(index)})
                     }
                 }

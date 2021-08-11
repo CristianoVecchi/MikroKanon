@@ -20,11 +20,10 @@ object CounterpointInterpreter {
     fun doTheMagic(counterpoint: Counterpoint,
                    durations: List<Int> = listOf(240), // 1/8
                    ensembleParts: List<EnsemblePart>,
-                   nuances: Boolean,
+                   nuances: Int,
                    doublingFlags: Int): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
-        val stabilities = counterpoint.findStabilities()
-        val topNuances = findTopNuances(stabilities, 0.51f, 0.95f)
+
         if(counterpoint.parts.size > 15) {
             println("WARNING: Counterpoint n. parts: ${counterpoint.parts.size}")
         }
@@ -46,14 +45,21 @@ object CounterpointInterpreter {
                 21,
                 108
             )
-            val velocities: IntArray = if (nuances) {
-                val mssq = MelodySubSequencer(actualPitches)
-                mssq.assignVelocities(topNuances[partIndex], 0.40f)
-                mssq.velocities
-            } else IntArray(actualPitches.size) { 100 }
-//            println("PART: #$partIndex")
-//            println(actualPitches.asList())
-//            println(velocities.asList())
+            val lowLimit = 0.4f
+            val minNuance = 0.51f
+            val maxNuance = 0.95f
+            val stabilities = counterpoint.findStabilities()
+            val velocities: IntArray = when(nuances) {
+                1 -> {val mssq = MelodySubSequencer(actualPitches)
+                        val topNuances = findTopNuances(stabilities, minNuance, maxNuance)
+                        mssq.assignVelocities(topNuances[partIndex], lowLimit)
+                        mssq.velocities}
+                2 -> {val mssq = MelodySubSequencer(actualPitches)
+                        val topNuances = findTopNuances(stabilities, maxNuance, minNuance)
+                        mssq.assignVelocities(topNuances[partIndex], lowLimit)
+                        mssq.velocities}
+                else -> IntArray(actualPitches.size) { 100 } // case 0: no Nuances
+            }
             if (doublingFlags == 0) {
                 while (index < actualPitches.size) {
                     val pitch = actualPitches[index]

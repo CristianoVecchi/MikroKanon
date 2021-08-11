@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -54,7 +53,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val notesNames = language.noteNames
     val colors = model.appColors
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
-    val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive))}
+    val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
 
     val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
     val playing by model.playing.asFlow().collectAsState(initial = false)
@@ -144,10 +143,10 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
             ) {
 
 
-
+                val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
                 SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
                     title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
-                    sequencesList = model.sequences.value!!.map { it.toStringAll(notesNames, true) },
+                    sequencesList = sequencesToString,
                     onSubmitButtonClick = { index, repeat ->
                         dialogState.value = false
                         if (index != -1) {

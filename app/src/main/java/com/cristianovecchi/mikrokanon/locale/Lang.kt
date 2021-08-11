@@ -82,8 +82,11 @@ val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂�
     "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","皮埃罗","巴洛克","撥弦樂器")
 
 var zodiacPlanets = listOf("\u2644", "\u2643", "\u2642","\u2640","\u263F","\u263D","\u2609")
-val zodiacSignsEmojis = listOf("\u2648","\u2649","\u264A","\u264B","\u264C","\u264D","\u264E","\u264F","\u2650","\u2651","\u2652","\u2653",)
-val zodiacSigns = listOf("♈︎","♉︎","♊︎","♋︎","♌︎","♍︎","♎︎","♏︎","♐︎","♑︎","♒︎","♓︎",)
+private val zodiacSignsEmojis = listOf("\u2648","\u2649","\u264A","\u264B","\u264C","\u264D","\u264E","\u264F","\u2650","\u2651","\u2652","\u2653",)
+private val zodiacSigns = listOf("♈︎","♉︎","♊︎","♋︎","♌︎","♍︎","♎︎","♏︎","♐︎","♑︎","♒︎","♓︎",)
+fun getZodiacSigns(emojis: Boolean): List<String>{
+    return if(emojis) return zodiacSignsEmojis else zodiacSigns
+}
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
     "übermäßige Quarte", "Quinte", "kleine Sexte", "große Sexte", "kleine Septime", "große Septime",
     "Oktave", "kleine None", "große None", "kleine Dezime", "große Dezime", "Undezime",
@@ -163,6 +166,9 @@ data class Lang( // English by default
     val doublingNames: List<String> = doublingEn,
     val beatsPerMinute: String = "Beats Per Minute",
     val ensemble: String = "Ensemble",
+    val nuances: String = "Nuances",
+    val nuancesOptions: List<String> = listOf("None", "Exalt short notes", "Exalt long notes"),
+    val selectNuances: String = "Select dynamic nuances!",
     val bpm: String = "BPM",
     val rhythm: String = "Rhythm",
     val rhythmShuffle: String = "Rhythm shuffle",
@@ -188,7 +194,7 @@ data class Lang( // English by default
     val playToCreate: String = "Play a counterpoint to create a MIDI file!",
     val language: String = "Language",
     val zodiac: String = "Zodiac",
-    val zodiacOptions: List<String> = listOf("Planets", "Signs"),
+    val zodiacOptions: List<String> = listOf("Planets", "Signs", "Emojis"),
     val selectZodiac: String = "Use these Zodiac Symbols: ",
     val credits: String = "Credits"
     ){
@@ -257,6 +263,8 @@ data class Lang( // English by default
                 repeatSequence = "Ripeti la sequenza",
                 selectEnsemble = "Scegli un ensemble!",
                 ensembleNames = ensembleNamesIt,
+                nuancesOptions = listOf("Nessuna","In rilievo le note brevi","In rilievo le note lunghe"),
+                selectNuances = "Scegli le nuances per la dinamica!",
                 beatsPerMinute = "Pulsazioni al minuto",
                 selectRhythm = "Scegli un ritmo!",
                 selectDoubling = "Scegli degli intervalli per il raddoppio!",

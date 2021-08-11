@@ -246,6 +246,9 @@ init{
                 val ritornello: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].ritornello }
                         ?: 0
+                val nuances: Int =
+                    userOptionsData.value?.let { userOptionsData.value!![0].nuances }
+                        ?: 1
                 error = Player.playCounterpoint(
                     mediaPlayer!!,
                     false,
@@ -260,7 +263,8 @@ init{
                     partsShuffle,
                     rowFormsFlags,
                     ritornello,
-                    doublingFlags
+                    doublingFlags,
+                    nuances
                 )
             }
         mediaPlayer?.let{ if (it.isPlaying) _playing.value = true}
@@ -1006,6 +1010,9 @@ init{
             "zodiacFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(zodiacFlags = value as Int)
             }
+            "nuances" -> {
+                newUserOptionsData  = optionsDataClone.copy(nuances = value as Int)
+            }
         }
         newUserOptionsData?.let {
             viewModelScope.launch(Dispatchers.IO) {
@@ -1061,11 +1068,13 @@ init{
     }
     var zodiacPlanetsActive = false
     var zodiacSignsActive = false
+    var zodiacEmojisActive = false
     fun refreshZodiacFlags() {
         if(userOptionsData.value != null && userOptionsData.value!!.isNotEmpty()){
             val flags = userOptionsData.value!![0].zodiacFlags
             zodiacPlanetsActive = (flags and 1) == 1
             zodiacSignsActive = (flags and 2) == 2
+            zodiacEmojisActive = (flags and 4) == 4
         }
     }
 }

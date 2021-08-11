@@ -4,7 +4,7 @@ import android.os.Parcelable
 import com.cristianovecchi.mikrokanon.composables.Accidents
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.db.ClipData
-import com.cristianovecchi.mikrokanon.locale.zodiacSigns
+import com.cristianovecchi.mikrokanon.locale.getZodiacSigns
 import kotlinx.android.parcel.Parcelize
 import kotlin.math.abs
 import kotlin.random.Random
@@ -20,8 +20,8 @@ data class Clip(
         val actualAx = if(ax == Accidents.NATURAL) "" else ax.ax
         return if (name == NoteNamesEn.EMPTY ) "" else "${notesNames[name.ordinal]}$actualAx"
     }
-    fun findZodiacSign(): String {
-        return convertAbsToZodiacSign(abstractNote)
+    fun findZodiacSign(emoji: Boolean ): String {
+        return convertAbsToZodiacSign(abstractNote, emoji)
     }
 
     fun tritoneSubstitution(): Clip{
@@ -85,9 +85,9 @@ data class Clip(
                 else -> ""
             }
         }
-        fun convertAbsToZodiacSign(absPitch: Int): String {
+        fun convertAbsToZodiacSign(absPitch: Int, emoji: Boolean): String {
             return when (absPitch){
-                in 0..11 -> zodiacSigns[absPitch]
+                in 0..11 -> getZodiacSigns(emoji)[absPitch]
                 else -> ""
             }
         }
@@ -115,11 +115,11 @@ data class Clip(
                     Clip(-1,absPitch,pair.first,pair.second) }.toList()
             }.toList()
         }
-        fun toClipsText(counterpoint: Counterpoint, noteNames: List<String>, zodiacSigns: Boolean = false) : List<List<String>>{
+        fun toClipsText(counterpoint: Counterpoint, noteNames: List<String>, zodiacSigns: Boolean = false, emoji: Boolean = false) : List<List<String>>{
             return if(zodiacSigns) {
                 counterpoint.parts.map { part ->
                     part.absPitches.map{ absPitch ->
-                        convertAbsToZodiacSign(absPitch)
+                        convertAbsToZodiacSign(absPitch, emoji)
                     }.toList()
                 }.toList()
             } else {

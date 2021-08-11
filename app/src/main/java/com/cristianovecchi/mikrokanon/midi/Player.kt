@@ -93,7 +93,7 @@ object Player {
         counterpoint: Counterpoint, bpm: Float, shuffle: Float,
         rhythm: RhythmPatterns, ensembleType: EnsembleType,
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
-        rowFormsFlags: Int = 1, ritornello:Int = 0, doublingFlags: Int = 0
+        rowFormsFlags: Int = 1, ritornello:Int = 0, doublingFlags: Int = 0, nuances: Int = 0
     ) : String {
         var error = ""
         val durations = rhythm.values
@@ -103,7 +103,7 @@ object Player {
         val nNotesToSkip = if(rowFormsFlags and 0b10000 != 0) rhythm.nNotesLeftInThePattern(counterpoint.nNotes()) else 0
         var actualCounterpoint = if (rowFormsFlags == 1) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowFormsFlags, nNotesToSkip, ritornello > 0)
         actualCounterpoint = if(ritornello > 0)  actualCounterpoint.ritornello(ritornello) else actualCounterpoint
-        val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts,true, doublingFlags)
+        val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts, nuances, doublingFlags)
         if (counterpointTracks.isEmpty()) return "No Tracks in Counterpoint!!!"
 
         val tempoTrack = MidiTrack()

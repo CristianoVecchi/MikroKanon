@@ -61,7 +61,8 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
 
             NoteClipDisplay(
                 modifier = Modifier.fillMaxWidth(),  clips = clips.toList(), hintText = language.enterSomeNotes,
-                notesNames = notesNames,  zodiacSigns = model.zodiacSignsActive, colors = appColors,
+                notesNames = notesNames,  zodiacSigns = model.zodiacSignsActive, emoji = model.zodiacEmojisActive,
+                colors = appColors,
                 cursor = mutableStateOf(cursor.value), nCols = nClipCols, fontSize = dimensions.inputClipFontSize
             ) { id ->
                 clips.forEachIndexed { index, clip ->

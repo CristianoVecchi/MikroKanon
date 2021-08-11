@@ -336,7 +336,7 @@ fun BpmDialog(numberDialogData: MutableState<NumberDialogData>, okText: String =
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Spacer(modifier = Modifier.height(10.dp))
-                    Row() {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Text(text = "$bpm", style = TextStyle(fontSize = 32.sp,fontWeight = FontWeight.Bold) )
                     }
                     Spacer(modifier = Modifier.height(10.dp))

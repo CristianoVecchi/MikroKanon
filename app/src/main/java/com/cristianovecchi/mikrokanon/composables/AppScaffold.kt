@@ -131,8 +131,9 @@ data class CreditsDialogData(val dialogState: Boolean = false, val title:String 
 fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>){
 
     val listDialogData by lazy { mutableStateOf(ListDialogData())}
+    //val nuancesDialogData by lazy { mutableStateOf(ListDialogData())}
     val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
-    val multiListDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
     //val intervalSetDialogData by lazy { mutableStateOf(MultiListDialogData())}
@@ -144,7 +145,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val zodiacDialogData by lazy{ mutableStateOf(MultiListDialogData())}
 
     val dimensions = model.dimensions
-    val optionNames= listOf("Ensemble", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
+    val optionNames= listOf("Ensemble", "Nuances", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Ritornello","Doubling",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
         "Export MIDI", "Colors", "Custom Colors","Language","Zodiac","Credits")
@@ -157,7 +158,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val listState = rememberLazyListState()
     var isFirstTab by remember{ mutableStateOf(model.isFirstTab)}
     ListDialog(listDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize)
-    MultiListDialog(multiListDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
+    MultiListDialog(doublingDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     BpmDialog(bpmDialogData, lang.OKbutton)
     ExportDialog(exportDialogData, lang.OKbutton)
     CreditsDialog(creditsDialogData, lang.OKbutton)
@@ -247,6 +248,28 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                             ) { index ->
                                 model.updateUserOptions(
                                     "ensemble_type",
+                                    index
+                                )
+                                listDialogData.value =
+                                    ListDialogData(itemList = listDialogData.value.itemList)
+                            }
+                        })
+                }
+                "Nuances" -> {
+                    val nuancesOptions: List<String> = lang.nuancesOptions
+                    val nuancesIndex = userOptions.nuances
+                    val isOn = nuancesIndex != 0
+                    SelectableCard(
+                        text = if(isOn) "${lang.nuances}: ${nuancesOptions[nuancesIndex]}" else lang.nuances,
+                        fontSize = fontSize,
+                        colors = colors,
+                        isSelected = isOn,
+                        onClick = {
+                            listDialogData.value = ListDialogData(
+                                true, nuancesOptions, nuancesIndex, lang.selectNuances
+                            ) { index ->
+                                model.updateUserOptions(
+                                    "nuances",
                                     index
                                 )
                                 listDialogData.value =
@@ -431,15 +454,15 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         colors = colors,
                         isSelected = isOn,
                         onClick = { _ ->
-                            multiListDialogData.value = MultiListDialogData(
+                            doublingDialogData.value = MultiListDialogData(
                                 true, lang.doublingNames, intsFromFlags.toSet(), lang.selectDoubling
                             ) { indexes ->
                                 model.updateUserOptions(
                                     "doublingFlags",
                                     convertIntsToFlags(indexes.map { it + 1 }.toSortedSet())
                                 )
-                                multiListDialogData.value =
-                                    MultiListDialogData(itemList = multiListDialogData.value.itemList)
+                                doublingDialogData.value =
+                                    MultiListDialogData(itemList = doublingDialogData.value.itemList)
                             }
                         })
                 }
@@ -601,15 +624,16 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         colors = colors,
                         isSelected = isOn,
                         onClick = { _ ->
-                            multiListDialogData.value = MultiListDialogData(
+                            zodiacDialogData.value = MultiListDialogData(
                                 true, lang.zodiacOptions, intsFromFlags.toSet(), lang.selectZodiac
                             ) { indexes ->
+                                val actualIndexes = if(indexes.contains(2)) listOf(indexes[0],1,2) else indexes
                                 model.updateUserOptions(
                                     "zodiacFlags",
-                                    convertIntsToFlags(indexes.toSortedSet())
+                                    convertIntsToFlags(actualIndexes.toSortedSet())
                                 )
-                                multiListDialogData.value =
-                                    MultiListDialogData(itemList = multiListDialogData.value.itemList)
+                                zodiacDialogData.value =
+                                    MultiListDialogData(itemList = zodiacDialogData.value.itemList)
                             }
                         })
                 }
