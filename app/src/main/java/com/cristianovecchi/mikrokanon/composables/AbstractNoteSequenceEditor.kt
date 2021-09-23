@@ -12,8 +12,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AppViewModel
-import com.cristianovecchi.mikrokanon.db.UserOptionsData
-import com.cristianovecchi.mikrokanon.locale.zodiacPlanets
+import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
 import kotlin.collections.HashMap
 
 @Composable
@@ -53,7 +52,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
         SequenceAnalyzer(modifier = modifier1, absPitches = clips.map{it.abstractNote},
                         fontSize = if(model.zodiacPlanetsActive) dimensions.outputIntervalSetFontSize + 7 + 10 else dimensions.outputIntervalSetFontSize + 7,
                         colors = appColors ,
-                        intervalNames = if(model.zodiacPlanetsActive) zodiacPlanets else language.intervalSet)
+                        intervalNames = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet)
 //        Row(modifier1) {
 //            Text(text = "Build a Sequence!")
 //        }

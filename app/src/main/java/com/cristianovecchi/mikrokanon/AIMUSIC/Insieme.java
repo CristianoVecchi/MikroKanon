@@ -397,7 +397,7 @@ public class Insieme {
     }
     // MIDI: A0 = 21, C4 = 60, C8 = 108
     // octave 4 = central
-    public static int[] linearMelody(int octave, int[] absPitches, int lowerLimit, int upperLimit){
+    public static int[] findMelody(int octave, int[] absPitches, int lowerLimit, int upperLimit, int melodyType){
         int[] melody = new int[absPitches.length];
         int length = absPitches.length;
         int index = 0;
@@ -408,16 +408,31 @@ public class Insieme {
         melody[index]=absPitches[index] + (octave + 1) * 12;
         int lastNote = melody[index];
         if (index == length -1 ) {return melody;}
-        for (int i = index; i<length-1; i++ ){
-            int checkNote = absPitches[i+1];
-            if(checkNote==-1){
-                melody[i+1]=-1;
-            } else {
-                checkNote = checkNote + (octave + 1) * 12;
-                int newNote = notaInRange(lastNote
-                        +(checkNote-lastNote)+(12*Insieme.trovaOttavaLineare(lastNote, checkNote)),lowerLimit,upperLimit);
-                melody[i+1] = newNote;
-                lastNote = newNote;
+        if(melodyType == 0){
+            for (int i = index; i<length-1; i++ ){
+                int checkNote = absPitches[i+1];
+                if(checkNote==-1){
+                    melody[i+1]=-1;
+                } else {
+                    checkNote = checkNote + (octave + 1) * 12;
+                    int newNote = notaInRange(lastNote
+                            +(checkNote-lastNote)+(12*Insieme.trovaOttavaLineare(lastNote, checkNote)),lowerLimit,upperLimit);
+                    melody[i+1] = newNote;
+                    lastNote = newNote;
+                }
+            }
+        } else if(melodyType == 1){
+            for (int i = index; i<length-1; i++ ){
+                int checkNote = absPitches[i+1];
+                if(checkNote==-1){
+                    melody[i+1]=-1;
+                } else {
+                    checkNote = checkNote + (octave + 1) * 12;
+                    int newNote = notaInRange(lastNote
+                            +(checkNote-lastNote)+(12*Insieme.trovaOttavaAmpia(lastNote, checkNote)),lowerLimit,upperLimit);
+                    melody[i+1] = newNote;
+                    lastNote = newNote;
+                }
             }
         }
         return melody;

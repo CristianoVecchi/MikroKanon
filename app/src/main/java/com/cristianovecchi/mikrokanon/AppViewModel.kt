@@ -23,7 +23,6 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
-import com.cristianovecchi.mikrokanon.locale.zodiacPlanets
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
@@ -249,6 +248,12 @@ init{
                 val nuances: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].nuances }
                         ?: 1
+                val rangeType: Int =
+                    userOptionsData.value?.let { userOptionsData.value!![0].rangeType }
+                        ?: 0
+                val melodyType: Int =
+                    userOptionsData.value?.let { userOptionsData.value!![0].melodyType }
+                        ?: 0
                 error = Player.playCounterpoint(
                     mediaPlayer!!,
                     false,
@@ -264,7 +269,9 @@ init{
                     rowFormsFlags,
                     ritornello,
                     doublingFlags,
-                    nuances
+                    nuances,
+                    rangeType,
+                    melodyType,
                 )
             }
         mediaPlayer?.let{ if (it.isPlaying) _playing.value = true}
@@ -955,8 +962,14 @@ init{
                                 UserOptionsData.getDefaultUserOptionsData()
                                 else userOptionsData.value!![0].copy()
         when(key){
-            "ensemble_type" -> {
+            "ensembleType" -> {
                 newUserOptionsData = optionsDataClone.copy(ensembleType = value as Int)
+            }
+            "rangeType" -> {
+                newUserOptionsData = optionsDataClone.copy(rangeType = value as Int)
+            }
+            "melodyType" -> {
+                newUserOptionsData = optionsDataClone.copy(melodyType = value as Int)
             }
             "bpm" -> {
                 newUserOptionsData = optionsDataClone.copy(bpm = value as Int)

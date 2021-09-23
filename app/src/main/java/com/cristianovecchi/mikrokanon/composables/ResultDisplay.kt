@@ -19,7 +19,8 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.locale.zodiacPlanets
+import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
+
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -176,7 +177,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                             if (!elaborating) {
                                 val flags = model.userOptionsData.value!![0].intSetHorFlags
                                 val intsFromFlags = convertFlagsToInts(flags)
-                                val intervalNames = language.intervalSet.map{ it.replace("\n"," / ") }
+                                val intervalNames = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet.map{ it.replace("\n"," / ") }
                                     intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
                                         intsFromFlags.toSet(), dialogTitle = "${language.selectIntervalsForFP}\n${language.FPremember}"
                                     ) { indexes ->
@@ -277,7 +278,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 IntervalSetSelector(
                     model,
                     fontSize = if(model.zodiacPlanetsActive) dimensions.outputIntervalSetFontSize + 8 else dimensions.outputIntervalSetFontSize,
-                    names = if(model.zodiacPlanetsActive) zodiacPlanets else language.intervalSet, colors = colors
+                    names = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet, colors = colors
                 ) { scrollToTopList = true }
             }
         }

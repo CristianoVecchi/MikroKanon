@@ -112,78 +112,78 @@ object Ensembles {
     fun getWoodwinds(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2 -> listOf(
-                EnsemblePart(73, 5), //flute
-                EnsemblePart(70, 3)  // bassoon
+                EnsemblePart(73, 5, FLUTE_ALL), //flute
+                EnsemblePart(70, 3, BASSOON_ALL)  // bassoon
             )
             3 -> listOf(
-                EnsemblePart(73, 5), //flute
-                EnsemblePart(71, 4), //clarinet
-                EnsemblePart(70, 3)  // bassoon
+                EnsemblePart(73, 5, FLUTE_ALL), //flute
+                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
+                EnsemblePart(70, 3, BASSOON_ALL)  // bassoon
             )
             4 -> listOf(
-                EnsemblePart(73, 5), //flute
-                EnsemblePart(68, 4), //oboe
-                EnsemblePart(71, 3), //clarinet
-                EnsemblePart(70, 2)  // bassoon
+                EnsemblePart(73, 5, FLUTE_ALL), //flute
+                EnsemblePart(68, 4, OBOE_ALL), //oboe
+                EnsemblePart(71, 3, CLARINET_ALL), //clarinet
+                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
             )
             5 -> listOf(
-                EnsemblePart(73, 5), //flute
-                EnsemblePart(68, 5), //oboe
-                EnsemblePart(71, 4), //clarinet
-                EnsemblePart(60, 3), // french horn
-                EnsemblePart(70, 2)  // bassoon
+                EnsemblePart(73, 5, FLUTE_ALL), //flute
+                EnsemblePart(68, 5, OBOE_ALL), //oboe
+                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
+                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
+                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
             )
             6 -> listOf(
-                EnsemblePart(73, 5), //flute
-                EnsemblePart(68, 5), //oboe
-                EnsemblePart(71, 4), //clarinet
-                EnsemblePart(60, 3), // french horn
-                EnsemblePart(71, 3), // bass clarinet
-                EnsemblePart(70, 2)  // bassoon
+                EnsemblePart(73, 5, FLUTE_ALL), //flute
+                EnsemblePart(68, 5, OBOE_ALL), //oboe
+                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
+                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
+                EnsemblePart(71, 3, BASS_CLARINET_ALL), // bass clarinet
+                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
             )
             7 -> listOf(
-                EnsemblePart(73, 5), //flute
-                EnsemblePart(68, 5), //oboe
-                EnsemblePart(69, 4), // english horn
-                EnsemblePart(71, 4), //clarinet
-                EnsemblePart(60, 3), // french horn
-                EnsemblePart(71, 3), // bass clarinet
-                EnsemblePart(70, 2)  // bassoon
+                EnsemblePart(73, 5, FLUTE_ALL), //flute
+                EnsemblePart(68, 5, OBOE_ALL), //oboe
+                EnsemblePart(69, 4, ENGLISH_HORN_ALL), // english horn
+                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
+                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
+                EnsemblePart(71, 3, BASS_CLARINET_ALL), // bass clarinet
+                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
             )
             8 -> listOf(
-                EnsemblePart(72, 6), //piccolo
-                EnsemblePart(73, 5), //flute
-                EnsemblePart(68, 5), //oboe
-                EnsemblePart(69, 4), // english horn
-                EnsemblePart(71, 4), //clarinet
-                EnsemblePart(60, 3), // french horn
-                EnsemblePart(71, 3), // bass clarinet
-                EnsemblePart(70, 2)  // bassoon
+                EnsemblePart(72, 6, PICCOLO_ALL), //piccolo
+                EnsemblePart(73, 5, FLUTE_ALL), //flute
+                EnsemblePart(68, 5, OBOE_ALL), //oboe
+                EnsemblePart(69, 4, ENGLISH_HORN_ALL), // english horn
+                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
+                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
+                EnsemblePart(71, 3, BASS_CLARINET_ALL), // bass clarinet
+                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
             )
             9 -> listOf(
-                EnsemblePart(72, 6), //piccolo
-                EnsemblePart(73, 5), //flute
-                EnsemblePart(68, 5), //oboe
-                EnsemblePart(69, 4), // english horn
-                EnsemblePart(71, 4), //clarinet
-                EnsemblePart(60, 3), // french horn
-                EnsemblePart(71, 3), // bass clarinet
-                EnsemblePart(70, 2),  // bassoon
-                EnsemblePart(70, 2)  // bassoon
+                EnsemblePart(72, 6, PICCOLO_ALL), //piccolo
+                EnsemblePart(73, 5, FLUTE_ALL), //flute
+                EnsemblePart(68, 5, OBOE_ALL), //oboe
+                EnsemblePart(69, 4, ENGLISH_HORN_ALL), // english horn
+                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
+                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
+                EnsemblePart(71, 3, BASS_CLARINET_ALL), // bass clarinet
+                EnsemblePart(70, 2, BASSOON_ALL),  // bassoon
+                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
             )
             in 10..12 -> listOf(
-                EnsemblePart(72, 6), //piccolo
-                EnsemblePart(72, 6), //piccolo
-                EnsemblePart(73, 5), //flute
-                EnsemblePart(68, 5), //oboe
-                EnsemblePart(71, 5), //clarinet
-                EnsemblePart(69, 4), // english horn
-                EnsemblePart(71, 4), //clarinet
-                EnsemblePart(60, 3), // french horn
-                EnsemblePart(60, 3), // french horn
-                EnsemblePart(71, 3), // bass clarinet
-                EnsemblePart(70, 2),  // bassoon
-                EnsemblePart(70, 2)  // bassoon
+                EnsemblePart(72, 6, PICCOLO_ALL), //piccolo
+                EnsemblePart(72, 6, PICCOLO_ALL), //piccolo
+                EnsemblePart(73, 5, FLUTE_ALL), //flute
+                EnsemblePart(68, 5, OBOE_ALL), //oboe
+                EnsemblePart(71, 5, CLARINET_ALL), //clarinet
+                EnsemblePart(69, 4, ENGLISH_HORN_ALL), // english horn
+                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
+                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
+                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
+                EnsemblePart(71, 3, BASS_CLARINET_ALL), // bass clarinet
+                EnsemblePart(70, 2, BASSOON_ALL),  // bassoon
+                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
             )
             else -> listOf()
         }
@@ -1013,7 +1013,9 @@ object Ensembles {
         }
     }
 }
-data class EnsemblePart( val instrument: Int, val octave: Int)
+data class EnsemblePart( val instrument: Int, val octave: Int,
+                         val allRange: IntRange = PIANO_ALL,
+                         val colorRange: IntRange = allRange) // if colorRange is not specified, allRange will be taken
 const val PIANO = 0
 const val HARPSICHORD = 6
 const val NYLON_GUITAR = 24

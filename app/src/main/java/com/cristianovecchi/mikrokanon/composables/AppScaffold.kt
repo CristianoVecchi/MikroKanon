@@ -145,7 +145,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val zodiacDialogData by lazy{ mutableStateOf(MultiListDialogData())}
 
     val dimensions = model.dimensions
-    val optionNames= listOf("Ensemble", "Nuances", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
+    val optionNames= listOf("Ensemble", "Range","Melody","Nuances", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Ritornello","Doubling",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
         "Export MIDI", "Colors", "Custom Colors","Language","Zodiac","Credits")
@@ -166,6 +166,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     MultiListDialog(detectorDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     ListDialog(detExtensionDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize, fillPrevious = true)
     ListDialog(colorsDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize)
+    MultiListDialog(zodiacDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     CustomColorsDialog(customColorsDialogData, lang.OKbutton)
     ListDialog(ritornelloDialogData, lang.OKbutton, dimensions.sequenceDialogFontSize, fillPrevious = true)
 
@@ -247,7 +248,49 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 true, ensNames, ensIndex, lang.selectEnsemble
                             ) { index ->
                                 model.updateUserOptions(
-                                    "ensemble_type",
+                                    "ensembleType",
+                                    index
+                                )
+                                listDialogData.value =
+                                    ListDialogData(itemList = listDialogData.value.itemList)
+                            }
+                        })
+                }
+                "Range" -> {
+                    val rangeOptions: List<String> = lang.rangeOptions
+                    val rangeIndex = userOptions.rangeType
+                    SelectableCard(
+                        text = "${lang.range}: ${rangeOptions[rangeIndex]}",
+                        fontSize = fontSize,
+                        colors = colors,
+                        isSelected = true,
+                        onClick = {
+                            listDialogData.value = ListDialogData(
+                                true, rangeOptions, rangeIndex, lang.selectRange
+                            ) { index ->
+                                model.updateUserOptions(
+                                    "rangeType",
+                                    index
+                                )
+                                listDialogData.value =
+                                    ListDialogData(itemList = listDialogData.value.itemList)
+                            }
+                        })
+                }
+                "Melody" -> {
+                    val melodyOptions: List<String> = lang.melodyOptions
+                    val melodyIndex = userOptions.melodyType
+                    SelectableCard(
+                        text = "${lang.melody}: ${melodyOptions[melodyIndex]}",
+                        fontSize = fontSize,
+                        colors = colors,
+                        isSelected = true,
+                        onClick = {
+                            listDialogData.value = ListDialogData(
+                                true, melodyOptions, melodyIndex, lang.selectMelody
+                            ) { index ->
+                                model.updateUserOptions(
+                                    "melodyType",
                                     index
                                 )
                                 listDialogData.value =

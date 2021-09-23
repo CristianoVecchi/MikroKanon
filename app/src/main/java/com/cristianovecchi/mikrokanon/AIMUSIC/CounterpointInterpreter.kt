@@ -21,7 +21,9 @@ object CounterpointInterpreter {
                    durations: List<Int> = listOf(240), // 1/8
                    ensembleParts: List<EnsemblePart>,
                    nuances: Int,
-                   doublingFlags: Int): List<MidiTrack> {
+                   doublingFlags: Int,
+                   rangeType: Int,
+                   melodyType: Int): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
 
         if(counterpoint.parts.size > 15) {
@@ -29,22 +31,23 @@ object CounterpointInterpreter {
         }
 
         counterpoint.parts.forEachIndexed { partIndex, part ->
+            val ensemblePart = ensembleParts[partIndex]
             val channel =
                 if (partIndex < 9) partIndex else partIndex + 1 // skip percussion midi channel
             val track = MidiTrack()
             val pc: MidiEvent =
-                ProgramChange(0, channel, ensembleParts[partIndex].instrument) // cambia strumento
+                ProgramChange(0, channel, ensemblePart.instrument) // cambia strumento
             track.insertEvent(pc)
 
             var tick = 0
             var index = 0
             var durIndex = 0
-            val actualPitches = Insieme.linearMelody(
-                ensembleParts[partIndex].octave,
-                part.absPitches.toIntArray(),
-                21,
-                108
-            )
+            val range = when(rangeType) {
+                    1 -> ensemblePart.allRange
+                    2 -> ensemblePart.colorRange
+                    else -> PIANO_ALL
+            }
+            val actualPitches = Insieme.findMelody(ensemblePart.octave, part.absPitches.toIntArray(), range.first, range.last, melodyType)
             val lowLimit = 0.4f
             val minNuance = 0.51f
             val maxNuance = 0.95f

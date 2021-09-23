@@ -126,7 +126,7 @@ fun NoteKeyboard(
                         val actualFontSize = when (buttonInfo.text.length){
                             in 0..2 -> fontSize
                             3 -> fontSize - 3
-                            4 -> fontSize - 6
+                            4 -> fontSize - 7
                             else -> fontSize
                         }
                         val text = if (resId == -1) buttonInfo.text else ""

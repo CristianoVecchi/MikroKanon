@@ -81,9 +81,17 @@ val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao",
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器", "薩氏管", "长笛",
     "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","皮埃罗","巴洛克","撥弦樂器")
 
-var zodiacPlanets = listOf("\u2644", "\u2643", "\u2642","\u2640","\u263F","\u263D","\u2609")
+private var zodiacPlanets = listOf("\u2644", "\u2643", "\u2642","\u2640","\u263F","\u263D","\u2609")
+private var zodiacPlanetsEmojis = listOf("\u1fA90","\u9795","\u9794","\u9792","\u9791","\u1F31C","\u1F31E") // are different on xiaomi
 private val zodiacSignsEmojis = listOf("\u2648","\u2649","\u264A","\u264B","\u264C","\u264D","\u264E","\u264F","\u2650","\u2651","\u2652","\u2653",)
 private val zodiacSigns = listOf("♈︎","♉︎","♊︎","♋︎","♌︎","♍︎","♎︎","♏︎","♐︎","♑︎","♒︎","♓︎",)
+fun getZodiacPlanets(emojis: Boolean): List<String>{
+    return zodiacPlanets
+//    return if(emojis) {
+//        if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O) zodiacPlanets
+//        else zodiacPlanets
+//    } else zodiacPlanets
+}
 fun getZodiacSigns(emojis: Boolean): List<String>{
     return if(emojis) return zodiacSignsEmojis else zodiacSigns
 }
@@ -161,11 +169,18 @@ data class Lang( // English by default
     val OKbutton: String = "OK",
     val selectEnsemble: String = "Select an ensemble!",
     val ensembleNames: List<String> = ensembleNamesEn,
+    val selectRange: String = "Select a range type!",
+    val selectMelody: String = "Select a melody type!",
+
     val selectRhythm: String = "Select a rhythm!",
     val selectDoubling: String = "Select some intervals for doubling!",
     val doublingNames: List<String> = doublingEn,
     val beatsPerMinute: String = "Beats Per Minute",
     val ensemble: String = "Ensemble",
+    val range: String = "Range",
+    val rangeOptions: List<String> = listOf("Free", "Whole range", "Delimited range"),
+    val melody: String = "Melody",
+    val melodyOptions: List<String> = listOf("Linear", "Huge"),
     val nuances: String = "Nuances",
     val nuancesOptions: List<String> = listOf("None", "Exalt short notes", "Exalt long notes"),
     val selectNuances: String = "Select dynamic nuances!",
