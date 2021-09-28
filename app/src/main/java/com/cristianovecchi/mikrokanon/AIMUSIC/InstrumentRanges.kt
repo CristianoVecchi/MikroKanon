@@ -12,6 +12,7 @@ const val C6 = 84
 const val C7 = 96
 const val C8 = 108 //last piano key
 const val A0 = 21 //first piano key
+const val G2 = 43
 const val G3 = 55 // violin and alto flute low limit
 const val G4 = 67
 const val G5 = 79
@@ -81,7 +82,7 @@ val PART_FRENCH_HORN_MIDDLE = EnsemblePart(60, 3, FRENCH_HORN_ALL, FRENCH_HORN_M
 
 val TRUMPET_ALL: IntRange = IntRange(54 ,C6) // F#3 - C6
 val TRUMPET_LOW3: IntRange = IntRange(54, 70) // F#3 - Bb4
-val TRUMPET_MIDDLE3: IntRange = IntRange(62, 66) // D4 - F#5 third added at the start
+val TRUMPET_MIDDLE3: IntRange = IntRange(62, 78) // D4 - F#5 third added at the start
 val TRUMPET_HIGH3: IntRange = IntRange(68, C6) // Ab4 - C6
 val PART_TRUMPET_MIDDLE_HIGH = EnsemblePart(56, 5, TRUMPET_ALL, TRUMPET_MIDDLE3..TRUMPET_HIGH3)
 val PART_TRUMPET_HIGH = EnsemblePart(56, 5, TRUMPET_ALL, TRUMPET_HIGH3)
@@ -101,5 +102,39 @@ val TUBA_MIDDLE3: IntRange = IntRange(42, 58) // F#2 - Bb3
 val TUBA_HIGH3: IntRange = IntRange(49, 65) // Db3 - F4
 val PART_TUBA_LOW = EnsemblePart(58, 2, TUBA_ALL, TUBA_LOW3)
 
-
 val VIOLIN_ALL: IntRange = IntRange(G3, 105) // G3 - A7
+val VIOLIN_LOW3: IntRange = IntRange(G3, 71) // G3 - B4 (G string)
+val VIOLIN_MIDDLE3: IntRange = IntRange(62, 78) // D4 - F#5 (D string)
+val VIOLIN_HIGH3: IntRange = IntRange(69, 85) // A4 - C#6 (A string)
+val VIOLIN_HIGHEST: IntRange = IntRange(69, 85) // E5 - A7 (E string)
+val PART_VIOLIN_MIDDLE_HIGH_HIGHEST = EnsemblePart(40, 5,VIOLIN_ALL, VIOLIN_MIDDLE3..VIOLIN_HIGH3..VIOLIN_HIGHEST)
+val PART_VIOLIN_HIGH_HIGHEST = EnsemblePart(40, 5,VIOLIN_ALL, VIOLIN_HIGH3..VIOLIN_HIGHEST)
+val PART_VIOLIN_HIGHEST = EnsemblePart(40, 6, VIOLIN_ALL, VIOLIN_HIGHEST)
+
+val VIOLA_ALL: IntRange = IntRange(C3, 93) // C3 - A6
+val VIOLA_LOW3: IntRange = IntRange(C3, 64) // C3 - E4 (C string)
+val VIOLA_MIDDLE3: IntRange = IntRange(G3, 71) // G3 - B4 (G string)
+val VIOLA_HIGH3: IntRange = IntRange(62, 78) // D4 - F#5 (D string)
+val VIOLA_HIGHEST: IntRange = IntRange(69, 93) // A4 - A6 (A string)
+val PART_VIOLA_MIDDLE_HIGH = EnsemblePart(41, 4, VIOLA_ALL, VIOLA_MIDDLE3..VIOLA_HIGH3)
+val PART_VIOLA_MIDDLE = EnsemblePart(41, 4, VIOLA_ALL, VIOLA_MIDDLE3)
+val PART_VIOLA_LOW_MIDDLE = EnsemblePart(41, 3, VIOLA_ALL, VIOLA_MIDDLE3)
+
+val CELLO_ALL: IntRange = IntRange(C2, 81) // C2 - A5
+val CELLO_LOW3: IntRange = IntRange(C2, 52) // C2 - E3 (C string)
+val CELLO_MIDDLE3: IntRange = IntRange(G2, 59) // G2 - B3 (G string)
+val CELLO_HIGH3: IntRange = IntRange(50, 66) // D3 - F#4 (D string)
+val CELLO_HIGHEST: IntRange = IntRange(57, 81) // A3 - A5 (A string)
+val PART_CELLO_LOW_MIDDLE = EnsemblePart(42, 3, CELLO_ALL, CELLO_LOW3..CELLO_MIDDLE3)
+val PART_CELLO_MIDDLE_HIGH = EnsemblePart(42, 3, CELLO_ALL, CELLO_MIDDLE3..CELLO_HIGH3)
+val PART_CELLO_HIGH_HIGHEST = EnsemblePart(42, 4, CELLO_ALL, CELLO_HIGH3..CELLO_HIGHEST)
+
+val DOUBLE_BASS_ALL: IntRange = IntRange(28, G4) // E1 - G4
+val DOUBLE_BASS_LOW3: IntRange = IntRange(28, 44) // E1 - G#2 (E string)
+val DOUBLE_BASS_MIDDLE3: IntRange = IntRange(33, 49) // A1 - C#3 (A string)
+val DOUBLE_BASS_HIGH3: IntRange = IntRange(38, 54) // D2 - F#3 (D string)
+val DOUBLE_BASS_HIGHEST: IntRange = IntRange(G2, 64) // G2 - E4 (G string)
+
+
+val PART_STRING_ORCHESTRA_CELLO_LOW3 = EnsemblePart(STRING_ORCHESTRA, 2, CELLO_ALL, CELLO_LOW3)
+val PART_STRING_ORCHESTRA_DB_LOW3 = EnsemblePart(STRING_ORCHESTRA, 1, DOUBLE_BASS_ALL, DOUBLE_BASS_LOW3)

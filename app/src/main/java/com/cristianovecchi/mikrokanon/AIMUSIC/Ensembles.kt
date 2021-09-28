@@ -32,80 +32,79 @@ object Ensembles {
     fun getStrings(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2 -> listOf(
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(42, 3)  // cello
+                EnsemblePart(40, 5, VIOLIN_ALL),
+                EnsemblePart(42, 3, CELLO_ALL)
             )
             3 -> listOf(
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(41, 4), //viola
-                EnsemblePart(42, 3)  // cello
+                PART_VIOLIN_MIDDLE_HIGH_HIGHEST,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_CELLO_LOW_MIDDLE
             )
             4 -> listOf(
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(40, 4), //violin
-                EnsemblePart(41, 3), //viola
-                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLIN_MIDDLE_HIGH_HIGHEST,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_CELLO_LOW3
             )
             5 -> listOf(
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(40, 4), //violin
-                EnsemblePart(41, 4), //viola
-                EnsemblePart(41, 3), //viola
-                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
-
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLIN_MIDDLE_HIGH_HIGHEST,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_CELLO_LOW3
             )
             6 -> listOf(
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(41, 4), //viola
-                EnsemblePart(41, 3), //viola
-                EnsemblePart(42, 3),  // cello
-                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLIN_MIDDLE_HIGH_HIGHEST,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_CELLO_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_CELLO_LOW3
 
             )
             7 -> listOf(
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(41, 4), //viola
-                EnsemblePart(41, 3), //viola
-                EnsemblePart(42, 3),  // cello
-                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
-                EnsemblePart(STRING_ORCHESTRA, 1),  // Doublebass
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLIN_MIDDLE_HIGH_HIGHEST,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_CELLO_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_CELLO_LOW3,
+                PART_STRING_ORCHESTRA_DB_LOW3
             )
             8 -> listOf(
-                EnsemblePart(40, 6), //violin
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(41, 4), //viola
-                EnsemblePart(41, 3), //viola
-                EnsemblePart(42, 3),  // cello
-                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
-                EnsemblePart(STRING_ORCHESTRA, 1),  // Doublebass
+                PART_VIOLIN_HIGHEST,
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLIN_MIDDLE_HIGH_HIGHEST,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_CELLO_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_CELLO_LOW3,
+                PART_STRING_ORCHESTRA_DB_LOW3
             )
             9 -> listOf(
-                EnsemblePart(40, 6), //violin
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(41, 4), //viola
-                EnsemblePart(41, 4), //viola
-                EnsemblePart(41, 3), //viola
-                EnsemblePart(42, 3),  // cello
-                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
-                EnsemblePart(STRING_ORCHESTRA, 1),  // Doublebass
+                PART_VIOLIN_HIGHEST,
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLIN_MIDDLE_HIGH_HIGHEST,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_MIDDLE,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_CELLO_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_CELLO_LOW3,
+                PART_STRING_ORCHESTRA_DB_LOW3
             )
             in 10..12 -> listOf(
-                EnsemblePart(40, 6), //violin
-                EnsemblePart(40, 6), //violin
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(40, 5), //violin
-                EnsemblePart(41, 4), //viola
-                EnsemblePart(41, 4), //viola
-                EnsemblePart(41, 3), //viola
-                EnsemblePart(42, 3),  // cello
-                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
-                EnsemblePart(STRING_ORCHESTRA, 2),  // Cello
-                EnsemblePart(STRING_ORCHESTRA, 1),  // Doublebass
-                EnsemblePart(STRING_ORCHESTRA, 1),  // Doublebass
+                PART_VIOLIN_HIGHEST,
+                PART_VIOLIN_HIGHEST,
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_MIDDLE,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_CELLO_HIGH_HIGHEST,
+                PART_STRING_ORCHESTRA_CELLO_LOW3,
+                PART_STRING_ORCHESTRA_CELLO_LOW3,
+                PART_STRING_ORCHESTRA_DB_LOW3,
+                PART_STRING_ORCHESTRA_DB_LOW3
             )
             else -> listOf()
         }
