@@ -1,5 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.rangeTo
+
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES,
     DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, PIERROT,
@@ -116,74 +118,75 @@ object Ensembles {
                 EnsemblePart(70, 3, BASSOON_ALL)  // bassoon
             )
             3 -> listOf(
-                EnsemblePart(73, 5, FLUTE_ALL), //flute
-                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
-                EnsemblePart(70, 3, BASSOON_ALL)  // bassoon
+                PART_FLUTE_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_CLARINET_LOW_MIDDLE
             )
             4 -> listOf(
-                EnsemblePart(73, 5, FLUTE_ALL), //flute
-                EnsemblePart(68, 4, OBOE_ALL), //oboe
-                EnsemblePart(71, 3, CLARINET_ALL), //clarinet
-                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
+                PART_FLUTE_MIDDLE_HIGH,
+                PART_OBOE_LOW_MIDDLE,
+                PART_CLARINET_LOW_MIDDLE,
+                PART_BASSOON_LOW_MIDDLE
             )
             5 -> listOf(
-                EnsemblePart(73, 5, FLUTE_ALL), //flute
-                EnsemblePart(68, 5, OBOE_ALL), //oboe
-                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
-                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
-                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
+                PART_FLUTE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_BASSOON_LOW_MIDDLE
             )
             6 -> listOf(
-                EnsemblePart(73, 5, FLUTE_ALL), //flute
-                EnsemblePart(68, 5, OBOE_ALL), //oboe
-                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
-                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
-                EnsemblePart(71, 3, BASS_CLARINET_ALL), // bass clarinet
-                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
+                PART_FLUTE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_BASS_CLARINET_LOW_MIDDLE,
+                PART_BASSOON_LOW
             )
+
             7 -> listOf(
-                EnsemblePart(73, 5, FLUTE_ALL), //flute
-                EnsemblePart(68, 5, OBOE_ALL), //oboe
-                EnsemblePart(69, 4, ENGLISH_HORN_ALL), // english horn
-                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
-                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
-                EnsemblePart(71, 3, BASS_CLARINET_ALL), // bass clarinet
-                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
+                PART_FLUTE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_BASS_CLARINET_LOW_MIDDLE,
+                PART_BASSOON_LOW
             )
             8 -> listOf(
-                EnsemblePart(72, 6, PICCOLO_ALL), //piccolo
-                EnsemblePart(73, 5, FLUTE_ALL), //flute
-                EnsemblePart(68, 5, OBOE_ALL), //oboe
-                EnsemblePart(69, 4, ENGLISH_HORN_ALL), // english horn
-                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
-                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
-                EnsemblePart(71, 3, BASS_CLARINET_ALL), // bass clarinet
-                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
+                PART_PICCOLO_MIDDLE_HIGH,
+                PART_FLUTE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_BASS_CLARINET_LOW_MIDDLE,
+                PART_BASSOON_LOW
             )
             9 -> listOf(
-                EnsemblePart(72, 6, PICCOLO_ALL), //piccolo
-                EnsemblePart(73, 5, FLUTE_ALL), //flute
-                EnsemblePart(68, 5, OBOE_ALL), //oboe
-                EnsemblePart(69, 4, ENGLISH_HORN_ALL), // english horn
-                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
-                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
-                EnsemblePart(71, 3, BASS_CLARINET_ALL), // bass clarinet
-                EnsemblePart(70, 2, BASSOON_ALL),  // bassoon
-                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
+                PART_PICCOLO_MIDDLE_HIGH,
+                PART_FLUTE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_BASS_CLARINET_LOW_MIDDLE,
+                PART_BASSOON_LOW,
+                PART_BASSOON_LOW
             )
             in 10..12 -> listOf(
-                EnsemblePart(72, 6, PICCOLO_ALL), //piccolo
-                EnsemblePart(72, 6, PICCOLO_ALL), //piccolo
-                EnsemblePart(73, 5, FLUTE_ALL), //flute
-                EnsemblePart(68, 5, OBOE_ALL), //oboe
-                EnsemblePart(71, 5, CLARINET_ALL), //clarinet
-                EnsemblePart(69, 4, ENGLISH_HORN_ALL), // english horn
-                EnsemblePart(71, 4, CLARINET_ALL), //clarinet
-                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
-                EnsemblePart(60, 3, FRENCH_HORN_ALL), // french horn
-                EnsemblePart(71, 3, BASS_CLARINET_ALL), // bass clarinet
-                EnsemblePart(70, 2, BASSOON_ALL),  // bassoon
-                EnsemblePart(70, 2, BASSOON_ALL)  // bassoon
+                PART_PICCOLO_HIGH,
+                PART_PICCOLO_MIDDLE_HIGH,
+                PART_FLUTE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_BASS_CLARINET_LOW_MIDDLE,
+                PART_BASSOON_LOW,
+                PART_BASSOON_LOW,
             )
             else -> listOf()
         }

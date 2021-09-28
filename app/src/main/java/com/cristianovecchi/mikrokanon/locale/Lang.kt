@@ -53,7 +53,7 @@ enum class NoteNamesEl {
 //}
 val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية", "ساكسفون", "فلوت",
     "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","بييرو","الباروك","أوتار نتف")
-val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente", "Saxophone", "Flauti",
+val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente", "Saxophone", "Flöten",
     "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Pierrot","Barockensemble","Zupfinstrument")
 val ensembleNamesEl = listOf("Έγχόρδα", "Ξύλινα πνευστά της συμφωνικής ορχήστρας", "Ορχήστρα εγχόρδων", "Χάλκινα πνευστά της συμφωνικής ορχήστρας", "Σαξόφωνα", "Φλάουτα",
     "Διπλά καλάμια", "Κλαρινέτ", "Φαγκότα", "Βιολοντσέλα", "Πιάνο", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές")
@@ -178,7 +178,7 @@ data class Lang( // English by default
     val beatsPerMinute: String = "Beats Per Minute",
     val ensemble: String = "Ensemble",
     val range: String = "Range",
-    val rangeOptions: List<String> = listOf("Free", "Whole range", "Delimited range"),
+    val rangeOptions: List<String> = listOf("Free", "Instrument range", "Delimited range"),
     val melody: String = "Melody",
     val melodyOptions: List<String> = listOf("Linear", "Huge"),
     val nuances: String = "Nuances",
