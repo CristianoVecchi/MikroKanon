@@ -76,8 +76,30 @@ val FRENCH_HORN_ALL: IntRange = IntRange(35, 77) // B1 - F5
 val FRENCH_HORN_LOW3: IntRange = IntRange(35, 51) // B1 - D#3
 val FRENCH_HORN_MIDDLE3: IntRange = IntRange(51, G4) // Eb3 - G4
 val FRENCH_HORN_HIGH3: IntRange = IntRange(61, 77) // Db4 - F5
-val PART_FRENCH_HORN_MIDDLE_HIGH = EnsemblePart(60, 3, FRENCH_HORN_ALL, FRENCH_HORN_MIDDLE3..FRENCH_HORN_HIGH3)
+val PART_FRENCH_HORN_MIDDLE_HIGH = EnsemblePart(60, 4, FRENCH_HORN_ALL, FRENCH_HORN_MIDDLE3..FRENCH_HORN_HIGH3)
 val PART_FRENCH_HORN_MIDDLE = EnsemblePart(60, 3, FRENCH_HORN_ALL, FRENCH_HORN_MIDDLE3)
+
+val TRUMPET_ALL: IntRange = IntRange(54 ,C6) // F#3 - C6
+val TRUMPET_LOW3: IntRange = IntRange(54, 70) // F#3 - Bb4
+val TRUMPET_MIDDLE3: IntRange = IntRange(62, 66) // D4 - F#5 third added at the start
+val TRUMPET_HIGH3: IntRange = IntRange(68, C6) // Ab4 - C6
+val PART_TRUMPET_MIDDLE_HIGH = EnsemblePart(56, 5, TRUMPET_ALL, TRUMPET_MIDDLE3..TRUMPET_HIGH3)
+val PART_TRUMPET_HIGH = EnsemblePart(56, 5, TRUMPET_ALL, TRUMPET_HIGH3)
+
+val TROMBONE_ALL: IntRange = IntRange(34 ,77) // Bb1 - F5
+val TROMBONE_LOW3: IntRange = IntRange(34 ,50) // Bb1 - D3
+val TROMBONE_MIDDLE5: IntRange = IntRange(42 ,61) // F#2 - C#4 added a fifth to cover the whole range
+val TROMBONE_HIGH3: IntRange = IntRange(61 ,77) // C#4 - F5
+val PART_TROMBONE_LOW_MIDDLE = EnsemblePart(57, 3, TROMBONE_ALL, TROMBONE_LOW3..TROMBONE_MIDDLE5)
+val PART_TROMBONE_MIDDLE = EnsemblePart(57, 3, TROMBONE_ALL, TROMBONE_MIDDLE5)
+val PART_TROMBONE_MIDDLE_HIGH = EnsemblePart(57, 4, TROMBONE_ALL, TROMBONE_MIDDLE5..TROMBONE_HIGH3)
+val PART_TROMBONE_HIGH = EnsemblePart(57, 4, TROMBONE_ALL, TROMBONE_HIGH3)
+
+val TUBA_ALL: IntRange = IntRange(26, 65) // D1 - F4
+val TUBA_LOW3: IntRange = IntRange(26, 42) // D1 - F#2
+val TUBA_MIDDLE3: IntRange = IntRange(42, 58) // F#2 - Bb3
+val TUBA_HIGH3: IntRange = IntRange(49, 65) // Db3 - F4
+val PART_TUBA_LOW = EnsemblePart(58, 2, TUBA_ALL, TUBA_LOW3)
 
 
 val VIOLIN_ALL: IntRange = IntRange(G3, 105) // G3 - A7

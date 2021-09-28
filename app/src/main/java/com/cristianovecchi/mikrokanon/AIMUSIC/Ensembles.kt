@@ -246,78 +246,78 @@ object Ensembles {
     fun getBrass(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2 -> listOf(
-                EnsemblePart(56, 4), //trumpet
-                EnsemblePart(57, 3)  // trombone
+                EnsemblePart(56, 4, TRUMPET_ALL), //trumpet
+                EnsemblePart(57, 3, TROMBONE_ALL)  // trombone
             )
             3 -> listOf(
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(57, 3)  // trombone
+                PART_TRUMPET_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_TROMBONE_LOW_MIDDLE
             )
             4 -> listOf(
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(56, 4), //trumpet
-                EnsemblePart(60, 3), //french horn
-                EnsemblePart(57, 2),  // trombone
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_TROMBONE_LOW_MIDDLE
             )
             5 -> listOf(
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(57, 3),  // trombone
-                EnsemblePart(58, 2)  //tuba
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_TROMBONE_MIDDLE,
+                PART_TUBA_LOW
             )
             6 -> listOf(
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(57, 3),  // trombone
-                EnsemblePart(58, 2)  //tuba
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_TROMBONE_MIDDLE,
+                PART_TUBA_LOW
             )
             7 -> listOf(
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(57, 3),  // trombone
-                EnsemblePart(57, 3),  // trombone
-                EnsemblePart(58, 2)  //tuba
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_TROMBONE_MIDDLE_HIGH,
+                PART_TROMBONE_MIDDLE,
+                PART_TUBA_LOW
             )
             8 -> listOf(
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(60, 3), //french horn
-                EnsemblePart(57, 3),  // trombone
-                EnsemblePart(57, 2),  // trombone
-                EnsemblePart(58, 1)  //tuba
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_TROMBONE_MIDDLE_HIGH,
+                PART_TROMBONE_MIDDLE,
+                PART_TUBA_LOW
             )
             9 -> listOf(
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(60, 3), //french horn
-                EnsemblePart(60, 3), //french horn
-                EnsemblePart(57, 3),  // trombone
-                EnsemblePart(57, 2),  // trombone
-                EnsemblePart(58, 1)  //tuba
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_TROMBONE_MIDDLE_HIGH,
+                PART_TROMBONE_MIDDLE,
+                PART_TUBA_LOW
             )
             in 10..12 -> listOf(
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(56, 5), //trumpet
-                EnsemblePart(56, 4), //trumpet
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(60, 4), //french horn
-                EnsemblePart(57, 4), // trombone
-                EnsemblePart(60, 3), //french horn
-                EnsemblePart(60, 3), //french horn
-                EnsemblePart(57, 3),  // trombone
-                EnsemblePart(57, 2),  // trombone
-                EnsemblePart(58, 1)  //tuba
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_TROMBONE_HIGH,
+                PART_TROMBONE_MIDDLE_HIGH,
+                PART_TROMBONE_MIDDLE,
+                PART_TUBA_LOW
             )
             else -> listOf()
         }

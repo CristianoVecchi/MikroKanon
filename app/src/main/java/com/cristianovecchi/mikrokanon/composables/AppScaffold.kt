@@ -613,7 +613,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 val appColors = AppColorThemes.values().map{ it.title }
                 val appColorsName = if(colorDefs.app == "System") model.getSystemAppColorsName() else colorDefs.app
                 val colorsIndex = appColors.indexOf(appColorsName)
-                SelectableCard(text = "Custom Colors: $appColorsName", fontSize = fontSize, colors = colors, isSelected = !colorDefs.isCustom, onClick = {
+                SelectableCard(text = "App Colors: $appColorsName", fontSize = fontSize, colors = colors, isSelected = !colorDefs.isCustom, onClick = {
                     colorsDialogData.value = ListDialogData(true, appColors, colorsIndex, "Choose a Color Set"){ index ->
                         model.updateUserOptions(
                             "colors",
