@@ -2,6 +2,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
+import com.cristianovecchi.mikrokanon.extractFromMiddle
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.NoteOff
@@ -45,12 +46,14 @@ object CounterpointInterpreter {
             val range = when(rangeType) {
                     1 -> ensemblePart.allRange
                     2 -> ensemblePart.colorRange
+                    3 -> ensemblePart.colorRange.extractFromMiddle(8)
+                    4 -> ensemblePart.colorRange.extractFromMiddle(6)
                     else -> PIANO_ALL
             }
             val actualPitches = Insieme.findMelody(ensemblePart.octave, part.absPitches.toIntArray(), range.first, range.last, melodyType)
             val lowLimit = 0.4f
             val minNuance = 0.51f
-            val maxNuance = 0.95f
+            val maxNuance = 0.97f
             val stabilities = counterpoint.findStabilities()
             val velocities: IntArray = when(nuances) {
                 1 -> {val mssq = MelodySubSequencer(actualPitches)

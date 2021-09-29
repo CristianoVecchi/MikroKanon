@@ -84,74 +84,80 @@ fun MutableList<Int>.getIntOrEmptyValue(index: Int): Int {
 
 operator fun IntRange.rangeTo(nextRange: IntRange) = IntRange(this.first, nextRange.last)
 
-fun createIntervalSetFromFlags(flags: Int): List<Int>{
-    val result = mutableSetOf<Int>()
-    if(flags and 1 > 0) result.addAll(listOf(1,11))
-    if(flags and 0b10 > 0) result.addAll(listOf(2,10))
-    if(flags and 0b100 > 0) result.addAll(listOf(3,9))
-    if(flags and 0b1000 > 0) result.addAll(listOf(4,8))
-    if(flags and 0b10000 > 0) result.addAll(listOf(5,7))
-    if(flags and 0b100000 > 0) result.add(6)
-    if(flags and 0b1000000 > 0) result.add(0)
-    return result.toList()
+fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
+    val middle  = (this.first + this.last) / 2
+    return IntRange(middle - halfRange, middle + halfRange)
 }
 
-fun createFlagsFromIntervalSet(intervalSet: List<Int>): Int{
-    var flags = 0
-    intervalSet.apply{
-        if(this.containsAll(listOf(1,11))) flags = flags or 1
-        if(this.containsAll(listOf(2,10))) flags = flags or 0b10
-        if(this.containsAll(listOf(3,9))) flags = flags or 0b100
-        if(this.containsAll(listOf(4,8))) flags = flags or 0b1000
-        if(this.containsAll(listOf(5,7))) flags = flags or 0b10000
-        if(this.contains(6))flags = flags or 0b100000
-        if(this.contains(0)) flags = flags or 0b1000000
-    }
-    return flags
-}
-
-//TODO: implement in CounterpointInterpreter
-suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
-    map { async() { f(it) } }.awaitAll()
-}
-@Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
-fun <A, B> Iterable<A>.mapIf(condition: Boolean, f: (A) -> B): List<B> =
-    map { (if(condition) f(it) else it) as B }
-
-@Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
-suspend fun <A, B> Iterable<A>.pmapIf(condition: Boolean, f: suspend (A) -> B): List<B> = coroutineScope {
-    map { async{(if (condition) f(it) else it) as B} }.awaitAll()
-}
-
-fun <T, R> Iterable<T>.tmap(
-    numThreads: Int = Runtime.getRuntime().availableProcessors() - 2,
-    exec: ExecutorService = Executors.newFixedThreadPool(numThreads),
-    transform: (T) -> R): List<R> {
-
-    // default size is just an inlined version of kotlin.collections.collectionSizeOrDefault
-    val defaultSize = if (this is Collection<*>) this.size else 10
-    val destination = Collections.synchronizedList(ArrayList<R>(defaultSize))
-
-    for (item in this) {
-        exec.submit { destination.add(transform(item)) }
+    fun createIntervalSetFromFlags(flags: Int): List<Int>{
+        val result = mutableSetOf<Int>()
+        if(flags and 1 > 0) result.addAll(listOf(1,11))
+        if(flags and 0b10 > 0) result.addAll(listOf(2,10))
+        if(flags and 0b100 > 0) result.addAll(listOf(3,9))
+        if(flags and 0b1000 > 0) result.addAll(listOf(4,8))
+        if(flags and 0b10000 > 0) result.addAll(listOf(5,7))
+        if(flags and 0b100000 > 0) result.add(6)
+        if(flags and 0b1000000 > 0) result.add(0)
+        return result.toList()
     }
 
-    exec.shutdown()
-    exec.awaitTermination(1, TimeUnit.DAYS)
+    fun createFlagsFromIntervalSet(intervalSet: List<Int>): Int{
+        var flags = 0
+        intervalSet.apply{
+            if(this.containsAll(listOf(1,11))) flags = flags or 1
+            if(this.containsAll(listOf(2,10))) flags = flags or 0b10
+            if(this.containsAll(listOf(3,9))) flags = flags or 0b100
+            if(this.containsAll(listOf(4,8))) flags = flags or 0b1000
+            if(this.containsAll(listOf(5,7))) flags = flags or 0b10000
+            if(this.contains(6))flags = flags or 0b100000
+            if(this.contains(0)) flags = flags or 0b1000000
+        }
+        return flags
+    }
 
-    return ArrayList<R>(destination)
-}
+    //TODO: implement in CounterpointInterpreter
+    suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
+        map { async() { f(it) } }.awaitAll()
+    }
+    @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
+    fun <A, B> Iterable<A>.mapIf(condition: Boolean, f: (A) -> B): List<B> =
+        map { (if(condition) f(it) else it) as B }
 
-fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
-fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+    @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
+    suspend fun <A, B> Iterable<A>.pmapIf(condition: Boolean, f: suspend (A) -> B): List<B> = coroutineScope {
+        map { async{(if (condition) f(it) else it) as B} }.awaitAll()
+    }
 
-fun Color.toHexString(): String {
-    return "#${this.red.toColorHexString()}${this.green.toColorHexString()}${this.blue.toColorHexString()}"
-}
+    fun <T, R> Iterable<T>.tmap(
+        numThreads: Int = Runtime.getRuntime().availableProcessors() - 2,
+        exec: ExecutorService = Executors.newFixedThreadPool(numThreads),
+        transform: (T) -> R): List<R> {
 
-fun Float.toColorHexString(): String {
-    return (256 * this).toInt().toString(16)
-}
+        // default size is just an inlined version of kotlin.collections.collectionSizeOrDefault
+        val defaultSize = if (this is Collection<*>) this.size else 10
+        val destination = Collections.synchronizedList(ArrayList<R>(defaultSize))
+
+        for (item in this) {
+            exec.submit { destination.add(transform(item)) }
+        }
+
+        exec.shutdown()
+        exec.awaitTermination(1, TimeUnit.DAYS)
+
+        return ArrayList<R>(destination)
+    }
+
+    fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
+    fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+
+    fun Color.toHexString(): String {
+        return "#${this.red.toColorHexString()}${this.green.toColorHexString()}${this.blue.toColorHexString()}"
+    }
+
+    fun Float.toColorHexString(): String {
+        return (256 * this).toInt().toString(16)
+    }
+
 
 
 

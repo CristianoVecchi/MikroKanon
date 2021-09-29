@@ -178,7 +178,7 @@ data class Lang( // English by default
     val beatsPerMinute: String = "Beats Per Minute",
     val ensemble: String = "Ensemble",
     val range: String = "Range",
-    val rangeOptions: List<String> = listOf("Free", "Instrument range", "Delimited range"),
+    val rangeOptions: List<String> = listOf("Free", "Of the instrument", "Delimited", "Almost closed", "Closed"),
     val melody: String = "Melody",
     val melodyOptions: List<String> = listOf("Linear", "Huge"),
     val nuances: String = "Nuances",

@@ -44,14 +44,14 @@ object Ensembles {
                 PART_VIOLIN_HIGH_HIGHEST,
                 PART_VIOLIN_MIDDLE_HIGH_HIGHEST,
                 PART_VIOLA_LOW_MIDDLE,
-                PART_STRING_ORCHESTRA_CELLO_LOW3
+                PART_STRING_ORCHESTRA_CELLO_LOW
             )
             5 -> listOf(
                 PART_VIOLIN_HIGH_HIGHEST,
                 PART_VIOLIN_MIDDLE_HIGH_HIGHEST,
                 PART_VIOLA_MIDDLE_HIGH,
                 PART_VIOLA_LOW_MIDDLE,
-                PART_STRING_ORCHESTRA_CELLO_LOW3
+                PART_STRING_ORCHESTRA_CELLO_LOW
             )
             6 -> listOf(
                 PART_VIOLIN_HIGH_HIGHEST,
@@ -59,7 +59,7 @@ object Ensembles {
                 PART_VIOLA_MIDDLE_HIGH,
                 PART_VIOLA_LOW_MIDDLE,
                 PART_CELLO_MIDDLE_HIGH,
-                PART_STRING_ORCHESTRA_CELLO_LOW3
+                PART_STRING_ORCHESTRA_CELLO_LOW
 
             )
             7 -> listOf(
@@ -68,8 +68,8 @@ object Ensembles {
                 PART_VIOLA_MIDDLE_HIGH,
                 PART_VIOLA_LOW_MIDDLE,
                 PART_CELLO_MIDDLE_HIGH,
-                PART_STRING_ORCHESTRA_CELLO_LOW3,
-                PART_STRING_ORCHESTRA_DB_LOW3
+                PART_STRING_ORCHESTRA_CELLO_LOW,
+                PART_STRING_ORCHESTRA_DB_LOW
             )
             8 -> listOf(
                 PART_VIOLIN_HIGHEST,
@@ -78,8 +78,8 @@ object Ensembles {
                 PART_VIOLA_MIDDLE_HIGH,
                 PART_VIOLA_LOW_MIDDLE,
                 PART_CELLO_MIDDLE_HIGH,
-                PART_STRING_ORCHESTRA_CELLO_LOW3,
-                PART_STRING_ORCHESTRA_DB_LOW3
+                PART_STRING_ORCHESTRA_CELLO_LOW,
+                PART_STRING_ORCHESTRA_DB_LOW
             )
             9 -> listOf(
                 PART_VIOLIN_HIGHEST,
@@ -89,8 +89,8 @@ object Ensembles {
                 PART_VIOLA_MIDDLE,
                 PART_VIOLA_LOW_MIDDLE,
                 PART_CELLO_MIDDLE_HIGH,
-                PART_STRING_ORCHESTRA_CELLO_LOW3,
-                PART_STRING_ORCHESTRA_DB_LOW3
+                PART_STRING_ORCHESTRA_CELLO_LOW,
+                PART_STRING_ORCHESTRA_DB_LOW
             )
             in 10..12 -> listOf(
                 PART_VIOLIN_HIGHEST,
@@ -101,10 +101,10 @@ object Ensembles {
                 PART_VIOLA_MIDDLE,
                 PART_VIOLA_LOW_MIDDLE,
                 PART_CELLO_HIGH_HIGHEST,
-                PART_STRING_ORCHESTRA_CELLO_LOW3,
-                PART_STRING_ORCHESTRA_CELLO_LOW3,
-                PART_STRING_ORCHESTRA_DB_LOW3,
-                PART_STRING_ORCHESTRA_DB_LOW3
+                PART_STRING_ORCHESTRA_CELLO_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_CELLO_LOW,
+                PART_STRING_ORCHESTRA_DB_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_DB_LOW
             )
             else -> listOf()
         }
@@ -194,50 +194,50 @@ object Ensembles {
     fun getStringOrchestra(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2, 3 -> listOf(
-                EnsemblePart(48, 4), // string ensemble
-                EnsemblePart(48, 3), // string ensemble
-                EnsemblePart(48, 2), // string ensemble
+                PART_STRING_ORCHESTRA_VIOLIN_LOW_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_VIOLA_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_CELLO_LOW_MIDDLE
             )
             4, 5 -> listOf(
-                EnsemblePart(48, 4), // string ensemble
-                EnsemblePart(48, 4), // string ensemble
-                EnsemblePart(48, 3), // string ensemble
-                EnsemblePart(48, 3), // string ensemble
-                EnsemblePart(48, 2), // string ensemble
+                PART_STRING_ORCHESTRA_VIOLIN_MIDDLE_HIGH_HIGHEST,
+                PART_STRING_ORCHESTRA_VIOLIN_LOW_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_VIOLA_LOW,
+                PART_STRING_ORCHESTRA_VIOLA_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_CELLO_LOW
             )
             6, 7 -> listOf(
-                EnsemblePart(48, 5), // string ensemble
-                EnsemblePart(48, 4), // string ensemble
-                EnsemblePart(48, 4), // string ensemble
-                EnsemblePart(48, 3), // string ensemble
-                EnsemblePart(48, 3), // string ensemble
-                EnsemblePart(48, 2), // string ensemble
-                EnsemblePart(48, 1), // string ensemble
+                PART_STRING_ORCHESTRA_VIOLIN_HIGH_HIGHEST,
+                PART_STRING_ORCHESTRA_VIOLIN_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_VIOLIN_LOW_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_VIOLA_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_VIOLA_LOW,
+                PART_STRING_ORCHESTRA_CELLO_LOW,
+                PART_STRING_ORCHESTRA_DB_LOW
             )
             8, 9 -> listOf(
-                EnsemblePart(48, 5), // string ensemble
-                EnsemblePart(48, 5), // string ensemble
-                EnsemblePart(48, 4), // string ensemble
-                EnsemblePart(48, 4), // string ensemble
-                EnsemblePart(48, 3), // string ensemble
-                EnsemblePart(48, 3), // string ensemble
-                EnsemblePart(48, 2), // string ensemble
-                EnsemblePart(48, 2), // string ensemble
-                EnsemblePart(48, 1), // string ensemble
+                PART_STRING_ORCHESTRA_VIOLIN_HIGHEST,
+                PART_STRING_ORCHESTRA_VIOLIN_HIGH_HIGHEST,
+                PART_STRING_ORCHESTRA_VIOLIN_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_VIOLIN_LOW_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_VIOLA_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_VIOLA_LOW,
+                PART_STRING_ORCHESTRA_CELLO_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_CELLO_LOW,
+                PART_STRING_ORCHESTRA_DB_LOW
             )
             in 10..12 -> listOf(
-                EnsemblePart(48, 6), // string ensemble
-                EnsemblePart(48, 5), // string ensemble
-                EnsemblePart(48, 5), // string ensemble
-                EnsemblePart(48, 5), // string ensemble
-                EnsemblePart(48, 4), // string ensemble
-                EnsemblePart(48, 4), // string ensemble
-                EnsemblePart(48, 4), // string ensemble
-                EnsemblePart(48, 3), // string ensemble
-                EnsemblePart(48, 3), // string ensemble
-                EnsemblePart(48, 2), // string ensemble
-                EnsemblePart(48, 2), // string ensemble
-                EnsemblePart(48, 1), // string ensemble
+                PART_STRING_ORCHESTRA_VIOLIN_HIGHEST,
+                PART_STRING_ORCHESTRA_VIOLIN_HIGHEST,
+                PART_STRING_ORCHESTRA_VIOLIN_HIGH_HIGHEST,
+                PART_STRING_ORCHESTRA_VIOLIN_HIGH_HIGHEST,
+                PART_STRING_ORCHESTRA_VIOLIN_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_VIOLIN_MIDDLE_HIGH,
+                PART_STRING_ORCHESTRA_VIOLA_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_VIOLA_LOW,
+                PART_STRING_ORCHESTRA_CELLO_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_CELLO_LOW,
+                PART_STRING_ORCHESTRA_DB_LOW_MIDDLE,
+                PART_STRING_ORCHESTRA_DB_LOW,
             )
             else -> listOf()
         }
@@ -324,78 +324,78 @@ object Ensembles {
     fun getSaxophones(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2 -> listOf(
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(66, 3)  // Tenor Sax
+                PART_SAX_ALTO_MIDDLE_HIGH,
+                PART_SAX_TENOR_LOW_MIDDLE
             )
             3 -> listOf(
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(66, 3)  // Tenor Sax
+                PART_SAX_SOPRANO_MIDDLE_HIGH,
+                PART_SAX_ALTO_MIDDLE_HIGH,
+                PART_SAX_TENOR_LOW_MIDDLE
             )
             4 -> listOf(
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(67, 2)  // Tenor Sax
+                PART_SAX_SOPRANO_MIDDLE_HIGH,
+                PART_SAX_ALTO_MIDDLE_HIGH,
+                PART_SAX_TENOR_MIDDLE,
+                PART_SAX_BARITONE_LOW_MIDDLE
             )
             5 -> listOf(
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(67, 2)  // Tenor Sax
+                PART_SAX_SOPRANO_MIDDLE_HIGH,
+                PART_SAX_ALTO_MIDDLE_HIGH,
+                PART_SAX_ALTO_MIDDLE,
+                PART_SAX_TENOR_MIDDLE,
+                PART_SAX_BARITONE_LOW_MIDDLE
             )
             6 -> listOf(
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(67, 2)  // Tenor Sax
+                PART_SAX_SOPRANO_MIDDLE_HIGH,
+                PART_SAX_SOPRANO_MIDDLE,
+                PART_SAX_ALTO_MIDDLE_HIGH,
+                PART_SAX_ALTO_MIDDLE,
+                PART_SAX_TENOR_MIDDLE,
+                PART_SAX_BARITONE_LOW_MIDDLE
             )
             7 -> listOf(
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(67, 2)  // Tenor Sax
+                PART_SAX_SOPRANO_MIDDLE_HIGH,
+                PART_SAX_SOPRANO_MIDDLE,
+                PART_SAX_ALTO_MIDDLE_HIGH,
+                PART_SAX_ALTO_MIDDLE,
+                PART_SAX_TENOR_MIDDLE_HIGH,
+                PART_SAX_TENOR_MIDDLE,
+                PART_SAX_BARITONE_LOW_MIDDLE
             )
             8 -> listOf(
-                EnsemblePart(64, 6), // Soprano Sax
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(67, 2)  // Tenor Sax
+                PART_SAX_SOPRANO_HIGH,
+                PART_SAX_SOPRANO_MIDDLE_HIGH,
+                PART_SAX_SOPRANO_MIDDLE,
+                PART_SAX_ALTO_MIDDLE_HIGH,
+                PART_SAX_ALTO_MIDDLE,
+                PART_SAX_TENOR_MIDDLE_HIGH,
+                PART_SAX_TENOR_MIDDLE,
+                PART_SAX_BARITONE_LOW_MIDDLE
             )
             9 -> listOf(
-                EnsemblePart(64, 6), // Soprano Sax
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(67, 2),  // Tenor Sax
-                EnsemblePart(67, 2)  // Tenor Sax
+                PART_SAX_SOPRANO_HIGH,
+                PART_SAX_SOPRANO_MIDDLE_HIGH,
+                PART_SAX_SOPRANO_MIDDLE,
+                PART_SAX_ALTO_MIDDLE_HIGH,
+                PART_SAX_ALTO_MIDDLE,
+                PART_SAX_TENOR_MIDDLE_HIGH,
+                PART_SAX_TENOR_MIDDLE,
+                PART_SAX_BARITONE_LOW_MIDDLE,
+                PART_SAX_BARITONE_LOW
             )
             in 10..12 -> listOf(
-                EnsemblePart(64, 6), // Soprano Sax
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(64, 5), // Soprano Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(65, 4), // Alto Sax
-                EnsemblePart(65, 3), // Alto Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(66, 3),  // Tenor Sax
-                EnsemblePart(67, 2),  // Tenor Sax
-                EnsemblePart(67, 2)  // Tenor Sax
+                PART_SAX_SOPRANO_HIGH,
+                PART_SAX_SOPRANO_MIDDLE_HIGH,
+                PART_SAX_SOPRANO_MIDDLE_HIGH,
+                PART_SAX_SOPRANO_MIDDLE,
+                PART_SAX_ALTO_MIDDLE_HIGH,
+                PART_SAX_ALTO_MIDDLE_HIGH,
+                PART_SAX_ALTO_MIDDLE,
+                PART_SAX_ALTO_MIDDLE,
+                PART_SAX_TENOR_MIDDLE_HIGH,
+                PART_SAX_TENOR_MIDDLE,
+                PART_SAX_BARITONE_LOW_MIDDLE,
+                PART_SAX_BARITONE_LOW
             )
             else -> listOf()
         }
@@ -403,73 +403,73 @@ object Ensembles {
         fun getFlutes(nParts: Int): List<EnsemblePart> {
             return when (nParts) {
                 1, 2 -> listOf(
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 4)  // Flute
+                    PART_FLUTE_MIDDLE_HIGH,
+                    PART_FLUTE_LOW_MIDDLE
                 )
                 3, 4 -> listOf(
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 3)  // Flute
+                    PART_PICCOLO_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE,
+                    PART_FLUTE_LOW_MIDDLE
                 )
                 5 -> listOf(
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 3)  // Flute
+                    PART_PICCOLO_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE,
+                    PART_FLUTE_LOW_MIDDLE,
+                    PART_BASS_FLUTE_LOW_MIDDLE
                 )
                 6 -> listOf(
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 3)  // Flute
+                    PART_PICCOLO_HIGH,
+                    PART_PICCOLO_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE,
+                    PART_FLUTE_LOW_MIDDLE,
+                    PART_BASS_FLUTE_LOW_MIDDLE
                 )
                 7 -> listOf(
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 3)  // Flute
+                    PART_PICCOLO_HIGH,
+                    PART_PICCOLO_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE,
+                    PART_FLUTE_LOW_MIDDLE,
+                    PART_FLUTE_LOW,
+                    PART_BASS_FLUTE_LOW_MIDDLE
                 )
                 8 -> listOf(
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 3)  // Flute
+                    PART_PICCOLO_HIGH,
+                    PART_PICCOLO_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE,
+                    PART_FLUTE_MIDDLE,
+                    PART_FLUTE_LOW_MIDDLE,
+                    PART_FLUTE_LOW,
+                    PART_BASS_FLUTE_LOW_MIDDLE
                 )
                 9 -> listOf(
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 3),  // Flute
-                    EnsemblePart(73, 3)  // Flute
+                    PART_PICCOLO_HIGH,
+                    PART_PICCOLO_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE,
+                    PART_FLUTE_MIDDLE,
+                    PART_FLUTE_LOW_MIDDLE,
+                    PART_FLUTE_LOW,
+                    PART_BASS_FLUTE_LOW_MIDDLE,
+                    PART_BASS_FLUTE_LOW
                 )
                 in 10..12 -> listOf(
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(72, 6), // Piccolo
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 5), // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 4),  // Flute
-                    EnsemblePart(73, 3),  // Flute
-                    EnsemblePart(73, 3)  // Flute
+                    PART_PICCOLO_HIGH,
+                    PART_PICCOLO_MIDDLE_HIGH,
+                    PART_PICCOLO_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE_HIGH,
+                    PART_FLUTE_MIDDLE,
+                    PART_FLUTE_MIDDLE,
+                    PART_FLUTE_LOW_MIDDLE,
+                    PART_FLUTE_LOW_MIDDLE,
+                    PART_FLUTE_LOW,
+                    PART_BASS_FLUTE_LOW_MIDDLE,
+                    PART_BASS_FLUTE_LOW
                 )
                 else -> listOf()
             }
@@ -477,69 +477,69 @@ object Ensembles {
     fun getDoubleReeds(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2 -> listOf(
-                EnsemblePart(68, 4), // Oboe
-                EnsemblePart(70, 3)  // Bassoon
+                EnsemblePart(OBOE, 4, OBOE_ALL),
+                EnsemblePart(BASSOON, 3, BASSOON_ALL)
             )
             3 -> listOf(
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(70, 3)  // Bassoon
+                PART_OBOE_MIDDLE_HIGH,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_BASSOON_LOW_MIDDLE
             )
             4 -> listOf(
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 2)  // Bassoon
+                PART_OBOE_MIDDLE_HIGH,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_BASSOON_LOW_MIDDLE,
+                PART_BASSOON_LOW
             )
             5 -> listOf(
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 2)  // Bassoon
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_BASSOON_LOW_MIDDLE,
+                PART_BASSOON_LOW
             )
             6 -> listOf(
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 2)  // Bassoon
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_BASSOON_MIDDLE,
+                PART_BASSOON_LOW_MIDDLE,
+                PART_BASSOON_LOW
             )
             7, 8 -> listOf(
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 2),  // Bassoon
-                EnsemblePart(70, 2)  // Bassoon
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_ENGLISH_HORN_LOW,
+                PART_BASSOON_MIDDLE_HIGH,
+                PART_BASSOON_MIDDLE,
+                PART_BASSOON_LOW_MIDDLE,
+                PART_BASSOON_LOW
             )
             9 -> listOf(
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 2),  // Bassoon
-                EnsemblePart(70, 2)  // Bassoon
+                PART_OBOE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_ENGLISH_HORN_LOW,
+                PART_BASSOON_MIDDLE_HIGH,
+                PART_BASSOON_MIDDLE,
+                PART_BASSOON_LOW_MIDDLE,
+                PART_BASSOON_LOW
             )
             in 10..12 -> listOf(
-                EnsemblePart(68, 6), // Oboe
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(68, 5), // Oboe
-                EnsemblePart(68, 4), // Oboe
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(69, 4), // English Horn
-                EnsemblePart(69, 3), // English Horn
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 3),  // Bassoon
-                EnsemblePart(70, 2),  // Bassoon
-                EnsemblePart(70, 2)  // Bassoon
+                PART_OBOE_HIGH,
+                PART_OBOE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE,
+                PART_ENGLISH_HORN_MIDDLE_HIGH,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_ENGLISH_HORN_LOW,
+                PART_BASSOON_MIDDLE_HIGH,
+                PART_BASSOON_MIDDLE,
+                PART_BASSOON_LOW_MIDDLE,
+                PART_BASSOON_LOW
             )
             else -> listOf()
         }
@@ -547,50 +547,50 @@ object Ensembles {
     fun getClarinets(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2, 3 -> listOf(
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 4),  // Clarinet
-                EnsemblePart(71, 3)  // Clarinet
+                PART_CLARINET_HIGH,
+                PART_CLARINET_MIDDLE,
+                PART_CLARINET_LOW_MIDDLE
             )
             4, 5 -> listOf(
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 4), // Clarinet
-                EnsemblePart(71, 3),  // Clarinet
-                EnsemblePart(71, 2)  // Clarinet
+                PART_CLARINET_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE,
+                PART_CLARINET_LOW_MIDDLE,
+                PART_BASS_CLARINET_LOW_MIDDLE
             )
             6, 7 -> listOf(
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 4), // Clarinet
-                EnsemblePart(71, 4), // Clarinet
-                EnsemblePart(71, 3),  // Clarinet
-                EnsemblePart(71, 3),  // Clarinet
-                EnsemblePart(71, 2)  // Clarinet
+                PART_CLARINET_HIGH_HIGHEST,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE,
+                PART_CLARINET_LOW_MIDDLE,
+                PART_CLARINET_LOW,
+                PART_BASS_CLARINET_LOW_MIDDLE,
+                PART_BASS_CLARINET_LOW
             )
             8, 9 -> listOf(
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 4), // Clarinet
-                EnsemblePart(71, 4), // Clarinet
-                EnsemblePart(71, 4), // Clarinet
-                EnsemblePart(71, 3),  // Clarinet
-                EnsemblePart(71, 3),  // Clarinet
-                EnsemblePart(71, 2)  // Clarinet
+                PART_CLARINET_HIGH_HIGHEST,
+                PART_CLARINET_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE,
+                PART_CLARINET_MIDDLE,
+                PART_CLARINET_LOW_MIDDLE,
+                PART_CLARINET_LOW,
+                PART_BASS_CLARINET_LOW_MIDDLE,
+                PART_BASS_CLARINET_LOW
             )
             in 10..12 -> listOf(
-                EnsemblePart(71, 6), // Clarinet
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 5), // Clarinet
-                EnsemblePart(71, 4), // Clarinet
-                EnsemblePart(71, 4), // Clarinet
-                EnsemblePart(71, 4), // Clarinet
-                EnsemblePart(71, 3),  // Clarinet
-                EnsemblePart(71, 3),  // Clarinet
-                EnsemblePart(71, 3),  // Clarinet
-                EnsemblePart(71, 2),  // Clarinet
-                EnsemblePart(71, 2)  // Clarinet
+                PART_CLARINET_HIGHEST,
+                PART_CLARINET_HIGH_HIGHEST,
+                PART_CLARINET_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE,
+                PART_CLARINET_MIDDLE,
+                PART_CLARINET_LOW_MIDDLE,
+                PART_CLARINET_LOW_MIDDLE,
+                PART_CLARINET_LOW,
+                PART_BASS_CLARINET_LOW_MIDDLE,
+                PART_BASS_CLARINET_LOW,
+                PART_BASS_CLARINET_LOW
             )
             else -> listOf()
         }
@@ -1018,28 +1018,6 @@ object Ensembles {
 data class EnsemblePart( val instrument: Int, val octave: Int,
                          val allRange: IntRange = PIANO_ALL,
                          val colorRange: IntRange = allRange) // if colorRange is not specified, allRange will be taken
-const val PIANO = 0
-const val HARPSICHORD = 6
-const val NYLON_GUITAR = 24
-const val STEEL_GUITAR = 25
-const val CLEAN_GUITAR = 27
-const val GUITAR_HARMONICS= 31
-const val ACOUSTIC_BASS= 32
-const val VIOLIN = 40
-const val VIOLA = 41
-const val CELLO = 42
-const val DOUBLEBASS = 43
-const val PIZZICATO = 45
-const val HARP = 46
-const val STRING_ORCHESTRA = 48
-const val OBOE = 68
-const val BASSOON = 70
-const val FLUTE = 73
-const val RECORDER = 74
-const val CLARINET = 71
-const val SITAR = 104
-const val BANJO = 105
-const val SHAMISEN = 106
-const val KOTO = 107
+
 
 

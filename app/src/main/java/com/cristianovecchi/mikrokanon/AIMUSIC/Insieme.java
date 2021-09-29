@@ -398,6 +398,7 @@ public class Insieme {
     // MIDI: A0 = 21, C4 = 60, C8 = 108
     // octave 4 = central
     public static int[] findMelody(int octave, int[] absPitches, int lowerLimit, int upperLimit, int melodyType){
+        octave++;
         int[] melody = new int[absPitches.length];
         int length = absPitches.length;
         int index = 0;
@@ -405,7 +406,7 @@ public class Insieme {
             melody[index++] = -1;
         }
         if (index == length) {return melody;}
-        melody[index]=absPitches[index] + (octave + 1) * 12;
+        melody[index]=notaInRange(absPitches[index] + octave * 12, lowerLimit,upperLimit);
         int lastNote = melody[index];
         if (index == length -1 ) {return melody;}
         if(melodyType == 0){
@@ -414,7 +415,7 @@ public class Insieme {
                 if(checkNote==-1){
                     melody[i+1]=-1;
                 } else {
-                    checkNote = checkNote + (octave + 1) * 12;
+                    checkNote = checkNote + octave * 12;
                     int newNote = notaInRange(lastNote
                             +(checkNote-lastNote)+(12*Insieme.trovaOttavaLineare(lastNote, checkNote)),lowerLimit,upperLimit);
                     melody[i+1] = newNote;
@@ -427,7 +428,7 @@ public class Insieme {
                 if(checkNote==-1){
                     melody[i+1]=-1;
                 } else {
-                    checkNote = checkNote + (octave + 1) * 12;
+                    checkNote = checkNote + octave  * 12;
                     int newNote = notaInRange(lastNote
                             +(checkNote-lastNote)+(12*Insieme.trovaOttavaAmpia(lastNote, checkNote)),lowerLimit,upperLimit);
                     melody[i+1] = newNote;
