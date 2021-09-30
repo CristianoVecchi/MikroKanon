@@ -57,6 +57,26 @@ const val G6 = 91
 // for LOW3 and MIDDLE3 a Major Third is added at the end, for HIGH3 at the start
 
 val PIANO_ALL: IntRange = IntRange(A0, C8)
+val PARTS_PIANO: List<EnsemblePart> = listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(PIANO, 0, PIANO_ALL), //useless
+    EnsemblePart(PIANO, 1, PIANO_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(PIANO, it, PIANO_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(PIANO, 8, PIANO_ALL, IntRange(89, C8)) // F6 - C8
+)
+val HARPSICHORD_ALL: IntRange = IntRange(A0, C8)
+val PARTS_HARPSICHORD: List<EnsemblePart> = listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(HARPSICHORD, 0, HARPSICHORD_ALL), //useless
+    EnsemblePart(HARPSICHORD, 1, HARPSICHORD_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(HARPSICHORD, it, HARPSICHORD_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(HARPSICHORD, 8, HARPSICHORD_ALL, IntRange(89, C8)) // F6 - C8
+)
+val HARP_ALL: IntRange = IntRange(A0, C8)
+val PARTS_HARP: List<EnsemblePart> = listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(HARP, 0, HARP_ALL), //useless
+    EnsemblePart(HARP, 1, HARP_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(HARP, it, HARP_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(HARP, 8, HARP_ALL, IntRange(89, C8)) // F6 - C8
+)
 
 val PICCOLO_ALL: IntRange = IntRange(74, C8) // D5 - C8
 val PICCOLO_LOW3: IntRange = IntRange(74, 90) // D5 - F#6
@@ -64,6 +84,12 @@ val PICCOLO_MIDDLE3: IntRange = IntRange(80, C7) // G#5 - C7
 val PICCOLO_HIGH3: IntRange = IntRange(92, C8) // Ab6 - C8
 val PART_PICCOLO_MIDDLE_HIGH = EnsemblePart(PICCOLO, 6, PICCOLO_ALL, PICCOLO_MIDDLE3..PICCOLO_HIGH3)
 val PART_PICCOLO_HIGH = EnsemblePart(PICCOLO, 6, PICCOLO_ALL, PICCOLO_HIGH3)
+
+val GUITAR_ALL: IntRange = IntRange(40, C6) // E2 - C6
+val GUITAR_LOW5: IntRange = IntRange(40, 59) // E2 - B3
+val GUITAR_MIDDLE5: IntRange = IntRange(50, 69) // D3 - A4
+val GUITAR_HIGH5: IntRange = IntRange(59, 78) // B3 - F#5
+val GUITAR_HIGHEST5: IntRange = IntRange(65, C6) // F4 - C6
 
 val FLUTE_ALL: IntRange = IntRange(C4, C7)
 val FLUTE_LOW3: IntRange = IntRange(C4, 76) // C4 - E5
@@ -125,8 +151,9 @@ val BASSOON_ALL: IntRange = IntRange(34, 77) // Bb1 - F5
 val BASSOON_LOW3: IntRange = IntRange(34, 50) // Bb1 - D3
 val BASSOON_MIDDLE3: IntRange = IntRange(42, 58) // F#2 - Bb3
 val BASSOON_HIGH5: IntRange = IntRange(58, 77) // Bb3 - F5 (added a fifth at the start to cover the whole range)
-val PART_BASSOON_LOW_MIDDLE = EnsemblePart(BASSOON, 2, BASSOON_ALL, BASSOON_LOW3..BASSOON_MIDDLE3)
+val PART_BASSOON_LOW_MIDDLE = EnsemblePart(BASSOON, 3, BASSOON_ALL, BASSOON_LOW3..BASSOON_MIDDLE3)
 val PART_BASSOON_MIDDLE_HIGH = EnsemblePart(BASSOON, 4, BASSOON_ALL, BASSOON_MIDDLE3..BASSOON_HIGH5)
+val PART_BASSOON_HIGH = EnsemblePart(BASSOON, 5, BASSOON_ALL, BASSOON_HIGH5)
 val PART_BASSOON_MIDDLE = EnsemblePart(BASSOON, 3, BASSOON_ALL, BASSOON_MIDDLE3)
 val PART_BASSOON_LOW = EnsemblePart(BASSOON, 2, BASSOON_ALL, BASSOON_LOW3)
 
@@ -165,6 +192,7 @@ val VIOLIN_MIDDLE3: IntRange = IntRange(62, 78) // D4 - F#5 (D string)
 val VIOLIN_HIGH3: IntRange = IntRange(69, 85) // A4 - C#6 (A string)
 val VIOLIN_HIGHEST: IntRange = IntRange(69, 85) // E5 - A7 (E string)
 val PART_VIOLIN_MIDDLE_HIGH_HIGHEST = EnsemblePart(VIOLIN, 5,VIOLIN_ALL, VIOLIN_MIDDLE3..VIOLIN_HIGH3..VIOLIN_HIGHEST)
+val PART_VIOLIN_MIDDLE_HIGH = EnsemblePart(VIOLIN, 5,VIOLIN_ALL, VIOLIN_MIDDLE3..VIOLIN_HIGH3)
 val PART_VIOLIN_HIGH_HIGHEST = EnsemblePart(VIOLIN, 5,VIOLIN_ALL, VIOLIN_HIGH3..VIOLIN_HIGHEST)
 val PART_VIOLIN_HIGHEST = EnsemblePart(VIOLIN, 6, VIOLIN_ALL, VIOLIN_HIGHEST)
 
@@ -183,8 +211,12 @@ val CELLO_MIDDLE3: IntRange = IntRange(G2, 59) // G2 - B3 (G string)
 val CELLO_HIGH3: IntRange = IntRange(50, 66) // D3 - F#4 (D string)
 val CELLO_HIGHEST: IntRange = IntRange(57, 81) // A3 - A5 (A string)
 val PART_CELLO_LOW_MIDDLE = EnsemblePart(CELLO, 3, CELLO_ALL, CELLO_LOW3..CELLO_MIDDLE3)
+val PART_CELLO_LOW = EnsemblePart(CELLO, 2, CELLO_ALL, CELLO_LOW3)
 val PART_CELLO_MIDDLE_HIGH = EnsemblePart(CELLO, 3, CELLO_ALL, CELLO_MIDDLE3..CELLO_HIGH3)
+val PART_CELLO_MIDDLE = EnsemblePart(CELLO, 3, CELLO_ALL, CELLO_MIDDLE3)
 val PART_CELLO_HIGH_HIGHEST = EnsemblePart(CELLO, 4, CELLO_ALL, CELLO_HIGH3..CELLO_HIGHEST)
+val PART_CELLO_HIGH = EnsemblePart(CELLO, 4, CELLO_ALL, CELLO_HIGH3)
+val PART_CELLO_HIGHEST = EnsemblePart(CELLO, 5, CELLO_ALL, CELLO_HIGHEST)
 
 val DOUBLE_BASS_ALL: IntRange = IntRange(28, G4) // E1 - G4
 val DOUBLE_BASS_LOW3: IntRange = IntRange(28, 44) // E1 - G#2 (E string)
