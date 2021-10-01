@@ -21,8 +21,8 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "melody_type")
         val melodyType: Int,
 
-        @ColumnInfo(name = "bpm")
-        val bpm: Int,
+        @ColumnInfo(name = "bpms")
+        val bpms: String,
 
         @ColumnInfo(name = "rhythm")
         val rhythm: Int,
@@ -74,7 +74,7 @@ import androidx.room.PrimaryKey
     ){
         companion object{
             fun getDefaultUserOptionsData(): UserOptionsData{
-                return UserOptionsData(0,2, 0,0,90,3,
+                return UserOptionsData(0,2, 0,0,"90",3,
                     0,0, 1,0,
                     0,0b0011110, 0b1111111,
                     0,0,0,1,

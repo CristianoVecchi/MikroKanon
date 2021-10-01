@@ -225,8 +225,8 @@ init{
                 val ensType: EnsembleType =
                     EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType }
                         ?: 0]
-                val bpm: Float =
-                    userOptionsData.value?.let { userOptionsData.value!![0].bpm.toFloat() } ?: 90f
+                val bpms: List<Float> =
+                    userOptionsData.value?.let { userOptionsData.value!![0].bpms.extractFromCsv().map { it.toFloat() } } ?: listOf(90f)
                 val rhythm: RhythmPatterns =
                     RhythmPatterns.values()[userOptionsData.value?.let { userOptionsData.value!![0].rhythm }
                         ?: 0]
@@ -254,11 +254,12 @@ init{
                 val melodyType: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].melodyType }
                         ?: 0
+
                 error = Player.playCounterpoint(
                     mediaPlayer!!,
                     false,
                     selectedCounterpoint.value!!,
-                    bpm,
+                    bpms,
                     0f,
                     rhythm,
                     ensType,
@@ -971,8 +972,8 @@ init{
             "melodyType" -> {
                 newUserOptionsData = optionsDataClone.copy(melodyType = value as Int)
             }
-            "bpm" -> {
-                newUserOptionsData = optionsDataClone.copy(bpm = value as Int)
+            "bpms" -> {
+                newUserOptionsData = optionsDataClone.copy(bpms = value as String)
             }
             "rhythm" -> {
                 newUserOptionsData = optionsDataClone.copy(rhythm = value as Int)

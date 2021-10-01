@@ -33,10 +33,12 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
 import com.cristianovecchi.mikrokanon.G
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.cristianovecchi.mikrokanon.convertIntsToFlags
+import com.cristianovecchi.mikrokanon.describe
 import com.cristianovecchi.mikrokanon.locale.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
+import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import com.cristianovecchi.mikrokanon.ui.shift
 import kotlinx.coroutines.flow.Flow
@@ -109,6 +111,8 @@ data class MultiListDialogData(val dialogState: Boolean = false, val itemList: L
                           val dialogTitle: String = "", val onSubmitButtonClick: (List<Int>) -> Unit = {} )
 data class NumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:Int = 0,
                             val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
+data class MultiNumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="0",
+                                 val min: Int = 0, val max: Int = 360, val model: AppViewModel, val onSubmitButtonClick: (String) -> Unit = {})
 data class CustomColorsDialogData(val dialogState: Boolean = false, val title:String = "", val arrayColorIndex: Int = 0,
                                   val model: AppViewModel,val onSubmitButtonClick: (Int) -> Unit = {})
 data class ButtonsDialogData(
@@ -130,9 +134,12 @@ data class CreditsDialogData(val dialogState: Boolean = false, val title:String 
 @Composable
 fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>){
 
+
+
     val listDialogData by lazy { mutableStateOf(ListDialogData())}
     //val nuancesDialogData by lazy { mutableStateOf(ListDialogData())}
-    val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
+    //val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
+    val multiBpmDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
@@ -145,6 +152,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val zodiacDialogData by lazy{ mutableStateOf(MultiListDialogData())}
 
     val dimensions = model.dimensions
+    val colors = model.appColors
     val optionNames= listOf("Ensemble", "Range","Melody","Nuances", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Ritornello","Doubling",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
@@ -152,14 +160,14 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val lang = Lang.provideLanguage(model.getUserLangDef())
-    val colors = model.appColors
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionsData()
                         else userOptionsData[0]
     val listState = rememberLazyListState()
     var isFirstTab by remember{ mutableStateOf(model.isFirstTab)}
     ListDialog(listDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize)
     MultiListDialog(doublingDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
-    BpmDialog(bpmDialogData, lang.OKbutton)
+    //BpmDialog(bpmDialogData, lang.OKbutton)
+    MultiBpmDialog(multiBpmDialogData, lang.OKbutton)
     ExportDialog(exportDialogData, lang.OKbutton)
     CreditsDialog(creditsDialogData, lang.OKbutton)
     //MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
@@ -321,19 +329,19 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         })
                 }
                 "BPM" -> {
-                    val bpm = userOptions.bpm
+                    val bpms = userOptions.bpms
                     SelectableCard(
-                        text = "${lang.bpm}: $bpm",
+                        text = "${lang.bpm}: ${bpms.describe()}",
                         fontSize = fontSize,
                         colors = colors,
                         isSelected = true,
                         onClick = {
-                            bpmDialogData.value = NumberDialogData(
-                                true, "${lang.beatsPerMinute}:", bpm, 18, 600
-                            ) { bpm ->
+                            multiBpmDialogData.value = MultiNumberDialogData(
+                                true, "${lang.beatsPerMinute}:", bpms, 18, 600,
+                            model = model) { bpms ->
                                 model.updateUserOptions(
-                                    "bpm",
-                                    bpm
+                                    "bpms",
+                                    bpms
                                 )
                                 listDialogData.value =
                                     ListDialogData(itemList = listDialogData.value.itemList)

@@ -8,6 +8,9 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.BebopBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParker
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParkerBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.DEF.MIDDLE_C
+import com.cristianovecchi.mikrokanon.alterateBpm
+import com.cristianovecchi.mikrokanon.alterateBpmWithDistribution
+import com.cristianovecchi.mikrokanon.projectTo
 
 import com.leff.midi.MidiFile
 import com.leff.midi.MidiTrack
@@ -90,7 +93,7 @@ object Player {
 
     fun playCounterpoint(
         mediaPlayer: MediaPlayer, looping: Boolean,
-        counterpoint: Counterpoint, bpm: Float, shuffle: Float,
+        counterpoint: Counterpoint, bpms: List<Float>, shuffle: Float,
         rhythm: RhythmPatterns, ensembleType: EnsembleType,
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
         rowFormsFlags: Int = 1, ritornello: Int = 0, doublingFlags: Int = 0, nuances: Int = 0,
@@ -107,6 +110,7 @@ object Player {
         val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts, nuances, doublingFlags, rangeType, melodyType)
         if (counterpointTracks.isEmpty()) return "No Tracks in Counterpoint!!!"
 
+        val totalLength = counterpointTracks[0].lengthInTicks
         val tempoTrack = MidiTrack()
         // from TimeSignature.class
 //        public static final int DEFAULT_METER = 24;
@@ -114,10 +118,25 @@ object Player {
         val ts = TimeSignature()
         ts.setTimeSignature(rhythm.metro.first, rhythm.metro.second,
                             TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION)
-        val t = Tempo()
-        t.bpm = bpm
         tempoTrack.insertEvent(ts);
-        tempoTrack.insertEvent(t)
+
+        //val t = Tempo()
+        //t.bpm = bpm
+        //val t2 = Tempo(totalLength/2,0L, 500000)
+        //t2.bpm = bpm * 3
+        //tempoTrack.insertEvent(t)
+        //tempoTrack.insertEvent(t2)
+        //val bpmAlterations = bpm.projectTo(bpm*2, 0.5f).projectTo(bpm, 0.5f).also{println(it)}
+        val bpmAlterationsAndDeltas = alterateBpmWithDistribution(bpms, 0.5f, totalLength)
+        var tempoTick = 0L
+        val bpmAlterations = bpmAlterationsAndDeltas.first.also { println("${it.size} + $it") }
+        val bpmDeltas = bpmAlterationsAndDeltas.second.also { println("${it.size} + $it") }
+        bpmAlterations.forEachIndexed { index, bpm ->
+            val newTempo = Tempo(tempoTick, 0L, 500000)
+            newTempo.bpm = bpm
+            tempoTrack.insertEvent(newTempo)
+            tempoTick += bpmDeltas[index]
+        }
         val tracks: java.util.ArrayList<MidiTrack> = java.util.ArrayList<MidiTrack>()
         tracks.add(tempoTrack)
         tracks.addAll(counterpointTracks)

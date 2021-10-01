@@ -7,6 +7,9 @@ enum class EnsembleType {
     DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, PIERROT,
     BAROQUE, PLUCKED_STRINGS
 }
+data class EnsemblePart( val instrument: Int, val octave: Int,
+                         val allRange: IntRange = PIANO_ALL,
+                         val colorRange: IntRange = allRange) // if colorRange is not specified, allRange will be taken
 
 
 object Ensembles {
@@ -1015,9 +1018,7 @@ object Ensembles {
         }
     }
 }
-data class EnsemblePart( val instrument: Int, val octave: Int,
-                         val allRange: IntRange = PIANO_ALL,
-                         val colorRange: IntRange = allRange) // if colorRange is not specified, allRange will be taken
+
 
 
 

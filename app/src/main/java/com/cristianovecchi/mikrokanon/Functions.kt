@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import kotlinx.coroutines.*
 import kotlinx.coroutines.GlobalScope.coroutineContext
+import java.lang.StringBuilder
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -150,15 +151,82 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
     fun Int.toDp(): Int = (this / Resources.getSystem().displayMetrics.density).toInt()
     fun Int.toPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
 
-    fun Color.toHexString(): String {
-        return "#${this.red.toColorHexString()}${this.green.toColorHexString()}${this.blue.toColorHexString()}"
+    fun Float.projectTo(goal: Float, step: Float): List<Float>{
+        return listOf(this).projectTo(goal, step)
     }
+    fun List<Float>.projectTo(goal: Float, step: Float, deltas: MutableList<Long>? = null, sectionDuration: Long = 0L): List<Float>{
+        if(this.isEmpty()) return listOf(goal)
+        val result = this.toMutableList()
+        var newValue = this.last()
+        if (newValue == goal) {
+            deltas?.add(sectionDuration)
+            result.add(goal)
+            return result.toList()
+        }
+        var count = 0
+        if(newValue > goal){
+            newValue -= step
+            while (newValue > goal){
+                count ++
+                result.add(newValue)
+                newValue -= step
+            }
+            result.add(goal)
+            count ++
+        } else {
+            newValue += step
+            while (newValue < goal){
+                count ++
+                result.add(newValue)
+                newValue += step
+            }
+            result.add(goal)
+            count ++
+        }
 
-    fun Float.toColorHexString(): String {
-        return (256 * this).toInt().toString(16)
+        deltas?.let{
+            val delta = sectionDuration / count
+            (0 until count).forEach{ _ -> deltas.add(delta)}
+        }
+        return result.toList()
     }
+fun alterateBpm(bpmValues: List<Float>, step:Float): List<Float>{
+    return bpmValues.fold(listOf()) {acc, nextBpm -> acc.projectTo(nextBpm, step)}
+}
+fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuration: Long): Pair<List<Float>, List<Long>>{
+    val sectionDuration = totalDuration / bpmValues.size - 1
+    val deltas: MutableList<Long> = mutableListOf()
+    val bpms: List<Float> = bpmValues.fold(listOf()) {
+            acc, nextBpm -> acc.projectTo(nextBpm, step, deltas, sectionDuration)}
+    deltas.add(0) // to set the same lenght - last value is unused
+    return Pair(bpms, deltas.toList() )
+}
 
+fun String.extractFromCsv(): List<Int>{
+    return this.split(',').mapNotNull { it.toInt()}
+}
+fun String.describe(): String {
+    val ints = this.extractFromCsv()
+    return ints.foldIndexed("") { index, acc, i ->
+        when {
+            index == 0 -> acc + i.toString()
+            ints[index - 1] > i -> "$acc ➘ $i"
+            ints[index - 1] < i -> "$acc ➚ $i"
+            ints[index - 1] == i -> "$acc - $i"
+            else -> acc + i.toString()
+        }
+    }
+}
+fun String.valueFromCsv(index: Int): Int {
+    return this.extractFromCsv()[index]
+}
+fun Color.toHexString(): String {
+    return "#${this.red.toColorHexString()}${this.green.toColorHexString()}${this.blue.toColorHexString()}"
+}
 
+fun Float.toColorHexString(): String {
+    return (256 * this).toInt().toString(16)
+}
 
 
 
