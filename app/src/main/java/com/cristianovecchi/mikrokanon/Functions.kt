@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.absoluteValue
 
 fun tritoneSubstitution(absPitch: Int): Int {
     return when (absPitch) {
@@ -155,38 +156,52 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
         return listOf(this).projectTo(goal, step)
     }
     fun List<Float>.projectTo(goal: Float, step: Float, deltas: MutableList<Long>? = null, sectionDuration: Long = 0L): List<Float>{
-        if(this.isEmpty()) return listOf(goal)
+        val absoluteGoal = goal.absoluteValue
+        if(this.isEmpty()) return listOf(absoluteGoal)
         val result = this.toMutableList()
         var newValue = this.last()
-        if (newValue == goal) {
-            deltas?.add(sectionDuration)
-            result.add(goal)
+
+        if (newValue == absoluteGoal) {
+            deltas?.let {
+                //if (deltas.isNotEmpty() && deltas.last() == -1L) deltas.removeAt(deltas.size-1)
+                deltas.add(sectionDuration)
+            }
+            result.add(absoluteGoal)
             return result.toList()
         }
-        var count = 0
-        if(newValue > goal){
+
+        if (goal < 0) {
+            result[result.size-1] = absoluteGoal
+            //deltas?.add(-1L)
+            return result.toList()
+        }
+        var count = 1
+        if(newValue > absoluteGoal){
             newValue -= step
-            while (newValue > goal){
+            while (newValue > absoluteGoal){
                 count ++
                 result.add(newValue)
                 newValue -= step
             }
-            result.add(goal)
-            count ++
+            result.add(absoluteGoal)
+
         } else {
             newValue += step
-            while (newValue < goal){
+            while (newValue < absoluteGoal){
                 count ++
                 result.add(newValue)
                 newValue += step
             }
-            result.add(goal)
-            count ++
+            result.add(absoluteGoal)
+
         }
 
         deltas?.let{
             val delta = sectionDuration / count
-            (0 until count).forEach{ _ -> deltas.add(delta)}
+            val rest = sectionDuration % count
+            //if (deltas.isNotEmpty() && deltas.last() == -1L) deltas[deltas.size-1] = delta + rest else
+            deltas.add(delta+rest)
+            (1 until count).forEach{ _ -> deltas.add(delta)}
         }
         return result.toList()
     }
@@ -194,11 +209,12 @@ fun alterateBpm(bpmValues: List<Float>, step:Float): List<Float>{
     return bpmValues.fold(listOf()) {acc, nextBpm -> acc.projectTo(nextBpm, step)}
 }
 fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuration: Long): Pair<List<Float>, List<Long>>{
-    val sectionDuration = totalDuration / bpmValues.size - 1
+    val sectionDuration = totalDuration / (bpmValues.count{it > -1} - 1)
+    println("total: $totalDuration | section: $sectionDuration")
     val deltas: MutableList<Long> = mutableListOf()
     val bpms: List<Float> = bpmValues.fold(listOf()) {
             acc, nextBpm -> acc.projectTo(nextBpm, step, deltas, sectionDuration)}
-    deltas.add(0) // to set the same lenght - last value is unused
+    //deltas.add(0) // to set the same lenght - last value is unused
     return Pair(bpms, deltas.toList() )
 }
 
@@ -209,10 +225,11 @@ fun String.describe(): String {
     val ints = this.extractFromCsv()
     return ints.foldIndexed("") { index, acc, i ->
         when {
-            index == 0 -> acc + i.toString()
-            ints[index - 1] > i -> "$acc ➘ $i"
-            ints[index - 1] < i -> "$acc ➚ $i"
-            ints[index - 1] == i -> "$acc - $i"
+            index == 0 -> acc + i.absoluteValue.toString()
+            i < 0 -> "$acc | ${i.absoluteValue}"
+            ints[index - 1].absoluteValue > i.absoluteValue -> "$acc ➘ $i"
+            ints[index - 1].absoluteValue < i.absoluteValue -> "$acc ➚ $i"
+            ints[index - 1].absoluteValue == i.absoluteValue -> "$acc - $i"
             else -> acc + i.toString()
         }
     }

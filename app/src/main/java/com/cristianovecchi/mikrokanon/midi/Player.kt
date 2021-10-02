@@ -131,9 +131,9 @@ object Player {
         var tempoTick = 0L
         val bpmAlterations = bpmAlterationsAndDeltas.first.also { println("${it.size} + $it") }
         val bpmDeltas = bpmAlterationsAndDeltas.second.also { println("${it.size} + $it") }
-        bpmAlterations.forEachIndexed { index, bpm ->
+        (0 until bpmAlterations.size -1).forEach { index -> // doesn't take the last bpm
             val newTempo = Tempo(tempoTick, 0L, 500000)
-            newTempo.bpm = bpm
+            newTempo.bpm = bpmAlterations[index]
             tempoTrack.insertEvent(newTempo)
             tempoTick += bpmDeltas[index]
         }

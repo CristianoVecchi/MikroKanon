@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.*
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 @Composable
 fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>, okText: String = "OK",
@@ -379,7 +380,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 ) {
                                     for (j in 0 until nCols) {
                                         if (index != bpms.size) {
-                                            val bpmText = bpms[index]
+                                            val text = bpms[index]
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -397,7 +398,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                             )
                                             {
                                                 Text(
-                                                    text = bpmText.toString(),
+                                                    text = if(text < 0) "|${text.absoluteValue}" else text.toString(),
                                                     modifier = Modifier.padding(innerPadding),
                                                     style = TextStyle(fontSize = if (cursor == index) fontSize else fontSize),
                                                     fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal
@@ -530,7 +531,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                         Spacer(modifier = Modifier.height(10.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){
 
-                            val buttonSize = model.dimensions.inputButtonSize - 20.dp
+                            val buttonSize = model.dimensions.inputButtonSize - 4.dp
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "",
@@ -575,6 +576,19 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 values.add(lastValue)
                                 bpmText = values.joinToString(",")
                                 cursor = values.size - 1
+                            }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "|",
+                                fontSize = 10,
+                                buttonSize = buttonSize,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val values = bpmText.extractFromCsv().toMutableList()
+                                val value = values[cursor]
+                                values.set(cursor, value * -1)
+                                bpmText = values.joinToString(",")
                             }
                         }
                     }
