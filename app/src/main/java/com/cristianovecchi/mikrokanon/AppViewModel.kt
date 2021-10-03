@@ -245,6 +245,8 @@ init{
                 val ritornello: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].ritornello }
                         ?: 0
+                val transpose: List<Int> =
+                    userOptionsData.value?.let { userOptionsData.value!![0].transpose.extractFromCsv() } ?: listOf(0)
                 val nuances: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].nuances }
                         ?: 1
@@ -269,6 +271,7 @@ init{
                     partsShuffle,
                     rowFormsFlags,
                     ritornello,
+                    transpose,
                     doublingFlags,
                     nuances,
                     rangeType,
@@ -991,6 +994,9 @@ init{
             }
             "ritornello" -> {
                 newUserOptionsData  = optionsDataClone.copy(ritornello = value as Int)
+            }
+            "transpose" -> {
+                newUserOptionsData = optionsDataClone.copy(transpose = value as String)
             }
             "doublingFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(doublingFlags = value as Int)

@@ -199,6 +199,8 @@ data class Lang( // English by default
     val ritornello: String = if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O) String(Character.toChars(0x1D106)) + "  " + String(Character.toChars(0x1D107))
                             else "Ritornello",
     val selectRitornello: String = "Select how many repetitions!",
+    val transpose: String = "Transpose",
+    val selectTranspositions: String = "Select transpositions!",
     val doubling: String = "Doubling",
     val spreadWherePossible: String = "Spread where possible",
     val deepSearch: String = "Deep search in four-part canons",

@@ -209,6 +209,9 @@ fun alterateBpm(bpmValues: List<Float>, step:Float): List<Float>{
     return bpmValues.fold(listOf()) {acc, nextBpm -> acc.projectTo(nextBpm, step)}
 }
 fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuration: Long): Pair<List<Float>, List<Long>>{
+    if(bpmValues.size == 1){
+        return Pair(listOf(bpmValues[0],0f), listOf(totalDuration))
+    }
     val sectionDuration = totalDuration / (bpmValues.count{it > -1} - 1)
     println("total: $totalDuration | section: $sectionDuration")
     val deltas: MutableList<Long> = mutableListOf()
@@ -233,6 +236,28 @@ fun String.describe(): String {
             else -> acc + i.toString()
         }
     }
+}
+fun String.describeForTranspose(intervals: List<String>): String {
+    val ints = this.extractFromCsv()
+    return ints.map{ intervals[it] }.joinToString(", ")
+}
+fun correctBpms(bpms: String): String{
+    val result = bpms.extractFromCsv().toMutableList()
+    if (result.all{ it == result[0]}) return result[0].toString()
+    repeat(2){
+        if (result[0] < 0) result[0] = result[0].absoluteValue
+        if (result.size > 1){
+            if (result[1] < 0)  result.add(1, result[0])
+            (1 until result.size).forEach{ index ->
+                if (result[index-1].absoluteValue == result[index].absoluteValue) result[index] = result[index].absoluteValue
+            }
+            (1 until result.size - 1).forEach{ index ->
+                if (result[index] < 0 && result[index+1] < 0 ) result.add(index+1, result[index].absoluteValue)
+            }
+            if (result.last() < 0) result.add(result.last().absoluteValue)
+        }
+    }
+    return result.joinToString(",")
 }
 fun String.valueFromCsv(index: Int): Int {
     return this.extractFromCsv()[index]

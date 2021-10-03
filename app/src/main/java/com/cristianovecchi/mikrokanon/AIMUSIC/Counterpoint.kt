@@ -154,7 +154,6 @@ data class Counterpoint(val parts: List<AbsPart>,
         return newCounterpoint
     }
 
-
     fun spreadAsPossible() : Counterpoint {
         val clone = this.normalizePartsSize(false)// cloning is necessary in a coroutine context
         for(partIndex in clone.parts.indices){
@@ -344,14 +343,28 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun tritoneSubstitution(): Counterpoint {
         return Counterpoint(parts.map{ it.tritoneSubstitution()}, tritoneSubstitutionOnIntervalSet(intervalSet))
     }
-
-    fun ritornello(ritornello: Int): Counterpoint {
-        if (ritornello == 0) return this
-        var newCounterpoint = this.copy()
-        for (i in 0 until ritornello){
-            newCounterpoint = this.enqueue(newCounterpoint)
+    fun transpose(transposition: Int): Counterpoint{
+        if (transposition == 0) return this.clone()
+        val newParts = this.parts.map{ it.transpose(transposition)}
+        return Counterpoint(newParts, this.intervalSet, this.emptiness)
+    }
+    fun ritornello(ritornello: Int, transpositions: List<Int> = listOf(0)): Counterpoint {
+        println(ritornello)
+        println(transpositions)
+        if (transpositions.all{ it == 0}) {
+            if (ritornello == 0) return this
+            var newCounterpoint = this.copy()
+            for (i in 0 until ritornello){
+                newCounterpoint = this.enqueue(newCounterpoint)
+            }
+            return newCounterpoint
+        } else {
+            var newCounterpoint = this.transpose(transpositions[0])
+            for (i in 0 until ritornello){
+                newCounterpoint = newCounterpoint.enqueue(this.transpose(transpositions[(i + 1) % transpositions.size]))
+            }
+            return newCounterpoint
         }
-        return newCounterpoint
     }
     companion object {
         fun createSeparatorCounterpoint(nParts: Int, nNotesToSkip: Int) : Counterpoint{

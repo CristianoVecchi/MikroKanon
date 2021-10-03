@@ -33,6 +33,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
 import com.cristianovecchi.mikrokanon.G
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.cristianovecchi.mikrokanon.convertIntsToFlags
+import com.cristianovecchi.mikrokanon.describeForTranspose
 import com.cristianovecchi.mikrokanon.describe
 import com.cristianovecchi.mikrokanon.locale.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
@@ -140,6 +141,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     //val nuancesDialogData by lazy { mutableStateOf(ListDialogData())}
     //val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
     val multiBpmDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val transposeDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
@@ -154,7 +156,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val dimensions = model.dimensions
     val colors = model.appColors
     val optionNames= listOf("Ensemble", "Range","Melody","Nuances", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
-        "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Ritornello","Doubling",
+        "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Ritornello","Transpose","Doubling",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
         "Export MIDI", "Colors", "Custom Colors","Language","Zodiac","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
@@ -168,6 +170,9 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     MultiListDialog(doublingDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
     MultiBpmDialog(multiBpmDialogData, lang.OKbutton)
+    val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
+    TransposeDialog(transposeDialogData,
+        intervalsForTranspose, lang.OKbutton)
     ExportDialog(exportDialogData, lang.OKbutton)
     CreditsDialog(creditsDialogData, lang.OKbutton)
     //MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
@@ -487,6 +492,27 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 )
                                 ritornelloDialogData.value =
                                     ListDialogData(itemList = ritornelloDialogData.value.itemList)
+                            }
+                        })
+                }
+                "Transpose" -> {
+                    val transposeCsv = userOptions.transpose
+                    val isOn = transposeCsv != "0"
+                    SelectableCard(
+                        text = if(isOn) "${lang.transpose}: ${transposeCsv.describeForTranspose(intervalsForTranspose)}" else lang.transpose,
+                        fontSize = fontSize,
+                        colors = colors,
+                        isSelected = isOn,
+                        onClick = {
+                            transposeDialogData.value = MultiNumberDialogData(
+                                true, "${lang.selectTranspositions}", transposeCsv,
+                                model = model) { transpositions ->
+                                model.updateUserOptions(
+                                    "transpose",
+                                    transpositions
+                                )
+                                listDialogData.value =
+                                    ListDialogData(itemList = listDialogData.value.itemList)
                             }
                         })
                 }
