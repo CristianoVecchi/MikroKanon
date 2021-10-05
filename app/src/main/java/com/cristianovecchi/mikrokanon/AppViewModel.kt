@@ -236,9 +236,9 @@ init{
                 val partsShuffle: Boolean =
                     0 != (userOptionsData.value?.let { userOptionsData.value!![0].partsShuffle }
                         ?: 0)
-                val rowFormsFlags: Int =
-                    userOptionsData.value?.let { userOptionsData.value!![0].rowFormsFlags }
-                        ?: 1 // ORIGINAL by default
+                val rowForms: List<Int> =
+                    userOptionsData.value?.let { userOptionsData.value!![0].rowForms.extractFromCsv() }
+                        ?: listOf(1) // ORIGINAL by default || 0 is unused
                 val doublingFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].doublingFlags }
                         ?: 0
@@ -269,7 +269,7 @@ init{
                     midiPath,
                     rhythmShuffle,
                     partsShuffle,
-                    rowFormsFlags,
+                    rowForms,
                     ritornello,
                     transpose,
                     doublingFlags,
@@ -987,11 +987,14 @@ init{
             "partsShuffle" -> {
                 newUserOptionsData = optionsDataClone.copy(partsShuffle = value as Int)
             }
-            "rowFormsFlags" -> {
-                var flags = value as Int
-                flags = if(flags and 0b10000 > 0 && flags and 0b1110 == 0) 1 else flags // deactivate separator if row forms are unactive
-                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = flags)
+            "rowForms" -> {
+                newUserOptionsData = optionsDataClone.copy(rowForms = value as String)
             }
+//            "rowFormsFlags" -> {
+//                var flags = value as Int
+//                flags = if(flags and 0b10000 > 0 && flags and 0b1110 == 0) 1 else flags // deactivate separator if row forms are unactive
+//                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = flags)
+//            }
             "ritornello" -> {
                 newUserOptionsData  = optionsDataClone.copy(ritornello = value as Int)
             }

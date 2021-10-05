@@ -192,6 +192,7 @@ data class Lang( // English by default
     val rhythm: String = "Rhythm",
     val rhythmShuffle: String = "Rhythm shuffle",
     val partsShuffle: String = "Parts shuffle",
+    val selectRowForms: String = "Select Row forms!",
     val retrograde: String = "Retrograde",
     val inverse: String = "Inverse",
     val invRetrograde: String = "Inv-Retrograde",

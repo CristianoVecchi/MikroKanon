@@ -96,7 +96,7 @@ object Player {
         counterpoint: Counterpoint, bpms: List<Float>, shuffle: Float,
         rhythm: RhythmPatterns, ensembleType: EnsembleType,
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
-        rowFormsFlags: Int = 1, ritornello: Int = 0, transpose: List<Int> = listOf(0),
+        rowForms: List<Int> = listOf(1), ritornello: Int = 0, transpose: List<Int> = listOf(0),
         doublingFlags: Int = 0, nuances: Int = 0,
         rangeType: Int = 0, melodyType: Int = 0
     ) : String {
@@ -105,8 +105,9 @@ object Player {
         val actualDurations = if (rhythmShuffle) listOf(*durations.toTypedArray(),*durations.toTypedArray(),*durations.toTypedArray()).shuffled() else durations
         val ensembleParts: List<EnsemblePart> = Ensembles.getEnsemble(counterpoint.parts.size, ensembleType)
         val actualEnsembleParts = if (partsShuffle) ensembleParts.shuffled() else ensembleParts
-        val nNotesToSkip = if(rowFormsFlags and 0b10000 != 0) rhythm.nNotesLeftInThePattern(counterpoint.nNotes()) else 0
-        var actualCounterpoint = if (rowFormsFlags == 1) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowFormsFlags, nNotesToSkip, ritornello > 0)
+//        val nNotesToSkip = if(rowFormsFlags and 0b10000 != 0) rhythm.nNotesLeftInThePattern(counterpoint.nNotes()) else 0
+//        var actualCounterpoint = if (rowFormsFlags == 1) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowFormsFlags, nNotesToSkip, ritornello > 0)
+        var actualCounterpoint = counterpoint
         actualCounterpoint = if(ritornello > 0)  actualCounterpoint.ritornello(ritornello, transpose)
                             else actualCounterpoint.transpose(transpose[0])
         val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts, nuances, doublingFlags, rangeType, melodyType)

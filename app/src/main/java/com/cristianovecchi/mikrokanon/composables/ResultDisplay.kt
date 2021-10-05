@@ -18,6 +18,9 @@ import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
+import com.cristianovecchi.mikrokanon.composables.dialogs.ButtonsDialog
+import com.cristianovecchi.mikrokanon.composables.dialogs.MultiListDialog
+import com.cristianovecchi.mikrokanon.composables.dialogs.SequencesDialog
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
 

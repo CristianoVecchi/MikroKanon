@@ -243,7 +243,7 @@ fun String.describeForTranspose(intervals: List<String>): String {
 }
 fun correctBpms(bpms: String): String{
     val result = bpms.extractFromCsv().toMutableList()
-    if (result.all{ it == result[0]}) return result[0].toString()
+    if (result.all{ it.absoluteValue == result[0].absoluteValue}) return result[0].absoluteValue.toString()
     repeat(2){
         if (result[0] < 0) result[0] = result[0].absoluteValue
         if (result.size > 1){
@@ -269,6 +269,9 @@ fun Color.toHexString(): String {
 fun Float.toColorHexString(): String {
     return (256 * this).toInt().toString(16)
 }
+val rowFormsMap = mapOf(
+    1 to "O", 2 to "I" , 3 to "R", 4 to "RI", -1 to "| O", -2 to "| I" , -3 to "| R", -4 to "| RI"
+)
 
 
 

@@ -33,8 +33,10 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "parts_shuffle")
         val partsShuffle: Int,
 
-        @ColumnInfo(name = "rowforms_flags")// row forms + separator
-        val rowFormsFlags: Int,
+        @ColumnInfo(name = "rowForms")
+        val rowForms: String,
+//        @ColumnInfo(name = "rowforms_flags")// row forms + separator
+//        val rowFormsFlags: Int,
 
         @ColumnInfo(name = "ritornello")
         val ritornello: Int,
@@ -78,7 +80,7 @@ import androidx.room.PrimaryKey
         companion object{
             fun getDefaultUserOptionsData(): UserOptionsData{
                 return UserOptionsData(0,2, 0,0,"90",3,
-                    0,0, 1,0, "0",
+                    0,0, "1",0, "0",
                     0,0b0011110, 0b1111111,
                     0,0,0,1,
                      "System||0" ,"System", 0, 1 )

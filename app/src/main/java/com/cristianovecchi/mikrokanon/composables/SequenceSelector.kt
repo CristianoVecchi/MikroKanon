@@ -17,6 +17,8 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.composables.dialogs.ButtonsDialog
+import com.cristianovecchi.mikrokanon.composables.dialogs.SequencesDialog
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.*

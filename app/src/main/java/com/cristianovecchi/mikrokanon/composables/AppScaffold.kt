@@ -12,7 +12,6 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import com.cristianovecchi.mikrokanon.AppViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -28,13 +27,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
-import com.cristianovecchi.mikrokanon.G
-import com.cristianovecchi.mikrokanon.convertFlagsToInts
-import com.cristianovecchi.mikrokanon.convertIntsToFlags
-import com.cristianovecchi.mikrokanon.describeForTranspose
-import com.cristianovecchi.mikrokanon.describe
+import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.locale.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
@@ -43,6 +39,7 @@ import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import com.cristianovecchi.mikrokanon.ui.shift
 import kotlinx.coroutines.flow.Flow
+import kotlin.math.absoluteValue
 
 @Composable
 fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>, content: @Composable () -> Unit) {
@@ -142,6 +139,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     //val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
     val multiBpmDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val transposeDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val rowFormsDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
@@ -156,7 +154,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val dimensions = model.dimensions
     val colors = model.appColors
     val optionNames= listOf("Ensemble", "Range","Melody","Nuances", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
-        "Retrograde", "Inverse",  "Inv-Retrograde", "Separator","Ritornello","Transpose","Doubling",
+        "Row Forms","Ritornello","Transpose","Doubling",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
         "Export MIDI", "Colors", "Custom Colors","Language","Zodiac","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
@@ -173,6 +171,9 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
     TransposeDialog(transposeDialogData,
         intervalsForTranspose, lang.OKbutton)
+    val formsNames = listOf("unrelated", "Original", lang.inverse, lang.retrograde, lang.invRetrograde)
+    RowFormsDialog(rowFormsDialogData,
+        formsNames, lang.OKbutton)
     ExportDialog(exportDialogData, lang.OKbutton)
     CreditsDialog(creditsDialogData, lang.OKbutton)
     //MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
@@ -404,74 +405,33 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                             )
                         })
                 }
-                "Inverse" -> {
-                    val flags = userOptions.rowFormsFlags
-                    val isOn = flags and RowForm.INVERSE.flag != 0
+                "Row Forms" -> {
+                    val formsCsv = userOptions.rowForms
+                    val isOn = formsCsv != "1"
+                    val formsNumbers = formsCsv.extractFromCsv()
                     SelectableCard(
-                        text = lang.inverse,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            val newFlags = flags xor RowForm.INVERSE.flag // ^ toggles the flag
-                            model.updateUserOptions(
-                                "rowFormsFlags",
-                                newFlags
-                            )
-                        })
-                }
-                "Retrograde" -> {
-                    val flags = userOptions.rowFormsFlags
-                    val isOn = flags and RowForm.RETROGRADE.flag != 0
-                    SelectableCard(
-                        text = lang.retrograde,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            val newFlags = flags xor RowForm.RETROGRADE.flag // ^ toggles the flag
-                            model.updateUserOptions(
-                                "rowFormsFlags",
-                                newFlags
-                            )
-                        })
-                }
-                "Inv-Retrograde" -> {
-                    val flags = userOptions.rowFormsFlags
-                    val isOn = flags and RowForm.INV_RETROGRADE.flag != 0
-                    SelectableCard(
-                        text = lang.invRetrograde,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            val newFlags =
-                                flags xor RowForm.INV_RETROGRADE.flag // ^ toggles the flag
-                            model.updateUserOptions(
-                                "rowFormsFlags",
-                                newFlags
-                            )
-                        })
-                }
-                "Separator" -> {
-                    val flags = userOptions.rowFormsFlags
-                    val isOn = flags and 0b10000 != 0
-                    SelectableCard(
-                        text = lang.rowFormSeparator,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            if (flags != 1) { // don't need a separator if row forms are unactive
-                                val newFlags = flags xor 0b10000 // ^ toggles the flag
-                                model.updateUserOptions(
-                                    "rowFormsFlags",
-                                    newFlags
-                                )
+                        text = if(isOn)
+                            "${lang.rowFormSeparator}: ${formsNumbers.map{ 
+                                if(it<0) "| ${rowFormsMap[it.absoluteValue]}" 
+                                else "${rowFormsMap[it]}"}.joinToString(" ")}"
+                                else lang.rowFormSeparator,
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = isOn,
+                                onClick = {
+                                    rowFormsDialogData.value = MultiNumberDialogData(
+                                        true, lang.selectRowForms, formsCsv,
+                                        model = model) { rowForms ->
+                                        model.updateUserOptions(
+                                            "rowForms",
+                                            rowForms
+                                        )
+                                        listDialogData.value =
+                                            ListDialogData(itemList = listDialogData.value.itemList)
+                                    }
+                                })
                             }
 
-                        })
-                }
                 "Ritornello" -> {
                     val timeIndices: List<String> = (1..128).map { it.toString() }
                     val nTimes = userOptions.ritornello
