@@ -412,7 +412,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     SelectableCard(
                         text = if(isOn)
                             "${lang.rowFormSeparator}: ${formsNumbers.map{ 
-                                if(it<0) "| ${rowFormsMap[it.absoluteValue]}" 
+                                if(it<0) "${rowFormsMap[it.absoluteValue]} |" 
                                 else "${rowFormsMap[it]}"}.joinToString(" ")}"
                                 else lang.rowFormSeparator,
                                 fontSize = fontSize,

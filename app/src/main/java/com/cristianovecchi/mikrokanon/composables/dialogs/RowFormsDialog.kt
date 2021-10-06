@@ -41,7 +41,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
 
 
             Surface(
-                modifier = Modifier.width(350.dp).height(500.dp),
+                modifier = Modifier.width(350.dp).height(600.dp),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -49,7 +49,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(2f)
+                        .weight(3f)
                     val modifierB = Modifier
                         //.fillMaxSize()
                         .weight(4f)

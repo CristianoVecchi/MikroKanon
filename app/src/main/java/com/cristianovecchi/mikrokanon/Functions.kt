@@ -270,7 +270,7 @@ fun Float.toColorHexString(): String {
     return (256 * this).toInt().toString(16)
 }
 val rowFormsMap = mapOf(
-    1 to "O", 2 to "I" , 3 to "R", 4 to "RI", -1 to "| O", -2 to "| I" , -3 to "| R", -4 to "| RI"
+    1 to "O", 2 to "I" , 3 to "R", 4 to "RI", -1 to "O |", -2 to "I |" , -3 to "R |", -4 to "RI |"
 )
 
 

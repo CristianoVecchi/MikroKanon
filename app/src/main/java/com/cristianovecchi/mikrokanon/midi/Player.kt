@@ -105,9 +105,8 @@ object Player {
         val actualDurations = if (rhythmShuffle) listOf(*durations.toTypedArray(),*durations.toTypedArray(),*durations.toTypedArray()).shuffled() else durations
         val ensembleParts: List<EnsemblePart> = Ensembles.getEnsemble(counterpoint.parts.size, ensembleType)
         val actualEnsembleParts = if (partsShuffle) ensembleParts.shuffled() else ensembleParts
-//        val nNotesToSkip = if(rowFormsFlags and 0b10000 != 0) rhythm.nNotesLeftInThePattern(counterpoint.nNotes()) else 0
-//        var actualCounterpoint = if (rowFormsFlags == 1) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowFormsFlags, nNotesToSkip, ritornello > 0)
-        var actualCounterpoint = counterpoint
+        val nNotesToSkip = rhythm.nNotesLeftInThePattern(counterpoint.nNotes())
+        var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
         actualCounterpoint = if(ritornello > 0)  actualCounterpoint.ritornello(ritornello, transpose)
                             else actualCounterpoint.transpose(transpose[0])
         val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts, nuances, doublingFlags, rangeType, melodyType)

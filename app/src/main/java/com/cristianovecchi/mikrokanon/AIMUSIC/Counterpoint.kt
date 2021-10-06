@@ -8,6 +8,7 @@ import com.cristianovecchi.mikrokanon.tritoneSubstitutionOnIntervalSet
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 fun main(args : Array<String>){
 //    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8)
@@ -609,6 +610,38 @@ data class Counterpoint(val parts: List<AbsPart>,
             result = if(separator) result.enqueue(separatorCounterpoint!!) else result
             result = if(rowFormsFlags and RowForm.INV_RETROGRADE.flag != 0) result.enqueue(original.inverse().retrograde()) else result
             result = if(separator && addFinal) result.enqueue(separatorCounterpoint!!) else result
+            return result
+        }
+        fun explodeRowForms(counterpoint: Counterpoint, rowForms: List<Int> = listOf(1), nNotesToSkip: Int = 0): Counterpoint {
+            //val separator = rowFormsFlags and 0b10000 != 0
+            val separator = nNotesToSkip > 0 && rowForms.any{ it < 0}
+            val separatorCounterpoint: Counterpoint? = if(separator)
+                Counterpoint.createSeparatorCounterpoint(counterpoint.parts.size, nNotesToSkip)
+            else null
+            val original = counterpoint.normalizePartsSize(true)
+            var result = when(rowForms[0].absoluteValue){
+                1 -> original.clone()
+                2 -> original.inverse()
+                3 -> original.retrograde()
+                4 -> original.inverse().retrograde()
+                else -> original.clone()
+            }
+            result  = if (rowForms[0] <0) result.enqueue(separatorCounterpoint!!) else result
+            if (rowForms.size > 1){
+                 (1 until rowForms.size).forEach{
+                    result = when(rowForms[it]) {
+                        1 -> result.enqueue(original.clone())
+                        2 -> result.enqueue(original.inverse())
+                        3 -> result.enqueue(original.retrograde())
+                        4 -> result.enqueue(original.inverse().retrograde())
+                        -1 -> result.enqueue(original.clone()).enqueue(separatorCounterpoint!!)
+                        -2 -> result.enqueue(original.inverse()).enqueue(separatorCounterpoint!!)
+                        -3 -> result.enqueue(original.retrograde()).enqueue(separatorCounterpoint!!)
+                        -4 -> result.enqueue(original.inverse().retrograde()).enqueue(separatorCounterpoint!!)
+                        else -> result
+                    }
+                }
+            }
             return result
         }
 

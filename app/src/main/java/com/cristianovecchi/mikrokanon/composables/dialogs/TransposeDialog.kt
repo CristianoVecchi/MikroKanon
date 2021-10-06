@@ -56,7 +56,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                         bpmValues[index] = newTranspose
                         transposeText = bpmValues.joinToString(",")
                     }
-                    val fontSize = 24.sp
+                    val fontSize = 16.sp
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
