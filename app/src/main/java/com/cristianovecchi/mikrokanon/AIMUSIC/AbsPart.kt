@@ -95,7 +95,7 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
     }
 
     fun transpose(transposition: Int): AbsPart {
-        val newPart = absPitches.map{ it + transposition}.map{ if(it>11) it - 12 else it}
+        val newPart = absPitches.map{ if(it != -1) it + transposition else -1}.map{ if(it>11) it - 12 else it}
         return AbsPart(newPart.toMutableList(),rowForm,transpose,delay)
     }
 }

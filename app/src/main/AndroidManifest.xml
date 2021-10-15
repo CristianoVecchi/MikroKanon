@@ -17,9 +17,8 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" /> // provider_paths.xml file path in this example
+                android:resource="@xml/provider_paths" />
         </provider>
-
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
