@@ -25,7 +25,7 @@ import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
 import com.cristianovecchi.mikrokanon.extractFromCsv
-import com.cristianovecchi.mikrokanon.rowFormsMap
+import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import kotlinx.coroutines.launch
 
 @Composable

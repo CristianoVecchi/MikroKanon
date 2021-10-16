@@ -17,9 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -29,13 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
-import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.locale.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
-import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import com.cristianovecchi.mikrokanon.ui.shift
 import kotlinx.coroutines.flow.Flow
@@ -171,7 +167,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
     TransposeDialog(transposeDialogData,
         intervalsForTranspose, lang.OKbutton)
-    val formsNames = listOf("unrelated", "Original", lang.inverse, lang.retrograde, lang.invRetrograde)
+    val formsNames = listOf("unrelated", lang.original, lang.inverse, lang.retrograde, lang.invRetrograde)
     RowFormsDialog(rowFormsDialogData,
         formsNames, lang.OKbutton)
     ExportDialog(exportDialogData, lang.OKbutton)
@@ -411,10 +407,10 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     val formsNumbers = formsCsv.extractFromCsv()
                     SelectableCard(
                         text = if(isOn)
-                            "${lang.rowFormSeparator}: ${formsNumbers.map{ 
+                            "${lang.rowForms}: ${formsNumbers.map{ 
                                 if(it<0) "${rowFormsMap[it.absoluteValue]} |" 
                                 else "${rowFormsMap[it]}"}.joinToString(" ")}"
-                                else lang.rowFormSeparator,
+                                else lang.rowForms,
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = isOn,
