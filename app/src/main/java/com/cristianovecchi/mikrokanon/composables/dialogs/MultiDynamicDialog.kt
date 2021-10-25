@@ -22,22 +22,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
+import com.cristianovecchi.mikrokanon.composables.MultiFloatDialogData
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
-import com.cristianovecchi.mikrokanon.correctBpms
-import com.cristianovecchi.mikrokanon.extractIntsFromCsv
-import com.cristianovecchi.mikrokanon.valueFromCsv
+import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
-fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, okText: String = "OK",
-                   onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) }) {
+fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>, okText: String = "OK",
+                       onDismissRequest: () -> Unit = { multiFloatDialogData.value = MultiFloatDialogData(model = multiFloatDialogData.value.model, value = multiFloatDialogData.value.value) }) {
 
-    if (multiNumberDialogData.value.dialogState) {
+    if (multiFloatDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            val model = multiNumberDialogData.value.model
+            val model = multiFloatDialogData.value.model
             Surface(
                 modifier = Modifier.width(350.dp).height(700.dp),
                 shape = RoundedCornerShape(10.dp)
@@ -51,22 +51,27 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                     val modifierB = Modifier
                         //.fillMaxSize()
                         .weight(4f)
-                    var bpmText by remember { mutableStateOf(multiNumberDialogData.value.value) }
+                    var dynamicText by remember { mutableStateOf(multiFloatDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
-                    val setBpm = { index: Int, bpmToCheck: Int ->
-                        val newBpm = bpmToCheck.coerceIn(
-                            multiNumberDialogData.value.min,
-                            multiNumberDialogData.value.max
+                    val setDynamic = { index: Int, dynamicToCheck: Float ->
+                        val newDynamic = dynamicToCheck.coerceIn(
+                            multiFloatDialogData.value.min,
+                            multiFloatDialogData.value.max
                         )
-                        val bpmValues = bpmText.extractIntsFromCsv().toMutableList()
-                        bpmValues[index] = newBpm
-                        bpmText = bpmValues.joinToString(",")
+                        val dynamicValues = dynamicText.extractFloatsFromCsv().toMutableList()
+                        dynamicValues[index] = newDynamic
+                        dynamicText = dynamicValues.joinToString(",")
                     }
                     val fontSize = 22.sp
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
+                    val symbols = getDynamicSymbols()
+                    // avoiding negative zero
+                    val steps = model.dynamicSteps
+                    val dynamicMap: Map<Float,String> =  model.dynamicMap
+
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title)
+                        Text(text = multiFloatDialogData.value.title)
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors
@@ -80,9 +85,9 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                         val unselectionBorderColor = colors.selCardBorderColorUnselected
                         val intervalPadding = 4.dp
                         val innerPadding = 10.dp
-                        val bpms = bpmText.extractIntsFromCsv()
+                        val dynamics = dynamicText.extractFloatsFromCsv()
                         val nCols = 4
-                        val nRows = (bpms.size / nCols) + 1
+                        val nRows = (dynamics.size / nCols) + 1
                         val rows = (0 until nRows).toList()
                         LazyColumn(state = listState) {
                             items(rows) { row ->
@@ -94,8 +99,8 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                     horizontalArrangement = Arrangement.Start
                                 ) {
                                     for (j in 0 until nCols) {
-                                        if (index != bpms.size) {
-                                            val text = bpms[index]
+                                        if (index != dynamics.size) {
+                                            val text = dynamics[index]
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -113,7 +118,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                             )
                                             {
                                                 Text(
-                                                    text = if (text < 0) "|${text.absoluteValue}" else text.toString(),
+                                                    text = if (text < 0f) "| ${dynamicMap[text.absoluteValue]!!}" else dynamicMap[text]!!,
                                                     modifier = Modifier.padding(innerPadding),
                                                     style = TextStyle(fontSize = if (cursor == index) fontSize else fontSize),
                                                     fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal
@@ -125,7 +130,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 }
                             }
                             if (cursor > -1) coroutineScope.launch {
-                                val rowIndex = if (bpms.size <= nCols) 1 else cursor / nCols
+                                val rowIndex = if (dynamics.size <= nCols) 1 else cursor / nCols
                                 listState.animateScrollToItem(rowIndex)
                             }
                         }
@@ -143,10 +148,10 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                             ) {
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(buttonPadding), onClick = { setBpm(cursor, 240) })
+                                    .padding(buttonPadding), onClick = { setDynamic(cursor, steps[0]) })
                                 {
                                     Text(
-                                        text = "240",
+                                        text = symbols[0],
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
@@ -157,10 +162,10 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(buttonPadding),
-                                    onClick = { setBpm(cursor, bpmText.valueFromCsv(cursor) + 30) })
+                                    onClick = { setDynamic(cursor, steps[1]) })
                                 {
                                     Text(
-                                        text = "+30",
+                                        text = symbols[1],
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
@@ -171,10 +176,24 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(buttonPadding),
-                                    onClick = { setBpm(cursor, bpmText.valueFromCsv(cursor) - 30) })
+                                    onClick = { setDynamic(cursor, steps[2]) })
                                 {
                                     Text(
-                                        text = "-30",
+                                        text = symbols[2],
+                                        style = TextStyle(
+                                            fontSize = fontSize,
+                                            fontWeight = fontWeight
+                                        )
+                                    )
+                                }
+                                Button(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(buttonPadding),
+                                    onClick = { setDynamic(cursor, steps[3]) })
+                                {
+                                    Text(
+                                        text = symbols[3],
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
@@ -189,10 +208,10 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                             ) {
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(buttonPadding), onClick = { setBpm(cursor, 150) })
+                                    .padding(buttonPadding), onClick = { setDynamic(cursor, steps[4]) })
                                 {
                                     Text(
-                                        text = "150",
+                                        text = symbols[4],
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
@@ -202,10 +221,10 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setBpm(cursor, bpmText.valueFromCsv(cursor) + 6) })
+                                    onClick = { setDynamic(cursor, steps[5])})
                                 {
                                     Text(
-                                        text = "+6",
+                                        text = symbols[5],
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
@@ -215,10 +234,23 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setBpm(cursor, bpmText.valueFromCsv(cursor) - 6) })
+                                    onClick = { setDynamic(cursor, steps[6]) })
                                 {
                                     Text(
-                                        text = "-6",
+                                        text = symbols[6],
+                                        style = TextStyle(
+                                            fontSize = fontSize,
+                                            fontWeight = fontWeight
+                                        )
+                                    )
+                                }
+                                Button(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(buttonPadding),
+                                    onClick = { setDynamic(cursor, steps[7]) })
+                                {
+                                    Text(
+                                        text = symbols[7],
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
@@ -233,10 +265,10 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                             ) {
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(buttonPadding), onClick = { setBpm(cursor, 60) })
+                                    .padding(buttonPadding), onClick = { setDynamic(cursor, steps[8]) })
                                 {
                                     Text(
-                                        text = "60",
+                                        text = symbols[8],
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
@@ -246,10 +278,10 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setBpm(cursor, bpmText.valueFromCsv(cursor) + 1) })
+                                    onClick = { setDynamic(cursor, steps[9]) })
                                 {
                                     Text(
-                                        text = "+1",
+                                        text = symbols[9],
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
@@ -259,10 +291,23 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setBpm(cursor, bpmText.valueFromCsv(cursor) - 1) })
+                                    onClick = { setDynamic(cursor, steps[10]) })
                                 {
                                     Text(
-                                        text = "-1",
+                                        text = symbols[10],
+                                        style = TextStyle(
+                                            fontSize = fontSize,
+                                            fontWeight = fontWeight
+                                        )
+                                    )
+                                }
+                                Button(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(buttonPadding),
+                                    onClick = { setDynamic(cursor, steps[11]) })
+                                {
+                                    Text(
+                                        text = symbols[11],
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
@@ -287,9 +332,9 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 iconColor = Color.Green,
                                 colors = model.appColors
                             ) {
-                                multiNumberDialogData.value.onSubmitButtonClick.invoke(
-                                    correctBpms(
-                                        bpmText
+                                multiFloatDialogData.value.onSubmitButtonClick.invoke(
+                                    correctDynamics(
+                                        dynamicText
                                     )
                                 )
                                 onDismissRequest.invoke()
@@ -302,10 +347,10 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = bpmText.extractIntsFromCsv().toMutableList()
+                                val values = dynamicText.extractFloatsFromCsv().toMutableList()
                                 val value = values[cursor]
-                                values.set(cursor, value * -1)
-                                bpmText = values.joinToString(",")
+                                values.set(cursor, value * -1f)
+                                dynamicText = values.joinToString(",")
                             }
                             CustomButton(
                                 adaptSizeToIconButton = true,
@@ -316,13 +361,13 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = bpmText.extractIntsFromCsv().toMutableList()
+                                val values = dynamicText.extractFloatsFromCsv().toMutableList()
                                 if (values.size > 1) {
                                     values.removeAt(cursor)
-                                    bpmText = values.joinToString(",")
-                                    val newCursor = if (values.size > 1) cursor - 1 else 0
+                                    dynamicText = values.joinToString(",")
+                                    val newCursor = if (values.size > 1f) cursor - 1 else 0
                                     cursor = if (newCursor < 0) 0 else newCursor
-                                    bpmText = values.joinToString(",")
+                                    dynamicText = values.joinToString(",")
                                 }
                             }
                             CustomButton(
@@ -334,10 +379,10 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = bpmText.extractIntsFromCsv().toMutableList()
+                                val values = dynamicText.extractFloatsFromCsv().toMutableList()
                                 val lastValue = values[values.size - 1]
                                 values.add(lastValue)
-                                bpmText = values.joinToString(",")
+                                dynamicText = values.joinToString(",")
                                 cursor = values.size - 1
                             }
 
@@ -348,6 +393,8 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
             }
         }
     }}
+
+
 
 
 

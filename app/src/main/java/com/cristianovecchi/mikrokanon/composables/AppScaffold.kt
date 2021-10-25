@@ -30,6 +30,7 @@ import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.locale.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
@@ -107,6 +108,8 @@ data class NumberDialogData(val dialogState: Boolean = false, val title:String =
                             val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
 data class MultiNumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="0",
                                  val min: Int = 0, val max: Int = 360, val model: AppViewModel, val onSubmitButtonClick: (String) -> Unit = {})
+data class MultiFloatDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="1.0",
+                                 val min: Float = 0f, val max: Float = 1f, val model: AppViewModel, val onSubmitButtonClick: (String) -> Unit = {})
 data class CustomColorsDialogData(val dialogState: Boolean = false, val title:String = "", val arrayColorIndex: Int = 0,
                                   val model: AppViewModel,val onSubmitButtonClick: (Int) -> Unit = {})
 data class ButtonsDialogData(
@@ -134,6 +137,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     //val nuancesDialogData by lazy { mutableStateOf(ListDialogData())}
     //val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
     val multiBpmDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val multiFloatDialogData by lazy { mutableStateOf(MultiFloatDialogData(model = model))}
     val transposeDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val rowFormsDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
@@ -149,7 +153,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 
     val dimensions = model.dimensions
     val colors = model.appColors
-    val optionNames= listOf("Ensemble", "Range","Melody","Nuances", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
+    val optionNames= listOf("Ensemble", "Range","Melody","Nuances", "Dynamic", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Row Forms","Ritornello","Transpose","Doubling",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
         "Export MIDI", "Colors", "Custom Colors","Language","Zodiac","Credits")
@@ -164,6 +168,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     MultiListDialog(doublingDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
     MultiBpmDialog(multiBpmDialogData, lang.OKbutton)
+    MultiDynamicDialog(multiFloatDialogData, lang.OKbutton)
     val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
     TransposeDialog(transposeDialogData,
         intervalsForTranspose, lang.OKbutton)
@@ -330,6 +335,27 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                             }
                         })
                 }
+                "Dynamic" -> {
+                    val dynamics = userOptions.dynamics
+                    val symbols = getDynamicSymbols()
+                    SelectableCard(
+                        text = "${lang.dynamic}: ${dynamics.describeForDynamic(model.dynamicMap, symbols[12], symbols[13])}",
+                        fontSize = fontSize,
+                        colors = colors,
+                        isSelected = true,
+                        onClick = {
+                            multiFloatDialogData.value = MultiFloatDialogData(
+                                true, "${lang.selectDynamicAlterations}:", dynamics,
+                                model = model) { dynamics ->
+                                model.updateUserOptions(
+                                    "dynamics",
+                                    dynamics
+                                )
+                                listDialogData.value =
+                                    ListDialogData(itemList = listDialogData.value.itemList)
+                            }
+                        })
+                }
                 "BPM" -> {
                     val bpms = userOptions.bpms
                     SelectableCard(
@@ -404,7 +430,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 "Row Forms" -> {
                     val formsCsv = userOptions.rowForms
                     val isOn = formsCsv != "1"
-                    val formsNumbers = formsCsv.extractFromCsv()
+                    val formsNumbers = formsCsv.extractIntsFromCsv()
                     SelectableCard(
                         text = if(isOn)
                             "${lang.rowForms}: ${formsNumbers.map{ 

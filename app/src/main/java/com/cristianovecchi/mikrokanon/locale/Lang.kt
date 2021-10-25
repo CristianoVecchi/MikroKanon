@@ -98,6 +98,15 @@ fun getZodiacPlanets(emojis: Boolean): List<String>{
 fun getZodiacSigns(emojis: Boolean): List<String>{
     return if(emojis) return zodiacSignsEmojis else zodiacSigns
 }
+fun getDynamicSymbols(): List<String>{
+    return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+        listOf("\uD834\uDDC8","\uD834\uDD8F\uD834\uDD8F\uD834\uDD8F\uD834\uDD8F","\uD834\uDD8F\uD834\uDD8F\uD834\uDD8F","\uD834\uDD8F\uD834\uDD8F",
+        "\uD834\uDD8F","\uD834\uDD90\uD834\uDD8F","\uD834\uDD90\uD834\uDD91","\uD834\uDD91",
+        "\uD834\uDD91\uD834\uDD91","\uD834\uDD91\uD834\uDD91\uD834\uDD91","\uD834\uDD91\uD834\uDD91\uD834\uDD91\uD834\uDD91","\uD834\uDD91\uD834\uDD91\uD834\uDD91\uD834\uDD91\uD834\uDD91",
+        "\uD834\uDD92", "\uD834\uDD93")
+    else listOf("0","pppp","ppp","pp",  "p","mp","mf","f", "ff", "fff","ffff","fffff","<",">")
+}
+
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
     "übermäßige Quarte", "Quinte", "kleine Sexte", "große Sexte", "kleine Septime", "große Septime",
     "Oktave", "kleine None", "große None", "kleine Dezime", "große Dezime", "Undezime",
@@ -165,6 +174,7 @@ val intervalSetRu = listOf("2м\n7В","2В\n7м","3м\n6В","3В\n6м","4\n5","4
 val rowFormsMap = mapOf(
     1 to "O", 2 to "I" , 3 to "R", 4 to "RI", -1 to "O |", -2 to "I |" , -3 to "R |", -4 to "RI |"
 )
+
 data class Lang( // English by default
     val noteNames: List<String> = NoteNamesEn.values().map { it.toString() },
     val intervalSet: List<String> = intervalSetEn,
@@ -191,9 +201,11 @@ data class Lang( // English by default
     val nuances: String = "Nuances",
     val nuancesOptions: List<String> = listOf("None", "Exalt short notes", "Exalt long notes"),
     val selectNuances: String = "Select dynamic nuances!",
+    val dynamic: String = "Dynamic",
+    val selectDynamicAlterations: String ="Select the dynamic alterations!",
     val bpm: String = "BPM",
-    val bpmAlteration: String = "BPM alteration",
-    val selectBpmAlteration: String = "Select the BPM alteration",
+    val bpmAlterations: String = "BPM alterations",
+    val selectBpmAlterations: String = "Select the BPM alterations!",
     val alterationOptions: List<String> = listOf("BPM", "BPM *2", "BPM /2",
         "BPM *2 BPM", "BPM /2 BPM", "BPM *2 BPM /2", "BPM /2 BPM *2"),
     val rhythm: String = "Rhythm",

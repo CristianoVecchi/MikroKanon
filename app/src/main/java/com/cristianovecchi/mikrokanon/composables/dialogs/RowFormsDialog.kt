@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
-import com.cristianovecchi.mikrokanon.extractFromCsv
+import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import kotlinx.coroutines.launch
 
@@ -56,7 +56,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                     var formsText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setForms = { index: Int, newForm: Int ->
-                        val formsValues = formsText.extractFromCsv().toMutableList()
+                        val formsValues = formsText.extractIntsFromCsv().toMutableList()
                         formsValues[index] = newForm
                         formsText = formsValues.joinToString(",")
                     }
@@ -78,7 +78,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                         val unselectionBorderColor = colors.selCardBorderColorUnselected
                         val intervalPadding = 4.dp
                         val innerPadding = 10.dp
-                        val formsNumbers = formsText.extractFromCsv()
+                        val formsNumbers = formsText.extractIntsFromCsv()
                         val nCols = 4
                         val nRows = (formsNumbers.size / nCols) + 1
                         val rows = (0 until nRows).toList()
@@ -220,7 +220,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = formsText.extractFromCsv().toMutableList()
+                                val values = formsText.extractIntsFromCsv().toMutableList()
                                 val value = values[cursor]
                                 values.set(cursor, value * -1)
                                 formsText = values.joinToString(",")
@@ -234,7 +234,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = formsText.extractFromCsv().toMutableList()
+                                val values = formsText.extractIntsFromCsv().toMutableList()
                                 if (values.size > 1) {
                                     values.removeAt(cursor)
                                     formsText = values.joinToString(",")
@@ -251,7 +251,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = formsText.extractFromCsv().toMutableList()
+                                val values = formsText.extractIntsFromCsv().toMutableList()
                                 val lastValue = values[values.size - 1]
                                 values.add(lastValue)
                                 formsText = values.joinToString(",")

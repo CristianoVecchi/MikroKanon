@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
-import com.cristianovecchi.mikrokanon.extractFromCsv
+import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import kotlinx.coroutines.launch
 
 @Composable
@@ -52,7 +52,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                     var transposeText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember{ mutableStateOf(0) }
                     val setTranspose = { index: Int, newTranspose: Int ->
-                        val bpmValues = transposeText.extractFromCsv().toMutableList()
+                        val bpmValues = transposeText.extractIntsFromCsv().toMutableList()
                         bpmValues[index] = newTranspose
                         transposeText = bpmValues.joinToString(",")
                     }
@@ -74,7 +74,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                         val unselectionBorderColor = colors.selCardBorderColorUnselected
                         val intervalPadding = 4.dp
                         val innerPadding = 10.dp
-                        val transpositions = transposeText.extractFromCsv()
+                        val transpositions = transposeText.extractIntsFromCsv()
                         val nCols = 4
                         val nRows = (transpositions.size / nCols) + 1
                         val rows = (0 until nRows).toList()
@@ -292,7 +292,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = transposeText.extractFromCsv().toMutableList()
+                                val values = transposeText.extractIntsFromCsv().toMutableList()
                                 if(values.size > 1) {
                                     values.removeAt(cursor)
                                     transposeText = values.joinToString(",")
@@ -309,7 +309,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = transposeText.extractFromCsv().toMutableList()
+                                val values = transposeText.extractIntsFromCsv().toMutableList()
                                 val lastValue = values[values.size -1]
                                 values.add(lastValue)
                                 transposeText = values.joinToString(",")

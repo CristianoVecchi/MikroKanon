@@ -23,6 +23,7 @@ import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
+import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
@@ -72,6 +73,9 @@ class AppViewModel(
 
     var dimensions: Dimensions
     var isFirstTab = true
+    // + 0.86f
+    val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
+    val dynamicMap: Map<Float,String> =  dynamicSteps.zip(getDynamicSymbols()).toMap()
     val iconMap = mapOf(
 
         "mikrokanon" to R.drawable.ic_baseline_clear_all_24,
@@ -225,8 +229,10 @@ init{
                 val ensType: EnsembleType =
                     EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType }
                         ?: 0]
+                val dynamics: List<Float> =
+                    userOptionsData.value?.let { userOptionsData.value!![0].dynamics.extractFloatsFromCsv() } ?: listOf(1f)
                 val bpms: List<Float> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].bpms.extractFromCsv().map { it.toFloat() } } ?: listOf(90f)
+                    userOptionsData.value?.let { userOptionsData.value!![0].bpms.extractIntsFromCsv().map { it.toFloat() } } ?: listOf(90f)
                 val rhythm: RhythmPatterns =
                     RhythmPatterns.values()[userOptionsData.value?.let { userOptionsData.value!![0].rhythm }
                         ?: 0]
@@ -237,7 +243,7 @@ init{
                     0 != (userOptionsData.value?.let { userOptionsData.value!![0].partsShuffle }
                         ?: 0)
                 val rowForms: List<Int> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].rowForms.extractFromCsv() }
+                    userOptionsData.value?.let { userOptionsData.value!![0].rowForms.extractIntsFromCsv() }
                         ?: listOf(1) // ORIGINAL by default || 0 is unused
                 val doublingFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].doublingFlags }
@@ -246,7 +252,7 @@ init{
                     userOptionsData.value?.let { userOptionsData.value!![0].ritornello }
                         ?: 0
                 val transpose: List<Int> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].transpose.extractFromCsv() } ?: listOf(0)
+                    userOptionsData.value?.let { userOptionsData.value!![0].transpose.extractIntsFromCsv() } ?: listOf(0)
                 val nuances: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].nuances }
                         ?: 1
@@ -261,6 +267,7 @@ init{
                     mediaPlayer!!,
                     false,
                     selectedCounterpoint.value!!,
+                    dynamics,
                     bpms,
                     0f,
                     rhythm,
@@ -974,6 +981,9 @@ init{
             }
             "melodyType" -> {
                 newUserOptionsData = optionsDataClone.copy(melodyType = value as Int)
+            }
+            "dynamics" -> {
+                newUserOptionsData = optionsDataClone.copy(dynamics = value as String)
             }
             "bpms" -> {
                 newUserOptionsData = optionsDataClone.copy(bpms = value as String)

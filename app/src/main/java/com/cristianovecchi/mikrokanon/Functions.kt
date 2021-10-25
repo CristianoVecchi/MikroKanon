@@ -209,11 +209,12 @@ fun alterateBpm(bpmValues: List<Float>, step:Float): List<Float>{
     return bpmValues.fold(listOf()) {acc, nextBpm -> acc.projectTo(nextBpm, step)}
 }
 fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuration: Long): Pair<List<Float>, List<Long>>{
+    //println("values: $bpmValues")
     if(bpmValues.size == 1){
         return Pair(listOf(bpmValues[0],0f), listOf(totalDuration))
     }
-    val sectionDuration = totalDuration / (bpmValues.count{it > -1} - 1)
-    println("total: $totalDuration | section: $sectionDuration")
+    val sectionDuration = totalDuration / (bpmValues.count{it >= 0} - 1)
+    //println("total: $totalDuration | section: $sectionDuration")
     val deltas: MutableList<Long> = mutableListOf()
     val bpms: List<Float> = bpmValues.fold(listOf()) {
             acc, nextBpm -> acc.projectTo(nextBpm, step, deltas, sectionDuration)}
@@ -221,11 +222,14 @@ fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuratio
     return Pair(bpms, deltas.toList() )
 }
 
-fun String.extractFromCsv(): List<Int>{
+fun String.extractIntsFromCsv(): List<Int>{
     return this.split(',').mapNotNull { it.toInt()}
 }
+fun String.extractFloatsFromCsv(): List<Float>{
+    return this.split(',').mapNotNull { it.toFloat() }
+}
 fun String.describe(): String {
-    val ints = this.extractFromCsv()
+    val ints = this.extractIntsFromCsv()
     return ints.foldIndexed("") { index, acc, i ->
         when {
             index == 0 -> acc + i.absoluteValue.toString()
@@ -237,12 +241,25 @@ fun String.describe(): String {
         }
     }
 }
+fun String.describeForDynamic(map: Map<Float, String>, ascendingSymbol: String, descendingSymbol: String) : String {
+    val floats = this.extractFloatsFromCsv()
+    return floats.foldIndexed("") { index, acc, i ->
+        when {
+            index == 0 -> acc + map[i.absoluteValue]!!
+            i < 0 -> "$acc | ${map[i.absoluteValue]!!}"
+            floats[index - 1].absoluteValue > i.absoluteValue -> "$acc $descendingSymbol ${map[i]!!}"
+            floats[index - 1].absoluteValue < i.absoluteValue -> "$acc $ascendingSymbol ${map[i]!!}"
+            floats[index - 1].absoluteValue == i.absoluteValue -> "$acc - ${map[i]!!}"
+            else -> acc + i.toString()
+        }
+    }
+}
 fun String.describeForTranspose(intervals: List<String>): String {
-    val ints = this.extractFromCsv()
+    val ints = this.extractIntsFromCsv()
     return ints.map{ intervals[it] }.joinToString(", ")
 }
 fun correctBpms(bpms: String): String{
-    val result = bpms.extractFromCsv().toMutableList()
+    val result = bpms.extractIntsFromCsv().toMutableList()
     if (result.all{ it.absoluteValue == result[0].absoluteValue}) return result[0].absoluteValue.toString()
     repeat(2){
         if (result[0] < 0) result[0] = result[0].absoluteValue
@@ -259,8 +276,26 @@ fun correctBpms(bpms: String): String{
     }
     return result.joinToString(",")
 }
+fun correctDynamics(dynamics: String): String{
+    val result = dynamics.extractFloatsFromCsv().toMutableList()
+    if (result.all{ it.absoluteValue == result[0].absoluteValue}) return result[0].absoluteValue.toString()
+    repeat(2){
+        if (result[0] < 0f) result[0] = result[0].absoluteValue
+        if (result.size > 1){
+            if (result[1] < 0f)  result.add(1, result[0])
+            (1 until result.size).forEach{ index ->
+                if (result[index-1].absoluteValue == result[index].absoluteValue) result[index] = result[index].absoluteValue
+            }
+            (1 until result.size - 1).forEach{ index ->
+                if (result[index] < 0f && result[index+1] < 0f ) result.add(index+1, result[index].absoluteValue)
+            }
+            if (result.last() < 0f) result.add(result.last().absoluteValue)
+        }
+    }
+    return result.joinToString(",")
+}
 fun String.valueFromCsv(index: Int): Int {
-    return this.extractFromCsv()[index]
+    return this.extractIntsFromCsv()[index]
 }
 fun Color.toHexString(): String {
     return "#${this.red.toColorHexString()}${this.green.toColorHexString()}${this.blue.toColorHexString()}"
@@ -268,6 +303,15 @@ fun Color.toHexString(): String {
 
 fun Float.toColorHexString(): String {
     return (256 * this).toInt().toString(16)
+}
+
+// bytes = first the low 7 bits, second the high 7 bits - volume is from 0x0000 to 0x3FFF
+fun Float.convertDynamicToBytes(): Pair<Int, Int> {
+    val fl = this.coerceIn(0f,1f)
+    val volumeInt = (0x3FFF * fl).toInt()
+    val firstBite = volumeInt and 0b1111111
+    val secondByte = (volumeInt shr(7)) and 0b1111111
+    return Pair(firstBite, secondByte)
 }
 
 

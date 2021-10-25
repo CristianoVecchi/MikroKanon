@@ -9,15 +9,14 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParker
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParkerBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.DEF.MIDDLE_C
 import com.cristianovecchi.mikrokanon.alterateBpm
+
 import com.cristianovecchi.mikrokanon.alterateBpmWithDistribution
+import com.cristianovecchi.mikrokanon.convertDynamicToBytes
 import com.cristianovecchi.mikrokanon.projectTo
 
 import com.leff.midi.MidiFile
 import com.leff.midi.MidiTrack
-import com.leff.midi.event.MidiEvent
-import com.leff.midi.event.NoteOff
-import com.leff.midi.event.NoteOn
-import com.leff.midi.event.ProgramChange
+import com.leff.midi.event.*
 import com.leff.midi.event.meta.Tempo
 import java.io.IOException
 import com.leff.midi.event.meta.TimeSignature
@@ -93,7 +92,7 @@ object Player {
 
     fun playCounterpoint(
         mediaPlayer: MediaPlayer, looping: Boolean,
-        counterpoint: Counterpoint, bpms: List<Float>, shuffle: Float,
+        counterpoint: Counterpoint, dynamics: List<Float>, bpms: List<Float>, shuffle: Float,
         rhythm: RhythmPatterns, ensembleType: EnsembleType,
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
         rowForms: List<Int> = listOf(1), ritornello: Int = 0, transpose: List<Int> = listOf(0),
@@ -131,14 +130,32 @@ object Player {
         //val bpmAlterations = bpm.projectTo(bpm*2, 0.5f).projectTo(bpm, 0.5f).also{println(it)}
         val bpmAlterationsAndDeltas = alterateBpmWithDistribution(bpms, 0.5f, totalLength)
         var tempoTick = 0L
-        val bpmAlterations = bpmAlterationsAndDeltas.first.also { println("${it.size} + $it") }
-        val bpmDeltas = bpmAlterationsAndDeltas.second.also { println("${it.size} + $it") }
+        val bpmAlterations = bpmAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
+        val bpmDeltas = bpmAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
         (0 until bpmAlterations.size -1).forEach { index -> // doesn't take the last bpm
             val newTempo = Tempo(tempoTick, 0L, 500000)
             newTempo.bpm = bpmAlterations[index]
             tempoTrack.insertEvent(newTempo)
             tempoTick += bpmDeltas[index]
         }
+
+        //val dynamics = listOf(1f,0f,1f)
+        val dynamicAlterationsAndDeltas = alterateBpmWithDistribution(dynamics,0.01f, totalLength)
+        tempoTick = 0L
+        val dynamicAlterations = dynamicAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
+        val dynamicDeltas = dynamicAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
+        (0 until dynamicAlterations.size -1).forEach { index -> // doesn't take the last dynamic
+            // 0x7F = universal immediatly message, 0x7F = all devices, 0x04 = device control message, 0x01 = master volume
+            // bytes = first the low 7 bits, second the high 7 bits - volume is from 0x0000 to 0x3FFF
+            val volumeBytes: Pair<Int, Int> = dynamicAlterations[index].convertDynamicToBytes()
+            val data: ByteArray = listOf(0x7F,0x7F, 0x04, 0x01,volumeBytes.first,volumeBytes.second, 0xF7)
+                                .foldIndexed(ByteArray(7)){i, a, v -> a.apply{ set(i, v.toByte())}}
+            val newGeneralVolume = SystemExclusiveEvent(0xF0, tempoTick, data)
+
+            tempoTrack.insertEvent(newGeneralVolume)
+            tempoTick += dynamicDeltas[index]
+        }
+
         val tracks: java.util.ArrayList<MidiTrack> = java.util.ArrayList<MidiTrack>()
         tracks.add(tempoTrack)
         tracks.addAll(counterpointTracks)
@@ -217,3 +234,5 @@ object Player {
             return mediaPlayer2
         }
 }
+
+
