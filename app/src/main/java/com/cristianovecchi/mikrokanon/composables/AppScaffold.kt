@@ -345,7 +345,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         isSelected = true,
                         onClick = {
                             multiFloatDialogData.value = MultiFloatDialogData(
-                                true, "${lang.selectDynamicAlterations}:", dynamics,
+                                true, "${lang.selectDynamicAlterations}", dynamics,
                                 model = model) { dynamics ->
                                 model.updateUserOptions(
                                     "dynamics",

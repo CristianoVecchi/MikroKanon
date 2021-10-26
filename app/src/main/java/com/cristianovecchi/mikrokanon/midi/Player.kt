@@ -196,6 +196,7 @@ object Player {
                 error = e.message.toString()
                 return error
             }
+            //mediaPlayer.setAuxEffectSendLevel()
             //System.out.println("Midifile salvato");
             mediaPlayer.start()
             //mediaPlayer.setLooping(looping);

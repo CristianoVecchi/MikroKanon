@@ -955,4 +955,41 @@ public class Insieme {
         if(intervalCount.get(6) != 0 ) intervalSet.addAll(Arrays.asList(0));
         return (Integer[]) intervalSet.toArray(new Integer[0]);
     }
+    public static int getBendFromInterval(int interval){
+        switch(interval){
+            case -1: return 7000;
+            case 1: return 16383;
+
+        }
+        return -1;// 0 4096 8192 12288 (14335) 16383
+    }
+    public static int[] checkIntervalsInPitches(@NotNull int[] pitches, int[] intervals){
+        int nPitches = pitches.length;
+        int nIntervals = intervals.length;
+        int[] result = new int[nPitches];
+        Arrays.fill(result, 0);
+        int indexPitch = 0; int nextPitch = 0;
+        if(nIntervals== 0 || nPitches == 1 ) return result;
+            for(int i=0; i < nPitches-1; i++){
+                indexPitch = pitches[i]; nextPitch = pitches[i+1];
+                if (nextPitch == -1 || indexPitch == -1) continue;
+                for (int interval : intervals) {
+                    if (nextPitch - indexPitch == interval) {
+                        result[i] = interval;
+                        break;
+                    }
+                }
+        }
+        indexPitch = pitches[nPitches-1]; nextPitch = pitches[0];
+        if (nextPitch != -1 || indexPitch != -1) {
+            for (int interval : intervals) {
+                if (nextPitch - indexPitch  == interval) {
+                    result[nPitches - 1] = interval;
+                    break;
+                }
+            }
+        }
+        System.out.println("glissandoChecks: " + Arrays.toString(result));
+        return result;
+    }
 }
