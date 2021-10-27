@@ -101,6 +101,10 @@ class SequencesFragment(): Fragment() {
                                    onMikroKanons4 = { list ->
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onMikroKanons4(list)
+                                   },
+                                   onMikroKanons5reducted = { list ->
+                                       findNavController().navigate(R.id.outputFragment)
+                                       model.onMikroKanons5reducted(list)
                                    }
                                )
                            }

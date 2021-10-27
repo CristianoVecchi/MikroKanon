@@ -117,7 +117,8 @@ data class ButtonsDialogData(
     val onPedal1: () -> Unit = {}, val onPedal3: () -> Unit = {}, val onPedal5: () -> Unit = {},
     val onTritoneSubstitution: () -> Unit = {}, val onRound: () -> Unit = {},
     val onCadenza: () -> Unit = {}, val onSingle: () -> Unit = {},
-    val onSubmitButtonClick: () -> Unit = {}, )
+    val onMK5reducted: () -> Unit = {},
+    val onSubmitButtonClick: () -> Unit = {})
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
                             val error:String = "", val onSubmitButtonClick: () -> Unit = {})

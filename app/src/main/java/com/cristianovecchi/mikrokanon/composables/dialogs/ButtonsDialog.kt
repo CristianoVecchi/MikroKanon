@@ -15,16 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.AppViewModel
-import com.cristianovecchi.mikrokanon.composables.ButtonsDialogData
-import com.cristianovecchi.mikrokanon.composables.PedalsButtons
-import com.cristianovecchi.mikrokanon.composables.SpecialFunctions1Buttons
-import com.cristianovecchi.mikrokanon.composables.WavesButtons
+import com.cristianovecchi.mikrokanon.composables.*
 
 @Composable
 fun ButtonsDialog(
     buttonsDialogData: MutableState<ButtonsDialogData>,
     okText: String = "OK",
     model: AppViewModel,
+    boostedMK: Boolean = false,
     onDismissRequest: () -> Unit = {
         buttonsDialogData.value = ButtonsDialogData(model = model)
     }
@@ -44,7 +42,7 @@ fun ButtonsDialog(
                         state = listState,
                         modifier = Modifier.height(420.dp)
                     ) {
-                        items((0..2).toList()) { item ->
+                        items((0..3).toList()) { item ->
                             when (item) {
                                 0 -> SpecialFunctions1Buttons(
                                     model = buttonsDialogData.value.model,
@@ -76,8 +74,17 @@ fun ButtonsDialog(
                                     onPedal3Click = buttonsDialogData.value.onPedal3,
                                     onPedal5Click = buttonsDialogData.value.onPedal5
                                 )
-
+                                3 -> if(boostedMK){
+                                    BoostedMikroKanonsButtons(
+                                        model = buttonsDialogData.value.model,
+                                        buttonSize = buttonsDialogData.value.buttonSize,
+                                        fontSize = buttonsDialogData.value.fontSize,
+                                        colors = model.appColors,
+                                        onMK5reductedClick = buttonsDialogData.value.onMK5reducted
+                                    )
+                                }
                             }
+
                         }
                     }
 

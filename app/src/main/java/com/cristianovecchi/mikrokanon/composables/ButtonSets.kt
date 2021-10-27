@@ -144,6 +144,17 @@ fun MikroKanonsButtons(
     }
 }
 @Composable
+fun BoostedMikroKanonsButtons(
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
+    onMK5reductedClick: () -> Unit
+) {
+    Row(){
+        CustomButton(iconId = model.iconMap["mikrokanon"]!!, text = "5", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+            onMK5reductedClick()
+        }
+    }
+}
+@Composable
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
     onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onSingle: () -> Unit,

@@ -40,7 +40,8 @@ fun SequenceSelector(model: AppViewModel,
                      onFreePart: (ArrayList<Clip>, TREND) -> Unit,
                      onMikroKanons2: (ArrayList<Clip>) -> Unit,
                      onMikroKanons3: (ArrayList<Clip>) -> Unit,
-                     onMikroKanons4: (ArrayList<Clip>) -> Unit
+                     onMikroKanons4: (ArrayList<Clip>) -> Unit,
+                     onMikroKanons5reducted: (ArrayList<Clip>) -> Unit
                     )
 {
 
@@ -83,7 +84,7 @@ fun SequenceSelector(model: AppViewModel,
                 }
             }
         )
-        ButtonsDialog(buttonsDialogData, language.OKbutton, model)
+        ButtonsDialog(buttonsDialogData, language.OKbutton, boostedMK = true, model = model)
         val onSelectComposition = { index: Int ->
             onSelect(index)
         }
@@ -138,6 +139,7 @@ fun SequenceSelector(model: AppViewModel,
                             onPedal1 = { onPedal(1, sequences[selected]) },
                             onPedal3 = { onPedal(3, sequences[selected]) },
                             onPedal5 = { onPedal(5, sequences[selected]) },
+                            onMK5reducted = { onMikroKanons5reducted(sequences[selected]) },
                         )
                         {
                             buttonsDialogData.value = ButtonsDialogData(model = model)

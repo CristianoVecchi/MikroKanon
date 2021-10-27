@@ -171,6 +171,7 @@ class AppViewModel(
     private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk4deepSearchCache = HashMap<CacheKey, List<Counterpoint>>()
+    private val mk5reductedCache = HashMap<CacheKey, List<Counterpoint>>()
 
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -436,6 +437,16 @@ init{
             if (list.isNotEmpty()) changeSequenceToMikroKanons(list)
             findCounterpointsByMikroKanons4()
     }
+    val onMikroKanons5reducted = {list: ArrayList<Clip> ->
+        computationStack.pushAndDispatch(
+            Computation.MikroKanonOnly(
+                selectedCounterpoint.value!!.clone(),
+                ArrayList(sequenceToMikroKanons.value!!), 5
+            )
+        )
+        if (list.isNotEmpty()) changeSequenceToMikroKanons(list)
+        findCounterpointsByMikroKanons5reducted()
+    }
     val onBack = {
         if(computationStack.size > 1) {
             refreshComputation(true)
@@ -535,6 +546,7 @@ init{
                             2 -> onMikroKanons2(ArrayList(sequenceToMikroKanons.value!!))
                             3 -> onMikroKanons3(ArrayList(sequenceToMikroKanons.value!!))
                             4 -> onMikroKanons4(ArrayList(sequenceToMikroKanons.value!!))
+                            5 -> onMikroKanons5reducted(ArrayList(sequenceToMikroKanons.value!!))
                             else -> Unit
                         }
                     }
@@ -732,7 +744,39 @@ init{
             }
         }.also{  jobQueue.add(it)  }
     }
+    private fun findCounterpointsByMikroKanons5reducted() {
+        viewModelScope.launch(Dispatchers.Main) {
+            val deepSearch = userOptionsData.value!![0].deepSearch != 0
+            if (sequenceToMikroKanons.value!!.isNotEmpty()) {
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
+                val key = CacheKey(sequence, intervalSet.value!!)
+                if (mk5reductedCache.containsKey(key) ) {
+                    changeCounterpoints(mk5reductedCache[key]!!, true)
+                } else {
+                    measureTimeMillis {
+                        _elaborating.value = true
+                        // val def = async(Dispatchers.Default + MKjob) {
+                        val newList = withContext(Dispatchers.Default) {
+                            mikroKanons5reducted(
+                                this.coroutineContext.job,
+                                sequenceToMikroKanons.value!!,
+                                intervalSet.value!!
+                            )
+                                .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                                .take(maxVisibleCounterpoints)
+                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible() }
+                                .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                        }
+                        //val newList: List<Counterpoint> = def.await()
+                        mk5reductedCache[key] = newList
 
+                        changeCounterpoints(newList, true)
+                        _elaborating.value = false
+                    }.also { time -> println("MK5reducted executed in $time ms") }
+                }
+            }
+        }.also { jobQueue.add(it) }
+    }
     private fun findCounterpointsByMikroKanons3(){
          viewModelScope.launch(Dispatchers.Main){
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
@@ -922,6 +966,8 @@ init{
     fun clearMKcaches() {
         mk3cache.clear()
         mk4cache.clear()
+        mk4deepSearchCache.clear()
+        mk5reductedCache.clear()
     }
 
     // ROOM ---------------------------------------------------------------------
@@ -1033,7 +1079,8 @@ init{
             }
             "deepSearch" -> {
                 newUserOptionsData  = optionsDataClone.copy(deepSearch = value as Int)
-                clearMKcaches()
+                mk4cache.clear()
+                mk4deepSearchCache.clear()
             }
             "detectorFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(detectorFlags = value as Int)

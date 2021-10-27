@@ -44,6 +44,16 @@ suspend fun mikroKanons4(
       MikroKanon.findAll4AbsPartMikroKanonsParallel(context, sequence.map { it.abstractNote },  intervalSet, depth, emptinessGate)
           .pmap { it.toCounterpoint() }
 }
+suspend fun mikroKanons5reducted(
+     context: CoroutineContext,
+     sequence: List<Clip>,
+     intervalSet: List<Int>
+): List<Counterpoint> = withContext(context){
+     val emptinessGate = 1.0f
+     val depth = 2
+     MikroKanon.findAll5AbsPartMikroKanonsParallelReducted(context, sequence.map { it.abstractNote },  intervalSet, depth, emptinessGate)
+          .pmap { it.toCounterpoint() }
+}
 suspend fun mikroKanons3(sequence: List<Clip>, intervalSet: List<Int>, depth: Int = 6): List<Counterpoint>{
      return MikroKanon.findAll3AbsPartMikroKanonsParallel(sequence.map { it.abstractNote }, intervalSet, depth)
                                    .pmap { it.toCounterpoint() }
