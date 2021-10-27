@@ -262,6 +262,9 @@ init{
                 val melodyType: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].melodyType }
                         ?: 0
+                val glissandoFlags: Int =
+                    userOptionsData.value?.let { userOptionsData.value!![0].glissandoFlags }
+                        ?: 0
 
                 error = Player.playCounterpoint(
                     mediaPlayer!!,
@@ -283,6 +286,7 @@ init{
                     nuances,
                     rangeType,
                     melodyType,
+                    glissandoFlags,
                 )
             }
         mediaPlayer?.let{ if (it.isPlaying) _playing.value = true}
@@ -981,6 +985,9 @@ init{
             }
             "melodyType" -> {
                 newUserOptionsData = optionsDataClone.copy(melodyType = value as Int)
+            }
+            "glissandoFlags" -> {
+                newUserOptionsData  = optionsDataClone.copy(glissandoFlags = value as Int)
             }
             "dynamics" -> {
                 newUserOptionsData = optionsDataClone.copy(dynamics = value as String)

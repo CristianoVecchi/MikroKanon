@@ -27,11 +27,8 @@ import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
-import com.cristianovecchi.mikrokanon.locale.LANGUAGES
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
-import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
-import com.cristianovecchi.mikrokanon.locale.rowFormsMap
+import com.cristianovecchi.mikrokanon.locale.*
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import com.cristianovecchi.mikrokanon.ui.shift
@@ -141,6 +138,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val transposeDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val rowFormsDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    val glissandoDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
     //val intervalSetDialogData by lazy { mutableStateOf(MultiListDialogData())}
@@ -153,7 +151,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 
     val dimensions = model.dimensions
     val colors = model.appColors
-    val optionNames= listOf("Ensemble", "Range","Melody","Nuances", "Dynamic", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
+    val optionNames= listOf("Ensemble", "Range","Melody", "Glissando","Nuances", "Dynamic", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Row Forms","Ritornello","Transpose","Doubling",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
         "Export MIDI", "Colors", "Custom Colors","Language","Zodiac","Credits")
@@ -167,6 +165,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     ListDialog(listDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize)
     MultiListDialog(doublingDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
+    val intervalsForGlissando = createGlissandoIntervals(lang.doublingNames)
     MultiBpmDialog(multiBpmDialogData, lang.OKbutton)
     MultiDynamicDialog(multiFloatDialogData, lang.OKbutton)
     val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
@@ -310,6 +309,31 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 )
                                 listDialogData.value =
                                     ListDialogData(itemList = listDialogData.value.itemList)
+                            }
+                        })
+                }
+                "Glissando" -> {
+                    val flags = userOptions.glissandoFlags
+                    val intsFromFlags = convertFlagsToInts(flags).map { it - 1 }
+                    val isOn = flags > 0
+                    val text = if (!isOn) lang.glissando else "${lang.glissando}: ${
+                        intsFromFlags.joinToString(separator = ", ") { intervalsForGlissando[it] }
+                    }"
+                    SelectableCard(
+                        text = text,
+                        fontSize = fontSize,
+                        colors = colors,
+                        isSelected = isOn,
+                        onClick = { _ ->
+                            doublingDialogData.value = MultiListDialogData(
+                                true, intervalsForGlissando, intsFromFlags.toSet(), lang.selectGlissando
+                            ) { indexes ->
+                                model.updateUserOptions(
+                                    "glissandoFlags",
+                                    convertIntsToFlags(indexes.map { it + 1 }.toSortedSet())
+                                )
+                                doublingDialogData.value =
+                                    MultiListDialogData(itemList = doublingDialogData.value.itemList)
                             }
                         })
                 }

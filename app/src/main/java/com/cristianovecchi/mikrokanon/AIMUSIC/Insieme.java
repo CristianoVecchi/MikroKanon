@@ -989,7 +989,7 @@ public class Insieme {
                 }
             }
         }
-        System.out.println("glissandoChecks: " + Arrays.toString(result));
+        //System.out.println("glissandoChecks: " + Arrays.toString(result));
         return result;
     }
 }

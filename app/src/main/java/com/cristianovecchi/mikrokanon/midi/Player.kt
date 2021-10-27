@@ -3,16 +3,12 @@ package com.cristianovecchi.mikrokanon.midi
 import android.media.MediaPlayer
 import android.os.Environment
 import android.util.Log
+import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.BebopBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParker
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParkerBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.DEF.MIDDLE_C
-import com.cristianovecchi.mikrokanon.alterateBpm
-
-import com.cristianovecchi.mikrokanon.alterateBpmWithDistribution
-import com.cristianovecchi.mikrokanon.convertDynamicToBytes
-import com.cristianovecchi.mikrokanon.projectTo
 
 import com.leff.midi.MidiFile
 import com.leff.midi.MidiTrack
@@ -97,7 +93,7 @@ object Player {
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
         rowForms: List<Int> = listOf(1), ritornello: Int = 0, transpose: List<Int> = listOf(0),
         doublingFlags: Int = 0, nuances: Int = 0,
-        rangeType: Int = 0, melodyType: Int = 0
+        rangeType: Int = 0, melodyType: Int = 0, glissandoFlags: Int = 0
     ) : String {
         var error = ""
         val durations = rhythm.values
@@ -108,7 +104,9 @@ object Player {
         var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
         actualCounterpoint = if(ritornello > 0)  actualCounterpoint.ritornello(ritornello, transpose)
                             else actualCounterpoint.transpose(transpose[0])
-        val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts, nuances, doublingFlags, rangeType, melodyType)
+        val glissando: List<Int> = if(glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
+        val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts,
+                                                                    nuances, doublingFlags, rangeType, melodyType, glissando)
         if (counterpointTracks.isEmpty()) return "No Tracks in Counterpoint!!!"
 
         val totalLength = counterpointTracks[0].lengthInTicks

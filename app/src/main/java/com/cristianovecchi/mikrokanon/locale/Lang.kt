@@ -98,6 +98,18 @@ fun getZodiacPlanets(emojis: Boolean): List<String>{
 fun getZodiacSigns(emojis: Boolean): List<String>{
     return if(emojis) return zodiacSignsEmojis else zodiacSigns
 }
+fun getGlissandoSymbols(): Pair<String,String>{
+    return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+        Pair("\uD834\uDDB1", "\uD834\uDDB2")
+    else Pair("➚", "➘")
+}
+fun createGlissandoIntervals(doublingNames: List<String>): List<String>{
+    val symbols = getGlissandoSymbols()
+    val asc = symbols.first
+    val desc = symbols.second
+    return listOf("$asc${doublingNames[0]}", "$desc${doublingNames[0]}",
+        "$asc${doublingNames[1]}", "$desc${doublingNames[1]}", "$asc${doublingNames[2]}", "$desc${doublingNames[2]}",)
+}
 fun getDynamicSymbols(): List<String>{
     return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
         listOf("\uD834\uDDC8","\uD834\uDD8F\uD834\uDD8F\uD834\uDD8F\uD834\uDD8F","\uD834\uDD8F\uD834\uDD8F\uD834\uDD8F","\uD834\uDD8F\uD834\uDD8F",
@@ -198,6 +210,10 @@ data class Lang( // English by default
     val selectMelody: String = "Select a melody type!",
     val melody: String = "Melody",
     val melodyOptions: List<String> = listOf("Linear", "Broad"),
+    val glissando: String = if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+        "\uD834\uDDB1\uD834\uDDB2\uD834\uDDB1"
+    else "Glissando",
+    val selectGlissando: String = "Select some intervals for glissando!",
     val nuances: String = "Nuances",
     val nuancesOptions: List<String> = listOf("None", "Exalt short notes", "Exalt long notes"),
     val selectNuances: String = "Select dynamic nuances!",
@@ -217,7 +233,8 @@ data class Lang( // English by default
     val retrograde: String = "Retrograde",
     val inverse: String = "Inverse",
     val invRetrograde: String = "Inv-Retrograde",
-    val ritornello: String = if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O) String(Character.toChars(0x1D106)) + "  " + String(Character.toChars(0x1D107))
+    val ritornello: String = if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+        String(Character.toChars(0x1D106)) + "  " + String(Character.toChars(0x1D107))
                             else "Ritornello",
     val selectRitornello: String = "Select how many repetitions!",
     val transpose: String = "Transpose",

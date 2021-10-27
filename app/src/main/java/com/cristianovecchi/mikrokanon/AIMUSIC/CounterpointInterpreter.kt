@@ -22,14 +22,15 @@ object CounterpointInterpreter {
                    doublingFlags: Int,
                    rangeType: Int,
                    melodyType: Int,
-                    glissando: List<Int> = listOf(-1,1,-2,2,-3,3)
+                   glissando: List<Int> = listOf()
         ): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
 
         if(counterpoint.parts.size > 15) {
             println("WARNING: Counterpoint n. parts: ${counterpoint.parts.size}")
         }
-
+        val potStep: Int = 127 / counterpoint.parts.size
+        val pots = (counterpoint.parts.indices).map{ it * potStep + potStep/2}.also { println(it) }
         counterpoint.parts.forEachIndexed { partIndex, part ->
             val ensemblePart = ensembleParts[partIndex]
             val channel =
@@ -38,6 +39,8 @@ object CounterpointInterpreter {
             val pc: MidiEvent =
                 ProgramChange(0, channel, ensemblePart.instrument) // cambia strumento
             track.insertEvent(pc)
+            val pot = Controller(0,channel,10, pots[partIndex])
+            track.insertEvent(pot)
 //            if(glissando.isNotEmpty()){
 //                val omniOff = Controller(0, channel,124,0)
 //                val omniOn = Controller(0, channel,125,0)
@@ -399,7 +402,7 @@ object CounterpointInterpreter {
            // mt.insertEvent(portamentoOff)
 
 
-             println("GLISSANDO: $pitch at $start")
+             //println("GLISSANDO: $pitch at $start")
         } else {
             val on = NoteOn(start, channel, pitch, velOn)
             val off = NoteOff(start + duration, channel, pitch, velOff)
