@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.composables.dialogs
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -26,9 +27,20 @@ import com.cristianovecchi.mikrokanon.toDp
 
 @Composable
 fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogData>, okText: String = "OK",
-                       onDismissRequest: () -> Unit = { G.deleteColorArrays(); customColorsDialogData.value = CustomColorsDialogData(model = customColorsDialogData.value.model) })
+                       onRefreshRendering: (Boolean) -> Unit =
+                           {customColorsDialogData.value = customColorsDialogData.value.copy(firstRendering = it, isRefreshing = true)},
+                       onStopRefresh: () -> Unit =
+                           {customColorsDialogData.value = customColorsDialogData.value.copy(isRefreshing = false)},
+                       onSetArrayIndexAndRefresh: (Int) -> Unit =
+                           {customColorsDialogData.value = customColorsDialogData.value.copy(arrayColorIndex = it, firstRendering = true)},
+                       onDismissRequest: () -> Unit =
+                           {G.deleteColorArrays(); customColorsDialogData.value = CustomColorsDialogData(model = customColorsDialogData.value.model) })
 {
+
+    var indexColors = customColorsDialogData.value.arrayColorIndex
+
     if(customColorsDialogData.value.dialogState){
+
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier.width(300.dp),
@@ -36,7 +48,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
                     Spacer(modifier = Modifier.height(10.dp))
-                    var firstRendering by remember{ mutableStateOf(true) }
+
                     val fontColor: Color
                     val back1Color: Color
                     val back2Color: Color
@@ -44,10 +56,10 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                     val pass1Color: Color
                     val pass2Color: Color
                     val radarColor: Color
-                    var indexColors = customColorsDialogData.value.arrayColorIndex
+                    val arraySize: Int
                     var customColor by remember{ mutableStateOf(Color.Black) }
                     val context = customColorsDialogData.value.model.getContext()
-                    if(firstRendering){
+                    if(customColorsDialogData.value.firstRendering){
                         if(G.loadColorArrays(context)) G.setColorArray(context,indexColors)
                         fontColor = Color(G.colorFont)
                         back1Color = Color(G.colorBackground1)
@@ -56,11 +68,12 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                         pass1Color = Color(G.colorPassageNotes1)
                         pass2Color = Color(G.colorPassageNotes2)
                         radarColor = Color(G.colorRadar)
+                        arraySize = G.getArraySize()
                         indexColors = G.indexColorArray
-                        firstRendering = false
+                        onRefreshRendering.invoke(false)
                     } else {
                         if(G.loadColorArrays(context))
-                            G.setColorArrayBySearch(context, customColor.toArgb())
+                            G.setColorArrayBySearchFromIndex(context, customColor.toArgb(), indexColors)
                         fontColor = Color(G.colorFont)
                         back1Color = Color(G.colorBackground1)
                         back2Color = Color(G.colorBackground2)
@@ -68,6 +81,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                         pass1Color = Color(G.colorPassageNotes1)
                         pass2Color = Color(G.colorPassageNotes2)
                         radarColor = Color(G.colorRadar)
+                        arraySize = G.getArraySize()
                         indexColors = G.indexColorArray
                     }
                     val h = 80.dp
@@ -104,11 +118,17 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                             Box(
                                 Modifier
                                     .size(w, h)
-                                    .background(pass1Color))
+                                    .background(pass1Color)
+                                    .clickable {
+                                        if (indexColors > 0) onSetArrayIndexAndRefresh.invoke(indexColors-1)
+                                    })
                             Box(
                                 Modifier
                                     .size(w, h)
-                                    .background(pass2Color))
+                                    .background(pass2Color)
+                                    .clickable {
+                                        if (indexColors < arraySize ) onSetArrayIndexAndRefresh.invoke(indexColors+1)
+                                    })
                         }
                         Row(
                             Modifier
@@ -123,20 +143,55 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                     }
 
                     Row(Modifier.fillMaxWidth()) {
-                        ColorSelector(height = 300.dp, startColor = back1Color) { color ->
-                            customColor =  color.copy()
+
+                            ColorSelector(
+                                height = 350.dp,
+                               startColor = back1Color.copy(),
+                                refresh = customColorsDialogData.value.isRefreshing
+                            ) { color ->
+                                if(customColorsDialogData.value.isRefreshing){
+                                    customColor = color.copy()
+
+                                    onStopRefresh.invoke()
+                                } else {
+                                    customColor = color.copy()
+                                }
+
+                           }
+
+                  }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween){
+                        Button(
+                            onClick = {
+                                customColorsDialogData.value.onSubmitButtonClick.invoke(indexColors)
+                                onDismissRequest.invoke()
+                            },
+                            shape = MaterialTheme.shapes.large
+                        ) {
+                            Text(text = okText)
+                        }
+                        Row{
+                            Button(
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                onClick = {
+                                    if (indexColors > 0) onSetArrayIndexAndRefresh.invoke(indexColors-1)
+                                },
+                                shape = MaterialTheme.shapes.large
+                            ) {
+                                Text(text = "-")
+                            }
+                            Button(
+                                onClick = {
+                                    if (indexColors < arraySize ) onSetArrayIndexAndRefresh.invoke(indexColors+1)
+                                },
+                                shape = MaterialTheme.shapes.large
+                            ) {
+                                Text(text = "+")
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Button(
-                        onClick = {
-                            customColorsDialogData.value.onSubmitButtonClick.invoke(indexColors)
-                            onDismissRequest.invoke()
-                        },
-                        shape = MaterialTheme.shapes.large
-                    ) {
-                        Text(text = okText)
-                    }
+
                 }
             }
         }

@@ -107,8 +107,8 @@ fun createGlissandoIntervals(doublingNames: List<String>): List<String>{
     val symbols = getGlissandoSymbols()
     val asc = symbols.first
     val desc = symbols.second
-    return listOf("$asc${doublingNames[0]}", "$desc${doublingNames[0]}",
-        "$asc${doublingNames[1]}", "$desc${doublingNames[1]}", "$asc${doublingNames[2]}", "$desc${doublingNames[2]}",)
+    return listOf("${doublingNames[0]}$asc", "${doublingNames[0]}$desc",
+        "${doublingNames[1]}$asc", "${doublingNames[1]}$desc", "${doublingNames[2]}$asc", "${doublingNames[2]}$desc",)
 }
 fun getDynamicSymbols(): List<String>{
     return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)

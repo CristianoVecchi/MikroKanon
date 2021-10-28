@@ -108,7 +108,8 @@ data class MultiNumberDialogData(val dialogState: Boolean = false, val title:Str
 data class MultiFloatDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="1.0",
                                  val min: Float = 0f, val max: Float = 1f, val model: AppViewModel, val onSubmitButtonClick: (String) -> Unit = {})
 data class CustomColorsDialogData(val dialogState: Boolean = false, val title:String = "", val arrayColorIndex: Int = 0,
-                                  val model: AppViewModel,val onSubmitButtonClick: (Int) -> Unit = {})
+                                  val model: AppViewModel, val firstRendering: Boolean = true, val isRefreshing: Boolean = false,
+                                  val onSubmitButtonClick: (Int) -> Unit = {})
 data class ButtonsDialogData(
     val dialogState: Boolean = false, val title:String = "",
     val model: AppViewModel, val buttonSize: Dp = 60.dp, val fontSize: Int = 18,

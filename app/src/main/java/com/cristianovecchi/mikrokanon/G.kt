@@ -8,6 +8,7 @@ import android.content.Context
 import com.cristianovecchi.mikrokanon.ui.AIColor
 import java.lang.Exception
 import java.lang.reflect.Field
+import kotlin.math.absoluteValue
 
 
 // General Constants
@@ -52,10 +53,12 @@ class G {
      var colorPassageNotes1 = 0
      var colorPassageNotes2 = 0
      var colorRadar = 0
-     var indexColorArray = 534
+     var indexColorArray = 559
      private var radarColorEditor = false
      private var colorArrays: List<IntArray>? = null
-
+     fun getArraySize(): Int{
+         return colorArrays!!.size * 3
+     }
      fun isRadarColorEditor(): Boolean {
          return radarColorEditor
      }
@@ -71,7 +74,7 @@ class G {
      }
      fun loadColorArrays(context: Context): Boolean{
          colorArrays = AIColor.getMultiTypedArray(context, "colors", -0.12f).map { it.toIntArray() }
-         println("ArraYColors = ${colorArrays?.size}")
+         //println("ArraYColors = ${colorArrays?.size}")
          return colorArrays?.isNotEmpty() ?: false
      }
      fun deleteColorArrays(){
@@ -81,6 +84,7 @@ class G {
      fun setColorArrayBySearch(context: Context, desiredColor: Int) {
          var max = Int.MAX_VALUE
          val background1index = 1
+
          var choice = indexColorArray
          for (i in colorArrays!!.indices) {
              val aimColor = colorArrays!![i][background1index]
@@ -91,10 +95,40 @@ class G {
              }
          }
          indexColorArray = choice
-         println("Color Array = $choice")
+         //println("Color Array = $choice")
          setColorArray(context, choice)
      }
+     fun setColorArrayBySearchFromIndex(context: Context, desiredColor: Int, from: Int) {
+         var max = Int.MAX_VALUE
+         val background1index = 1
 
+         var choice = indexColorArray
+         for (i in colorArrays!!.indices) {
+             val aimColor = colorArrays!![i][background1index]
+             val diff: Int = AIColor.colorDistance(desiredColor, aimColor)
+             if (diff < max) {
+                 max = diff
+             }
+         }
+         val choices = mutableListOf<Int>()
+         for (i in colorArrays!!.indices) {
+             val aimColor = colorArrays!![i][background1index]
+             if(AIColor.colorDistance(desiredColor, aimColor) == max){
+                 choices.add(i)
+             }
+         }
+         var maxChoices = Int.MAX_VALUE
+         for(i in choices){
+             val diff = (i - from).absoluteValue
+             if((i - from).absoluteValue < maxChoices){
+                 maxChoices = diff
+                 choice = i
+             }
+         }
+         indexColorArray = choice
+         //println("Color Array = $choice")
+         setColorArray(context, choice)
+     }
      fun setColorArray(context: Context, index: Int) {
          var index = index
          indexColorArray = index

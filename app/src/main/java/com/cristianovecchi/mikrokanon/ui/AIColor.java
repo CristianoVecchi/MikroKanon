@@ -81,6 +81,22 @@ public class AIColor {
         if(B < 0) B = 0;
         return (255 << 24) | (R << 16) | (G << 8) | (B);
     }
+    public static int averageColor(int color1, int color2){
+        int R1 = (color1 >> 16) & 0xff;
+        int G1 = (color1 >>  8) & 0xff;
+        int B1 = (color1      ) & 0xff;
+        int R2 = (color2 >> 16) & 0xff;
+        int G2 = (color2 >>  8) & 0xff;
+        int B2 = (color2      ) & 0xff;
+        int Rsum = R1 + R2;
+        int Gsum = G1 + G2;
+        int Bsum = B1 + B2;
+        int Ra, Ga, Ba;
+        if(Rsum == 0) {Ra = 0;} else {Ra = Rsum / 2;}
+        if(Gsum == 0) {Ga = 0;} else {Ga = Rsum / 2;}
+        if(Bsum == 0) {Ba = 0;} else {Ba = Rsum / 2;}
+        return (255 << 24) | (Ra << 16) | (Ga << 8) | (Ba);
+    }
 
     public static int colorDistance(int startColor, int aimColor){
         int R1 = (startColor >> 16) & 0xff;

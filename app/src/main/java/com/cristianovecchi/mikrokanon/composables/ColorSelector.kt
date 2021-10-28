@@ -24,7 +24,7 @@ import com.cristianovecchi.mikrokanon.toDp
 import kotlin.math.roundToInt
 
 @Composable
-fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, dispatchColor : (Color) -> Unit ) {
+fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, refresh: Boolean, dispatchColor : (Color) -> Unit ) {
     var sizeR by remember { mutableStateOf(IntSize.Zero) }
     var sizeG by remember { mutableStateOf(IntSize.Zero) }
     var sizeB by remember { mutableStateOf(IntSize.Zero) }
@@ -35,6 +35,11 @@ fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, dispatch
     val barHeight = 80
     if(firstColor && sizeR.height != 0 && sizeG.height != 0 && sizeB.height != 0){
         false.also { firstColor = it } // LOL (instead of [firstColor = false] that gets a warning)
+        redY = (1f - startColor.red) * (sizeR.height - barHeight)
+        greenY = (1f - startColor.green) * (sizeR.height - barHeight)
+        blueY = (1f - startColor.blue) * (sizeR.height - barHeight)
+    }
+    if(refresh && sizeR.height != 0 && sizeG.height != 0 && sizeB.height != 0){
         redY = (1f - startColor.red) * (sizeR.height - barHeight)
         greenY = (1f - startColor.green) * (sizeR.height - barHeight)
         blueY = (1f - startColor.blue) * (sizeR.height - barHeight)
