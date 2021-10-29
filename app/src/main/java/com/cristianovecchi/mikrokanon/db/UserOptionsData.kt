@@ -53,6 +53,9 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "doubling_flags")
         val doublingFlags: Int,
 
+        @ColumnInfo(name = "(audio8D_flags")
+        val audio8DFlags: Int,
+
         @ColumnInfo(name = "intSetVert_flags")
         val intSetVertFlags: Int,
 
@@ -88,7 +91,7 @@ import androidx.room.PrimaryKey
                 return UserOptionsData(0,2, 2,0, 0,
                     "1.0", "90", 3,
                     0,0, "1",0, "0",
-                    0,0b0011110, 0b1111111,
+                    0,0,0b0011110, 0b1111111,
                     0,0,0,1,
                      "System||0" ,"System", 0, 1 )
             }

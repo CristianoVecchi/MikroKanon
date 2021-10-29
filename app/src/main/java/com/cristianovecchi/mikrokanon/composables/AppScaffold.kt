@@ -140,6 +140,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val transposeDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val rowFormsDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    val audio8DDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val glissandoDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
@@ -154,7 +155,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val dimensions = model.dimensions
     val colors = model.appColors
     val optionNames= listOf("Ensemble", "Range","Melody", "Glissando","Nuances", "Dynamic", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
-        "Row Forms","Ritornello","Transpose","Doubling",
+        "Row Forms","Ritornello","Transpose","Doubling","8D AUDIO",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
         "Export MIDI", "Colors", "Custom Colors","Language","Zodiac","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
@@ -166,6 +167,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     var isFirstTab by remember{ mutableStateOf(model.isFirstTab)}
     ListDialog(listDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize)
     MultiListDialog(doublingDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
+    MultiListDialog(audio8DDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
     val intervalsForGlissando = createGlissandoIntervals(lang.doublingNames)
     MultiBpmDialog(multiBpmDialogData, lang.OKbutton)
@@ -545,6 +547,33 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 model.updateUserOptions(
                                     "doublingFlags",
                                     convertIntsToFlags(indexes.map { it + 1 }.toSortedSet())
+                                )
+                                doublingDialogData.value =
+                                    MultiListDialogData(itemList = doublingDialogData.value.itemList)
+                            }
+                        })
+                }
+                "8D AUDIO" -> {
+                    val flags = userOptions.audio8DFlags
+                    val intsFromFlags = convertFlagsToInts(flags)
+                    val isOn = flags > 0
+                    val text = if (!isOn) lang.audio8D else "${lang.audio8D}: ${
+                        intsFromFlags.joinToString(
+                            separator = ", "
+                        ) { (it+1).toString() }
+                    }"
+                    SelectableCard(
+                        text = text,
+                        fontSize = fontSize,
+                        colors = colors,
+                        isSelected = isOn,
+                        onClick = { _ ->
+                            doublingDialogData.value = MultiListDialogData(
+                                true, (1..12).map{it.toString()}, intsFromFlags.toSet(), lang.selectAudio8D
+                            ) { indexes ->
+                                model.updateUserOptions(
+                                    "audio8DFlags",
+                                    convertIntsToFlags(indexes.toSortedSet())
                                 )
                                 doublingDialogData.value =
                                     MultiListDialogData(itemList = doublingDialogData.value.itemList)

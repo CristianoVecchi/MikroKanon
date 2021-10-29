@@ -201,10 +201,10 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
 
         deltas?.let{
             val delta = sectionDuration / count
-            val rest = sectionDuration % count
+            val rest = sectionDuration - (delta * count) // module operation without decimals
+            println("section duration:$sectionDuration  count:$count  delta:$delta  rest:$rest")
             //if (deltas.isNotEmpty() && deltas.last() == -1L) deltas[deltas.size-1] = delta + rest else
-            deltas.add(delta+rest)
-            (1 until count).forEach{ _ -> deltas.add(delta)}
+            it.addAll(sectionDuration.divideDistributingRest(count))
         }
         return result.toList()
     }
@@ -224,6 +224,8 @@ fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuratio
     //deltas.add(0) // to set the same lenght - last value is unused
     return Pair(bpms, deltas.toList() )
 }
+
+
 
 fun String.extractIntsFromCsv(): List<Int>{
     return this.split(',').mapNotNull { it.toInt()}
@@ -315,6 +317,54 @@ fun Float.convertDynamicToBytes(): Pair<Int, Int> {
     val firstBite = volumeInt and 0b1111111
     val secondByte = (volumeInt shr(7)) and 0b1111111
     return Pair(firstBite, secondByte)
+}
+
+fun Long.divideDistributingRest(divisor: Int): MutableList<Long>{
+    if(this == 0L || divisor == 0) return mutableListOf(this)
+    val result = this / divisor
+    val rest = this - (result * divisor) // module operation without decimals
+    val halfDivisor = divisor / 2 + (divisor and 1)
+    val restDiv = rest / halfDivisor
+    val restOfRest = rest - (restDiv * halfDivisor )
+    val addOne = rest % halfDivisor != 0L
+    val list = mutableListOf<Long>()
+    val resultPlusRestDiv = result + restDiv
+    //println("result=$result rest=$rest restDiv=$restDiv restOfRest=$restOfRest")
+    (0 until divisor).forEach{ i -> if(i and 1 == 1) list.add(result) else list.add(resultPlusRestDiv) }
+    (0 until restOfRest.toInt()).forEach{ i -> list[i*2+1] = list[i*2+1]+1}
+    //if(addOne) list[0] = list[0] + 1
+    return list
+}
+fun main(args : Array<String>){
+    val pairs = listOf(
+        Pair(836L,127),
+        Pair(500L,78),
+        Pair(343L,45),
+        Pair(1947L,37),
+        Pair(12L,127),
+        Pair(689L,78),
+        Pair(100L,45),
+        Pair(4L,3),
+    )
+    pairs.forEach {
+        println("${it.first} / ${it.second} -> ${it.first.divideDistributingRest(it.second)}")
+        println("check sum: ${it.first.divideDistributingRest(it.second).sum()}")
+        println()
+    }
+    var success = true
+    for(i in 0..100){
+        val pair = Pair(Random().nextInt(10000).toLong(), Random().nextInt(10000)).also{println(it)}
+        val list = pair.first.divideDistributingRest(pair.second)
+        println(list)
+        println()
+        if(list.sum() != pair.first){
+            println("TEST FAILED with: $pair")
+            success = false
+        }
+    }
+    if(success){
+        println("SUCCESS!!!")
+    }
 }
 
 

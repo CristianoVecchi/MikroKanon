@@ -240,6 +240,8 @@ data class Lang( // English by default
     val transpose: String = "Transpose",
     val selectTranspositions: String = "Select transpositions!",
     val doubling: String = "Doubling",
+    val audio8D: String = "8D AUDIO",
+    val selectAudio8D: String = "Select voices for 8D AUDIO!",
     val spreadWherePossible: String = "Spread where possible",
     val deepSearch: String = "Deep search in four-part canons",
     val horIntervalSet: String = "Free part intervals",

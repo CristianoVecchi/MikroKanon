@@ -93,7 +93,7 @@ object Player {
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
         rowForms: List<Int> = listOf(1), ritornello: Int = 0, transpose: List<Int> = listOf(0),
         doublingFlags: Int = 0, nuances: Int = 0,
-        rangeType: Int = 0, melodyType: Int = 0, glissandoFlags: Int = 0
+        rangeType: Int = 0, melodyType: Int = 0, glissandoFlags: Int = 0, audio8DFlags: Int = 0
     ) : String {
         var error = ""
         val durations = rhythm.values
@@ -105,8 +105,9 @@ object Player {
         actualCounterpoint = if(ritornello > 0)  actualCounterpoint.ritornello(ritornello, transpose)
                             else actualCounterpoint.transpose(transpose[0])
         val glissando: List<Int> = if(glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
+        val audio8D: List<Int> = if(audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
         val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts,
-                                                                    nuances, doublingFlags, rangeType, melodyType, glissando)
+                                                                    nuances, doublingFlags, rangeType, melodyType, glissando, audio8D)
         if (counterpointTracks.isEmpty()) return "No Tracks in Counterpoint!!!"
 
         val totalLength = counterpointTracks[0].lengthInTicks
@@ -126,6 +127,7 @@ object Player {
         //tempoTrack.insertEvent(t)
         //tempoTrack.insertEvent(t2)
         //val bpmAlterations = bpm.projectTo(bpm*2, 0.5f).projectTo(bpm, 0.5f).also{println(it)}
+        // INSERT BPM ALTERATIONS
         val bpmAlterationsAndDeltas = alterateBpmWithDistribution(bpms, 0.5f, totalLength)
         var tempoTick = 0L
         val bpmAlterations = bpmAlterationsAndDeltas.first//.also { println("${it.size} + $it") }

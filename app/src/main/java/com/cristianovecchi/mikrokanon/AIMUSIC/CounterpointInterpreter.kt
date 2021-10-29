@@ -1,10 +1,12 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 
+import com.cristianovecchi.mikrokanon.alterateBpmWithDistribution
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.cristianovecchi.mikrokanon.extractFromMiddle
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
+import com.leff.midi.event.meta.Tempo
 import java.lang.Math.abs
 
 fun findTopNuances(stabilities: List<Float>, minNuance: Float, maxNuance: Float) : List<Float>{
@@ -22,7 +24,8 @@ object CounterpointInterpreter {
                    doublingFlags: Int,
                    rangeType: Int,
                    melodyType: Int,
-                   glissando: List<Int> = listOf()
+                   glissando: List<Int> = listOf(),
+                   audio8D: List<Int> = listOf()
         ): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
 
@@ -31,16 +34,23 @@ object CounterpointInterpreter {
         }
         val panStep: Int = 127 / counterpoint.parts.size
         val pans = (counterpoint.parts.indices).map{ it * panStep + panStep/2}.also { println(it) }
+
+        // CREATION OF TRACKS
         counterpoint.parts.forEachIndexed { partIndex, part ->
             val ensemblePart = ensembleParts[partIndex]
             val channel =
                 if (partIndex < 9) partIndex else partIndex + 1 // skip percussion midi channel
             val track = MidiTrack()
+
+            // STEREO AND INSTRUMENTS
             val pc: MidiEvent =
                 ProgramChange(0, channel, ensemblePart.instrument) // cambia strumento
             track.insertEvent(pc)
-            val pot = Controller(0,channel,10, pans[partIndex])
-            track.insertEvent(pot)
+            if(!audio8D.contains(partIndex)){ // set a fixed pan if 8D AUDIO is not set on this track
+                val pan = Controller(0,channel,10, pans[partIndex])
+                track.insertEvent(pan)
+            }
+
 //            if(glissando.isNotEmpty()){
 //                val omniOff = Controller(0, channel,124,0)
 //                val omniOn = Controller(0, channel,125,0)
@@ -51,6 +61,8 @@ object CounterpointInterpreter {
             var tick = 0
             var index = 0
             var durIndex = 0
+
+            // RANGE EXTENSION
             val range = when(rangeType) {
                     1 -> ensemblePart.allRange
                     2 -> ensemblePart.colorRange
@@ -58,8 +70,9 @@ object CounterpointInterpreter {
                     4 -> ensemblePart.colorRange.extractFromMiddle(6)
                     else -> PIANO_ALL
             }
+
+            //NUANCES
             val actualPitches = Insieme.findMelody(ensemblePart.octave, part.absPitches.toIntArray(), range.first, range.last, melodyType)
-            val glissandoChecks = Insieme.checkIntervalsInPitches(actualPitches, glissando.toIntArray())
             val lowLimit = 0.4f
             val minNuance = 0.51f
             val maxNuance = 0.97f
@@ -75,8 +88,10 @@ object CounterpointInterpreter {
                         mssq.velocities}
                 else -> IntArray(actualPitches.size) { 100 } // case 0: no Nuances
             }
-            if (doublingFlags == 0) {
 
+            // ADDING NOTES
+            val glissandoChecks = Insieme.checkIntervalsInPitches(actualPitches, glissando.toIntArray())
+            if (doublingFlags == 0) {
                 while (index < actualPitches.size) {
                     val pitch = actualPitches[index]
                     val velocity = velocities[index]
@@ -115,7 +130,7 @@ object CounterpointInterpreter {
                         durIndex++
                     }
                 }
-                result.add(track)
+
             } else {
                 val doubling = convertFlagsToInts(doublingFlags)
                 while (index < actualPitches.size) {
@@ -159,8 +174,29 @@ object CounterpointInterpreter {
                         durIndex++
                     }
                 }
-                result.add(track)
+
             }
+            // STEREO ALTERATIONS FOR EACH TRACK
+            if(audio8D.contains(partIndex)){
+                val nRevolutions = (12 - partIndex) * 2
+                //val panStep: Int = 127 / counterpoint.parts.size
+                val aims = mutableListOf<Float>()
+                for(i in 0 until nRevolutions){
+                    aims.add(0f)
+                    aims.add(127f)
+                }
+                aims.add(0f)
+                val audio8DalterationsAndDeltas = alterateBpmWithDistribution(aims, 2f, track.lengthInTicks)
+                val audio8Dalterations= audio8DalterationsAndDeltas.first
+                val audio8Ddeltas = audio8DalterationsAndDeltas.second.also{println(it)}
+                var tempoTick = 0L
+                (0 until audio8Dalterations.size -1).forEach { i -> // doesn't take the last bpm
+                    val newPan = Controller(tempoTick, channel,10, audio8Dalterations[i].toInt())
+                    track.insertEvent(newPan)
+                    tempoTick += audio8Ddeltas[i]
+                }
+            }
+            result.add(track)
         }
         return result
     }

@@ -249,6 +249,9 @@ init{
                 val doublingFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].doublingFlags }
                         ?: 0
+                val audio8DFlags: Int =
+                    userOptionsData.value?.let { userOptionsData.value!![0].audio8DFlags }
+                        ?: 0
                 val ritornello: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].ritornello }
                         ?: 0
@@ -288,6 +291,7 @@ init{
                     rangeType,
                     melodyType,
                     glissandoFlags,
+                    audio8DFlags,
                 )
             }
         mediaPlayer?.let{ if (it.isPlaying) _playing.value = true}
@@ -1066,6 +1070,9 @@ init{
             }
             "doublingFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(doublingFlags = value as Int)
+            }
+            "audio8DFlags" -> {
+                newUserOptionsData  = optionsDataClone.copy(audio8DFlags = value as Int)
             }
             "intSetVertFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(intSetVertFlags = value as Int)
