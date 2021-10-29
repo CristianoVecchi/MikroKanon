@@ -25,7 +25,8 @@ object CounterpointInterpreter {
                    rangeType: Int,
                    melodyType: Int,
                    glissando: List<Int> = listOf(),
-                   audio8D: List<Int> = listOf()
+                   audio8D: List<Int> = listOf(),
+                   vibrato: Int = 0
         ): List<MidiTrack> {
         val result = mutableListOf<MidiTrack>()
 
@@ -119,6 +120,9 @@ object CounterpointInterpreter {
                                     durIndex++
                                 }
                             }
+                            if(vibrato != 0){
+                                addVibratoToTrack(track, tick.toLong(), dur, channel, vibrato)
+                            }
 
                             insertNoteWithGlissando(
                                 track, tick.toLong(), dur.toLong(), channel, pitch,
@@ -157,6 +161,9 @@ object CounterpointInterpreter {
                                     index++
                                     durIndex++
                                 }
+                            }
+                            if(vibrato != 0){
+                                addVibratoToTrack(track, tick.toLong(), dur, channel, vibrato)
                             }
                             insertNote(
                                 track, tick, dur, channel, pitch,
@@ -209,7 +216,30 @@ object CounterpointInterpreter {
         mt.insertEvent(on)
         mt.insertEvent(off)
     }
-    fun insertNoteWithGlissando(
+    private fun addVibratoToTrack(mt: MidiTrack, start: Long, duration: Int, channel: Int, vibratoDivisor: Int){
+        val nVibrations = duration / vibratoDivisor // 4 vibrations in a quarter
+        if(nVibrations == 0 ) {
+            val expressionOn = Controller(start + duration / 3,channel,1, 0b1111111)
+            val expressionOff = Controller(start + duration - 4,channel,1, 0)
+            mt.insertEvent(expressionOn)
+            mt.insertEvent(expressionOff)
+        } else {
+            val vibrationDur = duration / nVibrations
+            val vibrationHalfDur = vibrationDur / 2
+            val vibrationQuarterDur = vibrationDur / 4
+            (0 until nVibrations).forEach(){
+                val expressionMiddle1 = Controller(start + vibrationDur * it + vibrationQuarterDur , channel,1, 64)
+                val expressionOn = Controller(start + vibrationDur * it + vibrationHalfDur , channel,1, 0b1111111)
+                val expressionMiddle2 = Controller(start + vibrationDur * it + vibrationHalfDur + vibrationQuarterDur , channel,1, 64)
+                val expressionOff = Controller(start +  vibrationDur * (it + 1) ,channel,1, 0)
+                mt.insertEvent(expressionMiddle1)
+                mt.insertEvent(expressionOn)
+                mt.insertEvent(expressionMiddle2)
+                mt.insertEvent(expressionOff)
+            }
+        }
+    }
+    private fun insertNoteWithGlissando(
         mt: MidiTrack, start: Long, duration: Long, channel: Int,
         pitch: Int, velOn: Int, velOff: Int, gliss: Int
     ) {

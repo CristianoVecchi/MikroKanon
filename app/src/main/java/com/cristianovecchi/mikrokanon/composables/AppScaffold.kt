@@ -150,11 +150,12 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val colorsDialogData by lazy { mutableStateOf(ListDialogData())}
     val customColorsDialogData by lazy { mutableStateOf(CustomColorsDialogData(model = model))}
     val ritornelloDialogData by lazy {mutableStateOf(ListDialogData())}
+    val vibratoDialogData by lazy {mutableStateOf(ListDialogData())}
     val zodiacDialogData by lazy{ mutableStateOf(MultiListDialogData())}
 
     val dimensions = model.dimensions
     val colors = model.appColors
-    val optionNames= listOf("Ensemble", "Range","Melody", "Glissando","Nuances", "Dynamic", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
+    val optionNames= listOf("Ensemble", "Range","Melody", "Glissando","Vibrato","Nuances", "Dynamic", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
         "Row Forms","Ritornello","Transpose","Doubling","8D AUDIO",
         "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
         "Export MIDI", "Colors", "Custom Colors","Language","Zodiac","Credits")
@@ -187,6 +188,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     MultiListDialog(zodiacDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     CustomColorsDialog(customColorsDialogData, lang.OKbutton)
     ListDialog(ritornelloDialogData, lang.OKbutton, dimensions.sequenceDialogFontSize, fillPrevious = true)
+    ListDialog(vibratoDialogData, lang.OKbutton, dimensions.sequenceDialogFontSize, fillPrevious = true)
 
 //    userOptionsData.forEach{
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
@@ -338,6 +340,30 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 )
                                 doublingDialogData.value =
                                     MultiListDialogData(itemList = doublingDialogData.value.itemList)
+                            }
+                        })
+                }
+                "Vibrato" -> {
+                    val intensity = userOptions.vibrato
+
+                    val timeIndices: List<String> = (0 until 9).map { if(it == 0) "-" else "~".repeat(it) }
+                    val isOn = intensity != 0
+                    val text = if (intensity == 0) lang.vibrato else "${lang.vibrato}: ${"~".repeat(intensity)}"
+                    SelectableCard(
+                        text = text,
+                        fontSize = fontSize,
+                        colors = colors,
+                        isSelected = isOn,
+                        onClick = {
+                            vibratoDialogData.value = ListDialogData(
+                                true, timeIndices, intensity, lang.selectVibrato
+                            ) { index ->
+                                model.updateUserOptions(
+                                    "vibrato",
+                                    index
+                                )
+                                ritornelloDialogData.value =
+                                    ListDialogData(itemList = vibratoDialogData.value.itemList)
                             }
                         })
                 }

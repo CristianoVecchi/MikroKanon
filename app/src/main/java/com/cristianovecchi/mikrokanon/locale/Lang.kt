@@ -214,6 +214,8 @@ data class Lang( // English by default
         "\uD834\uDDB1\uD834\uDDB2\uD834\uDDB1"
     else "Glissando",
     val selectGlissando: String = "Select some intervals for glissando!",
+    val vibrato: String = "Vibrato",
+    val selectVibrato: String = "Select the vibrato intensity!",
     val nuances: String = "Nuances",
     val nuancesOptions: List<String> = listOf("None", "Exalt short notes", "Exalt long notes"),
     val selectNuances: String = "Select dynamic nuances!",

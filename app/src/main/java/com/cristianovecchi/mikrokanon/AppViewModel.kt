@@ -269,6 +269,9 @@ init{
                 val glissandoFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].glissandoFlags }
                         ?: 0
+                val vibrato: Int =
+                    userOptionsData.value?.let { userOptionsData.value!![0].vibrato }
+                        ?: 0
 
                 error = Player.playCounterpoint(
                     mediaPlayer!!,
@@ -292,6 +295,7 @@ init{
                     melodyType,
                     glissandoFlags,
                     audio8DFlags,
+                    vibrato
                 )
             }
         mediaPlayer?.let{ if (it.isPlaying) _playing.value = true}
@@ -1038,6 +1042,9 @@ init{
             }
             "glissandoFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(glissandoFlags = value as Int)
+            }
+            "vibrato" -> {
+                newUserOptionsData  = optionsDataClone.copy(vibrato = value as Int)
             }
             "dynamics" -> {
                 newUserOptionsData = optionsDataClone.copy(dynamics = value as String)
