@@ -1,15 +1,33 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.extractFromMiddle
 import com.cristianovecchi.mikrokanon.rangeTo
 
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES,
     DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, PIERROT,
-    BAROQUE, PLUCKED_STRINGS
+    BAROQUE, PLUCKED_STRINGS, SPOOKY,
+    SYN_SQUARE_WAVE, SYN_SAW_WAVE, SYN_CALLIOPE, SYN_CHIFF,
+    SYN_CHARANG, SYN_VOICE, SYN_FIFTHS_SAW, SYN_BRASS_AND_LEAD,
+    SYN_FANTASIA, WARM_PAD, POLYSYNTH, SPACE_VOX,
+    BOWED_GLASS, METAL_PAD, HALO_PAD, SWEEP_PAD,
+    ICE_RAIN, SOUNDTRACK, CRYSTAL, ATMOSPHERE,
+    BRIGHTNESS, GOBLINS, ECHO_DROPS, SCI_FI
 }
 data class EnsemblePart( val instrument: Int, val octave: Int,
                          val allRange: IntRange = PIANO_ALL,
-                         val colorRange: IntRange = allRange) // if colorRange is not specified, allRange will be taken
+                         val colorRange: IntRange = allRange){ // if colorRange is not specified, allRange will be taken
+
+    fun getRangeByType(rangeType: Int): IntRange {
+        return when(rangeType) {
+            1 -> allRange
+            2 -> colorRange
+            3 -> colorRange.extractFromMiddle(8)
+            4 -> colorRange.extractFromMiddle(6)
+            else -> PIANO_ALL
+        }
+    }
+}
 
 
 object Ensembles {
@@ -29,6 +47,31 @@ object Ensembles {
             EnsembleType.PIERROT -> getPierrot(nParts)
             EnsembleType.BAROQUE -> getBaroque(nParts)
             EnsembleType.PLUCKED_STRINGS -> getPluckedStrings(nParts)
+            EnsembleType.SPOOKY -> getSpooky(nParts)
+            EnsembleType.SYN_SQUARE_WAVE -> getKeyboardInstrument(SYN_SQUARE_WAVE ,nParts)
+            EnsembleType.SYN_SAW_WAVE -> getKeyboardInstrument(SYN_SAW_WAVE ,nParts)
+            EnsembleType.SYN_CALLIOPE -> getKeyboardInstrument(SYN_CALLIOPE ,nParts)
+            EnsembleType.SYN_CHIFF -> getKeyboardInstrument(SYN_CHIFF ,nParts)
+            EnsembleType.SYN_CHARANG -> getKeyboardInstrument(SYN_CHARANG ,nParts)
+            EnsembleType.SYN_VOICE -> getKeyboardInstrument(SYN_VOICE ,nParts)
+            EnsembleType.SYN_FIFTHS_SAW -> getKeyboardInstrument(SYN_FIFTHS_SAW ,nParts)
+            EnsembleType.SYN_BRASS_AND_LEAD -> getKeyboardInstrument(SYN_BRASS_AND_LEAD ,nParts)
+            EnsembleType.SYN_FANTASIA -> getKeyboardInstrument(SYN_FANTASIA ,nParts)
+            EnsembleType.WARM_PAD -> getKeyboardInstrument(WARM_PAD ,nParts)
+            EnsembleType.POLYSYNTH -> getKeyboardInstrument(POLYSYNTH ,nParts)
+            EnsembleType.SPACE_VOX -> getKeyboardInstrument(SPACE_VOX ,nParts)
+            EnsembleType.BOWED_GLASS -> getKeyboardInstrument(BOWED_GLASS ,nParts)
+            EnsembleType.METAL_PAD -> getKeyboardInstrument(METAL_PAD ,nParts)
+            EnsembleType.HALO_PAD -> getKeyboardInstrument(HALO_PAD ,nParts)
+            EnsembleType.SWEEP_PAD -> getKeyboardInstrument(SWEEP_PAD ,nParts)
+            EnsembleType.ICE_RAIN -> getKeyboardInstrument(ICE_RAIN ,nParts)
+            EnsembleType.SOUNDTRACK -> getKeyboardInstrument(SOUNDTRACK ,nParts)
+            EnsembleType.CRYSTAL -> getKeyboardInstrument(CRYSTAL ,nParts)
+            EnsembleType.ATMOSPHERE -> getKeyboardInstrument(ATMOSPHERE ,nParts)
+            EnsembleType.BRIGHTNESS -> getKeyboardInstrument(BRIGHTNESS ,nParts)
+            EnsembleType.GOBLINS -> getKeyboardInstrument(GOBLINS ,nParts)
+            EnsembleType.ECHO_DROPS -> getKeyboardInstrument(ECHO_DROPS ,nParts)
+            EnsembleType.SCI_FI -> getKeyboardInstrument(SCI_FI ,nParts)
         }
     }
 
@@ -913,6 +956,7 @@ object Ensembles {
             else -> listOf()
         }
     }
+
     fun getPluckedStrings(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2 -> listOf(
@@ -1016,6 +1060,133 @@ object Ensembles {
             )
             else -> listOf()
         }
+    }
+    fun getSpooky(nParts: Int): List<EnsemblePart> {
+
+        return when (nParts) {
+            1, 2, 3 -> listOf(
+                PARTS_BOWED_GLASS[5],
+                PARTS_ECHO_DROPS[4],
+                PARTS_WARM_PAD[2],
+            )
+            in (4..6) -> listOf(
+                PARTS_BOWED_GLASS[5],
+                PARTS_ECHO_DROPS[4],
+                PARTS_WARM_PAD[4],
+                PARTS_BOWED_GLASS[3],
+                PARTS_SOUNDTRACK[3],
+                PARTS_GOBLINS[2]
+            )
+            7 -> listOf(
+                PARTS_BOWED_GLASS[5],
+                PARTS_ECHO_DROPS[4],
+                PARTS_WARM_PAD[4],
+                PARTS_BOWED_GLASS[3],
+                PARTS_SOUNDTRACK[3],
+                PARTS_GOBLINS[2],
+                PARTS_SYN_VOICE[1]
+            )
+            8 -> listOf(
+                PARTS_ECHO_DROPS[6],
+                PARTS_BOWED_GLASS[5],
+                PARTS_ECHO_DROPS[4],
+                PARTS_SOUNDTRACK[4],
+                PARTS_GOBLINS[3],
+                PARTS_WARM_PAD[3],
+                PARTS_GOBLINS[2],
+                PARTS_SYN_VOICE[1]
+            )
+            9 -> listOf(
+                PARTS_ECHO_DROPS[6],
+                PARTS_BOWED_GLASS[5],
+                PARTS_ECHO_DROPS[5],
+                PARTS_ECHO_DROPS[4],
+                PARTS_WARM_PAD[4],
+                PARTS_BOWED_GLASS[3],
+                PARTS_SOUNDTRACK[3],
+                PARTS_GOBLINS[2],
+                PARTS_SYN_VOICE[1]
+            )
+            in 10..12 -> listOf(
+                PARTS_WARM_PAD[7],
+                PARTS_WARM_PAD[6],
+                PARTS_ECHO_DROPS[6],
+                PARTS_BOWED_GLASS[5],
+                PARTS_WARM_PAD[5],
+                PARTS_ECHO_DROPS[4],
+                PARTS_WARM_PAD[4],
+                PARTS_BOWED_GLASS[3],
+                PARTS_SOUNDTRACK[3],
+                PARTS_GOBLINS[2],
+                PARTS_WARM_PAD[2],
+                PARTS_SYN_VOICE[1]
+            )
+            else -> listOf()
+        }
+    }
+    fun getKeyboardInstrument(keyboardInstrument: Int, nParts: Int): List<EnsemblePart> {
+        val instrument = createKeyboardInstrumentParts(keyboardInstrument)
+        return when (nParts) {
+            1, 2, 3 -> listOf(
+                instrument[5],
+                instrument[4],
+                instrument[2],
+            )
+            in (4..6) -> listOf(
+                instrument[5],
+                instrument[4],
+                instrument[4],
+                instrument[3],
+                instrument[3],
+                instrument[2]
+            )
+            7 -> listOf(
+                instrument[5],
+                instrument[4],
+                instrument[4],
+                instrument[3],
+                instrument[3],
+                instrument[2],
+                instrument[1]
+            )
+            8 -> listOf(
+                instrument[6],
+                instrument[5],
+                instrument[4],
+                instrument[4],
+                instrument[3],
+                instrument[3],
+                instrument[2],
+                instrument[1]
+            )
+            9 -> listOf(
+                instrument[6],
+                instrument[5],
+                instrument[5],
+                instrument[4],
+                instrument[4],
+                instrument[3],
+                instrument[3],
+                instrument[2],
+                instrument[1]
+            )
+            in 10..12 -> listOf(
+                instrument[7],
+                instrument[6],
+                instrument[6],
+                instrument[5],
+                instrument[5],
+                instrument[4],
+                instrument[4],
+                instrument[3],
+                instrument[3],
+                instrument[2],
+                instrument[2],
+                instrument[1]
+            )
+            else -> listOf()
+        }
+
     }
 }
 

@@ -157,22 +157,32 @@ fun BoostedMikroKanonsButtons(
 @Composable
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
-    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onSingle: () -> Unit,
+    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit,
+    onSingle: () -> Unit, onDoppelgänger: () -> Unit,
 ) {
-    Row {
-        CustomButton(iconId = model.iconMap["tritone_substitution"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-            onTritoneSubstitution()
+    Column {
+        Row{
+            CustomButton(iconId = model.iconMap["single"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onSingle()
+            }
+            CustomButton(iconId = model.iconMap["doppelgänger"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onDoppelgänger()
+            }
         }
-        CustomButton(iconId = model.iconMap["round"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-            onRound()
-        }
-        CustomButton(iconId = model.iconMap["cadenza"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-            onCadenza()
-        }
-        CustomButton(iconId = model.iconMap["single"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-            onSingle()
+        Row {
+            CustomButton(iconId = model.iconMap["tritone_substitution"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onTritoneSubstitution()
+            }
+            CustomButton(iconId = model.iconMap["round"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onRound()
+            }
+            CustomButton(iconId = model.iconMap["cadenza"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onCadenza()
+            }
+
         }
     }
+
 }
 @Composable
 fun WavesButtons(

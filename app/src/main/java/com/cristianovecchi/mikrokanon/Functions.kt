@@ -202,7 +202,7 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
         deltas?.let{
             val delta = sectionDuration / count
             val rest = sectionDuration - (delta * count) // module operation without decimals
-            println("section duration:$sectionDuration  count:$count  delta:$delta  rest:$rest")
+            //println("section duration:$sectionDuration  count:$count  delta:$delta  rest:$rest")
             //if (deltas.isNotEmpty() && deltas.last() == -1L) deltas[deltas.size-1] = delta + rest else
             it.addAll(sectionDuration.divideDistributingRest(count))
         }

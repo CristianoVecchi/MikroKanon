@@ -78,6 +78,10 @@ class SequencesFragment(): Fragment() {
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onSingleFromSelector(list)
                                    },
+                                   onDoppelgänger = { list ->
+                                       findNavController().navigate(R.id.outputFragment)
+                                       model.onDoppelgängerFromSelector(list)
+                                   },
                                    onPedal = { nPedals, list ->
                                        findNavController().navigate(R.id.outputFragment)
                                        model.onPedalFromSelector(nPedals, list)

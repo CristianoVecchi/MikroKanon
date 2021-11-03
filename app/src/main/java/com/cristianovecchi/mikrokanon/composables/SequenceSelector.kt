@@ -17,6 +17,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.ActiveButtons
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.Computation
 import com.cristianovecchi.mikrokanon.composables.dialogs.ButtonsDialog
 import com.cristianovecchi.mikrokanon.composables.dialogs.SequencesDialog
 import com.cristianovecchi.mikrokanon.locale.Lang
@@ -35,6 +36,7 @@ fun SequenceSelector(model: AppViewModel,
                      onRound: (ArrayList<Clip>) -> Unit,
                      onCadenza: (ArrayList<Clip>) -> Unit,
                      onSingle: (ArrayList<Clip>) -> Unit,
+                     onDoppelgänger: (ArrayList<Clip>) -> Unit,
                      onPedal: (Int, ArrayList<Clip>) -> Unit,
                      onKP: (ArrayList<Clip>, Int, Boolean) -> Unit,
                      onFreePart: (ArrayList<Clip>, TREND) -> Unit,
@@ -136,6 +138,7 @@ fun SequenceSelector(model: AppViewModel,
                             onRound = { onRound(sequences[selected]) },
                             onCadenza = { onCadenza(sequences[selected]) },
                             onSingle = { onSingle(sequences[selected]) },
+                            onDoppelgänger = { onDoppelgänger(sequences[selected])},
                             onPedal1 = { onPedal(1, sequences[selected]) },
                             onPedal3 = { onPedal(3, sequences[selected]) },
                             onPedal5 = { onPedal(5, sequences[selected]) },

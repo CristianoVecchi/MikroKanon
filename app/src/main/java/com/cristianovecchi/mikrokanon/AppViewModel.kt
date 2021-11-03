@@ -45,6 +45,7 @@ sealed class Computation {
     data class Round(val counterpoints: List<Counterpoint>, val index: Int): Computation()
     data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
+    data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2 ) : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int) : Computation()
 }
@@ -103,7 +104,9 @@ class AppViewModel(
         "cadenza" to R.drawable.ic_baseline_autofps_select_24,
         "single" to R.drawable.ic_baseline_single_24,
         "music" to R.drawable.ic_baseline_music_note_24,
-        "settings" to R.drawable.ic_baseline_settings_24
+        "settings" to R.drawable.ic_baseline_settings_24,
+        "doppelgänger" to R.drawable.ic_baseline_shuffle_24
+
     )
 
 
@@ -121,6 +124,7 @@ class AppViewModel(
     }
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
+    public val MAX_PARTS = 12
 
     private val  maxVisibleCounterpoints: Int = 74
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
@@ -347,6 +351,18 @@ init{
         computationStack.pushAndDispatch(Computation.Single(originalCounterpoints, null, index))
         singleOnCounterpoints(originalCounterpoints, index)
     }
+    val onDoppelgänger= {
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        computationStack.pushAndDispatch(Computation.Doppelgänger(originalCounterpoints, null, index))
+        doppelgängerOnCounterpoints(originalCounterpoints, index)
+    }
+    val onDoppelgängerFromSelector = { list: ArrayList<Clip> ->
+        changeFirstSequence(list)
+        convertFirstSequenceToSelectedCounterpoint()
+        computationStack.pushAndDispatch(Computation.Doppelgänger(listOf(selectedCounterpoint.value!!.clone()), list,0))
+        doppelgängerOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+    }
     val onRoundFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
@@ -517,6 +533,7 @@ init{
                     is Computation.Fioritura -> computationStack.lastElement()
                     is Computation.Expand -> computationStack.lastElement()
                     is Computation.Round -> computationStack.lastElement()
+                    is Computation.Doppelgänger -> computationStack.lastElement()
                     is Computation.Cadenza -> computationStack.lastElement()
                     is Computation.Single-> computationStack.lastElement()
                     is Computation.Pedal -> computationStack.lastElement()
@@ -575,6 +592,9 @@ init{
                                 refreshComputation(false)
                             }
                         }
+                    }
+                    is Computation.Doppelgänger -> {
+                        doppelgängerOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
                     }
                     is Computation.Round -> {
                         if(stepBack){
@@ -863,6 +883,28 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = reduceCounterpointsToSinglePart(originalCounterpoints)
+                }
+                changeCounterpoints(newList, false)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
+    private fun doppelgängerOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            val ensType: EnsembleType =
+                EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType }
+                    ?: 0]
+            val rangeType: Int =
+                userOptionsData.value?.let { userOptionsData.value!![0].rangeType }
+                    ?: 0
+            val melodyType: Int =
+                userOptionsData.value?.let { userOptionsData.value!![0].melodyType }
+                    ?: 0
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = explodeCounterpointsToDoppelgänger(originalCounterpoints,
+                        MAX_PARTS, ensType, rangeType, melodyType )
                 }
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
@@ -1178,6 +1220,8 @@ init{
             zodiacEmojisActive = (flags and 4) == 4
         }
     }
+
+
 }
 
 

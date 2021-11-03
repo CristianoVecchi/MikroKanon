@@ -98,4 +98,23 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         val newPart = absPitches.map{ if(it != -1) it + transposition else -1}.map{ if(it>11) it - 12 else it}
         return AbsPart(newPart.toMutableList(),rowForm,transpose,delay)
     }
+
+    fun divideWithSubSequencer(octave: Int, range: IntRange, melodyType: Int): List<AbsPart> {
+        val actualPitches = Insieme.findMelody(octave, absPitches.toIntArray(), range.first, range.last, melodyType).also{println(it.toList())}
+        val mssq = MelodySubSequencer(actualPitches)
+        val subSequences = mssq.subSequences
+        mssq.printSubSequences()
+        val partAscendant = IntArray(this.absPitches.size).apply{fill(-1)}
+        val partDescendant = IntArray(this.absPitches.size).apply{fill(-1)}
+        subSequences.forEach { ss ->
+            when (ss.quality!!){
+                MelodySubSequencer.SubSeqQuality.ASCENDENT -> if(ss.nNotes > 1) (ss.start until ss.start+ss.nNotes).forEach { partAscendant[it] = absPitches[it] }
+                MelodySubSequencer.SubSeqQuality.DESCENDENT -> if(ss.nNotes > 1) (ss.start until ss.start+ss.nNotes).forEach { partDescendant[it] = absPitches[it] }
+                MelodySubSequencer.SubSeqQuality.EQUAL -> (ss.start until ss.start+ss.nNotes).forEach { partDescendant[it] = absPitches[it] }
+                MelodySubSequencer.SubSeqQuality.INTERRUPTED -> (ss.start until ss.start+ss.nNotes).forEach { partAscendant[it] = absPitches[it] }
+            }
+        }
+        partAscendant.forEachIndexed { index, i -> if(i == partDescendant[index])  partDescendant[index] = -1}
+        return listOf(copy(absPitches = partAscendant.toMutableList()), copy(absPitches = partDescendant.toMutableList()) )
+    }
 }

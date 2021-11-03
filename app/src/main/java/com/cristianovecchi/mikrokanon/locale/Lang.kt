@@ -54,35 +54,43 @@ enum class NoteNamesEl {
 //enum class NoteNamesAr {
 //    دو, ري, مي, فا, صول, لا,سي , EMPTY
 //}
+
+val synthsNames = listOf("Square Wave","Saw Wave", "Calliope", "Chiff",
+        "Charang", "Synth Voice", "Fifths Saw", "Brass and Lead",
+    "Fantasia", "Warm Pad", "Polysynth", "Space Vox",
+    "Bowed Glass", "Metal Pad", "Halo Pad", "Sweep Pad",
+    "Ice Rain", "Soundtrack", "Crystal", "Atmosphere",
+"Brightness", "Goblins", "Echo Drops", "Sci Fi")
 val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية", "ساكسفون", "فلوت",
-    "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","بييرو","الباروك","أوتار نتف")
+    "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","بييرو","الباروك","أوتار نتف","Spooky")
 val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente", "Saxophone", "Flöten",
-    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Pierrot","Barockensemble","Zupfinstrument")
+    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Pierrot","Barockensemble","Zupfinstrument","Spooky")
 val ensembleNamesEl = listOf("Έγχόρδα", "Ξύλινα πνευστά της συμφωνικής ορχήστρας", "Ορχήστρα εγχόρδων", "Χάλκινα πνευστά της συμφωνικής ορχήστρας", "Σαξόφωνα", "Φλάουτα",
-    "Διπλά καλάμια", "Κλαρινέτ", "Φαγκότα", "Βιολοντσέλα", "Πιάνο", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές")
+    "Διπλά καλάμια", "Κλαρινέτ", "Φαγκότα", "Βιολοντσέλα", "Πιάνο", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές","Spooky")
 val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Saxophones", "Flutes",
-    "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","Pierrot","Baroque","Plucked strings")
+    "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","Pierrot","Baroque","Plucked strings","Spooky")
+
 val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal", "Saxofones", "Flautas",
-    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Pierrot","Barroco","Instrumentos de cuerda pulsada")
+    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Pierrot","Barroco","Instrumentos de cuerda pulsada","Spooky")
 val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기", "색소폰", "플루트",
-    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","피에로","바로크","발현악기")
+    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","피에로","바로크","발현악기","Spooky")
 val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器", "サックス", "フルート",
-    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ピエロ", "バロック","撥弦楽器")
+    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ピエロ", "バロック","撥弦楽器","Spooky")
 val ensembleNamesId = listOf("Alat musik dawai membungkuk", "Instrumen musik tiup kayu", "Orkestra dawai", "Instrumen musik tiup logam", "Saxophone", "Seruling",
-    "Alang-alang ganda", "Klarinet", "Bassoon", "Cellos", "Piano", "Pierrot", "Baroque", "Dawai yang dipetik")
+    "Alang-alang ganda", "Klarinet", "Bassoon", "Cellos", "Piano", "Pierrot", "Baroque", "Dawai yang dipetik","Spooky")
 val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni", "Saxofoni", "Flauti",
-    "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte","Pierrot","Barocco", "Corde pizzicate")
+    "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte","Pierrot","Barocco", "Corde pizzicate","Spooky")
 val ensembleNamesPt = listOf("Cordas friccionadas", "Madeiras", "Orquestra de cordas", "Metais", "Saxofones", "Flautas",
-    "Palhetas duplas", "Clarinetes", "Fagotes", "Violoncelos", "Piano", "Pierrot", "Barroco", "Cordas dedilhadas")
+    "Palhetas duplas", "Clarinetes", "Fagotes", "Violoncelos", "Piano", "Pierrot", "Barroco", "Cordas dedilhadas","Spooky")
 val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Saxophones", "Flûtes",
-    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Pierrot","Baroque","Cordes pincées")
+    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Pierrot","Baroque","Cordes pincées","Spooky")
 val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты", "Саксофоны", "Флейты",
-    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано","Пьеро","Барокко","Струнные щипковые инструменты")
+    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано","Пьеро","Барокко","Струнные щипковые инструменты","Spooky")
 val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao", "Orchestra ya ala za nyuzi", "Vyombo vya upepo vya chuma",
     "Saxophones", "Zilizimbi","Mwanzi mara mbili", "Clarinets", "Bassoons", "Cellos", "Piano",
-    "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa")
+    "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa","Spooky")
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器", "薩氏管", "长笛",
-    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","皮埃罗","巴洛克","撥弦樂器")
+    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","皮埃罗","巴洛克","撥弦樂器","Spooky")
 
 private var zodiacPlanets = listOf("\u2644", "\u2643", "\u2642","\u2640","\u263F","\u263D","\u2609")
 private var zodiacPlanetsEmojis = listOf("\u1fA90","\u9795","\u9794","\u9792","\u9791","\u1F31C","\u1F31E") // are different on xiaomi
@@ -102,6 +110,11 @@ fun getGlissandoSymbols(): Pair<String,String>{
     return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
         Pair("\uD834\uDDB1", "\uD834\uDDB2")
     else Pair("➚", "➘")
+}
+fun getVibratoSymbol(): String {
+    return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+      "\u223f"
+    else "~"
 }
 fun createGlissandoIntervals(doublingNames: List<String>): List<String>{
     val symbols = getGlissandoSymbols()

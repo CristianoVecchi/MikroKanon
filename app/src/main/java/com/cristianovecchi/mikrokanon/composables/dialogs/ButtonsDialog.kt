@@ -52,7 +52,8 @@ fun ButtonsDialog(
                                     onRound = buttonsDialogData.value.onRound,
                                     onCadenza = buttonsDialogData.value.onCadenza,
                                     onSingle = buttonsDialogData.value.onSingle,
-                                    onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution
+                                    onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution,
+                                    onDoppelgänger = buttonsDialogData.value.onDoppelgänger
                                 )
                                 1 -> WavesButtons(
                                     model = buttonsDialogData.value.model,

@@ -64,13 +64,7 @@ object CounterpointInterpreter {
             var durIndex = 0
 
             // RANGE EXTENSION
-            val range = when(rangeType) {
-                    1 -> ensemblePart.allRange
-                    2 -> ensemblePart.colorRange
-                    3 -> ensemblePart.colorRange.extractFromMiddle(8)
-                    4 -> ensemblePart.colorRange.extractFromMiddle(6)
-                    else -> PIANO_ALL
-            }
+            val range = ensemblePart.getRangeByType(rangeType)
 
             //NUANCES
             val actualPitches = Insieme.findMelody(ensemblePart.octave, part.absPitches.toIntArray(), range.first, range.last, melodyType)

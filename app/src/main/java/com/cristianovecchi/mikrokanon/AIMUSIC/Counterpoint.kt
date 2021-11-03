@@ -263,6 +263,24 @@ data class Counterpoint(val parts: List<AbsPart>,
         val reducedAbsPitches = (0 until maxSize()).map{ this.getColumnValuesWithEmptyValues(it)}.flatten().toMutableList()
         return this.copy(parts = listOf(parts[0].copy(absPitches = reducedAbsPitches)))
     }
+    fun explodeToDoppelgänger(maxParts: Int, ensembleType: EnsembleType, rangeType: Int, melodyType: Int): Counterpoint {
+        val newParts = mutableListOf<AbsPart>()
+        val nPartsToExplode = (maxParts - (parts.size * 2 - maxParts).absoluteValue ) / 2
+        val nNewParts = nPartsToExplode * 2 + ( parts.size - nPartsToExplode)
+        println("nNewParts: "+ nNewParts)
+        val ensembles = Ensembles.getEnsemble(nNewParts, ensembleType)
+        parts.forEachIndexed { index, absPart ->
+            if(index < nPartsToExplode){
+                val ensemble = ensembles[index]
+                val partTwins: List<AbsPart> =
+                    absPart.divideWithSubSequencer(ensemble.octave, ensemble.getRangeByType(rangeType), melodyType )
+                newParts.addAll(partTwins)
+            } else {
+                newParts.add(absPart)
+            }
+        }
+        return Counterpoint(newParts.toList(), this.intervalSet)
+    }
     fun detectIntervalsInColumns(detectorIntervalSet: List<Int>): List<Boolean> {
         val result = mutableListOf<Boolean>()
         val maxSize = maxSize()

@@ -90,6 +90,9 @@ class OutputFragment: Fragment() {
                                 onSingle = {
                                     model.onSingle()
                                 },
+                                onDoppelgänger = {
+                                    model.onDoppelgänger()
+                                },
                                 onPedal = { nPedals ->
                                     model.onPedal(nPedals)
                                 },

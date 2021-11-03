@@ -34,7 +34,7 @@ public class MelodySubSequencer {
         return SubSeqQuality.EQUAL;
     }
 
-    public void printSubSequences(){
+    public void printSubSequenceVelocities(){
         for (MelodySubSequence msq: subSequences
              ) {
             int[] vels = new int[msq.nNotes];
@@ -45,6 +45,18 @@ public class MelodySubSequencer {
                     Arrays.toString(getSubSequencePitches(msq))+
                     " vels: "+Arrays.toString(vels));
         }
+    }
+    public void printSubSequences(){
+        for (MelodySubSequence msq: subSequences
+        ) {
+            System.out.println(msq.quality.toString()+" --- " +
+                    "start: " + msq.start +
+                    " nNotes: " + msq.nNotes);
+        }
+    }
+
+    public MelodySubSequence[] getSubSequences(){
+        return subSequences;
     }
 
 

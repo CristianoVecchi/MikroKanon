@@ -38,6 +38,31 @@ const val BANJO = 105
 const val SHAMISEN = 106
 const val KOTO = 107
 
+const val SYN_SQUARE_WAVE = 80
+const val SYN_SAW_WAVE = 81
+const val SYN_CALLIOPE = 82
+const val SYN_CHIFF = 83
+const val SYN_CHARANG = 84
+const val SYN_VOICE = 85
+const val SYN_FIFTHS_SAW = 86
+const val SYN_BRASS_AND_LEAD = 87
+const val SYN_FANTASIA = 88
+const val WARM_PAD = 89
+const val POLYSYNTH = 90
+const val SPACE_VOX = 91
+const val BOWED_GLASS = 92
+const val METAL_PAD = 93
+const val HALO_PAD = 94
+const val SWEEP_PAD = 95
+const val ICE_RAIN = 96
+const val SOUNDTRACK = 97
+const val CRYSTAL = 98
+const val ATMOSPHERE = 99
+const val BRIGHTNESS = 100
+const val GOBLINS = 101
+const val ECHO_DROPS = 102
+const val SCI_FI = 103
+
 const val C1 = 24
 const val C2 = 36
 const val C3 = 48
@@ -71,12 +96,95 @@ val PARTS_HARPSICHORD: List<EnsemblePart> = listOf( // the array index indicates
     EnsemblePart(HARPSICHORD, 8, HARPSICHORD_ALL, IntRange(89, C8)) // F6 - C8
 )
 val HARP_ALL: IntRange = IntRange(A0, C8)
-val PARTS_HARP: List<EnsemblePart> = listOf( // the array index indicates the requested octave + 5M
+val PARTS_HARP: List<EnsemblePart> by lazy { listOf( // the array index indicates the requested octave + 5M
     EnsemblePart(HARP, 0, HARP_ALL), //useless
     EnsemblePart(HARP, 1, HARP_ALL, IntRange(A0, 40)), // A0 - E2
     *(2..6).map{ val start = (it+1)*12; EnsemblePart(HARP, it, HARP_ALL, IntRange(start, start + 19))}.toTypedArray(),
     EnsemblePart(HARP, 8, HARP_ALL, IntRange(89, C8)) // F6 - C8
-)
+)}
+val SYN_SQUARE_WAVE_ALL: IntRange = IntRange(A0, C8)
+val PARTS_SYN_SQUARE_WAVE: List<EnsemblePart> by lazy { listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(SYN_SQUARE_WAVE, 0, SYN_SQUARE_WAVE_ALL), //useless
+    EnsemblePart(SYN_SQUARE_WAVE, 1, SYN_SQUARE_WAVE_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(SYN_SQUARE_WAVE, it, SYN_SQUARE_WAVE_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(SYN_SQUARE_WAVE, 8, SYN_SQUARE_WAVE_ALL, IntRange(89, C8)) // F6 - C8
+)}
+val SYN_SAW_WAVE_ALL: IntRange = IntRange(A0, C8)
+val PARTS_SYN_SAW_WAVE: List<EnsemblePart> by lazy { listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(SYN_SAW_WAVE, 0, SYN_SAW_WAVE_ALL), //useless
+    EnsemblePart(SYN_SAW_WAVE, 1, SYN_SAW_WAVE_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(SYN_SAW_WAVE, it, SYN_SAW_WAVE_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(SYN_SAW_WAVE, 8, SYN_SAW_WAVE_ALL, IntRange(89, C8)) // F6 - C8
+)}
+val SYN_CALLIOPE_ALL: IntRange = IntRange(A0, C8)
+val PARTS_SYN_CALLIOPE: List<EnsemblePart> by lazy { listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(SYN_CALLIOPE, 0, SYN_CALLIOPE_ALL), //useless
+    EnsemblePart(SYN_CALLIOPE, 1, SYN_CALLIOPE_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(SYN_CALLIOPE, it, SYN_CALLIOPE_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(SYN_CALLIOPE, 8, SYN_CALLIOPE_ALL, IntRange(89, C8)) // F6 - C8
+)}
+val SYN_CHIFF_ALL: IntRange = IntRange(A0, C8)
+val PARTS_SYN_CHIFF: List<EnsemblePart> by lazy { listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(SYN_CHIFF, 0, SYN_CHIFF_ALL), //useless
+    EnsemblePart(SYN_CHIFF, 1, SYN_CHIFF_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(SYN_CHIFF, it, SYN_CHIFF_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(SYN_CHIFF, 8, SYN_CHIFF_ALL, IntRange(89, C8)) // F6 - C8
+)}
+val SYN_CHARANG_ALL: IntRange = IntRange(A0, C8)
+val PARTS_SYN_CHARANG: List<EnsemblePart> by lazy { listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(SYN_CHARANG, 0, SYN_CHARANG_ALL), //useless
+    EnsemblePart(SYN_CHARANG, 1, SYN_CHARANG_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(SYN_CHARANG, it, SYN_CHARANG_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(SYN_CHARANG, 8, SYN_CHARANG_ALL, IntRange(89, C8)) // F6 - C8
+)}
+val SYN_VOICE_ALL: IntRange = IntRange(A0, C8)
+val PARTS_SYN_VOICE: List<EnsemblePart> by lazy { listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(SYN_VOICE, 0, SYN_VOICE_ALL), //useless
+    EnsemblePart(SYN_VOICE, 1, SYN_VOICE_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(SYN_VOICE, it, SYN_VOICE_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(SYN_VOICE, 8, SYN_VOICE_ALL, IntRange(89, C8)) // F6 - C8
+)}
+val SYN_FIFTHS_SAW_ALL: IntRange = IntRange(A0, C8)
+val PARTS_SYN_FIFTHS_SAW: List<EnsemblePart> by lazy { listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(SYN_FIFTHS_SAW, 0, SYN_FIFTHS_SAW_ALL), //useless
+    EnsemblePart(SYN_FIFTHS_SAW, 1, SYN_FIFTHS_SAW_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(SYN_FIFTHS_SAW, it, SYN_FIFTHS_SAW_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(SYN_FIFTHS_SAW, 8, SYN_FIFTHS_SAW_ALL, IntRange(89, C8)) // F6 - C8
+)}
+val SYN_BRASS_AND_LEAD_ALL: IntRange = IntRange(A0, C8)
+val PARTS_SYN_BRASS_AND_LEAD: List<EnsemblePart> by lazy { listOf( // the array index indicates the requested octave + 5M
+    EnsemblePart(SYN_BRASS_AND_LEAD, 0, SYN_BRASS_AND_LEAD_ALL), //useless
+    EnsemblePart(SYN_BRASS_AND_LEAD, 1, SYN_BRASS_AND_LEAD_ALL, IntRange(A0, 40)), // A0 - E2
+    *(2..6).map{ val start = (it+1)*12; EnsemblePart(SYN_BRASS_AND_LEAD, it, SYN_BRASS_AND_LEAD_ALL, IntRange(start, start + 19))}.toTypedArray(),
+    EnsemblePart(SYN_BRASS_AND_LEAD, 8, SYN_BRASS_AND_LEAD_ALL, IntRange(89, C8)) // F6 - C8
+)}
+
+val PARTS_SYN_FANTASIA by lazy{ createKeyboardInstrumentParts(SYN_FANTASIA) }
+val PARTS_WARM_PAD by lazy{ createKeyboardInstrumentParts(WARM_PAD) }
+val PARTS_SPACE_VOX by lazy{ createKeyboardInstrumentParts(SPACE_VOX) }
+val PARTS_BOWED_GLASS by lazy{ createKeyboardInstrumentParts(BOWED_GLASS) }
+val PARTS_METAL_PAD by lazy{ createKeyboardInstrumentParts(METAL_PAD) }
+val PARTS_HALO_PAD by lazy{ createKeyboardInstrumentParts(HALO_PAD) }
+val PARTS_SWEEP_PAD by lazy{ createKeyboardInstrumentParts(SWEEP_PAD) }
+val PARTS_ICE_RAIN by lazy{ createKeyboardInstrumentParts(ICE_RAIN) }
+val PARTS_SOUNDTRACK by lazy{ createKeyboardInstrumentParts(SOUNDTRACK) }
+val PARTS_CRYSTAL by lazy{ createKeyboardInstrumentParts(CRYSTAL) }
+val PARTS_ATMOSPHERE by lazy{ createKeyboardInstrumentParts(ATMOSPHERE) }
+val PARTS_BRIGHTNESS by lazy{ createKeyboardInstrumentParts(BRIGHTNESS) }
+val PARTS_GOBLINS by lazy{ createKeyboardInstrumentParts(GOBLINS) }
+val PARTS_ECHO_DROPS by lazy{ createKeyboardInstrumentParts(ECHO_DROPS) }
+val PARTS_SCI_FI by lazy{ createKeyboardInstrumentParts(SCI_FI) }
+
+fun createKeyboardInstrumentParts(instrument: Int, rangeAll: IntRange = IntRange(A0, C8)): List<EnsemblePart>{
+    return listOf(
+        EnsemblePart(instrument, 0, rangeAll), //useless
+        EnsemblePart(instrument, 1, rangeAll, IntRange(A0, 40)), // A0 - E2
+        *(2..6).map{ val start = (it+1)*12; EnsemblePart(instrument, it, rangeAll, IntRange(start, start + 19))}.toTypedArray(),
+        EnsemblePart(instrument, 8, rangeAll, IntRange(89, C8)) // F6 - C8
+    )
+}
+
+
 
 val PICCOLO_ALL: IntRange = IntRange(74, C8) // D5 - C8
 val PICCOLO_LOW3: IntRange = IntRange(74, 90) // D5 - F#6

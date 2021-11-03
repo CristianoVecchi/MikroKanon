@@ -118,7 +118,7 @@ data class ButtonsDialogData(
     val onPedal1: () -> Unit = {}, val onPedal3: () -> Unit = {}, val onPedal5: () -> Unit = {},
     val onTritoneSubstitution: () -> Unit = {}, val onRound: () -> Unit = {},
     val onCadenza: () -> Unit = {}, val onSingle: () -> Unit = {},
-    val onMK5reducted: () -> Unit = {},
+    val onMK5reducted: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
     val onSubmitButtonClick: () -> Unit = {})
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
@@ -256,7 +256,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
             val fontSize = dimensions.optionsFontSize
             when (optionName) {
                 "Ensemble" -> {
-                    val ensNames: List<String> = lang.ensembleNames
+                    val ensNames: List<String> = lang.ensembleNames + synthsNames
                     val ensIndex = userOptions.ensembleType
                     SelectableCard(
                         text = "${lang.ensemble}: ${ensNames[ensIndex]}",
@@ -345,10 +345,10 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 }
                 "Vibrato" -> {
                     val intensity = userOptions.vibrato
-
-                    val timeIndices: List<String> = (0 until 9).map { if(it == 0) "-" else "~".repeat(it) }
+                    val sym = getVibratoSymbol()
+                    val timeIndices: List<String> = (0 until 9).map { if(it == 0) "-" else sym.repeat(it) }
                     val isOn = intensity != 0
-                    val text = if (intensity == 0) lang.vibrato else "${lang.vibrato}: ${"~".repeat(intensity)}"
+                    val text = if (intensity == 0) lang.vibrato else "${lang.vibrato}: ${sym.repeat(intensity)}"
                     SelectableCard(
                         text = text,
                         fontSize = fontSize,

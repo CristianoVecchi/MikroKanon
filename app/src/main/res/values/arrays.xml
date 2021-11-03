@@ -6956,6 +6956,163 @@
         <item>#73724c</item>
     </array>
 
+    <array name="colors_595">
+        <item>#fefaec</item>
+        <item>#101010</item>
+        <item>#000000</item>
+
+        <item>#8cb3c5</item>
+        <item>#ab1b10</item>
+        <item>#9b0f00</item>
+
+        <item>#ff4c00</item>
+    </array>
+    <array name="colors_596">
+        <item>#9b0f00</item>
+        <item>#fefaec</item>
+        <item>#eeeadc</item>
+
+        <item>#ff4c00</item>
+        <item>#8cb3c5</item>
+        <item>#7ca3b5</item>
+
+        <item>#000000</item>
+    </array>
+    <array name="colors_597">
+        <item>#000000</item>
+        <item>#8cb3c5</item>
+        <item>#7ca3b5</item>
+
+        <item>#ff4c00</item>
+        <item>#bb2f20</item>
+        <item>#9b0f00</item>
+
+        <item>#000000</item>
+    </array>
+    <array name="colors_598">
+        <item>#182d38</item>
+        <item>#49636c</item>
+        <item>#39535c</item>
+
+        <item>#989e9a</item>
+        <item>#ebfbed</item>
+        <item>#dbebdd</item>
+
+        <item>#cac511</item>
+    </array>
+    <array name="colors_599">
+        <item>#cac511</item>
+        <item>#ebfbed</item>
+        <item>#dbebdd</item>
+
+        <item>#989e9a</item>
+        <item>#49636c</item>
+        <item>#39535c</item>
+
+        <item>#182d38</item>
+    </array>
+    <array name="colors_600">
+        <item>#ebfbed</item>
+        <item>#182d38</item>
+        <item>#081d28</item>
+
+        <item>#cac511</item>
+        <item>#989e9a</item>
+        <item>#888e8a</item>
+
+        <item>#39535c</item>
+    </array>
+    <array name="colors_601">
+        <item>#39535c</item>
+        <item>#cac511</item>
+        <item>#bab501</item>
+
+        <item>#182d38</item>
+        <item>#ebfbed</item>
+        <item>#dbebdd</item>
+
+        <item>#989e9a</item>
+    </array>
+    <array name="colors_602">
+        <item>#84828f</item>
+        <item>#3f393e</item>
+        <item>#2f292e</item>
+
+        <item>#423d40</item>
+        <item>#625e63</item>
+        <item>#524e53</item>
+
+        <item>#85797a</item>
+    </array>
+    <array name="colors_603">
+    <item>#85797a</item>
+    <item>#625e63</item>
+    <item>#524e53</item>
+
+    <item>#84828f</item>
+    <item>#524d50</item>
+    <item>#423d40</item>
+
+    <item>#3f393e</item>
+    </array>
+    <array name="colors_604">
+        <item>#214e44</item>
+        <item>#f7f7f7</item>
+        <item>#e7e7e7</item>
+
+        <item>#d7d7d7</item>
+        <item>#113e34</item>
+        <item>#012e24</item>
+
+        <item>#c7c7c7</item>
+    </array>
+    <array name="colors_605">
+        <item>#e7e7e7</item>
+        <item>#315e54</item>
+        <item>#214e44</item>
+
+        <item>#d7d7d7</item>
+        <item>#c7c7c7</item>
+        <item>#b7b7b7</item>
+
+        <item>#113e34</item>
+    </array>
+    <array name="colors_606">
+        <item>#fac585</item>
+        <item>#104845</item>
+        <item>#003835</item>
+
+        <item>#c0cec5</item>
+        <item>#77b3b8</item>
+        <item>#67a3a8</item>
+
+        <item>#e8ca9e</item>
+    </array>
+    <array name="colors_607">
+        <item>#77b3b8</item>
+        <item>#d0d3d5</item>
+        <item>#c0c3c5</item>
+
+        <item>#003835</item>
+        <item>#e8ca9e</item>
+        <item>#d8ba8e</item>
+
+        <item>#fac585</item>
+    </array>
+    <array name="colors_608">
+        <item>#003835</item>
+        <item>#77b3b8</item>
+        <item>#67a3a8</item>
+
+        <item>#c0cecf</item>
+        <item>#e8ca9e</item>
+        <item>#d8ba8e</item>
+
+        <item>#fac585</item>
+    </array>
+
+
+
 
 
 
