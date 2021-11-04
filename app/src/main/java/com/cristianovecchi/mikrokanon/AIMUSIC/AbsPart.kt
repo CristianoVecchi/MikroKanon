@@ -14,7 +14,7 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         }
 
         fun emptyPart(nNotes: Int = 0): AbsPart {
-            val emptyPart = (0 until nNotes).map{ -1 }.toMutableList()
+            val emptyPart = MutableList(nNotes){ -1 }
             return AbsPart(emptyPart)
         }
 

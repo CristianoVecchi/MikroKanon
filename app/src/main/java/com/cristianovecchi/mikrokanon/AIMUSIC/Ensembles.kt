@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.extractFromMiddle
 import com.cristianovecchi.mikrokanon.rangeTo
 
@@ -31,6 +32,11 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
 
 
 object Ensembles {
+    fun getEnsembleMix(nParts: Int, types: List<EnsembleType>):  List<EnsemblePart> {
+        val mix = types.map{ getEnsemble(nParts, it)}
+        return (0 until nParts).toList().map{
+            mix[it % types.size][it]}
+    }
     fun getEnsemble(nParts: Int, type: EnsembleType): List<EnsemblePart> {
         return when (type) {
             EnsembleType.STRINGS -> getStrings(nParts)

@@ -54,7 +54,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                         .weight(3f)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(5f)
+                        .weight(4f)
                     var formsText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setForms = { index: Int, newForm: Int ->
@@ -130,7 +130,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                             }
                         }
                     }
-                    Column(modifier = modifierB) {
+                    Column(modifier = modifierB, verticalArrangement = Arrangement.Bottom) {
                         Spacer(modifier = Modifier.height(10.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -197,7 +197,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                         val buttonSize = model.dimensions.inputButtonSize - 14.dp
-                        val fontSize = 12
+                        val fontSize = 14
                         Row(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly

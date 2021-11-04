@@ -89,7 +89,7 @@ object Player {
     fun playCounterpoint(
         mediaPlayer: MediaPlayer, looping: Boolean,
         counterpoints: List<Counterpoint?>, dynamics: List<Float>, bpms: List<Float>, shuffle: Float,
-        rhythm: RhythmPatterns, ensembleType: EnsembleType,
+        rhythm: RhythmPatterns, ensembleTypes: List<EnsembleType>,
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
         rowForms: List<Pair<Int,Int>> = listOf(Pair(0,1)), ritornello: Int = 0, transpose: List<Int> = listOf(0),
         doublingFlags: Int = 0, nuances: Int = 0,
@@ -99,7 +99,9 @@ object Player {
         val durations = rhythm.values
         val actualDurations = if (rhythmShuffle) listOf(*durations.toTypedArray(),*durations.toTypedArray(),*durations.toTypedArray()).shuffled() else durations
         val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0}?.parts?.size ?: 0
-        val ensembleParts: List<EnsemblePart> = Ensembles.getEnsemble(nParts, ensembleType)
+        val ensembleParts: List<EnsemblePart> = if(ensembleTypes.size == 1) Ensembles.getEnsemble(nParts, ensembleTypes[0])
+                                                else Ensembles.getEnsembleMix(nParts, ensembleTypes)
+        //ensembleParts.display()
         val actualEnsembleParts = if (partsShuffle) ensembleParts.shuffled() else ensembleParts
         val firstCounterpoint = counterpoints.firstOrNull()
             ?: return "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
@@ -245,5 +247,6 @@ object Player {
             return mediaPlayer2
         }
 }
+
 
 

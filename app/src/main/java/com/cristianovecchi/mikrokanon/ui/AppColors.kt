@@ -39,6 +39,37 @@ data class AppColors(
     val inputBackgroundColor: Color = Color(0.3f,0.3f,0.6f,1.0f)
 ){
     companion object{
+        fun allBlack(): AppColors{
+            return AppColors(
+                selCardBackColorSelected = Color.Black,
+                selCardBackColorUnselected = Color.Black,
+                selCardTextColorSelected = Color.Black,
+                selCardTextColorUnselected = Color.Black,
+                selCardBorderColorSelected = Color.Black,
+                selCardBorderColorUnselected = Color.Black,
+
+                cellDarkColorUnselected = Color.Black,
+                cellLightColorUnselected = Color.Black,
+                cellDarkColorSelected = Color.Black,
+                cellLightColorSelected = Color.Black,
+                selectionBorderColor = Color.Black,
+                cellTextColorSelected = Color.Black,
+                cellTextColorUnselected = Color.Black,
+
+                iconButtonBorderColor = Color.Black,
+                iconButtonIconColor = Color.Black,
+                iconButtonBackgroundColor = Color.Black,
+                iconButtonInactiveBorderColor = Color.Black,
+                iconButtonInactiveIconColor = Color.Black,
+                iconButtonInactiveBackgroundColor = Color.Black,
+
+                sequencesListBackgroundColor = Color.Black,
+                buttonsDisplayBackgroundColor = Color.Black,
+                drawerBackgroundColor = Color.Black,
+                inputBackgroundColor =  Color.Black
+
+            )
+        }
         fun createCustomColors(fontColor: Color, backgroundColor1: Color, backgroundColor2: Color,
                                beat: Color, pass1: Color, pass2: Color, radar: Color): AppColors{
             return AppColors(

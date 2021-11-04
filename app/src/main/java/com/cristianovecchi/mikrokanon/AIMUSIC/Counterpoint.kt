@@ -113,7 +113,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             else -> listOf()
         }
 
-        return Counterpoint(newParts, intervalSet).also{ it.display(); println()}
+        return Counterpoint(newParts, intervalSet)//.also{ it.display(); println()}
     }
     fun inverse(): Counterpoint {
         val newParts = parts.map{ it.inverse() }
@@ -153,6 +153,11 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun addEmptyPart(): Counterpoint {
         val newParts = listOf(parts, listOf( AbsPart.emptyPart(maxSize()) )).flatten()
         return this.copy(parts = newParts)
+    }
+    fun shiftDown(shift: Int): Counterpoint {
+        if(shift == 0) return this
+        val emptyParts = List<AbsPart>(shift){ AbsPart.emptyPart(this.parts[0].absPitches.size) }
+        return this.copy(parts = emptyParts + this.parts)
     }
     fun addBestPedal(intervalSet: List<Int>): Counterpoint {
         return Counterpoint.addBestPedal(this,  intervalSet).first
@@ -289,11 +294,12 @@ data class Counterpoint(val parts: List<AbsPart>,
         val reducedAbsPitches = (0 until maxSize()).map{ this.getColumnValuesWithEmptyValues(it)}.flatten().toMutableList()
         return this.copy(parts = listOf(parts[0].copy(absPitches = reducedAbsPitches)))
     }
-    fun explodeToDoppelgänger(maxParts: Int, ensembleType: EnsembleType, rangeType: Int, melodyType: Int): Counterpoint {
+    fun explodeToDoppelgänger(maxParts: Int, ensembleTypes: List<EnsembleType>, rangeType: Int, melodyType: Int): Counterpoint {
         val newParts = mutableListOf<AbsPart>()
         val nPartsToExplode = (maxParts - (parts.size * 2 - maxParts).absoluteValue ) / 2
         val nNewParts = nPartsToExplode * 2 + ( parts.size - nPartsToExplode)
-        val ensembles = Ensembles.getEnsemble(nNewParts, ensembleType)
+        val ensembles = if(ensembleTypes.size ==1) Ensembles.getEnsemble(nNewParts, ensembleTypes[0])
+                        else Ensembles.getEnsembleMix(nNewParts, ensembleTypes)
         parts.forEachIndexed { index, absPart ->
             if(index < nPartsToExplode){
                 val ensemble = ensembles[index]
@@ -393,8 +399,8 @@ data class Counterpoint(val parts: List<AbsPart>,
         return Counterpoint(newParts, this.intervalSet, this.emptiness)
     }
     fun ritornello(ritornello: Int, transpositions: List<Int> = listOf(0)): Counterpoint {
-        println(ritornello)
-        println(transpositions)
+       // println(ritornello)
+       // println(transpositions)
         if (transpositions.all{ it == 0}) {
             if (ritornello == 0) return this
             var newCounterpoint = this.copy()
@@ -670,7 +676,12 @@ data class Counterpoint(val parts: List<AbsPart>,
             else null
 
             var result = empty(nParts)
-            val actualCounterpoints = counterpoints.map{ it?.normalizePartsSize(false) }
+            val actualCounterpoints =
+                counterpoints.map{
+                    it?.normalizePartsSize(false)
+                        ?.shiftDown((nParts - it.parts.size) shr 1)
+                }
+
             rowForms.forEach{ rowForm ->
                 val original = actualCounterpoints[rowForm.first]
                 original?.let{

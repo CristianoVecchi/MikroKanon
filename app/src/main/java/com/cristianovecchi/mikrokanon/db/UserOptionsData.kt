@@ -12,8 +12,8 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "id")
         val id: Long,
 
-        @ColumnInfo(name = "ensemble_type")
-        val ensembleType: Int,
+        @ColumnInfo(name = "ensemble_types")
+        val ensembleTypes: String,
 
         @ColumnInfo(name = "range_type")
         val rangeType: Int,
@@ -91,7 +91,7 @@ import androidx.room.PrimaryKey
     ){
         companion object{
             fun getDefaultUserOptionsData(): UserOptionsData{
-                return UserOptionsData(0,2, 2,0,
+                return UserOptionsData(0,"2", 2,0,
                     0,0,
                     "1.0", "90", 3,
                     0,0, "0|1",0, "0",

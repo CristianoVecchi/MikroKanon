@@ -5,6 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
+import com.cristianovecchi.mikrokanon.AIMUSIC.EnsemblePart
 import kotlinx.coroutines.*
 import kotlinx.coroutines.GlobalScope.coroutineContext
 import java.lang.StringBuilder
@@ -228,6 +229,7 @@ fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuratio
 
 
 fun String.extractIntsFromCsv(): List<Int>{
+    //if(this.isEmpty() ) return listOf(0)
     return this.split(',').mapNotNull { it.toInt()}
 }
 fun String.extractIntPairsFromCsv(): List<Pair<Int,Int>>{
@@ -342,6 +344,11 @@ fun Long.divideDistributingRest(divisor: Int): MutableList<Long>{
     //if(addOne) list[0] = list[0] + 1
     return list
 }
+fun  List<EnsemblePart>.display() {
+    this.forEach {  println(it) }
+    println()
+}
+
 fun main(args : Array<String>){
     val pairs = listOf(
         Pair(836L,127),

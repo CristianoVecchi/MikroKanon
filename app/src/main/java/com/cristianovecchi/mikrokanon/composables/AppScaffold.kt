@@ -135,6 +135,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 
 
     val listDialogData by lazy { mutableStateOf(ListDialogData())}
+    val ensemblesDialogData by lazy { mutableStateOf(MultiListDialogData())}
     //val nuancesDialogData by lazy { mutableStateOf(ListDialogData())}
     //val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
     val multiBpmDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
@@ -168,7 +169,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                         else userOptionsData[0]
     val listState = rememberLazyListState()
     var isFirstTab by remember{ mutableStateOf(model.isFirstTab)}
-    ListDialog(listDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize)
+    MultiListDialog(ensemblesDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     MultiListDialog(doublingDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     MultiListDialog(audio8DDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
@@ -257,24 +258,25 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
         ) { items(optionNames) { optionName ->
             val fontSize = dimensions.optionsFontSize
             when (optionName) {
+
                 "Ensemble" -> {
                     val ensNames: List<String> = lang.ensembleNames + synthsNames
-                    val ensIndex = userOptions.ensembleType
+                    val ensIndexes = userOptions.ensembleTypes.extractIntsFromCsv()
                     SelectableCard(
-                        text = "${lang.ensemble}: ${ensNames[ensIndex]}",
+                        text = "${lang.ensemble}: ${ensIndexes.joinToString(" + ") { ensNames[it] }}",
                         fontSize = fontSize,
                         colors = colors,
                         isSelected = true,
                         onClick = {
-                            listDialogData.value = ListDialogData(
-                                true, ensNames, ensIndex, lang.selectEnsemble
-                            ) { index ->
+                            ensemblesDialogData.value = MultiListDialogData(
+                                true, ensNames, ensIndexes.toSet(), lang.selectEnsemble
+                            ) { indexes ->
                                 model.updateUserOptions(
-                                    "ensembleType",
-                                    index
+                                    "ensembleTypes",
+                                    indexes.joinToString(",")
                                 )
-                                listDialogData.value =
-                                    ListDialogData(itemList = listDialogData.value.itemList)
+                                ensemblesDialogData.value =
+                                    MultiListDialogData(itemList = ensemblesDialogData.value.itemList)
                             }
                         })
                 }

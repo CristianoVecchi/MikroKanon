@@ -187,6 +187,7 @@ class AppViewModel(
 //        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
 //    }
 init{
+
     val size = getDeviceResolution()
     dimensions = Dimensions.provideDimensions(size.x, size.y)
 }
@@ -248,9 +249,10 @@ init{
                     mediaPlayer = MediaPlayer()
                     mediaPlayer?.setOnCompletionListener { onStop() }
                 }
-                val ensType: EnsembleType =
-                    EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType }
-                        ?: 0]
+                val ensTypes: List<EnsembleType> =
+                    userOptionsData.value?.let { userOptionsData.value!![0].ensembleTypes
+                        .extractIntsFromCsv().map{EnsembleType.values()[it]}}
+                        ?: listOf(EnsembleType.STRING_ORCHESTRA)
                 val dynamics: List<Float> =
                     if(simplify) {
                         listOf(1f)
@@ -322,7 +324,7 @@ init{
                     bpms,
                     0f,
                     rhythm,
-                    ensType,
+                    ensTypes,
                     createAndPlay,
                     midiPath,
                     rhythmShuffle,
@@ -929,9 +931,10 @@ init{
     private fun doppelgängerOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
-            val ensType: EnsembleType =
-                EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType }
-                    ?: 0]
+            val ensTypes: List<EnsembleType> =
+                userOptionsData.value?.let { userOptionsData.value!![0].ensembleTypes
+                    .extractIntsFromCsv().map{EnsembleType.values()[it]}}
+                    ?: listOf(EnsembleType.STRING_ORCHESTRA)
             val rangeType: Int =
                 userOptionsData.value?.let { userOptionsData.value!![0].rangeType }
                     ?: 0
@@ -941,7 +944,7 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = explodeCounterpointsToDoppelgänger(originalCounterpoints,
-                        MAX_PARTS, ensType, rangeType, melodyType )
+                        MAX_PARTS, ensTypes, rangeType, melodyType )
                 }
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
@@ -1110,8 +1113,8 @@ init{
                                 UserOptionsData.getDefaultUserOptionsData()
                                 else userOptionsData.value!![0].copy()
         when(key){
-            "ensembleType" -> {
-                newUserOptionsData = optionsDataClone.copy(ensembleType = value as Int)
+            "ensembleTypes" -> {
+                newUserOptionsData = optionsDataClone.copy(ensembleTypes = value as String)
             }
             "rangeType" -> {
                 newUserOptionsData = optionsDataClone.copy(rangeType = value as Int)
@@ -1204,10 +1207,11 @@ init{
         }
     }
     var usingCustomColors: Boolean = false
-    var appColors: AppColors = AppColors()
+    var appColors: AppColors = AppColors.allBlack()
     var lastIndexCustomColors = -1
     var lastAppColors = ""
     fun setAppColors(defs: String){
+        //println("COLORS: $defs")
         val colorDefs = extractColorDefs(defs)
         if(colorDefs.isCustom){
             if(lastIndexCustomColors != colorDefs.custom) {

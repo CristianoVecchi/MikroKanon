@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.material.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 
 import androidx.fragment.app.Fragment
@@ -15,7 +17,7 @@ import com.cristianovecchi.mikrokanon.composables.SequenceSelector
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 
 class SequencesFragment(): Fragment() {
-
+var visible = false
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,6 +37,7 @@ class SequencesFragment(): Fragment() {
                 }
             }
         }
+
         model.selectedSequence.observe(viewLifecycleOwner){
             model.changeActiveButtons( if(model.selectedSequence.value!! != -1 )
                 ActiveButtons(editing = true, mikrokanon = true, counterpoint = true,
@@ -46,75 +49,78 @@ class SequencesFragment(): Fragment() {
 //        }
         model.setInitialBlankState()
         return ComposeView(requireContext()).apply {
-            setContent {
-                MikroKanonTheme(model) {
-                    // A surface container using the 'background' color from the theme
-                    Surface(color = MaterialTheme.colors.background) {
+            if(true){
+                setContent {
+                    MikroKanonTheme(model) {
+                        // A surface container using the 'background' color from the theme
+                        Surface(color = MaterialTheme.colors.background) {
 
-                        AppScaffold(model = model, model.userOptionsData.asFlow()) {
-                               SequenceSelector(model = model,
-                                   onAdd = { list, editing ->
-                                       val bundle = Bundle()
-                                       bundle.putParcelableArrayList("list", list)
-                                       bundle.putBoolean("editing", editing)
-                                       findNavController().navigate(R.id.inputFragment, bundle)
-                                   },
-                                   onWave = { nWaves, list ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onWaveFromFirstSelection(nWaves, list)
-                                   },
-                                   onTritoneSubstitution = { index ->
-                                       model.onTritoneSubstitutionFromSelector(index)
-                                   },
-                                   onRound = { list ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onRoundFromSelector(list)
-                                   },
-                                   onCadenza = { list ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onCadenzaFromSelector(list)
-                                   },
-                                   onSingle = { list ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onSingleFromSelector(list)
-                                   },
-                                   onDoppelgänger = { list ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onDoppelgängerFromSelector(list)
-                                   },
-                                   onPedal = { nPedals, list ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onPedalFromSelector(nPedals, list)
-                                   },
-                                   onKP = { list, index, repeat ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onKPfromFirstSelection(list, index, repeat)
-                                   },
-                                   onFreePart = { list, trend ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onFreePartFromFirstSelection(list, trend)
-                                   },
-                                   onMikroKanons2 = { list ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onMikroKanons2(list)
-                                   },
-                                   onMikroKanons3 = { list ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onMikroKanons3(list)
-                                   },
-                                   onMikroKanons4 = { list ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onMikroKanons4(list)
-                                   },
-                                   onMikroKanons5reducted = { list ->
-                                       findNavController().navigate(R.id.outputFragment)
-                                       model.onMikroKanons5reducted(list)
-                                   }
-                               )
-                           }
+                            AppScaffold(model = model, model.userOptionsData.asFlow()) {
+                                SequenceSelector(model = model, userOptionsDataFlow = model.userOptionsData.asFlow(),
+                                    onAdd = { list, editing ->
+                                        val bundle = Bundle()
+                                        bundle.putParcelableArrayList("list", list)
+                                        bundle.putBoolean("editing", editing)
+                                        findNavController().navigate(R.id.inputFragment, bundle)
+                                    },
+                                    onWave = { nWaves, list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onWaveFromFirstSelection(nWaves, list)
+                                    },
+                                    onTritoneSubstitution = { index ->
+                                        model.onTritoneSubstitutionFromSelector(index)
+                                    },
+                                    onRound = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onRoundFromSelector(list)
+                                    },
+                                    onCadenza = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onCadenzaFromSelector(list)
+                                    },
+                                    onSingle = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onSingleFromSelector(list)
+                                    },
+                                    onDoppelgänger = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onDoppelgängerFromSelector(list)
+                                    },
+                                    onPedal = { nPedals, list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onPedalFromSelector(nPedals, list)
+                                    },
+                                    onKP = { list, index, repeat ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onKPfromFirstSelection(list, index, repeat)
+                                    },
+                                    onFreePart = { list, trend ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onFreePartFromFirstSelection(list, trend)
+                                    },
+                                    onMikroKanons2 = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onMikroKanons2(list)
+                                    },
+                                    onMikroKanons3 = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onMikroKanons3(list)
+                                    },
+                                    onMikroKanons4 = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onMikroKanons4(list)
+                                    },
+                                    onMikroKanons5reducted = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onMikroKanons5reducted(list)
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
+
         }
     }
 }
