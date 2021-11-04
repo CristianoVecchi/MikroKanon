@@ -230,6 +230,13 @@ fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuratio
 fun String.extractIntsFromCsv(): List<Int>{
     return this.split(',').mapNotNull { it.toInt()}
 }
+fun String.extractIntPairsFromCsv(): List<Pair<Int,Int>>{
+    val pairs = this.split(',')
+    return pairs.map{ val split = it.split('|'); Pair(split[0].toInt(), split[1].toInt())}
+}
+fun  MutableList<Pair<Int,Int>>.toIntPairsString(): String {
+    return this.joinToString(",") { "${it.first}|${it.second}" }
+}
 fun String.extractFloatsFromCsv(): List<Float>{
     return this.split(',').mapNotNull { it.toFloat() }
 }

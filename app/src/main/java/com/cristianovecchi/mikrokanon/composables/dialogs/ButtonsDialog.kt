@@ -22,7 +22,7 @@ fun ButtonsDialog(
     buttonsDialogData: MutableState<ButtonsDialogData>,
     okText: String = "OK",
     model: AppViewModel,
-    boostedMK: Boolean = false,
+    workingOnSequences: Boolean = false,
     onDismissRequest: () -> Unit = {
         buttonsDialogData.value = ButtonsDialogData(model = model)
     }
@@ -42,7 +42,7 @@ fun ButtonsDialog(
                         state = listState,
                         modifier = Modifier.height(420.dp)
                     ) {
-                        items((0..3).toList()) { item ->
+                        items((0..4).toList()) { item ->
                             when (item) {
                                 0 -> SpecialFunctions1Buttons(
                                     model = buttonsDialogData.value.model,
@@ -75,13 +75,22 @@ fun ButtonsDialog(
                                     onPedal3Click = buttonsDialogData.value.onPedal3,
                                     onPedal5Click = buttonsDialogData.value.onPedal5
                                 )
-                                3 -> if(boostedMK){
+                                3 -> if(workingOnSequences){
                                     BoostedMikroKanonsButtons(
                                         model = buttonsDialogData.value.model,
                                         buttonSize = buttonsDialogData.value.buttonSize,
                                         fontSize = buttonsDialogData.value.fontSize,
                                         colors = model.appColors,
                                         onMK5reductedClick = buttonsDialogData.value.onMK5reducted
+                                    )
+                                }
+                                4 -> if(!workingOnSequences){
+                                    SavingButtons(
+                                        model = buttonsDialogData.value.model,
+                                        buttonSize = buttonsDialogData.value.buttonSize,
+                                        fontSize = buttonsDialogData.value.fontSize,
+                                        colors = model.appColors,
+                                        onSavingCounterpoint = buttonsDialogData.value.onSavingCounterpoint
                                     )
                                 }
                             }

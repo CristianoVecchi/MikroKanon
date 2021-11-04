@@ -29,6 +29,7 @@ import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import kotlinx.coroutines.*
+import kotlin.math.absoluteValue
 import kotlin.system.measureTimeMillis
 
 
@@ -105,8 +106,8 @@ class AppViewModel(
         "single" to R.drawable.ic_baseline_single_24,
         "music" to R.drawable.ic_baseline_music_note_24,
         "settings" to R.drawable.ic_baseline_settings_24,
-        "doppelgänger" to R.drawable.ic_baseline_shuffle_24
-
+        "doppelgänger" to R.drawable.ic_baseline_shuffle_24,
+        "save" to R.drawable.ic_baseline_save_24
     )
 
 
@@ -124,7 +125,7 @@ class AppViewModel(
     }
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
-    public val MAX_PARTS = 12
+    val MAX_PARTS = 12
 
     private val  maxVisibleCounterpoints: Int = 74
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
@@ -177,6 +178,8 @@ class AppViewModel(
     private val mk4deepSearchCache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk5reductedCache = HashMap<CacheKey, List<Counterpoint>>()
 
+    val savedCounterpoints: Array<Counterpoint?> = arrayOf(null, null, null)
+
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 //        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
@@ -219,9 +222,23 @@ init{
     }
     val onPlaySequence = { clips: List<Clip> ->
         _selectedCounterpoint.value = Counterpoint.counterpointFromClipList(clips)
-        onPlay(true)
+        onPlay(true, true)
     }
-    val onPlay = { createAndPlay: Boolean ->
+    val onPlayExample = { counterpointSaved: Int, rowForm: Int ->
+        val selCpSaved = _selectedCounterpoint.value?.clone()
+        var counterpointExample: Counterpoint? = if(counterpointSaved == 0) _selectedCounterpoint.value
+        else savedCounterpoints[counterpointSaved - 1]
+       if(counterpointExample != null){
+           counterpointExample = Counterpoint.explodeRowForms(counterpointExample, listOf(rowForm.absoluteValue))
+           _selectedCounterpoint.value = counterpointExample
+               onPlay(true, true)
+        }
+
+        if (selCpSaved != null) {
+            _selectedCounterpoint.value = selCpSaved.clone()
+        }
+    }
+    val onPlay = { createAndPlay: Boolean, simplify: Boolean ->
             var error = "ERROR: NO FILE"
             if(userOptionsData.value!!.isEmpty()){
                 insertUserOptionData(UserOptionsData.getDefaultUserOptionsData())
@@ -235,9 +252,18 @@ init{
                     EnsembleType.values()[userOptionsData.value?.let { userOptionsData.value!![0].ensembleType }
                         ?: 0]
                 val dynamics: List<Float> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].dynamics.extractFloatsFromCsv() } ?: listOf(1f)
+                    if(simplify) {
+                        listOf(1f)
+                    } else {
+                        userOptionsData.value?.let { userOptionsData.value!![0].dynamics.extractFloatsFromCsv()
+                    }} ?: listOf(1f)
                 val bpms: List<Float> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].bpms.extractIntsFromCsv().map { it.toFloat() } } ?: listOf(90f)
+                    userOptionsData.value?.let {
+                        if(simplify) {
+                            userOptionsData.value!![0].bpms.extractIntsFromCsv().map { it.toFloat() }.take(1)
+                        } else {
+                            userOptionsData.value!![0].bpms.extractIntsFromCsv().map { it.toFloat() }
+                        } } ?: listOf(90f)
                 val rhythm: RhythmPatterns =
                     RhythmPatterns.values()[userOptionsData.value?.let { userOptionsData.value!![0].rhythm }
                         ?: 0]
@@ -247,18 +273,30 @@ init{
                 val partsShuffle: Boolean =
                     0 != (userOptionsData.value?.let { userOptionsData.value!![0].partsShuffle }
                         ?: 0)
-                val rowForms: List<Int> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].rowForms.extractIntsFromCsv() }
-                        ?: listOf(1) // ORIGINAL by default || 0 is unused
+                val rowForms: List<Pair<Int,Int>> =
+                    userOptionsData.value?.let {
+                        if(simplify){
+                            listOf(Pair(0,1))
+                        } else {
+                            userOptionsData.value!![0].rowForms.extractIntPairsFromCsv()
+                        } }?: listOf(Pair(0,1)) // ORIGINAL by default || 0 is unused
                 val doublingFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].doublingFlags }
                         ?: 0
                 val audio8DFlags: Int =
-                    userOptionsData.value?.let { userOptionsData.value!![0].audio8DFlags }
-                        ?: 0
+                    userOptionsData.value?.let {
+                        if(simplify){
+                            0
+                        } else {
+                            userOptionsData.value!![0].audio8DFlags
+                        } } ?: 0
                 val ritornello: Int =
-                    userOptionsData.value?.let { userOptionsData.value!![0].ritornello }
-                        ?: 0
+                    userOptionsData.value?.let {
+                        if(simplify){
+                            0
+                        } else {
+                            userOptionsData.value!![0].ritornello
+                        } } ?: 0
                 val transpose: List<Int> =
                     userOptionsData.value?.let { userOptionsData.value!![0].transpose.extractIntsFromCsv() } ?: listOf(0)
                 val nuances: Int =
@@ -276,11 +314,10 @@ init{
                 val vibrato: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].vibrato }
                         ?: 0
-
                 error = Player.playCounterpoint(
                     mediaPlayer!!,
                     false,
-                    selectedCounterpoint.value!!,
+                    listOf(selectedCounterpoint.value!!) + savedCounterpoints.toList(),
                     dynamics,
                     bpms,
                     0f,
@@ -303,7 +340,7 @@ init{
                 )
             }
         mediaPlayer?.let{ if (it.isPlaying) _playing.value = true}
-            error
+            error.also{println(it)}
     }
     val dispatchIntervals = {
         if(computationStack.isNotEmpty())

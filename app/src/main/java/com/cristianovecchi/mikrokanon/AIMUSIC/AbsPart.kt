@@ -57,9 +57,19 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         val newAbsPitches = absPitches.asReversed()
         return AbsPart(newAbsPitches, rowForm, transpose, delay)
     }
-    fun enqueue(absPart: AbsPart) : AbsPart {
+    fun enqueue(absPart: AbsPart): AbsPart {
         val newAbsPitches = absPitches.toMutableList().also { it.addAll(absPart.absPitches)}
         return AbsPart(newAbsPitches, rowForm, transpose, delay)
+    }
+    fun enqueueFilling(nNotes: Int, value: Int = -1): AbsPart {
+        if(nNotes == 0) return this
+        val newAbsPitches =  absPitches + MutableList<Int>(nNotes){value}
+        return AbsPart(newAbsPitches.toMutableList(), rowForm, transpose, delay)
+    }
+    fun fillAndEnqueue(nNotes: Int, value: Int = -1): AbsPart {
+        if(nNotes == 0) return this
+        val newAbsPitches = MutableList<Int>(nNotes){value} + absPitches
+        return AbsPart(newAbsPitches.toMutableList(), rowForm, transpose, delay)
     }
     fun clone(): AbsPart{
         return AbsPart(ArrayList(absPitches.toList()),rowForm, transpose, delay)
@@ -103,18 +113,48 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         val actualPitches = Insieme.findMelody(octave, absPitches.toIntArray(), range.first, range.last, melodyType).also{println(it.toList())}
         val mssq = MelodySubSequencer(actualPitches)
         val subSequences = mssq.subSequences
-        mssq.printSubSequences()
+        //mssq.printSubSequences()
         val partAscendant = IntArray(this.absPitches.size).apply{fill(-1)}
         val partDescendant = IntArray(this.absPitches.size).apply{fill(-1)}
         subSequences.forEach { ss ->
+            var lastQuality = MelodySubSequencer.SubSeqQuality.ASCENDENT
             when (ss.quality!!){
-                MelodySubSequencer.SubSeqQuality.ASCENDENT -> if(ss.nNotes > 1) (ss.start until ss.start+ss.nNotes).forEach { partAscendant[it] = absPitches[it] }
-                MelodySubSequencer.SubSeqQuality.DESCENDENT -> if(ss.nNotes > 1) (ss.start until ss.start+ss.nNotes).forEach { partDescendant[it] = absPitches[it] }
-                MelodySubSequencer.SubSeqQuality.EQUAL -> (ss.start until ss.start+ss.nNotes).forEach { partDescendant[it] = absPitches[it] }
+                MelodySubSequencer.SubSeqQuality.ASCENDENT -> {
+                    lastQuality = MelodySubSequencer.SubSeqQuality.ASCENDENT
+                    if(ss.nNotes > 1) (ss.start until ss.start+ss.nNotes).forEach { partAscendant[it] = absPitches[it] }
+                }
+                MelodySubSequencer.SubSeqQuality.DESCENDENT -> {
+                    lastQuality = MelodySubSequencer.SubSeqQuality.DESCENDENT
+                    if(ss.nNotes > 1) (ss.start until ss.start+ss.nNotes).forEach { partDescendant[it] = absPitches[it] }
+                }
+                MelodySubSequencer.SubSeqQuality.EQUAL ->
+                    if(lastQuality == MelodySubSequencer.SubSeqQuality.ASCENDENT){
+                        (ss.start until ss.start+ss.nNotes).forEach { partAscendant[it] = absPitches[it] }
+                    } else {
+                        (ss.start until ss.start+ss.nNotes).forEach { partDescendant[it] = absPitches[it] }
+                    }
+
                 MelodySubSequencer.SubSeqQuality.INTERRUPTED -> (ss.start until ss.start+ss.nNotes).forEach { partAscendant[it] = absPitches[it] }
             }
         }
-        partAscendant.forEachIndexed { index, i -> if(i == partDescendant[index])  partDescendant[index] = -1}
+        var countAsc = 0
+        var countDesc = 0
+        (1 until absPitches.size).forEach { i ->
+            if(partAscendant[i] == partDescendant[i]) {
+                if (partAscendant[i - 1] == partAscendant[i]) {
+                    partDescendant[i] = -1
+                } else if (partDescendant[i - 1] == partDescendant[i]) {
+                    partAscendant[i] = -1
+                } else if (countAsc <= countDesc) {
+                    partDescendant[i] = -1
+                } else {
+                    partAscendant[i] = -1
+                }
+            }
+            if(partAscendant[i] != -1) countAsc++
+            if(partDescendant[i] != -1) countDesc++
+        }
+        //partAscendant.forEachIndexed { index, i -> if(i == partDescendant[index])  partDescendant[index] = -1}
         return listOf(copy(absPitches = partAscendant.toMutableList()), copy(absPitches = partDescendant.toMutableList()) )
     }
 }

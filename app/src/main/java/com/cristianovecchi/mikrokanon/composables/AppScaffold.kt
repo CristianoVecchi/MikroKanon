@@ -104,7 +104,8 @@ data class MultiListDialogData(val dialogState: Boolean = false, val itemList: L
 data class NumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:Int = 0,
                             val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
 data class MultiNumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="0",
-                                 val min: Int = 0, val max: Int = 360, val model: AppViewModel, val onSubmitButtonClick: (String) -> Unit = {})
+                                 val min: Int = 0, val max: Int = 360, val model: AppViewModel,
+                                 val onSubmitButtonClick: (String) -> Unit = {})
 data class MultiFloatDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="1.0",
                                  val min: Float = 0f, val max: Float = 1f, val model: AppViewModel, val onSubmitButtonClick: (String) -> Unit = {})
 data class CustomColorsDialogData(val dialogState: Boolean = false, val title:String = "", val arrayColorIndex: Int = 0,
@@ -119,6 +120,7 @@ data class ButtonsDialogData(
     val onTritoneSubstitution: () -> Unit = {}, val onRound: () -> Unit = {},
     val onCadenza: () -> Unit = {}, val onSingle: () -> Unit = {},
     val onMK5reducted: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
+    val onSavingCounterpoint: (Int) -> Unit = {},
     val onSubmitButtonClick: () -> Unit = {})
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
@@ -484,12 +486,16 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 "Row Forms" -> {
                     val formsCsv = userOptions.rowForms
                     val isOn = formsCsv != "1"
-                    val formsNumbers = formsCsv.extractIntsFromCsv()
+                    val formPairs = formsCsv.extractIntPairsFromCsv()
                     SelectableCard(
                         text = if(isOn)
-                            "${lang.rowForms}: ${formsNumbers.map{ 
-                                if(it<0) "${rowFormsMap[it.absoluteValue]} |" 
-                                else "${rowFormsMap[it]}"}.joinToString(" ")}"
+                            "${lang.rowForms}: ${
+                                formPairs.joinToString(" ") {
+                                    "${if (it.first == 0) "" else it.first}" +
+                                            if (it.second < 0) "${rowFormsMap[it.second.absoluteValue]} |"
+                                            else "${rowFormsMap[it.second]}"
+                                }
+                            }"
                                 else lang.rowForms,
                                 fontSize = fontSize,
                                 colors = colors,
@@ -497,7 +503,8 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 onClick = {
                                     rowFormsDialogData.value = MultiNumberDialogData(
                                         true, lang.selectRowForms, formsCsv,
-                                        model = model) { rowForms ->
+                                        model = model,
+                                        ) { rowForms ->
                                         model.updateUserOptions(
                                             "rowForms",
                                             rowForms
@@ -639,7 +646,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 "Export MIDI" -> {
                     SelectableCard(text = lang.exportMidi, fontSize = fontSize, colors = colors, isSelected = true, onClick = {
                         val path = model.midiPath.absolutePath.toString()
-                        var error = model.onPlay(false)
+                        var error = model.onPlay(false, false)
                         if (error.isEmpty()){
                             model.shareMidi(model.midiPath)
                         } else {

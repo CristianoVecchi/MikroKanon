@@ -88,26 +88,33 @@ object Player {
 
     fun playCounterpoint(
         mediaPlayer: MediaPlayer, looping: Boolean,
-        counterpoint: Counterpoint, dynamics: List<Float>, bpms: List<Float>, shuffle: Float,
+        counterpoints: List<Counterpoint?>, dynamics: List<Float>, bpms: List<Float>, shuffle: Float,
         rhythm: RhythmPatterns, ensembleType: EnsembleType,
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
-        rowForms: List<Int> = listOf(1), ritornello: Int = 0, transpose: List<Int> = listOf(0),
+        rowForms: List<Pair<Int,Int>> = listOf(Pair(0,1)), ritornello: Int = 0, transpose: List<Int> = listOf(0),
         doublingFlags: Int = 0, nuances: Int = 0,
         rangeType: Int = 0, melodyType: Int = 0, glissandoFlags: Int = 0, audio8DFlags: Int = 0, vibrato: Int = 0
     ) : String {
         var error = ""
         val durations = rhythm.values
         val actualDurations = if (rhythmShuffle) listOf(*durations.toTypedArray(),*durations.toTypedArray(),*durations.toTypedArray()).shuffled() else durations
-        val ensembleParts: List<EnsemblePart> = Ensembles.getEnsemble(counterpoint.parts.size, ensembleType)
+        val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0}?.parts?.size ?: 0
+        val ensembleParts: List<EnsemblePart> = Ensembles.getEnsemble(nParts, ensembleType)
         val actualEnsembleParts = if (partsShuffle) ensembleParts.shuffled() else ensembleParts
-        val nNotesToSkip = rhythm.nNotesLeftInThePattern(counterpoint.nNotes())
-        var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
+        val firstCounterpoint = counterpoints.firstOrNull()
+            ?: return "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
+        val nNotesToSkip = rhythm.nNotesLeftInThePattern(firstCounterpoint.nNotes())
+        //var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
+        var actualCounterpoint = if (rowForms == listOf(Pair(0,1)) ) firstCounterpoint
+            else Counterpoint.explodeRowFormsAddingCps(counterpoints, rowForms, nNotesToSkip)
         actualCounterpoint = if(ritornello > 0)  actualCounterpoint.ritornello(ritornello, transpose)
                             else actualCounterpoint.transpose(transpose[0])
         val glissando: List<Int> = if(glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
         val audio8D: List<Int> = if(audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
         val vibratoExtensions = listOf(0, 360, 240 ,160, 120, 80 ,60, 30, 15)
 
+        if (actualCounterpoint.isEmpty()) return "Counterpoint to play is empty!!!"
+        if (actualCounterpoint.parts[0].absPitches.size == 0) return "Counterpoint parts are empty!!!"
         val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts,
                                                                     nuances, doublingFlags, rangeType, melodyType,
                                                                     glissando, audio8D, vibratoExtensions[vibrato])

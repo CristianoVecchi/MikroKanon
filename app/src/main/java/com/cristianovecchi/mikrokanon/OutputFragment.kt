@@ -65,11 +65,16 @@ class OutputFragment: Fragment() {
                                 model.iconMap,
                                 onClick = { counterpoint ->
                                     if(counterpoint == model.selectedCounterpoint.value!!){
-                                        model.onPlay(true)
+                                        model.onPlay(true, false)
                                     } else {
                                         model.changeSelectedCounterpoint(
                                             counterpoint
                                         )
+                                    }
+                                },
+                                onSavingCounterpoint= { position ->
+                                    model.selectedCounterpoint.value?.let{
+                                        model.savedCounterpoints[position] = it.copy()
                                     }
                                 },
                                 onKP = { index, repeat ->
@@ -103,7 +108,7 @@ class OutputFragment: Fragment() {
                                 onExpand = { model.onExpand() },
                                 onFlourish = { model.onFlourish() },
                                 onPlay = {
-                                    model.onPlay(true)
+                                    model.onPlay(true, false)
                                 },
                                 onStop = { model.onStop() }
                             )

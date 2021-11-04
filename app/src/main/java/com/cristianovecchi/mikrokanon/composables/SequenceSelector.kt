@@ -86,7 +86,7 @@ fun SequenceSelector(model: AppViewModel,
                 }
             }
         )
-        ButtonsDialog(buttonsDialogData, language.OKbutton, boostedMK = true, model = model)
+        ButtonsDialog(buttonsDialogData, language.OKbutton, workingOnSequences = true, model = model)
         val onSelectComposition = { index: Int ->
             onSelect(index)
         }

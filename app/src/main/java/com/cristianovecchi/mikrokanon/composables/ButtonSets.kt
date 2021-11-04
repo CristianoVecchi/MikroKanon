@@ -125,7 +125,23 @@ fun SequenceEditingButtons(
         }
     }
 }
-
+@Composable
+fun SavingButtons(
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
+    onSavingCounterpoint: (Int) -> Unit
+) {
+    Row {
+        CustomButton(iconId = model.iconMap["save"]!!, text = "1", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+            onSavingCounterpoint(0)
+        }
+        CustomButton(iconId = model.iconMap["save"]!!, text = "2", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+            onSavingCounterpoint(1)
+        }
+        CustomButton(iconId = model.iconMap["save"]!!, text = "3", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+            onSavingCounterpoint(2)
+        }
+    }
+}
 @Composable
 fun MikroKanonsButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,

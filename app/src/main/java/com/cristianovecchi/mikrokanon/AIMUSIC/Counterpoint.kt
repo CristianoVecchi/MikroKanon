@@ -86,9 +86,34 @@ data class Counterpoint(val parts: List<AbsPart>,
         return if(nextColumn < parts[partIndex].absPitches.size) parts[partIndex].absPitches[nextColumn] else -1
     }
     fun enqueue(counterpoint: Counterpoint): Counterpoint{
-        val newParts = parts.mapIndexed { index, absPart ->
-            if(index<counterpoint.parts.size) absPart.enqueue( counterpoint.parts[index]) else absPart }
-        return Counterpoint(newParts, intervalSet)
+        val nParts = this.parts.size
+        val nPartsToAdd = counterpoint.parts.size
+        val diff = nParts - counterpoint.parts.size
+        val newParts = when {
+            diff == 0 -> parts.mapIndexed { index, absPart ->
+                absPart.enqueue( counterpoint.parts[index]) }
+            diff < 0 -> { // previous is smaller
+                val nNotes = this.parts[0].absPitches.size
+                val initialParts = parts.mapIndexed { index, absPart ->
+                     absPart.enqueue( counterpoint.parts[index])  }
+                val addedParts =  (nParts until nParts + diff.absoluteValue).map { index ->
+                    counterpoint.parts[index].fillAndEnqueue(nNotes)
+                }
+                initialParts + addedParts
+            }
+            diff > 0 -> { // previous is bigger
+                val nNotes = counterpoint.parts[0].absPitches.size
+                val initialParts = counterpoint.parts.mapIndexed { index, absPart ->
+                     parts[index].enqueue( absPart ) }
+                val addedParts =  (nPartsToAdd until nPartsToAdd + diff).map { index ->
+                    this.parts[index].enqueueFilling(nNotes)
+                }
+                initialParts + addedParts
+            }
+            else -> listOf()
+        }
+
+        return Counterpoint(newParts, intervalSet).also{ it.display(); println()}
     }
     fun inverse(): Counterpoint {
         val newParts = parts.map{ it.inverse() }
@@ -139,6 +164,7 @@ data class Counterpoint(val parts: List<AbsPart>,
 
     fun normalizePartsSize(refreshEmptiness: Boolean): Counterpoint{
         val maxSize: Int = parts.maxOf { it.absPitches.size }
+        //if(this.parts.isEmpty()) return this
         val newParts = mutableListOf<AbsPart>()
         parts.forEach{ absPart ->
             val newPart = absPart.copy()
@@ -267,7 +293,6 @@ data class Counterpoint(val parts: List<AbsPart>,
         val newParts = mutableListOf<AbsPart>()
         val nPartsToExplode = (maxParts - (parts.size * 2 - maxParts).absoluteValue ) / 2
         val nNewParts = nPartsToExplode * 2 + ( parts.size - nPartsToExplode)
-        println("nNewParts: "+ nNewParts)
         val ensembles = Ensembles.getEnsemble(nNewParts, ensembleType)
         parts.forEachIndexed { index, absPart ->
             if(index < nPartsToExplode){
@@ -396,6 +421,9 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         fun empty(): Counterpoint{
             return Counterpoint(emptyList(), emptyList(), 1.0f)
+        }
+        fun empty(nParts: Int): Counterpoint{
+            return Counterpoint((0 until nParts).map { AbsPart.emptyPart() }, emptyList(), 1.0f)
         }
         fun flourish(counterpoint: Counterpoint, intervalSet: List<Int>, horIntervalSet: List<Int>): Counterpoint{
             val actualDirections = TREND.ASCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}
@@ -630,8 +658,44 @@ data class Counterpoint(val parts: List<AbsPart>,
             result = if(separator && addFinal) result.enqueue(separatorCounterpoint!!) else result
             return result
         }
+        fun explodeRowFormsAddingCps(counterpoints: List<Counterpoint?>,
+                                     rowForms: List<Pair<Int,Int>> = listOf(Pair(0,1)),
+                                     nNotesToSkip: Int = 0): Counterpoint {
+            //val separator = rowFormsFlags and 0b10000 != 0
+            val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0}?.parts?.size ?: 0
+            if (nParts == 0) return empty()
+            val separator = nNotesToSkip > 0 && rowForms.any{ it.second < 0}
+            val separatorCounterpoint: Counterpoint? = if(separator)
+                Counterpoint.createSeparatorCounterpoint(nParts, nNotesToSkip)
+            else null
+
+            var result = empty(nParts)
+            val actualCounterpoints = counterpoints.map{ it?.normalizePartsSize(false) }
+            rowForms.forEach{ rowForm ->
+                val original = actualCounterpoints[rowForm.first]
+                original?.let{
+                    result = when(rowForm.second) {
+                        1 -> result.enqueue(original.clone())
+                        2 -> result.enqueue(original.inverse())
+                        3 -> result.enqueue(original.retrograde())
+                        4 -> result.enqueue(original.inverse().retrograde())
+                        -1 -> result.enqueue(original.clone()).enqueue(separatorCounterpoint!!)
+                        -2 -> result.enqueue(original.inverse()).enqueue(separatorCounterpoint!!)
+                        -3 -> result.enqueue(original.retrograde())
+                            .enqueue(separatorCounterpoint!!)
+                        -4 -> result.enqueue(original.inverse().retrograde()).enqueue(separatorCounterpoint!!)
+                        else -> result
+                    }
+                }
+
+            }
+
+            return result
+        }
+
         fun explodeRowForms(counterpoint: Counterpoint, rowForms: List<Int> = listOf(1), nNotesToSkip: Int = 0): Counterpoint {
             //val separator = rowFormsFlags and 0b10000 != 0
+            if (counterpoint.parts.isEmpty()) return counterpoint
             val separator = nNotesToSkip > 0 && rowForms.any{ it < 0}
             val separatorCounterpoint: Counterpoint? = if(separator)
                 Counterpoint.createSeparatorCounterpoint(counterpoint.parts.size, nNotesToSkip)
