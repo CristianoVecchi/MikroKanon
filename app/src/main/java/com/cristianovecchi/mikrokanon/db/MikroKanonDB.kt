@@ -8,12 +8,13 @@ import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import java.util.concurrent.Executors
 
-@Database(entities = [SequenceData::class, UserOptionsData::class], version = 2, exportSchema = false)
+@Database(entities = [SequenceData::class, UserOptionsData::class, CounterpointData::class], version = 2, exportSchema = false)
 @TypeConverters(ClipConverters::class)
 public abstract class MikroKanonDB : RoomDatabase() {
 
     abstract fun sequenceDataDao(): SequenceDataDao
     abstract fun userOptionsDataDao(): UserOptionsDataDao
+    abstract fun counterpointDataDao(): CounterpointDataDao
 
     companion object {
 
@@ -33,6 +34,11 @@ public abstract class MikroKanonDB : RoomDatabase() {
                         //pre-populate data
                         Executors.newSingleThreadExecutor().execute {
                             instance?.sequenceDataDao()?.insertAll(*DataGenerator.getSequencesData().toTypedArray())
+                        }
+                        Executors.newSingleThreadExecutor().execute {
+                            instance?.counterpointDataDao()?.insertAllCounterpoints(
+                                *DataGenerator.getCounterpointsData().toTypedArray()
+                            )
                         }
                         Executors.newSingleThreadExecutor().execute {
                             instance?.userOptionsDataDao()?.insertAllUserOptions(
@@ -132,6 +138,13 @@ class DataGenerator {
         fun getUserOptionsData(): List<UserOptionsData>{
             return listOf(
                 UserOptionsData.getDefaultUserOptionsData()
+            )
+        }
+        fun getCounterpointsData(): List<CounterpointData>{
+            return listOf(
+                CounterpointData(0,""),
+                CounterpointData(0,""),
+                CounterpointData(0,""),
             )
         }
     }

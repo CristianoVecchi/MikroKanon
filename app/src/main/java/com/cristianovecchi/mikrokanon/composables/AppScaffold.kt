@@ -170,6 +170,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val listState = rememberLazyListState()
     var isFirstTab by remember{ mutableStateOf(model.isFirstTab)}
     MultiListDialog(ensemblesDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
+    ListDialog(listDialogData, lang.OKbutton, dimensions.sequenceDialogFontSize)
     MultiListDialog(doublingDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     MultiListDialog(audio8DDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
@@ -273,7 +274,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                             ) { indexes ->
                                 model.updateUserOptions(
                                     "ensembleTypes",
-                                    indexes.joinToString(",")
+                                    if(indexes.isEmpty()) "2" else indexes.joinToString(",")
                                 )
                                 ensemblesDialogData.value =
                                     MultiListDialogData(itemList = ensemblesDialogData.value.itemList)

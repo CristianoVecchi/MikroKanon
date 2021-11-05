@@ -6,8 +6,6 @@ import android.content.Intent
 import android.graphics.Point
 import androidx.lifecycle.*
 import com.cristianovecchi.mikrokanon.composables.*
-import com.cristianovecchi.mikrokanon.db.SequenceData
-import com.cristianovecchi.mikrokanon.db.SequenceDataRepository
 import com.cristianovecchi.mikrokanon.midi.Player
 import java.util.*
 import kotlin.collections.ArrayList
@@ -16,13 +14,12 @@ import android.media.MediaPlayer
 import android.os.Build
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import androidx.core.content.FileProvider
-import com.cristianovecchi.mikrokanon.db.UserOptionsData
-import com.cristianovecchi.mikrokanon.db.UserOptionsDataRepository
 import java.io.File
 import androidx.lifecycle.Lifecycle
 
 import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
+import com.cristianovecchi.mikrokanon.db.*
 import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
 import com.cristianovecchi.mikrokanon.ui.AppColors
@@ -61,6 +58,7 @@ data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean =
 class AppViewModel(
     application: Application,
     private val sequenceRepository: SequenceDataRepository,
+    private val counterpointRepository: CounterpointDataRepository,
     private val userRepository: UserOptionsDataRepository,
 ) : AndroidViewModel(application), LifecycleObserver {
 
@@ -168,6 +166,7 @@ class AppViewModel(
     private var _selectedCounterpoint = MutableLiveData(Counterpoint.empty())
     val selectedCounterpoint : LiveData<Counterpoint> = _selectedCounterpoint
     val allSequencesData: LiveData<List<SequenceData>> = sequenceRepository.allSequences.asLiveData()
+    val allCounterpointsData: LiveData<List<CounterpointData>> = counterpointRepository.counterpoints.asLiveData()
     val userOptionsData: LiveData<List<UserOptionsData>> = userRepository.userOptions.asLiveData()
 
     private val computationStack = Stack<Computation>()
@@ -1091,9 +1090,28 @@ init{
         sequenceDataMap.clear()
         _sequences.value = allSequencesData.value!!.map{sequenceDataToSequence(it)}
     }
+    fun retrieveCounterpointsFromDB(){
+
+        allCounterpointsData.value!!.forEachIndexed { index, counterpoint ->
+            val newCounterpoint = if (counterpoint.parts.isEmpty()) null
+            else Counterpoint.createFromCsv(counterpoint.parts)
+            savedCounterpoints[index] = newCounterpoint
+        }
+    }
+    fun saveCounterpointInDb(position: Int, counterpoint: Counterpoint) {
+        val counterpointData = CounterpointData(position.toLong()+1L, counterpoint.convertPartsToCsv())
+        viewModelScope.launch(Dispatchers.IO) {
+            counterpointRepository.updateCounterpoint(counterpointData)
+        }
+    }
+    fun displaySavedCounterpoints(){
+        allCounterpointsData.value?.let{
+            it.forEach { each -> println(each) }
+        }
+    }
 
     private fun sequenceDataToSequence(sequenceData: SequenceData) : ArrayList<Clip>{
-        val sequence = ArrayList(sequenceData.clips.map { Clip.clipDataToClip(it)})
+        val sequence = ArrayList(sequenceData.clips.map {  Clip.clipDataToClip(it) } )
         sequenceDataMap[sequence] = sequenceData
         return sequence
     }
@@ -1264,6 +1282,8 @@ init{
 
 
 }
+
+
 
 
 

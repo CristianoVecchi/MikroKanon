@@ -416,7 +416,17 @@ data class Counterpoint(val parts: List<AbsPart>,
             return newCounterpoint
         }
     }
+    fun convertPartsToCsv(partSeparator: String = "\n"): String{
+        if(parts.isEmpty()) return ""
+        return parts.joinToString(partSeparator) { it.absPitches.joinToString(",") }
+    }
     companion object {
+        fun createFromCsv(doubleLevelCsv: String, partSeparator: String = "\n"): Counterpoint{
+            val newParts = doubleLevelCsv.split(partSeparator)
+                .map{ csvPart -> csvPart.split(',').map{it.toInt()}}
+                .map{ intsPart -> AbsPart(intsPart.toMutableList())}
+            return Counterpoint(newParts)
+        }
         fun createSeparatorCounterpoint(nParts: Int, nNotesToSkip: Int) : Counterpoint{
             val absPart = AbsPart( (0 until nNotesToSkip).map{ -1 }.toMutableList() )
             val newParts = (0 until nParts).map{ absPart }

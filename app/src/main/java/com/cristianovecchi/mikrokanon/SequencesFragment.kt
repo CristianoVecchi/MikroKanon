@@ -17,7 +17,7 @@ import com.cristianovecchi.mikrokanon.composables.SequenceSelector
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 
 class SequencesFragment(): Fragment() {
-var visible = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,6 +27,10 @@ var visible = false
         val model = (activity as MainActivity).model
         model.allSequencesData.observe(viewLifecycleOwner){
             model.retrieveSequencesFromDB()
+        }
+        model.allCounterpointsData.observe(viewLifecycleOwner){
+            model.retrieveCounterpointsFromDB()
+            //model.displaySavedCounterpoints()
         }
         model.userOptionsData.observe(viewLifecycleOwner){
             model.userOptionsData.value.let {

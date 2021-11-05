@@ -29,7 +29,9 @@ class OutputFragment: Fragment() {
                 )
             }
         }
-
+        model.allCounterpointsData.observe(viewLifecycleOwner){
+            model.retrieveCounterpointsFromDB()
+        }
         if(model.userOptionsData.value != null && model.userOptionsData.value!!.isNotEmpty()){
             val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
             model.createVerticalIntervalSet(verticalIntervalSetFlag)
@@ -38,7 +40,7 @@ class OutputFragment: Fragment() {
             model.userOptionsData.value.let {
                 if(it!!.isNotEmpty()) {
                     val newIntervalSet = createIntervalSetFromFlags(it[0].intSetHorFlags)
-                    if(!newIntervalSet.equals(model.intervalSetHorizontal.value!!)){
+                    if(newIntervalSet != model.intervalSetHorizontal.value!!){
                         model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                         model.dispatchIntervals()
                     }
@@ -74,7 +76,7 @@ class OutputFragment: Fragment() {
                                 },
                                 onSavingCounterpoint= { position ->
                                     model.selectedCounterpoint.value?.let{
-                                        model.savedCounterpoints[position] = it.copy()
+                                        model.saveCounterpointInDb(position, it.copy())
                                     }
                                 },
                                 onKP = { index, repeat ->
