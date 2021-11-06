@@ -158,17 +158,22 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 
     val dimensions = model.dimensions
     val colors = model.appColors
-    val optionNames= listOf("Ensemble", "Range","Melody", "Glissando","Vibrato","Nuances", "Dynamic", "BPM", "Rhythm",  "Rhythm Shuffle", "Parts Shuffle",
-        "Row Forms","Ritornello","Transpose","Doubling","8D AUDIO",
-        "Spread where possible", "Deep Search in 4 part MK", "Detector","Detector Extension",
-        "Export MIDI", "Colors", "Custom Colors","Language","Zodiac","Credits")
+    val optionNames= listOf("Ensemble", "Range","Melody", "Glissando","Vibrato","Nuances",
+        "Rhythm",  "Rhythm Shuffle", "Parts Shuffle","Doubling","8D AUDIO",
+
+        "BPM", "Dynamic", "Row Forms","Transpose","Ritornello",
+        "Spread where possible", "Deep Search in 4 part MK","Export MIDI",
+
+        "Detector","Detector Extension",
+        //"Colors",
+        "Custom Colors","Language","Zodiac","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val lang = Lang.provideLanguage(model.getUserLangDef())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionsData()
                         else userOptionsData[0]
     val listState = rememberLazyListState()
-    var isFirstTab by remember{ mutableStateOf(model.isFirstTab)}
+    var selectedTab by remember{ mutableStateOf(model.lastScaffoldTab)}
     MultiListDialog(ensemblesDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     ListDialog(listDialogData, lang.OKbutton, dimensions.sequenceDialogFontSize)
     MultiListDialog(doublingDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
@@ -201,23 +206,46 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
     Column(Modifier
         .weight(1f)
         .background(
-            if (isFirstTab) colors.drawerBackgroundColor
+            if (selectedTab == ScaffoldTabs.SOUND) colors.drawerBackgroundColor
             else colors.drawerBackgroundColor.shift(-0.2f)
         )
-        .clickable(onClick = { isFirstTab = true; model.isFirstTab = true }), horizontalAlignment = Alignment.CenterHorizontally){
+        .clickable(onClick = { selectedTab = ScaffoldTabs.SOUND; model.lastScaffoldTab = ScaffoldTabs.SOUND }), horizontalAlignment = Alignment.CenterHorizontally){
         IconButton(modifier = Modifier
             .background(
-                if (isFirstTab) colors.drawerBackgroundColor else colors.drawerBackgroundColor.shift(
+                if (selectedTab == ScaffoldTabs.SOUND) colors.drawerBackgroundColor else colors.drawerBackgroundColor.shift(
                     -0.2f
                 ), RoundedCornerShape(4.dp)
             )
-            .then(Modifier.size(50.dp)), onClick = { isFirstTab = true; model.isFirstTab = true }
+            .then(Modifier.size(50.dp)), onClick = { selectedTab = ScaffoldTabs.SOUND; model.lastScaffoldTab = ScaffoldTabs.SOUND }
         )
         {
             Icon(
-                painter = painterResource(id = model.iconMap["music"]!!),
+                painter = painterResource(id = model.iconMap["sound"]!!),
                 contentDescription = null, // decorative element
-                tint = if(isFirstTab) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
+                tint = if(selectedTab == ScaffoldTabs.SOUND) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
+            )
+        }
+    }
+    Column(Modifier
+        .weight(1f)
+        .background(
+            if (selectedTab == ScaffoldTabs.BUILDING) colors.drawerBackgroundColor
+            else colors.drawerBackgroundColor.shift(-0.2f)
+        )
+        .clickable(onClick = { selectedTab = ScaffoldTabs.BUILDING ; model.lastScaffoldTab = ScaffoldTabs.BUILDING  }), horizontalAlignment = Alignment.CenterHorizontally){
+        IconButton(modifier = Modifier
+            .background(
+                if (selectedTab == ScaffoldTabs.BUILDING ) colors.drawerBackgroundColor else colors.drawerBackgroundColor.shift(
+                    -0.2f
+                ), RoundedCornerShape(4.dp)
+            )
+            .then(Modifier.size(50.dp)), onClick = { selectedTab = ScaffoldTabs.BUILDING ; model.lastScaffoldTab = ScaffoldTabs.BUILDING  }
+        )
+        {
+            Icon(
+                painter = painterResource(id = model.iconMap["building"]!!),
+                contentDescription = null, // decorative element
+                tint = if(selectedTab == ScaffoldTabs.BUILDING) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
             )
         }
     }
@@ -225,280 +253,353 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
         Modifier
             .weight(1f)
             .background(
-                if (!isFirstTab) colors.drawerBackgroundColor
+                if (selectedTab == ScaffoldTabs.SETTINGS) colors.drawerBackgroundColor
                 else colors.drawerBackgroundColor.shift(-0.2f)
             )
-            .clickable(onClick = { isFirstTab = false; model.isFirstTab = false }), horizontalAlignment = Alignment.CenterHorizontally,
+            .clickable(onClick = { selectedTab = ScaffoldTabs.SETTINGS; model.lastScaffoldTab = ScaffoldTabs.SETTINGS }), horizontalAlignment = Alignment.CenterHorizontally,
         )
            {
         IconButton(modifier = Modifier
             .background(
-                if (!isFirstTab) colors.drawerBackgroundColor else colors.drawerBackgroundColor.shift(
+                if (selectedTab == ScaffoldTabs.SETTINGS) colors.drawerBackgroundColor else colors.drawerBackgroundColor.shift(
                     -0.2f
                 ), RoundedCornerShape(4.dp)
             )
-            .then(Modifier.size(50.dp)), onClick = { isFirstTab = false; model.isFirstTab = false }
+            .then(Modifier.size(50.dp)), onClick = { selectedTab = ScaffoldTabs.SETTINGS; model.lastScaffoldTab = ScaffoldTabs.SETTINGS }
         )
         {
             Icon(
                 painter = painterResource(id = model.iconMap["settings"]!!),
                 contentDescription = null, // decorative element
-                tint = if(!isFirstTab) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
+                tint = if(selectedTab == ScaffoldTabs.SETTINGS) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
             )
         }
     }
 
 }
 
-    if(isFirstTab){
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(colors.drawerBackgroundColor),
-            state = listState,
-        ) { items(optionNames) { optionName ->
-            val fontSize = dimensions.optionsFontSize
-            when (optionName) {
+    when (selectedTab) {
+        ScaffoldTabs.SOUND -> {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colors.drawerBackgroundColor),
+                state = listState,
+            ) { items(optionNames) { optionName ->
+                val fontSize = dimensions.optionsFontSize
+                when (optionName) {
 
-                "Ensemble" -> {
-                    val ensNames: List<String> = lang.ensembleNames + synthsNames
-                    val ensIndexes = userOptions.ensembleTypes.extractIntsFromCsv()
-                    SelectableCard(
-                        text = "${lang.ensemble}: ${ensIndexes.joinToString(" + ") { ensNames[it] }}",
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = true,
-                        onClick = {
-                            ensemblesDialogData.value = MultiListDialogData(
-                                true, ensNames, ensIndexes.toSet(), lang.selectEnsemble
-                            ) { indexes ->
-                                model.updateUserOptions(
-                                    "ensembleTypes",
-                                    if(indexes.isEmpty()) "2" else indexes.joinToString(",")
-                                )
-                                ensemblesDialogData.value =
-                                    MultiListDialogData(itemList = ensemblesDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Range" -> {
-                    val rangeOptions: List<String> = lang.rangeOptions
-                    val rangeIndex = userOptions.rangeType
-                    SelectableCard(
-                        text = "${lang.range}: ${rangeOptions[rangeIndex]}",
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = true,
-                        onClick = {
-                            listDialogData.value = ListDialogData(
-                                true, rangeOptions, rangeIndex, lang.selectRange
-                            ) { index ->
-                                model.updateUserOptions(
-                                    "rangeType",
-                                    index
-                                )
-                                listDialogData.value =
-                                    ListDialogData(itemList = listDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Melody" -> {
-                    val melodyOptions: List<String> = lang.melodyOptions
-                    val melodyIndex = userOptions.melodyType
-                    SelectableCard(
-                        text = "${lang.melody}: ${melodyOptions[melodyIndex]}",
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = true,
-                        onClick = {
-                            listDialogData.value = ListDialogData(
-                                true, melodyOptions, melodyIndex, lang.selectMelody
-                            ) { index ->
-                                model.updateUserOptions(
-                                    "melodyType",
-                                    index
-                                )
-                                listDialogData.value =
-                                    ListDialogData(itemList = listDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Glissando" -> {
-                    val flags = userOptions.glissandoFlags
-                    val intsFromFlags = convertFlagsToInts(flags).map { it - 1 }
-                    val isOn = flags > 0
-                    val text = if (!isOn) lang.glissando else "${lang.glissando}: ${
-                        intsFromFlags.joinToString(separator = ", ") { intervalsForGlissando[it] }
-                    }"
-                    SelectableCard(
-                        text = text,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = { _ ->
-                            doublingDialogData.value = MultiListDialogData(
-                                true, intervalsForGlissando, intsFromFlags.toSet(), lang.selectGlissando
-                            ) { indexes ->
-                                model.updateUserOptions(
-                                    "glissandoFlags",
-                                    convertIntsToFlags(indexes.map { it + 1 }.toSortedSet())
-                                )
-                                doublingDialogData.value =
-                                    MultiListDialogData(itemList = doublingDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Vibrato" -> {
-                    val intensity = userOptions.vibrato
-                    val sym = getVibratoSymbol()
-                    val timeIndices: List<String> = (0 until 9).map { if(it == 0) "-" else sym.repeat(it) }
-                    val isOn = intensity != 0
-                    val text = if (intensity == 0) lang.vibrato else "${lang.vibrato}: ${sym.repeat(intensity)}"
-                    SelectableCard(
-                        text = text,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            vibratoDialogData.value = ListDialogData(
-                                true, timeIndices, intensity, lang.selectVibrato
-                            ) { index ->
-                                model.updateUserOptions(
-                                    "vibrato",
-                                    index
-                                )
-                                ritornelloDialogData.value =
-                                    ListDialogData(itemList = vibratoDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Nuances" -> {
-                    val nuancesOptions: List<String> = lang.nuancesOptions
-                    val nuancesIndex = userOptions.nuances
-                    val isOn = nuancesIndex != 0
-                    SelectableCard(
-                        text = if(isOn) "${lang.nuances}: ${nuancesOptions[nuancesIndex]}" else lang.nuances,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            listDialogData.value = ListDialogData(
-                                true, nuancesOptions, nuancesIndex, lang.selectNuances
-                            ) { index ->
-                                model.updateUserOptions(
-                                    "nuances",
-                                    index
-                                )
-                                listDialogData.value =
-                                    ListDialogData(itemList = listDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Dynamic" -> {
-                    val dynamics = userOptions.dynamics
-                    val symbols = getDynamicSymbols()
-                    SelectableCard(
-                        text = "${lang.dynamic}: ${dynamics.describeForDynamic(model.dynamicMap, symbols[12], symbols[13])}",
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = true,
-                        onClick = {
-                            multiFloatDialogData.value = MultiFloatDialogData(
-                                true, "${lang.selectDynamicAlterations}", dynamics,
-                                model = model) { dynamics ->
-                                model.updateUserOptions(
-                                    "dynamics",
-                                    dynamics
-                                )
-                                listDialogData.value =
-                                    ListDialogData(itemList = listDialogData.value.itemList)
-                            }
-                        })
-                }
-                "BPM" -> {
-                    val bpms = userOptions.bpms
-                    SelectableCard(
-                        text = "${lang.bpm}: ${bpms.describe()}",
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = true,
-                        onClick = {
-                            multiBpmDialogData.value = MultiNumberDialogData(
-                                true, "${lang.beatsPerMinute}:", bpms, 18, 600,
-                            model = model) { bpms ->
-                                model.updateUserOptions(
-                                    "bpms",
-                                    bpms
-                                )
-                                listDialogData.value =
-                                    ListDialogData(itemList = listDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Rhythm" -> {
-                    val rhythmNames = RhythmPatterns.getTitles()
-                    val rhythmIndex = userOptions.rhythm
-                    SelectableCard(
-                        text = "${lang.rhythm}: ${rhythmNames[rhythmIndex]}",
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = true,
-                        onClick = {
-                            listDialogData.value = ListDialogData(
-                                true, rhythmNames, rhythmIndex, lang.selectRhythm
-                            ) { index ->
-                                model.updateUserOptions(
-                                    "rhythm",
-                                    index
-                                )
-                                listDialogData.value =
-                                    ListDialogData(itemList = listDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Rhythm Shuffle" -> {
-                    var isOn = userOptions.rhythmShuffle != 0
-                    SelectableCard(
-                        text = lang.rhythmShuffle,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            isOn = !isOn
-                            model.updateUserOptions(
-                                "rhythmShuffle",
-                                if (isOn) 1 else 0
-                            )
-                        })
-                }
-                "Parts Shuffle" -> {
-                    var isOn = userOptions.partsShuffle != 0
-                    SelectableCard(
-                        text = lang.partsShuffle,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            isOn = !isOn
-                            model.updateUserOptions(
-                                "partsShuffle",
-                                if (isOn) 1 else 0
-                            )
-                        })
-                }
-                "Row Forms" -> {
-                    val formsCsv = userOptions.rowForms
-                    val isOn = formsCsv != "1"
-                    val formPairs = formsCsv.extractIntPairsFromCsv()
-                    SelectableCard(
-                        text = if(isOn)
-                            "${lang.rowForms}: ${
-                                formPairs.joinToString(" ") {
-                                    "${if (it.first == 0) "" else it.first}" +
-                                            if (it.second < 0) "${rowFormsMap[it.second.absoluteValue]} |"
-                                            else "${rowFormsMap[it.second]}"
+                    "Ensemble" -> {
+                        val ensNames: List<String> = lang.ensembleNames + synthsNames
+                        val ensIndexes = userOptions.ensembleTypes.extractIntsFromCsv()
+                        SelectableCard(
+                            text = "${lang.ensemble}: ${ensIndexes.joinToString(" + ") { ensNames[it] }}",
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = true,
+                            onClick = {
+                                ensemblesDialogData.value = MultiListDialogData(
+                                    true, ensNames, ensIndexes.toSet(), lang.selectEnsemble
+                                ) { indexes ->
+                                    model.updateUserOptions(
+                                        "ensembleTypes",
+                                        if(indexes.isEmpty()) "2" else indexes.joinToString(",")
+                                    )
+                                    ensemblesDialogData.value =
+                                        MultiListDialogData(itemList = ensemblesDialogData.value.itemList)
                                 }
-                            }"
+                            })
+                    }
+                    "Range" -> {
+                        val rangeOptions: List<String> = lang.rangeOptions
+                        val rangeIndex = userOptions.rangeType
+                        SelectableCard(
+                            text = "${lang.range}: ${rangeOptions[rangeIndex]}",
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = true,
+                            onClick = {
+                                listDialogData.value = ListDialogData(
+                                    true, rangeOptions, rangeIndex, lang.selectRange
+                                ) { index ->
+                                    model.updateUserOptions(
+                                        "rangeType",
+                                        index
+                                    )
+                                    listDialogData.value =
+                                        ListDialogData(itemList = listDialogData.value.itemList)
+                                }
+                            })
+                    }
+                    "Melody" -> {
+                        val melodyOptions: List<String> = lang.melodyOptions
+                        val melodyIndex = userOptions.melodyType
+                        SelectableCard(
+                            text = "${lang.melody}: ${melodyOptions[melodyIndex]}",
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = true,
+                            onClick = {
+                                listDialogData.value = ListDialogData(
+                                    true, melodyOptions, melodyIndex, lang.selectMelody
+                                ) { index ->
+                                    model.updateUserOptions(
+                                        "melodyType",
+                                        index
+                                    )
+                                    listDialogData.value =
+                                        ListDialogData(itemList = listDialogData.value.itemList)
+                                }
+                            })
+                    }
+                    "Glissando" -> {
+                        val flags = userOptions.glissandoFlags
+                        val intsFromFlags = convertFlagsToInts(flags).map { it - 1 }
+                        val isOn = flags > 0
+                        val text = if (!isOn) lang.glissando else "${lang.glissando}: ${
+                            intsFromFlags.joinToString(separator = ", ") { intervalsForGlissando[it] }
+                        }"
+                        SelectableCard(
+                            text = text,
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = isOn,
+                            onClick = { _ ->
+                                doublingDialogData.value = MultiListDialogData(
+                                    true, intervalsForGlissando, intsFromFlags.toSet(), lang.selectGlissando
+                                ) { indexes ->
+                                    model.updateUserOptions(
+                                        "glissandoFlags",
+                                        convertIntsToFlags(indexes.map { it + 1 }.toSortedSet())
+                                    )
+                                    doublingDialogData.value =
+                                        MultiListDialogData(itemList = doublingDialogData.value.itemList)
+                                }
+                            })
+                    }
+                    "Vibrato" -> {
+                        val intensity = userOptions.vibrato
+                        val sym = getVibratoSymbol()
+                        val timeIndices: List<String> = (0 until 9).map { if(it == 0) "-" else sym.repeat(it) }
+                        val isOn = intensity != 0
+                        val text = if (intensity == 0) lang.vibrato else "${lang.vibrato}: ${sym.repeat(intensity)}"
+                        SelectableCard(
+                            text = text,
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = isOn,
+                            onClick = {
+                                vibratoDialogData.value = ListDialogData(
+                                    true, timeIndices, intensity, lang.selectVibrato
+                                ) { index ->
+                                    model.updateUserOptions(
+                                        "vibrato",
+                                        index
+                                    )
+                                    ritornelloDialogData.value =
+                                        ListDialogData(itemList = vibratoDialogData.value.itemList)
+                                }
+                            })
+                    }
+                    "Nuances" -> {
+                        val nuancesOptions: List<String> = lang.nuancesOptions
+                        val nuancesIndex = userOptions.nuances
+                        val isOn = nuancesIndex != 0
+                        SelectableCard(
+                            text = if(isOn) "${lang.nuances}: ${nuancesOptions[nuancesIndex]}" else lang.nuances,
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = isOn,
+                            onClick = {
+                                listDialogData.value = ListDialogData(
+                                    true, nuancesOptions, nuancesIndex, lang.selectNuances
+                                ) { index ->
+                                    model.updateUserOptions(
+                                        "nuances",
+                                        index
+                                    )
+                                    listDialogData.value =
+                                        ListDialogData(itemList = listDialogData.value.itemList)
+                                }
+                            })
+                    }
+                    "Rhythm" -> {
+                        val rhythmNames = RhythmPatterns.getTitles()
+                        val rhythmIndex = userOptions.rhythm
+                        SelectableCard(
+                            text = "${lang.rhythm}: ${rhythmNames[rhythmIndex]}",
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = true,
+                            onClick = {
+                                listDialogData.value = ListDialogData(
+                                    true, rhythmNames, rhythmIndex, lang.selectRhythm
+                                ) { index ->
+                                    model.updateUserOptions(
+                                        "rhythm",
+                                        index
+                                    )
+                                    listDialogData.value =
+                                        ListDialogData(itemList = listDialogData.value.itemList)
+                                }
+                            })
+                    }
+                    "Rhythm Shuffle" -> {
+                        var isOn = userOptions.rhythmShuffle != 0
+                        SelectableCard(
+                            text = lang.rhythmShuffle,
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = isOn,
+                            onClick = {
+                                isOn = !isOn
+                                model.updateUserOptions(
+                                    "rhythmShuffle",
+                                    if (isOn) 1 else 0
+                                )
+                            })
+                    }
+                    "Parts Shuffle" -> {
+                        var isOn = userOptions.partsShuffle != 0
+                        SelectableCard(
+                            text = lang.partsShuffle,
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = isOn,
+                            onClick = {
+                                isOn = !isOn
+                                model.updateUserOptions(
+                                    "partsShuffle",
+                                    if (isOn) 1 else 0
+                                )
+                            })
+                    }
+
+                    "Doubling" -> {
+                        val flags = userOptions.doublingFlags
+                        val intsFromFlags = convertFlagsToInts(flags).map { it - 1 }
+                        val isOn = flags > 0
+                        val text = if (!isOn) lang.doubling else "${lang.doubling}: ${
+                            intsFromFlags.joinToString(
+                                separator = ", "
+                            ) { lang.doublingNames[it] }
+                        }"
+                        SelectableCard(
+                            text = text,
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = isOn,
+                            onClick = { _ ->
+                                doublingDialogData.value = MultiListDialogData(
+                                    true, lang.doublingNames, intsFromFlags.toSet(), lang.selectDoubling
+                                ) { indexes ->
+                                    model.updateUserOptions(
+                                        "doublingFlags",
+                                        convertIntsToFlags(indexes.map { it + 1 }.toSortedSet())
+                                    )
+                                    doublingDialogData.value =
+                                        MultiListDialogData(itemList = doublingDialogData.value.itemList)
+                                }
+                            })
+                    }
+                    "8D AUDIO" -> {
+                        val flags = userOptions.audio8DFlags
+                        val intsFromFlags = convertFlagsToInts(flags)
+                        val isOn = flags > 0
+                        val text = if (!isOn) lang.audio8D else "${lang.audio8D}: ${
+                            intsFromFlags.joinToString(
+                                separator = ", "
+                            ) { (it+1).toString() }
+                        }"
+                        SelectableCard(
+                            text = text,
+                            fontSize = fontSize,
+                            colors = colors,
+                            isSelected = isOn,
+                            onClick = { _ ->
+                                doublingDialogData.value = MultiListDialogData(
+                                    true, (1..12).map{it.toString()}, intsFromFlags.toSet(), lang.selectAudio8D
+                                ) { indexes ->
+                                    model.updateUserOptions(
+                                        "audio8DFlags",
+                                        convertIntsToFlags(indexes.toSortedSet())
+                                    )
+                                    doublingDialogData.value =
+                                        MultiListDialogData(itemList = doublingDialogData.value.itemList)
+                                }
+                            })
+                    }
+
+
+                }
+            }
+            }
+        }
+        ScaffoldTabs.BUILDING -> {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colors.drawerBackgroundColor),
+                state = listState,
+            ) {
+                items(optionNames) { optionName ->
+                    val fontSize = dimensions.optionsFontSize
+                    when (optionName) {
+
+                        "Dynamic" -> {
+                            val dynamics = userOptions.dynamics
+                            val symbols = getDynamicSymbols()
+                            SelectableCard(
+                                text = "${lang.dynamic}: ${dynamics.describeForDynamic(model.dynamicMap, symbols[12], symbols[13])}",
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = true,
+                                onClick = {
+                                    multiFloatDialogData.value = MultiFloatDialogData(
+                                        true, "${lang.selectDynamicAlterations}", dynamics,
+                                        model = model) { dynamics ->
+                                        model.updateUserOptions(
+                                            "dynamics",
+                                            dynamics
+                                        )
+                                        listDialogData.value =
+                                            ListDialogData(itemList = listDialogData.value.itemList)
+                                    }
+                                })
+                        }
+                        "BPM" -> {
+                            val bpms = userOptions.bpms
+                            SelectableCard(
+                                text = "${lang.bpm}: ${bpms.describe()}",
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = true,
+                                onClick = {
+                                    multiBpmDialogData.value = MultiNumberDialogData(
+                                        true, "${lang.beatsPerMinute}:", bpms, 18, 600,
+                                        model = model) { bpms ->
+                                        model.updateUserOptions(
+                                            "bpms",
+                                            bpms
+                                        )
+                                        listDialogData.value =
+                                            ListDialogData(itemList = listDialogData.value.itemList)
+                                    }
+                                })
+                        }
+                        "Row Forms" -> {
+                            val formsCsv = userOptions.rowForms
+                            val isOn = formsCsv != "1"
+                            val formPairs = formsCsv.extractIntPairsFromCsv()
+                            SelectableCard(
+                                text = if(isOn)
+                                    "${lang.rowForms}: ${
+                                        formPairs.joinToString(" ") {
+                                            "${if (it.first == 0) "" else it.first}" +
+                                                    if (it.second < 0) "${rowFormsMap[it.second.absoluteValue]} |"
+                                                    else "${rowFormsMap[it.second]}"
+                                        }
+                                    }"
                                 else lang.rowForms,
                                 fontSize = fontSize,
                                 colors = colors,
@@ -507,7 +608,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                     rowFormsDialogData.value = MultiNumberDialogData(
                                         true, lang.selectRowForms, formsCsv,
                                         model = model,
-                                        ) { rowForms ->
+                                    ) { rowForms ->
                                         model.updateUserOptions(
                                             "rowForms",
                                             rowForms
@@ -516,290 +617,301 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                             ListDialogData(itemList = listDialogData.value.itemList)
                                     }
                                 })
-                            }
-
-                "Ritornello" -> {
-                    val timeIndices: List<String> = (1..128).map { it.toString() }
-                    val nTimes = userOptions.ritornello
-                    val isOn = nTimes != 0
-                    val text = if (nTimes == 0) lang.ritornello else "${lang.ritornello} x ${nTimes+1}"
-                    SelectableCard(
-                        text = text,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            ritornelloDialogData.value = ListDialogData(
-                                true, timeIndices, nTimes, lang.selectRitornello
-                            ) { index ->
-                                model.updateUserOptions(
-                                    "ritornello",
-                                    index
-                                )
-                                ritornelloDialogData.value =
-                                    ListDialogData(itemList = ritornelloDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Transpose" -> {
-                    val transposeCsv = userOptions.transpose
-                    val isOn = transposeCsv != "0"
-                    SelectableCard(
-                        text = if(isOn) "${lang.transpose}: ${transposeCsv.describeForTranspose(intervalsForTranspose)}" else lang.transpose,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            transposeDialogData.value = MultiNumberDialogData(
-                                true, "${lang.selectTranspositions}", transposeCsv,
-                                model = model) { transpositions ->
-                                model.updateUserOptions(
-                                    "transpose",
-                                    transpositions
-                                )
-                                listDialogData.value =
-                                    ListDialogData(itemList = listDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Doubling" -> {
-                    val flags = userOptions.doublingFlags
-                    val intsFromFlags = convertFlagsToInts(flags).map { it - 1 }
-                    val isOn = flags > 0
-                    val text = if (!isOn) lang.doubling else "${lang.doubling}: ${
-                        intsFromFlags.joinToString(
-                            separator = ", "
-                        ) { lang.doublingNames[it] }
-                    }"
-                    SelectableCard(
-                        text = text,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = { _ ->
-                            doublingDialogData.value = MultiListDialogData(
-                                true, lang.doublingNames, intsFromFlags.toSet(), lang.selectDoubling
-                            ) { indexes ->
-                                model.updateUserOptions(
-                                    "doublingFlags",
-                                    convertIntsToFlags(indexes.map { it + 1 }.toSortedSet())
-                                )
-                                doublingDialogData.value =
-                                    MultiListDialogData(itemList = doublingDialogData.value.itemList)
-                            }
-                        })
-                }
-                "8D AUDIO" -> {
-                    val flags = userOptions.audio8DFlags
-                    val intsFromFlags = convertFlagsToInts(flags)
-                    val isOn = flags > 0
-                    val text = if (!isOn) lang.audio8D else "${lang.audio8D}: ${
-                        intsFromFlags.joinToString(
-                            separator = ", "
-                        ) { (it+1).toString() }
-                    }"
-                    SelectableCard(
-                        text = text,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = { _ ->
-                            doublingDialogData.value = MultiListDialogData(
-                                true, (1..12).map{it.toString()}, intsFromFlags.toSet(), lang.selectAudio8D
-                            ) { indexes ->
-                                model.updateUserOptions(
-                                    "audio8DFlags",
-                                    convertIntsToFlags(indexes.toSortedSet())
-                                )
-                                doublingDialogData.value =
-                                    MultiListDialogData(itemList = doublingDialogData.value.itemList)
-                            }
-                        })
-                }
-                "Spread where possible" -> {
-                    var isOn = userOptions.spread != 0
-                    SelectableCard(
-                        text = lang.spreadWherePossible,
-                        colors = colors,
-                        fontSize = fontSize,
-                        isSelected = isOn,
-                        onClick = {
-                            isOn = !isOn
-                            model.updateUserOptions(
-                                "spread",
-                                if (isOn) 1 else 0
-                            )
-                        })
-                }
-                "Deep Search in 4 part MK" -> {
-                    var isOn = userOptions.deepSearch != 0
-                    SelectableCard(
-                        text = lang.deepSearch,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = {
-                            isOn = !isOn
-                            model.updateUserOptions(
-                                "deepSearch",
-                                if (isOn) 1 else 0
-                            )
-                        })
-                     }
-                "Export MIDI" -> {
-                    SelectableCard(text = lang.exportMidi, fontSize = fontSize, colors = colors, isSelected = true, onClick = {
-                        val path = model.midiPath.absolutePath.toString()
-                        var error = model.onPlay(false, false)
-                        if (error.isEmpty()){
-                            model.shareMidi(model.midiPath)
-                        } else {
-                            exportDialogData.value = ExportDialogData(true,"EXPORT MIDI",
-                                "", error = lang.playToCreate
-                            ) {
-
-                                exportDialogData.value = ExportDialogData(path = path, error = error)
-                            }
                         }
-                    })
-                }
-                }
-            }
-        }
-    } else { // Settings List
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(colors.drawerBackgroundColor),
-            state = listState,
-        ) { items(optionNames) { optionName ->
-            val fontSize = dimensions.optionsFontSize
-            when (optionName) {
-            "Detector" -> {
-            val flags = userOptions.detectorFlags
-            val intsFromFlags = convertFlagsToInts(flags)
-            val isOn = flags != 0
-            val intervalNames = lang.intervalSet.map{ it.replace("\n"," / ") }
-            val text = if(!isOn) lang.detector else "${lang.detector}: ${
-                intsFromFlags.joinToString(
-                    separator = ", "
-                ) { intervalNames[it] }
-            }"
-            SelectableCard(text = text, fontSize = fontSize, colors = colors, isSelected = isOn, onClick = {
-                detectorDialogData.value = MultiListDialogData(true, intervalNames,
-                    intsFromFlags.toSet(), dialogTitle = lang.selectIntervalsToDetect
-                ) { indexes ->
-                    model.updateUserOptions(
-                        "detectorFlags",
-                        convertIntsToFlags(indexes.toSortedSet())
-                    )
-                    detectorDialogData.value = MultiListDialogData(itemList = detectorDialogData.value.itemList)
-                }
-            })
-        }
-            "Detector Extension" -> {
-            val extensions: List<String> = (1..16).map{ it.toString()}
-            val extIndex = userOptions.detectorExtension
-            val isOn = userOptions.detectorFlags != 0
-            SelectableCard(text = "${lang.detectorExtension}: ${extensions[extIndex-1]}", fontSize = fontSize, colors = colors, isSelected = isOn, onClick = {
-                if(isOn){
-                    detExtensionDialogData.value = ListDialogData(true,extensions,extIndex-1,lang.selectDetectorExtension
-                    ) { index ->
-                        model.updateUserOptions(
-                            "detectorExtension",
-                            index +1
-                        )
-                        detExtensionDialogData.value = ListDialogData(itemList = detExtensionDialogData.value.itemList)
+                        "Transpose" -> {
+                            val transposeCsv = userOptions.transpose
+                            val isOn = transposeCsv != "0"
+                            SelectableCard(
+                                text = if(isOn) "${lang.transpose}: ${transposeCsv.describeForTranspose(intervalsForTranspose)}" else lang.transpose,
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = isOn,
+                                onClick = {
+                                    transposeDialogData.value = MultiNumberDialogData(
+                                        true, "${lang.selectTranspositions}", transposeCsv,
+                                        model = model) { transpositions ->
+                                        model.updateUserOptions(
+                                            "transpose",
+                                            transpositions
+                                        )
+                                        listDialogData.value =
+                                            ListDialogData(itemList = listDialogData.value.itemList)
+                                    }
+                                })
+                        }
+                        "Ritornello" -> {
+                            val timeIndices: List<String> = (1..128).map { it.toString() }
+                            val nTimes = userOptions.ritornello
+                            val isOn = nTimes != 0
+                            val text = if (nTimes == 0) lang.ritornello else "${lang.ritornello} x ${nTimes+1}"
+                            SelectableCard(
+                                text = text,
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = isOn,
+                                onClick = {
+                                    ritornelloDialogData.value = ListDialogData(
+                                        true, timeIndices, nTimes, lang.selectRitornello
+                                    ) { index ->
+                                        model.updateUserOptions(
+                                            "ritornello",
+                                            index
+                                        )
+                                        ritornelloDialogData.value =
+                                            ListDialogData(itemList = ritornelloDialogData.value.itemList)
+                                    }
+                                })
+                        }
+
+                        "Spread where possible" -> {
+                            var isOn = userOptions.spread != 0
+                            SelectableCard(
+                                text = lang.spreadWherePossible,
+                                colors = colors,
+                                fontSize = fontSize,
+                                isSelected = isOn,
+                                onClick = {
+                                    isOn = !isOn
+                                    model.updateUserOptions(
+                                        "spread",
+                                        if (isOn) 1 else 0
+                                    )
+                                })
+                        }
+                        "Deep Search in 4 part MK" -> {
+                            var isOn = userOptions.deepSearch != 0
+                            SelectableCard(
+                                text = lang.deepSearch,
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = isOn,
+                                onClick = {
+                                    isOn = !isOn
+                                    model.updateUserOptions(
+                                        "deepSearch",
+                                        if (isOn) 1 else 0
+                                    )
+                                })
+                        }
+                        "Export MIDI" -> {
+                            SelectableCard(text = lang.exportMidi, fontSize = fontSize, colors = colors, isSelected = true, onClick = {
+                                val path = model.midiPath.absolutePath.toString()
+                                var error = model.onPlay(false, false)
+                                if (error.isEmpty()){
+                                    model.shareMidi(model.midiPath)
+                                } else {
+                                    exportDialogData.value = ExportDialogData(true,"EXPORT MIDI",
+                                        "", error = lang.playToCreate
+                                    ) {
+
+                                        exportDialogData.value = ExportDialogData(path = path, error = error)
+                                    }
+                                }
+                            })
+                        }
+
                     }
                 }
 
-            })
+            }
         }
+        ScaffoldTabs.SETTINGS -> {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(colors.drawerBackgroundColor),
+                state = listState,
+            ) {
+                items(optionNames) { optionName ->
+                    val fontSize = dimensions.optionsFontSize
+                    when (optionName) {
+                        "Detector" -> {
+                            val flags = userOptions.detectorFlags
+                            val intsFromFlags = convertFlagsToInts(flags)
+                            val isOn = flags != 0
+                            val intervalNames = lang.intervalSet.map { it.replace("\n", " / ") }
+                            val text = if (!isOn) lang.detector else "${lang.detector}: ${
+                                intsFromFlags.joinToString(
+                                    separator = ", "
+                                ) { intervalNames[it] }
+                            }"
+                            SelectableCard(
+                                text = text,
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = isOn,
+                                onClick = {
+                                    detectorDialogData.value = MultiListDialogData(
+                                        true,
+                                        intervalNames,
+                                        intsFromFlags.toSet(),
+                                        dialogTitle = lang.selectIntervalsToDetect
+                                    ) { indexes ->
+                                        model.updateUserOptions(
+                                            "detectorFlags",
+                                            convertIntsToFlags(indexes.toSortedSet())
+                                        )
+                                        detectorDialogData.value =
+                                            MultiListDialogData(itemList = detectorDialogData.value.itemList)
+                                    }
+                                })
+                        }
+                        "Detector Extension" -> {
+                            val extensions: List<String> = (1..16).map { it.toString() }
+                            val extIndex = userOptions.detectorExtension
+                            val isOn = userOptions.detectorFlags != 0
+                            SelectableCard(
+                                text = "${lang.detectorExtension}: ${extensions[extIndex - 1]}",
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = isOn,
+                                onClick = {
+                                    if (isOn) {
+                                        detExtensionDialogData.value = ListDialogData(
+                                            true,
+                                            extensions,
+                                            extIndex - 1,
+                                            lang.selectDetectorExtension
+                                        ) { index ->
+                                            model.updateUserOptions(
+                                                "detectorExtension",
+                                                index + 1
+                                            )
+                                            detExtensionDialogData.value =
+                                                ListDialogData(itemList = detExtensionDialogData.value.itemList)
+                                        }
+                                    }
 
-            "Colors" -> {
-                val colorDefs = extractColorDefs(userOptions.colors)
-                val appColors = AppColorThemes.values().map{ it.title }
-                val appColorsName = if(colorDefs.app == "System") model.getSystemAppColorsName() else colorDefs.app
-                val colorsIndex = appColors.indexOf(appColorsName)
-                SelectableCard(text = "App Colors: $appColorsName", fontSize = fontSize, colors = colors, isSelected = !colorDefs.isCustom, onClick = {
-                    colorsDialogData.value = ListDialogData(true, appColors, colorsIndex, "Choose a Color Set"){ index ->
-                        model.updateUserOptions(
-                            "colors",
-                            "${AppColorThemes.values()[index].title}||${colorDefs.custom}"
-                        )
-                        colorsDialogData.value = ListDialogData(itemList = colorsDialogData.value.itemList)
+                                })
+                        }
+
+                        "Colors" -> {
+                            val colorDefs = extractColorDefs(userOptions.colors)
+                            val appColors = AppColorThemes.values().map { it.title }
+                            val appColorsName =
+                                if (colorDefs.app == "System") model.getSystemAppColorsName() else colorDefs.app
+                            val colorsIndex = appColors.indexOf(appColorsName)
+                            SelectableCard(
+                                text = "App Colors: $appColorsName",
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = !colorDefs.isCustom,
+                                onClick = {
+                                    colorsDialogData.value = ListDialogData(
+                                        true,
+                                        appColors,
+                                        colorsIndex,
+                                        "Choose a Color Set"
+                                    ) { index ->
+                                        model.updateUserOptions(
+                                            "colors",
+                                            "${AppColorThemes.values()[index].title}||${colorDefs.custom}"
+                                        )
+                                        colorsDialogData.value =
+                                            ListDialogData(itemList = colorsDialogData.value.itemList)
+                                    }
+                                })
+                        }
+                        "Custom Colors" -> {
+                            val colorDefs = extractColorDefs(userOptions.colors)
+                            SelectableCard(
+                                text = "Custom Colors: ${colorDefs.custom}",
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = colorDefs.isCustom,
+                                onClick = {
+                                    customColorsDialogData.value = CustomColorsDialogData(
+                                        true, "Create a Color Set", colorDefs.custom, model
+                                    ) { colorIndex ->
+                                        model.updateUserOptions(
+                                            "colors",
+                                            "$colorIndex||${colorDefs.app}"
+                                        )
+                                        customColorsDialogData.value =
+                                            CustomColorsDialogData(model = model)
+                                    }
+                                })
+                        }
+                        "Language" -> {
+                            val languages = LANGUAGES.values().map { it.language }
+                            val langDef: String =
+                                if (userOptions.language == "System") model.getSystemLangDef() else userOptions.language
+                            val languageName = LANGUAGES.languageNameFromDef(langDef)
+                            val languageIndex = languages.indexOf(languageName)
+                            SelectableCard(
+                                text = "${lang.language}: $languageName",
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = true,
+                                onClick = {
+                                    listDialogData.value = ListDialogData(
+                                        true, languages, languageIndex, "Select a Language!"
+                                    ) { index ->
+                                        model.updateUserOptions(
+                                            "language",
+                                            LANGUAGES.values()[index].toString()
+                                        )
+                                        listDialogData.value =
+                                            ListDialogData(itemList = listDialogData.value.itemList)
+                                    }
+                                })
+                        }
+                        "Zodiac" -> {
+                            val flags = userOptions.zodiacFlags
+                            val intsFromFlags = convertFlagsToInts(flags)
+                            val isOn = flags > 0
+                            val text = if (!isOn) lang.zodiac else "${lang.zodiac}: ${
+                                intsFromFlags.joinToString(
+                                    separator = ", "
+                                ) { lang.zodiacOptions[it] }
+                            }"
+                            SelectableCard(
+                                text = text,
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = isOn,
+                                onClick = { _ ->
+                                    zodiacDialogData.value = MultiListDialogData(
+                                        true,
+                                        lang.zodiacOptions,
+                                        intsFromFlags.toSet(),
+                                        lang.selectZodiac
+                                    ) { indexes ->
+                                        val actualIndexes = if (indexes.contains(2)) listOf(
+                                            indexes[0],
+                                            1,
+                                            2
+                                        ) else indexes
+                                        model.updateUserOptions(
+                                            "zodiacFlags",
+                                            convertIntsToFlags(actualIndexes.toSortedSet())
+                                        )
+                                        zodiacDialogData.value =
+                                            MultiListDialogData(itemList = zodiacDialogData.value.itemList)
+                                    }
+                                })
+                        }
+                        "Credits" -> {
+                            SelectableCard(
+                                text = lang.credits,
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = true,
+                                onClick = {
+                                    creditsDialogData.value = CreditsDialogData(
+                                        true, "Credits:",
+                                    ) {
+                                        creditsDialogData.value = CreditsDialogData()
+                                    }
+                                }
+                            )
+                        }
                     }
-                })
-            }
-            "Custom Colors"-> {
-            val colorDefs = extractColorDefs(userOptions.colors)
-            SelectableCard(text = "Custom Colors: ${colorDefs.custom}", fontSize = fontSize, colors = colors, isSelected = colorDefs.isCustom,onClick = {
-                customColorsDialogData.value = CustomColorsDialogData(true, "Create a Color Set", colorDefs.custom, model
-                ) { colorIndex ->
-                    model.updateUserOptions(
-                        "colors",
-                        "$colorIndex||${colorDefs.app}"
-                    )
-                    customColorsDialogData.value = CustomColorsDialogData(model = model)
                 }
-            })
-        }
-            "Language" -> {
-            val languages = LANGUAGES.values().map{ it.language }
-            val langDef: String = if(userOptions.language == "System") model.getSystemLangDef() else userOptions.language
-            val languageName = LANGUAGES.languageNameFromDef(langDef)
-            val languageIndex= languages.indexOf(languageName)
-            SelectableCard(text = "${lang.language}: $languageName", fontSize = fontSize, colors = colors, isSelected = true,onClick = {
-                listDialogData.value = ListDialogData(true,languages,languageIndex,"Select a Language!"
-                ) { index ->
-                    model.updateUserOptions(
-                        "language",
-                        LANGUAGES.values()[index].toString()
-                    )
-                    listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)
-                }
-            })
-        }
-                "Zodiac" -> {
-                    val flags = userOptions.zodiacFlags
-                    val intsFromFlags = convertFlagsToInts(flags)
-                    val isOn = flags > 0
-                    val text = if (!isOn) lang.zodiac else "${lang.zodiac}: ${
-                        intsFromFlags.joinToString(
-                            separator = ", "
-                        ) { lang.zodiacOptions[it] }
-                    }"
-                    SelectableCard(
-                        text = text,
-                        fontSize = fontSize,
-                        colors = colors,
-                        isSelected = isOn,
-                        onClick = { _ ->
-                            zodiacDialogData.value = MultiListDialogData(
-                                true, lang.zodiacOptions, intsFromFlags.toSet(), lang.selectZodiac
-                            ) { indexes ->
-                                val actualIndexes = if(indexes.contains(2)) listOf(indexes[0],1,2) else indexes
-                                model.updateUserOptions(
-                                    "zodiacFlags",
-                                    convertIntsToFlags(actualIndexes.toSortedSet())
-                                )
-                                zodiacDialogData.value =
-                                    MultiListDialogData(itemList = zodiacDialogData.value.itemList)
-                            }
-                        })
-                }
-            "Credits" -> {
-            SelectableCard(text = lang.credits, fontSize = fontSize, colors = colors, isSelected = true, onClick = {
-                creditsDialogData.value = CreditsDialogData(true,"Credits:",
-                ) {
-                    creditsDialogData.value = CreditsDialogData()
-                }
-            }
-            )
-        }
-        }
-    }
 
+            }
         }
     }
 }
+
 

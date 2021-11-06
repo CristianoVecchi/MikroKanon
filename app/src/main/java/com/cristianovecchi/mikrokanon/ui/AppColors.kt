@@ -133,7 +133,7 @@ fun Color.shift(diff: Float): Color {
 
 data class ColorDefs(val app:String = "System", val custom: Int = 0, val isCustom: Boolean = false)
 fun extractColorDefs(defs: String): ColorDefs{
-    val couple = defs.split("||")
+    val couple = defs.split("|")
     return if(couple[0].isDigitsOnly()) ColorDefs(couple[1],couple[0].toInt(),true)
     else ColorDefs(couple[0], couple[1].toInt(),false)
 }

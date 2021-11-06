@@ -55,6 +55,10 @@ data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean =
                          val freeparts: Boolean = false, val playOrStop: Boolean = true) {
 }
 
+enum class ScaffoldTabs {
+    SOUND, BUILDING, SETTINGS
+}
+
 class AppViewModel(
     application: Application,
     private val sequenceRepository: SequenceDataRepository,
@@ -72,7 +76,7 @@ class AppViewModel(
     }
 
     var dimensions: Dimensions
-    var isFirstTab = true
+    var lastScaffoldTab = ScaffoldTabs.SETTINGS
     // + 0.86f
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
     val dynamicMap: Map<Float,String> =  dynamicSteps.zip(getDynamicSymbols()).toMap()
@@ -102,7 +106,8 @@ class AppViewModel(
         "pedal" to R.drawable.ic_baseline_anchor_24,
         "cadenza" to R.drawable.ic_baseline_autofps_select_24,
         "single" to R.drawable.ic_baseline_single_24,
-        "music" to R.drawable.ic_baseline_music_note_24,
+        "sound" to R.drawable.ic_baseline_music_note_24,
+        "building" to R.drawable.ic_baseline_account_balance_24,
         "settings" to R.drawable.ic_baseline_settings_24,
         "doppelgänger" to R.drawable.ic_baseline_shuffle_24,
         "save" to R.drawable.ic_baseline_save_24
@@ -1229,7 +1234,7 @@ init{
     var lastIndexCustomColors = -1
     var lastAppColors = ""
     fun setAppColors(defs: String){
-        //println("COLORS: $defs")
+        println("COLORS: $defs")
         val colorDefs = extractColorDefs(defs)
         if(colorDefs.isCustom){
             if(lastIndexCustomColors != colorDefs.custom) {
