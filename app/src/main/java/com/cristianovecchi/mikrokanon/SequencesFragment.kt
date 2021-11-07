@@ -82,6 +82,10 @@ class SequencesFragment(): Fragment() {
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onCadenzaFromSelector(list)
                                     },
+                                    onEraseIntervals = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onEraseIntervalsFromSelector(list)
+                                    },
                                     onSingle = { list ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onSingleFromSelector(list)

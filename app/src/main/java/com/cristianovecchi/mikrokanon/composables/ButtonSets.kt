@@ -130,17 +130,31 @@ fun SavingButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
     onSavingCounterpoint: (Int) -> Unit
 ) {
-    Row {
-        CustomButton(iconId = model.iconMap["save"]!!, text = "1", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-            onSavingCounterpoint(0)
+    Column{
+        Row {
+            CustomButton(iconId = model.iconMap["save"]!!, text = "1", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                onSavingCounterpoint(0)
+            }
+            CustomButton(iconId = model.iconMap["save"]!!, text = "2", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                onSavingCounterpoint(1)
+            }
+            CustomButton(iconId = model.iconMap["save"]!!, text = "3", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                onSavingCounterpoint(2)
+            }
         }
-        CustomButton(iconId = model.iconMap["save"]!!, text = "2", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-            onSavingCounterpoint(1)
-        }
-        CustomButton(iconId = model.iconMap["save"]!!, text = "3", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-            onSavingCounterpoint(2)
+        Row {
+            CustomButton(iconId = model.iconMap["save"]!!, text = "4", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                onSavingCounterpoint(3)
+            }
+            CustomButton(iconId = model.iconMap["save"]!!, text = "5", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                onSavingCounterpoint(4)
+            }
+            CustomButton(iconId = model.iconMap["save"]!!, text = "6", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                onSavingCounterpoint(5)
+            }
         }
     }
+
 }
 @Composable
 fun MikroKanonsButtons(
@@ -174,7 +188,7 @@ fun BoostedMikroKanonsButtons(
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
     onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit,
-    onSingle: () -> Unit, onDoppelgänger: () -> Unit,
+    onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit,
 ) {
     Column {
         Row{
@@ -183,6 +197,9 @@ fun SpecialFunctions1Buttons(
             }
             CustomButton(iconId = model.iconMap["doppelgänger"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onDoppelgänger()
+            }
+            CustomButton(iconId = model.iconMap["erase"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onEraseIntervals()
             }
         }
         Row {

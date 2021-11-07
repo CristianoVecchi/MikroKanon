@@ -145,6 +145,9 @@ class DataGenerator {
                 CounterpointData(0,""),
                 CounterpointData(0,""),
                 CounterpointData(0,""),
+                CounterpointData(0,""),
+                CounterpointData(0,""),
+                CounterpointData(0,""),
             )
         }
     }

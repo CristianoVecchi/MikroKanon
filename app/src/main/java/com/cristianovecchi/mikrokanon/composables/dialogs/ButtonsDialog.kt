@@ -51,6 +51,7 @@ fun ButtonsDialog(
                                     colors = model.appColors,
                                     onRound = buttonsDialogData.value.onRound,
                                     onCadenza = buttonsDialogData.value.onCadenza,
+                                    onEraseIntervals = buttonsDialogData.value.onEraseIntervals,
                                     onSingle = buttonsDialogData.value.onSingle,
                                     onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution,
                                     onDoppelgänger = buttonsDialogData.value.onDoppelgänger

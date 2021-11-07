@@ -42,6 +42,7 @@ sealed class Computation {
     data class Fioritura(val counterpoints: List<Counterpoint>, val index: Int): Computation()
     data class Round(val counterpoints: List<Counterpoint>, val index: Int): Computation()
     data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
+    data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
     data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2 ) : Computation()
@@ -110,7 +111,8 @@ class AppViewModel(
         "building" to R.drawable.ic_baseline_account_balance_24,
         "settings" to R.drawable.ic_baseline_settings_24,
         "doppelgänger" to R.drawable.ic_baseline_shuffle_24,
-        "save" to R.drawable.ic_baseline_save_24
+        "save" to R.drawable.ic_baseline_save_24,
+        "erase" to R.drawable.ic_baseline_cleaning_services_24
     )
 
 
@@ -182,7 +184,7 @@ class AppViewModel(
     private val mk4deepSearchCache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk5reductedCache = HashMap<CacheKey, List<Counterpoint>>()
 
-    val savedCounterpoints: Array<Counterpoint?> = arrayOf(null, null, null)
+    val savedCounterpoints: Array<Counterpoint?> = arrayOf(null, null, null, null, null, null)
 
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -382,6 +384,18 @@ init{
         computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, index))
         cadenzasOnCounterpoints(originalCounterpoints, index)
     }
+    val onEraseIntervals = {
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        computationStack.pushAndDispatch(Computation.EraseIntervals(originalCounterpoints, null, index))
+        eraseIntervalsOnCounterpoints(originalCounterpoints, index)
+    }
+    val onEraseIntervalsFromSelector = { list: ArrayList<Clip> ->
+        changeFirstSequence(list)
+        convertFirstSequenceToSelectedCounterpoint()
+        computationStack.pushAndDispatch(Computation.EraseIntervals(listOf(selectedCounterpoint.value!!.clone()), list,0))
+        eraseIntervalsOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+    }
     val onSingleFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
@@ -578,6 +592,7 @@ init{
                     is Computation.Round -> computationStack.lastElement()
                     is Computation.Doppelgänger -> computationStack.lastElement()
                     is Computation.Cadenza -> computationStack.lastElement()
+                    is Computation.EraseIntervals -> computationStack.lastElement()
                     is Computation.Single-> computationStack.lastElement()
                     is Computation.Pedal -> computationStack.lastElement()
                     is Computation.TritoneSubstitution -> computationStack.lastElement()
@@ -656,6 +671,9 @@ init{
                     }
                     is Computation.Cadenza -> {
                         cadenzasOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
+                    }
+                    is Computation.EraseIntervals -> {
+                        eraseIntervalsOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
                     }
                     is Computation.Single -> {
                         singleOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
@@ -914,6 +932,18 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = addCadenzasOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints)
+                }
+                changeCounterpoints(newList, false)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
+    private fun eraseIntervalsOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = eraseHorizontalIntervalsOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints)
                 }
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])

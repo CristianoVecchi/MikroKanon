@@ -157,4 +157,26 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         //partAscendant.forEachIndexed { index, i -> if(i == partDescendant[index])  partDescendant[index] = -1}
         return listOf(copy(absPitches = partAscendant.toMutableList()), copy(absPitches = partDescendant.toMutableList()) )
     }
+    fun detectIntervalsReportingBothNotes(intervalSet: List<Int>): Array<Boolean>{
+        val intervalSetArray = intervalSet.toIntArray()
+        val nNotes = absPitches.size
+        val result = Array<Boolean>(nNotes) {false}
+        var index = 0
+        while (index < nNotes - 2){
+            if(Insieme.isIntervalInSet(intervalSetArray, absPitches[index], absPitches[index+1])){
+                result[index] = true; result[index+1] = true
+                index += 2
+            } else {
+                index++
+            }
+        }
+        if(Insieme.isIntervalInSet(intervalSetArray, absPitches[nNotes-1], absPitches[0])){
+            result[nNotes-1] = true; result[0] = true}
+        return result
+    }
+    fun setAbsPitchesByChecks(checks: Array<Boolean>, value: Int = -1): AbsPart{
+        if(checks.size<this.absPitches.size) return this
+        val newPart = this.absPitches.mapIndexed{ index, oldValue -> if(checks[index]) value else oldValue }
+        return this.copy(absPitches = newPart.toMutableList())
+    }
 }

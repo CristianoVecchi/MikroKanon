@@ -267,9 +267,9 @@ data class Counterpoint(val parts: List<AbsPart>,
         parts.map { absPart -> absPart.absPitches.add(-1) }
     }
 
-    fun addCadenzas(horIntervalSet: List<Int>): Counterpoint{
+    fun addCadenzas(horizontalIntervalSet: List<Int>): Counterpoint{
         val clone = this.normalizePartsSize(false)
-        val checks = clone.detectIntervalsInColumns(horIntervalSet)
+        val checks = clone.detectIntervalsInColumns(horizontalIntervalSet)
         val result = clone.cloneWithEmptyParts()
         var index = 0
         val maxSize = clone.maxSize()
@@ -289,6 +289,15 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
         }
         return result
+    }
+    fun eraseIntervalsOnBothNotes(horizontalIntervalSet: List<Int>): Counterpoint{
+        val clone = this.normalizePartsSize(false)
+        val newParts = mutableListOf<AbsPart>()
+        clone.parts.forEach { part ->
+            val checks = part.detectIntervalsReportingBothNotes(horizontalIntervalSet)
+            newParts.add(part.setAbsPitchesByChecks(checks))
+        }
+        return Counterpoint(parts = newParts, this.intervalSet)
     }
     fun reduceToSinglePart(): Counterpoint{
         val reducedAbsPitches = (0 until maxSize()).map{ this.getColumnValuesWithEmptyValues(it)}.flatten().toMutableList()
