@@ -65,6 +65,7 @@ class OutputFragment: Fragment() {
                             ResultDisplay(
                                 model = model,
                                 model.iconMap,
+                                model.selectedCounterpoint.asFlow(),
                                 onClick = { counterpoint ->
                                     if(counterpoint == model.selectedCounterpoint.value!!){
                                         model.onPlay(true, false)

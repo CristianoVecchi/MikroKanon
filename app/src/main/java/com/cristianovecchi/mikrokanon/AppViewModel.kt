@@ -30,23 +30,23 @@ import kotlin.math.absoluteValue
 import kotlin.system.measureTimeMillis
 
 
-sealed class Computation {
-    data class MikroKanonOnly(val counterpoint: Counterpoint,val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int): Computation()
-    data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
-    data class FirstFromWave(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val nWaves: Int): Computation()
-    data class Pedal(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, val intervalSet: List<Int>, val nPedals: Int): Computation()
-    data class FurtherFromKP(val counterpoint: Counterpoint,val indexSequenceToAdd: Int, val repeat: Boolean): Computation()
-    data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int): Computation()
-    data class FirstFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
-    data class FurtherFromFreePart(val counterpoint: Counterpoint,val firstSequence: ArrayList<Clip>, val trend: TREND): Computation()
-    data class Fioritura(val counterpoints: List<Counterpoint>, val index: Int): Computation()
-    data class Round(val counterpoints: List<Counterpoint>, val index: Int): Computation()
-    data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
-    data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
-    data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
-    data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int): Computation()
-    data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2 ) : Computation()
-    data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int) : Computation()
+sealed class Computation(open val icon: String = "") {
+    data class MikroKanonOnly(val counterpoint: Counterpoint, val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int, override val icon: String = "mikrokanon"): Computation()
+    data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int, val repeat: Boolean, override val icon: String = "counterpoint"): Computation()
+    data class FirstFromWave(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val nWaves: Int, override val icon: String = "waves"): Computation()
+    data class Pedal(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, val intervalSet: List<Int>, val nPedals: Int, override val icon: String = "pedal"): Computation()
+    data class FurtherFromKP(val counterpoint: Counterpoint, val indexSequenceToAdd: Int, val repeat: Boolean, override val icon: String = "counterpoint"): Computation()
+    data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int, override val icon: String = "waves"): Computation()
+    data class FirstFromFreePart(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val trend: TREND, override val icon: String = "free_parts"): Computation()
+    data class FurtherFromFreePart(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val trend: TREND, override val icon: String = "free_parts"): Computation()
+    data class Fioritura(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "fioritura"): Computation()
+    data class Round(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "round"): Computation()
+    data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "cadenza"): Computation()
+    data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "erase"): Computation()
+    data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
+    data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "doppelgänger"): Computation()
+    data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2, override val icon: String = "expand") : Computation()
+    data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int, override val icon: String = "tritone_substitution") : Computation()
 }
 
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
@@ -112,20 +112,23 @@ class AppViewModel(
         "settings" to R.drawable.ic_baseline_settings_24,
         "doppelgänger" to R.drawable.ic_baseline_shuffle_24,
         "save" to R.drawable.ic_baseline_save_24,
-        "erase" to R.drawable.ic_baseline_cleaning_services_24
+        "erase" to R.drawable.ic_baseline_cleaning_services_24,
+        "free_parts" to R.drawable.ic_baseline_queue_music_24,
     )
-
-
+    val stackIcons = mutableListOf<String>()
     private fun Stack<Computation>.pushAndDispatch(computation: Computation){
         push(computation)
+        stackIcons.add(computation.icon)
         this@AppViewModel._stackSize.value = this.size
     }
     private fun Stack<Computation>.popAndDispatch(){
         pop()
+        if (stackIcons.size > 1) stackIcons.removeLast()
         this@AppViewModel._stackSize.value = this.size
     }
     private fun Stack<Computation>.clearAndDispatch(){
         clear()
+        stackIcons.clear()
         this@AppViewModel._stackSize.value = this.size
     }
     private var mediaPlayer: MediaPlayer? = null
@@ -596,7 +599,7 @@ init{
                     is Computation.Single-> computationStack.lastElement()
                     is Computation.Pedal -> computationStack.lastElement()
                     is Computation.TritoneSubstitution -> computationStack.lastElement()
-                    else -> computationStack.pop() // do not Dispatch!!!
+                    else -> { stackIcons.removeLast(); computationStack.pop() } // do not Dispatch!!!
                 }
                 previousIntervalSet?.let { changeIntervalSet(previousIntervalSet)}
                 when (previousComputation) {

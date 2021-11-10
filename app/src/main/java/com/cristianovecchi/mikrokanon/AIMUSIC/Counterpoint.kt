@@ -130,6 +130,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         return findWave(this, intervalSet, startAbsPitch, steps )
     }
     fun nNotes(): Int {
+        if (parts.isEmpty()) return 0
         return parts.maxOf { it.absPitches.size }
     }
     fun buildRound(): Counterpoint {
@@ -250,6 +251,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
     }
     fun findEmptiness() : Float {
+        if (parts.isEmpty()) return 1f
         val maxSize = parts.maxOf { it.absPitches.size }
         val nCells = maxSize * parts.size
         if (nCells == 0) return 1.0f

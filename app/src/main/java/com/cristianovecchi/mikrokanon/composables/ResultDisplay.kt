@@ -2,17 +2,25 @@ package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
@@ -23,12 +31,15 @@ import com.cristianovecchi.mikrokanon.composables.dialogs.MultiListDialog
 import com.cristianovecchi.mikrokanon.composables.dialogs.SequencesDialog
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
+import com.cristianovecchi.mikrokanon.ui.shift
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 @Composable
 fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
+                  selectedCounterpointFlow: Flow<Counterpoint>,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
                   onWave: (Int) -> Unit,
                   onTritoneSubstitution: () -> Unit = {},
@@ -76,21 +87,22 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val dialogState = remember { mutableStateOf(false) }
     val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
+    val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
 
         Column(
             modifier = Modifier
                 .fillMaxHeight()
                 .background(backgroundColor)
         ) {
-            val modifier4 = Modifier
+            val modifierAbove = Modifier
                 .fillMaxWidth()
-                .weight(4f)
-            val modifier1 = Modifier
+                .weight(16f)
+            val modifierBottom = Modifier
                 .fillMaxSize()
                 .background(buttonsBackgroundColor)
-                .weight(1f)
+                .weight(5f)
             val buttonSize = dimensions.outputButtonSize
-            Box(modifier = modifier4) {
+            Box(modifier = modifierAbove) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), state = listState)
                 {
                     itemsIndexed(counterpointsData) { _ , counterpointsData ->
@@ -119,7 +131,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                             clipsText, colors,
                             dimensions.outputNoteTableFontSize,
                             redNotes,
-                            onClick = { onClick(counterpoint) })
+                            onClick = { onClick(counterpoint); })
 
                        // if(model.selectedCounterpoint.value!! == counterpoint) indexSelected = index
                     }
@@ -144,7 +156,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 }
             }
             Column(
-                modifier1.padding(top = 6.dp),
+                modifierBottom.padding(top = 6.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -163,6 +175,36 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 
                 ButtonsDialog(buttonsDialogData, language.OKbutton, model)
                 MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, language.OKbutton)
+                // STACK ICONS
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween){
+
+                    Row{
+                        val icons = model.stackIcons.map{model.iconMap[it]!!}
+                        icons.forEach{ iconId ->
+                            Icon(
+                                modifier = Modifier.size(18.dp),
+                                painter = painterResource(id = iconId),
+                                contentDescription = null, // decorative element
+                                tint = colors.iconButtonIconColor
+                            )
+                        }
+                    }
+                    Row{
+                        val percentStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 14.sp,
+                            color = colors.selCardTextColorSelected.shift(0.2f), fontWeight = FontWeight.Bold
+                        )
+                        val percent = ( 1f - selCounterpoint.findEmptiness() ) * 100f
+                        val nNotes = selCounterpoint.nNotes()
+                        val formattedPercent = String.format("%.1f", percent)
+                        Text( text = "$nNotes♪    ${formattedPercent}%",
+                            style =  percentStyle  )
+
+                    }
+                }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column{
@@ -280,7 +322,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 }
             }
             Column(
-                modifier1,
+                modifier = Modifier.background(colors.buttonsDisplayBackgroundColor).padding(vertical= 10.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
