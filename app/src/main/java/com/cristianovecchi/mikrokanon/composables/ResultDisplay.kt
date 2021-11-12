@@ -242,8 +242,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 
                     }
                     ExtensionButtons(model = model, isActive = activeButtons.expand, buttonSize = buttonSize, colors = colors,
-                         onExpand = { if (!elaborating) onExpand();scrollToTopList = false },
-                         onFlourish ={ if (!elaborating) onFlourish();scrollToTopList = false }
+                         onExpand = { if (!elaborating) onExpand(); scrollToTopList = false },
+                         onTranspose = {  scrollToTopList = false }
                     )
 
                     // Add and Special Functions
@@ -264,6 +264,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                     onRound = { onRound(); close() },
                                     onCadenza = { onCadenza(); close() },
                                     onScarlatti = { onScarlatti(); close() },
+                                    onFlourish = {onFlourish(); close(); scrollToTopList = false},
                                     onEraseIntervals = { onEraseIntervals(); close() },
                                     onSingle = { onSingle(); close() },
                                     onSavingCounterpoint = { position -> onSavingCounterpoint(position); close()},

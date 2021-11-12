@@ -39,7 +39,7 @@ sealed class Computation(open val icon: String = "") {
     data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int, override val icon: String = "waves"): Computation()
     data class FirstFromFreePart(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val trend: TREND, override val icon: String = "free_parts"): Computation()
     data class FurtherFromFreePart(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val trend: TREND, override val icon: String = "free_parts"): Computation()
-    data class Fioritura(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "fioritura"): Computation()
+    data class Fioritura(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "fioritura"): Computation()
     data class Round(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "round"): Computation()
     data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "cadenza"): Computation()
     data class Scarlatti(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "Scarlatti"): Computation()
@@ -115,7 +115,8 @@ class AppViewModel(
         "save" to R.drawable.ic_baseline_save_24,
         "erase" to R.drawable.ic_baseline_cleaning_services_24,
         "free_parts" to R.drawable.ic_baseline_queue_music_24,
-        "Scarlatti" to R.drawable.ic_baseline_exposure_plus_2_24,
+        "Scarlatti" to R.drawable.ic_baseline_exposure_plus_1_24,
+        "transpose" to R.drawable.ic_baseline_unfold_more_24,
     )
     val stackIcons = mutableListOf<String>()
     private fun Stack<Computation>.pushAndDispatch(computation: Computation){
@@ -400,7 +401,7 @@ init{
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
         computationStack.pushAndDispatch(Computation.Scarlatti(originalCounterpoints, null, index))
-        duplicateAllPhrasesInCounterpoint(selectedCounterpoint.value!!.clone(), index)
+        duplicateAllPhrasesInCounterpoint(selectedCounterpoint.value!!.clone(), 0)
     }
     val onEraseIntervals = {
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
@@ -451,10 +452,16 @@ init{
         computationStack.pushAndDispatch(Computation.Round(originalCounterpoints,index))
         roundOnCounterpoints(originalCounterpoints, index)
     }
+    val onFlourishFromSelector = { list: ArrayList<Clip> ->
+        changeFirstSequence(list)
+        convertFirstSequenceToSelectedCounterpoint()
+        computationStack.pushAndDispatch(Computation.Fioritura(listOf(selectedCounterpoint.value!!.clone()), list,0))
+        flourishCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+    }
     val onFlourish = {
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-        computationStack.pushAndDispatch(Computation.Fioritura(originalCounterpoints, index))
+        computationStack.pushAndDispatch(Computation.Fioritura(originalCounterpoints, null, index))
         flourishCounterpoints(originalCounterpoints, index)
     }
     val onExpand = {
@@ -656,19 +663,8 @@ init{
                             tritoneSubstitutionOnCounterpoints(previousComputation.counterpoints, previousComputation.index)
                     }
                     is Computation.Fioritura -> {
-                        if(stepBack){
                             flourishCounterpoints(previousComputation.counterpoints, previousComputation.index)
-                        } else {
-                            _elaborating.value = false
-                            var originalComputation: Computation
-                            viewModelScope.launch(Dispatchers.Unconfined){
-                                do {
-                                    computationStack.pop()
-                                    originalComputation = computationStack.lastElement()
-                                } while(originalComputation is Computation.Fioritura )
-                                refreshComputation(false)
-                            }
-                        }
+
                     }
                     is Computation.Doppelgänger -> {
                         doppelgängerOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
@@ -676,16 +672,6 @@ init{
                     is Computation.Round -> {
                         if(stepBack){
                             roundOnCounterpoints(previousComputation.counterpoints, previousComputation.index)
-                        } else {
-                            _elaborating.value = false
-                            var originalComputation: Computation
-                            viewModelScope.launch(Dispatchers.Unconfined){
-                                do {
-                                    computationStack.pop()
-                                    originalComputation = computationStack.lastElement()
-                                } while(originalComputation is Computation.Round )
-                                refreshComputation(false)
-                            }
                         }
                     }
                     is Computation.Cadenza -> {
@@ -701,37 +687,13 @@ init{
                         singleOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
                     }
                     is Computation.Pedal -> {
-//                        if(stepBack){
                             changeSelectedCounterpoint(previousComputation.counterpoint)
                             findPedal(previousComputation.nPedals, previousComputation.firstSequence)
-//                        } else {
-//                            _elaborating.value = false
-//                            var originalComputation: Computation
-//                            if(computationStack.size > 1){
-//                                viewModelScope.launch(Dispatchers.Unconfined){
-//                                    do {
-//                                        computationStack.pop()
-//                                        originalComputation = computationStack.lastElement()
-//                                    } while(computationStack.size > 1  && originalComputation is Computation.Pedal )
-//                                    refreshComputation(false)
-//                                }
-//                            }
-//                        }
                     }
                     is Computation.Expand -> {
                         if(stepBack){
                             expandCounterpoints(previousComputation.counterpoints,
                                                 previousComputation.index, previousComputation.extension)
-                        } else {
-                            _elaborating.value = false
-                            var originalComputation: Computation
-                            viewModelScope.launch(Dispatchers.Unconfined){
-                                do {
-                                    computationStack.pop()
-                                    originalComputation = computationStack.lastElement()
-                                } while(originalComputation is Computation.Expand )
-                                refreshComputation(false)
-                            }
                         }
                     }
                 }

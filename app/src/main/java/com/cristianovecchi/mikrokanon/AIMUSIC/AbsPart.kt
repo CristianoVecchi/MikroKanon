@@ -194,7 +194,37 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
             }
         }
 
-        return result.toList().also{println(it)}
+        return result.toList().also{println("SubSequences: " + it)}
+    }
+    fun subSequencesLastRepetition(endSequence: Int = -1): List<Pair<Int, Int>>{
+        val result = subSequences(endSequence)
+        val checkedResult = mutableListOf<Pair<Int, Int>>()
+        result.forEach{ pair ->
+            val sequenceSize = pair.second - pair.first
+            val divisors = (sequenceSize downTo 1).filter{ sequenceSize % it == 0 }.also{println("divisors: "+it)}
+            if (sequenceSize == 1 || divisors == listOf(1)) {
+                checkedResult.add(pair)
+            } else {
+                val sequence = this.absPitches.subList(pair.first, pair.second)
+                for(divisor in divisors){
+                    if(divisor == 1) {checkedResult.add(pair); break}
+                    val nNotes = sequenceSize / divisor
+                    val subSequences = sequence.chunked(nNotes)
+                    var isRepeated = true
+                    for(subs in (1 until subSequences.size)){
+                        if(subSequences[0] != subSequences[subs]) {
+                            isRepeated = false
+                            break
+                        }
+                    }
+                    if(isRepeated) {
+                        checkedResult.add(Pair( pair.second - nNotes,pair.second))
+                        break
+                    }
+                }
+            }
+        }
+        return checkedResult.toList().also{println("SubSequencesRepetitions: " + it)}
     }
 
 

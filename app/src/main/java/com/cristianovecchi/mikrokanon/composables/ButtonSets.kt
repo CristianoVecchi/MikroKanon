@@ -187,7 +187,8 @@ fun BoostedMikroKanonsButtons(
 @Composable
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
-    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onScarlatti: () -> Unit,
+    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
+    onScarlatti: () -> Unit,
     onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit,
 ) {
     Column {
@@ -214,6 +215,9 @@ fun SpecialFunctions1Buttons(
             }
             CustomButton(iconId = model.iconMap["cadenza"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onCadenza()
+            }
+            CustomButton(iconId = model.iconMap["fioritura"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onFlourish()
             }
 
         }
@@ -271,7 +275,7 @@ fun FunctionButtons(
 @Composable
 fun ExtensionButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, colors: AppColors,
-    onExpand: () -> Unit, onFlourish: () -> Unit
+    onExpand: () -> Unit, onTranspose: () -> Unit//onFlourish: () -> Unit
 ) {
     Column(){
         CustomButton(
@@ -282,11 +286,11 @@ fun ExtensionButtons(
             onExpand()
         }
         CustomButton(
-            iconId = model.iconMap["fioritura"]!!,
+            iconId = model.iconMap["transpose"]!!,
             isActive = isActive,
             buttonSize = buttonSize, colors = colors
         ) {
-            onFlourish()
+            onTranspose()
         }
 
 

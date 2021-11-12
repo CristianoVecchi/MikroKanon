@@ -42,7 +42,7 @@ fun ButtonsDialog(
                         state = listState,
                         modifier = Modifier.height(420.dp)
                     ) {
-                        items((0..4).toList()) { item ->
+                        items((0..5).toList()) { item ->
                             when (item) {
                                 0 -> SpecialFunctions1Buttons(
                                     model = buttonsDialogData.value.model,
@@ -52,12 +52,14 @@ fun ButtonsDialog(
                                     onRound = buttonsDialogData.value.onRound,
                                     onCadenza = buttonsDialogData.value.onCadenza,
                                     onScarlatti = buttonsDialogData.value.onScarlatti,
+                                    onFlourish = buttonsDialogData.value.onFlourish,
                                     onEraseIntervals = buttonsDialogData.value.onEraseIntervals,
                                     onSingle = buttonsDialogData.value.onSingle,
                                     onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution,
                                     onDoppelgänger = buttonsDialogData.value.onDoppelgänger
                                 )
-                                1 -> WavesButtons(
+                                1 -> Spacer(modifier = Modifier.height(6.dp))
+                                2 -> WavesButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActiveWaves,
                                     buttonSize = buttonsDialogData.value.buttonSize,
@@ -67,7 +69,7 @@ fun ButtonsDialog(
                                     onWave4Click = buttonsDialogData.value.onWave4,
                                     onWave6Click = buttonsDialogData.value.onWave6
                                 )
-                                2 -> PedalsButtons(
+                                3 -> PedalsButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActivePedals,
                                     buttonSize = buttonsDialogData.value.buttonSize,
@@ -77,7 +79,7 @@ fun ButtonsDialog(
                                     onPedal3Click = buttonsDialogData.value.onPedal3,
                                     onPedal5Click = buttonsDialogData.value.onPedal5
                                 )
-                                3 -> if(workingOnSequences){
+                                4 -> if(workingOnSequences){
                                     BoostedMikroKanonsButtons(
                                         model = buttonsDialogData.value.model,
                                         buttonSize = buttonsDialogData.value.buttonSize,
@@ -86,7 +88,7 @@ fun ButtonsDialog(
                                         onMK5reductedClick = buttonsDialogData.value.onMK5reducted
                                     )
                                 }
-                                4 -> if(!workingOnSequences){
+                                5 -> if(!workingOnSequences){
                                     SavingButtons(
                                         model = buttonsDialogData.value.model,
                                         buttonSize = buttonsDialogData.value.buttonSize,

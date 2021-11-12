@@ -174,7 +174,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         val parts = clone.parts
         val nNotes = this.nNotes().also { print(it) }
         val sectionsToDuplicate = parts.map { part ->
-            part.subSequences()}.flatten().distinct()
+            part.subSequencesLastRepetition()}.flatten().distinct()
         sectionsToDuplicate.forEach{ sectionToDuplicate ->
             val nNotesOfSection = sectionToDuplicate.second - sectionToDuplicate.first
             val  newParts: List<IntArray> = List(this.parts.size){ IntArray(nNotes + nNotesOfSection) {-1} }

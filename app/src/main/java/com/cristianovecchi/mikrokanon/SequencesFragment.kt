@@ -86,6 +86,10 @@ class SequencesFragment(): Fragment() {
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onScarlattiFromSelector(list)
                                     },
+                                    onFlourish = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onFlourishFromSelector(list)
+                                    },
                                     onEraseIntervals = { list ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onEraseIntervalsFromSelector(list)
