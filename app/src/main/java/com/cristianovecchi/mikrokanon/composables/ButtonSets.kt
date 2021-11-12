@@ -187,7 +187,7 @@ fun BoostedMikroKanonsButtons(
 @Composable
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
-    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit,
+    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onScarlatti: () -> Unit,
     onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit,
 ) {
     Column {
@@ -200,6 +200,9 @@ fun SpecialFunctions1Buttons(
             }
             CustomButton(iconId = model.iconMap["erase"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onEraseIntervals()
+            }
+            CustomButton(iconId = model.iconMap["Scarlatti"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onScarlatti()
             }
         }
         Row {

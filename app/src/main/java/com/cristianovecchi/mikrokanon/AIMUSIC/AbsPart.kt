@@ -179,4 +179,28 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         val newPart = this.absPitches.mapIndexed{ index, oldValue -> if(checks[index]) value else oldValue }
         return this.copy(absPitches = newPart.toMutableList())
     }
+    fun subSequences(endSequence: Int = -1): List<Pair<Int, Int>>{
+        val result = mutableListOf<Pair<Int, Int>>()
+        var start = 0
+        var index = 0
+        val pitches = absPitches + endSequence
+        while( index < pitches.size ) {
+            if (pitches[index] == endSequence){
+                if(index-start > 0) result.add(Pair(start, index))
+                index++
+                start = index
+            } else {
+                index++
+            }
+        }
+
+        return result.toList().also{println(it)}
+    }
+
+
+
+}
+fun main(args : Array<String>){
+    val part = AbsPart(mutableListOf(0,4,5,1,-1,-1,4,4,5,-1,5,7,8,1,1))
+    println(part.subSequences())
 }

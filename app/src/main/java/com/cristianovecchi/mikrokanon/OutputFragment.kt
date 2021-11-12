@@ -95,6 +95,9 @@ class OutputFragment: Fragment() {
                                 onCadenza = {
                                     model.onCadenza()
                                 },
+                                onScarlatti = {
+                                    model.onScarlatti()
+                                },
                                 onEraseIntervals = {
                                     model.onEraseIntervals()
                                 },

@@ -42,6 +42,7 @@ sealed class Computation(open val icon: String = "") {
     data class Fioritura(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "fioritura"): Computation()
     data class Round(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "round"): Computation()
     data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "cadenza"): Computation()
+    data class Scarlatti(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "Scarlatti"): Computation()
     data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "erase"): Computation()
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
     data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "doppelgänger"): Computation()
@@ -114,6 +115,7 @@ class AppViewModel(
         "save" to R.drawable.ic_baseline_save_24,
         "erase" to R.drawable.ic_baseline_cleaning_services_24,
         "free_parts" to R.drawable.ic_baseline_queue_music_24,
+        "Scarlatti" to R.drawable.ic_baseline_exposure_plus_2_24,
     )
     val stackIcons = mutableListOf<String>()
     private fun Stack<Computation>.pushAndDispatch(computation: Computation){
@@ -325,6 +327,7 @@ init{
                 val vibrato: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].vibrato }
                         ?: 0
+                //selectedCounterpoint.value!!.display()
                 error = Player.playCounterpoint(
                     mediaPlayer!!,
                     false,
@@ -386,6 +389,18 @@ init{
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
         computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, index))
         cadenzasOnCounterpoints(originalCounterpoints, index)
+    }
+    val onScarlattiFromSelector = { list: ArrayList<Clip> ->
+        changeFirstSequence(list)
+        convertFirstSequenceToSelectedCounterpoint()
+        computationStack.pushAndDispatch(Computation.Scarlatti(listOf(selectedCounterpoint.value!!.clone()), list,0))
+        duplicateAllPhrasesInCounterpoint(selectedCounterpoint.value!!.clone(), 0)
+    }
+    val onScarlatti = {
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        computationStack.pushAndDispatch(Computation.Scarlatti(originalCounterpoints, null, index))
+        duplicateAllPhrasesInCounterpoint(selectedCounterpoint.value!!.clone(), index)
     }
     val onEraseIntervals = {
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
@@ -595,6 +610,7 @@ init{
                     is Computation.Round -> computationStack.lastElement()
                     is Computation.Doppelgänger -> computationStack.lastElement()
                     is Computation.Cadenza -> computationStack.lastElement()
+                    is Computation.Scarlatti -> computationStack.lastElement()
                     is Computation.EraseIntervals -> computationStack.lastElement()
                     is Computation.Single-> computationStack.lastElement()
                     is Computation.Pedal -> computationStack.lastElement()
@@ -674,6 +690,9 @@ init{
                     }
                     is Computation.Cadenza -> {
                         cadenzasOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
+                    }
+                    is Computation.Scarlatti -> {
+                        duplicateAllPhrasesInCounterpoint( previousComputation.counterpoints[previousComputation.index],previousComputation.index)
                     }
                     is Computation.EraseIntervals -> {
                         eraseIntervalsOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
@@ -935,6 +954,18 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = addCadenzasOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints)
+                }
+                changeCounterpoints(newList, false)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
+    private fun duplicateAllPhrasesInCounterpoint(originalCounterpoint: Counterpoint,index: Int){
+        if(!originalCounterpoint.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = duplicateAllInCounterpoint(originalCounterpoint)
                 }
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])

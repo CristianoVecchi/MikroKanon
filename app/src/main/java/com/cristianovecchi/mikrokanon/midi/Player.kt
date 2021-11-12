@@ -122,7 +122,7 @@ object Player {
                                                                     glissando, audio8D, vibratoExtensions[vibrato])
         if (counterpointTracks.isEmpty()) return "No Tracks in Counterpoint!!!"
 
-        val totalLength = counterpointTracks[0].lengthInTicks
+        val totalLength = counterpointTracks.maxOf{ it.lengthInTicks}//.also{println("Total length: $it")} // Empty tracks have 0 length
         val tempoTrack = MidiTrack()
         // from TimeSignature.class
 //        public static final int DEFAULT_METER = 24;

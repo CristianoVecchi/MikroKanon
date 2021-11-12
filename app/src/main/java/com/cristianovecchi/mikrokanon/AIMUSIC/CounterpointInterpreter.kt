@@ -28,13 +28,15 @@ object CounterpointInterpreter {
                    audio8D: List<Int> = listOf(),
                    vibrato: Int = 0
         ): List<MidiTrack> {
+        counterpoint.display()
+        durations.also{println("Durations: $it")}
         val result = mutableListOf<MidiTrack>()
 
         if(counterpoint.parts.size > 15) {
             println("WARNING: Counterpoint n. parts: ${counterpoint.parts.size}")
         }
         val panStep: Int = 127 / counterpoint.parts.size
-        val pans = (counterpoint.parts.indices).map{ it * panStep + panStep/2}.also { println(it) }
+        val pans = (counterpoint.parts.indices).map{ it * panStep + panStep/2}//.also { println(it) }
 
         // CREATION OF TRACKS
         counterpoint.parts.forEachIndexed { partIndex, part ->
@@ -178,7 +180,7 @@ object CounterpointInterpreter {
 
             }
             // STEREO ALTERATIONS FOR EACH TRACK
-            if(audio8D.contains(partIndex)){
+            if(audio8D.contains(partIndex) && track.lengthInTicks > 0){
                 val nRevolutions = (12 - partIndex) * 2
                 //val panStep: Int = 127 / counterpoint.parts.size
                 val aims = mutableListOf<Float>()

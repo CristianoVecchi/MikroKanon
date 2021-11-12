@@ -200,13 +200,7 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
 
         }
 
-        deltas?.let{
-            val delta = sectionDuration / count
-            val rest = sectionDuration - (delta * count) // module operation without decimals
-            //println("section duration:$sectionDuration  count:$count  delta:$delta  rest:$rest")
-            //if (deltas.isNotEmpty() && deltas.last() == -1L) deltas[deltas.size-1] = delta + rest else
-            it.addAll(sectionDuration.divideDistributingRest(count))
-        }
+        deltas?.addAll(sectionDuration.divideDistributingRest(count))
         return result.toList()
     }
 fun alterateBpm(bpmValues: List<Float>, step:Float): List<Float>{
@@ -222,7 +216,7 @@ fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuratio
     val deltas: MutableList<Long> = mutableListOf()
     val bpms: List<Float> = bpmValues.fold(listOf()) {
             acc, nextBpm -> acc.projectTo(nextBpm, step, deltas, sectionDuration)}
-    //deltas.add(0) // to set the same lenght - last value is unused
+    deltas.add(0) // to set the same lenght - last value is unused
     return Pair(bpms, deltas.toList() )
 }
 

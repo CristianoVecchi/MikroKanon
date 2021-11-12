@@ -45,6 +45,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onTritoneSubstitution: () -> Unit = {},
                   onRound: () -> Unit = {},
                   onCadenza: () -> Unit = {},
+                  onScarlatti: () -> Unit = {},
                   onEraseIntervals: () -> Unit = {},
                   onSingle: () -> Unit = {},
                   onDoppelgänger: () -> Unit = {},
@@ -182,13 +183,13 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     horizontalArrangement = Arrangement.SpaceBetween){
 
                     Row{
-                        val icons = model.stackIcons.map{model.iconMap[it]!!}
+                        val icons = model.stackIcons.takeLast(12).map{model.iconMap[it]!!}
                         icons.forEach{ iconId ->
                             Icon(
                                 modifier = Modifier.size(18.dp),
                                 painter = painterResource(id = iconId),
                                 contentDescription = null, // decorative element
-                                tint = colors.iconButtonIconColor
+                                tint = colors.selCardTextColorSelected
                             )
                         }
                     }
@@ -262,6 +263,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                     onTritoneSubstitution = { onTritoneSubstitution(); close() },
                                     onRound = { onRound(); close() },
                                     onCadenza = { onCadenza(); close() },
+                                    onScarlatti = { onScarlatti(); close() },
                                     onEraseIntervals = { onEraseIntervals(); close() },
                                     onSingle = { onSingle(); close() },
                                     onSavingCounterpoint = { position -> onSavingCounterpoint(position); close()},

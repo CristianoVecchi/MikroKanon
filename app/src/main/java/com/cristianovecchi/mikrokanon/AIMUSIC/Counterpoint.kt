@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import android.os.Parcelable
+import androidx.compose.ui.text.createTextLayoutResult
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.getIntOrEmptyValue
@@ -166,6 +167,39 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun addPedal(pitch: Int): Counterpoint {
         val pedalPart = AbsPart.fill(pitch, maxSize())
         return this.copy(parts = listOf(parts, listOf(pedalPart)).flatten())
+    }
+    fun duplicateAllPhrases(): List<Counterpoint>{
+        val result = mutableListOf<Counterpoint>()
+        val clone = this.normalizePartsSize(false)
+        val parts = clone.parts
+        val nNotes = this.nNotes().also { print(it) }
+        val sectionsToDuplicate = parts.map { part ->
+            part.subSequences()}.flatten().distinct()
+        sectionsToDuplicate.forEach{ sectionToDuplicate ->
+            val nNotesOfSection = sectionToDuplicate.second - sectionToDuplicate.first
+            val  newParts: List<IntArray> = List(this.parts.size){ IntArray(nNotes + nNotesOfSection) {-1} }
+            for(i in (0 until sectionToDuplicate.second)){
+                for (j in newParts.indices) {
+                    newParts[j][i] = parts[j].absPitches[i]
+                }
+            }
+            for(i in (sectionToDuplicate.first until sectionToDuplicate.second)){
+                for (j in newParts.indices) {
+                    newParts[j][i+nNotesOfSection] = parts[j].absPitches[i]
+                }
+            }
+            for(i in (sectionToDuplicate.second  until nNotes )){
+                for (j in newParts.indices) {
+                    newParts[j][i+nNotesOfSection] = parts[j].absPitches[i]
+                }
+            }
+            result.add(Counterpoint(newParts.map{ AbsPart(it.toMutableList()) }, this.intervalSet))
+        }
+        return if(result.isEmpty()) {result.add(Counterpoint.empty(parts.size)); result.toList()
+        } else {
+            result.toList()
+        }
+
     }
 
     fun normalizePartsSize(refreshEmptiness: Boolean): Counterpoint{

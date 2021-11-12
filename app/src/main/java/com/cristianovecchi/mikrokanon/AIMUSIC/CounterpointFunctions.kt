@@ -71,6 +71,9 @@ suspend fun buildRound(originalCounterpoints: List<Counterpoint> ): List<Counter
 suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{it.addCadenzas(horIntervalSet)}
 }
+suspend fun duplicateAllInCounterpoint(counterpoint: Counterpoint ): List<Counterpoint>{
+     return counterpoint.duplicateAllPhrases()
+}
 suspend fun eraseHorizontalIntervalsOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{it.eraseIntervalsOnBothNotes(horIntervalSet)}
 }
