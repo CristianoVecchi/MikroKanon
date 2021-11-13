@@ -182,52 +182,6 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setTranspose(cursor, 4) })
-                                {
-                                    Text(
-                                        text = intervals[4],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
-                                    )
-                                }
-                                Button(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(buttonPadding),
-                                    onClick = { setTranspose(cursor, 3) })
-                                {
-                                    Text(
-                                        text = intervals[3],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
-                                    )
-                                }
-                                Button(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(buttonPadding),
-                                    onClick = { setTranspose(cursor, 2) })
-                                {
-                                    Text(
-                                        text = intervals[2],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
-                                    )
-                                }
-                                Button(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(buttonPadding),
-                                    onClick = { setTranspose(cursor, 1) })
-                                {
-                                    Text(
-                                        text = intervals[1],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
-                                    )
-                                }
-
-                            }
-                            Column(
-                                modifier = Modifier.width(IntrinsicSize.Max),
-                                verticalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                Button(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(buttonPadding),
                                     onClick = { setTranspose(cursor, 7) })
                                 {
                                     Text(
@@ -258,6 +212,51 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
+                                    onClick = { setTranspose(cursor, 4) })
+                                {
+                                    Text(
+                                        text = intervals[4],
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                    )
+                                }
+                            }
+                            Column(
+                                modifier = Modifier.width(IntrinsicSize.Max),
+                                verticalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                Button(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(buttonPadding),
+                                    onClick = { setTranspose(cursor, 3) })
+                                {
+                                    Text(
+                                        text = intervals[3],
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                    )
+                                }
+                                Button(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(buttonPadding),
+                                    onClick = { setTranspose(cursor, 2) })
+                                {
+                                    Text(
+                                        text = intervals[2],
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                    )
+                                }
+                                Button(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(buttonPadding),
+                                    onClick = { setTranspose(cursor, 1) })
+                                {
+                                    Text(
+                                        text = intervals[1],
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                    )
+                                }
+                                Button(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(buttonPadding),
                                     onClick = { setTranspose(cursor, 0) })
                                 {
                                     Text(
@@ -265,6 +264,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                         style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
                                     )
                                 }
+
                             }
                         }
                         Spacer(modifier = Modifier.height(10.dp))

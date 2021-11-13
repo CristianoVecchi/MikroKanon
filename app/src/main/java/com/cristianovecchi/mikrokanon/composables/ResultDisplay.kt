@@ -29,7 +29,9 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.composables.dialogs.ButtonsDialog
 import com.cristianovecchi.mikrokanon.composables.dialogs.MultiListDialog
 import com.cristianovecchi.mikrokanon.composables.dialogs.SequencesDialog
+import com.cristianovecchi.mikrokanon.composables.dialogs.SimpleTransposeDialog
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
 import com.cristianovecchi.mikrokanon.ui.shift
 
@@ -41,6 +43,7 @@ import kotlinx.coroutines.launch
 fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   selectedCounterpointFlow: Flow<Counterpoint>,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
+                  onTranspose: (Int) -> Unit,
                   onWave: (Int) -> Unit,
                   onTritoneSubstitution: () -> Unit = {},
                   onRound: () -> Unit = {},
@@ -88,6 +91,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val dialogState = remember { mutableStateOf(false) }
     val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
+    val simpleTransposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+
     val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
 
         Column(
@@ -176,6 +181,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 
                 ButtonsDialog(buttonsDialogData, language.OKbutton, model)
                 MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, language.OKbutton)
+                SimpleTransposeDialog(simpleTransposeDialogData, getIntervalsForTranspose(language.intervalSet))
                 // STACK ICONS
                 Row(modifier = Modifier
                     .fillMaxWidth()
@@ -243,7 +249,17 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     }
                     ExtensionButtons(model = model, isActive = activeButtons.expand, buttonSize = buttonSize, colors = colors,
                          onExpand = { if (!elaborating) onExpand(); scrollToTopList = false },
-                         onTranspose = {  scrollToTopList = false }
+                         onTranspose = {  if (!elaborating) {
+                             simpleTransposeDialogData.value = MultiNumberDialogData(
+                                 true, language.selectTranspositions,
+                                 model = model) { transposition ->
+                                 onTranspose(transposition.toInt())
+                                 simpleTransposeDialogData.value = MultiNumberDialogData(model = model)
+
+                             }
+                             scrollToTopList = false
+                            }
+                         }
                     )
 
                     // Add and Special Functions

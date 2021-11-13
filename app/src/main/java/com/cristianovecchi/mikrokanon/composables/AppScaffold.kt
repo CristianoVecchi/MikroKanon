@@ -183,7 +183,8 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val intervalsForGlissando = createGlissandoIntervals(lang.doublingNames)
     MultiBpmDialog(multiBpmDialogData, lang.OKbutton)
     MultiDynamicDialog(multiFloatDialogData, lang.OKbutton)
-    val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
+    //val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
+    val intervalsForTranspose = getIntervalsForTranspose(lang.intervalSet)
     TransposeDialog(transposeDialogData,
         intervalsForTranspose, lang.OKbutton)
     val formsNames = listOf("unrelated", lang.original, lang.inverse, lang.retrograde, lang.invRetrograde)

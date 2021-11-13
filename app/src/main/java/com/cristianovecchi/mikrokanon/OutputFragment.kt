@@ -68,7 +68,7 @@ class OutputFragment: Fragment() {
                                 model.selectedCounterpoint.asFlow(),
                                 onClick = { counterpoint ->
                                     if(counterpoint == model.selectedCounterpoint.value!!){
-                                        model.onPlay(true, false)
+                                        model.onPlay(true, true) // play without build the entire structure
                                     } else {
                                         model.changeSelectedCounterpoint(
                                             counterpoint
@@ -82,6 +82,9 @@ class OutputFragment: Fragment() {
                                 },
                                 onKP = { index, repeat ->
                                     model.onKPfurtherSelections(index, repeat)
+                                },
+                                onTranspose = { transposition ->
+                                    model.onSimpleTransposition(transposition)
                                 },
                                 onWave = { nWaves ->
                                     model.onWaveFurtherSelection(nWaves, null)
@@ -117,7 +120,7 @@ class OutputFragment: Fragment() {
                                 onExpand = { model.onExpand() },
                                 onFlourish = { model.onFlourish() },
                                 onPlay = {
-                                    model.onPlay(true, false)
+                                    model.onPlay(true, false) // play the entire structure
                                 },
                                 onStop = { model.onStop() }
                             )

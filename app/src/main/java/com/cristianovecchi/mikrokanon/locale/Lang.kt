@@ -195,7 +195,11 @@ val intervalSetIt = listOf("2m\n7M","2M\n7m","3m\n6M","3M\n6m","4\n5","4A\n5d","
 val intervalSetEn = listOf("m2\nM7","M2\nm7","m3\nM7","M3\nm6","4\n5","A4\nd5","U\n8")
 val intervalSetDe = listOf("k2\nG7","G2\nk7","k3\nG7","G3\nk6","4\n5","Ü4\nv5","1\n8")
 val intervalSetRu = listOf("2м\n7В","2В\n7м","3м\n6В","3В\n6м","4\n5","4У\n5у","1\n8")
-
+fun getIntervalsForTranspose(intervalSet: List<String> = intervalSetEn): List<String>{
+    val split = intervalSet.map{ it.split("\n")}
+    return listOf(split[6][0], split[0][0], split[1][0], split[2][0], split[3][0], split[4][0],
+        split[5][0], split[4][1], split[3][1], split[2][1], split[1][1], split[0][1])
+}
 val rowFormsMap = mapOf(
     1 to "O", 2 to "I" , 3 to "R", 4 to "RI", -1 to "O |", -2 to "I |" , -3 to "R |", -4 to "RI |"
 )
