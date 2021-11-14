@@ -107,7 +107,7 @@ object Player {
             ?: return "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
         val nNotesToSkip = rhythm.nNotesLeftInThePattern(firstCounterpoint.nNotes())
         //var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
-        var actualCounterpoint = if (rowForms == listOf(Pair(0,1)) ) firstCounterpoint
+        var actualCounterpoint = if (rowForms == listOf(Pair(1,1)) ) firstCounterpoint
             else Counterpoint.explodeRowFormsAddingCps(counterpoints, rowForms, nNotesToSkip)
         actualCounterpoint = if(ritornello > 0)  actualCounterpoint.ritornello(ritornello, transpose)
                             else actualCounterpoint.transpose(transpose[0])

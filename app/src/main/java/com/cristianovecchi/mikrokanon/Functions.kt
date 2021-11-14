@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsemblePart
+import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import kotlinx.coroutines.*
 import kotlinx.coroutines.GlobalScope.coroutineContext
 import java.lang.StringBuilder
@@ -232,6 +233,14 @@ fun String.extractIntPairsFromCsv(): List<Pair<Int,Int>>{
 }
 fun  MutableList<Pair<Int,Int>>.toIntPairsString(): String {
     return this.joinToString(",") { "${it.first}|${it.second}" }
+}
+fun Pair<Int, Int>.describeSingleBpm(rowFormsMap: Map<Int, String>): String {
+    val openBracket = (if(this.first < 0) "(" else "" )
+    val counterpointNumber = (if (this.first.absoluteValue == 1) "" else "${this.first.absoluteValue-1}")
+    val rowForm = rowFormsMap[this.second.absoluteValue]
+    val closeBracket = (if(this.first < 0) ")" else "")
+    val separator = (if(this.second < 0)" |" else "")
+    return openBracket + counterpointNumber + rowForm +closeBracket + separator
 }
 fun String.extractFloatsFromCsv(): List<Float>{
     return this.split(',').mapNotNull { it.toFloat() }

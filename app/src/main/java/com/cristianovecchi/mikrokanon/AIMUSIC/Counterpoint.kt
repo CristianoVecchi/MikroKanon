@@ -720,12 +720,13 @@ data class Counterpoint(val parts: List<AbsPart>,
             return result
         }
         fun explodeRowFormsAddingCps(counterpoints: List<Counterpoint?>,
-                                     rowForms: List<Pair<Int,Int>> = listOf(Pair(0,1)),
+                                     rowForms: List<Pair<Int,Int>> = listOf(Pair(1,1)),
                                      nNotesToSkip: Int = 0): Counterpoint {
             //val separator = rowFormsFlags and 0b10000 != 0
             val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0}?.parts?.size ?: 0
             if (nParts == 0) return empty()
             val separator = nNotesToSkip > 0 && rowForms.any{ it.second < 0}
+            val containsShadows = rowForms.any{ it.first < 0}
             val separatorCounterpoint: Counterpoint? = if(separator)
                 Counterpoint.createSeparatorCounterpoint(nParts, nNotesToSkip)
             else null
@@ -736,9 +737,15 @@ data class Counterpoint(val parts: List<AbsPart>,
                     it?.normalizePartsSize(false)
                         ?.shiftDown((nParts - it.parts.size) shr 1)
                 }
+            val shadowCounterpoints = if(containsShadows)
+                actualCounterpoints.map{
+                    it?.tritoneSubstitution()
+                } else listOf()
 
             rowForms.forEach{ rowForm ->
-                val original = actualCounterpoints[rowForm.first]
+                val original = if(rowForm.first > 0) actualCounterpoints[rowForm.first -1]
+                                else shadowCounterpoints[rowForm.first.absoluteValue -1]
+
                 original?.let{
                     result = when(rowForm.second) {
                         1 -> result.enqueue(original.clone())

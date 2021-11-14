@@ -597,9 +597,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 text = if(isOn)
                                     "${lang.rowForms}: ${
                                         formPairs.joinToString(" ") {
-                                            "${if (it.first == 0) "" else it.first}" +
-                                                    if (it.second < 0) "${rowFormsMap[it.second.absoluteValue]} |"
-                                                    else "${rowFormsMap[it.second]}"
+                                           it.describeSingleBpm(rowFormsMap)
                                         }
                                     }"
                                 else lang.rowForms,

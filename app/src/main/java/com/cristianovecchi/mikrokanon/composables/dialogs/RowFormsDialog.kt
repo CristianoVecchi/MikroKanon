@@ -22,13 +22,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
+import com.cristianovecchi.mikrokanon.describeSingleBpm
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 @Composable
 fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, forms: List<String>, okText: String = "OK",
@@ -40,7 +43,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
 
-
+            val playing by model.playing.asFlow().collectAsState(initial = false)
 
             Surface(
                 modifier = Modifier.width(350.dp).height(600.dp),
@@ -62,12 +65,12 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                         pairs[index] = Pair(pairs[index].first, newForm)
                         formsText = pairs.toIntPairsString()
                     }
-                    val fontSize = 20.sp
+                    val fontSize = 16.sp
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
                         Text(text = multiNumberDialogData.value.title)
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         val colors = model.appColors
                         val listState = rememberLazyListState()
@@ -78,8 +81,8 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                         val unselectionBackColor = colors.selCardBackColorUnselected
                         val unselectionTextColor = colors.selCardTextColorUnselected
                         val unselectionBorderColor = colors.selCardBorderColorUnselected
-                        val intervalPadding = 4.dp
-                        val innerPadding = 10.dp
+                        val intervalPadding = 2.dp
+                        val innerPadding = 8.dp
                         val formPairs = formsText.extractIntPairsFromCsv()
                         val nCols = 4
                         val nRows = (formPairs.size / nCols) + 1
@@ -95,7 +98,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                                 ) {
                                     for (j in 0 until nCols) {
                                         if (index != formPairs.size) {
-                                            val text ="${if(formPairs[index].first==0) "" else formPairs[index].first}${rowFormsMap[formPairs[index].second]!!}"
+                                            val text = formPairs[index].describeSingleBpm(rowFormsMap)
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -131,23 +134,26 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                         }
                     }
                     Column(modifier = modifierB, verticalArrangement = Arrangement.Bottom) {
-                        Spacer(modifier = Modifier.height(10.dp))
+                        val textFontSize = if(forms.maxOf{it.length}>26) 12.sp else 16.sp
+                        val textButtonPadding = 1.dp
+                        Spacer(modifier = Modifier.height(6.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
+                            // ROW FORM BUTTONS
                             Column(
                                 modifier = Modifier.width(IntrinsicSize.Max),
                                 verticalArrangement = Arrangement.SpaceEvenly
                             ) {
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(buttonPadding), onClick = { setForms(cursor, 1) })
+                                    .padding(textButtonPadding), onClick = { setForms(cursor, 1) })
                                 {
                                     Text(
                                         text = forms[1],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = textFontSize,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -155,39 +161,39 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                                 Button(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(buttonPadding),
+                                        .padding(textButtonPadding),
                                     onClick = { setForms(cursor, 3) })
                                 {
                                     Text(
                                         text = forms[3],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = textFontSize,
                                             fontWeight = fontWeight
                                         )
                                     )
                                 }
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(buttonPadding),
+                                    .padding(textButtonPadding),
                                     onClick = { setForms(cursor, 2) })
                                 {
                                     Text(
                                         text = forms[2],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = textFontSize,
                                             fontWeight = fontWeight
                                         )
                                     )
                                 }
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(buttonPadding),
+                                    .padding(textButtonPadding),
                                     onClick = { setForms(cursor, 4) })
                                 {
                                     Text(
                                         text = forms[4],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = textFontSize,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -195,7 +201,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
 
                             }
                         }
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         val buttonSize = model.dimensions.inputButtonSize - 14.dp
                         val fontSize = 14
                         Row(
@@ -212,7 +218,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                             ) {
                                 val pairs = formsText.extractIntPairsFromCsv().toMutableList()
                                 val (counterpoint, form) = pairs[cursor]
-                                pairs[cursor] = Pair( if(counterpoint == 1) 0 else 1,form)
+                                pairs[cursor] = Pair( if(counterpoint == 2) 1 else 2,form)
                                 formsText = pairs.toIntPairsString()
                             }
                             CustomButton(
@@ -225,7 +231,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                             ) {
                                 val pairs = formsText.extractIntPairsFromCsv().toMutableList()
                                 val (counterpoint, form) = pairs[cursor]
-                                pairs[cursor] = Pair( if(counterpoint == 2) 0 else 2,form)
+                                pairs[cursor] = Pair( if(counterpoint == 3) 1 else 3,form)
                                 formsText = pairs.toIntPairsString()
                             }
                             CustomButton(
@@ -238,13 +244,13 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                             ) {
                                 val pairs = formsText.extractIntPairsFromCsv().toMutableList()
                                 val (counterpoint, form) = pairs[cursor]
-                                pairs[cursor] = Pair( if(counterpoint == 3) 0 else 3,form)
+                                pairs[cursor] = Pair( if(counterpoint == 4) 1 else 4,form)
                                 formsText = pairs.toIntPairsString()
                             }
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "",
-                                iconId = model.iconMap["play"]!!,
+                                iconId = model.iconMap["tritone_substitution"]!!,
                                 fontSize = fontSize,
                                 buttonSize = buttonSize,
                                 iconColor = model.appColors.iconButtonIconColor,
@@ -252,9 +258,83 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                             ) {
                                 val pairs = formsText.extractIntPairsFromCsv().toMutableList()
                                 val (counterpoint, form) = pairs[cursor]
-                                model.onPlayExample(counterpoint, form)
+                                pairs[cursor] = Pair( counterpoint * -1 ,form )
+                                formsText = pairs.toIntPairsString()
                             }
                         }
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "4",
+                                fontSize = fontSize,
+                                buttonSize = buttonSize,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val pairs = formsText.extractIntPairsFromCsv().toMutableList()
+                                val (counterpoint, form) = pairs[cursor]
+                                pairs[cursor] = Pair( if(counterpoint == 5) 1 else 5,form)
+                                formsText = pairs.toIntPairsString()
+                            }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "5",
+                                fontSize = fontSize,
+                                buttonSize = buttonSize,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val pairs = formsText.extractIntPairsFromCsv().toMutableList()
+                                val (counterpoint, form) = pairs[cursor]
+                                pairs[cursor] = Pair( if(counterpoint == 6) 1 else 6,form)
+                                formsText = pairs.toIntPairsString()
+                            }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "6",
+                                fontSize = fontSize,
+                                buttonSize = buttonSize,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val pairs = formsText.extractIntPairsFromCsv().toMutableList()
+                                val (counterpoint, form) = pairs[cursor]
+                                pairs[cursor] = Pair( if(counterpoint == 7) 1 else 7,form)
+                                formsText = pairs.toIntPairsString()
+                            }
+                            if (!playing) {
+                                CustomButton(
+                                    adaptSizeToIconButton = true,
+                                    text = "",
+                                    iconId = model.iconMap["play"]!!,
+                                    fontSize = fontSize,
+                                    buttonSize = buttonSize,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val pairs = formsText.extractIntPairsFromCsv().toMutableList()
+                                    val (counterpoint, form) = pairs[cursor]
+                                    model.onPlayExample(counterpoint, form)
+                                }
+                            } else {
+                                CustomButton(
+                                    adaptSizeToIconButton = true,
+                                    text = "",
+                                    iconId = model.iconMap["stop"]!!,
+                                    fontSize = fontSize,
+                                    buttonSize = buttonSize,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    model.onStop()
+                                }
+                            }
+
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
                         Row(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly

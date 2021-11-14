@@ -239,12 +239,18 @@ init{
         onPlay(true, true)
     }
     val onPlayExample = { counterpointSaved: Int, rowForm: Int ->
+        //println("counterpointSaved: $counterpointSaved")
+        // 1 or -1 is the original counterpoint; 2..7 or -2..-7 are the saved counterpoints
         val selCpSaved = _selectedCounterpoint.value?.clone()
-        var counterpointExample: Counterpoint? = if(counterpointSaved == 0) _selectedCounterpoint.value
-        else savedCounterpoints[counterpointSaved - 1]
+        val counterpointExample: Counterpoint? = if(counterpointSaved.absoluteValue == 1) _selectedCounterpoint.value
+        else savedCounterpoints[counterpointSaved.absoluteValue - 2]
        if(counterpointExample != null){
-           counterpointExample = Counterpoint.explodeRowForms(counterpointExample, listOf(rowForm.absoluteValue))
-           _selectedCounterpoint.value = counterpointExample
+           val counterpointToPlay = if(counterpointSaved > 0) {
+               Counterpoint.explodeRowForms(counterpointExample, listOf(rowForm.absoluteValue))
+           } else {
+               Counterpoint.explodeRowForms(counterpointExample.tritoneSubstitution(), listOf(rowForm.absoluteValue))
+           }
+           _selectedCounterpoint.value = counterpointToPlay
                onPlay(true, true)
         }
 
@@ -252,7 +258,7 @@ init{
             _selectedCounterpoint.value = selCpSaved.clone()
         }
     }
-    val onPlay = { createAndPlay: Boolean, simplify: Boolean ->
+    val onPlay = { createAndPlay: Boolean, simplify: Boolean  ->
             var error = "ERROR: NO FILE"
             if(userOptionsData.value!!.isEmpty()){
                 insertUserOptionData(UserOptionsData.getDefaultUserOptionsData())
@@ -291,10 +297,10 @@ init{
                 val rowForms: List<Pair<Int,Int>> =
                     userOptionsData.value?.let {
                         if(simplify){
-                            listOf(Pair(0,1))
+                            listOf(Pair(1,1))
                         } else {
                             userOptionsData.value!![0].rowForms.extractIntPairsFromCsv()
-                        } }?: listOf(Pair(0,1)) // ORIGINAL by default || 0 is unused
+                        } }?: listOf(Pair(1,1)) // ORIGINAL by default || 0 is unused
                 val doublingFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].doublingFlags }
                         ?: 0

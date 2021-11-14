@@ -37,7 +37,7 @@ fun SimpleTransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
             Surface(
-                modifier = Modifier.width(350.dp).height(400.dp),
+                modifier = Modifier.width(300.dp).height(300.dp),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -53,7 +53,7 @@ fun SimpleTransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                         Text(text = multiNumberDialogData.value.title)
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        Column(modifier = modifierA) {
+                        Column(modifier = modifierA, verticalArrangement = Arrangement.Center) {
                             Spacer(modifier = Modifier.height(10.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),

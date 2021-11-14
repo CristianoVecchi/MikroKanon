@@ -195,14 +195,14 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                 modifier = Modifier.size(18.dp),
                                 painter = painterResource(id = iconId),
                                 contentDescription = null, // decorative element
-                                tint = colors.selCardTextColorSelected
+                                tint = colors.selCardTextColorSelected.shift(0.1f)
                             )
                         }
                     }
                     Row{
                         val percentStyle = androidx.compose.ui.text.TextStyle(
                             fontSize = 14.sp,
-                            color = colors.selCardTextColorSelected.shift(0.2f), fontWeight = FontWeight.Bold
+                            color = colors.selCardTextColorSelected.shift(0.1f), fontWeight = FontWeight.Bold
                         )
                         val percent = ( 1f - selCounterpoint.findEmptiness() ) * 100f
                         val nNotes = selCounterpoint.nNotes()

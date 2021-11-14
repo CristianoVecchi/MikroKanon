@@ -39,7 +39,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
             Surface(
-                modifier = Modifier.width(350.dp).height(700.dp),
+                modifier = Modifier.width(350.dp).height(600.dp),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
