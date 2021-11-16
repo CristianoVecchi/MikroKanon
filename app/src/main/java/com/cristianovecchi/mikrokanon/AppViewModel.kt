@@ -319,16 +319,17 @@ init{
                             userOptionsData.value!![0].ritornello
                         } } ?: 0
                 val transpose: List<Int> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].transpose.extractIntsFromCsv() } ?: listOf(0)
+                    userOptionsData.value?.let { userOptionsData.value!![0].transpose.extractIntsFromCsv() }
+                        ?: listOf(0)
                 val nuances: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].nuances }
                         ?: 1
-                val rangeType: Int =
-                    userOptionsData.value?.let { userOptionsData.value!![0].rangeType }
-                        ?: 0
-                val melodyType: Int =
-                    userOptionsData.value?.let { userOptionsData.value!![0].melodyType }
-                        ?: 0
+                val rangeTypes: List<Int> =
+                    userOptionsData.value?.let { userOptionsData.value!![0].rangeTypes.extractIntsFromCsv() }
+                        ?: listOf(2)
+                val melodyTypes: List<Int> =
+                    userOptionsData.value?.let { userOptionsData.value!![0].melodyTypes.extractIntsFromCsv() }
+                        ?: listOf(0)
                 val glissandoFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].glissandoFlags }
                         ?: 0
@@ -354,8 +355,8 @@ init{
                     transpose,
                     doublingFlags,
                     nuances,
-                    rangeType,
-                    melodyType,
+                    rangeTypes,
+                    melodyTypes,
                     glissandoFlags,
                     audio8DFlags,
                     vibrato
@@ -985,10 +986,10 @@ init{
                     .extractIntsFromCsv().map{EnsembleType.values()[it]}}
                     ?: listOf(EnsembleType.STRING_ORCHESTRA)
             val rangeType: Int =
-                userOptionsData.value?.let { userOptionsData.value!![0].rangeType }
-                    ?: 0
+                userOptionsData.value?.let { userOptionsData.value!![0].rangeTypes.extractIntsFromCsv()[0] }
+                    ?: 2
             val melodyType: Int =
-                userOptionsData.value?.let { userOptionsData.value!![0].melodyType }
+                userOptionsData.value?.let { userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()[0] }
                     ?: 0
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
@@ -1196,11 +1197,11 @@ init{
             "ensembleTypes" -> {
                 newUserOptionsData = optionsDataClone.copy(ensembleTypes = value as String)
             }
-            "rangeType" -> {
-                newUserOptionsData = optionsDataClone.copy(rangeType = value as Int)
+            "rangeTypes" -> {
+                newUserOptionsData = optionsDataClone.copy(rangeTypes = value as String)
             }
-            "melodyType" -> {
-                newUserOptionsData = optionsDataClone.copy(melodyType = value as Int)
+            "melodyTypes" -> {
+                newUserOptionsData = optionsDataClone.copy(melodyTypes = value as String)
             }
             "glissandoFlags" -> {
                 newUserOptionsData  = optionsDataClone.copy(glissandoFlags = value as Int)

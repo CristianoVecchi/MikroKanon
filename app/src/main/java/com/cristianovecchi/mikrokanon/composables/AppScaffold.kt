@@ -140,6 +140,8 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     //val nuancesDialogData by lazy { mutableStateOf(ListDialogData())}
     //val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
     val multiBpmDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val melodyTypesDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val rangeTypesDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val multiFloatDialogData by lazy { mutableStateOf(MultiFloatDialogData(model = model))}
     val transposeDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val rowFormsDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
@@ -159,11 +161,15 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 
     val dimensions = model.dimensions
     val colors = model.appColors
-    val optionNames= listOf("Ensemble", "Range","Melody", "Glissando","Vibrato","Nuances",
+    val optionNames= listOf("Ensemble", "Glissando","Vibrato","Nuances",
         "Rhythm",  "Rhythm Shuffle", "Parts Shuffle","Doubling","8D AUDIO",
 
-        "BPM", "Dynamic", "Row Forms","Transpose","Ritornello",
-        "Spread where possible", "Deep Search in 4 part MK","Export MIDI",
+        "Spread where possible", "Deep Search in 4 part MK",
+        "Row Forms",
+        "Spacer1",
+        "Ritornello","Range","Melody","BPM", "Dynamic", "Transpose",
+        "Spacer2",
+        "Export MIDI",
 
         "Detector","Detector Extension",
         //"Colors",
@@ -181,6 +187,9 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     MultiListDialog(audio8DDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
     val intervalsForGlissando = createGlissandoIntervals(lang.doublingNames)
+
+    MelodyTypeDialog(melodyTypesDialogData, lang.melodyOptions)
+    RangeTypeDialog(rangeTypesDialogData, lang.rangeOptions)
     MultiBpmDialog(multiBpmDialogData, lang.OKbutton)
     MultiDynamicDialog(multiFloatDialogData, lang.OKbutton)
     //val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
@@ -211,7 +220,9 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
             if (selectedTab == ScaffoldTabs.SOUND) colors.drawerBackgroundColor
             else colors.drawerBackgroundColor.shift(-0.2f)
         )
-        .clickable(onClick = { selectedTab = ScaffoldTabs.SOUND; model.lastScaffoldTab = ScaffoldTabs.SOUND }), horizontalAlignment = Alignment.CenterHorizontally){
+        .clickable(onClick = {
+            selectedTab = ScaffoldTabs.SOUND; model.lastScaffoldTab = ScaffoldTabs.SOUND
+        }), horizontalAlignment = Alignment.CenterHorizontally){
         IconButton(modifier = Modifier
             .background(
                 if (selectedTab == ScaffoldTabs.SOUND) colors.drawerBackgroundColor else colors.drawerBackgroundColor.shift(
@@ -234,10 +245,12 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
             if (selectedTab == ScaffoldTabs.BUILDING) colors.drawerBackgroundColor
             else colors.drawerBackgroundColor.shift(-0.2f)
         )
-        .clickable(onClick = { selectedTab = ScaffoldTabs.BUILDING ; model.lastScaffoldTab = ScaffoldTabs.BUILDING  }), horizontalAlignment = Alignment.CenterHorizontally){
+        .clickable(onClick = {
+            selectedTab = ScaffoldTabs.BUILDING; model.lastScaffoldTab = ScaffoldTabs.BUILDING
+        }), horizontalAlignment = Alignment.CenterHorizontally){
         IconButton(modifier = Modifier
             .background(
-                if (selectedTab == ScaffoldTabs.BUILDING ) colors.drawerBackgroundColor else colors.drawerBackgroundColor.shift(
+                if (selectedTab == ScaffoldTabs.BUILDING) colors.drawerBackgroundColor else colors.drawerBackgroundColor.shift(
                     -0.2f
                 ), RoundedCornerShape(4.dp)
             )
@@ -258,7 +271,9 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 if (selectedTab == ScaffoldTabs.SETTINGS) colors.drawerBackgroundColor
                 else colors.drawerBackgroundColor.shift(-0.2f)
             )
-            .clickable(onClick = { selectedTab = ScaffoldTabs.SETTINGS; model.lastScaffoldTab = ScaffoldTabs.SETTINGS }), horizontalAlignment = Alignment.CenterHorizontally,
+            .clickable(onClick = {
+                selectedTab = ScaffoldTabs.SETTINGS; model.lastScaffoldTab = ScaffoldTabs.SETTINGS
+            }), horizontalAlignment = Alignment.CenterHorizontally,
         )
            {
         IconButton(modifier = Modifier
@@ -309,48 +324,6 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                     )
                                     ensemblesDialogData.value =
                                         MultiListDialogData(itemList = ensemblesDialogData.value.itemList)
-                                }
-                            })
-                    }
-                    "Range" -> {
-                        val rangeOptions: List<String> = lang.rangeOptions
-                        val rangeIndex = userOptions.rangeType
-                        SelectableCard(
-                            text = "${lang.range}: ${rangeOptions[rangeIndex]}",
-                            fontSize = fontSize,
-                            colors = colors,
-                            isSelected = true,
-                            onClick = {
-                                listDialogData.value = ListDialogData(
-                                    true, rangeOptions, rangeIndex, lang.selectRange
-                                ) { index ->
-                                    model.updateUserOptions(
-                                        "rangeType",
-                                        index
-                                    )
-                                    listDialogData.value =
-                                        ListDialogData(itemList = listDialogData.value.itemList)
-                                }
-                            })
-                    }
-                    "Melody" -> {
-                        val melodyOptions: List<String> = lang.melodyOptions
-                        val melodyIndex = userOptions.melodyType
-                        SelectableCard(
-                            text = "${lang.melody}: ${melodyOptions[melodyIndex]}",
-                            fontSize = fontSize,
-                            colors = colors,
-                            isSelected = true,
-                            onClick = {
-                                listDialogData.value = ListDialogData(
-                                    true, melodyOptions, melodyIndex, lang.selectMelody
-                                ) { index ->
-                                    model.updateUserOptions(
-                                        "melodyType",
-                                        index
-                                    )
-                                    listDialogData.value =
-                                        ListDialogData(itemList = listDialogData.value.itemList)
                                 }
                             })
                     }
@@ -547,6 +520,48 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 items(optionNames) { optionName ->
                     val fontSize = dimensions.optionsFontSize
                     when (optionName) {
+                        "Range" -> {
+                            //val rangeOptions: List<String> = lang.rangeOptions
+                            val rangeTypes = userOptions.rangeTypes
+                            SelectableCard(
+                                text = "${lang.range}: ${rangeTypes.extractIntsFromCsv().map{ rangeTypeMap[it]}.joinToString(" | ") }",
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = true,
+                                onClick = {
+                                    rangeTypesDialogData.value = MultiNumberDialogData(
+                                        true, lang.selectRange, rangeTypes, model = model
+                                    ) { index ->
+                                        model.updateUserOptions(
+                                            "rangeTypes",
+                                            index
+                                        )
+                                        listDialogData.value =
+                                            ListDialogData(itemList = listDialogData.value.itemList)
+                                    }
+                                })
+                        }
+                        "Melody" -> {
+                            //val melodyOptions: List<String> = lang.melodyOptions
+                            val melodyTypes = userOptions.melodyTypes
+                            SelectableCard(
+                                text = "${lang.melody}: ${melodyTypes.extractIntsFromCsv().map{melodyTypeMap[it]}.joinToString(" | ") }",
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = true,
+                                onClick = {
+                                    melodyTypesDialogData.value = MultiNumberDialogData(
+                                        true,lang.selectMelody, melodyTypes, model = model
+                                    ) { index ->
+                                        model.updateUserOptions(
+                                            "melodyTypes",
+                                            index
+                                        )
+                                        listDialogData.value =
+                                            ListDialogData(itemList = listDialogData.value.itemList)
+                                    }
+                                })
+                        }
 
                         "Dynamic" -> {
                             val dynamics = userOptions.dynamics
@@ -617,6 +632,9 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                             ListDialogData(itemList = listDialogData.value.itemList)
                                     }
                                 })
+                        }
+                        "Spacer1" -> {
+                            Spacer(modifier = Modifier.height(6.dp))
                         }
                         "Transpose" -> {
                             val transposeCsv = userOptions.transpose
@@ -692,6 +710,9 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                         if (isOn) 1 else 0
                                     )
                                 })
+                        }
+                        "Spacer2" -> {
+                            Spacer(modifier = Modifier.height(6.dp))
                         }
                         "Export MIDI" -> {
                             SelectableCard(text = lang.exportMidi, fontSize = fontSize, colors = colors, isSelected = true, onClick = {

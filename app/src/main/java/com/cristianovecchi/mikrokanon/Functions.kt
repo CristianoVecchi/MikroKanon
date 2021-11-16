@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsemblePart
+import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import kotlinx.coroutines.*
 import kotlinx.coroutines.GlobalScope.coroutineContext
@@ -347,9 +348,77 @@ fun Long.divideDistributingRest(divisor: Int): MutableList<Long>{
     //if(addOne) list[0] = list[0] + 1
     return list
 }
+
 fun  List<EnsemblePart>.display() {
     this.forEach {  println(it) }
     println()
+}
+
+fun findMelodyWithStructure(octave: Int, absPitches: IntArray ,
+lowerLimits: IntArray, upperLimits: IntArray,  melodyTypes: IntArray): IntArray {
+
+    val melTypes = mutableListOf<Int>()
+    val lowLimits = mutableListOf<Int>()
+    val upLimits = mutableListOf<Int>()
+    val durs = mutableListOf<Int>()
+    val melTicks = absPitches.size.toLong().divideDistributingRest(melodyTypes.size).sums()//.also{ println("melTicks: $it")}
+    val rangeTicks = absPitches.size.toLong().divideDistributingRest(lowerLimits.size).sums()//.also{ println("rangeTicks: $it")}
+    val allTicks = (melTicks + rangeTicks).toSet().sorted()
+    var lastTick = 0
+    var melIndex = 0
+    var lowIndex = 0
+    allTicks.forEach{
+        when{
+            melTicks.contains(it) && rangeTicks.contains(it) -> {
+                melTypes.add(melodyTypes[melIndex])
+                lowLimits.add(lowerLimits[lowIndex])
+                upLimits.add(upperLimits[lowIndex]) // lowers and uppers share the same index
+                durs.add(it.toInt() - lastTick)
+                lastTick = it.toInt()
+                melIndex++
+                lowIndex++
+            }
+            melTicks.contains(it) -> {
+                melTypes.add(melodyTypes[melIndex])
+                lowLimits.add(lowerLimits[lowIndex])
+                upLimits.add(upperLimits[lowIndex]) // lowers and uppers share the same index
+                durs.add(it.toInt() - lastTick)
+                lastTick = it.toInt()
+                melIndex++
+            }
+            rangeTicks.contains(it) -> {
+                melTypes.add(melodyTypes[melIndex])
+                lowLimits.add(lowerLimits[lowIndex])
+                upLimits.add(upperLimits[lowIndex]) // lowers and uppers share the same index
+                durs.add(it.toInt() - lastTick)
+                lastTick = it.toInt()
+                lowIndex++
+            }
+        }
+    }
+//    println("melTypes ${melTypes.size}: $melTypes")
+//    println("lowLimits ${lowLimits.size}: $lowLimits")
+//    println("upLimits ${upLimits.size}: $upLimits")
+//    println("durs ${durs.size}: $durs")
+
+    var lastOctave = octave
+    var lastTick2 = 0
+
+    val sequences = durs.mapIndexed{ index, dur ->
+        val subSequence = absPitches.copyOfRange(lastTick2, lastTick2 + dur)//.also{println("subSequence $index: ${it.contentToString()}")}
+        val sequence = Insieme.findMelody(lastOctave, subSequence,
+                lowLimits[index], upLimits[index], melTypes[index])
+        lastOctave = sequence.last() / 12 -1
+        lastTick2 += dur
+        sequence
+    }
+    //sequences.forEach{println("subSequence: ${it.contentToString()}")}
+    return sequences.reduce{ acc, arr -> acc + arr}//.also{println("Result sequence: ${it.contentToString()}")}
+}
+
+fun List<Long>.sums(start: Long = 0): List<Long>{
+    var last = start
+    return this.map{ last += it; last }
 }
 
 fun main(args : Array<String>){

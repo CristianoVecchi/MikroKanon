@@ -93,7 +93,8 @@ object Player {
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
         rowForms: List<Pair<Int,Int>> = listOf(Pair(0,1)), ritornello: Int = 0, transpose: List<Int> = listOf(0),
         doublingFlags: Int = 0, nuances: Int = 0,
-        rangeType: Int = 0, melodyType: Int = 0, glissandoFlags: Int = 0, audio8DFlags: Int = 0, vibrato: Int = 0
+        rangeTypes: List<Int> = listOf(0), melodyTypes: List<Int> = listOf(0),
+        glissandoFlags: Int = 0, audio8DFlags: Int = 0, vibrato: Int = 0
     ) : String {
         var error = ""
         val durations = rhythm.values
@@ -118,7 +119,7 @@ object Player {
         if (actualCounterpoint.isEmpty()) return "Counterpoint to play is empty!!!"
         if (actualCounterpoint.parts[0].absPitches.size == 0) return "Counterpoint parts are empty!!!"
         val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts,
-                                                                    nuances, doublingFlags, rangeType, melodyType,
+                                                                    nuances, doublingFlags, rangeTypes, melodyTypes,
                                                                     glissando, audio8D, vibratoExtensions[vibrato])
         if (counterpointTracks.isEmpty()) return "No Tracks in Counterpoint!!!"
 

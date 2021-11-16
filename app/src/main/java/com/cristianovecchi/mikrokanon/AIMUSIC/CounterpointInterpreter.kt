@@ -4,6 +4,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 import com.cristianovecchi.mikrokanon.alterateBpmWithDistribution
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.cristianovecchi.mikrokanon.extractFromMiddle
+import com.cristianovecchi.mikrokanon.findMelodyWithStructure
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.Tempo
@@ -22,8 +23,8 @@ object CounterpointInterpreter {
                    ensembleParts: List<EnsemblePart>,
                    nuances: Int,
                    doublingFlags: Int,
-                   rangeType: Int,
-                   melodyType: Int,
+                   rangeTypes: List<Int>,
+                   melodyTypes: List<Int>,
                    glissando: List<Int> = listOf(),
                    audio8D: List<Int> = listOf(),
                    vibrato: Int = 0
@@ -65,14 +66,22 @@ object CounterpointInterpreter {
             var index = 0
             var durIndex = 0
 
-            // RANGE EXTENSION
-            val range = ensemblePart.getRangeByType(rangeType)
+            // RANGES EXTENSION
+            val ranges = rangeTypes.map{ ensemblePart.getRangeByType(it) }
 
-            //NUANCES
-            val actualPitches = Insieme.findMelody(ensemblePart.octave, part.absPitches.toIntArray(), range.first, range.last, melodyType)
+            //ACTUAL PITCHES
+            val actualPitches = if(melodyTypes.size == 1 && rangeTypes.size == 1){
+                Insieme.findMelody(ensemblePart.octave, part.absPitches.toIntArray(), ranges[0].first, ranges[0].last, melodyTypes[0])
+            } else {
+                findMelodyWithStructure(ensemblePart.octave, part.absPitches.toIntArray(),
+                    ranges.map{it.first}.toIntArray(), ranges.map{it.last}.toIntArray(),
+                    melodyTypes.toIntArray())
+            }
+
+            // NUANCES
             val lowLimit = 0.4f
             val minNuance = 0.51f
-            val maxNuance = 0.97f
+            val maxNuance = 0.95f
             val stabilities = counterpoint.findStabilities()
             val velocities: IntArray = when(nuances) {
                 1 -> {val mssq = MelodySubSequencer(actualPitches)

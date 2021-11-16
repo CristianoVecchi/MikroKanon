@@ -6,7 +6,7 @@ import com.cristianovecchi.mikrokanon.rangeTo
 
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES,
-    DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, PIERROT,
+    DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
     BAROQUE, PLUCKED_STRINGS, SPOOKY,
     SYN_SQUARE_WAVE, SYN_SAW_WAVE, SYN_CALLIOPE, SYN_CHIFF,
     SYN_CHARANG, SYN_VOICE, SYN_FIFTHS_SAW, SYN_BRASS_AND_LEAD,
@@ -50,6 +50,7 @@ object Ensembles {
             EnsembleType.BASSOONS -> getBassoons(nParts)
             EnsembleType.CELLOS -> getCellos(nParts)
             EnsembleType.PIANO -> getPiano(nParts)
+            EnsembleType.HARP -> getHarp(nParts)
             EnsembleType.PIERROT -> getPierrot(nParts)
             EnsembleType.BAROQUE -> getBaroque(nParts)
             EnsembleType.PLUCKED_STRINGS -> getPluckedStrings(nParts)
@@ -792,6 +793,68 @@ object Ensembles {
                 PARTS_PIANO[2],
                 PARTS_PIANO[2],
                 PARTS_PIANO[1]
+            )
+            else -> listOf()
+        }
+    }
+    fun getHarp(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            1, 2, 3 -> listOf(
+                PARTS_HARP[5],
+                PARTS_HARP[4],
+                PARTS_HARP[2],
+            )
+            in (4..6) -> listOf(
+                PARTS_HARP[5],
+                PARTS_HARP[4],
+                PARTS_HARP[4],
+                PARTS_HARP[3],
+                PARTS_HARP[3],
+                PARTS_HARP[2]
+            )
+            7 -> listOf(
+                PARTS_HARP[5],
+                PARTS_HARP[4],
+                PARTS_HARP[4],
+                PARTS_HARP[3],
+                PARTS_HARP[3],
+                PARTS_HARP[2],
+                PARTS_HARP[1]
+            )
+            8 -> listOf(
+                PARTS_HARP[6],
+                PARTS_HARP[5],
+                PARTS_HARP[4],
+                PARTS_HARP[4],
+                PARTS_HARP[3],
+                PARTS_HARP[3],
+                PARTS_HARP[2],
+                PARTS_HARP[1]
+            )
+            9 -> listOf(
+                PARTS_HARP[6],
+                PARTS_HARP[5],
+                PARTS_HARP[5],
+                PARTS_HARP[4],
+                PARTS_HARP[4],
+                PARTS_HARP[3],
+                PARTS_HARP[3],
+                PARTS_HARP[2],
+                PARTS_HARP[1]
+            )
+            in 10..12 -> listOf(
+                PARTS_HARP[7],
+                PARTS_HARP[6],
+                PARTS_HARP[6],
+                PARTS_HARP[5],
+                PARTS_HARP[5],
+                PARTS_HARP[4],
+                PARTS_HARP[4],
+                PARTS_HARP[3],
+                PARTS_HARP[3],
+                PARTS_HARP[2],
+                PARTS_HARP[2],
+                PARTS_HARP[1]
             )
             else -> listOf()
         }

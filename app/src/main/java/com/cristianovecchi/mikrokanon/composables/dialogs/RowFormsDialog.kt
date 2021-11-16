@@ -46,7 +46,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
             val playing by model.playing.asFlow().collectAsState(initial = false)
 
             Surface(
-                modifier = Modifier.width(350.dp).height(600.dp),
+                modifier = Modifier.width(350.dp).height(650.dp),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -54,10 +54,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(3f)
+                        .weight(5f)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(4f)
+                        .weight(9f)
                     var formsText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setForms = { index: Int, newForm: Int ->

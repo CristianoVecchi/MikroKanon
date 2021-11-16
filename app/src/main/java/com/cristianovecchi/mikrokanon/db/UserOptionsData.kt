@@ -15,11 +15,11 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "ensemble_types")
         val ensembleTypes: String,
 
-        @ColumnInfo(name = "range_type")
-        val rangeType: Int,
+        @ColumnInfo(name = "range_types")
+        val rangeTypes: String,
 
-        @ColumnInfo(name = "melody_type")
-        val melodyType: Int,
+        @ColumnInfo(name = "melody_types")
+        val melodyTypes: String,
 
         @ColumnInfo(name = "glissando_flags")
         val glissandoFlags: Int,
@@ -91,9 +91,9 @@ import androidx.room.PrimaryKey
     ){
         companion object{
             fun getDefaultUserOptionsData(): UserOptionsData{
-                return UserOptionsData(0,"2", 2,0,
+                return UserOptionsData(0,"2", "2","0",
                     0,0,
-                    "1.0", "90", 3,
+                    "0.828", "90", 3,
                     0,0, "1|1",0, "0",
                     0,0,0b0011110, 0b1111111,
                     0,0,0,1,
