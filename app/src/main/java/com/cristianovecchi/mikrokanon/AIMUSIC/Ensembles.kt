@@ -28,7 +28,14 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
             else -> PIANO_ALL
         }
     }
+
+    fun getOctavedRangeByType(rangeType: Int, octaveTranspose: Int): IntRange {
+        val range = getRangeByType(rangeType)
+        return range.octaveTranspose(octaveTranspose)
+    }
 }
+
+
 
 
 object Ensembles {

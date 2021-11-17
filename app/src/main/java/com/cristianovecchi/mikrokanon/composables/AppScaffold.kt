@@ -165,10 +165,10 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
         "Rhythm",  "Rhythm Shuffle", "Parts Shuffle","Doubling","8D AUDIO",
 
         "Spread where possible", "Deep Search in 4 part MK",
-        "Row Forms",
-        "Spacer1",
-        "Ritornello","Range","Melody","BPM", "Dynamic", "Transpose",
-        "Spacer2",
+        "Range","Melody","BPM", "Dynamic",
+        "Spacer",
+        "Ritornello", "Transpose", "Row Forms",
+        "Spacer",
         "Export MIDI",
 
         "Detector","Detector Extension",
@@ -523,8 +523,12 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         "Range" -> {
                             //val rangeOptions: List<String> = lang.rangeOptions
                             val rangeTypes = userOptions.rangeTypes
+                            val octaves = getOctaveSymbols()
                             SelectableCard(
-                                text = "${lang.range}: ${rangeTypes.extractIntsFromCsv().map{ rangeTypeMap[it]}.joinToString(" | ") }",
+                                text = "${lang.range}: ${
+                                    rangeTypes.extractIntPairsFromCsv()
+                                        .joinToString("  ") { "${rangeTypeMap[it.first]!!}${octaves[it.second + 2]}" }
+                                }",
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = true,
@@ -545,7 +549,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                             //val melodyOptions: List<String> = lang.melodyOptions
                             val melodyTypes = userOptions.melodyTypes
                             SelectableCard(
-                                text = "${lang.melody}: ${melodyTypes.extractIntsFromCsv().map{melodyTypeMap[it]}.joinToString(" | ") }",
+                                text = "${lang.melody}: ${melodyTypes.extractIntsFromCsv().map{melodyTypeMap[it]}.joinToString("  ") }",
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = true,
@@ -633,7 +637,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                     }
                                 })
                         }
-                        "Spacer1" -> {
+                        "Spacer" -> {
                             Spacer(modifier = Modifier.height(6.dp))
                         }
                         "Transpose" -> {
@@ -711,9 +715,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                     )
                                 })
                         }
-                        "Spacer2" -> {
-                            Spacer(modifier = Modifier.height(6.dp))
-                        }
+
                         "Export MIDI" -> {
                             SelectableCard(text = lang.exportMidi, fontSize = fontSize, colors = colors, isSelected = true, onClick = {
                                 val path = model.midiPath.absolutePath.toString()

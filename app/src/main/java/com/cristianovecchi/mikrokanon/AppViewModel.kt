@@ -324,9 +324,9 @@ init{
                 val nuances: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].nuances }
                         ?: 1
-                val rangeTypes: List<Int> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].rangeTypes.extractIntsFromCsv() }
-                        ?: listOf(2)
+                val rangeTypes: List<Pair<Int,Int>> =
+                    userOptionsData.value?.let { userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv() }
+                        ?: listOf(Pair(2,0))
                 val melodyTypes: List<Int> =
                     userOptionsData.value?.let { userOptionsData.value!![0].melodyTypes.extractIntsFromCsv() }
                         ?: listOf(0)
@@ -985,9 +985,9 @@ init{
                 userOptionsData.value?.let { userOptionsData.value!![0].ensembleTypes
                     .extractIntsFromCsv().map{EnsembleType.values()[it]}}
                     ?: listOf(EnsembleType.STRING_ORCHESTRA)
-            val rangeType: Int =
-                userOptionsData.value?.let { userOptionsData.value!![0].rangeTypes.extractIntsFromCsv()[0] }
-                    ?: 2
+            val rangeType: Pair<Int,Int> =
+                userOptionsData.value?.let { userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()[0] }
+                    ?: Pair(2,0)
             val melodyType: Int =
                 userOptionsData.value?.let { userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()[0] }
                     ?: 0

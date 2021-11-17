@@ -28,6 +28,7 @@ import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
 import com.cristianovecchi.mikrokanon.describeSingleBpm
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
+import com.cristianovecchi.mikrokanon.locale.getOctaveSymbols
 import com.cristianovecchi.mikrokanon.locale.melodyTypeMap
 import com.cristianovecchi.mikrokanon.locale.rangeTypeMap
 import com.cristianovecchi.mikrokanon.toIntPairsString
@@ -44,7 +45,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
-
+            val octaves= getOctaveSymbols()
             Surface(
                 modifier = Modifier.width(350.dp).height(450.dp),
                 shape = RoundedCornerShape(10.dp)
@@ -61,9 +62,9 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                     var rangeText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setRange = { index: Int, newRange: Int ->
-                        val ranges = rangeText.extractIntsFromCsv().toMutableList()
-                        ranges[index] = newRange
-                        rangeText = ranges.joinToString(",")
+                        val ranges = rangeText.extractIntPairsFromCsv().toMutableList()
+                        ranges[index] = Pair(newRange, ranges[index].second)
+                        rangeText = ranges.toIntPairsString()
                     }
                     val fontSize = 16.sp
                     val fontWeight = FontWeight.Normal
@@ -83,7 +84,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                         val unselectionBorderColor = colors.selCardBorderColorUnselected
                         val intervalPadding = 2.dp
                         val innerPadding = 8.dp
-                        val ranges = rangeText.extractIntsFromCsv()
+                        val ranges = rangeText.extractIntPairsFromCsv()
                         val nCols = 4
                         val nRows = (ranges.size / nCols) + 1
                         val rows = (0 until nRows).toList()
@@ -98,7 +99,8 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 ) {
                                     for (j in 0 until nCols) {
                                         if (index != ranges.size) {
-                                            val text = rangeTypeMap[ranges[index]]!!
+
+                                            val text = "${rangeTypeMap[ranges[index].first]!!}${octaves[ranges[index].second+2]}"
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -216,6 +218,67 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 }
 
                             }
+                            Column(
+                                modifier = Modifier.width(IntrinsicSize.Max),
+                                verticalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                val buttonSize = model.dimensions.inputButtonSize - 8.dp
+                                val fontSizeOctave = 16
+                                CustomButton(
+                                    adaptSizeToIconButton = false,
+                                    text = octaves[4], // +15
+                                    fontSize = fontSizeOctave,
+                                    buttonSize = buttonSize,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
+                                    val (range, octave) = pairs[cursor]
+                                    pairs[cursor] = Pair( range, if(octave ==2) 0 else 2 )
+                                    rangeText = pairs.toIntPairsString()
+                                }
+                                CustomButton(
+                                    adaptSizeToIconButton = false,
+                                    text = octaves[3], // +8
+                                    fontSize = fontSizeOctave,
+                                    buttonSize = buttonSize,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
+                                    val (range, octave) = pairs[cursor]
+                                    pairs[cursor] = Pair( range, if(octave ==1) 0 else 1 )
+                                    rangeText = pairs.toIntPairsString()
+                                }
+                                CustomButton(
+                                    adaptSizeToIconButton = false,
+                                    text = octaves[1], // -8
+                                    fontSize = fontSizeOctave,
+                                    buttonSize = buttonSize,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
+                                    val (range, octave) = pairs[cursor]
+                                    pairs[cursor] = Pair( range, if(octave == -1) 0 else -1)
+                                    rangeText = pairs.toIntPairsString()
+                                }
+                                CustomButton(
+                                    adaptSizeToIconButton = false,
+                                    text = octaves[0], // -15
+                                    fontSize = fontSizeOctave,
+                                    buttonSize = buttonSize,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
+                                    val (range, octave) = pairs[cursor]
+                                    pairs[cursor] = Pair( range, if(octave == -2) 0 else -2)
+                                    rangeText = pairs.toIntPairsString()
+                                }
+
+
+                            }
                         }
                         val buttonSize = model.dimensions.inputButtonSize - 14.dp
                         val fontSize = 14
@@ -247,10 +310,10 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val ranges = rangeText.extractIntsFromCsv().toMutableList()
+                                val ranges = rangeText.extractIntPairsFromCsv().toMutableList()
                                 if(ranges.size > 1){
                                     ranges.removeAt(cursor)
-                                    rangeText = ranges.joinToString(",")
+                                    rangeText = ranges.toIntPairsString()
                                     val newCursor = if (ranges.size > 1) cursor - 1 else 0
                                     cursor = if (newCursor < 0) 0 else newCursor
                                 }
@@ -264,10 +327,10 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val ranges = rangeText.extractIntsFromCsv().toMutableList()
-                                val lastMelody = ranges[ranges.size - 1]
-                                ranges.add(lastMelody)
-                                rangeText = ranges.joinToString(",")
+                                val ranges = rangeText.extractIntPairsFromCsv().toMutableList()
+                                val lastRange = ranges[ranges.size - 1]
+                                ranges.add(lastRange)
+                                rangeText = ranges.toIntPairsString()
                                 cursor = ranges.size - 1
                             }
                         }

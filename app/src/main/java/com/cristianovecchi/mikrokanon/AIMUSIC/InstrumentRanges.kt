@@ -178,6 +178,16 @@ fun createKeyboardInstrumentParts(instrument: Int, rangeAll: IntRange = IntRange
         EnsemblePart(instrument, 8, rangeAll, IntRange(89, C8)) // F6 - C8
     )
 }
+fun IntRange.octaveTranspose(octaveTranspose: Int): IntRange {
+    return when{
+        octaveTranspose == 0 -> this
+        octaveTranspose > 0 -> (octaveTranspose downTo 0).first{
+            this.last + it * 12 <= C8}.let{ IntRange(this.first + it * 12, this.last + it * 12)}
+        octaveTranspose < 0 -> (octaveTranspose..0).first{
+            this.first + it * 12 >= A0}.let{ IntRange(this.first + it * 12, this.last + it * 12)}
+        else -> this
+    }
+}
 
 
 

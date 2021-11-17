@@ -133,6 +133,9 @@ fun getDynamicSymbols(): List<String>{
         "\uD834\uDD92", "\uD834\uDD93")
     else listOf("0","pppp","ppp","pp",  "p","mp","mf","f", "ff", "fff","ffff","fffff","<",">")
 }
+fun getOctaveSymbols(): List<String>{
+    return listOf("➘15","➘8", "", "➚8","➚15")
+}
 
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
     "übermäßige Quarte", "Quinte", "kleine Sexte", "große Sexte", "kleine Septime", "große Septime",

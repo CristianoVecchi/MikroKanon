@@ -23,7 +23,7 @@ object CounterpointInterpreter {
                    ensembleParts: List<EnsemblePart>,
                    nuances: Int,
                    doublingFlags: Int,
-                   rangeTypes: List<Int>,
+                   rangeTypes: List<Pair<Int,Int>>,
                    melodyTypes: List<Int>,
                    glissando: List<Int> = listOf(),
                    audio8D: List<Int> = listOf(),
@@ -67,13 +67,13 @@ object CounterpointInterpreter {
             var durIndex = 0
 
             // RANGES EXTENSION
-            val ranges = rangeTypes.map{ ensemblePart.getRangeByType(it) }
-
+            val ranges = rangeTypes.map{ ensemblePart.getOctavedRangeByType(it.first, it.second) }
+            val startOctave = (ensemblePart.octave + rangeTypes[0].second).coerceIn(0,8)
             //ACTUAL PITCHES
             val actualPitches = if(melodyTypes.size == 1 && rangeTypes.size == 1){
-                Insieme.findMelody(ensemblePart.octave, part.absPitches.toIntArray(), ranges[0].first, ranges[0].last, melodyTypes[0])
+                Insieme.findMelody(startOctave, part.absPitches.toIntArray(), ranges[0].first, ranges[0].last, melodyTypes[0])
             } else {
-                findMelodyWithStructure(ensemblePart.octave, part.absPitches.toIntArray(),
+                findMelodyWithStructure(startOctave, part.absPitches.toIntArray(),
                     ranges.map{it.first}.toIntArray(), ranges.map{it.last}.toIntArray(),
                     melodyTypes.toIntArray())
             }
