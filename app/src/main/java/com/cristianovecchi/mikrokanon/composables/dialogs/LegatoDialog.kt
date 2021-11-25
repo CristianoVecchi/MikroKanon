@@ -23,13 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
-import com.cristianovecchi.mikrokanon.describeSingleBpm
-import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
-import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.*
-import com.cristianovecchi.mikrokanon.toIntPairsString
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -296,7 +293,8 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 iconColor = Color.Green,
                                 colors = model.appColors
                             ) {
-                                multiNumberDialogData.value.onSubmitButtonClick.invoke(legatoText)
+                                multiNumberDialogData.value.onSubmitButtonClick.invoke(
+                                    correctLegatos(legatoText))
                                 onDismissRequest.invoke()
                             }
 

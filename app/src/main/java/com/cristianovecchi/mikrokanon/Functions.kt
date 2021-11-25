@@ -330,6 +330,33 @@ fun correctDynamics(dynamics: String): String{
     }
     return result.joinToString(",")
 }
+fun correctLegatos(legatos: String): String{
+    val (leg, rib) = legatos.extractIntPairsFromCsv().unzip()
+    val result = leg.toMutableList()
+    val result2 = rib.toMutableList()
+    if (result.all{ it.absoluteValue == result[0].absoluteValue} && result2.all{ it.absoluteValue == result2[0].absoluteValue})
+        return "${result[0].absoluteValue}${result2[0].absoluteValue}"
+    repeat(2){
+        if (result[0] < 0f) result[0] = result[0].absoluteValue
+        if (result.size > 1){
+            if (result[1] < 0f)  result.add(1, result[0])
+            (1 until result.size).forEach{ index ->
+                if (result[index-1].absoluteValue == result[index].absoluteValue) result[index] = result[index].absoluteValue
+            }
+            (1 until result.size - 1).forEach{ index ->
+                if (result[index] < 0f && result[index+1] < 0f ) {
+                    result.add(index+1, result[index].absoluteValue)
+                    result2.add(index+1, result2[index].absoluteValue)
+                }
+            }
+            if (result.last() < 0f) {
+                result.add(result.last().absoluteValue)
+                result2.add(result2.last().absoluteValue)
+            }
+        }
+    }
+    return result.zip(result2){a, b -> "$a|$b"}.joinToString(",").also{println(it)}
+}
 fun String.valueFromCsv(index: Int): Int {
     return this.extractIntsFromCsv()[index]
 }

@@ -17,6 +17,8 @@ import com.leff.midi.event.meta.Tempo
 import java.io.IOException
 import com.leff.midi.event.meta.TimeSignature
 import java.io.File
+import java.util.*
+import kotlin.math.absoluteValue
 
 
 object Player {
@@ -128,11 +130,17 @@ object Player {
         val totalLength = counterpointTrackData.maxOf{ it.ticks.last() + it.durations.last()}.toLong()//.also{println("Total length: $it")} // Empty tracks have 0 length
         //LEGATO AND RIBATTUTO DURATION ZONE
         // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
-        val artMap = mapOf(0 to 1.0f, 1 to 0.125f, 2 to 0.25f, 3 to 0.75f, 4 to 1.0f, 5 to 1.125f, 6 to 1.25f )
-        val legatos = legatoTypes.map{ artMap[it.first]!!}
-        val legatoAlterationsAndDeltas = alterateBpmWithDistribution(legatos,0.001f, totalLength)
-        val legatoAlterations = legatoAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
-        val legatoDeltas = legatoAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
+        println("legatoTypes: $legatoTypes")
+        if(legatoTypes != listOf(Pair(4,0))){
+            val artMap = mapOf(0 to 1.0f, 1 to 0.125f, 2 to 0.25f, 3 to 0.75f, 4 to 1.0f, 5 to 1.125f, 6 to 1.25f )
+            val legatos = legatoTypes.map{ artMap[it.first.absoluteValue]!! * (if(it.first<0) -1 else 1)}
+            val legatoAlterationsAndDeltas = alterateBpmWithDistribution(legatos,0.005f, totalLength)
+            val legatoAlterations = legatoAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
+            val legatoDeltas = legatoAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
+            counterpointTrackData.forEach {
+                it.durations = alterateArticulation(it.ticks, it.durations, legatoAlterations, legatoDeltas) }
+        }
+
 
         // TRANSFORM DATATRACKS IN MIDITRACKS
         val counterpointTracks = counterpointTrackData.map{ convertToMidiTrack(it, counterpointTrackData.size) }
@@ -188,6 +196,25 @@ object Player {
         tracks.addAll(counterpointTracks)
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
         return saveAndPlayMidiFile(mediaPlayer, midi, looping, play, midiFile)
+    }
+
+    private fun alterateArticulation(ticks: IntArray, durations: IntArray,
+                                     legatoAlterations: List<Float>, legatoDeltas: List<Long>): IntArray {
+        val result = IntArray(durations.size)
+        var alterationIndex = 0
+        var alterationTick = 0
+        var durIndex = 0
+
+        while(durIndex < durations.size ){
+            while(alterationTick + legatoDeltas[alterationIndex] < ticks[durIndex] ) {
+                alterationTick += legatoDeltas[alterationIndex].toInt()
+                alterationIndex++
+            }
+            result[durIndex] = (durations[durIndex] * legatoAlterations[alterationIndex]).toInt()
+            durIndex++
+        }
+        result.also{ it.contentToString() }
+        return result
     }
 
     fun saveAndPlayMidiFile(mediaPlayer: MediaPlayer, midi: MidiFile, looping: Boolean, play: Boolean, midiFile: File?) : String {

@@ -10,7 +10,7 @@ fun findTopNuances(stabilities: List<Float>, minNuance: Float, maxNuance: Float)
     val orderedStabilities = stabilities.sorted()
     return (0 until n).map{ steps[orderedStabilities.indexOf(stabilities[it])]}
 }
-data class TrackData(val pitches: IntArray, val ticks: IntArray, val durations: IntArray,
+data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: IntArray,
                      val velocities: IntArray,val glissando: IntArray,  val channel: Int,  val velocityOff: Int = 80,
                      val vibrato: Int, val doublingFlags: Int = 0, val instrument: Int = 0,
                      val audio8D: Boolean = false, val partIndex: Int )

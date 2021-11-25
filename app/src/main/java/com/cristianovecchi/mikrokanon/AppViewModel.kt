@@ -345,11 +345,11 @@ init{
                 val legatoTypes: List<Pair<Int, Int>> =
                     userOptionsData.value?.let {
                         if (simplify) {
-                            listOf(userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()[0])
+                            listOf(userOptionsData.value!![0].legatoTypes.extractIntPairsFromCsv()[0])
                         } else {
-                            userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()
+                            userOptionsData.value!![0].legatoTypes.extractIntPairsFromCsv()
                         }
-                    } ?: listOf(Pair(2, 0))
+                    } ?: listOf(Pair(4, 0))
                 val melodyTypes: List<Int> =
                     userOptionsData.value?.let {
                     if (simplify) {
