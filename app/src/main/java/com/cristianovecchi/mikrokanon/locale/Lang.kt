@@ -61,37 +61,37 @@ val synthsNames = listOf("Square Wave","Saw Wave", "Calliope", "Chiff",
     "Bowed Glass", "Metal Pad", "Halo Pad", "Sweep Pad",
     "Ice Rain", "Soundtrack", "Crystal", "Atmosphere",
 "Brightness", "Goblins", "Echo Drops", "Sci Fi")
-val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية", "ساكسفون", "فلوت",
+val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية","غاميلان", "ساكسفون", "فلوت",
     "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","قيثار","بييرو","الباروك","أوتار نتف","Spooky")
-val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente", "Saxophone", "Flöten",
+val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente","Gamelan", "Saxophone", "Flöten",
     "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Harfe","Pierrot","Barockensemble","Zupfinstrument","Spooky")
-val ensembleNamesEl = listOf("Έγχόρδα", "Ξύλινα πνευστά της συμφωνικής ορχήστρας", "Ορχήστρα εγχόρδων", "Χάλκινα πνευστά της συμφωνικής ορχήστρας", "Σαξόφωνα", "Φλάουτα",
+val ensembleNamesEl = listOf("Έγχόρδα", "Ξύλινα πνευστά της συμφωνικής ορχήστρας", "Ορχήστρα εγχόρδων", "Χάλκινα πνευστά της συμφωνικής ορχήστρας","Gamelan", "Σαξόφωνα", "Φλάουτα",
     "Διπλά καλάμια", "Κλαρινέτ", "Φαγκότα", "Βιολοντσέλα", "Πιάνο","Άρπα", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές","Spooky")
-val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Saxophones", "Flutes",
+val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Gamelan", "Saxophones", "Flutes",
     "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","Harp","Pierrot","Baroque","Plucked strings","Spooky")
 
-val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal", "Saxofones", "Flautas",
+val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal","Gamelán", "Saxofones", "Flautas",
     "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Arpa", "Pierrot","Barroco","Instrumentos de cuerda pulsada","Spooky")
-val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기", "색소폰", "플루트",
+val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기","가믈란", "색소폰", "플루트",
     "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","하프","피에로","바로크","발현악기","Spooky")
-val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器", "サックス", "フルート",
+val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器","ガムラン","サックス", "フルート",
     "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ハープ", "ピエロ", "バロック","撥弦楽器","Spooky")
-val ensembleNamesId = listOf("Alat musik dawai membungkuk", "Instrumen musik tiup kayu", "Orkestra dawai", "Instrumen musik tiup logam", "Saxophone", "Seruling",
+val ensembleNamesId = listOf("Alat musik dawai membungkuk", "Instrumen musik tiup kayu", "Orkestra dawai", "Instrumen musik tiup logam", "Gamelan","Saxophone", "Seruling",
     "Alang-alang ganda", "Klarinet", "Bassoon", "Cellos", "Piano", "Harpa", "Pierrot", "Baroque", "Dawai yang dipetik","Spooky")
-val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni", "Saxofoni", "Flauti",
+val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni","Gamelan", "Saxofoni", "Flauti",
     "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte","Arpa","Pierrot","Barocco", "Corde pizzicate","Spooky")
-val ensembleNamesPt = listOf("Cordas friccionadas", "Madeiras", "Orquestra de cordas", "Metais", "Saxofones", "Flautas",
+val ensembleNamesPt = listOf("Cordas friccionadas", "Madeiras", "Orquestra de cordas", "Metais","Gamelão","Saxofones", "Flautas",
     "Palhetas duplas", "Clarinetes", "Fagotes", "Violoncelos", "Piano","Harpa", "Pierrot", "Barroco", "Cordas dedilhadas","Spooky")
-val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Saxophones", "Flûtes",
+val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Gamelan","Saxophones", "Flûtes",
     "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Harpe", "Pierrot","Baroque","Cordes pincées","Spooky")
-val ensembleNamesHi = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Saxophones", "Flutes",
+val ensembleNamesHi = listOf("Strings", "Woodwinds", "String orchestra", "Brass","गमेलन", "Saxophones", "Flutes",
     "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","वीणा","Pierrot","Baroque","Plucked strings","Spooky")
-val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты", "Саксофоны", "Флейты",
+val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты","Гамелан", "Саксофоны", "Флейты",
     "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано","Арфа", "Пьеро","Барокко","Струнные щипковые инструменты","Spooky")
 val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao", "Orchestra ya ala za nyuzi", "Vyombo vya upepo vya chuma",
-    "Saxophones", "Zilizimbi","Mwanzi mara mbili", "Clarinets", "Bassoons", "Cellos", "Piano", "Kinubi",
+    "Gamelan", "Saxophones", "Zilizimbi","Mwanzi mara mbili", "Clarinets", "Bassoons", "Cellos", "Piano", "Kinubi",
     "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa","Spooky")
-val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器", "薩氏管", "长笛",
+val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器","甘美蘭", "薩氏管", "长笛",
     "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","豎琴","皮埃罗","巴洛克","撥弦樂器","Spooky")
 
 private var zodiacPlanets = listOf("\u2644", "\u2643", "\u2642","\u2640","\u263F","\u263D","\u2609")
@@ -135,6 +135,9 @@ fun getDynamicSymbols(): List<String>{
 }
 fun getOctaveSymbols(): List<String>{
     return listOf("➘15","➘8", "", "➚8","➚15")
+}
+fun getRibattutoSymbols(): List<String>{
+    return listOf("", "\"", "\"\'", "\"\"")
 }
 
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
@@ -197,8 +200,8 @@ val doublingPt = listOf("2ª menor","2ª Maior", "3ª menor", "3ª Maior", "4ª"
     "11ª Aumentada", "12ª", "13ª menor", "13ª Maior", "14ª menor", "14ª Maior", "Oitava dupla")
 val functionNamesEn = listOf("Wave 3", "Wave 4", "Wave 6")
 val intervalSetIt = listOf("2m\n7M","2M\n7m","3m\n6M","3M\n6m","4\n5","4A\n5d","U\n8")
-val intervalSetEn = listOf("m2\nM7","M2\nm7","m3\nM7","M3\nm6","4\n5","A4\nd5","U\n8")
-val intervalSetDe = listOf("k2\nG7","G2\nk7","k3\nG7","G3\nk6","4\n5","Ü4\nv5","1\n8")
+val intervalSetEn = listOf("m2\nM7","M2\nm7","m3\nM6","M3\nm6","4\n5","A4\nd5","U\n8")
+val intervalSetDe = listOf("k2\nG7","G2\nk7","k3\nG6","G3\nk6","4\n5","Ü4\nv5","1\n8")
 val intervalSetRu = listOf("2м\n7В","2В\n7м","3м\n6В","3В\n6м","4\n5","4У\n5у","1\n8")
 fun getIntervalsForTranspose(intervalSet: List<String> = intervalSetEn): List<String>{
     val split = intervalSet.map{ it.split("\n")}
@@ -213,6 +216,9 @@ val melodyTypeMap = mapOf(
 )
 val rangeTypeMap = mapOf(
     0 to "@", 1 to "I", 2 to "[--]", 3 to "[-]", 4 to "[ ]"
+)
+val legatoTypeMap = mapOf(
+    0 to "S+", 1 to "S", 2 to "P", 3 to "A", 4 to "L", 5 to "L+"
 )
 
 data class Lang( // English by default
@@ -235,6 +241,9 @@ data class Lang( // English by default
     val selectRange: String = "Select a range type!",
     val range: String = "Range",
     val rangeOptions: List<String> = listOf("Free", "Of the instrument", "Delimited", "Almost closed", "Closed"),
+    val selectArticulation: String = "Select an articulation type!",
+    val articulation: String = "Articulation",
+    val articulationOptions: List<String> = listOf("Staccatissimo", "Staccato", "Portato", "Articolato", "Legato", "Legatissimo"),
     val selectMelody: String = "Select a melody type!",
     val melody: String = "Melody",
     val melodyOptions: List<String> = listOf("Linear", "Broad"),

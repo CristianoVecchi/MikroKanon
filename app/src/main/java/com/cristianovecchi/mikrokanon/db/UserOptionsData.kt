@@ -18,6 +18,9 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "range_types")
         val rangeTypes: String,
 
+        @ColumnInfo(name = "legato_types")
+        val legatoTypes: String,
+
         @ColumnInfo(name = "melody_types")
         val melodyTypes: String,
 
@@ -91,7 +94,7 @@ import androidx.room.PrimaryKey
     ){
         companion object{
             fun getDefaultUserOptionsData(): UserOptionsData{
-                return UserOptionsData(0,"2", "2|0","0",
+                return UserOptionsData(0,"2", "2|0","4|0","0",
                     0,0,
                     "0.828", "90", 3,
                     0,0, "1|1",0, "0",

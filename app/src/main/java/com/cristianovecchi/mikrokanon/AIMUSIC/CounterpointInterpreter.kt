@@ -17,6 +17,9 @@ fun findTopNuances(stabilities: List<Float>, minNuance: Float, maxNuance: Float)
     val orderedStabilities = stabilities.sorted()
     return (0 until n).map{ steps[orderedStabilities.indexOf(stabilities[it])]}
 }
+data class TrackData(val pitches: IntArray, val ticks: IntArray, val durations: IntArray,
+                     val channel: Int, val velocities: IntArray, val velocityOff: Int = 80,
+                     val gliss: IntArray, val vibrato: Int)
 object CounterpointInterpreter {
     fun doTheMagic(counterpoint: Counterpoint,
                    durations: List<Int> = listOf(240), // 1/8
@@ -24,13 +27,14 @@ object CounterpointInterpreter {
                    nuances: Int,
                    doublingFlags: Int,
                    rangeTypes: List<Pair<Int,Int>>,
+                   legatoTypes: List<Pair<Int,Int>>,
                    melodyTypes: List<Int>,
                    glissando: List<Int> = listOf(),
                    audio8D: List<Int> = listOf(),
                    vibrato: Int = 0
         ): List<MidiTrack> {
-        counterpoint.display()
-        durations.also{println("Durations: $it")}
+//        counterpoint.display()
+//        durations.also{println("Durations: $it")}
         val result = mutableListOf<MidiTrack>()
 
         if(counterpoint.parts.size > 15) {
@@ -38,6 +42,14 @@ object CounterpointInterpreter {
         }
         val panStep: Int = 127 / counterpoint.parts.size
         val pans = (counterpoint.parts.indices).map{ it * panStep + panStep/2}//.also { println(it) }
+
+        //LEGATO AND RIBATTUTO DURATION ZONE
+        // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
+        val artMap = mapOf(0 to 1.0f, 1 to 0.125f, 2 to 0.25f, 3 to 0.75f, 4 to 1.0f, 5 to 1.125f, 6 to 1.25f )
+        val legatos = legatoTypes.map{ artMap[it.first]!!}
+        val legatoAlterationsAndDeltas = alterateBpmWithDistribution(legatos,0.001f, totalLength)
+        val legatoAlterations = legatoAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
+        val legatoDeltas = legatoAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
 
         // CREATION OF TRACKS
         counterpoint.parts.forEachIndexed { partIndex, part ->

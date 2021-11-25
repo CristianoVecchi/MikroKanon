@@ -142,6 +142,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val multiBpmDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val melodyTypesDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val rangeTypesDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val legatoTypesDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val multiFloatDialogData by lazy { mutableStateOf(MultiFloatDialogData(model = model))}
     val transposeDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val rowFormsDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
@@ -165,7 +166,8 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
         "Rhythm",  "Rhythm Shuffle", "Parts Shuffle","Doubling","8D AUDIO",
 
         "Spread where possible", "Deep Search in 4 part MK",
-        "Range","Melody","BPM", "Dynamic",
+        "BPM", "Dynamic",
+        "Range","Melody","Articulation",
         "Spacer",
         "Ritornello", "Transpose", "Row Forms",
         "Spacer",
@@ -190,6 +192,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 
     MelodyTypeDialog(melodyTypesDialogData, lang.melodyOptions)
     RangeTypeDialog(rangeTypesDialogData, lang.rangeOptions)
+    LegatoTypeDialog(legatoTypesDialogData, lang.articulationOptions)
     MultiBpmDialog(multiBpmDialogData, lang.OKbutton)
     MultiDynamicDialog(multiFloatDialogData, lang.OKbutton)
     //val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
@@ -559,6 +562,30 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                     ) { index ->
                                         model.updateUserOptions(
                                             "melodyTypes",
+                                            index
+                                        )
+                                        listDialogData.value =
+                                            ListDialogData(itemList = listDialogData.value.itemList)
+                                    }
+                                })
+                        }
+                        "Articulation" -> {
+                            //val rangeOptions: List<String> = lang.rangeOptions
+                            val legatoTypes = userOptions.legatoTypes
+                            val ribattutos = getRibattutoSymbols()
+                            SelectableCard(
+                                text = "${lang.articulation}: ${
+                                    legatoTypes.describeForArticulation(legatoTypeMap)
+                                }",
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = true,
+                                onClick = {
+                                    legatoTypesDialogData.value = MultiNumberDialogData(
+                                        true, lang.selectArticulation, legatoTypes, model = model
+                                    ) { index ->
+                                        model.updateUserOptions(
+                                            "legatoTypes",
                                             index
                                         )
                                         listDialogData.value =

@@ -269,22 +269,29 @@ init{
                     mediaPlayer?.setOnCompletionListener { onStop() }
                 }
                 val ensTypes: List<EnsembleType> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].ensembleTypes
-                        .extractIntsFromCsv().map{EnsembleType.values()[it]}}
+                    userOptionsData.value?.let {
+                        userOptionsData.value!![0].ensembleTypes
+                            .extractIntsFromCsv().map { EnsembleType.values()[it] }
+                    }
                         ?: listOf(EnsembleType.STRING_ORCHESTRA)
                 val dynamics: List<Float> =
-                    if(simplify) {
+                    if (simplify) {
                         listOf(1f)
                     } else {
-                        userOptionsData.value?.let { userOptionsData.value!![0].dynamics.extractFloatsFromCsv()
-                    }} ?: listOf(1f)
+                        userOptionsData.value?.let {
+                            userOptionsData.value!![0].dynamics.extractFloatsFromCsv()
+                        }
+                    } ?: listOf(1f)
                 val bpms: List<Float> =
                     userOptionsData.value?.let {
-                        if(simplify) {
-                            userOptionsData.value!![0].bpms.extractIntsFromCsv().map { it.toFloat() }.take(1)
+                        if (simplify) {
+                            userOptionsData.value!![0].bpms.extractIntsFromCsv()
+                                .map { it.toFloat() }.take(1)
                         } else {
-                            userOptionsData.value!![0].bpms.extractIntsFromCsv().map { it.toFloat() }
-                        } } ?: listOf(90f)
+                            userOptionsData.value!![0].bpms.extractIntsFromCsv()
+                                .map { it.toFloat() }
+                        }
+                    } ?: listOf(90f)
                 val rhythm: RhythmPatterns =
                     RhythmPatterns.values()[userOptionsData.value?.let { userOptionsData.value!![0].rhythm }
                         ?: 0]
@@ -294,42 +301,63 @@ init{
                 val partsShuffle: Boolean =
                     0 != (userOptionsData.value?.let { userOptionsData.value!![0].partsShuffle }
                         ?: 0)
-                val rowForms: List<Pair<Int,Int>> =
+                val rowForms: List<Pair<Int, Int>> =
                     userOptionsData.value?.let {
-                        if(simplify){
-                            listOf(Pair(1,1))
+                        if (simplify) {
+                            listOf(Pair(1, 1))
                         } else {
                             userOptionsData.value!![0].rowForms.extractIntPairsFromCsv()
-                        } }?: listOf(Pair(1,1)) // ORIGINAL by default || 0 is unused
+                        }
+                    } ?: listOf(Pair(1, 1)) // ORIGINAL by default || 0 is unused
                 val doublingFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].doublingFlags }
                         ?: 0
                 val audio8DFlags: Int =
                     userOptionsData.value?.let {
-                        if(simplify){
+                        if (simplify) {
                             0
                         } else {
                             userOptionsData.value!![0].audio8DFlags
-                        } } ?: 0
+                        }
+                    } ?: 0
                 val ritornello: Int =
                     userOptionsData.value?.let {
-                        if(simplify){
+                        if (simplify) {
                             0
                         } else {
                             userOptionsData.value!![0].ritornello
-                        } } ?: 0
+                        }
+                    } ?: 0
                 val transpose: List<Int> =
                     userOptionsData.value?.let { userOptionsData.value!![0].transpose.extractIntsFromCsv() }
                         ?: listOf(0)
                 val nuances: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].nuances }
                         ?: 1
-                val rangeTypes: List<Pair<Int,Int>> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv() }
-                        ?: listOf(Pair(2,0))
+                val rangeTypes: List<Pair<Int, Int>> =
+                    userOptionsData.value?.let {
+                        if (simplify) {
+                            listOf(userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()[0])
+                        } else {
+                            userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()
+                        }
+                    } ?: listOf(Pair(2, 0))
+                val legatoTypes: List<Pair<Int, Int>> =
+                    userOptionsData.value?.let {
+                        if (simplify) {
+                            listOf(userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()[0])
+                        } else {
+                            userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()
+                        }
+                    } ?: listOf(Pair(2, 0))
                 val melodyTypes: List<Int> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].melodyTypes.extractIntsFromCsv() }
-                        ?: listOf(0)
+                    userOptionsData.value?.let {
+                    if (simplify) {
+                        listOf(userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()[0])
+                    } else {
+                        userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()
+                    }
+                 }  ?: listOf(0)
                 val glissandoFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].glissandoFlags }
                         ?: 0
@@ -356,6 +384,7 @@ init{
                     doublingFlags,
                     nuances,
                     rangeTypes,
+                    legatoTypes,
                     melodyTypes,
                     glissandoFlags,
                     audio8DFlags,
@@ -1199,6 +1228,9 @@ init{
             }
             "rangeTypes" -> {
                 newUserOptionsData = optionsDataClone.copy(rangeTypes = value as String)
+            }
+            "legatoTypes" -> {
+                newUserOptionsData = optionsDataClone.copy(legatoTypes = value as String)
             }
             "melodyTypes" -> {
                 newUserOptionsData = optionsDataClone.copy(melodyTypes = value as String)

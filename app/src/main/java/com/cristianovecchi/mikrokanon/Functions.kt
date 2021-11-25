@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsemblePart
 import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme
+import com.cristianovecchi.mikrokanon.locale.getRibattutoSymbols
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import kotlinx.coroutines.*
 import kotlinx.coroutines.GlobalScope.coroutineContext
@@ -259,6 +260,23 @@ fun String.describe(): String {
         }
     }
 }
+fun String.describeForArticulation(legatoMap: Map<Int, String>): String {
+    val (ints, ribs) = this.extractIntPairsFromCsv().unzip()
+    val ribSymbols = getRibattutoSymbols()
+    return ints.foldIndexed("") { index, acc, i ->
+        val name = legatoMap[i.absoluteValue -1]!!
+        val ribattuto = ribSymbols[ribs[index]]
+        //val previousRibattuto = if(index == 0) ribattuto else ribSymbols[ribs[index-1]]
+        when {
+            index == 0 -> acc + name + ribattuto
+            i < 0 -> "$acc | $name$ribattuto"
+            ints[index - 1].absoluteValue > i.absoluteValue -> "$acc ➘ $name$ribattuto"
+            ints[index - 1].absoluteValue < i.absoluteValue -> "$acc ➚ $name$ribattuto"
+            ints[index - 1].absoluteValue == i.absoluteValue -> "$acc - $name$ribattuto"
+            else -> acc + i.toString()
+        }
+    }
+}
 fun String.describeForDynamic(map: Map<Float, String>, ascendingSymbol: String, descendingSymbol: String) : String {
     val floats = this.extractFloatsFromCsv()
     return floats.foldIndexed("") { index, acc, i ->
@@ -405,10 +423,10 @@ lowerLimits: IntArray, upperLimits: IntArray,  melodyTypes: IntArray): IntArray 
     var lastTick2 = 0
 
     val sequences = durs.mapIndexed{ index, dur ->
-        val subSequence = absPitches.copyOfRange(lastTick2, lastTick2 + dur)//.also{println("subSequence $index: ${it.contentToString()}")}
+        val subSequence = absPitches.copyOfRange(lastTick2, lastTick2 + dur).also{println("subSequence $index: ${it.contentToString()}")}
         val sequence = Insieme.findMelody(lastOctave, subSequence,
                 lowLimits[index], upLimits[index], melTypes[index])
-        lastOctave = sequence.last() / 12 -1
+        lastOctave = sequence.lastOrNull { it != -1 }?.let{ last -> last / 12 -1} ?: lastOctave // sequence could be empty
         lastTick2 += dur
         sequence
     }

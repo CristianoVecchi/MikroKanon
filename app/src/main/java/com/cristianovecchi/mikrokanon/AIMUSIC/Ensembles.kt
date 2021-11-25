@@ -5,7 +5,7 @@ import com.cristianovecchi.mikrokanon.extractFromMiddle
 import com.cristianovecchi.mikrokanon.rangeTo
 
 enum class EnsembleType {
-    STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, SAXOPHONES, FLUTES,
+    STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, GAMELAN, SAXOPHONES, FLUTES,
     DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
     BAROQUE, PLUCKED_STRINGS, SPOOKY,
     SYN_SQUARE_WAVE, SYN_SAW_WAVE, SYN_CALLIOPE, SYN_CHIFF,
@@ -50,6 +50,7 @@ object Ensembles {
             EnsembleType.WOODWINDS -> getWoodwinds(nParts)
             EnsembleType.STRING_ORCHESTRA -> getStringOrchestra(nParts)
             EnsembleType.BRASS -> getBrass(nParts)
+            EnsembleType.GAMELAN -> getGamelan(nParts)
             EnsembleType.SAXOPHONES -> getSaxophones(nParts)
             EnsembleType.FLUTES -> getFlutes(nParts)
             EnsembleType.DOUBLEREEDS -> getDoubleReeds(nParts)
@@ -363,6 +364,34 @@ object Ensembles {
                 PART_TROMBONE_MIDDLE_HIGH,
                 PART_TROMBONE_MIDDLE,
                 PART_TUBA_LOW
+            )
+            in 10..12 -> listOf(
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_HIGH,
+                PART_TRUMPET_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_TROMBONE_HIGH,
+                PART_TROMBONE_MIDDLE_HIGH,
+                PART_TROMBONE_MIDDLE,
+                PART_TUBA_LOW
+            )
+            else -> listOf()
+        }
+    }
+    fun getGamelan(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            1, 2 -> listOf(
+                EnsemblePart(73, 5, FLUTE_ALL), //flute
+                EnsemblePart(70, 3, BASSOON_ALL)  // bassoon
+            )
+            3 -> listOf(
+                PART_FLUTE_MIDDLE_HIGH,
+                PART_CLARINET_MIDDLE_HIGH,
+                PART_CLARINET_LOW_MIDDLE
             )
             in 10..12 -> listOf(
                 PART_TRUMPET_HIGH,
