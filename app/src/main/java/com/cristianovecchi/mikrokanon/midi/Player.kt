@@ -120,12 +120,24 @@ object Player {
 
         if (actualCounterpoint.isEmpty()) return "Counterpoint to play is empty!!!"
         if (actualCounterpoint.parts[0].absPitches.size == 0) return "Counterpoint parts are empty!!!"
-        val counterpointTracks = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts,
+        val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts,
                                                                     nuances, doublingFlags, rangeTypes, legatoTypes, melodyTypes,
                                                                     glissando, audio8D, vibratoExtensions[vibrato])
-        if (counterpointTracks.isEmpty()) return "No Tracks in Counterpoint!!!"
+        if (counterpointTrackData.isEmpty()) return "No Tracks in Counterpoint!!!"
 
-        val totalLength = counterpointTracks.maxOf{ it.lengthInTicks}//.also{println("Total length: $it")} // Empty tracks have 0 length
+        val totalLength = counterpointTrackData.maxOf{ it.ticks.last() + it.durations.last()}.toLong()//.also{println("Total length: $it")} // Empty tracks have 0 length
+        //LEGATO AND RIBATTUTO DURATION ZONE
+        // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
+        val artMap = mapOf(0 to 1.0f, 1 to 0.125f, 2 to 0.25f, 3 to 0.75f, 4 to 1.0f, 5 to 1.125f, 6 to 1.25f )
+        val legatos = legatoTypes.map{ artMap[it.first]!!}
+        val legatoAlterationsAndDeltas = alterateBpmWithDistribution(legatos,0.001f, totalLength)
+        val legatoAlterations = legatoAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
+        val legatoDeltas = legatoAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
+
+        // TRANSFORM DATATRACKS IN MIDITRACKS
+        val counterpointTracks = counterpointTrackData.map{ convertToMidiTrack(it, counterpointTrackData.size) }
+
+       //val totalLength = counterpointTracks.maxOf{ it.lengthInTicks}//.also{println("Total length: $it")} // Empty tracks have 0 length
         val tempoTrack = MidiTrack()
         // from TimeSignature.class
 //        public static final int DEFAULT_METER = 24;
@@ -249,6 +261,365 @@ object Player {
             }
             return mediaPlayer2
         }
+    private fun insertNoteWithGlissando(
+        mt: MidiTrack, start: Long, duration: Long, channel: Int,
+        pitch: Int, velOn: Int, velOff: Int, gliss: Int
+    ) {
+        if(gliss != 0) {
+            // val portamentoOn = Controller(start, channel,65,127)
+            if(gliss == 1) {
+                val durationQuarter = duration / 4
+                val pitchBendOn1= PitchBend(start + durationQuarter, channel,0,0)
+                val pitchBendOn2= PitchBend(start + durationQuarter * 2, channel,0,0)
+                val pitchBendOn3= PitchBend(start + durationQuarter * 3, channel,0,0)
+                val pitchBendOn4= PitchBend(start + duration-1, channel,0,0)
+                val pitchBendOff= PitchBend(start , channel,0,0)
+                // 0 4096 8192 12288 (14335) 16383
+                pitchBendOn1.bendAmount = 1024
+                pitchBendOn2.bendAmount = 2048
+                pitchBendOn3.bendAmount = 3072
+                pitchBendOn4.bendAmount = 4096
+                pitchBendOff.bendAmount = 0
+                val on = NoteOn(start, channel, pitch, velOn)
+                val off = NoteOff(start + duration, channel, pitch, velOff)
+                mt.insertEvent(pitchBendOff)
+                mt.insertEvent(on)
+                mt.insertEvent(pitchBendOn1)
+                mt.insertEvent(pitchBendOn2)
+                mt.insertEvent(pitchBendOn3)
+                mt.insertEvent(pitchBendOn4)
+                mt.insertEvent(off)
+            } else if(gliss == 2) {
+                val durationOctave = duration / 8
+                val pitchBendOn1= PitchBend(start + durationOctave, channel,0,0)
+                val pitchBendOn2= PitchBend(start + durationOctave * 2, channel,0,0)
+                val pitchBendOn3= PitchBend(start + durationOctave * 3, channel,0,0)
+                val pitchBendOn4= PitchBend(start + durationOctave *4, channel,0,0)
+                val pitchBendOn5= PitchBend(start + durationOctave * 5, channel,0,0)
+                val pitchBendOn6= PitchBend(start + durationOctave * 6, channel,0,0)
+                val pitchBendOn7= PitchBend(start + durationOctave * 7, channel,0,0)
+                val pitchBendOn8= PitchBend(start + duration - 1, channel,0,0)
+                val pitchBendOff= PitchBend(start , channel,0,0)
+                // 0 1024 2048 3072 4096(ht) 5120 6144 7168 8192 9216 10240 11264 12288 13312 14335
+                pitchBendOn1.bendAmount = 1024
+                pitchBendOn2.bendAmount = 2048
+                pitchBendOn3.bendAmount = 3072
+                pitchBendOn4.bendAmount = 4096
+                pitchBendOn5.bendAmount = 5120
+                pitchBendOn6.bendAmount = 6144
+                pitchBendOn7.bendAmount = 7168
+                pitchBendOn8.bendAmount = 8192
+                pitchBendOff.bendAmount = 0
+                val on = NoteOn(start, channel, pitch, velOn)
+                val off = NoteOff(start + duration, channel, pitch, velOff)
+                mt.insertEvent(pitchBendOff)
+                mt.insertEvent(on)
+                mt.insertEvent(pitchBendOn1)
+                mt.insertEvent(pitchBendOn2)
+                mt.insertEvent(pitchBendOn3)
+                mt.insertEvent(pitchBendOn4)
+                mt.insertEvent(pitchBendOn5)
+                mt.insertEvent(pitchBendOn6)
+                mt.insertEvent(pitchBendOn7)
+                mt.insertEvent(off)
+            } else if(gliss == 3) {
+                val duration12 = duration / 12
+                val pitchBendOn1= PitchBend(start + duration12, channel,0,0)
+                val pitchBendOn2= PitchBend(start + duration12 * 2, channel,0,0)
+                val pitchBendOn3= PitchBend(start + duration12 * 3, channel,0,0)
+                val pitchBendOn4= PitchBend(start + duration12 *4, channel,0,0)
+                val pitchBendOn5= PitchBend(start + duration12 * 5, channel,0,0)
+                val pitchBendOn6= PitchBend(start + duration12 * 6, channel,0,0)
+                val pitchBendOn7= PitchBend(start + duration12 * 7, channel,0,0)
+                val pitchBendOn8= PitchBend(start + duration12 * 8, channel,0,0)
+                val pitchBendOn9= PitchBend(start + duration12 * 9, channel,0,0)
+                val pitchBendOn10= PitchBend(start + duration12 * 10, channel,0,0)
+                val pitchBendOn11= PitchBend(start + duration12 * 11, channel,0,0)
+                val pitchBendOn12= PitchBend(start + duration - 1, channel,0,0)
+                val pitchBendOff= PitchBend(start , channel,0,0)
+                // 0 1024 2048 3072 4096(ht) 5120 6144 7168 8192 9216 10240 11264 12288 13312 14335
+                pitchBendOn1.bendAmount = 1024
+                pitchBendOn2.bendAmount = 2048
+                pitchBendOn3.bendAmount = 3072
+                pitchBendOn4.bendAmount = 4096
+                pitchBendOn5.bendAmount = 5120
+                pitchBendOn6.bendAmount = 6144
+                pitchBendOn7.bendAmount = 7168
+                pitchBendOn8.bendAmount = 8192
+                pitchBendOn9.bendAmount = 9216
+                pitchBendOn10.bendAmount = 10240
+                pitchBendOn11.bendAmount = 11264
+                pitchBendOn12.bendAmount = 12288
+                pitchBendOff.bendAmount = 0
+                val on = NoteOn(start, channel, pitch, velOn)
+                val off = NoteOff(start + duration, channel, pitch, velOff)
+                mt.insertEvent(pitchBendOff)
+                mt.insertEvent(on)
+                mt.insertEvent(pitchBendOn1)
+                mt.insertEvent(pitchBendOn2)
+                mt.insertEvent(pitchBendOn3)
+                mt.insertEvent(pitchBendOn4)
+                mt.insertEvent(pitchBendOn5)
+                mt.insertEvent(pitchBendOn6)
+                mt.insertEvent(pitchBendOn7)
+                mt.insertEvent(pitchBendOn8)
+                mt.insertEvent(pitchBendOn9)
+                mt.insertEvent(pitchBendOn10)
+                mt.insertEvent(pitchBendOn11)
+                mt.insertEvent(pitchBendOn12)
+                mt.insertEvent(off)
+            }
+
+            else if (gliss == -1){
+                val durationQuarter = duration / 4
+                val pitchBendOn1= PitchBend(start , channel,0,0)
+                val pitchBendOn2= PitchBend(start + durationQuarter , channel,0,0)
+                val pitchBendOn3= PitchBend(start + durationQuarter * 2, channel,0,0)
+                val pitchBendOn4= PitchBend(start + durationQuarter * 3, channel,0,0)
+                val pitchBendOff= PitchBend(start+ duration -1 , channel,0,0)
+                // 0 4096 8192 12288 (14335) 16383
+                pitchBendOn4.bendAmount = 1024
+                pitchBendOn3.bendAmount = 2048
+                pitchBendOn2.bendAmount = 3072
+                pitchBendOn1.bendAmount = 4096
+                pitchBendOff.bendAmount = 0
+                val on = NoteOn(start, channel, pitch-1, velOn)
+                val off = NoteOff(start + duration, channel, pitch-1, velOff)
+
+                mt.insertEvent(pitchBendOn1)
+                mt.insertEvent(on)
+                mt.insertEvent(pitchBendOn2)
+                mt.insertEvent(pitchBendOn3)
+                mt.insertEvent(pitchBendOn4)
+                mt.insertEvent(pitchBendOff)
+                mt.insertEvent(off)
+            }else if(gliss == -2) {
+                val durationOctave = duration / 8
+                val pitchBendOn1= PitchBend(start , channel,0,0)
+                val pitchBendOn2= PitchBend(start + durationOctave , channel,0,0)
+                val pitchBendOn3= PitchBend(start + durationOctave * 2, channel,0,0)
+                val pitchBendOn4= PitchBend(start + durationOctave * 3, channel,0,0)
+                val pitchBendOn5= PitchBend(start + durationOctave * 4, channel,0,0)
+                val pitchBendOn6= PitchBend(start + durationOctave * 5, channel,0,0)
+                val pitchBendOn7= PitchBend(start + durationOctave * 6, channel,0,0)
+                val pitchBendOn8= PitchBend(start + durationOctave * 7, channel,0,0)
+                val pitchBendOff= PitchBend(start + duration -1 , channel,0,0)
+                // 0 1024 2048 3072 4096(ht) 5120 6144 7168 8192 9216 10240 11264 12288 13312 14335
+                pitchBendOn8.bendAmount = 1024
+                pitchBendOn7.bendAmount = 2048
+                pitchBendOn6.bendAmount = 3072
+                pitchBendOn5.bendAmount = 4096
+                pitchBendOn4.bendAmount = 5120
+                pitchBendOn3.bendAmount = 6144
+                pitchBendOn2.bendAmount = 7168
+                pitchBendOn1.bendAmount = 8192
+                pitchBendOff.bendAmount = 0
+                val on = NoteOn(start, channel, pitch-2, velOn)
+                val off = NoteOff(start + duration, channel, pitch-2, velOff)
+
+
+                mt.insertEvent(pitchBendOn1)
+                mt.insertEvent(on)
+                mt.insertEvent(pitchBendOn2)
+                mt.insertEvent(pitchBendOn3)
+                mt.insertEvent(pitchBendOn4)
+                mt.insertEvent(pitchBendOn5)
+                mt.insertEvent(pitchBendOn6)
+                mt.insertEvent(pitchBendOn7)
+                mt.insertEvent(pitchBendOn8)
+                mt.insertEvent(pitchBendOff)
+                mt.insertEvent(off)
+            } else if(gliss == -3) {
+                val duration12 = duration / 12
+                val pitchBendOn1 = PitchBend(start, channel, 0, 0)
+                val pitchBendOn2 = PitchBend(start + duration12, channel, 0, 0)
+                val pitchBendOn3 = PitchBend(start + duration12 * 2, channel, 0, 0)
+                val pitchBendOn4 = PitchBend(start + duration12 * 3, channel, 0, 0)
+                val pitchBendOn5 = PitchBend(start + duration12 * 4, channel, 0, 0)
+                val pitchBendOn6 = PitchBend(start + duration12 * 5, channel, 0, 0)
+                val pitchBendOn7 = PitchBend(start + duration12 * 6, channel, 0, 0)
+                val pitchBendOn8 = PitchBend(start + duration12 * 7, channel, 0, 0)
+                val pitchBendOn9 = PitchBend(start + duration12 * 8, channel, 0, 0)
+                val pitchBendOn10 = PitchBend(start + duration12 * 9, channel, 0, 0)
+                val pitchBendOn11 = PitchBend(start + duration12 * 10, channel, 0, 0)
+                val pitchBendOn12 = PitchBend(start + duration12 * 11, channel, 0, 0)
+                val pitchBendOff = PitchBend(start + duration - 1, channel, 0, 0)
+                // 0 1024 2048 3072 4096(ht) 5120 6144 7168 8192 9216 10240 11264 12288 13312 14335
+                pitchBendOn12.bendAmount = 1024
+                pitchBendOn11.bendAmount = 2048
+                pitchBendOn10.bendAmount = 3072
+                pitchBendOn9.bendAmount = 4096
+                pitchBendOn8.bendAmount = 5120
+                pitchBendOn7.bendAmount = 6144
+                pitchBendOn6.bendAmount = 7168
+                pitchBendOn5.bendAmount = 8192
+                pitchBendOn4.bendAmount = 9216
+                pitchBendOn3.bendAmount = 10240
+                pitchBendOn2.bendAmount = 11264
+                pitchBendOn1.bendAmount = 12288
+                pitchBendOff.bendAmount = 0
+                val on = NoteOn(start, channel, pitch-3, velOn)
+                val off = NoteOff(start + duration, channel, pitch-3, velOff)
+
+                mt.insertEvent(pitchBendOn1)
+                mt.insertEvent(on)
+                mt.insertEvent(pitchBendOn2)
+                mt.insertEvent(pitchBendOn3)
+                mt.insertEvent(pitchBendOn4)
+                mt.insertEvent(pitchBendOn5)
+                mt.insertEvent(pitchBendOn6)
+                mt.insertEvent(pitchBendOn7)
+                mt.insertEvent(pitchBendOn8)
+                mt.insertEvent(pitchBendOff)
+                mt.insertEvent(off)
+            }
+            // 5 - 37
+//            val portamentoTimeCoarse = Controller(start, channel, 5, 100)
+//            val portamentoTimeFine = Controller(start, channel, 37, fine)
+//            val portamentoAmount = Controller(start, channel, 84, 60)
+//            val portamentoOff = Controller(start+duration, channel,65, 0)
+
+            //0b10000000000001 = 8193 bend off
+
+            //mt.insertEvent(portamentoOn)
+            //mt.insertEvent(portamentoTimeCoarse)
+            // mt.insertEvent(portamentoTimeFine)
+            // mt.insertEvent(portamentoAmount)
+
+
+            // mt.insertEvent(portamentoOff)
+
+
+            //println("GLISSANDO: $pitch at $start")
+        } else {
+            val on = NoteOn(start, channel, pitch, velOn)
+            val off = NoteOff(start + duration, channel, pitch, velOff)
+            mt.insertEvent(on)
+            mt.insertEvent(off)
+        }
+    }
+    fun insertNoteCheckingHigh(
+        mt: MidiTrack, start: Int, duration: Int, channel: Int,
+        pitch: Int, velOn: Int, velOff: Int
+    ) {
+        var actualPitch = pitch
+        while (actualPitch > 108){
+            actualPitch -= 12
+        }
+        val on = NoteOn(start.toLong(), channel, actualPitch, velOn)
+        val off = NoteOff((start + duration).toLong(), channel, actualPitch, velOff)
+        mt.insertEvent(on)
+        mt.insertEvent(off)
+    }
+    fun insertNote(
+        mt: MidiTrack, start: Long, duration: Long, channel: Int,
+        pitch: Int, velOn: Int, velOff: Int
+    ) {
+        val on = NoteOn(start, channel, pitch, velOn)
+        val off = NoteOff(start + duration, channel, pitch, velOff)
+        mt.insertEvent(on)
+        mt.insertEvent(off)
+    }
+    private fun addVibratoToTrack(mt: MidiTrack, start: Long, duration: Long, channel: Int, vibratoDivisor: Int){
+        val nVibrations = (duration / vibratoDivisor).toInt() // 4 vibrations in a quarter
+        if(nVibrations == 0 ) {
+            val expressionOn = Controller(start + duration / 3,channel,1, 0b1111111)
+            val expressionOff = Controller(start + duration - 4,channel,1, 0)
+            mt.insertEvent(expressionOn)
+            mt.insertEvent(expressionOff)
+        } else {
+            val vibrationDur = duration / nVibrations
+            val vibrationHalfDur = vibrationDur / 2
+            val vibrationQuarterDur = vibrationDur / 4
+            (0 until nVibrations).forEach(){
+                val expressionMiddle1 = Controller(start + vibrationDur * it + vibrationQuarterDur , channel,1, 64)
+                val expressionOn = Controller(start + vibrationDur * it + vibrationHalfDur , channel,1, 0b1111111)
+                val expressionMiddle2 = Controller(start + vibrationDur * it + vibrationHalfDur + vibrationQuarterDur , channel,1, 64)
+                val expressionOff = Controller(start +  vibrationDur * (it + 1) ,channel,1, 0)
+                mt.insertEvent(expressionMiddle1)
+                mt.insertEvent(expressionOn)
+                mt.insertEvent(expressionMiddle2)
+                mt.insertEvent(expressionOff)
+            }
+        }
+    }
+    fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
+        val track = MidiTrack()
+        val channel = trackData.channel
+        val vibrato = trackData.vibrato
+        val velocityOff = trackData.velocityOff
+        val (pitches, ticks, durations, velocities, glissando) = trackData
+
+        // STEREO AND INSTRUMENTS
+        val pc: MidiEvent =
+            ProgramChange(0, channel, trackData.instrument) // cambia strumento
+        track.insertEvent(pc)
+        val panStep: Int = 127 / nParts
+        val pans = (0 until nParts).map { it * panStep + panStep / 2 }//.also { println(it) }
+        if (!trackData.audio8D) { // set a fixed pan if 8D AUDIO is not set on this track
+            val pan = Controller(0, channel, 10, pans[trackData.partIndex])
+            track.insertEvent(pan)
+        }
+        if (trackData.doublingFlags == 0) {
+            for (i in pitches.indices) {
+                val tick = ticks[i].toLong()
+                val dur = durations[i].toLong()
+                if (trackData.vibrato != 0) {
+                    addVibratoToTrack(track, tick, dur, channel, vibrato)
+                }
+                insertNoteWithGlissando(
+                    track, tick, dur, channel, pitches[i],
+                    velocities[i], velocityOff, glissando[i]
+                )
+            }
+
+        } else {
+            val doubling = convertFlagsToInts(trackData.doublingFlags)
+            for (i in pitches.indices) {
+                val tick = ticks[i].toLong()
+                val dur = durations[i].toLong()
+                val pitch = pitches[i]
+                val velocity = velocities[i]
+                if (trackData.vibrato != 0) {
+                    addVibratoToTrack(track, tick, dur, channel, vibrato)
+                }
+                insertNoteWithGlissando(
+                    track, tick, dur, channel, pitches[i],
+                    velocities[i], velocityOff, glissando[i]
+                )
+                doubling.forEach {
+                    insertNoteWithGlissando(
+                        track, tick, dur, channel, pitch + it,
+                        velocity, velocityOff, glissando[i]
+                    )
+                }
+            }
+        }
+
+        // STEREO ALTERATIONS FOR EACH TRACK
+        if(trackData.audio8D && track.lengthInTicks > 0){
+            val nRevolutions = (12 - trackData.partIndex) * 2
+            //val panStep: Int = 127 / counterpoint.parts.size
+            val aims = mutableListOf<Float>()
+            for(i in 0 until nRevolutions){
+                aims.add(0f)
+                aims.add(127f)
+            }
+            aims.add(0f)
+            val audio8DalterationsAndDeltas = alterateBpmWithDistribution(aims, 2f, track.lengthInTicks)
+            val audio8Dalterations= audio8DalterationsAndDeltas.first
+            val audio8Ddeltas = audio8DalterationsAndDeltas.second.also{println(it)}
+            var tempoTick = 0L
+            (0 until audio8Dalterations.size -1).forEach { i -> // doesn't take the last bpm
+                val newPan = Controller(tempoTick, channel,10, audio8Dalterations[i].toInt())
+                track.insertEvent(newPan)
+                tempoTick += audio8Ddeltas[i]
+            }
+        }
+
+        return track
+    }
+
 }
 
 
