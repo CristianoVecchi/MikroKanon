@@ -41,7 +41,7 @@ sealed class Computation(open val icon: String = "") {
     data class FurtherFromFreePart(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val trend: TREND, override val icon: String = "free_parts"): Computation()
     data class Fioritura(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "fioritura"): Computation()
     data class Round(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "round"): Computation()
-    data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "cadenza"): Computation()
+    data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val values: List<Int>, override val icon: String = "cadenza"): Computation()
     data class Scarlatti(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "Scarlatti"): Computation()
     data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "erase"): Computation()
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
@@ -82,6 +82,7 @@ class AppViewModel(
     var lastScaffoldTab = ScaffoldTabs.SETTINGS
     // + 0.86f
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
+    var cadenzaValues ="0,1,0,1,1"
     val dynamicMap: Map<Float,String> =  dynamicSteps.zip(getDynamicSymbols()).toMap()
     val iconMap = mapOf(
 
@@ -416,17 +417,17 @@ init{
             tritoneSubstitutionOnCounterpoints(originalCounterpoints, index)
         }
     }
-    val onCadenzaFromSelector = { list: ArrayList<Clip> ->
+    val onCadenzaFromSelector = { list: ArrayList<Clip>, values: List<Int> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
-        computationStack.pushAndDispatch(Computation.Cadenza(listOf(selectedCounterpoint.value!!.clone()), list,0))
-        cadenzasOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+        computationStack.pushAndDispatch(Computation.Cadenza(listOf(selectedCounterpoint.value!!.clone()), list,0, values))
+        cadenzasOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0, values)
     }
-    val onCadenza = {
+    val onCadenza = { values: List<Int> ->
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-        computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, index))
-        cadenzasOnCounterpoints(originalCounterpoints, index)
+        computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, index, values))
+        cadenzasOnCounterpoints(originalCounterpoints, index, values)
     }
     val onScarlattiFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
@@ -721,7 +722,7 @@ init{
                         }
                     }
                     is Computation.Cadenza -> {
-                        cadenzasOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
+                        cadenzasOnCounterpoints( previousComputation.counterpoints,previousComputation.index, previousComputation.values)
                     }
                     is Computation.Scarlatti -> {
                         duplicateAllPhrasesInCounterpoint( previousComputation.counterpoints[previousComputation.index],previousComputation.index)
@@ -959,12 +960,12 @@ init{
             }
         }
     }
-    private fun cadenzasOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+    private fun cadenzasOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int, values: List<Int>){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
-                    newList = addCadenzasOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints)
+                    newList = addCadenzasOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints, values)
                 }
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])

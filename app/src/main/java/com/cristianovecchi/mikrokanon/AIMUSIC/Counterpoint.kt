@@ -303,20 +303,25 @@ data class Counterpoint(val parts: List<AbsPart>,
         parts.map { absPart -> absPart.absPitches.add(-1) }
     }
 
-    fun addCadenzas(horizontalIntervalSet: List<Int>): Counterpoint{
+    fun addCadenzas(horizontalIntervalSet: List<Int>, values: List<Int> = listOf(0,1,0,1,1)): Counterpoint{
         val clone = this.normalizePartsSize(false)
         val checks = clone.detectIntervalsInColumns(horizontalIntervalSet)
         val result = clone.cloneWithEmptyParts()
         var index = 0
         val maxSize = clone.maxSize()
+        val (nBeforeRests, nFirstNotes, nMiddleRests, nSecondNotes, nAfterRests ) = values
         while (index < maxSize){
             if(checks[index]){
                 val nextIndex = (index+1) %  maxSize
                 val column1 = clone.getColumnValuesWithEmptyValues(index)
                 val column2 = clone.getColumnValuesWithEmptyValues(nextIndex)
-                result.addColumn(column1)
-                result.addColumn(column2)
-                result.addEmptyColumn()
+
+                (0 until nBeforeRests).forEach{ _ -> result.addEmptyColumn() }
+                (0 until nFirstNotes).forEach{ _ -> result.addColumn(column1) }
+                (0 until nMiddleRests).forEach{ _ -> result.addEmptyColumn() }
+                (0 until nSecondNotes).forEach{ _ -> result.addColumn(column2) }
+                (0 until nAfterRests).forEach{ _ -> result.addEmptyColumn() }
+
                 index += 2
             } else {
                 val column1 = clone.getColumnValuesWithEmptyValues(index)

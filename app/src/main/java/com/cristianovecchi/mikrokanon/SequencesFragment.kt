@@ -78,9 +78,9 @@ class SequencesFragment(): Fragment() {
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onRoundFromSelector(list)
                                     },
-                                    onCadenza = { list ->
+                                    onCadenza = { list, values ->
                                         findNavController().navigate(R.id.outputFragment)
-                                        model.onCadenzaFromSelector(list)
+                                        model.onCadenzaFromSelector(list, values)
                                     },
                                     onScarlatti = { list ->
                                         findNavController().navigate(R.id.outputFragment)

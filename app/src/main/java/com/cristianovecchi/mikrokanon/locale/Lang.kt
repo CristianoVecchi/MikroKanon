@@ -118,6 +118,12 @@ fun getVibratoSymbol(): String {
       "\u223f"
     else "~"
 }
+fun getNoteAndRestSymbols(): List<String> {
+    return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+        listOf("\uD834\uDD60" ,"\uD834\uDD3E")
+    else listOf("♪", "-")
+}
+
 fun createGlissandoIntervals(doublingNames: List<String>): List<String>{
     val symbols = getGlissandoSymbols()
     val asc = symbols.first

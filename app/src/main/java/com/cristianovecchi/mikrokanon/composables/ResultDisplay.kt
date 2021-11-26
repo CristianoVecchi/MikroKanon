@@ -26,10 +26,7 @@ import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
-import com.cristianovecchi.mikrokanon.composables.dialogs.ButtonsDialog
-import com.cristianovecchi.mikrokanon.composables.dialogs.MultiListDialog
-import com.cristianovecchi.mikrokanon.composables.dialogs.SequencesDialog
-import com.cristianovecchi.mikrokanon.composables.dialogs.SimpleTransposeDialog
+import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
@@ -47,7 +44,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onWave: (Int) -> Unit,
                   onTritoneSubstitution: () -> Unit = {},
                   onRound: () -> Unit = {},
-                  onCadenza: () -> Unit = {},
+                  onCadenza: (List<Int>) -> Unit = {},
                   onScarlatti: () -> Unit = {},
                   onEraseIntervals: () -> Unit = {},
                   onSingle: () -> Unit = {},
@@ -92,6 +89,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
     val simpleTransposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+    val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+
 
     val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
 
@@ -182,6 +181,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 ButtonsDialog(buttonsDialogData, language.OKbutton, model)
                 MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, language.OKbutton)
                 SimpleTransposeDialog(simpleTransposeDialogData, getIntervalsForTranspose(language.intervalSet))
+                CadenzaDialog(cadenzaDialogData, language.OKbutton)
                 // STACK ICONS
                 Row(modifier = Modifier
                     .fillMaxWidth()
@@ -278,7 +278,15 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                     onWave6 = { onWave(6); close(); scrollToTopList = true },
                                     onTritoneSubstitution = { onTritoneSubstitution(); close() },
                                     onRound = { onRound(); close() },
-                                    onCadenza = { onCadenza(); close() },
+                                    onCadenza = {
+                                        close();
+                                        cadenzaDialogData.value = MultiNumberDialogData(true,
+                                            "Cadenza Dialog", model.cadenzaValues, 0, 16, model = model,
+                                        ){ newValues ->
+                                            model.cadenzaValues = newValues
+                                            onCadenza( newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
+                                        }
+                                                },
                                     onScarlatti = { onScarlatti(); close() },
                                     onFlourish = {onFlourish(); close(); scrollToTopList = false},
                                     onEraseIntervals = { onEraseIntervals(); close() },

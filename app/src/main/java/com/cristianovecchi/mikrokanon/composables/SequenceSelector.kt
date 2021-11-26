@@ -13,16 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
-import com.cristianovecchi.mikrokanon.ActiveButtons
-import com.cristianovecchi.mikrokanon.AppViewModel
-import com.cristianovecchi.mikrokanon.Computation
 import com.cristianovecchi.mikrokanon.composables.dialogs.ButtonsDialog
+import com.cristianovecchi.mikrokanon.composables.dialogs.CadenzaDialog
 import com.cristianovecchi.mikrokanon.composables.dialogs.SequencesDialog
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.toStringAll
 import com.cristianovecchi.mikrokanon.ui.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +35,7 @@ fun SequenceSelector(model: AppViewModel,
                      onWave: (Int, ArrayList<Clip>) -> Unit,
                      onTritoneSubstitution: (Int) -> Unit,
                      onRound: (ArrayList<Clip>) -> Unit,
-                     onCadenza: (ArrayList<Clip>) -> Unit,
+                     onCadenza: (ArrayList<Clip>, List<Int>) -> Unit,
                      onScarlatti: (ArrayList<Clip>) -> Unit,
                      onFlourish: (ArrayList<Clip>) -> Unit,
                      onEraseIntervals: (ArrayList<Clip>) -> Unit,
@@ -81,6 +79,7 @@ fun SequenceSelector(model: AppViewModel,
             //val snackbarVisibleState = remember { mutableStateOf(false) }
             val dialogState by lazy { mutableStateOf(false) }
             val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
+            val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
             val dimensions = model.dimensions
             val buttonSize = dimensions.selectorButtonSize
             val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
@@ -98,6 +97,7 @@ fun SequenceSelector(model: AppViewModel,
             val onSelectComposition = { index: Int ->
                 onSelect(index)
             }
+            CadenzaDialog(cadenzaDialogData, language.OKbutton)
             SequenceScrollableColumn( listState = listState, colors = appColors,
                 modifier = modifier3, notesNames = notesNames,
                 zodiacSigns = model.zodiacSignsActive, emoji = model.zodiacEmojisActive,
@@ -144,7 +144,16 @@ fun SequenceSelector(model: AppViewModel,
                                 onWave6 = { onWave(6, sequences[selected]) },
                                 onTritoneSubstitution = { onTritoneSubstitution(selected) },
                                 onRound = { onRound(sequences[selected]) },
-                                onCadenza = { onCadenza(sequences[selected]) },
+                               // onCadenza = { onCadenza(sequences[selected]) },
+                                onCadenza = {
+                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+                                    cadenzaDialogData.value = MultiNumberDialogData(true,
+                                    "Cadenza Dialog", model.cadenzaValues, 0, 16, model = model,
+                                        ){ newValues ->
+                                        model.cadenzaValues = newValues
+                                        onCadenza(sequences[selected], newValues.extractIntsFromCsv()) // CADENZA DIALOG OK BUTTON
+                                    }
+                                },
                                 onScarlatti = { onScarlatti(sequences[selected]) },
                                 onFlourish = { onFlourish(sequences[selected]) },
                                 onEraseIntervals = { onEraseIntervals(sequences[selected]) },
@@ -156,7 +165,7 @@ fun SequenceSelector(model: AppViewModel,
                                 onMK5reducted = { onMikroKanons5reducted(sequences[selected]) },
                             )
                             {
-                                buttonsDialogData.value = ButtonsDialogData(model = model)
+
                             }
                         }
                     )

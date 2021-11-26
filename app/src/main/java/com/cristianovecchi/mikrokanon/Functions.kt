@@ -331,11 +331,12 @@ fun correctDynamics(dynamics: String): String{
     return result.joinToString(",")
 }
 fun correctLegatos(legatos: String): String{
+    println("legatos: $legatos")
     val (leg, rib) = legatos.extractIntPairsFromCsv().unzip()
     val result = leg.toMutableList()
     val result2 = rib.toMutableList()
     if (result.all{ it.absoluteValue == result[0].absoluteValue} && result2.all{ it.absoluteValue == result2[0].absoluteValue})
-        return "${result[0].absoluteValue}${result2[0].absoluteValue}"
+        return "${result[0].absoluteValue}|${result2[0].absoluteValue}"
     repeat(2){
         if (result[0] < 0f) result[0] = result[0].absoluteValue
         if (result.size > 1){
@@ -355,7 +356,7 @@ fun correctLegatos(legatos: String): String{
             }
         }
     }
-    return result.zip(result2){a, b -> "$a|$b"}.joinToString(",").also{println(it)}
+    return result.zip(result2){a, b -> "$a|$b" }.joinToString(",")//.also{println("res: $it")}
 }
 fun String.valueFromCsv(index: Int): Int {
     return this.extractIntsFromCsv()[index]
@@ -467,35 +468,38 @@ fun List<Long>.sums(start: Long = 0): List<Long>{
 }
 
 fun main(args : Array<String>){
-    val pairs = listOf(
-        Pair(836L,127),
-        Pair(500L,78),
-        Pair(343L,45),
-        Pair(1947L,37),
-        Pair(12L,127),
-        Pair(689L,78),
-        Pair(100L,45),
-        Pair(4L,3),
-    )
-    pairs.forEach {
-        println("${it.first} / ${it.second} -> ${it.first.divideDistributingRest(it.second)}")
-        println("check sum: ${it.first.divideDistributingRest(it.second).sum()}")
-        println()
-    }
-    var success = true
-    for(i in 0..100){
-        val pair = Pair(Random().nextInt(10000).toLong(), Random().nextInt(10000)).also{println(it)}
-        val list = pair.first.divideDistributingRest(pair.second)
-        println(list)
-        println()
-        if(list.sum() != pair.first){
-            println("TEST FAILED with: $pair")
-            success = false
-        }
-    }
-    if(success){
-        println("SUCCESS!!!")
-    }
+    val string = "4|0,4|0"
+    //string.extractIntPairsFromCsv().also{println(it)}
+    correctLegatos(string).also{println("RESULT: $it")}
+//    val pairs = listOf(
+//        Pair(836L,127),
+//        Pair(500L,78),
+//        Pair(343L,45),
+//        Pair(1947L,37),
+//        Pair(12L,127),
+//        Pair(689L,78),
+//        Pair(100L,45),
+//        Pair(4L,3),
+//    )
+//    pairs.forEach {
+//        println("${it.first} / ${it.second} -> ${it.first.divideDistributingRest(it.second)}")
+//        println("check sum: ${it.first.divideDistributingRest(it.second).sum()}")
+//        println()
+//    }
+//    var success = true
+//    for(i in 0..100){
+//        val pair = Pair(Random().nextInt(10000).toLong(), Random().nextInt(10000)).also{println(it)}
+//        val list = pair.first.divideDistributingRest(pair.second)
+//        println(list)
+//        println()
+//        if(list.sum() != pair.first){
+//            println("TEST FAILED with: $pair")
+//            success = false
+//        }
+//    }
+//    if(success){
+//        println("SUCCESS!!!")
+//    }
 }
 
 

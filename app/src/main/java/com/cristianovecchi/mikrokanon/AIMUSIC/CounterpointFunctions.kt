@@ -68,8 +68,8 @@ suspend fun flourish(originalCounterpoints: List<Counterpoint>, intervalSet: Lis
 suspend fun buildRound(originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{it.buildRound()}
 }
-suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
-     return originalCounterpoints.map{it.addCadenzas(horIntervalSet)}
+suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint>, values: List<Int>): List<Counterpoint>{
+     return originalCounterpoints.map{it.addCadenzas(horIntervalSet, values)}
 }
 suspend fun duplicateAllInCounterpoint(counterpoint: Counterpoint ): List<Counterpoint>{
      return counterpoint.duplicateAllPhrases()

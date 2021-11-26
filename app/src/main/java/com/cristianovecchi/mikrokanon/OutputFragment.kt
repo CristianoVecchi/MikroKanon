@@ -95,8 +95,8 @@ class OutputFragment: Fragment() {
                                 onRound = {
                                     model.onRound()
                                 },
-                                onCadenza = {
-                                    model.onCadenza()
+                                onCadenza = { values ->
+                                    model.onCadenza(values)
                                 },
                                 onScarlatti = {
                                     model.onScarlatti()
