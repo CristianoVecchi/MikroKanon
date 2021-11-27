@@ -127,7 +127,7 @@ object Player {
                                                                     glissando, audio8D, vibratoExtensions[vibrato])
         if (counterpointTrackData.isEmpty()) return "No Tracks in Counterpoint!!!"
 
-        val totalLength = counterpointTrackData.maxOf{ it.ticks.last() + it.durations.last()}.toLong()//.also{println("Total length: $it")} // Empty tracks have 0 length
+        val totalLength = (counterpointTrackData.filter{it.ticks.isNotEmpty()}.maxOfOrNull{ it.ticks.last() + it.durations.last()} ?: 0).toLong()//.also{println("Total length: $it")} // Empty tracks have 0 length
 
         //LEGATO AND RIBATTUTO DURATION ZONE
         // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
@@ -439,6 +439,85 @@ object Player {
                     insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
                     insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff, 2)
                 }
+                5 -> {
+                    val duration3 = duration / 5
+                    val duration2 = duration3 * 2
+                    val duration1 = duration2 + duration % 5
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2, duration3, channel, pitch + 4, velOn, velOff,1)
+
+                }
+                6 -> {
+                    val duration2 = duration / 3
+                    val duration1 = duration2 + duration % 3
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2, duration2, channel, pitch + 4, velOn, velOff,2)
+                }
+                7 -> {
+                    val duration3 = duration / 7
+                    val duration2 = duration3 * 2
+                    val duration1 = duration2 + duration % 7
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 , duration2, channel, pitch + 4, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration3, channel, pitch + 6, velOn, velOff,1)
+
+                }
+                8 -> {
+                    val duration2 = duration / 4
+                    val duration1 = duration2 + duration % 4
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2, duration2, channel, pitch + 4, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration2, channel, pitch + 6, velOn, velOff,2)
+
+                }
+                9 -> {
+                    val duration3 = duration / 9
+                    val duration2 = duration3 * 2
+                    val duration1 = duration2 + duration % 9
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 , duration2, channel, pitch + 4, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration2, channel, pitch + 6, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 3, duration3, channel, pitch + 8, velOn, velOff,1)
+
+                }
+                10 -> {
+                    val duration2 = duration / 5
+                    val duration1 = duration2 + duration % 5
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2, duration2, channel, pitch + 4, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration2, channel, pitch + 6, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 3, duration2, channel, pitch + 8, velOn, velOff,2)
+
+                }
+                11 -> {
+                    val duration3 = duration / 11
+                    val duration2 = duration3 * 2
+                    val duration1 = duration2 + duration % 11
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 , duration2, channel, pitch + 4, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration2, channel, pitch + 6, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 3, duration2, channel, pitch + 8, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 4, duration3, channel, pitch + 10, velOn, velOff,1)
+
+                }
+                12 -> {
+                    val duration2 = duration / 6
+                    val duration1 = duration2 + duration % 6
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2, duration2, channel, pitch + 4, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration2, channel, pitch + 6, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 3, duration2, channel, pitch + 8, velOn, velOff,2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 4, duration2, channel, pitch + 10, velOn, velOff,2)
+
+                }
                 -1 -> {
                     val durationQuarter = duration / 4
                     val pitchBendOn1= PitchBend(start + durationQuarter, channel,0,0)
@@ -512,6 +591,84 @@ object Player {
                     val duration1 = duration2 + duration % 2
                     insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
                     insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch - 2, velOn, velOff, -2)
+                }
+                -5 -> {
+                    val duration3 = duration / 5
+                    val duration2 = duration3 * 2
+                    val duration1 = duration2 + duration % 5
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch - 2, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2, duration3, channel, pitch - 4, velOn, velOff,-1)
+
+                }
+                -6 -> {
+                    val duration2 = duration / 3
+                    val duration1 = duration2 + duration % 3
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch - 2, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2, duration2, channel, pitch - 4, velOn, velOff,-2)
+                }
+                -7 -> {
+                    val duration3 = duration / 7
+                    val duration2 = duration3 * 2
+                    val duration1 = duration2 + duration % 7
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch -2, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 , duration2, channel, pitch - 4, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration3, channel, pitch - 6, velOn, velOff,-1)
+
+                }
+                -8 -> {
+                    val duration2 = duration / 4
+                    val duration1 = duration2 + duration % 4
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch - 2, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2, duration2, channel, pitch - 4, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 *2, duration2, channel, pitch - 6, velOn, velOff,-2)
+                }
+                -9 -> {
+                    val duration3 = duration / 9
+                    val duration2 = duration3 * 2
+                    val duration1 = duration2 + duration % 9
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch - 2, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 , duration2, channel, pitch - 4, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration2, channel, pitch - 6, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 3, duration3, channel, pitch - 8, velOn, velOff,-1)
+
+                }
+                -10 -> {
+                    val duration2 = duration / 5
+                    val duration1 = duration2 + duration % 5
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch - 2, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2, duration2, channel, pitch - 4, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration2, channel, pitch - 6, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 3, duration2, channel, pitch - 8, velOn, velOff,-2)
+
+                }
+                -11 -> {
+                    val duration3 = duration / 11
+                    val duration2 = duration3 * 2
+                    val duration1 = duration2 + duration % 11
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch - 2, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 , duration2, channel, pitch - 4, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration2, channel, pitch - 6, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 3, duration2, channel, pitch - 8, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 4, duration3, channel, pitch - 10, velOn, velOff,-1)
+
+                }
+                -12 -> {
+                    val duration2 = duration / 6
+                    val duration1 = duration2 + duration % 6
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch - 2, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2, duration2, channel, pitch - 4, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 2, duration2, channel, pitch - 6, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 3, duration2, channel, pitch - 8, velOn, velOff,-2)
+                    insertNoteWithGlissando(mt, start + duration1 + duration2 * 4, duration2, channel, pitch - 10, velOn, velOff,-2)
+
                 }
             }
             // 5 - 37
