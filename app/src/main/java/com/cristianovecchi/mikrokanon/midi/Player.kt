@@ -128,6 +128,7 @@ object Player {
         if (counterpointTrackData.isEmpty()) return "No Tracks in Counterpoint!!!"
 
         val totalLength = counterpointTrackData.maxOf{ it.ticks.last() + it.durations.last()}.toLong()//.also{println("Total length: $it")} // Empty tracks have 0 length
+
         //LEGATO AND RIBATTUTO DURATION ZONE
         // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
         println("legatoTypes: $legatoTypes")
@@ -138,13 +139,14 @@ object Player {
             val legatoAlterations = legatoAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
             val legatoDeltas = legatoAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
             counterpointTrackData.forEach {
-                it.durations = alterateArticulation(it.ticks, it.durations, legatoAlterations, legatoDeltas) }
+                it.articulationDurations = alterateArticulation(it.ticks, it.durations, legatoAlterations, legatoDeltas) }
         }
 
 
         // TRANSFORM DATATRACKS IN MIDITRACKS
         val counterpointTracks = counterpointTrackData.map{ convertToMidiTrack(it, counterpointTrackData.size) }
 
+        //val counterpointTracks = listOf(pitchBenderTest(MidiTrack()))
        //val totalLength = counterpointTracks.maxOf{ it.lengthInTicks}//.also{println("Total length: $it")} // Empty tracks have 0 length
         val tempoTrack = MidiTrack()
         // from TimeSignature.class
@@ -288,217 +290,229 @@ object Player {
             }
             return mediaPlayer2
         }
+    private fun pitchBenderTest(mt: MidiTrack): MidiTrack{
+        val pitches2m = listOf(61,60,59,61,60,59)
+        val noBend = 8192
+        val ht = 4096
+        val halfToneUp = noBend + ht
+        val halfToneDown = noBend - ht
+        val toneUp = noBend + ht * 2 -1
+        val toneDown = noBend + ht * 2
+        val durs = listOf(480,480,480,480,480,480)
+        val glissAmounts = listOf(noBend, noBend, noBend, toneDown, toneDown, noBend )
+       // var lastGliss = false
+        val pitches = pitches2m
+        var tick = 0L
+        (0 until 3).forEach{
+            val on = NoteOn(tick, 0, pitches[it], 100)
+            val off = NoteOff(tick + durs[it]-1, 0, pitches[it], 80)
+            mt.insertEvent(on)
+            mt.insertEvent(off)
+            tick += durs[it]
+        }
+        (3 until 6).forEach{
+            val pitchBendOff= PitchBend(tick , 0,0,0)
+            pitchBendOff.bendAmount = noBend
+            mt.insertEvent(pitchBendOff)
+
+            if(it != 5){
+                //7168 6144 5120 4096
+                val pitchBendOn1 = PitchBend(tick+120, 0,0,0)
+                pitchBendOn1.bendAmount = 7168
+                val pitchBendOn2 = PitchBend(tick+240, 0,0,0)
+                pitchBendOn2.bendAmount = 6144
+                val pitchBendOn3 = PitchBend(tick+360, 0,0,0)
+                pitchBendOn3.bendAmount = 5120
+                val pitchBendOn4= PitchBend(tick+480-1, 0,0,0)
+                pitchBendOn4.bendAmount = 4096
+                mt.insertEvent(pitchBendOn1)
+                mt.insertEvent(pitchBendOn2)
+                mt.insertEvent(pitchBendOn3)
+                mt.insertEvent(pitchBendOn4)
+            }
+
+
+            val on = NoteOn(tick, 0, pitches[it], 100)
+            val off = NoteOff(tick + durs[it]-1, 0, pitches[it], 80)
+            mt.insertEvent(on)
+            mt.insertEvent(off)
+            tick += durs[it]
+        }
+        return mt
+    }
+    private var separator = 1
+    private var lastIsGliss = false
     private fun insertNoteWithGlissando(
         mt: MidiTrack, start: Long, duration: Long, channel: Int,
         pitch: Int, velOn: Int, velOff: Int, gliss: Int
     ) {
-        if(gliss != 0) {
-            // val portamentoOn = Controller(start, channel,65,127)
-            if(gliss == 1) {
-                val durationQuarter = duration / 4
-                val pitchBendOn1= PitchBend(start + durationQuarter, channel,0,0)
-                val pitchBendOn2= PitchBend(start + durationQuarter * 2, channel,0,0)
-                val pitchBendOn3= PitchBend(start + durationQuarter * 3, channel,0,0)
-                val pitchBendOn4= PitchBend(start + duration-1, channel,0,0)
-                val pitchBendOff= PitchBend(start , channel,0,0)
-                // 0 4096 8192 12288 (14335) 16383
-                pitchBendOn1.bendAmount = 1024
-                pitchBendOn2.bendAmount = 2048
-                pitchBendOn3.bendAmount = 3072
-                pitchBendOn4.bendAmount = 4096
-                pitchBendOff.bendAmount = 0
-                val on = NoteOn(start, channel, pitch, velOn)
-                val off = NoteOff(start + duration, channel, pitch, velOff)
+        println("pitch: $pitch   gliss: $gliss   duration: $duration  lastIsGliss: $lastIsGliss")
+        val dur = duration - separator
+        if(gliss == 0) {
+            if(lastIsGliss){
+                val pitchBendOff = PitchBend(start, channel, 0, 0)
+                pitchBendOff.bendAmount = 8192
                 mt.insertEvent(pitchBendOff)
-                mt.insertEvent(on)
-                mt.insertEvent(pitchBendOn1)
-                mt.insertEvent(pitchBendOn2)
-                mt.insertEvent(pitchBendOn3)
-                mt.insertEvent(pitchBendOn4)
-                mt.insertEvent(off)
-            } else if(gliss == 2) {
-                val durationOctave = duration / 8
-                val pitchBendOn1= PitchBend(start + durationOctave, channel,0,0)
-                val pitchBendOn2= PitchBend(start + durationOctave * 2, channel,0,0)
-                val pitchBendOn3= PitchBend(start + durationOctave * 3, channel,0,0)
-                val pitchBendOn4= PitchBend(start + durationOctave *4, channel,0,0)
-                val pitchBendOn5= PitchBend(start + durationOctave * 5, channel,0,0)
-                val pitchBendOn6= PitchBend(start + durationOctave * 6, channel,0,0)
-                val pitchBendOn7= PitchBend(start + durationOctave * 7, channel,0,0)
-                val pitchBendOn8= PitchBend(start + duration - 1, channel,0,0)
-                val pitchBendOff= PitchBend(start , channel,0,0)
-                // 0 1024 2048 3072 4096(ht) 5120 6144 7168 8192 9216 10240 11264 12288 13312 14335
-                pitchBendOn1.bendAmount = 1024
-                pitchBendOn2.bendAmount = 2048
-                pitchBendOn3.bendAmount = 3072
-                pitchBendOn4.bendAmount = 4096
-                pitchBendOn5.bendAmount = 5120
-                pitchBendOn6.bendAmount = 6144
-                pitchBendOn7.bendAmount = 7168
-                pitchBendOn8.bendAmount = 8192
-                pitchBendOff.bendAmount = 0
-                val on = NoteOn(start, channel, pitch, velOn)
-                val off = NoteOff(start + duration, channel, pitch, velOff)
-                mt.insertEvent(pitchBendOff)
-                mt.insertEvent(on)
-                mt.insertEvent(pitchBendOn1)
-                mt.insertEvent(pitchBendOn2)
-                mt.insertEvent(pitchBendOn3)
-                mt.insertEvent(pitchBendOn4)
-                mt.insertEvent(pitchBendOn5)
-                mt.insertEvent(pitchBendOn6)
-                mt.insertEvent(pitchBendOn7)
-                mt.insertEvent(off)
-            } else if(gliss == 3) {
-                val duration12 = duration / 12
-                val pitchBendOn1= PitchBend(start + duration12, channel,0,0)
-                val pitchBendOn2= PitchBend(start + duration12 * 2, channel,0,0)
-                val pitchBendOn3= PitchBend(start + duration12 * 3, channel,0,0)
-                val pitchBendOn4= PitchBend(start + duration12 *4, channel,0,0)
-                val pitchBendOn5= PitchBend(start + duration12 * 5, channel,0,0)
-                val pitchBendOn6= PitchBend(start + duration12 * 6, channel,0,0)
-                val pitchBendOn7= PitchBend(start + duration12 * 7, channel,0,0)
-                val pitchBendOn8= PitchBend(start + duration12 * 8, channel,0,0)
-                val pitchBendOn9= PitchBend(start + duration12 * 9, channel,0,0)
-                val pitchBendOn10= PitchBend(start + duration12 * 10, channel,0,0)
-                val pitchBendOn11= PitchBend(start + duration12 * 11, channel,0,0)
-                val pitchBendOn12= PitchBend(start + duration - 1, channel,0,0)
-                val pitchBendOff= PitchBend(start , channel,0,0)
-                // 0 1024 2048 3072 4096(ht) 5120 6144 7168 8192 9216 10240 11264 12288 13312 14335
-                pitchBendOn1.bendAmount = 1024
-                pitchBendOn2.bendAmount = 2048
-                pitchBendOn3.bendAmount = 3072
-                pitchBendOn4.bendAmount = 4096
-                pitchBendOn5.bendAmount = 5120
-                pitchBendOn6.bendAmount = 6144
-                pitchBendOn7.bendAmount = 7168
-                pitchBendOn8.bendAmount = 8192
-                pitchBendOn9.bendAmount = 9216
-                pitchBendOn10.bendAmount = 10240
-                pitchBendOn11.bendAmount = 11264
-                pitchBendOn12.bendAmount = 12288
-                pitchBendOff.bendAmount = 0
-                val on = NoteOn(start, channel, pitch, velOn)
-                val off = NoteOff(start + duration, channel, pitch, velOff)
-                mt.insertEvent(pitchBendOff)
-                mt.insertEvent(on)
-                mt.insertEvent(pitchBendOn1)
-                mt.insertEvent(pitchBendOn2)
-                mt.insertEvent(pitchBendOn3)
-                mt.insertEvent(pitchBendOn4)
-                mt.insertEvent(pitchBendOn5)
-                mt.insertEvent(pitchBendOn6)
-                mt.insertEvent(pitchBendOn7)
-                mt.insertEvent(pitchBendOn8)
-                mt.insertEvent(pitchBendOn9)
-                mt.insertEvent(pitchBendOn10)
-                mt.insertEvent(pitchBendOn11)
-                mt.insertEvent(pitchBendOn12)
-                mt.insertEvent(off)
+                lastIsGliss = false
             }
+            val on = NoteOn(start, channel, pitch, velOn)
+            val off = NoteOff(start + dur, channel, pitch, velOff)
+            mt.insertEvent(on)
+            mt.insertEvent(off)
+        } else{
+            lastIsGliss = true
+            when (gliss) {
+                1 -> {
 
-            else if (gliss == -1){
-                val durationQuarter = duration / 4
-                val pitchBendOn1= PitchBend(start , channel,0,0)
-                val pitchBendOn2= PitchBend(start + durationQuarter , channel,0,0)
-                val pitchBendOn3= PitchBend(start + durationQuarter * 2, channel,0,0)
-                val pitchBendOn4= PitchBend(start + durationQuarter * 3, channel,0,0)
-                val pitchBendOff= PitchBend(start+ duration -1 , channel,0,0)
-                // 0 4096 8192 12288 (14335) 16383
-                pitchBendOn4.bendAmount = 1024
-                pitchBendOn3.bendAmount = 2048
-                pitchBendOn2.bendAmount = 3072
-                pitchBendOn1.bendAmount = 4096
-                pitchBendOff.bendAmount = 0
-                val on = NoteOn(start, channel, pitch-1, velOn)
-                val off = NoteOff(start + duration, channel, pitch-1, velOff)
+                    val durationQuarter = duration / 4
+                    val pitchBendOn1= PitchBend(start + durationQuarter, channel,0,0)
+                    val pitchBendOn2= PitchBend(start + durationQuarter * 2, channel,0,0)
+                    val pitchBendOn3= PitchBend(start + durationQuarter * 3, channel,0,0)
+                    val pitchBendOn4= PitchBend(start + dur, channel,0,0)
+                    val pitchBendOff= PitchBend(start , channel,0,0)
+                    // 0 4096 8192 12288 (14335) 16383
+                    // [4096] 5120 6144 7168 8192(+ht)
+                    //val c = 4096
+                    pitchBendOn1.bendAmount = 9216
+                    pitchBendOn2.bendAmount = 10240
+                    pitchBendOn3.bendAmount = 11264
+                    pitchBendOn4.bendAmount = 12288
+                    pitchBendOff.bendAmount = 8192//0 +c
+                    val on = NoteOn(start, channel, pitch, velOn)
+                    val off = NoteOff(start + dur, channel, pitch, velOff)
+                    mt.insertEvent(pitchBendOff)
+                    mt.insertEvent(on)
+                    mt.insertEvent(pitchBendOn1)
+                    mt.insertEvent(pitchBendOn2)
+                    mt.insertEvent(pitchBendOn3)
+                    mt.insertEvent(pitchBendOn4)
+                    mt.insertEvent(off)
+                }
+                2 -> {
+                    val durationOctave = duration / 8
+                    val pitchBendOn1= PitchBend(start + durationOctave, channel,0,0)
+                    val pitchBendOn2= PitchBend(start + durationOctave * 2, channel,0,0)
+                    val pitchBendOn3= PitchBend(start + durationOctave * 3, channel,0,0)
+                    val pitchBendOn4= PitchBend(start + durationOctave * 4, channel,0,0)
+                    val pitchBendOn5= PitchBend(start + durationOctave * 5, channel,0,0)
+                    val pitchBendOn6= PitchBend(start + durationOctave * 6, channel,0,0)
+                    val pitchBendOn7= PitchBend(start + durationOctave * 7, channel,0,0)
+                    val pitchBendOn8= PitchBend(start + dur, channel,0,0)
+                    val pitchBendOff= PitchBend(start , channel,0,0)
+                    val pitchBendOff2= PitchBend(start + dur , channel,0,0)
+                    // 0 1024 2048 3072 4096(ht) 5120 6144 7168 8192 9216 10240 11264 12288 13312 14336 15360 16384
+                    pitchBendOn1.bendAmount = 9216
+                    pitchBendOn2.bendAmount = 10240
+                    pitchBendOn3.bendAmount = 11264
+                    pitchBendOn4.bendAmount = 12288
+                    pitchBendOn5.bendAmount = 13312
+                    pitchBendOn6.bendAmount = 14336
+                    pitchBendOn7.bendAmount = 15360
+                    pitchBendOn8.bendAmount = 16384
+                    pitchBendOff.bendAmount = 8192
+                    val on = NoteOn(start, channel, pitch, velOn)
+                    val off = NoteOff(start + dur, channel, pitch, velOff)
+                    mt.insertEvent(pitchBendOff)
+                    mt.insertEvent(on)
+                    mt.insertEvent(pitchBendOn1)
+                    mt.insertEvent(pitchBendOn2)
+                    mt.insertEvent(pitchBendOn3)
+                    mt.insertEvent(pitchBendOn4)
+                    mt.insertEvent(pitchBendOn5)
+                    mt.insertEvent(pitchBendOn6)
+                    mt.insertEvent(pitchBendOn7)
+                    mt.insertEvent(pitchBendOn8)
+                    mt.insertEvent(off)
 
-                mt.insertEvent(pitchBendOn1)
-                mt.insertEvent(on)
-                mt.insertEvent(pitchBendOn2)
-                mt.insertEvent(pitchBendOn3)
-                mt.insertEvent(pitchBendOn4)
-                mt.insertEvent(pitchBendOff)
-                mt.insertEvent(off)
-            }else if(gliss == -2) {
-                val durationOctave = duration / 8
-                val pitchBendOn1= PitchBend(start , channel,0,0)
-                val pitchBendOn2= PitchBend(start + durationOctave , channel,0,0)
-                val pitchBendOn3= PitchBend(start + durationOctave * 2, channel,0,0)
-                val pitchBendOn4= PitchBend(start + durationOctave * 3, channel,0,0)
-                val pitchBendOn5= PitchBend(start + durationOctave * 4, channel,0,0)
-                val pitchBendOn6= PitchBend(start + durationOctave * 5, channel,0,0)
-                val pitchBendOn7= PitchBend(start + durationOctave * 6, channel,0,0)
-                val pitchBendOn8= PitchBend(start + durationOctave * 7, channel,0,0)
-                val pitchBendOff= PitchBend(start + duration -1 , channel,0,0)
-                // 0 1024 2048 3072 4096(ht) 5120 6144 7168 8192 9216 10240 11264 12288 13312 14335
-                pitchBendOn8.bendAmount = 1024
-                pitchBendOn7.bendAmount = 2048
-                pitchBendOn6.bendAmount = 3072
-                pitchBendOn5.bendAmount = 4096
-                pitchBendOn4.bendAmount = 5120
-                pitchBendOn3.bendAmount = 6144
-                pitchBendOn2.bendAmount = 7168
-                pitchBendOn1.bendAmount = 8192
-                pitchBendOff.bendAmount = 0
-                val on = NoteOn(start, channel, pitch-2, velOn)
-                val off = NoteOff(start + duration, channel, pitch-2, velOff)
 
+                }
+                3 -> {
+                    val duration2 = duration / 3
+                    val duration1 = duration2 * 2 + duration % 3
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff,1)
 
-                mt.insertEvent(pitchBendOn1)
-                mt.insertEvent(on)
-                mt.insertEvent(pitchBendOn2)
-                mt.insertEvent(pitchBendOn3)
-                mt.insertEvent(pitchBendOn4)
-                mt.insertEvent(pitchBendOn5)
-                mt.insertEvent(pitchBendOn6)
-                mt.insertEvent(pitchBendOn7)
-                mt.insertEvent(pitchBendOn8)
-                mt.insertEvent(pitchBendOff)
-                mt.insertEvent(off)
-            } else if(gliss == -3) {
-                val duration12 = duration / 12
-                val pitchBendOn1 = PitchBend(start, channel, 0, 0)
-                val pitchBendOn2 = PitchBend(start + duration12, channel, 0, 0)
-                val pitchBendOn3 = PitchBend(start + duration12 * 2, channel, 0, 0)
-                val pitchBendOn4 = PitchBend(start + duration12 * 3, channel, 0, 0)
-                val pitchBendOn5 = PitchBend(start + duration12 * 4, channel, 0, 0)
-                val pitchBendOn6 = PitchBend(start + duration12 * 5, channel, 0, 0)
-                val pitchBendOn7 = PitchBend(start + duration12 * 6, channel, 0, 0)
-                val pitchBendOn8 = PitchBend(start + duration12 * 7, channel, 0, 0)
-                val pitchBendOn9 = PitchBend(start + duration12 * 8, channel, 0, 0)
-                val pitchBendOn10 = PitchBend(start + duration12 * 9, channel, 0, 0)
-                val pitchBendOn11 = PitchBend(start + duration12 * 10, channel, 0, 0)
-                val pitchBendOn12 = PitchBend(start + duration12 * 11, channel, 0, 0)
-                val pitchBendOff = PitchBend(start + duration - 1, channel, 0, 0)
-                // 0 1024 2048 3072 4096(ht) 5120 6144 7168 8192 9216 10240 11264 12288 13312 14335
-                pitchBendOn12.bendAmount = 1024
-                pitchBendOn11.bendAmount = 2048
-                pitchBendOn10.bendAmount = 3072
-                pitchBendOn9.bendAmount = 4096
-                pitchBendOn8.bendAmount = 5120
-                pitchBendOn7.bendAmount = 6144
-                pitchBendOn6.bendAmount = 7168
-                pitchBendOn5.bendAmount = 8192
-                pitchBendOn4.bendAmount = 9216
-                pitchBendOn3.bendAmount = 10240
-                pitchBendOn2.bendAmount = 11264
-                pitchBendOn1.bendAmount = 12288
-                pitchBendOff.bendAmount = 0
-                val on = NoteOn(start, channel, pitch-3, velOn)
-                val off = NoteOff(start + duration, channel, pitch-3, velOff)
+                }
+                4 -> {
+                    val duration2 = duration / 2
+                    val duration1 = duration2 + duration % 2
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, 2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch + 2, velOn, velOff, 2)
+                }
+                -1 -> {
+                    val durationQuarter = duration / 4
+                    val pitchBendOn1= PitchBend(start + durationQuarter, channel,0,0)
+                    val pitchBendOn2= PitchBend(start + durationQuarter * 2, channel,0,0)
+                    val pitchBendOn3= PitchBend(start + durationQuarter * 3, channel,0,0)
+                    val pitchBendOn4= PitchBend(start + dur, channel,0,0)
+                    val pitchBendOff= PitchBend(start , channel,0,0)
+                    // 0 4096 8192 12288 (14335) 16383
+                    // 0(-ht) 1024 2048 3072 [4096]off 5120 6144 7168 8162(+ht)
+                    //val c = 4096
+                    // 3584 3072 2560 2048 1536 1024 512 0
+                    //7168 6144 5120 4096
+                    pitchBendOn1.bendAmount = 7168
+                    pitchBendOn2.bendAmount = 6144
+                    pitchBendOn3.bendAmount = 5120
+                    pitchBendOn4.bendAmount = 4096
+                    pitchBendOff.bendAmount = 8192//0 +c
+                    val on = NoteOn(start, channel, pitch, velOn)
+                    val off = NoteOff(start + dur, channel, pitch, velOff)
+                    mt.insertEvent(pitchBendOff)
+                    mt.insertEvent(on)
+                    mt.insertEvent(pitchBendOn1)
+                    mt.insertEvent(pitchBendOn2)
+                    mt.insertEvent(pitchBendOn3)
+                    mt.insertEvent(pitchBendOn4)
+                    mt.insertEvent(off)
+                }
+                -2 -> {
+                    val durationOctave = duration / 8
+                    val pitchBendOn1= PitchBend(start + durationOctave, channel,0,0)
+                    val pitchBendOn2= PitchBend(start + durationOctave * 2, channel,0,0)
+                    val pitchBendOn3= PitchBend(start + durationOctave * 3, channel,0,0)
+                    val pitchBendOn4= PitchBend(start + durationOctave *4, channel,0,0)
+                    val pitchBendOn5= PitchBend(start + durationOctave * 5, channel,0,0)
+                    val pitchBendOn6= PitchBend(start + durationOctave * 6, channel,0,0)
+                    val pitchBendOn7= PitchBend(start + durationOctave * 7, channel,0,0)
+                    val pitchBendOn8= PitchBend(start + dur, channel,0,0)
+                    val pitchBendOff= PitchBend(start , channel,0,0)
+                    // 0 1024 2048 3072 4096(ht) 5120 6144 7168 8192 9216 10240 11264 12288 13312 14336 15360 16384
+                    pitchBendOn1.bendAmount = 7168
+                    pitchBendOn2.bendAmount = 6144
+                    pitchBendOn3.bendAmount = 5120
+                    pitchBendOn4.bendAmount = 4096
+                    pitchBendOn5.bendAmount = 3072
+                    pitchBendOn6.bendAmount = 2048
+                    pitchBendOn7.bendAmount = 1024
+                    pitchBendOn8.bendAmount = 0
+                    pitchBendOff.bendAmount = 8192
+                    val on = NoteOn(start, channel, pitch, velOn)
+                    val off = NoteOff(start + dur, channel, pitch, velOff)
+                    mt.insertEvent(pitchBendOff)
+                    mt.insertEvent(on)
+                    mt.insertEvent(pitchBendOn1)
+                    mt.insertEvent(pitchBendOn2)
+                    mt.insertEvent(pitchBendOn3)
+                    mt.insertEvent(pitchBendOn4)
+                    mt.insertEvent(pitchBendOn5)
+                    mt.insertEvent(pitchBendOn6)
+                    mt.insertEvent(pitchBendOn7)
+                    mt.insertEvent(off)
+                }
+                -3 -> {
+                    val duration2 = duration / 3
+                    val duration1 = duration2 * 2 + duration % 3
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch - 2, velOn, velOff,-1)
 
-                mt.insertEvent(pitchBendOn1)
-                mt.insertEvent(on)
-                mt.insertEvent(pitchBendOn2)
-                mt.insertEvent(pitchBendOn3)
-                mt.insertEvent(pitchBendOn4)
-                mt.insertEvent(pitchBendOn5)
-                mt.insertEvent(pitchBendOn6)
-                mt.insertEvent(pitchBendOn7)
-                mt.insertEvent(pitchBendOn8)
-                mt.insertEvent(pitchBendOff)
-                mt.insertEvent(off)
+                }
+                -4 -> {
+                    val duration2 = duration / 2
+                    val duration1 = duration2 + duration % 2
+                    insertNoteWithGlissando(mt, start, duration1, channel, pitch, velOn, velOff, -2)
+                    insertNoteWithGlissando(mt, start + duration1, duration2, channel, pitch - 2, velOn, velOff, -2)
+                }
             }
             // 5 - 37
 //            val portamentoTimeCoarse = Controller(start, channel, 5, 100)
@@ -518,11 +532,6 @@ object Player {
 
 
             //println("GLISSANDO: $pitch at $start")
-        } else {
-            val on = NoteOn(start, channel, pitch, velOn)
-            val off = NoteOff(start + duration, channel, pitch, velOff)
-            mt.insertEvent(on)
-            mt.insertEvent(off)
         }
     }
     fun insertNoteCheckingHigh(
@@ -570,12 +579,14 @@ object Player {
             }
         }
     }
+
     fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
         val track = MidiTrack()
         val channel = trackData.channel
         val vibrato = trackData.vibrato
         val velocityOff = trackData.velocityOff
         val (pitches, ticks, durations, velocities, glissando) = trackData
+        val articulationDurations = trackData.articulationDurations ?: durations
 
         // STEREO AND INSTRUMENTS
         val pc: MidiEvent =
@@ -587,16 +598,22 @@ object Player {
             val pan = Controller(0, channel, 10, pans[trackData.partIndex])
             track.insertEvent(pan)
         }
+        var isLastNoteOverLegato = false
         if (trackData.doublingFlags == 0) {
             for (i in pitches.indices) {
                 val tick = ticks[i].toLong()
-                val dur = durations[i].toLong()
+                val gliss = glissando[i]
+                val duration = durations[i]
+                val articulationDuration = articulationDurations[i]
+                val dur = if(articulationDuration > duration && (glissando[(i+1) % glissando.size] >0 || gliss >0)  )
+                    duration.toLong() else articulationDuration.toLong()
+
                 if (trackData.vibrato != 0) {
                     addVibratoToTrack(track, tick, dur, channel, vibrato)
                 }
                 insertNoteWithGlissando(
                     track, tick, dur, channel, pitches[i],
-                    velocities[i], velocityOff, glissando[i]
+                    velocities[i], velocityOff, gliss
                 )
             }
 
@@ -604,20 +621,25 @@ object Player {
             val doubling = convertFlagsToInts(trackData.doublingFlags)
             for (i in pitches.indices) {
                 val tick = ticks[i].toLong()
-                val dur = durations[i].toLong()
+                val gliss = glissando[i]
+                val duration = durations[i]
+                val articulationDuration = articulationDurations[i]
+                val dur = if(articulationDuration > duration && (glissando[(i+1) % glissando.size] >0 || gliss >0)  )
+                    duration.toLong() else articulationDuration.toLong()
                 val pitch = pitches[i]
                 val velocity = velocities[i]
+
                 if (trackData.vibrato != 0) {
                     addVibratoToTrack(track, tick, dur, channel, vibrato)
                 }
                 insertNoteWithGlissando(
                     track, tick, dur, channel, pitches[i],
-                    velocities[i], velocityOff, glissando[i]
+                    velocities[i], velocityOff, gliss
                 )
                 doubling.forEach {
                     insertNoteWithGlissando(
                         track, tick, dur, channel, pitch + it,
-                        velocity, velocityOff, glissando[i]
+                        velocity, velocityOff, gliss
                     )
                 }
             }

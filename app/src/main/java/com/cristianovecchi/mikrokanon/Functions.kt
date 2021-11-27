@@ -52,7 +52,7 @@ fun tritoneSubstitutionOnIntervalSet(intervalSet: List<Int>): List<Int> {
 
 
 fun convertGlissandoFlags(glissandoFlags: Int): List<Int>{
-    val intervals = listOf( 1, -1, 2, -2, 3, -3)
+    val intervals = listOf( 1, -1, 2, -2, 3, -3, 4,-4, 5,-5,6,-6,7,-7,8,-8,9,-9,10,-10,11,-11,12,-12)
     return convertFlagsToInts(glissandoFlags).map { intervals[it-1] }
 }
 fun convertIntsToFlags(ints: Set<Int>): Int{
