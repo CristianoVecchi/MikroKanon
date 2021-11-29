@@ -489,8 +489,8 @@ data class Counterpoint(val parts: List<AbsPart>,
         fun empty(): Counterpoint{
             return Counterpoint(emptyList(), emptyList(), 1.0f)
         }
-        fun empty(nParts: Int): Counterpoint{
-            return Counterpoint((0 until nParts).map { AbsPart.emptyPart() }, emptyList(), 1.0f)
+        fun empty(nParts: Int, nRests: Int = 0): Counterpoint{
+            return Counterpoint((0 until nParts).map { AbsPart.emptyPart(nRests) }, emptyList(), 1.0f)
         }
         fun flourish(counterpoint: Counterpoint, intervalSet: List<Int>, horIntervalSet: List<Int>): Counterpoint{
             val actualDirections = TREND.ASCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}
@@ -610,7 +610,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             val verticalList = listOf(0,1,2,3,4,5,6,7,8,9,10,11)
             val directions: Array<Int> = Insieme.extractDirectionsFromIntervalSet(verticalList.toTypedArray(), trend.toTypedArray())
             var index = 0
-            counterpoint.display()
+            //counterpoint.display()
             val maxSize: Int = counterpoint.maxSize()
             var lastAbsPitch = startAbsPitch
             while(index < maxSize){

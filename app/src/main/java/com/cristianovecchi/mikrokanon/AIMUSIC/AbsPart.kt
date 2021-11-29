@@ -13,9 +13,8 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
             return AbsPart(clipList.map { it.abstractNote }.toMutableList())
         }
 
-        fun emptyPart(nNotes: Int = 0): AbsPart {
-            val emptyPart = MutableList(nNotes){ -1 }
-            return AbsPart(emptyPart)
+        fun emptyPart(nRests: Int = 0): AbsPart {
+            return AbsPart( MutableList(nRests){ -1 } )
         }
 
         fun fill(pitch: Int, size: Int): AbsPart {

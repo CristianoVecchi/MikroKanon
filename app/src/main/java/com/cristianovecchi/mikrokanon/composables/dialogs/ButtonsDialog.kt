@@ -88,15 +88,13 @@ fun ButtonsDialog(
                                         onMK5reductedClick = buttonsDialogData.value.onMK5reducted
                                     )
                                 }
-                                5 -> if(!workingOnSequences){
-                                    SavingButtons(
-                                        model = buttonsDialogData.value.model,
-                                        buttonSize = buttonsDialogData.value.buttonSize,
-                                        fontSize = buttonsDialogData.value.fontSize,
-                                        colors = model.appColors,
-                                        onSavingCounterpoint = buttonsDialogData.value.onSavingCounterpoint
-                                    )
-                                }
+                                5 -> SavingButtons(
+                                    model = buttonsDialogData.value.model,
+                                    buttonSize = buttonsDialogData.value.buttonSize,
+                                    fontSize = buttonsDialogData.value.fontSize,
+                                    colors = model.appColors,
+                                    onSavingCounterpoint = buttonsDialogData.value.onSavingCounterpoint)
+
                             }
 
                         }

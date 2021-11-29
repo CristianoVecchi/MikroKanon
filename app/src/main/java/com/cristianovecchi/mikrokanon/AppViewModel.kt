@@ -34,6 +34,7 @@ sealed class Computation(open val icon: String = "") {
     data class MikroKanonOnly(val counterpoint: Counterpoint, val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int, override val icon: String = "mikrokanon"): Computation()
     data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int, val repeat: Boolean, override val icon: String = "counterpoint"): Computation()
     data class FirstFromWave(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val nWaves: Int, override val icon: String = "waves"): Computation()
+    data class FirstFromLoading(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val position: Int, override val icon: String = "save"): Computation()
     data class Pedal(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, val intervalSet: List<Int>, val nPedals: Int, override val icon: String = "pedal"): Computation()
     data class FurtherFromKP(val counterpoint: Counterpoint, val indexSequenceToAdd: Int, val repeat: Boolean, override val icon: String = "counterpoint"): Computation()
     data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int, override val icon: String = "waves"): Computation()
@@ -192,7 +193,7 @@ class AppViewModel(
     private val mk4deepSearchCache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk5reductedCache = HashMap<CacheKey, List<Counterpoint>>()
 
-    val savedCounterpoints: Array<Counterpoint?> = arrayOf(null, null, null, null, null, null)
+    val savedCounterpoints: Array<Counterpoint?> = Array(8) { null }
 
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -533,6 +534,13 @@ init{
         changeSequenceToAdd(sequences.value!![index])
         addSequenceToCounterpoint(repeat)
     }
+    val onLoadingCounterpointFromSelector = { position: Int ->
+        val retrievedCounterpoint = savedCounterpoints[position]?.clone() ?: Counterpoint.empty(1,1)
+        computationStack.pushAndDispatch(Computation.FirstFromLoading(listOf(retrievedCounterpoint),
+            ArrayList(firstSequence.value!!), position))
+        changeSelectedCounterpoint(retrievedCounterpoint)
+        changeCounterpoints(listOf(retrievedCounterpoint),true)
+    }
     val onWaveFromFirstSelection = { nWaves: Int, list: ArrayList<Clip> ->
         changeFirstSequence(list)
         computationStack.pushAndDispatch(Computation.FirstFromWave(listOf(selectedCounterpoint.value!!.clone()),
@@ -658,6 +666,7 @@ init{
                     else null
                 if (stepBack ) computationStack.popAndDispatch()
                 val previousComputation = when(computationStack.lastElement()){
+                    is Computation.FirstFromLoading -> computationStack.lastElement()
                     is Computation.Fioritura -> computationStack.lastElement()
                     is Computation.Expand -> computationStack.lastElement()
                     is Computation.Round -> computationStack.lastElement()
@@ -673,6 +682,10 @@ init{
                 }
                 previousIntervalSet?.let { changeIntervalSet(previousIntervalSet)}
                 when (previousComputation) {
+                    is Computation.FirstFromLoading -> {
+                        changeSelectedCounterpoint(previousComputation.counterpoints[0])
+                        changeCounterpoints(previousComputation.counterpoints, true)
+                    }
                     is Computation.FirstFromFreePart -> onFreePartFromFirstSelection(
                         previousComputation.firstSequence, previousComputation.trend
                     )

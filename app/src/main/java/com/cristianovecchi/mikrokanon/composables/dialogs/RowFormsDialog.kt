@@ -202,7 +202,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                             }
                         }
                         Spacer(modifier = Modifier.height(6.dp))
-                        val buttonSize = model.dimensions.inputButtonSize - 14.dp
+                        val buttonSize = model.dimensions.inputButtonSize - 18.dp
                         val fontSize = 14
                         Row(
                             Modifier.fillMaxWidth(),
@@ -249,6 +249,19 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                             }
                             CustomButton(
                                 adaptSizeToIconButton = true,
+                                text = "4",
+                                fontSize = fontSize,
+                                buttonSize = buttonSize,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val pairs = formsText.extractIntPairsFromCsv().toMutableList()
+                                val (counterpoint, form) = pairs[cursor]
+                                pairs[cursor] = Pair( if(counterpoint == 5) 1 else 5,form)
+                                formsText = pairs.toIntPairsString()
+                            }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["tritone_substitution"]!!,
                                 fontSize = fontSize,
@@ -266,19 +279,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            CustomButton(
-                                adaptSizeToIconButton = true,
-                                text = "4",
-                                fontSize = fontSize,
-                                buttonSize = buttonSize,
-                                iconColor = model.appColors.iconButtonIconColor,
-                                colors = model.appColors
-                            ) {
-                                val pairs = formsText.extractIntPairsFromCsv().toMutableList()
-                                val (counterpoint, form) = pairs[cursor]
-                                pairs[cursor] = Pair( if(counterpoint == 5) 1 else 5,form)
-                                formsText = pairs.toIntPairsString()
-                            }
+
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "5",
@@ -303,6 +304,32 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, f
                                 val pairs = formsText.extractIntPairsFromCsv().toMutableList()
                                 val (counterpoint, form) = pairs[cursor]
                                 pairs[cursor] = Pair( if(counterpoint == 7) 1 else 7,form)
+                                formsText = pairs.toIntPairsString()
+                            }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "7",
+                                fontSize = fontSize,
+                                buttonSize = buttonSize,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val pairs = formsText.extractIntPairsFromCsv().toMutableList()
+                                val (counterpoint, form) = pairs[cursor]
+                                pairs[cursor] = Pair( if(counterpoint == 8) 1 else 8,form)
+                                formsText = pairs.toIntPairsString()
+                            }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "8",
+                                fontSize = fontSize,
+                                buttonSize = buttonSize,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val pairs = formsText.extractIntPairsFromCsv().toMutableList()
+                                val (counterpoint, form) = pairs[cursor]
+                                pairs[cursor] = Pair( if(counterpoint == 9) 1 else 9,form)
                                 formsText = pairs.toIntPairsString()
                             }
                             if (!playing) {

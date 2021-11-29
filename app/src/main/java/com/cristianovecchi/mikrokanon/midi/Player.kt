@@ -212,7 +212,8 @@ object Player {
                 alterationTick += legatoDeltas[alterationIndex].toInt()
                 alterationIndex++
             }
-            result[durIndex] = (durations[durIndex] * legatoAlterations[alterationIndex]).toInt()
+            val newDur = (durations[durIndex] * legatoAlterations[alterationIndex]).toInt()
+            result[durIndex] = if(newDur<12) 12 else newDur
             durIndex++
         }
         result.also{ it.contentToString() }
@@ -346,7 +347,7 @@ object Player {
         mt: MidiTrack, start: Long, duration: Long, channel: Int,
         pitch: Int, velOn: Int, velOff: Int, gliss: Int
     ) {
-        println("pitch: $pitch   gliss: $gliss   duration: $duration  lastIsGliss: $lastIsGliss")
+        //println("pitch: $pitch   gliss: $gliss   duration: $duration  lastIsGliss: $lastIsGliss")
         val dur = duration - separator
         if(gliss == 0) {
             if(lastIsGliss){
@@ -713,6 +714,10 @@ object Player {
         mt.insertEvent(on)
         mt.insertEvent(off)
     }
+    private fun addAttackDelayToTrack(mt: MidiTrack, start: Long, channel: Int, attackDelay: Int){
+        val attackAmount = Controller(start,channel,73, attackDelay)
+        mt.insertEvent(attackAmount)
+    }
     private fun addVibratoToTrack(mt: MidiTrack, start: Long, duration: Long, channel: Int, vibratoDivisor: Int){
         val nVibrations = (duration / vibratoDivisor).toInt() // 4 vibrations in a quarter
         if(nVibrations == 0 ) {
@@ -755,23 +760,35 @@ object Player {
             val pan = Controller(0, channel, 10, pans[trackData.partIndex])
             track.insertEvent(pan)
         }
-        var isLastNoteOverLegato = false
+
+//        var lastIsGliss = false
+//        var attackIsDelayed = false
         if (trackData.doublingFlags == 0) {
             for (i in pitches.indices) {
                 val tick = ticks[i].toLong()
                 val gliss = glissando[i]
                 val duration = durations[i]
                 val articulationDuration = articulationDurations[i]
-                val dur = if(articulationDuration > duration && (glissando[(i+1) % glissando.size] >0 || gliss >0)  )
+                val overLegato = articulationDuration > duration
+//                val attackDelay = if(lastIsGliss && (articulationDuration == duration || overLegato)) 127 else 0
+                val dur = if(overLegato && (glissando[(i+1) % glissando.size] >0 || gliss >0)  )
                     duration.toLong() else articulationDuration.toLong()
-
+                //println("note $i attack: $attackDelay")
                 if (trackData.vibrato != 0) {
                     addVibratoToTrack(track, tick, dur, channel, vibrato)
                 }
+//                if (attackDelay > 0){
+//                   addAttackDelayToTrack(track, tick, channel, attackDelay)
+//                    attackIsDelayed = true
+//                } else {
+//                    if(attackIsDelayed)  addAttackDelayToTrack(track, tick, channel, 0)
+//                    attackIsDelayed = false
+//                }
                 insertNoteWithGlissando(
                     track, tick, dur, channel, pitches[i],
                     velocities[i], velocityOff, gliss
                 )
+//                lastIsGliss = gliss > 0
             }
 
         } else {

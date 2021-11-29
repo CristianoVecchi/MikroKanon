@@ -33,6 +33,7 @@ fun SequenceSelector(model: AppViewModel,
                      onDelete: (Int) -> Unit = model::deleteSequence,
                      onAdd: (ArrayList<Clip>, Boolean) -> Unit,
                      onWave: (Int, ArrayList<Clip>) -> Unit,
+                     onLoadingCounterpoint: (Int) -> Unit,
                      onTritoneSubstitution: (Int) -> Unit,
                      onRound: (ArrayList<Clip>) -> Unit,
                      onCadenza: (ArrayList<Clip>, List<Int>) -> Unit,
@@ -163,6 +164,7 @@ fun SequenceSelector(model: AppViewModel,
                                 onPedal3 = { onPedal(3, sequences[selected]) },
                                 onPedal5 = { onPedal(5, sequences[selected]) },
                                 onMK5reducted = { onMikroKanons5reducted(sequences[selected]) },
+                                onSavingCounterpoint = { position -> onLoadingCounterpoint(position)}
                             )
                             {
 

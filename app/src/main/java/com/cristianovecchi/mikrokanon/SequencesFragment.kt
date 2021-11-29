@@ -67,6 +67,12 @@ class SequencesFragment(): Fragment() {
                                         bundle.putBoolean("editing", editing)
                                         findNavController().navigate(R.id.inputFragment, bundle)
                                     },
+                                    onLoadingCounterpoint = { position ->
+                                        model.selectedCounterpoint.value?.let{
+                                            model.onLoadingCounterpointFromSelector(position)
+                                        }
+                                        findNavController().navigate(R.id.outputFragment)
+                                    },
                                     onWave = { nWaves, list ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onWaveFromFirstSelection(nWaves, list)

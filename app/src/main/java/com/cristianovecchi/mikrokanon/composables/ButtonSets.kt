@@ -141,16 +141,22 @@ fun SavingButtons(
             CustomButton(iconId = model.iconMap["save"]!!, text = "3", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
                 onSavingCounterpoint(2)
             }
-        }
-        Row {
             CustomButton(iconId = model.iconMap["save"]!!, text = "4", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
                 onSavingCounterpoint(3)
             }
+        }
+        Row {
             CustomButton(iconId = model.iconMap["save"]!!, text = "5", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
                 onSavingCounterpoint(4)
             }
             CustomButton(iconId = model.iconMap["save"]!!, text = "6", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
                 onSavingCounterpoint(5)
+            }
+            CustomButton(iconId = model.iconMap["save"]!!, text = "7", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                onSavingCounterpoint(6)
+            }
+            CustomButton(iconId = model.iconMap["save"]!!, text = "8", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                onSavingCounterpoint(7)
             }
         }
     }
