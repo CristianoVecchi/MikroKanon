@@ -77,6 +77,9 @@ suspend fun duplicateAllInCounterpoint(counterpoint: Counterpoint ): List<Counte
 suspend fun eraseHorizontalIntervalsOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{it.eraseIntervalsOnBothNotes(horIntervalSet)}
 }
+suspend fun sortColumnsOnCounterpoints(originalCounterpoints: List<Counterpoint>, sortType: Int ): List<Counterpoint>{
+     return originalCounterpoints.map{ it.sortColumns(sortType) }
+}
 suspend fun reduceCounterpointsToSinglePart(originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{ it.reduceToSinglePart() }
 }

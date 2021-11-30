@@ -194,7 +194,7 @@ fun BoostedMikroKanonsButtons(
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
     onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
-    onScarlatti: () -> Unit,
+    onScarlatti: () -> Unit, onSort: (Int) -> Unit,
     onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit,
 ) {
     Column {
@@ -210,6 +210,14 @@ fun SpecialFunctions1Buttons(
             }
             CustomButton(iconId = model.iconMap["Scarlatti"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onScarlatti()
+            }
+        }
+        Row{
+            CustomButton(iconId = model.iconMap["sort_up"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onSort(0)
+            }
+            CustomButton(iconId = model.iconMap["sort_down"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onSort(1)
             }
         }
         Row {

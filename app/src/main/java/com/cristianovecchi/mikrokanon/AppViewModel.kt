@@ -43,6 +43,7 @@ sealed class Computation(open val icon: String = "") {
     data class Fioritura(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "fioritura"): Computation()
     data class Round(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "round"): Computation()
     data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val values: List<Int>, override val icon: String = "cadenza"): Computation()
+    data class Sort(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val sortType: Int, override val icon: String = "sort_up"): Computation()
     data class Scarlatti(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "Scarlatti"): Computation()
     data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "erase"): Computation()
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
@@ -120,6 +121,8 @@ class AppViewModel(
         "free_parts" to R.drawable.ic_baseline_queue_music_24,
         "Scarlatti" to R.drawable.ic_baseline_exposure_plus_1_24,
         "transpose" to R.drawable.ic_baseline_unfold_more_24,
+        "sort_up" to R.drawable.ic_baseline_trending_up_24,
+        "sort_down" to R.drawable.ic_baseline_trending_down_24,
     )
     val stackIcons = mutableListOf<String>()
     private fun Stack<Computation>.pushAndDispatch(computation: Computation){
@@ -442,6 +445,13 @@ init{
         computationStack.pushAndDispatch(Computation.Scarlatti(originalCounterpoints, null, index))
         duplicateAllPhrasesInCounterpoint(selectedCounterpoint.value!!.clone(), 0)
     }
+    val onSortCounterpoints = { sortType: Int ->
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        val iconString = if(sortType == 0) "sort_up" else "sort_down"
+        computationStack.pushAndDispatch(Computation.Sort(originalCounterpoints, null, index, sortType, iconString ))
+        sortAllCounterpoints(originalCounterpoints, sortType, index)
+    }
     val onEraseIntervals = {
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
@@ -673,6 +683,7 @@ init{
                     is Computation.Doppelgänger -> computationStack.lastElement()
                     is Computation.Cadenza -> computationStack.lastElement()
                     is Computation.Scarlatti -> computationStack.lastElement()
+                    is Computation.Sort -> computationStack.lastElement()
                     is Computation.EraseIntervals -> computationStack.lastElement()
                     is Computation.Single-> computationStack.lastElement()
                     is Computation.SimpleTransposition-> computationStack.lastElement()
@@ -736,6 +747,9 @@ init{
                     }
                     is Computation.Cadenza -> {
                         cadenzasOnCounterpoints( previousComputation.counterpoints,previousComputation.index, previousComputation.values)
+                    }
+                    is Computation.Sort -> {
+                        sortAllCounterpoints( previousComputation.counterpoints,previousComputation.index, previousComputation.sortType)
                     }
                     is Computation.Scarlatti -> {
                         duplicateAllPhrasesInCounterpoint( previousComputation.counterpoints[previousComputation.index],previousComputation.index)
@@ -997,12 +1011,25 @@ init{
             }
         }
     }
+
     private fun eraseIntervalsOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = eraseHorizontalIntervalsOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints)
+                }
+                changeCounterpoints(newList, false)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
+    private fun sortAllCounterpoints(originalCounterpoints: List<Counterpoint>, sortType: Int, index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = sortColumnsOnCounterpoints(originalCounterpoints, sortType)
                 }
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])

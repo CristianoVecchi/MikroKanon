@@ -121,6 +121,7 @@ data class ButtonsDialogData(
     val onCadenza: () -> Unit = {}, val onScarlatti: () -> Unit = {}, val onFlourish: () -> Unit = {},
     val onEraseIntervals: () -> Unit = {}, val onSingle: () -> Unit = {},
     val onMK5reducted: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
+    val onSort: (Int) -> Unit = {},
     val onSavingCounterpoint: (Int) -> Unit = {},
     val onSubmitButtonClick: () -> Unit = {})
 

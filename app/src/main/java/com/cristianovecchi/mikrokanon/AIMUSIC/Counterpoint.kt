@@ -302,7 +302,50 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun addEmptyColumn(){
         parts.map { absPart -> absPart.absPitches.add(-1) }
     }
+    fun sortColumns(sortType: Int): Counterpoint {
+        if(parts[0].absPitches.isEmpty()) return this
+        val clone = this.normalizePartsSize(false)
+        val maxSize = clone.maxSize()
+        val nParts = clone.parts.size
+        val result = clone.cloneWithEmptyParts()
+        var lastColumn = clone.getColumnValuesWithEmptyValues(0).sortedDescending()
+        result.addColumn(lastColumn)
+        val sorting = if ( sortType == 0 ){ p: Int, previousPitch: Int -> //Ascending Type
+            val p2 = if( p < previousPitch ) p + 12 else p
+            p2 - previousPitch
+        } else {p: Int, previousPitch: Int -> //Descending Type
+            val p2 = if( p > previousPitch ) p - 12 else p
+            previousPitch - p2
+        }
+        for( i in 1 until maxSize){
+            val newColumn = mutableListOf<Int>()
+            val absPitches = clone.getColumnValuesWithEmptyValues(i).toMutableList()
+            for(j in 0 until nParts){
+                val lastPitch =  lastColumn[j]
+                while(absPitches.isNotEmpty()){
+                    val indexPitch2 = absPitches
+                        .withIndex()
+                        .filter{ (_, v) -> v != -1 }
+                        .minByOrNull { (_, p) ->
+                        sorting(p, lastPitch)
+                    }?.index
+                    if(indexPitch2 == null){
+                        absPitches.removeAt(0)
+                        newColumn.add(-1)
+                    } else {
+                        newColumn.add(absPitches[indexPitch2])
+                        absPitches.removeAt(indexPitch2)
+                    }
+                }
+            }
 
+            result.addColumn(newColumn)
+            lastColumn = newColumn.toList()
+        }
+
+        result.emptiness = result.findEmptiness()
+        return result
+    }
     fun addCadenzas(horizontalIntervalSet: List<Int>, values: List<Int> = listOf(0,1,0,1,1)): Counterpoint{
         val clone = this.normalizePartsSize(false)
         val checks = clone.detectIntervalsInColumns(horizontalIntervalSet)
@@ -329,6 +372,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 index++
             }
         }
+        result.emptiness = result.findEmptiness()
         return result
     }
     fun eraseIntervalsOnBothNotes(horizontalIntervalSet: List<Int>): Counterpoint{
@@ -471,6 +515,9 @@ data class Counterpoint(val parts: List<AbsPart>,
         if(parts.isEmpty()) return ""
         return parts.joinToString(partSeparator) { it.absPitches.joinToString(",") }
     }
+
+
+
     companion object {
         fun createFromCsv(doubleLevelCsv: String, partSeparator: String = "\n"): Counterpoint{
             val newParts = doubleLevelCsv.split(partSeparator)

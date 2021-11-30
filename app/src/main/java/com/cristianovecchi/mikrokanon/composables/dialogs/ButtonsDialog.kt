@@ -56,7 +56,8 @@ fun ButtonsDialog(
                                     onEraseIntervals = buttonsDialogData.value.onEraseIntervals,
                                     onSingle = buttonsDialogData.value.onSingle,
                                     onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution,
-                                    onDoppelgänger = buttonsDialogData.value.onDoppelgänger
+                                    onDoppelgänger = buttonsDialogData.value.onDoppelgänger,
+                                    onSort = buttonsDialogData.value.onSort
                                 )
                                 1 -> Spacer(modifier = Modifier.height(6.dp))
                                 2 -> WavesButtons(

@@ -75,6 +75,9 @@ class OutputFragment: Fragment() {
                                         )
                                     }
                                 },
+                                onSort= { sortType ->
+                                    model.onSortCounterpoints(sortType)
+                                },
                                 onSavingCounterpoint= { position ->
                                     model.selectedCounterpoint.value?.let{
                                         model.saveCounterpointInDb(position, it.copy())
