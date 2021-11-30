@@ -45,7 +45,7 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
             val model = multiNumberDialogData.value.model
 
             Surface(
-                modifier = Modifier.width(350.dp).height(400.dp),
+                modifier = Modifier.width(350.dp).height(500.dp),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -53,10 +53,10 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(5f)
+                        .weight(4f)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(3f)
+                        .weight(4f)
                     var melodyText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setMelody = { index: Int, newMelody: Int ->
@@ -64,7 +64,7 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         melodies[index] = newMelody
                         melodyText = melodies.joinToString(",")
                     }
-                    val fontSize = 16.sp
+                    val fontSize = 18.sp
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
@@ -133,7 +133,7 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         }
                     }
                     Column(modifier = modifierB, verticalArrangement = Arrangement.Bottom) {
-                        val textFontSize = if(types.maxOf{it.length}>26) 16.sp else 20.sp
+                        val textFontSize = 16.sp
                         val textButtonPadding = 1.dp
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(
@@ -165,6 +165,30 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = types[1],
+                                        style = TextStyle(
+                                            fontSize = textFontSize,
+                                            fontWeight = fontWeight
+                                        )
+                                    )
+                                }
+                                Button(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(textButtonPadding), onClick = { setMelody(cursor, 2) })
+                                {
+                                    Text(
+                                        text = types[2],
+                                        style = TextStyle(
+                                            fontSize = textFontSize,
+                                            fontWeight = fontWeight
+                                        )
+                                    )
+                                }
+                                Button(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(textButtonPadding), onClick = { setMelody(cursor, 3) })
+                                {
+                                    Text(
+                                        text = types[3],
                                         style = TextStyle(
                                             fontSize = textFontSize,
                                             fontWeight = fontWeight

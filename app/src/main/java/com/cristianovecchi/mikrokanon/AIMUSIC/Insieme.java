@@ -388,13 +388,37 @@ public class Insieme {
         return 0;
     }
     public static int trovaOttavaAmpia(int notaPrec, int notaSeg) {
-        if (notaPrec==notaSeg) return 0;
+        //if (notaPrec==notaSeg) return 0;
         if (Math.abs(notaSeg-notaPrec)<6) {
             if (notaPrec<notaSeg) return -1;
             else return 1;
         }
         return 0;
     }
+    public static int findAscendantNoteCycling(int absPitch1, int absPitch2, int octave, int downLimit, int upLimit ){
+        int first = absPitch1 + octave * 12;
+        int second = absPitch2 + octave * 12;
+        if(first>second) second += 12;
+        if(second <= upLimit) {
+            return second;
+        } else {
+            while(absPitch2<downLimit) absPitch2 += 12;
+                    return absPitch2;
+        }
+    }
+    public static int findDescendantNoteCycling(int absPitch1, int absPitch2, int octave, int downLimit, int upLimit ){
+        int first = absPitch1 + octave * 12;
+        int second = absPitch2 + octave * 12;
+        if(first<second) second -= 12;
+        if(second >= downLimit) {
+            return second;
+        } else {
+            int newNote = absPitch2 + 96; // octave 8 * 12
+            while(newNote>upLimit) newNote -= 12;
+            return newNote;
+        }
+    }
+
     // MIDI: A0 = 21, C4 = 60, C8 = 108
     // octave 4 = central
     public static int[] findMelody(int octave, int[] absPitches, int lowerLimit, int upperLimit, int melodyType){
@@ -422,7 +446,7 @@ public class Insieme {
                     lastNote = newNote;
                 }
             }
-        } else if(melodyType == 1){
+        } else if(melodyType == 1){ //HUGE
             for (int i = index; i<length-1; i++ ){
                 int checkNote = absPitches[i+1];
                 if(checkNote==-1){
@@ -435,7 +459,35 @@ public class Insieme {
                     lastNote = newNote;
                 }
             }
-        }
+        } else if(melodyType == 2){ //ASCENDANT
+            lastNote = absPitches[index];
+            for (int i = index; i<length-1; i++ ) {
+                int checkNote = absPitches[i + 1];
+                if (checkNote == -1) {
+                    melody[i + 1] = -1;
+                } else {
+                    int newNote = findAscendantNoteCycling(lastNote, checkNote, octave, lowerLimit, upperLimit);
+                    melody[i + 1] = newNote;
+                    octave = newNote/12;
+                    lastNote = checkNote;
+                }
+            }
+        } else if(melodyType == 3) { //DESCENDANT
+                lastNote = absPitches[index];
+                for (int i = index; i < length - 1; i++) {
+                    int checkNote = absPitches[i + 1];
+                    if (checkNote == -1) {
+                        melody[i + 1] = -1;
+                    } else {
+                        int newNote = findDescendantNoteCycling(lastNote, checkNote, octave, lowerLimit, upperLimit);
+                        melody[i + 1] = newNote;
+                        octave = newNote/12;
+                        lastNote = checkNote;
+                    }
+                }
+            }
+
+
         return melody;
     }
     public static int[] sequenzaLineare(int ottavaIniz, int[] valoriNote, int min, int max){

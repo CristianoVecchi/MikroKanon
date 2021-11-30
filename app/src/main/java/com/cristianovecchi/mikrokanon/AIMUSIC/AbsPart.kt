@@ -230,6 +230,8 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
 
 }
 fun main(args : Array<String>){
-    val part = AbsPart(mutableListOf(0,4,5,1,-1,-1,4,4,5,-1,5,7,8,1,1))
-    println(part.subSequences())
+    val part = AbsPart(mutableListOf(9,0,4,5,1,-1,-1,4,4,5,-1,5,7,8,1,1))
+    println(Insieme.findMelody(0, part.absPitches.toIntArray(),
+        21,108,3).contentToString())
+    //println(part.subSequences())
 }
