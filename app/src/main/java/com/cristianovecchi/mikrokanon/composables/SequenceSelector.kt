@@ -151,7 +151,7 @@ fun SequenceSelector(model: AppViewModel,
                                 onCadenza = {
                                     buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                     cadenzaDialogData.value = MultiNumberDialogData(true,
-                                    "Cadenza Dialog", model.cadenzaValues, 0, 16, model = model,
+                                    language.selectCadenzaForm, model.cadenzaValues, 0, 16, model = model,
                                         ){ newValues ->
                                         model.cadenzaValues = newValues
                                         onCadenza(sequences[selected], newValues.extractIntsFromCsv()) // CADENZA DIALOG OK BUTTON

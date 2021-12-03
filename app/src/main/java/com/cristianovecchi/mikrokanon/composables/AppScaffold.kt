@@ -167,7 +167,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
         "Rhythm",  "Rhythm Shuffle", "Parts Shuffle","Doubling","8D AUDIO",
 
         "Spread where possible", "Deep Search in 4 part MK",
-        "BPM", "Dynamic",
+        "BPM", "Dynamics",
         "Range","Melody","Articulation",
         "Spacer",
         "Ritornello", "Transpose", "Row Forms",
@@ -595,11 +595,11 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 })
                         }
 
-                        "Dynamic" -> {
+                        "Dynamics" -> {
                             val dynamics = userOptions.dynamics
                             val symbols = getDynamicSymbols()
                             SelectableCard(
-                                text = "${lang.dynamic}: ${dynamics.describeForDynamic(model.dynamicMap, symbols[12], symbols[13])}",
+                                text = "${lang.dynamics}: ${dynamics.describeForDynamic(model.dynamicMap, symbols[12], symbols[13])}",
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = true,
@@ -866,7 +866,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         "Custom Colors" -> {
                             val colorDefs = extractColorDefs(userOptions.colors)
                             SelectableCard(
-                                text = "Custom Colors: ${colorDefs.custom}",
+                                text = "${lang.customColors}: ${colorDefs.custom}",
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = colorDefs.isCustom,

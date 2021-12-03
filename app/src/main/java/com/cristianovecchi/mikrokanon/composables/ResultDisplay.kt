@@ -235,7 +235,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                 val intsFromFlags = convertFlagsToInts(flags)
                                 val intervalNames = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet.map{ it.replace("\n"," / ") }
                                     intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
-                                        intsFromFlags.toSet(), dialogTitle = "${language.selectIntervalsForFP}\n${language.FPremember}"
+                                        intsFromFlags.toSet(), dialogTitle = "${language.selectHorizontalIntervals}" // \n${language.FPremember}"
                                     ) { indexes ->
                                         model.updateUserOptions(
                                             "intSetHorFlags",
@@ -282,7 +282,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                     onCadenza = {
                                         close();
                                         cadenzaDialogData.value = MultiNumberDialogData(true,
-                                            "Cadenza Dialog", model.cadenzaValues, 0, 16, model = model,
+                                            language.selectCadenzaForm, model.cadenzaValues, 0, 16, model = model,
                                         ){ newValues ->
                                             model.cadenzaValues = newValues
                                             onCadenza( newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
