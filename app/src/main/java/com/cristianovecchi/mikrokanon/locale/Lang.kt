@@ -62,37 +62,37 @@ val synthsNames = listOf("Square Wave","Saw Wave", "Calliope", "Chiff",
     "Ice Rain", "Soundtrack", "Crystal", "Atmosphere",
 "Brightness", "Goblins", "Echo Drops", "Sci Fi")
 val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية","غاميلان", "ساكسفون", "فلوت",
-    "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","قيثار","بييرو","الباروك","أوتار نتف","Spooky")
+    "ضعف القصب", "كلارينيت", "مزمار", "تشيلو", "بيانو","قيثار","بييرو","الباروك","أوتار نتف","مرعب")
 val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente","Gamelan", "Saxophone", "Flöten",
-    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Harfe","Pierrot","Barockensemble","Zupfinstrument","Spooky")
+    "Doppelblattinstrumente", "Klarinetten", "Fagotte", "Cellos", "Klavier","Harfe","Pierrot","Barockensemble","Zupfinstrument","Gespenstisch")
 val ensembleNamesEl = listOf("Έγχόρδα", "Ξύλινα πνευστά της συμφωνικής ορχήστρας", "Ορχήστρα εγχόρδων", "Χάλκινα πνευστά της συμφωνικής ορχήστρας","Gamelan", "Σαξόφωνα", "Φλάουτα",
-    "Διπλά καλάμια", "Κλαρινέτ", "Φαγκότα", "Βιολοντσέλα", "Πιάνο","Άρπα", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές","Spooky")
+    "Διπλά καλάμια", "Κλαρινέτ", "Φαγκότα", "Βιολοντσέλα", "Πιάνο","Άρπα", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές","Στοιχειωμένος")
 val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Gamelan", "Saxophones", "Flutes",
     "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","Harp","Pierrot","Baroque","Plucked strings","Spooky")
 
 val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal","Gamelán", "Saxofones", "Flautas",
-    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Arpa", "Pierrot","Barroco","Instrumentos de cuerda pulsada","Spooky")
+    "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Arpa", "Pierrot","Barroco","Instrumentos de cuerda pulsada","Escalofriante")
 val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기","가믈란", "색소폰", "플루트",
-    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","하프","피에로","바로크","발현악기","Spooky")
+    "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","하프","피에로","바로크","발현악기","유령 같은")
 val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器","ガムラン","サックス", "フルート",
-    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ハープ", "ピエロ", "バロック","撥弦楽器","Spooky")
+    "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ハープ", "ピエロ", "バロック","撥弦楽器","不気味な")
 val ensembleNamesId = listOf("Alat musik dawai membungkuk", "Instrumen musik tiup kayu", "Orkestra dawai", "Instrumen musik tiup logam", "Gamelan","Saxophone", "Seruling",
-    "Alang-alang ganda", "Klarinet", "Bassoon", "Cellos", "Piano", "Harpa", "Pierrot", "Baroque", "Dawai yang dipetik","Spooky")
+    "Alang-alang ganda", "Klarinet", "Bassoon", "Cellos", "Piano", "Harpa", "Pierrot", "Baroque", "Dawai yang dipetik","Menyeramkan")
 val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni","Gamelan", "Saxofoni", "Flauti",
     "Ance doppie", "Clarinetti", "Fagotti", "Violoncelli", "Pianoforte","Arpa","Pierrot","Barocco", "Corde pizzicate","Spooky")
 val ensembleNamesPt = listOf("Cordas friccionadas", "Madeiras", "Orquestra de cordas", "Metais","Gamelão","Saxofones", "Flautas",
-    "Palhetas duplas", "Clarinetes", "Fagotes", "Violoncelos", "Piano","Harpa", "Pierrot", "Barroco", "Cordas dedilhadas","Spooky")
+    "Palhetas duplas", "Clarinetes", "Fagotes", "Violoncelos", "Piano","Harpa", "Pierrot", "Barroco", "Cordas dedilhadas","Assustador")
 val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Gamelan","Saxophones", "Flûtes",
-    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Harpe", "Pierrot","Baroque","Cordes pincées","Spooky")
-val ensembleNamesHi = listOf("Strings", "Woodwinds", "String orchestra", "Brass","गमेलन", "Saxophones", "Flutes",
-    "Double reeds", "Clarinets", "Bassoons", "Cellos", "Piano","वीणा","Pierrot","Baroque","Plucked strings","Spooky")
+    "Anches doubles", "Clarinettes", "Bassons", "Violoncelles", "Piano","Harpe", "Pierrot","Baroque","Cordes pincées","Sinistre")
+val ensembleNamesHi = listOf("झुका हुआ यंत्र", "वुडविंड उपकरण", "स्ट्रिंग ऑर्केस्ट्रा", "धातु पवन यंत्र","गमेलन", "सैक्सोफोन", "बांसुरी",
+    "डबल रीड", "क्लैरिनेट", "बासून", "सेलोस", "पियानो","वीणा","पिय्रोट","बरोक","प्लक्ड स्ट्रिंग इंस्ट्रूमेंट्स","डरावना")
 val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты","Гамелан", "Саксофоны", "Флейты",
-    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано","Арфа", "Пьеро","Барокко","Струнные щипковые инструменты","Spooky")
+    "Двойной тростью", "Кларнеты", "Фаготы", "Виолончели", "Фортепиано","Арфа", "Пьеро","Барокко","Струнные щипковые инструменты","Пугающий")
 val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao", "Orchestra ya ala za nyuzi", "Vyombo vya upepo vya chuma",
     "Gamelan", "Saxophones", "Zilizimbi","Mwanzi mara mbili", "Clarinets", "Bassoons", "Cellos", "Piano", "Kinubi",
-    "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa","Spooky")
+    "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa","Ya kutisha")
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器","甘美蘭", "薩氏管", "长笛",
-    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","豎琴","皮埃罗","巴洛克","撥弦樂器","Spooky")
+    "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","豎琴","皮埃罗","巴洛克","撥弦樂器","幽灵般的")
 
 private var zodiacPlanets = listOf("\u2644", "\u2643", "\u2642","\u2640","\u263F","\u263D","\u2609")
 private var zodiacPlanetsEmojis = listOf("\u1fA90","\u9795","\u9794","\u9792","\u9791","\u1F31C","\u1F31E") // are different on xiaomi
@@ -294,7 +294,7 @@ data class Lang( // English by default
     val spreadWherePossible: String = "Spread where possible",
     val deepSearch: String = "Deep search in four-part canons",
     val horIntervalSet: String = "Free part intervals",
-    val FPremember: String = "",//""(  ☀  ∼➚  ∼➘  -➚  -➘  )   ",
+    val FPremember: String = "", // ""(  ☀  ∼➚  ∼➘  -➚  -➘  )   ",
     val detector: String = "Detector",
     val selectIntervalsToDetect: String = "Select intervals to detect!",
     val detectorExtension: String = "Detector extension",
@@ -305,7 +305,7 @@ data class Lang( // English by default
     val language: String = "Language",
     val zodiac: String = "Zodiac",
     val zodiacOptions: List<String> = listOf("Planets", "Signs", "Emojis"),
-    val selectZodiac: String = "Use these zodiac symbols: ",
+    val selectZodiac: String = "Use these zodiac symbols:",
     val credits: String = "Credits",
     val choose2ndSequence: String = "Choose the second sequence!",
 
@@ -1136,60 +1136,60 @@ data class Lang( // English by default
         }
         fun hindi(): Lang {
             return Lang(
-                noteNames = NoteNamesIt.values().map { it.toString() },
-                intervalSet = intervalSetIt,
-                enterSomeNotes = "Digita delle note!",
-                choose2ndSequence = "Scegli la seconda sequenza!",
-                repeatSequence = "Ripeti la sequenza",
-                selectEnsemble = "Scegli un ensemble!",
-                ensembleNames = ensembleNamesIt,
-                range = "Estensione",
-                selectRange = "Scegli un'estensione!",
-                rangeOptions = listOf("Libera", "Dello strumento", "Delimitata", "Quasi chiusa", "Chiusa"),
+                noteNames = NoteNamesEn.values().map { it.toString() },
+                intervalSet = intervalSetEn,
+                enterSomeNotes = "कुछ नोट्स टाइप करें!",
+                choose2ndSequence = "दूसरा क्रम चुनें!",
+                repeatSequence = "क्रम दोहराएं",
+                selectEnsemble = "एक पहनावा चुनें!",
+                ensembleNames = ensembleNamesHi,
+                range = "विस्तार",
+                selectRange = "एक एक्सटेंशन चुनें!",
+                rangeOptions = listOf("फ्री", "इंस्ट्रूमेंट का", "बॉर्डर्ड", "लगभग बंद", "बंद"),
                 articulation = "अभिव्यक्ति",
                 selectArticulation = "अभिव्यक्ति परिवर्तन का चयन करें!",
-                selectMelody ="Seleziona un tipo di melodia!",
-                melody = "Melodia",
+                selectMelody ="माधुर्य का एक प्रकार चुनें!",
+                melody = "राग",
                 //melodyOptions = listOf("Lineare","Ampia"),
                 selectGlissando = "ग्लिसेंडो के लिए अंतराल चुनें!",
                 vibrato = "वाइब्रेटो",
                 selectVibrato = "कंपन की तीव्रता चुनें!",
-                nuancesOptions = listOf("Nessuna", "In rilievo le note brevi", "In rilievo le note lunghe"),
-                nuances = "Nuances",
-                selectNuances = "Scegli le nuances per la dinamica!",
+                nuancesOptions = listOf("कोई नहीं", "उभरा हुआ छोटा नोट", "उभरा हुआ लंबा नोट"),
+                nuances = "बारीकियों",
+                selectNuances = "गतिकी के लिए बारीकियां चुनें!",
                 dynamics = "गतिकी",
                 selectDynamicAlterations ="गतिकी परिवर्तन चुनें!",
-                beatsPerMinute = "Pulsazioni al minuto",
-                selectRhythm = "Scegli un ritmo!",
-                selectDoubling = "Scegli degli intervalli per il raddoppio!",
-                doublingNames = doublingIt,
+                beatsPerMinute = "स्पंदन प्रति मिनट",
+                selectRhythm = "एक गति उठाओ!",
+                selectDoubling = "दोहरीकरण के लिए अंतराल चुनें!",
+                doublingNames = doublingEn,
                 selectAudio8D = "ऑडियो 8डी के साथ संगीतमय आवाज़ें चुनें!",
-                rhythm = "Ritmo",
-                rhythmShuffle  = "Mescola il ritmo",
-                partsShuffle  = "Mescola le parti",
-                rowForms = "Forme seriali",
-                selectRowForms = "Scegli le forme seriali!",
-                original = "Originale",
-                retrograde  = "Retrogrado",
-                inverse  = "Inverso",
-                invRetrograde  = "Inverso del retrogrado",
-                selectRitornello = "Scegli quante ripetizioni!",
-                transpose = "Trasponi",
-                selectTranspositions = "Scegli le trasposizioni!",
-                doubling  = "Raddoppi",
-                spreadWherePossible  = "Estendi dove è possibile",
-                deepSearch  = "Ricerca approfondita nei canoni a quattro parti",
-                horIntervalSet = "Intervalli delle parti libere",
-                detector = "Rilevatore",
-                selectIntervalsToDetect = "Scegli gli intervalli da rilevare!",
-                detectorExtension = "Raggio del rilevatore",
-                selectDetectorExtension = "Scegli il raggio del rilevatore!",
-                exportMidi  = "Esporta il file MIDI",
+                rhythm = "ताल",
+                rhythmShuffle  = "ताल मिलाएं",
+                partsShuffle  = "आवाज मिलाएं",
+                rowForms = "श्रृंखला के आकार",
+                selectRowForms = "श्रृंखला के आकार चुनें!",
+                original = "मूल",
+                retrograde  = "पतित",
+                inverse  = "उलटना",
+                invRetrograde  = "प्रतिगामी के विपरीत",
+                selectRitornello = "कितने प्रतिनिधि चुनें!",
+                transpose = "पक्षांतरित",
+                selectTranspositions = "ट्रांसपोज़िशन चुनें!",
+                doubling  = "ध्वनि दुगनी",
+                spreadWherePossible  = "जहाँ संभव हो बढ़ाएँ",
+                deepSearch  = "चार-भाग वाले सिद्धांतों में गहन शोध",
+                horIntervalSet = "मुक्त भागों के अंतराल",
+                detector = "डिटेक्टर",
+                selectIntervalsToDetect = "पता लगाने के लिए अंतराल चुनें!",
+                detectorExtension = "डिटेक्टर रेंज",
+                selectDetectorExtension = "डिटेक्टर रेंज चुनें!",
+                exportMidi  = "मिडी फ़ाइल निर्यात करें",
                 customColors = "रंग की",
-                language  = "Lingua",
-                zodiac = "Zodiaco",
-                zodiacOptions = listOf("Pianeti", "Segni", "Emojis"),
-                selectZodiac = "Usa questi simboli zodiacali:",
+                language  = "भाषा",
+                zodiac = "राशि",
+                zodiacOptions = listOf("ग्रह", "संकेत", "इमोजिस"),
+                selectZodiac = "इन राशि चिन्हों का प्रयोग करें:",
                 selectSpecialFunction = "एक फ़ंक्शन चुनें!",
                 selectCadenzaForm = "एक ताल प्रपत्र चुनें!",
                 selectHorizontalIntervals = "कार्यों के लिए मधुर अंतराल चुनें!",
