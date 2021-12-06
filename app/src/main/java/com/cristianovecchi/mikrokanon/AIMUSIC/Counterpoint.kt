@@ -207,7 +207,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         //if(this.parts.isEmpty()) return this
         val newParts = mutableListOf<AbsPart>()
         parts.forEach{ absPart ->
-            val newPart = absPart.copy()
+            val newPart = absPart.clone()
             if(absPart.absPitches.size != maxSize){
                 val diff = maxSize - absPart.absPitches.size
                 (0 until diff).forEach{ _ ->
@@ -220,9 +220,13 @@ data class Counterpoint(val parts: List<AbsPart>,
         if(refreshEmptiness) newCounterpoint.emptiness = findEmptiness()
         return newCounterpoint
     }
-
-    fun spreadAsPossible() : Counterpoint {
-        val clone = this.normalizePartsSize(false)// cloning is necessary in a coroutine context
+    fun isNormalized(): Boolean{
+        if(this.isEmpty() || this.parts.size == 1) return true
+        return this.parts.map{it.absPitches.size}.toSet().size == 1
+    }
+    fun spreadAsPossible(findEmptiness: Boolean = true) : Counterpoint {
+        val clone = this.normalizePartsSize(false) // cloning is necessary in a coroutine context
+        clone.display()
         for(partIndex in clone.parts.indices){
             val part = clone.parts[partIndex]
             for(pitchIndex in part.absPitches.indices)
@@ -267,7 +271,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                         }
                     }
                 }
-        clone.emptiness = clone.findEmptiness()
+        if(findEmptiness) clone.emptiness = clone.findEmptiness()
         //clone.display()
         return clone
     }
@@ -276,7 +280,7 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
     fun display() {
         parts.forEachIndexed { index, absPart ->
-            println("Part #$index: ${absPart.absPitches.toIntArray().contentToString()}")
+            println("Part #$index(${absPart.absPitches.size}): ${absPart.absPitches.toIntArray().contentToString()}")
         }
     }
     fun displayInNotes(noteNames: List<String> = NoteNamesEn.values().map{it.toString()}) {

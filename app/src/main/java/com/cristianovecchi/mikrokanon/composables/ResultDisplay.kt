@@ -179,10 +179,10 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         }
                     })
 
-                ButtonsDialog(buttonsDialogData, language.OKbutton, model)
-                MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, language.OKbutton)
+                ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model)
+                MultiListDialog(intervalSetDialogData, dimensions, language.OKbutton)
                 SimpleTransposeDialog(simpleTransposeDialogData, getIntervalsForTranspose(language.intervalSet))
-                CadenzaDialog(cadenzaDialogData, language.OKbutton)
+                CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
                 // STACK ICONS
                 Row(modifier = Modifier
                     .fillMaxWidth()

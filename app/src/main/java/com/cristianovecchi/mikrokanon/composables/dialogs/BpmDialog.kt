@@ -14,10 +14,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.NumberDialogData
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
 fun BpmDialog(
-    numberDialogData: MutableState<NumberDialogData>, okText: String = "OK",
+    numberDialogData: MutableState<NumberDialogData>, dimensions: Dimensions, okText: String = "OK",
     onDismissRequest: () -> Unit = {
         numberDialogData.value = NumberDialogData(value = numberDialogData.value.value)
     }
@@ -26,7 +27,7 @@ fun BpmDialog(
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
-                modifier = Modifier.width(300.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
@@ -41,7 +42,7 @@ fun BpmDialog(
                         )
                         bpm = newBpm
                     }
-                    val fontSize = 26.sp
+                    val fontSize = dimensions.dialogFontSize.sp
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Spacer(modifier = Modifier.height(10.dp))
@@ -52,7 +53,7 @@ fun BpmDialog(
                         Text(
                             text = "$bpm",
                             style = TextStyle(
-                                fontSize = 32.sp,
+                                fontSize = (dimensions.dialogFontSize + dimensions.dialogFontSize/2).sp,
                                 fontWeight = FontWeight.Bold
                             )
                         )

@@ -24,7 +24,9 @@ import com.cristianovecchi.mikrokanon.toDp
 import kotlin.math.roundToInt
 
 @Composable
-fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, refresh: Boolean, dispatchColor : (Color) -> Unit ) {
+fun ColorSelector(height: Dp = 300.dp,
+                  barHeight: Int = (height.value / 4f).toInt(), //+ (height.value % 4f).toInt(),
+    startColor: Color = Color.Black, refresh: Boolean, dispatchColor : (Color) -> Unit ) {
     var sizeR by remember { mutableStateOf(IntSize.Zero) }
     var sizeG by remember { mutableStateOf(IntSize.Zero) }
     var sizeB by remember { mutableStateOf(IntSize.Zero) }
@@ -32,7 +34,7 @@ fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, refresh:
     var greenY by remember { mutableStateOf(0f) }
     var blueY by remember { mutableStateOf(0f) }
     var firstColor by remember { mutableStateOf(true) }
-    val barHeight = 80
+
     if(firstColor && sizeR.height != 0 && sizeG.height != 0 && sizeB.height != 0){
         false.also { firstColor = it } // LOL (instead of [firstColor = false] that gets a warning)
         redY = (1f - startColor.red) * (sizeR.height - barHeight)
@@ -65,7 +67,7 @@ fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, refresh:
                     Modifier
                         .offset { IntOffset(0, redY.roundToInt()) }
                         .background(Color.White)
-                        .size(sizeR.width.toDp().dp+1.dp, barHeight.toDp().dp)
+                        .size(sizeR.width.toDp().dp+1.dp, barHeight.toDp().dp +1.dp)
                         .pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 change.consumeAllChanges()
@@ -84,7 +86,7 @@ fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, refresh:
                     Modifier
                         .offset { IntOffset(0, greenY.roundToInt()) }
                         .background(Color.White)
-                        .size(sizeG.width.toDp().dp+1.dp, barHeight.toDp().dp)
+                        .size(sizeG.width.toDp().dp+1.dp, barHeight.toDp().dp+1.dp)
                         .pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 change.consumeAllChanges()
@@ -101,7 +103,7 @@ fun ColorSelector(height: Dp = 300.dp, startColor: Color = Color.Black, refresh:
             {
                 Box(Modifier.offset { IntOffset(0, blueY.roundToInt()) }
                             .background(Color.White)
-                            .size(sizeB.width.toDp().dp+1.dp, barHeight.toDp().dp)
+                            .size(sizeB.width.toDp().dp+1.dp, barHeight.toDp().dp+1.dp)
                             .pointerInput(Unit) {
                                 detectDragGestures { change, dragAmount ->
                                     change.consumeAllChanges()

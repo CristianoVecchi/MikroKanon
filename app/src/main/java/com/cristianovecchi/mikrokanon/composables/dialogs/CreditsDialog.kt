@@ -19,21 +19,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.CreditsDialogData
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
-fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>, okText: String = "OK",
+fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>, dimensions: Dimensions,
+                  okText: String = "OK",
                   onDismissRequest: () -> Unit = {creditsDialogData.value = CreditsDialogData() })
 {
     if (creditsDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         val nameStyle = SpanStyle(
-            fontSize = 22.sp,
+            fontSize = (dimensions.dialogFontSize + dimensions.dialogFontSize/20).sp,
             color = Color.Black)
         val commentStyle = SpanStyle(
-            fontSize = 18.sp,
+            fontSize = (dimensions.dialogFontSize - dimensions.dialogFontSize/20).sp,
             color = Color.DarkGray)
         val uriStyle = SpanStyle(
-            fontSize = 20.sp,
+            fontSize = dimensions.dialogFontSize.sp,
             color = Color.Blue)
         val uriHandler = LocalUriHandler.current
         val youtubeChannelUri = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
@@ -44,82 +46,95 @@ fun CreditsDialog(creditsDialogData: MutableState<CreditsDialogData>, okText: St
         val githubLeffelManiaUri = "https://github.com/LeffelMania"
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
-                modifier = Modifier.width(300.dp),
+                modifier = Modifier
+                    .width(dimensions.dialogWidth)
+                    .height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = creditsDialogData.value.title)
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(text = buildAnnotatedString {
-                        withStyle(commentStyle){
-                            append("the MikroKanon App has been conceived and developed in 2021 by\n")
-                        }
-                        withStyle(nameStyle){
-                            append("Cristiano Vecchi")
-                        }
-                    })
-                    ClickableText(text = buildAnnotatedString {
-                        withStyle(uriStyle){
-                            append("Youtube Channel")
-                        }
-                    },onClick = {
-                        uriHandler.openUri(youtubeChannelUri)
-                    })
-                    ClickableText(text = buildAnnotatedString {
-                        withStyle(uriStyle){
-                            append("Youtube MK examples")
-                        }
-                    },onClick = {
-                        uriHandler.openUri(youtubeMikroKanonExamplesUri)
-                    })
-                    ClickableText(text = buildAnnotatedString {
-                        withStyle(uriStyle){
-                            append("Instagram")
-                        }
-                    },onClick = {
-                        uriHandler.openUri(instagramUri)
-                    })
-                    ClickableText(text = buildAnnotatedString {
-                        withStyle(uriStyle){
-                            append("Linkedin")
-                        }
-                    },onClick = {
-                        uriHandler.openUri(linkedinUri)
-                    })
-                    ClickableText(text = buildAnnotatedString {
-                        withStyle(uriStyle){
-                            append("GitHub")
-                        }
-                    },onClick = {
-                        uriHandler.openUri(githubUri)
-                    })
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(text = buildAnnotatedString {
-                        withStyle(commentStyle){
-                            append("this App uses the android-midi-lib library by\n")
-                        }
-                        withStyle(nameStyle){
-                            append("Alex Leffelman")
-                        }
-                    })
-                    ClickableText(text = buildAnnotatedString {
-                        withStyle(uriStyle){
-                            append("GitHub")
-                        }
-                    },onClick = {
-                        uriHandler.openUri(githubLeffelManiaUri)
-                    })
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Button(
-                        onClick = {
-                            creditsDialogData.value.onSubmitButtonClick.invoke()
-                            onDismissRequest.invoke()
-                        },
-                        shape = MaterialTheme.shapes.large
+                Column(verticalArrangement = Arrangement.SpaceBetween){
+                    Column(modifier = Modifier.padding(10.dp)
+
                     ) {
-                        Text(text = okText)
+                        Text(text = creditsDialogData.value.title)
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(text = buildAnnotatedString {
+                            withStyle(commentStyle){
+                                append("the MikroKanon App has been conceived and developed in 2021 by\n")
+                            }
+                            withStyle(nameStyle){
+                                append("Cristiano Vecchi")
+                            }
+                        })
+                        ClickableText(text = buildAnnotatedString {
+                            withStyle(uriStyle){
+                                append("Youtube Channel")
+                            }
+                        },onClick = {
+                            uriHandler.openUri(youtubeChannelUri)
+                        })
+                        ClickableText(text = buildAnnotatedString {
+                            withStyle(uriStyle){
+                                append("Youtube MK examples")
+                            }
+                        },onClick = {
+                            uriHandler.openUri(youtubeMikroKanonExamplesUri)
+                        })
+                        ClickableText(text = buildAnnotatedString {
+                            withStyle(uriStyle){
+                                append("Instagram")
+                            }
+                        },onClick = {
+                            uriHandler.openUri(instagramUri)
+                        })
+                        ClickableText(text = buildAnnotatedString {
+                            withStyle(uriStyle){
+                                append("Linkedin")
+                            }
+                        },onClick = {
+                            uriHandler.openUri(linkedinUri)
+                        })
+                        ClickableText(text = buildAnnotatedString {
+                            withStyle(uriStyle){
+                                append("GitHub")
+                            }
+                        },onClick = {
+                            uriHandler.openUri(githubUri)
+                        })
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(text = buildAnnotatedString {
+                            withStyle(commentStyle){
+                                append("this App uses the android-midi-lib library by\n")
+                            }
+                            withStyle(nameStyle){
+                                append("Alex Leffelman")
+                            }
+                        })
+                        ClickableText(text = buildAnnotatedString {
+                            withStyle(uriStyle){
+                                append("GitHub")
+                            }
+                        },onClick = {
+                            uriHandler.openUri(githubLeffelManiaUri)
+                        })
+
+
                     }
+                    Column(modifier = Modifier.padding(10.dp)) {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Button(
+                            onClick = {
+                                creditsDialogData.value.onSubmitButtonClick.invoke()
+                                onDismissRequest.invoke()
+                            },
+                            shape = MaterialTheme.shapes.large
+                        ) {
+                            Text(text = okText)
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+
                 }
+
             }
         }
     }

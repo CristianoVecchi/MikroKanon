@@ -31,6 +31,7 @@ import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.*
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
+import com.cristianovecchi.mikrokanon.ui.pxToSp
 import com.cristianovecchi.mikrokanon.ui.shift
 import kotlinx.coroutines.flow.Flow
 import kotlin.math.absoluteValue
@@ -41,11 +42,12 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
     val scope = rememberCoroutineScope()
     val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val colors = model.appColors
+    val dimensions = model.dimensions
     val titleStyle = SpanStyle(
-        fontSize = 18.sp,
+        fontSize = (dimensions.width/35).pxToSp.sp,
         color = colors.cellTextColorSelected)
     val creditStyle = SpanStyle(
-        fontSize = 14.sp,
+        fontSize = (dimensions.width/40).pxToSp.sp,
         color = colors.cellTextColorUnselected)
 
     Scaffold(
@@ -56,7 +58,7 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
         drawerContent = { SettingsDrawer(model, userOptionsDataFlow)},
         topBar = {
             val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
-            CreditsDialog(creditsDialogData)
+            CreditsDialog(creditsDialogData, dimensions)
             TopAppBar(Modifier.border(1.dp,colors.selCardBorderColorSelected)) {
                 Row(
                     Modifier
@@ -68,9 +70,13 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
                 )
                 {
                     IconButton(
+                        modifier = Modifier.size(dimensions.selectorButtonSize/3 * 2),
                         onClick = {scope.launch { scaffoldState.drawerState.open() }  }
                     ) {
-                        Icon(Icons.Filled.Menu,"", tint = colors.cellTextColorSelected)
+                        Icon(
+                            Icons.Filled.Menu, "",
+                            modifier = Modifier.size(dimensions.selectorButtonSize/2),
+                            tint = colors.cellTextColorSelected)
                     }
                     ClickableText(text = buildAnnotatedString {
                         withStyle(titleStyle){
@@ -184,16 +190,16 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
                         else userOptionsData[0]
     val listState = rememberLazyListState()
     var selectedTab by remember{ mutableStateOf(model.lastScaffoldTab)}
-    MultiListDialog(ensemblesDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
-    ListDialog(listDialogData, lang.OKbutton, dimensions.sequenceDialogFontSize)
-    MultiListDialog(doublingDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
-    MultiListDialog(audio8DDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
+    MultiListDialog(ensemblesDialogData, dimensions, lang.OKbutton)
+    ListDialog(listDialogData, dimensions, lang.OKbutton)
+    MultiListDialog(doublingDialogData, dimensions, lang.OKbutton)
+    MultiListDialog(audio8DDialogData, dimensions, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
     val intervalsForGlissando = createGlissandoIntervals(lang.doublingNames)
 
     MelodyTypeDialog(melodyTypesDialogData, lang.melodyOptions)
     RangeTypeDialog(rangeTypesDialogData, lang.rangeOptions)
-    LegatoTypeDialog(legatoTypesDialogData, lang.articulationOptions)
+    LegatoTypeDialog(legatoTypesDialogData, dimensions, lang.articulationOptions)
     MultiBpmDialog(multiBpmDialogData, lang.OKbutton)
     MultiDynamicDialog(multiFloatDialogData, lang.OKbutton)
     //val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
@@ -204,20 +210,21 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     RowFormsDialog(rowFormsDialogData,
         formsNames, lang.OKbutton)
     ExportDialog(exportDialogData, lang.OKbutton)
-    CreditsDialog(creditsDialogData, lang.OKbutton)
+    CreditsDialog(creditsDialogData, dimensions, lang.OKbutton)
     //MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
-    MultiListDialog(detectorDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
-    ListDialog(detExtensionDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize, fillPrevious = true)
-    ListDialog(colorsDialogData, lang.OKbutton,dimensions.sequenceDialogFontSize)
-    MultiListDialog(zodiacDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
-    CustomColorsDialog(customColorsDialogData, lang.OKbutton)
-    ListDialog(ritornelloDialogData, lang.OKbutton, dimensions.sequenceDialogFontSize, fillPrevious = true)
-    ListDialog(vibratoDialogData, lang.OKbutton, dimensions.sequenceDialogFontSize, fillPrevious = true)
+    MultiListDialog(detectorDialogData, dimensions, lang.OKbutton)
+    ListDialog(detExtensionDialogData, dimensions, lang.OKbutton, fillPrevious = true)
+    ListDialog(colorsDialogData, dimensions, lang.OKbutton)
+    MultiListDialog(zodiacDialogData, dimensions, lang.OKbutton)
+    CustomColorsDialog(customColorsDialogData, dimensions, lang.OKbutton)
+    ListDialog(ritornelloDialogData, dimensions, lang.OKbutton, fillPrevious = true)
+    ListDialog(vibratoDialogData, dimensions, lang.OKbutton,  fillPrevious = true)
 
 //    userOptionsData.forEach{
 //        Text("#${it.id} = ens_type: ${it.ensembleType} - bpm: ${it.bpm} ")
 //    }
 Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
+    val buttonSize = dimensions.selectorButtonSize
     Column(Modifier
         .weight(1f)
         .background(
@@ -233,10 +240,11 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     -0.2f
                 ), RoundedCornerShape(4.dp)
             )
-            .then(Modifier.size(50.dp)), onClick = { selectedTab = ScaffoldTabs.SOUND; model.lastScaffoldTab = ScaffoldTabs.SOUND }
+            .then(Modifier.size(buttonSize/4 * 3)), onClick = { selectedTab = ScaffoldTabs.SOUND; model.lastScaffoldTab = ScaffoldTabs.SOUND }
         )
         {
             Icon(
+                modifier = Modifier.size(buttonSize/2),
                 painter = painterResource(id = model.iconMap["sound"]!!),
                 contentDescription = null, // decorative element
                 tint = if(selectedTab == ScaffoldTabs.SOUND) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
@@ -258,10 +266,11 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     -0.2f
                 ), RoundedCornerShape(4.dp)
             )
-            .then(Modifier.size(50.dp)), onClick = { selectedTab = ScaffoldTabs.BUILDING ; model.lastScaffoldTab = ScaffoldTabs.BUILDING  }
+            .then(Modifier.size(buttonSize/4 * 3)), onClick = { selectedTab = ScaffoldTabs.BUILDING ; model.lastScaffoldTab = ScaffoldTabs.BUILDING  }
         )
         {
             Icon(
+                modifier = Modifier.size(buttonSize/2),
                 painter = painterResource(id = model.iconMap["building"]!!),
                 contentDescription = null, // decorative element
                 tint = if(selectedTab == ScaffoldTabs.BUILDING) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
@@ -286,10 +295,11 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     -0.2f
                 ), RoundedCornerShape(4.dp)
             )
-            .then(Modifier.size(50.dp)), onClick = { selectedTab = ScaffoldTabs.SETTINGS; model.lastScaffoldTab = ScaffoldTabs.SETTINGS }
+            .then(Modifier.size(buttonSize/4 * 3)), onClick = { selectedTab = ScaffoldTabs.SETTINGS; model.lastScaffoldTab = ScaffoldTabs.SETTINGS }
         )
         {
             Icon(
+                modifier = Modifier.size(buttonSize/2),
                 painter = painterResource(id = model.iconMap["settings"]!!),
                 contentDescription = null, // decorative element
                 tint = if(selectedTab == ScaffoldTabs.SETTINGS) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)

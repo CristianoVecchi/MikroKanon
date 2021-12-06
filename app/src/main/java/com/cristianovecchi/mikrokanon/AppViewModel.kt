@@ -3,6 +3,7 @@ package com.cristianovecchi.mikrokanon
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Point
 import androidx.lifecycle.*
 import com.cristianovecchi.mikrokanon.composables.*
@@ -207,7 +208,8 @@ class AppViewModel(
 init{
 
     val size = getDeviceResolution()
-    dimensions = Dimensions.provideDimensions(size.x, size.y)
+    val displayMetricsDensity = Resources.getSystem().displayMetrics.density
+    dimensions = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
 }
     fun getContext(): Context {
         return getApplication<MikroKanonApplication>()
@@ -1002,11 +1004,14 @@ init{
     private fun duplicateAllPhrasesInCounterpoint(originalCounterpoint: Counterpoint,index: Int){
         if(!originalCounterpoint.isEmpty()){
             var newList: List<Counterpoint>
+            val spread = userOptionsData.value!![0].spread != 0
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = duplicateAllInCounterpoint(originalCounterpoint)
+                        .pmapIf(spread){it.spreadAsPossible()}
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpoints(newList, false)
+                changeCounterpoints(newList, true)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
@@ -1027,11 +1032,15 @@ init{
     private fun sortAllCounterpoints(originalCounterpoints: List<Counterpoint>, sortType: Int, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
+
+            val spread = userOptionsData.value!![0].spread != 0
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = sortColumnsOnCounterpoints(originalCounterpoints, sortType)
+                        .pmapIf(spread){it.spreadAsPossible()}
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpoints(newList, false)
+                changeCounterpoints(newList, spread)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
@@ -1039,17 +1048,21 @@ init{
     private fun singleOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
+            val spread = userOptionsData.value!![0].spread != 0
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = reduceCounterpointsToSinglePart(originalCounterpoints)
+                        .pmapIf(spread){it.spreadAsPossible()}
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpoints(newList, false)
+                changeCounterpoints(newList, spread)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
     }
     private fun doppelgängerOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
+            val spread = userOptionsData.value!![0].spread != 0
             var newList: List<Counterpoint>
             val ensTypes: List<EnsembleType> =
                 userOptionsData.value?.let { userOptionsData.value!![0].ensembleTypes
@@ -1065,8 +1078,10 @@ init{
                 withContext(Dispatchers.Default){
                     newList = explodeCounterpointsToDoppelgänger(originalCounterpoints,
                         MAX_PARTS, ensTypes, rangeType, melodyType )
+                        .pmapIf(spread){it.spreadAsPossible()}
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpoints(newList, false)
+                changeCounterpoints(newList, true)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
@@ -1116,7 +1131,9 @@ init{
                 withContext(Dispatchers.Default){
                     newList = addSequence(selectedCounterpoint.value!! , sequenceToAdd.value!!, intervalSet.value!! ,repeat, 7)
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(maxVisibleCounterpoints)
-                        .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible()}
+                        .pmapIf(userOptionsData.value!![0].spread != 0){
+                            it.spreadAsPossible(true)}
+                        //.map{ it.emptiness = it.findEmptiness(); it}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpoints(newList, true)

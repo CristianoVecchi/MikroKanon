@@ -7763,6 +7763,38 @@
 
         <item>#8ad2ce</item>
     </array>
+    <array name="zodiacRGB">
+        <item>#ff5555</item>
+        <item>#d5802b</item>
+        <item>#aaaa00</item>
+        <item>#80d52b</item>
+
+        <item>#55ff55</item>
+        <item>#2bd580</item>
+        <item>#00aaaa</item>
+        <item>#2b80d5</item>
+
+        <item>#5555ff</item>
+        <item>#802bd5</item>
+        <item>#aa00aa</item>
+        <item>#d52b80</item>
+    </array>
+    <array name="zodiacRYB">
+        <item>#d91a18</item>
+        <item>#f24a0e</item>
+        <item>#ff8811</item>
+        <item>#eeb40b</item>
+
+        <item>#c0c60a</item>
+        <item>#83c724</item>
+        <item>#4ab14b</item>
+        <item>#2b8465</item>
+
+        <item>#335676</item>
+        <item>#5d3983</item>
+        <item>#902474</item>
+        <item>#b91245</item>
+    </array>
 
 
 

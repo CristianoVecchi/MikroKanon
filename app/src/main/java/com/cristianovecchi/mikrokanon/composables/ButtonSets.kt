@@ -38,7 +38,7 @@ fun CustomButton(iconId: Int = -1, text: String = "",
     if (iconId != -1) {
         if (text.isNotEmpty()) { //MK button (Icon + Text)
             val textStyle = TextStyle(
-                fontSize = fontSize.sp,
+                fontSize = (fontSize + fontSize/7).sp,
                 fontWeight = FontWeight.Bold,
                 color = actualIconColor
             )
@@ -54,6 +54,7 @@ fun CustomButton(iconId: Int = -1, text: String = "",
             {
                 Row() {
                     Icon(
+                        modifier = Modifier.size(buttonSize/3 + buttonSize/7),
                         painter = painterResource(id = iconId),
                         contentDescription = null, // decorative element
                         tint = actualIconColor
@@ -75,6 +76,7 @@ fun CustomButton(iconId: Int = -1, text: String = "",
             )
             {
                 Icon(
+                    modifier = Modifier.size(buttonSize/2),
                     painter = painterResource(id = iconId),
                     contentDescription = null, // decorative element
                     tint = actualIconColor

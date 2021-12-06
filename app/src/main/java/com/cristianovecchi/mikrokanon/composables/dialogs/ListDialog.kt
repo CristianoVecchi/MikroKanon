@@ -17,28 +17,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.ListDialogData
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
-fun ListDialog(listDialogData: MutableState<ListDialogData>, okText: String = "OK", fontSize: TextUnit, fillPrevious: Boolean = false) {
+fun ListDialog(listDialogData: MutableState<ListDialogData>, dimensions: Dimensions,
+               okText: String = "OK", fillPrevious: Boolean = false) {
     SingleSelectListDialog(
-        listDialogData = listDialogData,
-        fontSize = fontSize, okText = okText, fillPrevious,
+        listDialogData = listDialogData, dimensions = dimensions,
+        okText = okText, fillPrevious,
         onDismissRequest = { listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)  }
     )
 }
 @Composable
 fun SingleSelectListDialog(
-    listDialogData: MutableState<ListDialogData>,
-    fontSize: TextUnit, okText: String = "OK", fillPrevious: Boolean = false,
+    listDialogData: MutableState<ListDialogData>, dimensions: Dimensions,
+    okText: String = "OK", fillPrevious: Boolean = false,
     onDismissRequest: () -> Unit
 ) {
     if (listDialogData.value.dialogState) {
+        val fontSize = dimensions.dialogFontSize
         var selectedOption by remember{ mutableStateOf(listDialogData.value.selectedListDialogItem) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
-                modifier = Modifier.width(300.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
@@ -47,7 +51,7 @@ fun SingleSelectListDialog(
                     val listState = rememberLazyListState()
                     if(listDialogData.value.itemList.isNotEmpty()){
                         LazyColumn( state = listState,
-                            modifier = Modifier.height(420.dp)
+                            modifier = Modifier.height(dimensions.dialogHeight / 6 * 5)
                         ) { itemsIndexed(listDialogData.value.itemList) { index, item ->
                             val selected = if (selectedOption == -1) {
                                 ""
@@ -58,7 +62,7 @@ fun SingleSelectListDialog(
                             Spacer(modifier = Modifier.height(3.dp))
                             val showAsSelected = if (!fillPrevious) false
                             else index <= listDialogData.value.itemList.indexOf(selected)
-                            RadioButton(item, selected, showAsSelected, fontSize) { selectedValue ->
+                            RadioButton(item, selected, showAsSelected, fontSize.sp) { selectedValue ->
                                 selectedOption = listDialogData.value.itemList.indexOf(selectedValue)
                             }
                         }
@@ -66,15 +70,20 @@ fun SingleSelectListDialog(
                         }
 
                         Spacer(modifier = Modifier.height(10.dp))
-                        Button(
-                            onClick = {
-                                listDialogData.value.onSubmitButtonClick.invoke(selectedOption)
-                                onDismissRequest.invoke()
-                            },
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Text(text = okText)
+                        Row( modifier = Modifier.height(dimensions.dialogHeight / 6),
+                            verticalAlignment = Alignment.CenterVertically)
+                        {
+                            Button(
+                                onClick = {
+                                    listDialogData.value.onSubmitButtonClick.invoke(selectedOption)
+                                    onDismissRequest.invoke()
+                                },
+                                shape = MaterialTheme.shapes.medium
+                            ) {
+                                Text(text = okText)
+                            }
                         }
+
                     }
 
                 }

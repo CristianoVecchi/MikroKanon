@@ -24,9 +24,11 @@ import com.cristianovecchi.mikrokanon.G
 import com.cristianovecchi.mikrokanon.composables.ColorSelector
 import com.cristianovecchi.mikrokanon.composables.CustomColorsDialogData
 import com.cristianovecchi.mikrokanon.toDp
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
-fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogData>, okText: String = "OK",
+fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogData>,
+                       dimensions: Dimensions, okText: String = "OK",
                        onRefreshRendering: (Boolean) -> Unit =
                            {customColorsDialogData.value = customColorsDialogData.value.copy(firstRendering = it, isRefreshing = true)},
                        onStopRefresh: () -> Unit =
@@ -40,13 +42,13 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
     var indexColors = customColorsDialogData.value.arrayColorIndex
 
     if(customColorsDialogData.value.dialogState){
-
+        val padding = 10
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
-                modifier = Modifier.width(300.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
-                Column(modifier = Modifier.padding(10.dp)) {
+                Column(modifier = Modifier.padding(padding.dp)) {
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val fontColor: Color
@@ -84,9 +86,9 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                         arraySize = G.getArraySize()
                         indexColors = G.indexColorArray
                     }
-                    val h = 80.dp
+                    val h = dimensions.dialogHeight / 7//80.dp
                     var size by remember { mutableStateOf(IntSize.Zero) }
-                    val w = if (size.width == 0) 0.dp else (size.width / 6).toDp().dp + 1.dp
+                    val w = if (size.width == 0) 0.dp else ((size.width - padding) / 6).toDp().dp + 1.dp
                     Box(
                         Modifier
                             .fillMaxWidth()
@@ -136,7 +138,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                                 .height(h),
                             horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
                             Text( text = "$indexColors",
-                                style = TextStyle(fontSize = 35.sp, fontWeight = FontWeight.ExtraBold, color = fontColor) )
+                                style = TextStyle(fontSize = (dimensions.selectorClipFontSize * 2).sp, fontWeight = FontWeight.ExtraBold, color = fontColor) )
                         }
 
 
@@ -145,7 +147,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                     Row(Modifier.fillMaxWidth()) {
 
                             ColorSelector(
-                                height = 350.dp,
+                                height = dimensions.dialogHeight / 6 * 4,
                                startColor = back1Color.copy(),
                                 refresh = customColorsDialogData.value.isRefreshing
                             ) { color ->
@@ -161,7 +163,9 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
 
                   }
                     Spacer(modifier = Modifier.height(10.dp))
-                    Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween){
+                    Row(modifier = Modifier.fillMaxWidth().height(h),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically ){
                         Button(
                             onClick = {
                                 customColorsDialogData.value.onSubmitButtonClick.invoke(indexColors)

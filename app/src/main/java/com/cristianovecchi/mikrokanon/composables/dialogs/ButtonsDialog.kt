@@ -16,10 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.composables.*
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
 fun ButtonsDialog(
     buttonsDialogData: MutableState<ButtonsDialogData>,
+    dimensions: Dimensions,
     okText: String = "OK",
     model: AppViewModel,
     workingOnSequences: Boolean = false,
@@ -28,10 +30,12 @@ fun ButtonsDialog(
     }
 ) {
     if (buttonsDialogData.value.dialogState) {
+        val buttonSize = dimensions.selectorButtonSize / 5 * 4
+        val fontSize = dimensions.selectorFPbuttonFontSize /5 * 4
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
-                modifier = Modifier.width(300.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
@@ -40,14 +44,14 @@ fun ButtonsDialog(
                     val listState = rememberLazyListState()
                     LazyColumn(
                         state = listState,
-                        modifier = Modifier.height(420.dp)
+                        modifier = Modifier.height(dimensions.dialogHeight)
                     ) {
                         items((0..5).toList()) { item ->
                             when (item) {
                                 0 -> SpecialFunctions1Buttons(
                                     model = buttonsDialogData.value.model,
-                                    buttonSize = buttonsDialogData.value.buttonSize,
-                                    fontSize = buttonsDialogData.value.fontSize,
+                                    buttonSize = buttonSize,
+                                    fontSize = fontSize,
                                     colors = model.appColors,
                                     onRound = buttonsDialogData.value.onRound,
                                     onCadenza = buttonsDialogData.value.onCadenza,
@@ -63,8 +67,8 @@ fun ButtonsDialog(
                                 2 -> WavesButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActiveWaves,
-                                    buttonSize = buttonsDialogData.value.buttonSize,
-                                    fontSize = buttonsDialogData.value.fontSize,
+                                    buttonSize = buttonSize,
+                                    fontSize = fontSize,
                                     colors = model.appColors,
                                     onWave3Click = buttonsDialogData.value.onWave3,
                                     onWave4Click = buttonsDialogData.value.onWave4,
@@ -73,8 +77,8 @@ fun ButtonsDialog(
                                 3 -> PedalsButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActivePedals,
-                                    buttonSize = buttonsDialogData.value.buttonSize,
-                                    fontSize = buttonsDialogData.value.fontSize,
+                                    buttonSize = buttonSize,
+                                    fontSize = fontSize,
                                     colors = model.appColors,
                                     onPedal1Click = buttonsDialogData.value.onPedal1,
                                     onPedal3Click = buttonsDialogData.value.onPedal3,
@@ -83,16 +87,16 @@ fun ButtonsDialog(
                                 4 -> if(workingOnSequences){
                                     BoostedMikroKanonsButtons(
                                         model = buttonsDialogData.value.model,
-                                        buttonSize = buttonsDialogData.value.buttonSize,
-                                        fontSize = buttonsDialogData.value.fontSize,
+                                        buttonSize = buttonSize,
+                                        fontSize = fontSize,
                                         colors = model.appColors,
                                         onMK5reductedClick = buttonsDialogData.value.onMK5reducted
                                     )
                                 }
                                 5 -> SavingButtons(
                                     model = buttonsDialogData.value.model,
-                                    buttonSize = buttonsDialogData.value.buttonSize,
-                                    fontSize = buttonsDialogData.value.fontSize,
+                                    buttonSize = buttonSize,
+                                    fontSize = fontSize,
                                     colors = model.appColors,
                                     onSavingCounterpoint = buttonsDialogData.value.onSavingCounterpoint)
 
@@ -102,15 +106,15 @@ fun ButtonsDialog(
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
-                    Button(
-                        onClick = {
-                            //buttonDialogData.value.onSubmitButtonClick.invoke(bpm)
-                            onDismissRequest.invoke()
-                        },
-                        shape = MaterialTheme.shapes.large
-                    ) {
-                        Text(text = okText)
-                    }
+//                    Button(
+//                        onClick = {
+//                            //buttonDialogData.value.onSubmitButtonClick.invoke(bpm)
+//                            onDismissRequest.invoke()
+//                        },
+//                        shape = MaterialTheme.shapes.large
+//                    ) {
+//                        Text(text = okText)
+//                    }
                 }
             }
         }

@@ -12,28 +12,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.MultiListDialogData
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
-fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>, fontSize: TextUnit, okText: String = "OK") {
+fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>, dimensions: Dimensions, okText: String = "OK") {
     MultiSelectListDialog(
         listDialogData = listDialogData,
-        fontSize = fontSize, okText = okText,
+        dimensions = dimensions,  okText = okText,
         onDismissRequest = { listDialogData.value = MultiListDialogData(itemList = listDialogData.value.itemList)  }
     )
 }
 @Composable
 fun MultiSelectListDialog(
     listDialogData: MutableState<MultiListDialogData>,
-    fontSize: TextUnit, okText: String = "OK",
+    dimensions: Dimensions, okText: String = "OK",
     onDismissRequest: () -> Unit
 ) {
     if (listDialogData.value.dialogState) {
+        val fontSize = dimensions.dialogFontSize
         var selectedOptions by remember{ mutableStateOf(listDialogData.value.selectedListDialogItems) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
-                modifier = Modifier.width(300.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
@@ -42,7 +45,7 @@ fun MultiSelectListDialog(
                     val listState = rememberLazyListState()
                     if(listDialogData.value.itemList.isNotEmpty()){
                         LazyColumn( state = listState,
-                            modifier = Modifier.height(420.dp)
+                            modifier = Modifier.height(dimensions.dialogHeight / 6 * 5)
                         ) { items(listDialogData.value.itemList) { item ->
                             val selected = if (selectedOptions.isEmpty()) {
                                 listOf<String>()
@@ -51,7 +54,7 @@ fun MultiSelectListDialog(
                                 //sequencesList[selectedOption.value]
                             }
                             Spacer(modifier = Modifier.height(2.dp))
-                            MultiRadioButton(item, selected, fontSize) { selectedValue ->
+                            MultiRadioButton(item, selected, fontSize.sp) { selectedValue ->
                                 val index = listDialogData.value.itemList.indexOf(selectedValue)
                                 selectedOptions = if(selectedOptions.contains(index)){
                                     selectedOptions.toMutableSet().also{
@@ -67,15 +70,20 @@ fun MultiSelectListDialog(
                         }
 
                         Spacer(modifier = Modifier.height(10.dp))
-                        Button(
-                            onClick = {
-                                listDialogData.value.onSubmitButtonClick.invoke(selectedOptions.toList())
-                                onDismissRequest.invoke()
-                            },
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Text(text = okText)
+                        Row( modifier = Modifier.height(dimensions.dialogHeight / 6),
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                            Button(
+                                onClick = {
+                                    listDialogData.value.onSubmitButtonClick.invoke(selectedOptions.toList())
+                                    onDismissRequest.invoke()
+                                },
+                                shape = MaterialTheme.shapes.medium
+                            ) {
+                                Text(text = okText)
+                            }
                         }
+
                     }
 
                 }

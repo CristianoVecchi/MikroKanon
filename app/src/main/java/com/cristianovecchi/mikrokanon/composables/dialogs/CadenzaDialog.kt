@@ -19,18 +19,20 @@ import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.getNoteAndRestSymbols
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 
 @Composable
-fun CadenzaDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, okText: String = "OK",
-                   onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) }) {
+fun CadenzaDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dimensions: Dimensions,
+                  okText: String = "OK",
+                  onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) }) {
 
     if (multiNumberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
             Surface(
-                modifier = Modifier.width(350.dp).height(350.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight / 2),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -53,7 +55,7 @@ fun CadenzaDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, ok
                         cadenzaValues[index] = newCadenza
                         cadenzaText = cadenzaValues.joinToString(",")
                     }
-                    val fontSize = 20.sp // buttons plus & minus
+                    val fontSize = dimensions.dialogFontSize.sp//20.sp // buttons plus & minus
                     val textSize = 24.sp
                     val fontWeight = FontWeight.Normal
                     val numberFontWeight = FontWeight.Bold
@@ -238,7 +240,6 @@ fun CadenzaDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, ok
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["done"]!!,
-                                fontSize = 2,
                                 buttonSize = buttonSize,
                                 iconColor = Color.Green,
                                 colors = model.appColors
