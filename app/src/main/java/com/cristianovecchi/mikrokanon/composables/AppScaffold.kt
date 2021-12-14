@@ -44,10 +44,10 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
     val colors = model.appColors
     val dimensions = model.dimensions
     val titleStyle = SpanStyle(
-        fontSize = (dimensions.width/35).pxToSp.sp,
+        fontSize = dimensions.titleTextSize.first.sp,
         color = colors.cellTextColorSelected)
     val creditStyle = SpanStyle(
-        fontSize = (dimensions.width/40).pxToSp.sp,
+        fontSize = dimensions.titleTextSize.second.sp,
         color = colors.cellTextColorUnselected)
 
     Scaffold(
@@ -70,7 +70,7 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
                 )
                 {
                     IconButton(
-                        modifier = Modifier.size(dimensions.selectorButtonSize/3 * 2),
+                        modifier = Modifier.size(dimensions.selectorButtonSize),
                         onClick = {scope.launch { scaffoldState.drawerState.open() }  }
                     ) {
                         Icon(
@@ -197,17 +197,17 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     //BpmDialog(bpmDialogData, lang.OKbutton)
     val intervalsForGlissando = createGlissandoIntervals(lang.doublingNames)
 
-    MelodyTypeDialog(melodyTypesDialogData, lang.melodyOptions)
-    RangeTypeDialog(rangeTypesDialogData, lang.rangeOptions)
+    MelodyTypeDialog(melodyTypesDialogData,dimensions, lang.melodyOptions)
+    RangeTypeDialog(rangeTypesDialogData, dimensions, lang.rangeOptions)
     LegatoTypeDialog(legatoTypesDialogData, dimensions, lang.articulationOptions)
-    MultiBpmDialog(multiBpmDialogData, lang.OKbutton)
-    MultiDynamicDialog(multiFloatDialogData, lang.OKbutton)
+    MultiBpmDialog(multiBpmDialogData, dimensions, lang.OKbutton)
+    MultiDynamicDialog(multiFloatDialogData, dimensions, lang.OKbutton)
     //val intervalsForTranspose = listOf("U","2m","2M","3m","3M","4","4A","5","6m","6M","7m","7M")
     val intervalsForTranspose = getIntervalsForTranspose(lang.intervalSet)
-    TransposeDialog(transposeDialogData,
+    TransposeDialog(transposeDialogData, dimensions,
         intervalsForTranspose, lang.OKbutton)
     val formsNames = listOf("unrelated", lang.original, lang.inverse, lang.retrograde, lang.invRetrograde)
-    RowFormsDialog(rowFormsDialogData,
+    RowFormsDialog(rowFormsDialogData, dimensions,
         formsNames, lang.OKbutton)
     ExportDialog(exportDialogData, lang.OKbutton)
     CreditsDialog(creditsDialogData, dimensions, lang.OKbutton)
@@ -225,6 +225,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 //    }
 Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
     val buttonSize = dimensions.selectorButtonSize
+    val iconSize = dimensions.selectorButtonSize / 2
     Column(Modifier
         .weight(1f)
         .background(
@@ -244,7 +245,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
         )
         {
             Icon(
-                modifier = Modifier.size(buttonSize/2),
+                modifier = Modifier.size(iconSize),
                 painter = painterResource(id = model.iconMap["sound"]!!),
                 contentDescription = null, // decorative element
                 tint = if(selectedTab == ScaffoldTabs.SOUND) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
@@ -270,7 +271,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
         )
         {
             Icon(
-                modifier = Modifier.size(buttonSize/2),
+                modifier = Modifier.size(iconSize),
                 painter = painterResource(id = model.iconMap["building"]!!),
                 contentDescription = null, // decorative element
                 tint = if(selectedTab == ScaffoldTabs.BUILDING) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
@@ -299,7 +300,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
         )
         {
             Icon(
-                modifier = Modifier.size(buttonSize/2),
+                modifier = Modifier.size(iconSize),
                 painter = painterResource(id = model.iconMap["settings"]!!),
                 contentDescription = null, // decorative element
                 tint = if(selectedTab == ScaffoldTabs.SETTINGS) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
@@ -314,7 +315,8 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colors.drawerBackgroundColor),
+                    .background(colors.drawerBackgroundColor)
+                    .padding(top = 6.dp),
                 state = listState,
             ) { items(optionNames) { optionName ->
                 val fontSize = dimensions.optionsFontSize

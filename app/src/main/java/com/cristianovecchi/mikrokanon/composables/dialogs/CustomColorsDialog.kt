@@ -166,6 +166,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                     Row(modifier = Modifier.fillMaxWidth().height(h),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically ){
+                        val fontSize = dimensions.dialogFontSize
                         Button(
                             onClick = {
                                 customColorsDialogData.value.onSubmitButtonClick.invoke(indexColors)
@@ -173,7 +174,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                             },
                             shape = MaterialTheme.shapes.large
                         ) {
-                            Text(text = okText)
+                            Text(text = okText, fontSize = fontSize.sp)
                         }
                         Row{
                             Button(
@@ -183,7 +184,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                                 },
                                 shape = MaterialTheme.shapes.large
                             ) {
-                                Text(text = "-")
+                                Text(text = "-", fontSize = fontSize.sp)
                             }
                             Button(
                                 onClick = {
@@ -191,7 +192,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                                 },
                                 shape = MaterialTheme.shapes.large
                             ) {
-                                Text(text = "+")
+                                Text(text = "+", fontSize = fontSize.sp)
                             }
                         }
                     }

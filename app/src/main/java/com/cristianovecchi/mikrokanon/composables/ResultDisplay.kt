@@ -169,7 +169,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 
 
                 val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
-                SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
+                SequencesDialog(dialogState = dialogState, dimensions = dimensions,
                     title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
                     sequencesList = sequencesToString,
                     onSubmitButtonClick = { index, repeat ->
@@ -181,7 +181,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 
                 ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model)
                 MultiListDialog(intervalSetDialogData, dimensions, language.OKbutton)
-                SimpleTransposeDialog(simpleTransposeDialogData, getIntervalsForTranspose(language.intervalSet))
+                SimpleTransposeDialog(simpleTransposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
                 // STACK ICONS
                 Row(modifier = Modifier

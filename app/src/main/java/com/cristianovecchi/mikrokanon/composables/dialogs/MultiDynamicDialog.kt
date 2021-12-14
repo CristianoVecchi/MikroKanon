@@ -27,11 +27,13 @@ import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.composables.MultiFloatDialogData
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
 import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
-fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>, okText: String = "OK",
+fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
+                       dimensions: Dimensions, okText: String = "OK",
                        onDismissRequest: () -> Unit = { multiFloatDialogData.value = MultiFloatDialogData(model = multiFloatDialogData.value.model, value = multiFloatDialogData.value.value) }) {
 
     if (multiFloatDialogData.value.dialogState) {
@@ -39,18 +41,24 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiFloatDialogData.value.model
             Surface(
-                modifier = Modifier.width(350.dp).height(700.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
-                Column(modifier = Modifier.padding(10.dp)) {
+                Column(modifier = Modifier.height((dimensions.height / 6 * 5).dp)
+                    .padding(10.dp)) {
+                    val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(5f)
+                        .weight(weights.first)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(4f)
+                        .weight(weights.second)
+                    val modifierC = Modifier
+                        //.fillMaxSize()
+                        .padding(8.dp)
+                        .weight(weights.third)
                     var dynamicText by remember { mutableStateOf(multiFloatDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setDynamic = { index: Int, dynamicToCheck: Float ->
@@ -62,7 +70,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                         dynamicValues[index] = newDynamic
                         dynamicText = dynamicValues.joinToString(",")
                     }
-                    val fontSize = 22.sp
+                    val fontSize = dimensions.dialogFontSize
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     val symbols = getDynamicSymbols()
@@ -72,7 +80,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
 
                     Column(modifier = modifierA) {
                         Text(text = multiFloatDialogData.value.title)
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         val colors = model.appColors
                         val listState = rememberLazyListState()
@@ -120,7 +128,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                                 Text(
                                                     text = if (text < 0f) "| ${dynamicMap[text.absoluteValue]!!}" else dynamicMap[text]!!,
                                                     modifier = Modifier.padding(innerPadding),
-                                                    style = TextStyle(fontSize = if (cursor == index) fontSize else fontSize),
+                                                    style = TextStyle(fontSize = fontSize.sp),
                                                     fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal
                                                 )
                                             }
@@ -153,7 +161,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[0],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -167,7 +175,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[1],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -181,7 +189,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[2],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -195,7 +203,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[3],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -213,7 +221,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[4],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -226,7 +234,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[5],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -239,7 +247,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[6],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -252,7 +260,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[7],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -270,7 +278,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[8],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -283,7 +291,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[9],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -296,7 +304,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[10],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -309,7 +317,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     Text(
                                         text = symbols[11],
                                         style = TextStyle(
-                                            fontSize = fontSize,
+                                            fontSize = fontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -318,17 +326,17 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                         Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            modifier= modifierC.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
 
-                            val buttonSize = model.dimensions.inputButtonSize - 10.dp
+                            val buttonSize = model.dimensions.dialogButtonSize
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["done"]!!,
-                                fontSize = 2,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = Color.Green,
                                 colors = model.appColors
                             ) {
@@ -341,9 +349,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                             }
                             CustomButton(
                                 adaptSizeToIconButton = true,
-                                text = "|",
-                                fontSize = 10,
-                                buttonSize = buttonSize,
+                                text = "",
+                                iconId = model.iconMap["bar"]!!,
+                                buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
@@ -356,8 +364,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["delete"]!!,
-                                fontSize = 2,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
@@ -374,8 +381,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["add"]!!,
-                                fontSize = 2,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {

@@ -26,12 +26,14 @@ import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
 import com.cristianovecchi.mikrokanon.correctBpms
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.valueFromCsv
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
-fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, okText: String = "OK",
+fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
+                   dimensions: Dimensions, okText: String = "OK",
                    onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) }) {
 
     if (multiNumberDialogData.value.dialogState) {
@@ -39,18 +41,24 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
             Surface(
-                modifier = Modifier.width(350.dp).height(600.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
-                Column(modifier = Modifier.padding(10.dp)) {
+                Column(modifier = Modifier.height((dimensions.height / 6 * 5).dp)
+                    .padding(10.dp)) {
+                    val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(5f)
+                        .weight(weights.first)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(4f)
+                        .weight(weights.second)
+                    val modifierC = Modifier
+                        //.fillMaxSize()
+                        .padding(8.dp)
+                        .weight(weights.third)
                     var bpmText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setBpm = { index: Int, bpmToCheck: Int ->
@@ -62,7 +70,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                         bpmValues[index] = newBpm
                         bpmText = bpmValues.joinToString(",")
                     }
-                    val fontSize = 22.sp
+                    val fontSize = dimensions.dialogFontSize.sp
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
@@ -115,7 +123,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                                 Text(
                                                     text = if (text < 0) "|${text.absoluteValue}" else text.toString(),
                                                     modifier = Modifier.padding(innerPadding),
-                                                    style = TextStyle(fontSize = if (cursor == index) fontSize else fontSize),
+                                                    style = TextStyle(fontSize = fontSize),
                                                     fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal
                                                 )
                                             }
@@ -271,19 +279,19 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 }
                             }
                         }
-                        Spacer(modifier = Modifier.height(10.dp))
+
                         Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            modifier = modifierC.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
 
-                            val buttonSize = model.dimensions.inputButtonSize - 10.dp
+                            val buttonSize = model.dimensions.dialogButtonSize
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["done"]!!,
-                                fontSize = 2,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = Color.Green,
                                 colors = model.appColors
                             ) {
@@ -296,9 +304,9 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                             }
                             CustomButton(
                                 adaptSizeToIconButton = true,
-                                text = "|",
-                                fontSize = 10,
-                                buttonSize = buttonSize,
+                                text = "",
+                                iconId = model.iconMap["bar"]!!,
+                                buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
@@ -311,8 +319,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["delete"]!!,
-                                fontSize = 2,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
@@ -329,8 +336,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, o
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["add"]!!,
-                                fontSize = 2,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {

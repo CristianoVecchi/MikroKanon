@@ -51,10 +51,10 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(1f)
+                        .weight(5f)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(1f)
+                        .weight(7f)
                     var legatoText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setLegato = { index: Int, newLegato: Int ->
@@ -81,7 +81,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         val intervalPadding = 2.dp
                         val innerPadding = 8.dp
                         val ranges = legatoText.extractIntPairsFromCsv()
-                        val nCols = 6
+                        val nCols = 4
                         val nRows = (ranges.size / nCols) + 1
                         val rows = (0 until nRows).toList()
                         LazyColumn(state = listState) {
@@ -131,7 +131,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             }
                         }
                     }
-                    Column(modifier = modifierB, verticalArrangement = Arrangement.Bottom) {
+                    Column(modifier = modifierB, verticalArrangement = Arrangement.Center) {
                         val textFontSize = (dimensions.dialogFontSize / 3 * 3).sp
                         val textButtonPadding = 1.dp
                         Spacer(modifier = Modifier.height(6.dp))
@@ -278,7 +278,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
 
                             }
                         }
-                        val buttonSize = model.dimensions.inputButtonSize - 14.dp
+                        val buttonSize = dimensions.dialogButtonSize.dp
 
 
                         Spacer(modifier = Modifier.height(6.dp))
@@ -301,8 +301,8 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
 
                             CustomButton(
                                 adaptSizeToIconButton = true,
-                                text = "|",
-                                fontSize = fontSize,
+                                text = "",
+                                iconId = model.iconMap["bar"]!!,
                                 buttonSize = buttonSize,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors

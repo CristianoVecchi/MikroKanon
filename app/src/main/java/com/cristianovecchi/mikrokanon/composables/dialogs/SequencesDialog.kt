@@ -11,19 +11,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 
 @Composable
 fun SequencesDialog(dialogState: MutableState<Boolean>, sequencesList: List<String>,
-                    fontSize: TextUnit, title: String, repeatText: String, okText: String = "OK",
+                    dimensions: Dimensions, title: String, repeatText: String, okText: String = "OK",
                     onSubmitButtonClick: (Int, Boolean) -> Unit) {
     SingleSelectDialog(
         dialogState = dialogState,
         title = title,
         repeatText = repeatText, okText = okText,
         sequencesList = sequencesList,
-        fontSize = fontSize,
+        dimensions = dimensions,
         onSubmitButtonClick = {  index, repeated -> onSubmitButtonClick(index, repeated)},
         onDismissRequest = { dialogState.value = false }
     )
@@ -34,17 +36,17 @@ fun SingleSelectDialog(
     title: String, repeatText: String, okText: String = "OK",
     sequencesList: List<String>,
     defaultSelected: Int = -1,
-
-    fontSize: TextUnit,
+    dimensions:Dimensions,
     onSubmitButtonClick: (Int, Boolean) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     if (dialogState.value) {
         var selectedOption by remember{ mutableStateOf(defaultSelected) }
         var repeated by remember{ mutableStateOf(false) }
+        val fontSize = dimensions.dialogFontSize
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
-                modifier = Modifier.width(300.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
@@ -52,7 +54,7 @@ fun SingleSelectDialog(
                     Spacer(modifier = Modifier.height(10.dp))
                     val listState = rememberLazyListState()
                     LazyColumn( state = listState,
-                        modifier = Modifier.height(420.dp)
+                        modifier = Modifier.height(dimensions.dialogHeight / 5 * 4)
                     ) { items(sequencesList) { sequence ->
                         val selected = if (selectedOption == -1) {
                             ""
@@ -61,31 +63,37 @@ fun SingleSelectDialog(
                             //sequencesList[selectedOption.value]
                         }
                         Spacer(modifier = Modifier.height(6.dp))
-                        RadioButton(sequence, selected, fontSize = fontSize) { selectedValue ->
+                        RadioButton(sequence, selected, fontSize = fontSize.sp) { selectedValue ->
                             selectedOption = sequencesList.indexOf(selectedValue)
                         }
                     }
 
                     }
-                    Row(){
-                        Checkbox(
-                            checked = repeated,
-                            onCheckedChange = { checked ->
-                                repeated = !repeated
-                            }
-                        )
-                        Text(text = repeatText)
-                    }
                     Spacer(modifier = Modifier.height(10.dp))
-                    Button(
-                        onClick = {
-                            onSubmitButtonClick.invoke(selectedOption, repeated)
-                            onDismissRequest.invoke()
-                        },
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Text(text = okText, style = TextStyle(fontSize = fontSize))
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween){
+                        Button(
+                            onClick = {
+                                onSubmitButtonClick.invoke(selectedOption, repeated)
+                                onDismissRequest.invoke()
+                            },
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text(text = okText, style = TextStyle(fontSize = fontSize.sp))
+                        }
+                        Row{
+                            Checkbox(
+                                checked = repeated,
+                                onCheckedChange = { checked ->
+                                    repeated = !repeated
+                                }
+                            )
+                            Text(text = repeatText)
+                        }
+
                     }
+
+
                 }
             }
         }

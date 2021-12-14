@@ -30,8 +30,8 @@ fun ButtonsDialog(
     }
 ) {
     if (buttonsDialogData.value.dialogState) {
-        val buttonSize = dimensions.selectorButtonSize / 5 * 4
-        val fontSize = dimensions.selectorFPbuttonFontSize /5 * 4
+        val buttonSize = dimensions.dialogButtonSize.dp
+        val fontSize = dimensions.dialogFontSize
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(

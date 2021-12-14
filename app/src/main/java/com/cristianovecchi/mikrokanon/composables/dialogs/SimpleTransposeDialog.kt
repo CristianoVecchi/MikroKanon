@@ -25,35 +25,37 @@ import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
 @Composable
-fun SimpleTransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, intervals: List<String>,
-                    onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) })
+fun SimpleTransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
+                          dimensions: Dimensions, intervals: List<String>,
+                          onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) })
 {
 
     if (multiNumberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
+            val height = dimensions.dialogHeight / 3 * 2
             Surface(
-                modifier = Modifier.width(300.dp).height(300.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(height),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
-                Column(modifier = Modifier.padding(10.dp)) {
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
 
-                    val fontSize = 16.sp
+                    val fontSize = dimensions.dialogFontSize.sp
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
                         Text(text = multiNumberDialogData.value.title)
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        Column(modifier = modifierA, verticalArrangement = Arrangement.Center) {
+                        Column(modifier = Modifier.height(height / 6 * 5).padding(10.dp), verticalArrangement = Arrangement.Center) {
                             Spacer(modifier = Modifier.height(10.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -279,7 +281,7 @@ fun SimpleTransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                         }
                     }
                 }
-            }
+
         }
     }
 }

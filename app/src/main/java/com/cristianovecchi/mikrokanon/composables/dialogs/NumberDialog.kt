@@ -14,10 +14,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.NumberDialogData
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
 fun NumberDialog(
-    numberDialogData: MutableState<NumberDialogData>, okText: String = "OK",
+    numberDialogData: MutableState<NumberDialogData>,
+    dimensions: Dimensions, okText: String = "OK",
     onDismissRequest: () -> Unit = {
         numberDialogData.value = NumberDialogData(value = numberDialogData.value.value)
     }

@@ -85,7 +85,7 @@ fun SequenceSelector(model: AppViewModel,
             val dimensions = model.dimensions
             val buttonSize = dimensions.selectorButtonSize
             val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
-            SequencesDialog(dialogState = dialogState, fontSize = dimensions.sequenceDialogFontSize,
+            SequencesDialog(dialogState = dialogState, dimensions = dimensions,
                 title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
                 sequencesList = sequencesToString,
                 onSubmitButtonClick = { index, repeat ->

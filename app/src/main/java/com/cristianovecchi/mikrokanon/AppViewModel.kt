@@ -124,6 +124,7 @@ class AppViewModel(
         "transpose" to R.drawable.ic_baseline_unfold_more_24,
         "sort_up" to R.drawable.ic_baseline_trending_up_24,
         "sort_down" to R.drawable.ic_baseline_trending_down_24,
+        "bar" to R.drawable.ic_baseline_bar_24,
     )
     val stackIcons = mutableListOf<String>()
     private fun Stack<Computation>.pushAndDispatch(computation: Computation){

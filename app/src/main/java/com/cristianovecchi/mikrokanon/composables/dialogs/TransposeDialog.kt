@@ -25,10 +25,12 @@ import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
 @Composable
-fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, intervals: List<String>, okText: String = "OK",
+fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
+                    dimensions: Dimensions, intervals: List<String>, okText: String = "OK",
                     onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) })
 {
 
@@ -37,18 +39,24 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
             Surface(
-                modifier = Modifier.width(350.dp).height(700.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
-                Column(modifier = Modifier.padding(10.dp)) {
+                Column(modifier = Modifier.height((dimensions.height / 6 * 5).dp)
+                                    .padding(10.dp)) {
+                    val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(5f)
+                        .weight(weights.first)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(4f)
+                        .weight(weights.second)
+                    val modifierC = Modifier
+                        //.fillMaxSize()
+                        .padding(8.dp)
+                        .weight(weights.third)
                     var transposeText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember{ mutableStateOf(0) }
                     val setTranspose = { index: Int, newTranspose: Int ->
@@ -56,7 +64,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                         bpmValues[index] = newTranspose
                         transposeText = bpmValues.joinToString(",")
                     }
-                    val fontSize = 16.sp
+                    val fontSize = dimensions.dialogFontSize.sp
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
@@ -267,16 +275,20 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
 
                             }
                         }
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly){
 
-                            val buttonSize = model.dimensions.inputButtonSize - 10.dp
+
+                    } // end modifierB
+                    Row(
+                        modifier = modifierC.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                            val buttonSize = dimensions.dialogButtonSize
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["done"]!!,
-                                fontSize = 2,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = Color.Green,
                                 colors = model.appColors
                             ) {
@@ -287,8 +299,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["delete"]!!,
-                                fontSize = 2,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
@@ -304,8 +315,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["add"]!!,
-                                fontSize = 2,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
@@ -315,9 +325,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 transposeText = values.joinToString(",")
                                 cursor = values.size - 1
                             }
-                        }
                     }
-
                 }
             }
         }

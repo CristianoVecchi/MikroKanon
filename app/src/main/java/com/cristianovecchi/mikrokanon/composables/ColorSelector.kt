@@ -24,8 +24,8 @@ import com.cristianovecchi.mikrokanon.toDp
 import kotlin.math.roundToInt
 
 @Composable
-fun ColorSelector(height: Dp = 300.dp,
-                  barHeight: Int = (height.value / 4f).toInt(), //+ (height.value % 4f).toInt(),
+fun ColorSelector(height: Dp,
+                  barHeight: Int = (height.value / 8f).toInt(), //+ (height.value % 4f).toInt(),
     startColor: Color = Color.Black, refresh: Boolean, dispatchColor : (Color) -> Unit ) {
     var sizeR by remember { mutableStateOf(IntSize.Zero) }
     var sizeG by remember { mutableStateOf(IntSize.Zero) }

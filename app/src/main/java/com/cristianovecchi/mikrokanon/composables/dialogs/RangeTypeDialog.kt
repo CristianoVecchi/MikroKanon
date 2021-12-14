@@ -33,11 +33,13 @@ import com.cristianovecchi.mikrokanon.locale.melodyTypeMap
 import com.cristianovecchi.mikrokanon.locale.rangeTypeMap
 import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
-fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, types: List<String>,
+fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
+                    dimensions: Dimensions, types: List<String>,
                      onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) })
 {
 
@@ -47,18 +49,24 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
             val model = multiNumberDialogData.value.model
             val octaves= getOctaveSymbols()
             Surface(
-                modifier = Modifier.width(350.dp).height(450.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
-                Column(modifier = Modifier.padding(10.dp)) {
+                Column(modifier = Modifier.height((dimensions.height / 6 * 5).dp)
+                    .padding(10.dp)) {
+                    val weights = dimensions.fullDialogWeights
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(3f)
+                        .weight(weights.first)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(5f)
+                        .weight(weights.second)
+                    val modifierC = Modifier
+                        //.fillMaxSize()
+                        .padding(8.dp)
+                        .weight(weights.third)
                     var rangeText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setRange = { index: Int, newRange: Int ->
@@ -66,7 +74,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                         ranges[index] = Pair(newRange, ranges[index].second)
                         rangeText = ranges.toIntPairsString()
                     }
-                    val fontSize = 16.sp
+                    val fontSize = dimensions.dialogFontSize
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
@@ -120,7 +128,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                                 Text(
                                                     text = text,
                                                     modifier = Modifier.padding(innerPadding),
-                                                    style = TextStyle(fontSize = if (cursor == index) fontSize else fontSize),
+                                                    style = TextStyle(fontSize = (fontSize / 4 * 3).sp),
                                                     fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal
                                                 )
                                             }
@@ -135,8 +143,8 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                             }
                         }
                     }
-                    Column(modifier = modifierB, verticalArrangement = Arrangement.Bottom) {
-                        val textFontSize = if(types.maxOf{it.length}>26) 16.sp else 18.sp
+                    Column(modifier = modifierB, verticalArrangement = Arrangement.Center) {
+                        val textFontSize = if(types.maxOf{it.length}>26) fontSize / 3 * 2 else fontSize
                         val textButtonPadding = 1.dp
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(
@@ -155,7 +163,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                     Text(
                                         text = types[0],
                                         style = TextStyle(
-                                            fontSize = textFontSize,
+                                            fontSize = textFontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -169,7 +177,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                     Text(
                                         text = types[1],
                                         style = TextStyle(
-                                            fontSize = textFontSize,
+                                            fontSize = textFontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -183,7 +191,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                     Text(
                                         text = types[2],
                                         style = TextStyle(
-                                            fontSize = textFontSize,
+                                            fontSize = textFontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -197,7 +205,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                     Text(
                                         text = types[3],
                                         style = TextStyle(
-                                            fontSize = textFontSize,
+                                            fontSize = textFontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -211,7 +219,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                     Text(
                                         text = types[4],
                                         style = TextStyle(
-                                            fontSize = textFontSize,
+                                            fontSize = textFontSize.sp,
                                             fontWeight = fontWeight
                                         )
                                     )
@@ -222,13 +230,13 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                 modifier = Modifier.width(IntrinsicSize.Max),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                val buttonSize = model.dimensions.inputButtonSize - 8.dp
-                                val fontSizeOctave = 16
+                                val buttonSize = model.dimensions.dialogButtonSize / 3 * 2
+                                val fontSizeOctave = model.dimensions.dialogFontSize
                                 CustomButton(
                                     adaptSizeToIconButton = false,
                                     text = octaves[4], // +15
                                     fontSize = fontSizeOctave,
-                                    buttonSize = buttonSize,
+                                    buttonSize = buttonSize.dp,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
                                 ) {
@@ -241,7 +249,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                     adaptSizeToIconButton = false,
                                     text = octaves[3], // +8
                                     fontSize = fontSizeOctave,
-                                    buttonSize = buttonSize,
+                                    buttonSize = buttonSize.dp,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
                                 ) {
@@ -254,7 +262,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                     adaptSizeToIconButton = false,
                                     text = octaves[1], // -8
                                     fontSize = fontSizeOctave,
-                                    buttonSize = buttonSize,
+                                    buttonSize = buttonSize.dp,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
                                 ) {
@@ -267,7 +275,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
                                     adaptSizeToIconButton = false,
                                     text = octaves[0], // -15
                                     fontSize = fontSizeOctave,
-                                    buttonSize = buttonSize,
+                                    buttonSize = buttonSize.dp,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
                                 ) {
@@ -280,59 +288,54 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, 
 
                             }
                         }
-                        val buttonSize = model.dimensions.inputButtonSize - 14.dp
-                        val fontSize = 14
-
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                    }
+                    Row(
+                        modifier = modifierC.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val buttonSize = dimensions.dialogButtonSize
+                        CustomButton(
+                            adaptSizeToIconButton = true,
+                            text = "",
+                            iconId = model.iconMap["done"]!!,
+                            buttonSize = buttonSize.dp,
+                            iconColor = Color.Green,
+                            colors = model.appColors
                         ) {
-                            CustomButton(
-                                adaptSizeToIconButton = true,
-                                text = "",
-                                iconId = model.iconMap["done"]!!,
-                                fontSize = fontSize,
-                                buttonSize = buttonSize,
-                                iconColor = Color.Green,
-                                colors = model.appColors
-                            ) {
-                                multiNumberDialogData.value.onSubmitButtonClick.invoke(rangeText)
-                                onDismissRequest.invoke()
-                            }
+                            multiNumberDialogData.value.onSubmitButtonClick.invoke(rangeText)
+                            onDismissRequest.invoke()
+                        }
 
-                            CustomButton(
-                                adaptSizeToIconButton = true,
-                                text = "",
-                                iconId = model.iconMap["delete"]!!,
-                                fontSize = fontSize,
-                                buttonSize = buttonSize,
-                                iconColor = model.appColors.iconButtonIconColor,
-                                colors = model.appColors
-                            ) {
-                                val ranges = rangeText.extractIntPairsFromCsv().toMutableList()
-                                if(ranges.size > 1){
-                                    ranges.removeAt(cursor)
-                                    rangeText = ranges.toIntPairsString()
-                                    val newCursor = if (ranges.size > 1) cursor - 1 else 0
-                                    cursor = if (newCursor < 0) 0 else newCursor
-                                }
-                            }
-                            CustomButton(
-                                adaptSizeToIconButton = true,
-                                text = "",
-                                iconId = model.iconMap["add"]!!,
-                                fontSize = fontSize,
-                                buttonSize = buttonSize,
-                                iconColor = model.appColors.iconButtonIconColor,
-                                colors = model.appColors
-                            ) {
-                                val ranges = rangeText.extractIntPairsFromCsv().toMutableList()
-                                val lastRange = ranges[ranges.size - 1]
-                                ranges.add(lastRange)
+                        CustomButton(
+                            adaptSizeToIconButton = true,
+                            text = "",
+                            iconId = model.iconMap["delete"]!!,
+                            buttonSize = buttonSize.dp,
+                            iconColor = model.appColors.iconButtonIconColor,
+                            colors = model.appColors
+                        ) {
+                            val ranges = rangeText.extractIntPairsFromCsv().toMutableList()
+                            if(ranges.size > 1){
+                                ranges.removeAt(cursor)
                                 rangeText = ranges.toIntPairsString()
-                                cursor = ranges.size - 1
+                                val newCursor = if (ranges.size > 1) cursor - 1 else 0
+                                cursor = if (newCursor < 0) 0 else newCursor
                             }
+                        }
+                        CustomButton(
+                            adaptSizeToIconButton = true,
+                            text = "",
+                            iconId = model.iconMap["add"]!!,
+                            buttonSize = buttonSize.dp,
+                            iconColor = model.appColors.iconButtonIconColor,
+                            colors = model.appColors
+                        ) {
+                            val ranges = rangeText.extractIntPairsFromCsv().toMutableList()
+                            val lastRange = ranges[ranges.size - 1]
+                            ranges.add(lastRange)
+                            rangeText = ranges.toIntPairsString()
+                            cursor = ranges.size - 1
                         }
                     }
 

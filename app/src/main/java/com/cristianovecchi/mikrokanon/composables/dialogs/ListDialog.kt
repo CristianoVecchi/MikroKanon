@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,11 +48,11 @@ fun SingleSelectListDialog(
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
                     Text(text = listDialogData.value.dialogTitle)
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
                     val listState = rememberLazyListState()
                     if(listDialogData.value.itemList.isNotEmpty()){
                         LazyColumn( state = listState,
-                            modifier = Modifier.height(dimensions.dialogHeight / 6 * 5)
+                            modifier = Modifier.height(dimensions.dialogHeight / 5 * 4).padding(end = 5.dp)
                         ) { itemsIndexed(listDialogData.value.itemList) { index, item ->
                             val selected = if (selectedOption == -1) {
                                 ""
@@ -69,8 +70,8 @@ fun SingleSelectListDialog(
 
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Row( modifier = Modifier.height(dimensions.dialogHeight / 6),
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Row( modifier = Modifier.height(dimensions.dialogHeight / 5),
                             verticalAlignment = Alignment.CenterVertically)
                         {
                             Button(
@@ -80,7 +81,8 @@ fun SingleSelectListDialog(
                                 },
                                 shape = MaterialTheme.shapes.medium
                             ) {
-                                Text(text = okText)
+                                Text(text = okText, style = TextStyle(
+                                    fontSize = dimensions.dialogFontSize.sp ) )
                             }
                         }
 

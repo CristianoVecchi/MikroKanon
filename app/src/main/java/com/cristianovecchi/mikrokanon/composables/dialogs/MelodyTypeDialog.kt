@@ -31,11 +31,13 @@ import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.melodyTypeMap
 import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
-fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, types: List<String>,
+fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
+                     dimensions: Dimensions, types: List<String>,
                    onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) })
 {
 
@@ -45,18 +47,24 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
             val model = multiNumberDialogData.value.model
 
             Surface(
-                modifier = Modifier.width(350.dp).height(500.dp),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
-                Column(modifier = Modifier.padding(10.dp)) {
+                Column(modifier = Modifier.height((dimensions.height / 6 * 5).dp)
+                    .padding(10.dp)) {
+                    val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(4f)
+                        .weight(weights.first)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(4f)
+                        .weight(weights.second)
+                    val modifierC = Modifier
+                        //.fillMaxSize()
+                        .padding(8.dp)
+                        .weight(weights.third)
                     var melodyText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setMelody = { index: Int, newMelody: Int ->
@@ -64,7 +72,7 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         melodies[index] = newMelody
                         melodyText = melodies.joinToString(",")
                     }
-                    val fontSize = 18.sp
+                    val fontSize = dimensions.dialogFontSize
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
@@ -83,7 +91,7 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         val intervalPadding = 2.dp
                         val innerPadding = 8.dp
                         val melodies = melodyText.extractIntsFromCsv()
-                        val nCols = 4
+                        val nCols = 6
                         val nRows = (melodies.size / nCols) + 1
                         val rows = (0 until nRows).toList()
                         LazyColumn(state = listState) {
@@ -117,7 +125,7 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                                 Text(
                                                     text = text,
                                                     modifier = Modifier.padding(innerPadding),
-                                                    style = TextStyle(fontSize = if (cursor == index) fontSize else fontSize),
+                                                    style = TextStyle(fontSize = fontSize.sp),
                                                     fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal
                                                 )
                                             }
@@ -132,8 +140,8 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             }
                         }
                     }
-                    Column(modifier = modifierB, verticalArrangement = Arrangement.Bottom) {
-                        val textFontSize = 16.sp
+                    Column(modifier = modifierB, verticalArrangement = Arrangement.SpaceBetween) {
+                        val textFontSize = (dimensions.dialogFontSize).sp
                         val textButtonPadding = 1.dp
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(
@@ -198,20 +206,19 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
 
                             }
                         }
-                        val buttonSize = model.dimensions.inputButtonSize - 14.dp
-                        val fontSize = 14
 
-                        Spacer(modifier = Modifier.height(6.dp))
+                        val buttonSize = model.dimensions.dialogButtonSize
                         Row(
-                            Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            modifier = modifierC.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "",
                                 iconId = model.iconMap["done"]!!,
                                 fontSize = fontSize,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = Color.Green,
                                 colors = model.appColors
                             ) {
@@ -224,7 +231,7 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 text = "",
                                 iconId = model.iconMap["delete"]!!,
                                 fontSize = fontSize,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
@@ -241,7 +248,7 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 text = "",
                                 iconId = model.iconMap["add"]!!,
                                 fontSize = fontSize,
-                                buttonSize = buttonSize,
+                                buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
@@ -253,6 +260,7 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             }
                         }
                     }
+
 
                 }
             }
