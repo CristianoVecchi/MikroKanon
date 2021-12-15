@@ -23,6 +23,7 @@ import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.G
 import com.cristianovecchi.mikrokanon.composables.ColorSelector
 import com.cristianovecchi.mikrokanon.composables.CustomColorsDialogData
+import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.toDp
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
@@ -88,7 +89,8 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                     }
                     val h = dimensions.dialogHeight / 7//80.dp
                     var size by remember { mutableStateOf(IntSize.Zero) }
-                    val w = if (size.width == 0) 0.dp else ((size.width - padding) / 6).toDp().dp + 1.dp
+                    val w = if (size.width == 0) listOf(0,0,0,0,0,0) else
+                            ((size.width - padding) / dimensions.dpDensity + (size.width - padding) % dimensions.dpDensity + 1 ).toLong().divideDistributingRest(6).map{it.toInt()}
                     Box(
                         Modifier
                             .fillMaxWidth()
@@ -103,30 +105,30 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                                 .background(customColor), horizontalArrangement = Arrangement.SpaceEvenly) {
                             Box(
                                 Modifier
-                                    .size(w, h)
+                                    .size(w[0].dp, h)
                                     .background(radarColor))
                             Box(
                                 Modifier
-                                    .size(w, h)
+                                    .size(w[1].dp, h)
                                     .background(beatColor))
                             Box(
                                 Modifier
-                                    .size(w, h)
+                                    .size(w[2].dp, h)
                                     .background(back1Color))
                             Box(
                                 Modifier
-                                    .size(w, h)
+                                    .size(w[3].dp, h)
                                     .background(back2Color))
                             Box(
                                 Modifier
-                                    .size(w, h)
+                                    .size(w[4].dp, h)
                                     .background(pass1Color)
                                     .clickable {
                                         if (indexColors > 0) onSetArrayIndexAndRefresh.invoke(indexColors-1)
                                     })
                             Box(
                                 Modifier
-                                    .size(w, h)
+                                    .size(w[5].dp, h)
                                     .background(pass2Color)
                                     .clickable {
                                         if (indexColors < arraySize ) onSetArrayIndexAndRefresh.invoke(indexColors+1)

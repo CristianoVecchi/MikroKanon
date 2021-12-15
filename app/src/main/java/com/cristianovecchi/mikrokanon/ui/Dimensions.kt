@@ -26,9 +26,11 @@ data class Dimensions( // 1600px width and over
     val selectorClipFontSize: Int = (width/27).pxToSp,
 
     val inputNclipColumns: Int = 8, // 6
-    val inputClipFontSize: TextUnit = 18.sp,
-    val inputButtonSize: Dp = 80.dp,
-    val inputButtonFontSize: Int = 20, // 14
+    val inputAnalyzerFontSize: Int = (width/27).pxToSp,
+    val inputClipFontSize: Int = (width/27).pxToSp,
+    val inputButtonSize: Dp = (width/9).pxToDp.dp,
+    val inputButtonFontSize: Int = (width/27).pxToSp, // 14
+    val inputWeights: Pair<Float, Float> = Pair(5f, 8f),
 
     val outputNoteTableFontSize: Int = 16,
     val outputButtonSize: Dp = 64.dp, // 60
@@ -82,8 +84,10 @@ data class Dimensions( // 1600px width and over
                 selectorMKbuttonFontSize =(selectorButtonSizePx /4).pxToSp,
                 selectorFPbuttonFontSize= (selectorButtonSizePx /2).pxToSp,
                 inputNclipColumns = 6,
-                inputButtonSize = 56.dp,
-                inputButtonFontSize = 16,
+                inputButtonSize = (width/7).pxToDp.dp,
+                inputButtonFontSize = (width/24).pxToSp, // 14
+                inputWeights = Pair(4f, 8f),
+
                 outputButtonSize = 52.dp,
                 outputFPbuttonFontSize = 20,
                 outputIntervalSetFontSize = 10
@@ -100,9 +104,10 @@ data class Dimensions( // 1600px width and over
                 selectorButtonSize = (selectorButtonSizePx / dpDensity).toInt().dp,//50.dp,
                 selectorMKbuttonFontSize =(selectorButtonSizePx /4).pxToSp,
                 selectorFPbuttonFontSize= (selectorButtonSizePx /2).pxToSp,
+                inputButtonSize = (width/7).pxToDp.dp,
+                inputButtonFontSize = (width/24).pxToSp, // 14
+                inputWeights = Pair(4f, 8f),
                 inputNclipColumns = 6,
-                inputButtonSize = (154 / dpDensity).toInt().dp,//56.dp,
-                inputButtonFontSize = 17,
                 outputButtonSize =(154 / dpDensity).toInt().dp,//56.dp,
                 outputFPbuttonFontSize = 22,
                 outputIntervalSetFontSize = 10,
@@ -124,9 +129,13 @@ data class Dimensions( // 1600px width and over
                 selectorFPbuttonFontSize= (selectorButtonSizePx /2).pxToSp,// sp20,
                 selectorClipFontSize = (width/30).pxToSp,
 
+                //inputAnalyzerFontSize = (width/10).pxToSp,
+                inputClipFontSize = (width/24).pxToSp,
+                inputButtonSize = (width/7).pxToDp.dp,
+                inputButtonFontSize = (width/32).pxToSp, // 14
+                inputWeights = Pair(4f, 8f),
                 inputNclipColumns = 6,
-                inputButtonSize = 56.dp,
-                inputButtonFontSize = 3,
+
                 outputNoteTableFontSize = 12,
                 outputButtonSize = 38.dp,
                 outputFPbuttonFontSize = 16,
@@ -152,9 +161,12 @@ data class Dimensions( // 1600px width and over
                 selectorMKbuttonFontSize =(selectorButtonSizePx /3).pxToSp,
                 selectorFPbuttonFontSize= (selectorButtonSizePx /3).pxToSp,// sp20,
                 selectorClipFontSize = (width/30).pxToSp,
+
+                inputButtonSize = (width/8).pxToDp.dp,
+                inputButtonFontSize = (width/38).pxToSp, // 14
+                inputWeights = Pair(4f, 8f),
                 inputNclipColumns = 6,
-                inputButtonSize = 56.dp,
-                inputButtonFontSize = 3,
+
                 outputNoteTableFontSize = 12,
                 outputButtonSize = 38.dp,
                 outputFPbuttonFontSize = 16,

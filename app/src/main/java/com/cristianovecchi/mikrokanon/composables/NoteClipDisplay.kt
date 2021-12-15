@@ -35,7 +35,7 @@ fun NoteClipDisplay(
     modifier: Modifier, clips: List<Clip>, notesNames: List<String>,
     zodiacSigns: Boolean = false, emoji: Boolean = false,
     colors: AppColors, hintText: String = "",
-    cursor: MutableState<Int> = mutableStateOf(-1), fontSize: TextUnit = 18.sp,
+    cursor: MutableState<Int> = mutableStateOf(-1), fontSize: Int = 18,
     nCols: Int = 6, dispatch: (Int) -> Unit)
 {
     val listState = rememberLazyListState()
@@ -71,7 +71,7 @@ fun NoteClipDisplay(
                         for (j in 0 until nCols) {
                             if (index != clips.size) {
                                 val clip = clips[index]
-
+                                val text = if(zodiacSigns) clip.findZodiacSign(emoji) else clip.findText(notesNames = notesNames)
                                 Card(
                                     modifier = Modifier
                                         .background(colors.inputBackgroundColor)
@@ -88,9 +88,9 @@ fun NoteClipDisplay(
                                 )
                                 {
                                     Text(
-                                        text = if(zodiacSigns) clip.findZodiacSign(emoji) else clip.findText(notesNames = notesNames),
+                                        text = text,
                                         modifier = Modifier.padding(innerPadding),
-                                        style = TextStyle(fontSize = if (cursor.value == index) fontSize else fontSize),
+                                        style = TextStyle(fontSize = if(text.length>3) (fontSize/3 * 2).sp else fontSize.sp),
                                         fontWeight = if (cursor.value == index) FontWeight.Bold else FontWeight.Normal
                                     )
                                 }

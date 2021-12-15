@@ -63,7 +63,7 @@ private data class ButtonInfo(val text: String, val output: Out, val resId: Int 
 @Composable
 fun NoteKeyboard(
     model: AppViewModel, colors: AppColors,
-    nRows: Int = 5, nCols: Int = 4, iconMap: Map<String,Int> = HashMap<String,Int>(),
+    nRows: Int = 5, nCols: Int = 4, iconMap: Map<String,Int> = HashMap(),
     dispatch : (Out) -> Unit ) {
     model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val language = Lang.provideLanguage(model.getUserLangDef())
@@ -105,7 +105,7 @@ fun NoteKeyboard(
     )
     var buttonIndex = 0
     Column(modifier = Modifier.fillMaxSize().padding(top = 8.dp, bottom = 8.dp),
-            verticalArrangement = Arrangement.Bottom){
+            verticalArrangement = Arrangement.Center){
 
         for (i in 0 until nRows){
             Row(modifier = Modifier.fillMaxWidth(),
@@ -125,8 +125,8 @@ fun NoteKeyboard(
                         val actualColors = if(resId == -1) colors.copy(iconButtonBackgroundColor = colors.iconButtonBackgroundColor.shift(-0.15f)) else colors
                         val actualFontSize = when (buttonInfo.text.length){
                             in 0..2 -> fontSize
-                            3 -> fontSize - 3
-                            4 -> fontSize - 7
+                            3 -> fontSize / 3 * 2
+                            4 -> fontSize / 2
                             else -> fontSize
                         }
                         val text = if (resId == -1) buttonInfo.text else ""

@@ -19,7 +19,6 @@ import kotlin.collections.HashMap
 fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppViewModel, editing: Boolean,
                                iconMap: Map<String,Int> = HashMap(), done_action: (ArrayList<Clip>, Boolean) -> Unit) {
     val dimensions = model.dimensions
-    val nClipCols = dimensions.inputNclipColumns
     val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
     model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val appColors = model.appColors
@@ -38,82 +37,73 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
     Column(modifier = Modifier
         .fillMaxHeight()
         .background(appColors.inputBackgroundColor)) {
-        val modifier1 = Modifier
+        val weights = dimensions.inputWeights
+        val modifierAnalyzer = Modifier
             .fillMaxWidth()
             .padding(12.dp)
             //.weight(1f)
-        val modifier3 = Modifier
-            .fillMaxSize()
+        val modifierA = Modifier
+            .fillMaxWidth()
             .padding(8.dp)
-            .weight(3f)
-        val modifier5 = Modifier
-            .fillMaxSize()
-            .weight(7f)
-        SequenceAnalyzer(modifier = modifier1, absPitches = clips.map{it.abstractNote},
-                        fontSize = if(model.zodiacPlanetsActive) dimensions.outputIntervalSetFontSize + 7 + 10 else dimensions.outputIntervalSetFontSize + 7,
+            .weight(weights.first)
+        val modifierB = Modifier
+            .fillMaxWidth()
+            .weight(weights.second)
+        SequenceAnalyzer(modifier = modifierAnalyzer, absPitches = clips.map{it.abstractNote},
+                        fontSize = if(model.zodiacPlanetsActive) dimensions.inputAnalyzerFontSize  / 3 * 4 else dimensions.inputAnalyzerFontSize,
                         colors = appColors ,
                         intervalNames = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet)
 //        Row(modifier1) {
 //            Text(text = "Build a Sequence!")
 //        }
-        Row(modifier3) {
+        Column{
+            Row(modifierA) {
 
-            NoteClipDisplay(
-                modifier = Modifier.fillMaxWidth(),  clips = clips.toList(), hintText = language.enterSomeNotes,
-                notesNames = notesNames,  zodiacSigns = model.zodiacSignsActive, emoji = model.zodiacEmojisActive,
-                colors = appColors,
-                cursor = mutableStateOf(cursor.value), nCols = nClipCols, fontSize = dimensions.inputClipFontSize
-            ) { id ->
-                clips.forEachIndexed { index, clip ->
-                    if (clip.id == id) {
-                        cursor.value = index
-                        stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
-                        lastOutIsNotUndo.value = true
-                        lastIsCursorChanged.value = true
+                NoteClipDisplay(
+                    modifier = Modifier.fillMaxWidth(),  clips = clips.toList(), hintText = language.enterSomeNotes,
+                    notesNames = notesNames,  zodiacSigns = model.zodiacSignsActive, emoji = model.zodiacEmojisActive,
+                    colors = appColors, cursor = mutableStateOf(cursor.value),
+                    nCols = dimensions.inputNclipColumns, fontSize = dimensions.inputClipFontSize
+                ) { id ->
+                    clips.forEachIndexed { index, clip ->
+                        if (clip.id == id) {
+                            cursor.value = index
+                            stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                            lastOutIsNotUndo.value = true
+                            lastIsCursorChanged.value = true
+                        }
                     }
                 }
             }
-        }
-        Row(modifier5) {
-            NoteKeyboard(model, iconMap = iconMap, colors = appColors
-            ) { out ->
-                when (out) {
-                    is Out.Note -> {
-                        if (cursor.value == clips.size - 1) {
-                            cursor.value++
-                            clips.add(Clip(id.value++, out.note.abs, out.note, Accidents.NATURAL))
+            Row(modifierB) {
+                NoteKeyboard(model, iconMap = iconMap, colors = appColors
+                ) { out ->
+                    when (out) {
+                        is Out.Note -> {
+                            if (cursor.value == clips.size - 1) {
+                                cursor.value++
+                                clips.add(Clip(id.value++, out.note.abs, out.note, Accidents.NATURAL))
 
-                            stack.push(Undo(ArrayList(clips), cursor.value))
-                            lastOutIsNotUndo.value = true
-                            lastIsCursorChanged.value = true
+                                stack.push(Undo(ArrayList(clips), cursor.value))
+                                lastOutIsNotUndo.value = true
+                                lastIsCursorChanged.value = true
 
-                        } else {
-                            clips.add(
-                                cursor.value,
-                                Clip(id.value++, out.note.abs, out.note, Accidents.NATURAL)
-                            )
-                            stack.push(Undo(ArrayList(clips), cursor.value))
-                            lastOutIsNotUndo.value = true
+                            } else {
+                                clips.add(
+                                    cursor.value,
+                                    Clip(id.value++, out.note.abs, out.note, Accidents.NATURAL)
+                                )
+                                stack.push(Undo(ArrayList(clips), cursor.value))
+                                lastOutIsNotUndo.value = true
+                            }
                         }
-                    }
-                    is Out.Accident -> {
-                        if (clips.isNotEmpty()) {
-                            val oldClip = clips[cursor.value]
-                            val newClip: Clip
-                            val change: Boolean
-                            if (oldClip.ax != Accidents.NATURAL) { // Note has accident
-                                if (out.ax == Accidents.NATURAL) { // Removes the previous accident
-                                    newClip = Clip(
-                                        oldClip.id,
-                                        Clip.inAbsRange(oldClip.abstractNote - oldClip.ax.sum),
-                                        oldClip.name,
-                                        Accidents.NATURAL
-                                    )
-                                    change = true
-                                } else {
-                                    if (oldClip.findText(notesNames)
-                                            .contains(out.ax.ax)
-                                    ) { // Removes the same accident
+                        is Out.Accident -> {
+                            if (clips.isNotEmpty()) {
+                                val oldClip = clips[cursor.value]
+                                val newClip: Clip
+                                val change: Boolean
+                                if (oldClip.ax != Accidents.NATURAL) { // Note has accident
+                                    if (out.ax == Accidents.NATURAL) { // Removes the previous accident
                                         newClip = Clip(
                                             oldClip.id,
                                             Clip.inAbsRange(oldClip.abstractNote - oldClip.ax.sum),
@@ -121,124 +111,138 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                                             Accidents.NATURAL
                                         )
                                         change = true
-                                    } else { // Replaces the previous accident with a new one
-                                        //val noteName = oldClip.text.removeSuffix(oldClip.ax.ax)
+                                    } else {
+                                        if (oldClip.findText(notesNames)
+                                                .contains(out.ax.ax)
+                                        ) { // Removes the same accident
+                                            newClip = Clip(
+                                                oldClip.id,
+                                                Clip.inAbsRange(oldClip.abstractNote - oldClip.ax.sum),
+                                                oldClip.name,
+                                                Accidents.NATURAL
+                                            )
+                                            change = true
+                                        } else { // Replaces the previous accident with a new one
+                                            //val noteName = oldClip.text.removeSuffix(oldClip.ax.ax)
+                                            newClip = Clip(
+                                                oldClip.id,
+                                                Clip.inAbsRange(oldClip.abstractNote - oldClip.ax.sum + out.ax.sum),
+                                                oldClip.name,
+                                                out.ax
+                                            )
+                                            change = true
+                                        }
+                                    }
+                                } else {
+                                    if (out.ax == Accidents.NATURAL) {
+                                        change = false
+                                        newClip = oldClip
+                                    } else {
                                         newClip = Clip(
                                             oldClip.id,
-                                            Clip.inAbsRange(oldClip.abstractNote - oldClip.ax.sum + out.ax.sum),
+                                            Clip.inAbsRange(oldClip.abstractNote + out.ax.sum),
                                             oldClip.name,
                                             out.ax
                                         )
                                         change = true
                                     }
                                 }
-                            } else {
-                                if (out.ax == Accidents.NATURAL) {
-                                    change = false
-                                    newClip = oldClip
-                                } else {
-                                    newClip = Clip(
-                                        oldClip.id,
-                                        Clip.inAbsRange(oldClip.abstractNote + out.ax.sum),
-                                        oldClip.name,
-                                        out.ax
-                                    )
-                                    change = true
+                                if (change) {
+                                    clips[cursor.value] = newClip
+                                    stack.push(Undo(ArrayList(clips), cursor.value))
+                                    lastOutIsNotUndo.value = true
                                 }
                             }
-                            if (change) {
-                                clips[cursor.value] = newClip
+                        }
+                        is Out.Delete -> {
+                            var change = false
+                            if (clips.isNotEmpty()) {
+                                clips.removeAt(cursor.value)
+                                change = true
+                            }
+                            if (cursor.value > 0) {
+                                cursor.value--
+                                change = true
+                                lastIsCursorChanged.value = true
+
+                            }
+                            if (clips.isEmpty()) {
+                                cursor.value = -1
+                                change = true
+                                lastIsCursorChanged.value = true
+
+                            }
+                            if (change) stack.push(Undo(ArrayList(clips), cursor.value))
+                            lastOutIsNotUndo.value = true
+                        }
+                        is Out.Forward -> {
+                            if (cursor.value < clips.size - 1) {
+                                cursor.value++
                                 stack.push(Undo(ArrayList(clips), cursor.value))
                                 lastOutIsNotUndo.value = true
+                                lastIsCursorChanged.value = true
+
                             }
                         }
-                    }
-                    is Out.Delete -> {
-                        var change = false
-                        if (clips.isNotEmpty()) {
-                            clips.removeAt(cursor.value)
-                            change = true
-                        }
-                        if (cursor.value > 0) {
-                            cursor.value--
-                            change = true
-                            lastIsCursorChanged.value = true
+                        is Out.Back -> {
+                            if (clips.isNotEmpty() && cursor.value > 0) {
+                                cursor.value--
+                                stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                                lastOutIsNotUndo.value = true
+                                lastIsCursorChanged.value = true
 
-                        }
-                        if (clips.isEmpty()) {
-                            cursor.value = -1
-                            change = true
-                            lastIsCursorChanged.value = true
-
-                        }
-                        if (change) stack.push(Undo(ArrayList(clips), cursor.value))
-                        lastOutIsNotUndo.value = true
-                    }
-                    is Out.Forward -> {
-                        if (cursor.value < clips.size - 1) {
-                            cursor.value++
-                            stack.push(Undo(ArrayList(clips), cursor.value))
-                            lastOutIsNotUndo.value = true
-                            lastIsCursorChanged.value = true
-
-                        }
-                    }
-                    is Out.Back -> {
-                        if (clips.isNotEmpty() && cursor.value > 0) {
-                            cursor.value--
-                            stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
-                            lastOutIsNotUndo.value = true
-                            lastIsCursorChanged.value = true
-
-                        }
-                    }
-                    is Out.FullForward -> {
-                        if (cursor.value < clips.size - 1) {
-                            cursor.value = clips.size - 1
-                            stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
-                            lastOutIsNotUndo.value = true
-                            lastIsCursorChanged.value = true
-
-                        }
-                    }
-                    is Out.FullBack -> {
-                        if (clips.isNotEmpty() && cursor.value > 0) {
-                            cursor.value = 0
-                            stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
-                            lastOutIsNotUndo.value = true
-                            lastIsCursorChanged.value = true
-
-                        }
-                    }
-                    is Out.Undo -> {
-                        if (stack.isNotEmpty()) {
-                            if (lastOutIsNotUndo.value) {
-                                stack.pop()
-                                lastOutIsNotUndo.value = false
                             }
-                            val undo = stack.pop()
-                            clips.clear()
-                            clips.addAll(0, undo.list)
-                            cursor.value = undo.cursor
-                            lastIsCursorChanged.value = true
-
-                        } else {
-                            clips.clear()
-                            cursor.value = -1
-                            lastIsCursorChanged.value = true
-
                         }
-                    }
-                    is Out.PlaySequence -> {
-                        if (clips.isNotEmpty() && !playing) model.onPlaySequence(clips) else model.onStop
-                    }
-                    is Out.Enter -> {
-                        val newList = ArrayList<Clip>()
-                        clips.forEach { newList.add(it) }
-                        done_action(newList, editing)
+                        is Out.FullForward -> {
+                            if (cursor.value < clips.size - 1) {
+                                cursor.value = clips.size - 1
+                                stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                                lastOutIsNotUndo.value = true
+                                lastIsCursorChanged.value = true
+
+                            }
+                        }
+                        is Out.FullBack -> {
+                            if (clips.isNotEmpty() && cursor.value > 0) {
+                                cursor.value = 0
+                                stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
+                                lastOutIsNotUndo.value = true
+                                lastIsCursorChanged.value = true
+
+                            }
+                        }
+                        is Out.Undo -> {
+                            if (stack.isNotEmpty()) {
+                                if (lastOutIsNotUndo.value) {
+                                    stack.pop()
+                                    lastOutIsNotUndo.value = false
+                                }
+                                val undo = stack.pop()
+                                clips.clear()
+                                clips.addAll(0, undo.list)
+                                cursor.value = undo.cursor
+                                lastIsCursorChanged.value = true
+
+                            } else {
+                                clips.clear()
+                                cursor.value = -1
+                                lastIsCursorChanged.value = true
+
+                            }
+                        }
+                        is Out.PlaySequence -> {
+                            if (clips.isNotEmpty() && !playing) model.onPlaySequence(clips) else model.onStop
+                        }
+                        is Out.Enter -> {
+                            val newList = ArrayList<Clip>()
+                            clips.forEach { newList.add(it) }
+                            done_action(newList, editing)
+                        }
                     }
                 }
             }
         }
+
+
     }
 }
