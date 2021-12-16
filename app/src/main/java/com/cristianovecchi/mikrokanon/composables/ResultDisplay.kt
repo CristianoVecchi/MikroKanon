@@ -100,13 +100,14 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 .fillMaxHeight()
                 .background(backgroundColor)
         ) {
+            val weights = dimensions.outputWeights
             val modifierAbove = Modifier
                 .fillMaxWidth()
-                .weight(16f)
+                .weight(weights.first)
             val modifierBottom = Modifier
                 .fillMaxSize()
                 .background(buttonsBackgroundColor)
-                .weight(5f)
+                .weight(weights.second)
             val buttonSize = dimensions.outputButtonSize
             Box(modifier = modifierAbove) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), state = listState)
@@ -135,7 +136,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                             model,
                             counterpoint,
                             clipsText, colors,
-                            dimensions.outputNoteTableFontSize,
+                            dimensions.outputNoteTableFontSize, dimensions.outputNoteTableCellWidth,
                             redNotes,
                             onClick = { onClick(counterpoint); })
 
@@ -186,14 +187,15 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 // STACK ICONS
                 Row(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                    .padding(start = 10.dp, end = 15.dp, bottom = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween){
-
+                    val stackIconSize = dimensions.outputStackIconSize
+                    val percentFontSize = dimensions.outputPercentFontSize
                     Row{
                         val icons = model.stackIcons.takeLast(12).map{model.iconMap[it]!!}
                         icons.forEach{ iconId ->
                             Icon(
-                                modifier = Modifier.size(18.dp),
+                                modifier = Modifier.size(stackIconSize.dp),
                                 painter = painterResource(id = iconId),
                                 contentDescription = null, // decorative element
                                 tint = colors.selCardTextColorSelected.shift(0.1f)
@@ -202,7 +204,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     }
                     Row{
                         val percentStyle = androidx.compose.ui.text.TextStyle(
-                            fontSize = 14.sp,
+                            fontSize = percentFontSize.sp,
                             color = colors.selCardTextColorSelected.shift(0.1f), fontWeight = FontWeight.Bold
                         )
                         val percent = ( 1f - selCounterpoint.findEmptiness() ) * 100f
@@ -351,13 +353,14 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 }
             }
             Column(
-                modifier = Modifier.background(colors.buttonsDisplayBackgroundColor).padding(vertical= 10.dp),
+                modifier = Modifier.background(colors.buttonsDisplayBackgroundColor)
+                    .padding(start = 10.dp, top = 8.dp, end = 15.dp, bottom = 15.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 IntervalSetSelector(
                     model,
-                    fontSize = if(model.zodiacPlanetsActive) dimensions.outputIntervalSetFontSize + 8 else dimensions.outputIntervalSetFontSize,
+                    fontSize = if(model.zodiacPlanetsActive) dimensions.outputIntervalSetFontSize * 2 else dimensions.outputIntervalSetFontSize,
                     names = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet, colors = colors
                 ) { scrollToTopList = true }
             }

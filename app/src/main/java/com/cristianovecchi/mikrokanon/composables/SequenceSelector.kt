@@ -64,25 +64,26 @@ fun SequenceSelector(model: AppViewModel,
     val listState = rememberLazyListState()
 
     val notesNames = language.noteNames
+    val dimensions = model.dimensions
+    val weights = dimensions.selectorWeights
         Column(modifier = Modifier
             .fillMaxHeight()
             .background(appColors.drawerBackgroundColor)) {
             val modifier3 = Modifier
                 .fillMaxWidth()
                 .background(backgroundColor)
-                .weight(10f)
+                .weight(weights.first)
             val modifier1 = Modifier
                 .fillMaxSize()
                 .background(buttonsBackgroundColor)
                 .fillMaxWidth()
-                .weight(6f)
+                .weight(weights.second)
             val selected by model.selectedSequence.observeAsState(initial = -1)
             val sequences by model.sequences.observeAsState(emptyList())
             //val snackbarVisibleState = remember { mutableStateOf(false) }
             val dialogState by lazy { mutableStateOf(false) }
             val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
             val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
-            val dimensions = model.dimensions
             val buttonSize = dimensions.selectorButtonSize
             val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
             SequencesDialog(dialogState = dialogState, dimensions = dimensions,

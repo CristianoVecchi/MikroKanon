@@ -24,6 +24,8 @@ data class Dimensions( // 1600px width and over
     val selectorMKbuttonFontSize: Int = 18, // sp
     val selectorFPbuttonFontSize: Int = 26, // sp
     val selectorClipFontSize: Int = (width/27).pxToSp,
+    val selectorWeights: Pair<Float, Float> = Pair(10f, 6f),
+    val sequenceDialogFontSize: TextUnit = 20.sp,
 
     val inputNclipColumns: Int = 8, // 6
     val inputAnalyzerFontSize: Int = (width/27).pxToSp,
@@ -32,12 +34,14 @@ data class Dimensions( // 1600px width and over
     val inputButtonFontSize: Int = (width/27).pxToSp, // 14
     val inputWeights: Pair<Float, Float> = Pair(5f, 8f),
 
-    val outputNoteTableFontSize: Int = 16,
-    val outputButtonSize: Dp = 64.dp, // 60
-    val outputFPbuttonFontSize: Int = 28, // 22
-    val outputIntervalSetFontSize: Int = 16, //10
-
-    val sequenceDialogFontSize: TextUnit = 20.sp,
+    val outputNoteTableFontSize: Int = (width/36).pxToSp,//16,
+    val outputNoteTableCellWidth: Int = (width/8).pxToDp,
+    val outputStackIconSize: Int = (width/22).pxToDp,
+    val outputPercentFontSize: Int = (width/32).pxToSp,
+    val outputButtonSize: Dp = (width/9).pxToDp.dp, // 60 // 64
+    val outputFPbuttonFontSize: Int = (width/8 /3).pxToSp,
+    val outputIntervalSetFontSize: Int = (width/8 /5).pxToSp,
+    val outputWeights: Pair<Float, Float> = Pair(16f, 7f),
 
     val optionsFontSize: Int = (width/25).pxToSp,
     val dialogWidth: Dp = ((width/3*2)/dpDensity).toInt().dp,
@@ -70,6 +74,7 @@ data class Dimensions( // 1600px width and over
                 selectorButtonSize = (selectorButtonSizePx / dpDensity).toInt().dp,//50.dp,
                 selectorMKbuttonFontSize =(selectorButtonSizePx /4).pxToSp,
                 selectorFPbuttonFontSize= (selectorButtonSizePx /3).pxToSp,
+
             )
         }
         fun medium(width: Int, height: Int, dpDensity: Float) : Dimensions {
@@ -88,29 +93,40 @@ data class Dimensions( // 1600px width and over
                 inputButtonFontSize = (width/24).pxToSp, // 14
                 inputWeights = Pair(4f, 8f),
 
-                outputButtonSize = 52.dp,
-                outputFPbuttonFontSize = 20,
-                outputIntervalSetFontSize = 10
+                outputButtonSize = (selectorButtonSizePx).pxToDp.dp,
+                outputFPbuttonFontSize = (selectorButtonSizePx /3).pxToSp,
+                outputIntervalSetFontSize= (selectorButtonSizePx /6).pxToSp,
+                outputWeights= if(height >= 2880) Pair(16f,6f) else Pair(16f, 7f),
+
             )
         }
         fun mini(width: Int, height: Int, dpDensity: Float) : Dimensions {
             println("Dimensions provided: MINI")
             val selectorButtonSizePx = width/7
+            val outputButtonSizePx = width / 8
             return Dimensions(
                 width = width,
                 height = height,
                 dpDensity = dpDensity,
                 //selectorButtonSize = (159.5 / dpDensity).toInt().dp,//54.dp,
+                selectorClipFontSize = (width/22).pxToSp,
                 selectorButtonSize = (selectorButtonSizePx / dpDensity).toInt().dp,//50.dp,
-                selectorMKbuttonFontSize =(selectorButtonSizePx /4).pxToSp,
-                selectorFPbuttonFontSize= (selectorButtonSizePx /2).pxToSp,
+                selectorMKbuttonFontSize = (selectorButtonSizePx /4).pxToSp,
+                selectorFPbuttonFontSize = (selectorButtonSizePx /2).pxToSp,
+                selectorWeights = if(height >= 2400) Pair(10f,5f) else Pair(10f, 6f),
+                optionsFontSize = (width/22).pxToSp,
+
                 inputButtonSize = (width/7).pxToDp.dp,
                 inputButtonFontSize = (width/24).pxToSp, // 14
                 inputWeights = Pair(4f, 8f),
                 inputNclipColumns = 6,
-                outputButtonSize =(154 / dpDensity).toInt().dp,//56.dp,
-                outputFPbuttonFontSize = 22,
-                outputIntervalSetFontSize = 10,
+
+                outputNoteTableFontSize= (width/28).pxToSp,//16,
+                outputNoteTableCellWidth = (width/7).pxToDp,
+                outputButtonSize = (outputButtonSizePx/ dpDensity).toInt().dp,
+                outputFPbuttonFontSize = (outputButtonSizePx /3).pxToSp,
+                outputIntervalSetFontSize= (outputButtonSizePx /4).pxToSp,
+                outputWeights= if(height >= 2400) Pair(16f,5f) else Pair(16f, 6f),
 
 
             )
@@ -119,6 +135,7 @@ data class Dimensions( // 1600px width and over
         fun micro(width: Int, height: Int, dpDensity: Float) : Dimensions {
             println("Dimensions provided: MICRO")
             val selectorButtonSizePx = width/7
+            val outputButtonSizePx = width / 9
             return Dimensions(
                 width = width,
                 height = height,
@@ -128,6 +145,9 @@ data class Dimensions( // 1600px width and over
                 selectorMKbuttonFontSize =(selectorButtonSizePx /4).pxToSp,
                 selectorFPbuttonFontSize= (selectorButtonSizePx /2).pxToSp,// sp20,
                 selectorClipFontSize = (width/30).pxToSp,
+                dialogFontSize = (width/27).pxToSp,
+                dialogWeights = Triple(4f, 4f, 1f),
+                fullDialogWeights = Triple(3f, 4f, 1f),
 
                 //inputAnalyzerFontSize = (width/10).pxToSp,
                 inputClipFontSize = (width/24).pxToSp,
@@ -136,14 +156,12 @@ data class Dimensions( // 1600px width and over
                 inputWeights = Pair(4f, 8f),
                 inputNclipColumns = 6,
 
-                outputNoteTableFontSize = 12,
-                outputButtonSize = 38.dp,
-                outputFPbuttonFontSize = 16,
-                outputIntervalSetFontSize = 6,
-
-                dialogFontSize = (width/27).pxToSp,
-                dialogWeights = Triple(4f, 4f, 1f),
-                fullDialogWeights = Triple(3f, 4f, 1f)
+                outputNoteTableFontSize= (width/28).pxToSp,//16,
+                outputNoteTableCellWidth = (width/7).pxToDp,
+                outputButtonSize = (outputButtonSizePx/ dpDensity).toInt().dp,
+                outputFPbuttonFontSize = (outputButtonSizePx /2).pxToSp,
+                outputIntervalSetFontSize= if(dpDensity==1.0f) (outputButtonSizePx /3).pxToSp else (outputButtonSizePx /6).pxToSp,
+                outputWeights= if(height >= 1280) Pair(16f,7f) else Pair(16f, 9f),
 
                 //sequenceDialogFontSize = (width/16).pxToSp.sp
             )
@@ -151,6 +169,7 @@ data class Dimensions( // 1600px width and over
         fun res1080x1920(width: Int, height: Int, dpDensity: Float) : Dimensions {
             println("Dimensions provided: 1080x1920")
             val selectorButtonSizePx = width/7
+            val outputButtonSizePx = width / 9
             return Dimensions(
                 width = width,
                 height = height,
@@ -161,20 +180,21 @@ data class Dimensions( // 1600px width and over
                 selectorMKbuttonFontSize =(selectorButtonSizePx /3).pxToSp,
                 selectorFPbuttonFontSize= (selectorButtonSizePx /3).pxToSp,// sp20,
                 selectorClipFontSize = (width/30).pxToSp,
+                dialogFontSize = (width/27).pxToSp,
+                dialogWeights = Triple(4f, 4f, 1f),
+                fullDialogWeights = Triple(3f, 4f, 1f),
 
                 inputButtonSize = (width/8).pxToDp.dp,
                 inputButtonFontSize = (width/38).pxToSp, // 14
                 inputWeights = Pair(4f, 8f),
                 inputNclipColumns = 6,
 
-                outputNoteTableFontSize = 12,
-                outputButtonSize = 38.dp,
-                outputFPbuttonFontSize = 16,
-                outputIntervalSetFontSize = 6,
-
-                dialogFontSize = (width/27).pxToSp,
-                dialogWeights = Triple(4f, 4f, 1f),
-                fullDialogWeights = Triple(3f, 4f, 1f)
+                outputNoteTableFontSize= (width/44).pxToSp,//16,
+                outputNoteTableCellWidth = (width/8).pxToDp,
+                outputButtonSize = (outputButtonSizePx/ dpDensity).toInt().dp,
+                outputFPbuttonFontSize = (outputButtonSizePx /3).pxToSp,
+                outputIntervalSetFontSize= (outputButtonSizePx /5).pxToSp,
+                outputWeights= Pair(16f,6f)
             )
 
         }

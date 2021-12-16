@@ -45,7 +45,7 @@ fun SelectableCard(text: String, fontSize: Int, colors:AppColors, isSelected: Bo
         .clickable { if (isSelected) onClick(1) else onClick(-1) }
 
     ) {
-        Text(text = text, modifier = Modifier.padding(18.dp),
+        Text(text = text, modifier = Modifier.padding(14.dp),
             style = TextStyle(fontSize = fontSize.sp,
                 fontWeight = FontWeight.Bold)
         )

@@ -30,7 +30,7 @@ import com.cristianovecchi.mikrokanon.ui.AppColors
 
 @Composable
 fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: List<List<String>>, colors: AppColors,
-              fontSize: Int, redNotes: List<List<Boolean>>? = null,
+              fontSize: Int, cellWidth: Int, redNotes: List<List<Boolean>>? = null,
               onClick: (Counterpoint) -> Unit){
 
     val errorColor = Color.Red
@@ -63,7 +63,7 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: List<L
             itemsIndexed(clipsText) { i, col ->
 
                 Column(
-                    Modifier.width(70.dp)
+                    Modifier.width(cellWidth.dp)// 70
                 ) {
                     for (j in col.indices) {
                         val clipText = col[j]
