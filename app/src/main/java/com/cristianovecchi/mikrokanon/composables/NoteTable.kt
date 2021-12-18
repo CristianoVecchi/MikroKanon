@@ -38,7 +38,7 @@ fun NoteTable(model: AppViewModel, counterpoint: Counterpoint, clipsText: List<L
     val listState = rememberLazyListState()
     val selectedCounterpoint by model.selectedCounterpoint.observeAsState()
     val isSelected = counterpoint == selectedCounterpoint
-    val borderWidth by animateIntAsState(if(isSelected) 10 else 0)
+    val borderWidth by animateIntAsState(if(isSelected) 6 else 0)
     val fontWeight = if(isSelected) FontWeight.ExtraBold else FontWeight.Normal
     val finalFontSize by animateIntAsState(if (isSelected) (fontSize  ) else fontSize)
     val cellDarkColor by animateColorAsState( if(isSelected) colors.cellDarkColorSelected else colors.cellDarkColorUnselected )

@@ -32,7 +32,7 @@ data class Dimensions( // 1600px width and over
     val inputClipFontSize: Int = (width/27).pxToSp,
     val inputButtonSize: Dp = (width/9).pxToDp.dp,
     val inputButtonFontSize: Int = (width/27).pxToSp, // 14
-    val inputWeights: Pair<Float, Float> = Pair(5f, 8f),
+    val inputWeights: Pair<Float, Float> = Pair(4f, 9f),
 
     val outputNoteTableFontSize: Int = (width/36).pxToSp,//16,
     val outputNoteTableCellWidth: Int = (width/8).pxToDp,
@@ -48,7 +48,7 @@ data class Dimensions( // 1600px width and over
     val dialogHeight: Dp = ((height/6*5)/dpDensity).toInt().dp,
     val dialogFontSize: Int = (width/25).pxToSp,
     val dialogButtonSize: Int = (width/9).pxToDp, //60.dp in Maxi
-    val dialogWeights: Triple<Float, Float, Float> = Triple(4f, 3f, 1f),
+    val dialogWeights: Triple<Float, Float, Float> = Triple(3f, 3f, 2f),
     val fullDialogWeights: Triple<Float, Float, Float> = Triple(4f, 4f, 1f),
     val listDialogWeights: Pair<Float, Float> = Pair(6f, 1f)
 ){
@@ -159,10 +159,10 @@ data class Dimensions( // 1600px width and over
                 inputNclipColumns = 6,
 
                 outputNoteTableFontSize= (width/28).pxToSp,//16,
-                outputNoteTableCellWidth = (width/7).pxToDp,
+                outputNoteTableCellWidth = (width/6).pxToDp,
                 outputButtonSize = (outputButtonSizePx/ dpDensity).toInt().dp,
                 outputFPbuttonFontSize = (outputButtonSizePx /2).pxToSp,
-                outputIntervalSetFontSize= if(dpDensity==1.0f) (outputButtonSizePx /3).pxToSp else (outputButtonSizePx /6).pxToSp,
+                outputIntervalSetFontSize= if(dpDensity==1.0f) (outputButtonSizePx /3).pxToSp else (outputButtonSizePx /7).pxToSp,
                 outputWeights= if(height >= 1280) Pair(16f,7f) else Pair(16f, 9f),
 
                 //sequenceDialogFontSize = (width/16).pxToSp.sp
@@ -190,14 +190,14 @@ data class Dimensions( // 1600px width and over
                 inputClipFontSize = (width/24).pxToSp,
                 inputButtonSize = (width/8).pxToDp.dp,
                 inputButtonFontSize = (width/36).pxToSp, // 14
-                inputWeights = Pair(4f, 8f),
+                inputWeights = Pair(3f, 9f),
                 inputNclipColumns = 6,
 
                 outputNoteTableFontSize= (width/30).pxToSp,//16,
                 outputNoteTableCellWidth = (width/6).pxToDp,
                 outputButtonSize = (outputButtonSizePx/ dpDensity).toInt().dp,
                 outputFPbuttonFontSize = (outputButtonSizePx /3).pxToSp,
-                outputIntervalSetFontSize= if(dpDensity==1.0f) (outputButtonSizePx /3).pxToSp else (outputButtonSizePx /7).pxToSp,
+                outputIntervalSetFontSize= (outputButtonSizePx /7).pxToSp,
                 outputWeights= if(height >= 1280) Pair(16f,7f) else Pair(16f, 9f),
 
                 //sequenceDialogFontSize = (width/16).pxToSp.sp

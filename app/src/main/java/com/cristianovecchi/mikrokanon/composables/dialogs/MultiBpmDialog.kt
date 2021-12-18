@@ -40,8 +40,10 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
+            val width = if(dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
+            else dimensions.dialogWidth
             Surface(
-                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
+                modifier = Modifier.width(width).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
 

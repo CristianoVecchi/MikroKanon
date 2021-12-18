@@ -40,7 +40,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiFloatDialogData.value.model
-            val width = if(dimensions.width < 720) (dimensions.width / 10 * 7 / dimensions.dpDensity).toInt().dp
+            val width = if(dimensions.width <=884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             val height = if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
             else dimensions.dialogHeight

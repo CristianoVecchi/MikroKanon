@@ -56,7 +56,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         .weight(5f)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(7f)
+                        .weight(8f)
                     var legatoText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setLegato = { index: Int, newLegato: Int ->
@@ -286,7 +286,8 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(
                             Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             CustomButton(
                                 adaptSizeToIconButton = true,

@@ -31,8 +31,10 @@ fun CadenzaDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, di
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
+            val width = if(dimensions.width <= 884) (dimensions.width / dimensions.dpDensity).toInt().dp
+            else dimensions.dialogWidth
             Surface(
-                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight / 2),
+                modifier = Modifier.width(width).height(dimensions.dialogHeight / 2),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
