@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
@@ -44,17 +45,22 @@ fun SingleSelectDialog(
         var selectedOption by remember{ mutableStateOf(defaultSelected) }
         var repeated by remember{ mutableStateOf(false) }
         val fontSize = dimensions.dialogFontSize
+        val weights = dimensions.listDialogWeights
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
-                Column(modifier = Modifier.padding(10.dp)) {
+                Column(modifier = Modifier.padding(5.dp)) {
                     Text(text = title)
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(5.dp))
                     val listState = rememberLazyListState()
+                    val modifierA = Modifier
+                        .weight(weights.first)
+                    val modifierB = Modifier
+                        .weight(weights.second)
                     LazyColumn( state = listState,
-                        modifier = Modifier.height(dimensions.dialogHeight / 5 * 4)
+                        modifier = modifierA
                     ) { items(sequencesList) { sequence ->
                         val selected = if (selectedOption == -1) {
                             ""
@@ -62,16 +68,17 @@ fun SingleSelectDialog(
                             sequencesList[selectedOption]
                             //sequencesList[selectedOption.value]
                         }
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         RadioButton(sequence, selected, fontSize = fontSize.sp) { selectedValue ->
                             selectedOption = sequencesList.indexOf(selectedValue)
                         }
                     }
 
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Row(modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween){
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Row(modifier = modifierB.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically){
                         Button(
                             onClick = {
                                 onSubmitButtonClick.invoke(selectedOption, repeated)

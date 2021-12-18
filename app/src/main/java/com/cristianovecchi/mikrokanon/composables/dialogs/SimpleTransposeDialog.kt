@@ -37,10 +37,11 @@ fun SimpleTransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
     if (multiNumberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            val model = multiNumberDialogData.value.model
             val height = dimensions.dialogHeight / 3 * 2
+            val width = if(dimensions.width < 720) (dimensions.width / dimensions.dpDensity).toInt().dp
+            else dimensions.dialogWidth
             Surface(
-                modifier = Modifier.width(dimensions.dialogWidth).height(height),
+                modifier = Modifier.width(width).height(height),
                 shape = RoundedCornerShape(10.dp)
             ) {
 

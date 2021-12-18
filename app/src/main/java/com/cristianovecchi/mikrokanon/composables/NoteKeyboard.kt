@@ -124,7 +124,8 @@ fun NoteKeyboard(
                         }
                         val actualColors = if(resId == -1) colors.copy(iconButtonBackgroundColor = colors.iconButtonBackgroundColor.shift(-0.15f)) else colors
                         val actualFontSize = when (buttonInfo.text.length){
-                            in 0..2 -> fontSize
+                            in 0..1 -> fontSize / 5 * 7
+                            2 -> fontSize
                             3 -> fontSize / 3 * 2
                             4 -> fontSize / 2
                             else -> fontSize

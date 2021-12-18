@@ -40,13 +40,19 @@ fun MultiSelectListDialog(
                 modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
+
                 Column(modifier = Modifier.padding(10.dp)) {
                     Text(text = listDialogData.value.dialogTitle)
                     Spacer(modifier = Modifier.height(5.dp))
+                    val weights = dimensions.listDialogWeights
+                    val modifierA = Modifier
+                        .weight(weights.first)
+                    val modifierB = Modifier
+                        .weight(weights.second)
                     val listState = rememberLazyListState()
                     if(listDialogData.value.itemList.isNotEmpty()){
                         LazyColumn( state = listState,
-                            modifier = Modifier.height(dimensions.dialogHeight / 5 * 4)
+                            modifier = modifierA
                         ) { items(listDialogData.value.itemList) { item ->
                             val selected = if (selectedOptions.isEmpty()) {
                                 listOf<String>()
@@ -70,7 +76,7 @@ fun MultiSelectListDialog(
 
                         }
                         Spacer(modifier = Modifier.height(5.dp))
-                        Row( modifier = Modifier.height(dimensions.dialogHeight / 5),
+                        Row( modifier = modifierB,
                             verticalAlignment = Alignment.CenterVertically
                         ){
                             Button(

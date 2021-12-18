@@ -50,9 +50,14 @@ fun SingleSelectListDialog(
                     Text(text = listDialogData.value.dialogTitle)
                     Spacer(modifier = Modifier.height(5.dp))
                     val listState = rememberLazyListState()
+                    val weights = dimensions.listDialogWeights
                     if(listDialogData.value.itemList.isNotEmpty()){
+                        val modifierA = Modifier
+                            .weight(weights.first)
+                        val modifierB = Modifier
+                            .weight(weights.second)
                         LazyColumn( state = listState,
-                            modifier = Modifier.height(dimensions.dialogHeight / 5 * 4).padding(end = 5.dp)
+                            modifier = modifierA.padding(end = 5.dp)
                         ) { itemsIndexed(listDialogData.value.itemList) { index, item ->
                             val selected = if (selectedOption == -1) {
                                 ""
@@ -71,7 +76,7 @@ fun SingleSelectListDialog(
                         }
 
                         Spacer(modifier = Modifier.height(5.dp))
-                        Row( modifier = Modifier.height(dimensions.dialogHeight / 5),
+                        Row( modifier = modifierB,
                             verticalAlignment = Alignment.CenterVertically)
                         {
                             Button(

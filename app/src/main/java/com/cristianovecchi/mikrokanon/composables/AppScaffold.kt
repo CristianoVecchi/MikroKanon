@@ -309,16 +309,12 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
     }
 
 }
-
+    val tabModifier = Modifier.fillMaxSize().background(colors.drawerBackgroundColor)
+                            .padding( start = 4.dp, top = 4.dp, end = 4.dp)
     when (selectedTab) {
         ScaffoldTabs.SOUND -> {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(colors.drawerBackgroundColor)
-                    .padding(top = 6.dp),
-                state = listState,
-            ) { items(optionNames) { optionName ->
+            LazyColumn( modifier = tabModifier,state = listState)
+            { items(optionNames) { optionName ->
                 val fontSize = dimensions.optionsFontSize
                 when (optionName) {
 
@@ -527,12 +523,8 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
             }
         }
         ScaffoldTabs.BUILDING -> {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(colors.drawerBackgroundColor),
-                state = listState,
-            ) {
+            LazyColumn( modifier = tabModifier, state = listState)
+             {
                 items(optionNames) { optionName ->
                     val fontSize = dimensions.optionsFontSize
                     when (optionName) {
@@ -779,12 +771,8 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
             }
         }
         ScaffoldTabs.SETTINGS -> {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(colors.drawerBackgroundColor),
-                state = listState,
-            ) {
+            LazyColumn( modifier = tabModifier,state = listState)
+            {
                 items(optionNames) { optionName ->
                     val fontSize = dimensions.optionsFontSize
                     when (optionName) {

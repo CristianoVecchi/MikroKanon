@@ -42,8 +42,10 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
             val ribattutos = getRibattutoSymbols()
+            val height = if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
+                            else dimensions.dialogHeight
             Surface(
-                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
+                modifier = Modifier.width(dimensions.dialogWidth).height(height),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
