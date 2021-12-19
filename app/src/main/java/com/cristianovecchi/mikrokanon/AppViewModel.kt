@@ -1415,10 +1415,16 @@ init{
     fun createHorizontalIntervalSet(horizontalIntervalSetFlag: Int) {
         _intervalSetHorizontal.value = createIntervalSetFromFlags(horizontalIntervalSetFlag)
     }
-    fun createVerticalIntervalSet(verticalIntervalSetFlag: Int) {
+    fun createVerticalIntervalSet(verticalIntervalSetFlag: Int, from: String) {
+        println("Creating Vert Interval Set: ${intervalSet.value!!} from $from")
         _intervalSet.value = createIntervalSetFromFlags(verticalIntervalSetFlag)
     }
-    fun saveVerticalIntervalSet() {
+    fun createVerticalIntervalSet(intervalSet: List<Int>, from: String) {
+        println("Creating Vert Interval Set: $intervalSet from $from")
+        _intervalSet.value = intervalSet.sorted()
+    }
+    fun saveVerticalIntervalSet(from: String) {
+        println("Saving Vert Interval Set: ${intervalSet.value!!} from $from")
         val flags = createFlagsFromIntervalSet(intervalSet.value!!)
         updateUserOptions("intSetVertFlags", flags)
     }

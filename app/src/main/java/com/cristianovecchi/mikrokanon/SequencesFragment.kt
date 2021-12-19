@@ -17,7 +17,7 @@ import com.cristianovecchi.mikrokanon.composables.SequenceSelector
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 
 class SequencesFragment(): Fragment() {
-
+var start = true
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -38,6 +38,12 @@ class SequencesFragment(): Fragment() {
                     model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                     model.setAppColors(it[0].colors)
                     model.refreshZodiacFlags()
+                    if(start){
+                        val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
+                        model.createVerticalIntervalSet(verticalIntervalSetFlag, "SequencesFragment")
+                        start = false
+                    }
+
                 }
             }
         }
@@ -52,6 +58,10 @@ class SequencesFragment(): Fragment() {
 //            //model.selectLanguage(model.getUserLangDef())
 //        }
         model.setInitialBlankState()
+//        if(model.userOptionsData.value != null && model.userOptionsData.value!!.isNotEmpty()){
+//            val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
+//            model.createVerticalIntervalSet(verticalIntervalSetFlag)
+//        }
         return ComposeView(requireContext()).apply {
             if(true){
                 setContent {

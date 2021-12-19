@@ -24,6 +24,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
@@ -159,6 +160,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
     //val intervalSetDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    val mbtiDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val detectorDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val detExtensionDialogData by lazy { mutableStateOf(ListDialogData())}
     val colorsDialogData by lazy { mutableStateOf(ListDialogData())}
@@ -182,14 +184,17 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
 
         "Detector","Detector Extension",
         //"Colors",
-        "Custom Colors","Language","Zodiac","Credits")
+        "Custom Colors","Language","Zodiac","MBTI","Spacer","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-    val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
+    //val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
+    val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val lang = Lang.provideLanguage(model.getUserLangDef())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionsData()
                         else userOptionsData[0]
     val listState = rememberLazyListState()
     var selectedTab by remember{ mutableStateOf(model.lastScaffoldTab)}
+    val verticalIntervals by model.intervalSet.observeAsState(listOf(-1))
+
     MultiListDialog(ensemblesDialogData, dimensions, lang.OKbutton)
     ListDialog(listDialogData, dimensions, lang.OKbutton)
     MultiListDialog(doublingDialogData, dimensions, lang.OKbutton)
@@ -212,6 +217,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     ExportDialog(exportDialogData, lang.OKbutton)
     CreditsDialog(creditsDialogData, dimensions, lang.OKbutton)
     //MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
+    MultiListDialog(mbtiDialogData, dimensions, lang.OKbutton)
     MultiListDialog(detectorDialogData, dimensions, lang.OKbutton)
     ListDialog(detExtensionDialogData, dimensions, lang.OKbutton, fillPrevious = true)
     ListDialog(colorsDialogData, dimensions, lang.OKbutton)
@@ -241,7 +247,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     -0.2f
                 ), RoundedCornerShape(4.dp)
             )
-            .then(Modifier.size(buttonSize/4 * 3)), onClick = { selectedTab = ScaffoldTabs.SOUND; model.lastScaffoldTab = ScaffoldTabs.SOUND }
+            .then(Modifier.size(buttonSize / 4 * 3)), onClick = { selectedTab = ScaffoldTabs.SOUND; model.lastScaffoldTab = ScaffoldTabs.SOUND }
         )
         {
             Icon(
@@ -267,7 +273,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     -0.2f
                 ), RoundedCornerShape(4.dp)
             )
-            .then(Modifier.size(buttonSize/4 * 3)), onClick = { selectedTab = ScaffoldTabs.BUILDING ; model.lastScaffoldTab = ScaffoldTabs.BUILDING  }
+            .then(Modifier.size(buttonSize / 4 * 3)), onClick = { selectedTab = ScaffoldTabs.BUILDING ; model.lastScaffoldTab = ScaffoldTabs.BUILDING  }
         )
         {
             Icon(
@@ -296,7 +302,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     -0.2f
                 ), RoundedCornerShape(4.dp)
             )
-            .then(Modifier.size(buttonSize/4 * 3)), onClick = { selectedTab = ScaffoldTabs.SETTINGS; model.lastScaffoldTab = ScaffoldTabs.SETTINGS }
+            .then(Modifier.size(buttonSize / 4 * 3)), onClick = { selectedTab = ScaffoldTabs.SETTINGS; model.lastScaffoldTab = ScaffoldTabs.SETTINGS }
         )
         {
             Icon(
@@ -309,8 +315,11 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
     }
 
 }
-    val tabModifier = Modifier.fillMaxSize().background(colors.drawerBackgroundColor)
-                            .padding( start = 4.dp, top = 4.dp, end = 4.dp)
+    val tabModifier = Modifier
+        .fillMaxSize()
+        .background(colors.drawerBackgroundColor)
+        .padding(start = 4.dp, top = 4.dp, end = 4.dp)
+    val spacerHeight = 8
     when (selectedTab) {
         ScaffoldTabs.SOUND -> {
             LazyColumn( modifier = tabModifier,state = listState)
@@ -670,7 +679,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 })
                         }
                         "Spacer" -> {
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(spacerHeight.dp))
                         }
                         "Transpose" -> {
                             val transposeCsv = userOptions.transpose
@@ -942,6 +951,44 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                     }
                                 })
                         }
+                        "MBTI" -> {
+                            //model.saveVerticalIntervalSet()
+                            val mbtis = MBTI.listFromIntervals(
+                                if(verticalIntervals.contains(-1)) createIntervalSetFromFlags(userOptions.intSetVertFlags).toSet()
+                                 else verticalIntervals.toSet()
+                            )
+                            val isOn = mbtis.isNotEmpty()
+                            val text = if (!isOn) lang.mbti else "${lang.mbti}: ${
+                                mbtis.joinToString(
+                                    separator = " + "
+                                ) { it.name }
+                            }"
+                            val intsFromMbtis = MBTI.values().withIndex()
+                                .filter{mbtis.contains(it.value)}
+                                .map{ it.index}
+                            SelectableCard(
+                                text = text,
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = isOn,
+                                onClick = {
+                                    mbtiDialogData.value = MultiListDialogData(
+                                        true,
+                                        MBTI.values().map{"${it}\n  ${it.character}"},
+                                        intsFromMbtis.toSet(),
+                                        dialogTitle = lang.selectMbti
+                                    ) { indices ->
+                                        model.createVerticalIntervalSet(MBTI.intervalsFromIndices(indices).toList(), "AppScaffold")
+                                        model.saveVerticalIntervalSet("AppScaffold")
+                                        mbtiDialogData.value =
+                                            MultiListDialogData(itemList = detectorDialogData.value.itemList)
+
+                                    }
+                                })
+                        }
+                        "Spacer" -> {
+                            Spacer(modifier = Modifier.height(spacerHeight.dp))
+                        }
                         "Credits" -> {
                             SelectableCard(
                                 text = lang.credits,
@@ -957,6 +1004,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 }
                             )
                         }
+
                     }
                 }
 
