@@ -186,8 +186,8 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
         //"Colors",
         "Custom Colors","Language","Zodiac","MBTI","Spacer","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-    //val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
-    val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
+    val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
+    //val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val lang = Lang.provideLanguage(model.getUserLangDef())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionsData()
                         else userOptionsData[0]

@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   selectedCounterpointFlow: Flow<Counterpoint>,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
-                  onTranspose: (Int) -> Unit,
+                  onTranspose: (List<Int>) -> Unit,
                   onWave: (Int) -> Unit,
                   onTritoneSubstitution: () -> Unit = {},
                   onRound: () -> Unit = {},
@@ -89,7 +89,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val dialogState = remember { mutableStateOf(false) }
     val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
-    val simpleTransposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+    val transposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
 
 
@@ -182,7 +182,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
 
                 ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model)
                 MultiListDialog(intervalSetDialogData, dimensions, language.OKbutton)
-                SimpleTransposeDialog(simpleTransposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
+                TransposeDialog(transposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
                 // STACK ICONS
                 Row(modifier = Modifier
@@ -253,11 +253,11 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                     ExtensionButtons(model = model, isActive = activeButtons.expand, buttonSize = buttonSize, colors = colors,
                          onExpand = { if (!elaborating) onExpand(); scrollToTopList = false },
                          onTranspose = {  if (!elaborating) {
-                             simpleTransposeDialogData.value = MultiNumberDialogData(
+                             transposeDialogData.value = MultiNumberDialogData(
                                  true, language.selectTranspositions,
-                                 model = model) { transposition ->
-                                 onTranspose(transposition.toInt())
-                                 simpleTransposeDialogData.value = MultiNumberDialogData(model = model)
+                                 model = model) { transpositions ->
+                                 onTranspose(transpositions.extractIntsFromCsv())
+                                 transposeDialogData.value = MultiNumberDialogData(model = model)
 
                              }
                              scrollToTopList = false

@@ -502,16 +502,20 @@ data class Counterpoint(val parts: List<AbsPart>,
        // println(transpositions)
         if (transpositions.all{ it == 0}) {
             if (ritornello == 0) return this
-            var newCounterpoint = this.copy()
+            val normalized = this.normalizePartsSize(false)
+            var newCounterpoint = this.normalizePartsSize(false)
             for (i in 0 until ritornello){
-                newCounterpoint = this.enqueue(newCounterpoint)
+                newCounterpoint = newCounterpoint.enqueue(normalized)
             }
+            newCounterpoint.emptiness = newCounterpoint.findEmptiness()
             return newCounterpoint
         } else {
-            var newCounterpoint = this.transpose(transpositions[0])
+            val normalized = this.normalizePartsSize(false)
+            var newCounterpoint = this.normalizePartsSize(false).transpose(transpositions[0])
             for (i in 0 until ritornello){
-                newCounterpoint = newCounterpoint.enqueue(this.transpose(transpositions[(i + 1) % transpositions.size]))
+                newCounterpoint = newCounterpoint.enqueue(normalized.transpose(transpositions[(i + 1) % transpositions.size]))
             }
+            newCounterpoint.emptiness = newCounterpoint.findEmptiness()
             return newCounterpoint
         }
     }

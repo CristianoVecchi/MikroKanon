@@ -50,7 +50,7 @@ sealed class Computation(open val icon: String = "") {
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
     data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "doppelgänger"): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2, override val icon: String = "expand") : Computation()
-    data class SimpleTransposition(val counterpoints: List<Counterpoint>, val transposition: Int, val index: Int, override val icon: String = "transpose") : Computation()
+    data class Transposition(val counterpoints: List<Counterpoint>, val transpositions: List<Int>, val index: Int, override val icon: String = "transpose") : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int, override val icon: String = "tritone_substitution") : Computation()
 }
 
@@ -479,12 +479,12 @@ init{
         computationStack.pushAndDispatch(Computation.Single(originalCounterpoints, null, index))
         singleOnCounterpoints(originalCounterpoints, index)
     }
-    val onSimpleTransposition = { transposition: Int ->
-        if(transposition != 0){
+    val onSimpleTransposition = { transpositions: List<Int> ->
+        if(transpositions != listOf( 0 )){
             val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
             val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-            computationStack.pushAndDispatch(Computation.SimpleTransposition(originalCounterpoints, transposition, index))
-            transposeOnCounterpoints(originalCounterpoints, transposition, index)
+            computationStack.pushAndDispatch(Computation.Transposition(originalCounterpoints, transpositions, index))
+            transposeOnCounterpoints(originalCounterpoints, transpositions, index)
         }
     }
     val onDoppelgänger= {
@@ -689,7 +689,7 @@ init{
                     is Computation.Sort -> computationStack.lastElement()
                     is Computation.EraseIntervals -> computationStack.lastElement()
                     is Computation.Single-> computationStack.lastElement()
-                    is Computation.SimpleTransposition-> computationStack.lastElement()
+                    is Computation.Transposition-> computationStack.lastElement()
                     is Computation.Pedal -> computationStack.lastElement()
                     is Computation.TritoneSubstitution -> computationStack.lastElement()
                     else -> { stackIcons.removeLast(); computationStack.pop() } // do not Dispatch!!!
@@ -763,8 +763,8 @@ init{
                     is Computation.Single -> {
                         singleOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
                     }
-                    is Computation.SimpleTransposition -> {
-                        transposeOnCounterpoints( previousComputation.counterpoints, previousComputation.transposition, previousComputation.index)
+                    is Computation.Transposition -> {
+                        transposeOnCounterpoints( previousComputation.counterpoints, previousComputation.transpositions, previousComputation.index)
                     }
                     is Computation.Pedal -> {
                             changeSelectedCounterpoint(previousComputation.counterpoint)
@@ -1099,12 +1099,12 @@ init{
             }
         }
     }
-    private fun transposeOnCounterpoints(originalCounterpoints: List<Counterpoint>, transposition:Int, index: Int){
+    private fun transposeOnCounterpoints(originalCounterpoints: List<Counterpoint>, transpositions: List<Int>, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
-                    newList = transposeAllCounterpoints(originalCounterpoints, transposition)
+                    newList = transposeAllCounterpoints(originalCounterpoints, transpositions)
                 }
                 changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
