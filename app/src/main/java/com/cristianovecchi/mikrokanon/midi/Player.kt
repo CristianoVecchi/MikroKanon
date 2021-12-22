@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.midi
 
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Environment
 import android.util.Log
 import com.cristianovecchi.mikrokanon.*
@@ -122,8 +123,9 @@ object Player {
 
         if (actualCounterpoint.isEmpty()) return "Counterpoint to play is empty!!!"
         if (actualCounterpoint.parts[0].absPitches.size == 0) return "Counterpoint parts are empty!!!"
+
         val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts,
-                                                                    nuances, doublingFlags, rangeTypes, legatoTypes, melodyTypes,
+                                                                    nuances, doublingFlags, rangeTypes, melodyTypes,
                                                                     glissando, audio8D, vibratoExtensions[vibrato])
         if (counterpointTrackData.isEmpty()) return "No Tracks in Counterpoint!!!"
 
@@ -131,15 +133,20 @@ object Player {
 
         //LEGATO AND RIBATTUTO DURATION ZONE
         // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
-        println("legatoTypes: $legatoTypes")
+        //println("legatoTypes: $legatoTypes")
         if(legatoTypes != listOf(Pair(4,0))){
             val artMap = mapOf(0 to 1.0f, 1 to 0.125f, 2 to 0.25f, 3 to 0.75f, 4 to 1.0f, 5 to 1.125f, 6 to 1.25f )
             val legatos = legatoTypes.map{ artMap[it.first.absoluteValue]!! * (if(it.first<0) -1 else 1)}
             val legatoAlterationsAndDeltas = alterateBpmWithDistribution(legatos,0.005f, totalLength)
             val legatoAlterations = legatoAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
             val legatoDeltas = legatoAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
-            counterpointTrackData.forEach {
-                it.articulationDurations = alterateArticulation(it.ticks, it.durations, legatoAlterations, legatoDeltas) }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                counterpointTrackData.parallelStream().forEach {
+                    it.articulationDurations = alterateArticulation(it.ticks, it.durations, legatoAlterations, legatoDeltas) }
+            } else {
+                counterpointTrackData.forEach {
+                    it.articulationDurations = alterateArticulation(it.ticks, it.durations, legatoAlterations, legatoDeltas) }
+            }
         }
 
 
@@ -206,17 +213,30 @@ object Player {
         var alterationIndex = 0
         var alterationTick = 0
         var durIndex = 0
-
+        var legatoAlteration: Float
+        var newDur: Int
+        var nextDur: Int
+        var thisDur: Int
+        var legatoLimit: Int
         while(durIndex < durations.size ){
             while(alterationTick + legatoDeltas[alterationIndex] < ticks[durIndex] ) {
                 alterationTick += legatoDeltas[alterationIndex].toInt()
                 alterationIndex++
             }
-            val newDur = (durations[durIndex] * legatoAlterations[alterationIndex]).toInt()
-            result[durIndex] = if(newDur<12) 12 else newDur
+            legatoAlteration = legatoAlterations[alterationIndex]
+            thisDur = durations[durIndex]
+            if(legatoAlteration<=1.0){
+                newDur = (thisDur * legatoAlteration).toInt()
+                result[durIndex] = if(newDur < 12) 12 else newDur
+            } else {
+                nextDur = if(durIndex < durations.size - 1) durations[durIndex + 1] else 0
+                newDur = (thisDur * legatoAlteration).toInt()
+                legatoLimit = thisDur + (nextDur * (legatoAlteration - 1f)).toInt()
+                result[durIndex] = if(newDur > legatoLimit) legatoLimit else newDur
+            }
             durIndex++
         }
-        result.also{ it.contentToString() }
+        //result.also{ println("Alterate articulations: ${it.contentToString()}") }
         return result
     }
 

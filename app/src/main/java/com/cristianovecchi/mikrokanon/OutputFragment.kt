@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
+import kotlin.system.measureTimeMillis
 
 class OutputFragment: Fragment() {
     lateinit var model: AppViewModel
@@ -123,7 +124,9 @@ class OutputFragment: Fragment() {
                                 onExpand = { model.onExpand() },
                                 onFlourish = { model.onFlourish() },
                                 onPlay = {
+                                    val executionTime = measureTimeMillis {
                                     model.onPlay(true, false) // play the entire structure
+                                    }.also{ println("MIDI file build in $it ms") }
                                 },
                                 onStop = { model.onStop() }
                             )

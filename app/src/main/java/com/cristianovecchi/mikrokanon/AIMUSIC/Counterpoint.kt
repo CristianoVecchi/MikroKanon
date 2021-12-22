@@ -34,8 +34,8 @@ fun main(args : Array<String>){
 //    val counterpoint3 = Counterpoint.findWave(counterpoint2,pentatonicIntervalSet,6,
 //        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions).displayInNotes()
     val normCounterpoint = counterpoint.normalizePartsSize(true)
-    normCounterpoint.displayInNotes()
-    normCounterpoint.addCadenzas(listOf(1,11)).displayInNotes()
+    //normCounterpoint.displayInNotes()
+    normCounterpoint.addCadenzas(listOf(1,11))//.displayInNotes()
 //    println("emptiness: ${counterpoint.emptiness}")
 //    val counterpointRound = counterpoint.normalizePartsSize(true).buildRound()
 //    counterpointRound.display()
@@ -226,7 +226,7 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
     fun spreadAsPossible(findEmptiness: Boolean = true) : Counterpoint {
         val clone = this.normalizePartsSize(false) // cloning is necessary in a coroutine context
-        clone.display()
+        //clone.display()
         for(partIndex in clone.parts.indices){
             val part = clone.parts[partIndex]
             for(pitchIndex in part.absPitches.indices)

@@ -1,7 +1,10 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.cristianovecchi.mikrokanon.findMelodyWithStructure
+import java.util.stream.Collectors
 
 fun findTopNuances(stabilities: List<Float>, minNuance: Float, maxNuance: Float) : List<Float>{
     val n = stabilities.size
@@ -24,7 +27,6 @@ object CounterpointInterpreter {
                    nuances: Int,
                    doublingFlags: Int,
                    rangeTypes: List<Pair<Int,Int>>,
-                   legatoTypes: List<Pair<Int,Int>>,
                    melodyTypes: List<Int>,
                    glissando: List<Int> = listOf(),
                    audio8D: List<Int> = listOf(),
@@ -32,15 +34,18 @@ object CounterpointInterpreter {
         ): List<TrackData> {
 //        counterpoint.display()
 //        durations.also{println("Durations: $it")}
-        val result = mutableListOf<TrackData>()
+        //var result = mutableListOf<TrackData>()
 
-        if(counterpoint.parts.size > 15) {
+        if (counterpoint.parts.size > 15) {
             println("WARNING: Counterpoint n. parts: ${counterpoint.parts.size}")
         }
 
+        counterpoint.parts.forEachIndexed() { i, part ->
+            part.index = i
+        }
 
-        // CREATION OF TRACKS
-        counterpoint.parts.forEachIndexed { partIndex, part ->
+        val computation = { part: AbsPart ->
+            val partIndex = part.index!!
             val ensemblePart = ensembleParts[partIndex]
             val channel =
                 if (partIndex < 9) partIndex else partIndex + 1 // skip percussion midi channel
@@ -48,7 +53,7 @@ object CounterpointInterpreter {
             val pitchesData = mutableListOf<Int>()
             val ticksData = mutableListOf<Int>()
             val durationsData = mutableListOf<Int>()
-            val velocitiesData= mutableListOf<Int>()
+            val velocitiesData = mutableListOf<Int>()
             val glissandoData = mutableListOf<Int>()
 
 
@@ -64,15 +69,22 @@ object CounterpointInterpreter {
             var durIndex = 0
 
             // RANGES EXTENSION
-            val ranges = rangeTypes.map{ ensemblePart.getOctavedRangeByType(it.first, it.second) }
-            val startOctave = (ensemblePart.octave + rangeTypes[0].second).coerceIn(0,8)
+            val ranges = rangeTypes.map { ensemblePart.getOctavedRangeByType(it.first, it.second) }
+            val startOctave = (ensemblePart.octave + rangeTypes[0].second).coerceIn(0, 8)
             //ACTUAL PITCHES
-            val actualPitches = if(melodyTypes.size == 1 && rangeTypes.size == 1){
-                Insieme.findMelody(startOctave, part.absPitches.toIntArray(), ranges[0].first, ranges[0].last, melodyTypes[0])
+            val actualPitches = if (melodyTypes.size == 1 && rangeTypes.size == 1) {
+                Insieme.findMelody(
+                    startOctave,
+                    part.absPitches.toIntArray(),
+                    ranges[0].first,
+                    ranges[0].last,
+                    melodyTypes[0]
+                )
             } else {
                 findMelodyWithStructure(startOctave, part.absPitches.toIntArray(),
-                    ranges.map{it.first}.toIntArray(), ranges.map{it.last}.toIntArray(),
-                    melodyTypes.toIntArray())
+                    ranges.map { it.first }.toIntArray(), ranges.map { it.last }.toIntArray(),
+                    melodyTypes.toIntArray()
+                )
             }
 
             // NUANCES
@@ -80,70 +92,83 @@ object CounterpointInterpreter {
             val minNuance = 0.51f
             val maxNuance = 0.95f
             val stabilities = counterpoint.findStabilities()
-            val velocities: IntArray = when(nuances) {
-                1 -> {val mssq = MelodySubSequencer(actualPitches)
-                        val topNuances = findTopNuances(stabilities, minNuance, maxNuance)
-                        mssq.assignVelocities(topNuances[partIndex], lowLimit)
-                        mssq.velocities}
-                2 -> {val mssq = MelodySubSequencer(actualPitches)
-                        val topNuances = findTopNuances(stabilities, maxNuance, minNuance)
-                        mssq.assignVelocities(topNuances[partIndex], lowLimit)
-                        mssq.velocities}
+            val velocities: IntArray = when (nuances) {
+                1 -> {
+                    val mssq = MelodySubSequencer(actualPitches)
+                    val topNuances = findTopNuances(stabilities, minNuance, maxNuance)
+                    mssq.assignVelocities(topNuances[partIndex], lowLimit)
+                    mssq.velocities
+                }
+                2 -> {
+                    val mssq = MelodySubSequencer(actualPitches)
+                    val topNuances = findTopNuances(stabilities, maxNuance, minNuance)
+                    mssq.assignVelocities(topNuances[partIndex], lowLimit)
+                    mssq.velocities
+                }
                 else -> IntArray(actualPitches.size) { 100 } // case 0: no Nuances
             }
 
             // ADDING NOTES
-            val glissandoChecks = Insieme.checkIntervalsInPitches(actualPitches, glissando.toIntArray())
+            val glissandoChecks =
+                Insieme.checkIntervalsInPitches(actualPitches, glissando.toIntArray())
 
-                while (index < actualPitches.size) {
-                    val pitch = actualPitches[index]
-                    val velocity = velocities[index]
-                    var gliss = glissandoChecks[index]
-                    //println("pitch: $pitch vel: $velocity")
-                    var dur = durations[durIndex % durations.size]
-                    if (dur < 0) { // negative values are considered as rests
-                        dur *= -1
-                        tick += dur
-                        durIndex++
-                    } else {
-                        if (pitch != -1) {
-                            while (index + 1 < actualPitches.size && actualPitches[index + 1] == pitch) {
-                                var nextDur = durations[(durIndex + 1) % durations.size]
-                                gliss = glissandoChecks[index + 1]
-                                if (nextDur < 0) {
-                                    gliss = 0
-                                    nextDur *= -1
-                                    dur += nextDur
-                                    durIndex++
-                                } else {
+            while (index < actualPitches.size) {
+                val pitch = actualPitches[index]
+                val velocity = velocities[index]
+                var gliss = glissandoChecks[index]
+                //println("pitch: $pitch vel: $velocity")
+                var dur = durations[durIndex % durations.size]
+                if (dur < 0) { // negative values are considered as rests
+                    dur *= -1
+                    tick += dur
+                    durIndex++
+                } else {
+                    if (pitch != -1) {
+                        while (index + 1 < actualPitches.size && actualPitches[index + 1] == pitch) {
+                            var nextDur = durations[(durIndex + 1) % durations.size]
+                            gliss = glissandoChecks[index + 1]
+                            if (nextDur < 0) {
+                                gliss = 0
+                                nextDur *= -1
+                                dur += nextDur
+                                durIndex++
+                            } else {
 
-                                    dur += nextDur
-                                    index++
-                                    durIndex++
-                                }
+                                dur += nextDur
+                                index++
+                                durIndex++
                             }
-                            ticksData.add(tick)
-                            durationsData.add(dur)
-                            pitchesData.add(pitch)
-                            velocitiesData.add(velocity)
-                            glissandoData.add(gliss)
                         }
-                        tick += dur
-                        index++
-                        durIndex++
+                        ticksData.add(tick)
+                        durationsData.add(dur)
+                        pitchesData.add(pitch)
+                        velocitiesData.add(velocity)
+                        glissandoData.add(gliss)
                     }
+                    tick += dur
+                    index++
+                    durIndex++
                 }
-                result.add(
-                    TrackData(pitchesData.toIntArray(), ticksData.toIntArray(), durationsData.toIntArray(),
-                        velocitiesData.toIntArray(),glissandoData.toIntArray(), IntArray(pitchesData.size),
-                        null,
-                        channel, 80, vibrato, doublingFlags,
-                        ensemblePart.instrument, audio8D.contains(partIndex),partIndex)
-                )
             }
 
-        return result.toList()
+            TrackData(
+                pitchesData.toIntArray(), ticksData.toIntArray(), durationsData.toIntArray(),
+                velocitiesData.toIntArray(), glissandoData.toIntArray(), IntArray(pitchesData.size),
+                null,
+                channel, 80, vibrato, doublingFlags,
+                ensemblePart.instrument, audio8D.contains(partIndex), partIndex
+            )
+        }
+        // CREATION OF TRACKS
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            counterpoint.parts.parallelStream().map { part ->
+                computation(part)
+            }.collect(Collectors.toList()).sortedBy { it.channel }
+        } else {
+            counterpoint.parts.map { part ->
+                computation(part)
+            }.sortedBy { it.channel }
+        }
+
     }
-
-
 }

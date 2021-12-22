@@ -128,6 +128,7 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
     suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
         map { async() { f(it) } }.awaitAll()
     }
+
     @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
     fun <A, B> Iterable<A>.mapIf(condition: Boolean, f: (A) -> B): List<B> =
         map { (if(condition) f(it) else it) as B }
@@ -331,7 +332,7 @@ fun correctDynamics(dynamics: String): String{
     return result.joinToString(",")
 }
 fun correctLegatos(legatos: String): String{
-    println("legatos: $legatos")
+    //println("legatos: $legatos")
     val (leg, rib) = legatos.extractIntPairsFromCsv().unzip()
     val result = leg.toMutableList()
     val result2 = rib.toMutableList()
@@ -462,7 +463,7 @@ lowerLimits: IntArray, upperLimits: IntArray,  melodyTypes: IntArray): IntArray 
     var lastTick2 = 0
 
     val sequences = durs.mapIndexed{ index, dur ->
-        val subSequence = absPitches.copyOfRange(lastTick2, lastTick2 + dur).also{println("subSequence $index: ${it.contentToString()}")}
+        val subSequence = absPitches.copyOfRange(lastTick2, lastTick2 + dur)//.also{println("subSequence $index: ${it.contentToString()}")}
         val sequence = Insieme.findMelody(lastOctave, subSequence,
                 lowLimits[index], upLimits[index], melTypes[index])
         lastOctave = sequence.lastOrNull { it != -1 }?.let{ last -> last / 12 -1} ?: lastOctave // sequence could be empty

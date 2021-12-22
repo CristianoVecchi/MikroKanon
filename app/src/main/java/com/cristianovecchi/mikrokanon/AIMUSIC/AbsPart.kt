@@ -6,7 +6,7 @@ import java.lang.Math.abs
 import java.util.ArrayList
 
 @Parcelize
-data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowForm.UNRELATED, val transpose: Int = 0, val delay: Int = 0) :
+data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowForm.UNRELATED, val transpose: Int = 0, val delay: Int = 0, var index : Int? = null) :
     Parcelable {
     companion object{
         fun absPartfromClipList(clipList: List<Clip>) : AbsPart {
@@ -109,7 +109,7 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
     }
 
     fun divideWithSubSequencer(octave: Int, range: IntRange, melodyType: Int): List<AbsPart> {
-        val actualPitches = Insieme.findMelody(octave, absPitches.toIntArray(), range.first, range.last, melodyType).also{println(it.toList())}
+        val actualPitches = Insieme.findMelody(octave, absPitches.toIntArray(), range.first, range.last, melodyType)//.also{println(it.toList())}
         val mssq = MelodySubSequencer(actualPitches)
         val subSequences = mssq.subSequences
         //mssq.printSubSequences()
@@ -159,7 +159,7 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
     fun detectIntervalsReportingBothNotes(intervalSet: List<Int>): Array<Boolean>{
         val intervalSetArray = intervalSet.toIntArray()
         val nNotes = absPitches.size
-        val result = Array<Boolean>(nNotes) {false}
+        val result = Array(nNotes) {false}
         var index = 0
         while (index < nNotes - 2){
             if(Insieme.isIntervalInSet(intervalSetArray, absPitches[index], absPitches[index+1])){
@@ -193,14 +193,14 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
             }
         }
 
-        return result.toList().also{println("SubSequences: " + it)}
+        return result.toList()//.also{println("SubSequences: " + it)}
     }
     fun subSequencesLastRepetition(endSequence: Int = -1): List<Pair<Int, Int>>{
         val result = subSequences(endSequence)
         val checkedResult = mutableListOf<Pair<Int, Int>>()
         result.forEach{ pair ->
             val sequenceSize = pair.second - pair.first
-            val divisors = (sequenceSize downTo 1).filter{ sequenceSize % it == 0 }.also{println("divisors: "+it)}
+            val divisors = (sequenceSize downTo 1).filter{ sequenceSize % it == 0 }//.also{println("divisors: "+it)}
             if (sequenceSize == 1 || divisors == listOf(1)) {
                 checkedResult.add(pair)
             } else {
@@ -223,7 +223,7 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
                 }
             }
         }
-        return checkedResult.toList().also{println("SubSequencesRepetitions: " + it)}
+        return checkedResult.toList()//.also{println("SubSequencesRepetitions: " + it)}
     }
 
 

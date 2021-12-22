@@ -375,8 +375,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                 var mikroKanon: MikroKanon
                 for (tr in 0 until 12) {
                     for (form in 0 until 4) {
-                        mikroKanon =
-                            find2AbsPartMikroKanon(absPitches, intervalSet, delay, tr, form)
+                        mikroKanon = find2AbsPartMikroKanon(absPitches, intervalSet, delay, tr, form)
                         result.add(mikroKanon)
                     }
                 }
@@ -473,7 +472,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                 val delay3: Int, val transpose3: Int, val form3: Int
             )
             val nParams =  ((depth-1) * (depth-1) * (depth-1) ) * 12 * 4 * 12 * 4 * 12 * 4
-            println("nParams = $nParams")
+            //println("nParams = $nParams")
             val paramsListArray: Array<Params?> = Array(nParams) { _ -> null }
             val intervalSetIntArray = intervalSet.toIntArray()
             val absPitchesIntArray = absPitches.toIntArray()
@@ -535,7 +534,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                                   if(emptiness > gate){
                                       null
                                   } else {
-                                      println("NEW GATE: $gate")
+                                      //println("NEW GATE: $gate")
                                       gate = emptiness
                                       mk
                                   }
@@ -556,7 +555,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                                 val emptiness = mk.findEmptiness()
                                 // val emptiness = mk.parts[0].absPitches.count{ pitch -> pitch == -1}
                                 if(emptiness > gate) null else {
-                                    println("NEW GATE: $gate")
+                                    //println("NEW GATE: $gate")
                                     gate = emptiness
                                     mk
                                 }
@@ -567,7 +566,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                         }.filterNotNull()
                 }
             }catch (ex: OutOfMemoryError){
-                MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
+                findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
             }
         }
 
@@ -594,7 +593,6 @@ data class MikroKanon(val parts: List<AbsPart>,
                     for (delay2 in delay1 + 1 until depth + delay1) {
                         for (delay3 in delay2 + 1 until depth + delay2) {
 
-                            var mikroKanon: MikroKanon
                             for (tr1 in 0 until 12) {
                                 for (form1 in 0 until 4) {
                                     for (tr2 in 0 until 12) {
@@ -640,7 +638,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                 val delay4: Int = delay1 -1 + delay2 -1 + delay3 -1 +1, val form4: Int
             )
             val nParams =  ((depth-1) * (depth-1) * (depth-1) ) * 12 * 4 * 12 * 4 * 12 * 4 //*4 Out of memory!
-            println("MK5reducted nParams = $nParams")
+            //println("MK5reducted nParams = $nParams")
             val paramsListArray: Array<Params?> = Array(nParams) { _ -> null }
             val intervalSetIntArray = intervalSet.toIntArray()
             val absPitchesIntArray = absPitches.toIntArray()
@@ -684,7 +682,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                     }
                 }
             } catch (ex: OutOfMemoryError){
-                MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
+                findAll2AbsPartMikroKanons(absPitches,intervalSet,2)
             }
 
             try{
@@ -710,7 +708,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                                     if(emptiness > gate){
                                         null
                                     } else {
-                                        println("NEW GATE: $gate")
+                                        //println("NEW GATE: $gate")
                                         gate = emptiness
                                         mk
                                     }
@@ -732,7 +730,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                                 val emptiness = mk.findEmptiness()
                                 // val emptiness = mk.parts[0].absPitches.count{ pitch -> pitch == -1}
                                 if(emptiness > gate) null else {
-                                    println("NEW GATE: $gate")
+                                    //println("NEW GATE: $gate")
                                     gate = emptiness
                                     mk
                                 }

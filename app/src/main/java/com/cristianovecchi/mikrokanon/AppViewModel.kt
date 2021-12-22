@@ -267,11 +267,12 @@ init{
         }
     }
     val onPlay = { createAndPlay: Boolean, simplify: Boolean  ->
+
             var error = "ERROR: NO FILE"
-            if(userOptionsData.value!!.isEmpty()){
+            if (userOptionsData.value!!.isEmpty()) {
                 insertUserOptionData(UserOptionsData.getDefaultUserOptionsData())
             }
-            if(!selectedCounterpoint.value!!.isEmpty()) {
+            if (!selectedCounterpoint.value!!.isEmpty()) {
                 if (mediaPlayer == null) {
                     mediaPlayer = MediaPlayer()
                     mediaPlayer?.setOnCompletionListener { onStop() }
@@ -360,12 +361,12 @@ init{
                     } ?: listOf(Pair(4, 0))
                 val melodyTypes: List<Int> =
                     userOptionsData.value?.let {
-                    if (simplify) {
-                        listOf(userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()[0])
-                    } else {
-                        userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()
-                    }
-                 }  ?: listOf(0)
+                        if (simplify) {
+                            listOf(userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()[0])
+                        } else {
+                            userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()
+                        }
+                    } ?: listOf(0)
                 val glissandoFlags: Int =
                     userOptionsData.value?.let { userOptionsData.value!![0].glissandoFlags }
                         ?: 0
@@ -399,8 +400,8 @@ init{
                     vibrato
                 )
             }
-        mediaPlayer?.let{ if (it.isPlaying) _playing.value = true}
-            error.also{println(it)}
+        mediaPlayer?.let { if (it.isPlaying) _playing.value = true }
+        error.also { println(it) }
     }
     val dispatchIntervals = {
         if(computationStack.isNotEmpty())

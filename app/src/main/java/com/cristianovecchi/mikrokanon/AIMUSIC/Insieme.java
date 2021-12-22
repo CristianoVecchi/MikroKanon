@@ -750,10 +750,10 @@ public class Insieme {
             }
         }
         //Stampa resTab
-        for (int i =0; i<resTab.length; i++){
-            for (int j = 0 ; j<resTab[i].length;j++) {System.out.print(" "+resTab[i][j]);}
-            System.out.println("TabulaIntervalliVettori");
-        }
+//        for (int i =0; i<resTab.length; i++){
+//            for (int j = 0 ; j<resTab[i].length;j++) {System.out.print(" "+resTab[i][j]);}
+//            System.out.println("TabulaIntervalliVettori");
+//        }
         return resTab;
     }
 
