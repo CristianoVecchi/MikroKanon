@@ -500,9 +500,9 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun ritornello(ritornello: Int, transpositions: List<Int> = listOf(0)): Counterpoint {
        // println(ritornello)
        // println(transpositions)
+        val normalized = if(this.isNormalized()) this else this.normalizePartsSize(false)
         if (transpositions.all{ it == 0}) {
-            if (ritornello == 0) return this
-            val normalized = this.normalizePartsSize(false)
+            if (ritornello == 0) return normalized
             var newCounterpoint = this.normalizePartsSize(false)
             for (i in 0 until ritornello){
                 newCounterpoint = newCounterpoint.enqueue(normalized)
@@ -510,7 +510,6 @@ data class Counterpoint(val parts: List<AbsPart>,
             newCounterpoint.emptiness = newCounterpoint.findEmptiness()
             return newCounterpoint
         } else {
-            val normalized = this.normalizePartsSize(false)
             var newCounterpoint = this.normalizePartsSize(false).transpose(transpositions[0])
             for (i in 0 until ritornello){
                 newCounterpoint = newCounterpoint.enqueue(normalized.transpose(transpositions[(i + 1) % transpositions.size]))

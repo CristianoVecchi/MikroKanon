@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.composables.MultiNumberDialogData
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch

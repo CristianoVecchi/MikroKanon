@@ -18,7 +18,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.cristianovecchi.mikrokanon.composables.CreditsDialogData
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable

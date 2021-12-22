@@ -87,7 +87,7 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
                             append("by Cristiano Vecchi")
                         }
                     },onClick = {
-                        creditsDialogData.value = CreditsDialogData(true,"Credits:",
+                        creditsDialogData.value = CreditsDialogData(true, "Credits:",
                         ) {
                             creditsDialogData.value = CreditsDialogData()
                         }
@@ -102,46 +102,8 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
 }
 
 
-data class ListDialogData(val dialogState: Boolean = false, val itemList: List<String> = listOf(),
-                          val selectedListDialogItem: Int = -1,
-                          val dialogTitle: String = "", val onSubmitButtonClick: (Int) -> Unit = {} )
-data class MultiListDialogData(val dialogState: Boolean = false, val itemList: List<String> = listOf(),
-                               val selectedListDialogItems: Set<Int> = setOf(),
-                          val dialogTitle: String = "", val onSubmitButtonClick: (List<Int>) -> Unit = {} )
-data class NumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:Int = 0,
-                            val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
-data class MultiNumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="0",
-                                 val min: Int = 0, val max: Int = 360, val model: AppViewModel,
-                                 val onSubmitButtonClick: (String) -> Unit = {})
-data class MultiFloatDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="1.0",
-                                 val min: Float = 0f, val max: Float = 1f, val model: AppViewModel, val onSubmitButtonClick: (String) -> Unit = {})
-data class CustomColorsDialogData(val dialogState: Boolean = false, val title:String = "", val arrayColorIndex: Int = 0,
-                                  val model: AppViewModel, val firstRendering: Boolean = true, val isRefreshing: Boolean = false,
-                                  val onSubmitButtonClick: (Int) -> Unit = {})
-data class ButtonsDialogData(
-    val dialogState: Boolean = false, val title:String = "",
-    val model: AppViewModel, val buttonSize: Dp = 60.dp, val fontSize: Int = 18,
-    val isActiveWaves: Boolean = false, val isActivePedals: Boolean = false,
-    val onWave3: () -> Unit = {}, val onWave4: () -> Unit = {}, val onWave6: () -> Unit = {},
-    val onPedal1: () -> Unit = {}, val onPedal3: () -> Unit = {}, val onPedal5: () -> Unit = {},
-    val onTritoneSubstitution: () -> Unit = {}, val onRound: () -> Unit = {},
-    val onCadenza: () -> Unit = {}, val onScarlatti: () -> Unit = {}, val onFlourish: () -> Unit = {},
-    val onEraseIntervals: () -> Unit = {}, val onSingle: () -> Unit = {},
-    val onMK5reducted: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
-    val onSort: (Int) -> Unit = {},
-    val onSavingCounterpoint: (Int) -> Unit = {},
-    val onSubmitButtonClick: () -> Unit = {})
-
-data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
-                            val error:String = "", val onSubmitButtonClick: () -> Unit = {})
-data class CreditsDialogData(val dialogState: Boolean = false, val title:String = "",  val onSubmitButtonClick: () -> Unit = {})
-
-
-
 @Composable
 fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>){
-
-
 
     val listDialogData by lazy { mutableStateOf(ListDialogData())}
     val ensemblesDialogData by lazy { mutableStateOf(MultiListDialogData())}

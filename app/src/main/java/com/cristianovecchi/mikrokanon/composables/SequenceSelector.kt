@@ -16,9 +16,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
-import com.cristianovecchi.mikrokanon.composables.dialogs.ButtonsDialog
-import com.cristianovecchi.mikrokanon.composables.dialogs.CadenzaDialog
-import com.cristianovecchi.mikrokanon.composables.dialogs.SequencesDialog
+import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.*

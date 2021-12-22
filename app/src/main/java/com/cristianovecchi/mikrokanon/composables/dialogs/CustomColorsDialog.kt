@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.G
 import com.cristianovecchi.mikrokanon.composables.ColorSelector
-import com.cristianovecchi.mikrokanon.composables.CustomColorsDialogData
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.toDp
 import com.cristianovecchi.mikrokanon.ui.Dimensions

@@ -385,27 +385,103 @@ object Ensembles {
     fun getGamelan(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2 -> listOf(
-                EnsemblePart(73, 5, FLUTE_ALL), //flute
-                EnsemblePart(70, 3, BASSOON_ALL)  // bassoon
+                PART_GLOCKENSPIEL_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE
             )
             3 -> listOf(
-                PART_FLUTE_MIDDLE_HIGH,
-                PART_CLARINET_MIDDLE_HIGH,
-                PART_CLARINET_LOW_MIDDLE
+                PART_GLOCKENSPIEL_MIDDLE_HIGH,
+                PART_VIBRAPHONE_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE
             )
-            in 10..12 -> listOf(
-                PART_TRUMPET_HIGH,
-                PART_TRUMPET_HIGH,
-                PART_TRUMPET_HIGH,
-                PART_TRUMPET_MIDDLE_HIGH,
-                PART_FRENCH_HORN_MIDDLE_HIGH,
-                PART_FRENCH_HORN_MIDDLE_HIGH,
-                PART_FRENCH_HORN_MIDDLE,
-                PART_FRENCH_HORN_MIDDLE,
-                PART_TROMBONE_HIGH,
-                PART_TROMBONE_MIDDLE_HIGH,
-                PART_TROMBONE_MIDDLE,
-                PART_TUBA_LOW
+            4 -> listOf(
+                PART_GLOCKENSPIEL_HIGH,
+                PART_VIBRAPHONE_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE,
+                PART_MARIMBA_LOW_MIDDLE
+            )
+            5 -> listOf(
+                PART_GLOCKENSPIEL_HIGH,
+                PART_VIBRAPHONE_HIGH,
+                PART_VIBRAPHONE_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE,
+                PART_MARIMBA_LOW_MIDDLE
+            )
+            6 -> listOf(
+                PART_GLOCKENSPIEL_HIGH,
+                PART_VIBRAPHONE_HIGH,
+                PART_VIBRAPHONE_MIDDLE_HIGH,
+                PART_MARIMBA_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE,
+                PART_MARIMBA_LOW_MIDDLE
+            )
+            7 -> listOf(
+                PARTS_MUSIC_BOX[6],
+                PART_GLOCKENSPIEL_HIGH,
+                PART_VIBRAPHONE_HIGH,
+                PART_VIBRAPHONE_MIDDLE_HIGH,
+                PART_MARIMBA_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE,
+                PART_MARIMBA_LOW_MIDDLE
+            )
+            8 -> listOf(
+                PARTS_MUSIC_BOX[6],
+                PART_GLOCKENSPIEL_HIGH,
+                PART_VIBRAPHONE_HIGH,
+                PART_MARIMBA_HIGH,
+                PART_VIBRAPHONE_MIDDLE_HIGH,
+                PART_MARIMBA_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE,
+                PART_MARIMBA_LOW_MIDDLE
+            )
+            9 -> listOf(
+                PARTS_MUSIC_BOX[6],
+                PART_GLOCKENSPIEL_HIGH,
+                PART_VIBRAPHONE_HIGH,
+                PART_MARIMBA_HIGH,
+                PART_TUBULAR_BELLS_ALL,
+                PART_VIBRAPHONE_MIDDLE_HIGH,
+                PART_MARIMBA_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE,
+                PART_MARIMBA_LOW_MIDDLE
+            )
+            10 -> listOf(
+                PARTS_MUSIC_BOX[6],
+                PART_GLOCKENSPIEL_HIGH,
+                PART_VIBRAPHONE_HIGH,
+                PART_MARIMBA_HIGH,
+                PART_TUBULAR_BELLS_ALL,
+                PART_XYLOPHONE_MIDDLE_HIGH,
+                PART_VIBRAPHONE_MIDDLE_HIGH,
+                PART_MARIMBA_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE,
+                PART_MARIMBA_LOW_MIDDLE
+            )
+            11 -> listOf(
+                PARTS_MUSIC_BOX[6],
+                PART_GLOCKENSPIEL_HIGH,
+                PART_VIBRAPHONE_HIGH,
+                PART_MARIMBA_HIGH,
+                PART_TUBULAR_BELLS_ALL,
+                PART_TUBULAR_BELLS_ALL,
+                PART_XYLOPHONE_MIDDLE_HIGH,
+                PART_VIBRAPHONE_MIDDLE_HIGH,
+                PART_MARIMBA_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE,
+                PART_MARIMBA_LOW_MIDDLE
+            )
+            12 -> listOf(
+                PARTS_MUSIC_BOX[7],
+                PART_XYLOPHONE_HIGH,
+                PART_GLOCKENSPIEL_HIGH,
+                PART_VIBRAPHONE_HIGH,
+                PART_MARIMBA_HIGH,
+                PART_TUBULAR_BELLS_ALL,
+                PART_TUBULAR_BELLS_ALL,
+                PART_XYLOPHONE_MIDDLE_HIGH,
+                PART_VIBRAPHONE_MIDDLE_HIGH,
+                PART_MARIMBA_MIDDLE_HIGH,
+                PART_VIBRAPHONE_LOW_MIDDLE,
+                PART_MARIMBA_LOW_MIDDLE
             )
             else -> listOf()
         }

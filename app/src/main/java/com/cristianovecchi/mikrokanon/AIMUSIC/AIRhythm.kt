@@ -19,22 +19,30 @@ val N8 = listOf(60,60,60,60,60,60,60,60)
 val N8h = listOf(60,60,60,60)
 val N7 = listOf(69,68,69,68,69,68,69)
 val N6 = listOf(80,80,80,80,80,80)
+val N6graziosetto = listOf(80,20,-60,20,-60,20,-60,20,-60,20,-60)
+val N6rhythmDotted = listOf(60,20,60,20,60,20,60,20,60,20,60,20)
 val N6h = listOf(80,80,80)
 val N5 = listOf(96,96,96,96,96)
+val N5graziosetto = listOf(96,24,-72,24,-72,24,-72,24,-72)
+val N5rhythmDotted = listOf(72,24,72,24,72,24,72,24,72,24)
 val N4 = listOf(120,120,120,120)
+val N4rhythmDotted = listOf(90,30,90,30,90,30,90,30)
 val N4détaché = listOf(90,-30,90,-30,90,-30,90,-30)
 val N4staccato = listOf(30,-90,30,-90,30,-90,30,-90)
 val N4staccatissimo = listOf(15,-105,15,-105,15,-105,15,-105)
 val N4graziosetto = listOf(120,30,-90,30,-90,30,-90)
 val N4h = listOf(120,120)
 val N3 = listOf(160,160,160)
+val N3rhythmDotted = listOf(120,40,120,40,120,40)
 val N3graziosetto = listOf(160,40,-120,40,-120)
 val N2 = listOf(240,240)
+val N2rhythmDotted = listOf(180,60,180,60)
 val N2détaché = listOf(180,-60,180,-60)
 val N1 = listOf(480)
 val Qx3staccato = listOf(120,-360,120,-360,120,-360)// Q = Quaver
 val Ox3staccato = listOf(60,-180,60,-180,60,-180)// O = Octave
 val N1dotted = listOf(720) // Octave x 3
+val N1rhythmDotted = listOf(360,120)
 val Ox4grz = listOf(240,60,-180,60,-180,60,-180)// Octave x 4 graziosetto
 val Ox3grz = listOf(240,60,-180,60,-180)// Octave x 3 graziosetto
 val Ox2grz = listOf(240,60,-180)// Octave x 2 graziosetto
@@ -58,9 +66,26 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     GRAZIOSO_1_16(RhythmType.BALLET,"Grazioso 1/16",listOf(120,30,-90,120,30,-90,120,30,-90,120,30,-90,), Pair(2,4)),
     GRAZIOSETTO_1_16(RhythmType.BALLET,"Graziosetto 1/16",listOf(N4graziosetto, N4graziosetto).flatten(), Pair(2,4)),
     GRAZIOSETTO_1_16_1_8T(RhythmType.BALLET,"Graziosetto 1/16 1/8t",listOf(N4graziosetto, N3graziosetto).flatten(), Pair(2,4)),
+    GRAZIOSETTO_FLUX_3454(RhythmType.BALLET,"Graziosetto Flux 3454",listOf(N3graziosetto, N4graziosetto, N5graziosetto, N4graziosetto).flatten(), Pair(4,4)),
+    GRAZIOSETTO_FLUX_4564(RhythmType.BALLET,"Graziosetto Flux 4565",listOf(N4graziosetto, N5graziosetto, N6graziosetto, N5graziosetto).flatten(), Pair(4,4)),
+    GRAZIOSETTO_FLUX_345654(RhythmType.BALLET,"Graziosetto Flux 345654",listOf(N3graziosetto, N4graziosetto, N5graziosetto, N6graziosetto, N5graziosetto, N4graziosetto).flatten(), Pair(3,4)),
     DOTTED_1_4(RhythmType.PUNTATO,"Dotted 1/4", listOf(360,120,360,120,360,120,360,120)),
     DOTTED2_1_4(RhythmType.PUNTATO,"Dotted2 1/4", listOf(360,60,60,360,60,60,360,60,60,360,60,60)),
     DOTTED3_1_4(RhythmType.PUNTATO,"Dotted3 1/4", listOf(300,60,60,60,300,60,60,60,300,60,60,60,300,60,60,60)),
+    DOTTED_FLUX_123432(RhythmType.PUNTATO,"Dotted Flux 123432",
+        listOf(N1rhythmDotted, N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N3rhythmDotted, N2rhythmDotted).flatten(),Pair(3,4)),
+    DOTTED_FLUX_234543(RhythmType.PUNTATO,"Dotted Flux 234543",
+        listOf(N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N4rhythmDotted, N3rhythmDotted).flatten(),Pair(3,4)),
+    DOTTED_FLUX_23456543(RhythmType.PUNTATO,"Dotted Flux 23456543",
+        listOf(N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N6rhythmDotted, N5rhythmDotted,N4rhythmDotted,N3rhythmDotted,).flatten(),Pair(4,4)),
+    DOTTED_FLUX_2343(RhythmType.PUNTATO,"Dotted Flux 2343",
+        listOf(N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N3rhythmDotted).flatten(),Pair(4,4)),
+    DOTTED_FLUX_3454(RhythmType.PUNTATO,"Dotted Flux 3454",
+        listOf(N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N4rhythmDotted).flatten(),Pair(4,4)),
+    DOTTED_FLUX_12345432(RhythmType.PUNTATO,"Dotted Flux 12345432",
+        listOf(N1rhythmDotted, N2rhythmDotted,N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N4rhythmDotted,N3rhythmDotted, N2rhythmDotted).flatten(),Pair(4,4)),
+    DOTTED_FLUX_1234565432(RhythmType.PUNTATO,"Dotted Flux 1234565432",
+        listOf(N1rhythmDotted,N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N6rhythmDotted, N5rhythmDotted,N4rhythmDotted, N3rhythmDotted, N2rhythmDotted).flatten(),Pair(5,4)),
     RAGTIME(RhythmType.DANCE,"Ragtime", listOf(120,240,120,60,-180,60,-180, 120,120,120,240,120,180,-60), Pair(2,4)),
     SNARE(RhythmType.DANCE,"Snare", listOf(90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,30,-30,30,-30,30,-30,30,-30)),
     CANCAN(RhythmType.DANCE,"Cancan", listOf(listOf(360,-120),N4graziosetto, N2détaché, N4graziosetto, N2détaché, N4graziosetto, N4staccatissimo, N4staccatissimo).flatten(),Pair(4,8)),
@@ -154,10 +179,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
             }
         }
         fun getTitles(): List<String> {
-            return values().map {
-                it.title
-            }
+            return values().map { it.title }
         }
-
     }
 }

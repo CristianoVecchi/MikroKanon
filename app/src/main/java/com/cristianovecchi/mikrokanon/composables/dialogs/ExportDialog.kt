@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.cristianovecchi.mikrokanon.composables.ExportDialogData
+
 
 @Composable
 fun ExportDialog(exportDialogData: MutableState<ExportDialogData>, okText: String = "OK",
