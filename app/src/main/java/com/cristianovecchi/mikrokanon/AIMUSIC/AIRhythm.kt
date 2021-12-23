@@ -150,6 +150,9 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
         val notesValue = durationSum(nNotes)
         return barValue - (notesValue % barValue)
     }
+    fun metroDenominatorMidiValue(): Int {
+        return denominatorMidiValue(this.metro.second)
+    }
     companion object {
         fun durationSum(nNotes: Int, values: List<Int>): Int{
             var index = 0;

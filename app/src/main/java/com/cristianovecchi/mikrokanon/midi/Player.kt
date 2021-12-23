@@ -135,6 +135,7 @@ object Player {
         // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
         //println("legatoTypes: $legatoTypes")
         if(legatoTypes != listOf(Pair(4,0))){
+            val maxLegato = rhythm.metroDenominatorMidiValue() / 3
             val artMap = mapOf(0 to 1.0f, 1 to 0.125f, 2 to 0.25f, 3 to 0.75f, 4 to 1.0f, 5 to 1.125f, 6 to 1.25f )
             val legatos = legatoTypes.map{ artMap[it.first.absoluteValue]!! * (if(it.first<0) -1 else 1)}
             val legatoAlterationsAndDeltas = alterateBpmWithDistribution(legatos,0.005f, totalLength)
@@ -142,10 +143,10 @@ object Player {
             val legatoDeltas = legatoAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 counterpointTrackData.parallelStream().forEach {
-                    it.articulationDurations = alterateArticulation(it.ticks, it.durations, legatoAlterations, legatoDeltas) }
+                    it.articulationDurations = alterateArticulation(it.ticks, it.durations, legatoAlterations, legatoDeltas, it.isPreviousRest, maxLegato) }
             } else {
                 counterpointTrackData.forEach {
-                    it.articulationDurations = alterateArticulation(it.ticks, it.durations, legatoAlterations, legatoDeltas) }
+                    it.articulationDurations = alterateArticulation(it.ticks, it.durations, legatoAlterations, legatoDeltas, it.isPreviousRest, maxLegato) }
             }
         }
 
@@ -208,7 +209,9 @@ object Player {
     }
 
     private fun alterateArticulation(ticks: IntArray, durations: IntArray,
-                                     legatoAlterations: List<Float>, legatoDeltas: List<Long>): IntArray {
+                                     legatoAlterations: List<Float>, legatoDeltas: List<Long>,
+                                     previousIsRest: BooleanArray, maxLegato: Int): IntArray {
+        if(durations.isEmpty()) return IntArray(0)
         val result = IntArray(durations.size)
         var alterationIndex = 0
         var alterationTick = 0
@@ -217,26 +220,44 @@ object Player {
         var newDur: Int
         var nextDur: Int
         var thisDur: Int
-        var legatoLimit: Int
-        while(durIndex < durations.size ){
-            while(alterationTick + legatoDeltas[alterationIndex] < ticks[durIndex] ) {
-                alterationTick += legatoDeltas[alterationIndex].toInt()
-                alterationIndex++
+        var legato: Int
+        if (durations.size > 1) {
+            while(durIndex < durations.size - 1){
+                while(alterationTick + legatoDeltas[alterationIndex] < ticks[durIndex] ) {
+                    alterationTick += legatoDeltas[alterationIndex].toInt()
+                    alterationIndex++
+                }
+                legatoAlteration = legatoAlterations[alterationIndex]
+                thisDur = durations[durIndex]
+                if(legatoAlteration<=1.0){
+                    newDur = (thisDur * legatoAlteration).toInt()
+                    result[durIndex] = if(newDur < 12) 12 else newDur
+                } else {
+                    if(previousIsRest[durIndex+1]){ // there is a rest between notes, legato is not requested
+                        result[durIndex] = thisDur
+                    } else {
+                        nextDur = durations[durIndex + 1]
+                        legato = (nextDur * (legatoAlteration - 1f)).toInt()
+                        result[durIndex] = if(legato > maxLegato) thisDur + maxLegato else thisDur + legato
+                    }
+                }
+                durIndex++
             }
-            legatoAlteration = legatoAlterations[alterationIndex]
-            thisDur = durations[durIndex]
-            if(legatoAlteration<=1.0){
-                newDur = (thisDur * legatoAlteration).toInt()
-                result[durIndex] = if(newDur < 12) 12 else newDur
-            } else {
-                nextDur = if(durIndex < durations.size - 1) durations[durIndex + 1] else 0
-                newDur = (thisDur * legatoAlteration).toInt()
-                legatoLimit = thisDur + (nextDur * (legatoAlteration - 1f)).toInt()
-                result[durIndex] = if(newDur > legatoLimit) legatoLimit else newDur
-            }
-            durIndex++
         }
-        //result.also{ println("Alterate articulations: ${it.contentToString()}") }
+        while(alterationTick + legatoDeltas[alterationIndex] < ticks[durIndex] ) {
+            alterationTick += legatoDeltas[alterationIndex].toInt()
+            alterationIndex++
+        }
+        legatoAlteration = legatoAlterations[alterationIndex]
+        thisDur = durations[durIndex]
+        if(legatoAlteration<=1.0){
+            newDur = (thisDur * legatoAlteration).toInt()
+            result[durIndex] = if(newDur < 12) 12 else newDur
+        } else {
+                result[durIndex] = thisDur // last note doesn't need legato
+        }
+//        println("Original durations: ${durations.contentToString()}")
+//        result.also{ println("Alterate articulations: ${it.contentToString()}") }
         return result
     }
 

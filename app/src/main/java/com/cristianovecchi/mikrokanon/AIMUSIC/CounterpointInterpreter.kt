@@ -15,6 +15,7 @@ fun findTopNuances(stabilities: List<Float>, minNuance: Float, maxNuance: Float)
 }
 data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: IntArray,
                      val velocities: IntArray,val glissando: IntArray,  val attacks: IntArray,
+                     val isPreviousRest: BooleanArray,
                      var articulationDurations: IntArray? = null,
                      val channel: Int,  val velocityOff: Int = 80,
                      val vibrato: Int, val doublingFlags: Int = 0, val instrument: Int = 0,
@@ -55,6 +56,7 @@ object CounterpointInterpreter {
             val durationsData = mutableListOf<Int>()
             val velocitiesData = mutableListOf<Int>()
             val glissandoData = mutableListOf<Int>()
+            val previousIsRestData = mutableListOf<Boolean>()
 
 
 //            if(glissando.isNotEmpty()){
@@ -111,8 +113,9 @@ object CounterpointInterpreter {
             // ADDING NOTES
             val glissandoChecks =
                 Insieme.checkIntervalsInPitches(actualPitches, glissando.toIntArray())
-
+            var isPreviousRest = true
             while (index < actualPitches.size) {
+
                 val pitch = actualPitches[index]
                 val velocity = velocities[index]
                 var gliss = glissandoChecks[index]
@@ -144,6 +147,10 @@ object CounterpointInterpreter {
                         pitchesData.add(pitch)
                         velocitiesData.add(velocity)
                         glissandoData.add(gliss)
+                        previousIsRestData.add(isPreviousRest)
+                        isPreviousRest = false
+                    } else {
+                        isPreviousRest = true
                     }
                     tick += dur
                     index++
@@ -154,7 +161,7 @@ object CounterpointInterpreter {
             TrackData(
                 pitchesData.toIntArray(), ticksData.toIntArray(), durationsData.toIntArray(),
                 velocitiesData.toIntArray(), glissandoData.toIntArray(), IntArray(pitchesData.size),
-                null,
+                previousIsRestData.toBooleanArray(),null,
                 channel, 80, vibrato, doublingFlags,
                 ensemblePart.instrument, audio8D.contains(partIndex), partIndex
             )
