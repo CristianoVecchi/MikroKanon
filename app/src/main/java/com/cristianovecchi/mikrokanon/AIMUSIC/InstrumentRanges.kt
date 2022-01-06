@@ -4,7 +4,6 @@ import android.util.Range
 import com.cristianovecchi.mikrokanon.rangeTo
 
 const val PIANO = 0
-const val HARPSICHORD = 6
 const val NYLON_GUITAR = 24
 const val STEEL_GUITAR = 25
 const val CLEAN_GUITAR = 27
@@ -39,8 +38,17 @@ const val SHAMISEN = 106
 const val KOTO = 107
 
 //"009 - Glockenspiel","010 - Music Box","011 - Vibraphone","012 - Marimba","013 - Xylophone","014 - Tubular Bell","
-
-
+const val HARPSICHORD = 6
+const val ELECTRIC_PIANO_1 = 4
+const val ELECTRIC_PIANO_2 = 5
+const val HAMMOND_ORGAN = 16
+const val PERC_ORGAN = 17
+const val BLUES_ORGAN = 18
+const val CHURCH_ORGAN = 19
+const val REED_ORGAN = 20
+const val ACCORDION = 21
+const val TANGO_ACCORDION = 23
+//const val HARMONICA = 22 // just high pitches
 
 const val SYN_SQUARE_WAVE = 80
 const val SYN_SAW_WAVE = 81

@@ -53,6 +53,7 @@ enum class LANGUAGES(val language:String){
                 "fr" -> fr.language
                 "ko" -> ko.language
                 "jp" -> jp.language
+                "hi" -> hi.language
                 "id" -> id.language
                 "it" -> it.language
                 "pt" -> pt.language
@@ -85,7 +86,12 @@ enum class NoteNamesEl {
 //    دو, ري, مي, فا, صول, لا,سي , EMPTY
 //}
 
-val synthsNames = listOf("Square Wave","Saw Wave", "Calliope", "Chiff",
+val synthsNames = listOf(
+
+    "Harpsichord",
+    "Electric Piano 1", "Electric Piano 2",
+    "Hammond Organ","Perc. Organ","Blues Organ","Church Organ","Reed Organ","Accordion","Tango Accordion",
+    "Square Wave","Saw Wave", "Calliope", "Chiff",
         "Charang", "Synth Voice", "Fifths Saw", "Brass and Lead",
     "Fantasia", "Warm Pad", "Polysynth", "Space Vox",
     "Bowed Glass", "Metal Pad", "Halo Pad", "Sweep Pad",

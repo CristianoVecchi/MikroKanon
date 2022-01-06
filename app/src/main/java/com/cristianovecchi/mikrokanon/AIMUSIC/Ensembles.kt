@@ -8,6 +8,9 @@ enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, GAMELAN, SAXOPHONES, FLUTES,
     DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
     BAROQUE, PLUCKED_STRINGS, SPOOKY,
+    HARPSICHORD,
+    ELECTRIC_PIANO_1, ELECTRIC_PIANO_2,
+    HAMMOND_ORGAN, PERC_ORGAN, BLUES_ORGAN, CHURCH_ORGAN, REED_ORGAN, ACCORDION, TANGO_ACCORDION,
     SYN_SQUARE_WAVE, SYN_SAW_WAVE, SYN_CALLIOPE, SYN_CHIFF,
     SYN_CHARANG, SYN_VOICE, SYN_FIFTHS_SAW, SYN_BRASS_AND_LEAD,
     SYN_FANTASIA, WARM_PAD, POLYSYNTH, SPACE_VOX,
@@ -40,6 +43,7 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
 
 object Ensembles {
     fun getEnsembleMix(nParts: Int, types: List<EnsembleType>):  List<EnsemblePart> {
+        //println("Ensemble Types: $types")
         val mix = types.map{ getEnsemble(nParts, it)}
         return (0 until nParts).toList().map{
             mix[it % types.size][it]}
@@ -63,30 +67,40 @@ object Ensembles {
             EnsembleType.BAROQUE -> getBaroque(nParts)
             EnsembleType.PLUCKED_STRINGS -> getPluckedStrings(nParts)
             EnsembleType.SPOOKY -> getSpooky(nParts)
-            EnsembleType.SYN_SQUARE_WAVE -> getKeyboardInstrument(SYN_SQUARE_WAVE ,nParts)
-            EnsembleType.SYN_SAW_WAVE -> getKeyboardInstrument(SYN_SAW_WAVE ,nParts)
-            EnsembleType.SYN_CALLIOPE -> getKeyboardInstrument(SYN_CALLIOPE ,nParts)
-            EnsembleType.SYN_CHIFF -> getKeyboardInstrument(SYN_CHIFF ,nParts)
-            EnsembleType.SYN_CHARANG -> getKeyboardInstrument(SYN_CHARANG ,nParts)
-            EnsembleType.SYN_VOICE -> getKeyboardInstrument(SYN_VOICE ,nParts)
-            EnsembleType.SYN_FIFTHS_SAW -> getKeyboardInstrument(SYN_FIFTHS_SAW ,nParts)
-            EnsembleType.SYN_BRASS_AND_LEAD -> getKeyboardInstrument(SYN_BRASS_AND_LEAD ,nParts)
-            EnsembleType.SYN_FANTASIA -> getKeyboardInstrument(SYN_FANTASIA ,nParts)
-            EnsembleType.WARM_PAD -> getKeyboardInstrument(WARM_PAD ,nParts)
-            EnsembleType.POLYSYNTH -> getKeyboardInstrument(POLYSYNTH ,nParts)
-            EnsembleType.SPACE_VOX -> getKeyboardInstrument(SPACE_VOX ,nParts)
-            EnsembleType.BOWED_GLASS -> getKeyboardInstrument(BOWED_GLASS ,nParts)
-            EnsembleType.METAL_PAD -> getKeyboardInstrument(METAL_PAD ,nParts)
-            EnsembleType.HALO_PAD -> getKeyboardInstrument(HALO_PAD ,nParts)
-            EnsembleType.SWEEP_PAD -> getKeyboardInstrument(SWEEP_PAD ,nParts)
-            EnsembleType.ICE_RAIN -> getKeyboardInstrument(ICE_RAIN ,nParts)
-            EnsembleType.SOUNDTRACK -> getKeyboardInstrument(SOUNDTRACK ,nParts)
-            EnsembleType.CRYSTAL -> getKeyboardInstrument(CRYSTAL ,nParts)
-            EnsembleType.ATMOSPHERE -> getKeyboardInstrument(ATMOSPHERE ,nParts)
-            EnsembleType.BRIGHTNESS -> getKeyboardInstrument(BRIGHTNESS ,nParts)
-            EnsembleType.GOBLINS -> getKeyboardInstrument(GOBLINS ,nParts)
-            EnsembleType.ECHO_DROPS -> getKeyboardInstrument(ECHO_DROPS ,nParts)
-            EnsembleType.SCI_FI -> getKeyboardInstrument(SCI_FI ,nParts)
+            EnsembleType.HARPSICHORD -> getKeyboardInstrument(HARPSICHORD, nParts)
+            EnsembleType.ELECTRIC_PIANO_1 -> getKeyboardInstrument(ELECTRIC_PIANO_1, nParts)
+            EnsembleType.ELECTRIC_PIANO_2-> getKeyboardInstrument(ELECTRIC_PIANO_2, nParts)
+            EnsembleType.HAMMOND_ORGAN -> getKeyboardInstrument(HAMMOND_ORGAN, nParts)
+            EnsembleType.PERC_ORGAN ->  getKeyboardInstrument(PERC_ORGAN, nParts)
+            EnsembleType.BLUES_ORGAN ->  getKeyboardInstrument(BLUES_ORGAN, nParts)
+            EnsembleType.CHURCH_ORGAN -> getKeyboardInstrument(CHURCH_ORGAN, nParts)
+            EnsembleType.REED_ORGAN -> getKeyboardInstrument(REED_ORGAN, nParts)
+            EnsembleType.ACCORDION ->  getKeyboardInstrument(ACCORDION, nParts)
+            EnsembleType.TANGO_ACCORDION ->  getKeyboardInstrument(TANGO_ACCORDION, nParts)
+            EnsembleType.SYN_SQUARE_WAVE -> getKeyboardInstrument(SYN_SQUARE_WAVE, nParts)
+            EnsembleType.SYN_SAW_WAVE -> getKeyboardInstrument(SYN_SAW_WAVE, nParts)
+            EnsembleType.SYN_CALLIOPE -> getKeyboardInstrument(SYN_CALLIOPE, nParts)
+            EnsembleType.SYN_CHIFF -> getKeyboardInstrument(SYN_CHIFF, nParts)
+            EnsembleType.SYN_CHARANG -> getKeyboardInstrument(SYN_CHARANG, nParts)
+            EnsembleType.SYN_VOICE -> getKeyboardInstrument(SYN_VOICE, nParts)
+            EnsembleType.SYN_FIFTHS_SAW -> getKeyboardInstrument(SYN_FIFTHS_SAW, nParts)
+            EnsembleType.SYN_BRASS_AND_LEAD -> getKeyboardInstrument(SYN_BRASS_AND_LEAD, nParts)
+            EnsembleType.SYN_FANTASIA -> getKeyboardInstrument(SYN_FANTASIA, nParts)
+            EnsembleType.WARM_PAD -> getKeyboardInstrument(WARM_PAD, nParts)
+            EnsembleType.POLYSYNTH -> getKeyboardInstrument(POLYSYNTH, nParts)
+            EnsembleType.SPACE_VOX -> getKeyboardInstrument(SPACE_VOX, nParts)
+            EnsembleType.BOWED_GLASS -> getKeyboardInstrument(BOWED_GLASS, nParts)
+            EnsembleType.METAL_PAD -> getKeyboardInstrument(METAL_PAD, nParts)
+            EnsembleType.HALO_PAD -> getKeyboardInstrument(HALO_PAD, nParts)
+            EnsembleType.SWEEP_PAD -> getKeyboardInstrument(SWEEP_PAD, nParts)
+            EnsembleType.ICE_RAIN -> getKeyboardInstrument(ICE_RAIN, nParts)
+            EnsembleType.SOUNDTRACK -> getKeyboardInstrument(SOUNDTRACK, nParts)
+            EnsembleType.CRYSTAL -> getKeyboardInstrument(CRYSTAL, nParts)
+            EnsembleType.ATMOSPHERE -> getKeyboardInstrument(ATMOSPHERE, nParts)
+            EnsembleType.BRIGHTNESS -> getKeyboardInstrument(BRIGHTNESS, nParts)
+            EnsembleType.GOBLINS -> getKeyboardInstrument(GOBLINS, nParts)
+            EnsembleType.ECHO_DROPS -> getKeyboardInstrument(ECHO_DROPS, nParts)
+            EnsembleType.SCI_FI -> getKeyboardInstrument(SCI_FI, nParts)
         }
     }
 
