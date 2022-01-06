@@ -48,7 +48,7 @@ val Ox3grz = listOf(240,60,-180,60,-180)// Octave x 3 graziosetto
 val Ox2grz = listOf(240,60,-180)// Octave x 2 graziosetto
 val H1 = listOf(960) // H = 2/4
 enum class RhythmType{
-    PLAIN, BALLET, PUNTATO, DANCE, QUOTE, BULGARIAN, HEMIOLIA, FLUX
+    PLAIN, BALLET, PUNTATO, DANCE, RAGTIME, QUOTE, BULGARIAN, HEMIOLIA, FLUX
 }
 enum class RhythmPatterns(val type: RhythmType, val title: String, val values: List<Int>,val metro: Pair<Int,Int> = Pair(4,4)) {
     PLAIN_1_4(RhythmType.PLAIN,"Plain 1/4", listOf(480,480,480,480)),
@@ -86,7 +86,6 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
         listOf(N1rhythmDotted, N2rhythmDotted,N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N4rhythmDotted,N3rhythmDotted, N2rhythmDotted).flatten(),Pair(4,4)),
     DOTTED_FLUX_1234565432(RhythmType.PUNTATO,"Dotted Flux 1234565432",
         listOf(N1rhythmDotted,N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N6rhythmDotted, N5rhythmDotted,N4rhythmDotted, N3rhythmDotted, N2rhythmDotted).flatten(),Pair(5,4)),
-    RAGTIME(RhythmType.DANCE,"Ragtime", listOf(120,240,120,60,-180,60,-180, 120,120,120,240,120,180,-60), Pair(2,4)),
     SNARE(RhythmType.DANCE,"Snare", listOf(90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,30,-30,30,-30,30,-30,30,-30)),
     CANCAN(RhythmType.DANCE,"Cancan", listOf(listOf(360,-120),N4graziosetto, N2détaché, N4graziosetto, N2détaché, N4graziosetto, N4staccatissimo, N4staccatissimo).flatten(),Pair(4,8)),
 
@@ -95,6 +94,12 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     SICILIANA(RhythmType.DANCE,"Siciliana", listOf(240,60,-60, 120,120,60,-60, 240,60,-60, 120,120,60,-60, 180,-60,60,-60, 180,-60,60,-60,  120,120,60,-180,120,60,-60,
         240,60,-60, 120,120,60,-60, 240,60,-60, 120,120,60,-60, 120,120,60,-60,120,120,60,-60, 240,-240,120,60,-60), Pair(6,16)),
     GET5(RhythmType.DANCE,"Get Five",listOf(120,240,120,180,-60,180,-60,180,-60), Pair(5,8)),
+    MAPLE_LEAF_1(RhythmType.RAGTIME,"Maple Leaf 1", listOf(-120,120,120,120, 120,240,120, 120,120,120,600), Pair(2,4)),
+    MAPLE_LEAF_2(RhythmType.RAGTIME,"Maple Leaf 2", listOf(-120,120,120,120,120,240,120, 120,120,120,240,120,120,120 ), Pair(2,4)),
+    MAPLE_LEAF_3(RhythmType.RAGTIME,"Maple Leaf 3", listOf(180,-60,180,-60, 180,-60,120,240,120,120,120, 120,240,240,120,120,120, 120,240,120, 120,120,180,-60, 180, -180,120), Pair(2,4)),
+    CASCADES_1(RhythmType.RAGTIME,"Cascades 1", listOf(180,-60,60,-60,180,-60,60,-60,180,-60, 480,120,120,120,90,-30, 480,60,-60,180,-60,120, 120,-120,120,120, 120,120,120,90,-30 ), Pair(2,4)),
+    CASCADES_2(RhythmType.RAGTIME,"Cascades 2", listOf(120,120,120,120,120,120,120,90,-30, 60,-180,60,-60,180,-60,60,-60,180,-60, 60,-180,60,-60,180,-60,60,-60,180,-60, 60,-180,60,-60,180,-60, 120,120,120), Pair(2,4)),
+
     JUPITER(RhythmType.QUOTE,"Jupiter",listOf(N1,listOf(-240,80,80,80),N1,listOf(-240,80,80,80),N1,listOf(-1200,180,-60, 720,240,720,180,-60,960,480,-480)).flatten()),
     SCHERZO(RhythmType.QUOTE,"Scherzo",listOf(listOf(360,60,-60,60,-180), Ox3staccato, Ox3staccato).flatten(), Pair(3,8)),
     ALFREDO(RhythmType.QUOTE,"Alfredo", listOf(240,-120,30,-30,30,-30, 30,-330,30,-30,30,-30, 30,-330,30,-30,30,-30, 30,-330,30,-30,30,-30,

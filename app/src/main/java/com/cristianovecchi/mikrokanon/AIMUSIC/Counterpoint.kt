@@ -19,23 +19,30 @@ fun main(args : Array<String>){
 //    val absPitches1 = mutableListOf(-1,1,0,6,11,5,7,8,8,3,3,3,6,9)
 //    val absPitches2 = mutableListOf(1,11,2,10,3,-1,9,6)
 //    val absPitches3 = mutableListOf(1,11,2,10)
+//    val absPitches1 = mutableListOf(0, 4, 7, 11, 2, 6, 9)
+//    val absPitches2 = mutableListOf(-1, 0, 4, 7, 11, 2, 6, 9)
+//    val absPitches3 = mutableListOf(-1,2, 0, -1, -1, 10, -1, 7, 5, 9, 10, 0, 2)
     val absPitches1 = mutableListOf(0, 4, 7, 11, 2, 6, 9)
-    val absPitches2 = mutableListOf(-1, 0, 4, 7, 11, 2, 6, 9)
-    val absPitches3 = mutableListOf(-1,2, 0, -1, -1, 10, -1, 7, 5, 9, 10, 0, 2)
+    val absPitches2 = mutableListOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,0,1)
+    val absPitches3 = mutableListOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,0)
+
     val absParts = listOf(
-        AbsPart(absPitches1),
+        //AbsPart(absPitches1),
         AbsPart(absPitches2),
         AbsPart(absPitches3),
     )
     val pentatonicIntervalSet = listOf(2, 10, 3, 9, 4, 8, 5, 7)
     val counterpoint = Counterpoint(absParts, pentatonicIntervalSet)
+    counterpoint.display()
+    val detection = counterpoint.detectParallelIntervals(listOf(0,1,11))
+    detection.forEach { println(it) }
 //    val counterpoint2 = Counterpoint.findWave(counterpoint,pentatonicIntervalSet,3,
 //        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions)
 //    val counterpoint3 = Counterpoint.findWave(counterpoint2,pentatonicIntervalSet,6,
 //        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions).displayInNotes()
-    val normCounterpoint = counterpoint.normalizePartsSize(true)
+    //val normCounterpoint = counterpoint.normalizePartsSize(true)
     //normCounterpoint.displayInNotes()
-    normCounterpoint.addCadenzas(listOf(1,11))//.displayInNotes()
+    //normCounterpoint.addCadenzas(listOf(1,11))//.displayInNotes()
 //    println("emptiness: ${counterpoint.emptiness}")
 //    val counterpointRound = counterpoint.normalizePartsSize(true).buildRound()
 //    counterpointRound.display()
@@ -444,14 +451,22 @@ data class Counterpoint(val parts: List<AbsPart>,
                         val nextPitch1 = getAbsPitchInPosition(index + delay, match.row1)
                         val nextPitch2 = getAbsPitchInPosition(index + delay, match.row2)
                         if (nextPitch1 != -1 && nextPitch2 != -1) {
-                            if (abs(nextPitch2 - nextPitch1) == interval
+                            val diffNextPitches = nextPitch2 - nextPitch1
+                            if ((abs(diffNextPitches) == interval
+                                        || abs(diffNextPitches - 12) == interval
+                                        || abs(diffNextPitches + 12) == interval)
                                 && match.pitch1 != nextPitch1 && match.pitch2 != nextPitch2
-                                && abs(match.pitch1 - nextPitch1) == abs(match.pitch2 - nextPitch2)
-                            ) {
-                                result[match.row1][index] = true
-                                result[match.row2][index] = true
-                                result[match.row1][index + delay] = true
-                                result[match.row2][index + delay] = true
+                            )
+                                 {
+                                     val diff1 = nextPitch1 - match.pitch1
+                                     val diff2 = nextPitch2 - match.pitch2
+                                     if(diff1 == diff2 || diff1 == diff2 - 12 || diff1 == diff2 + 12){
+                                         result[match.row1][index] = true
+                                         result[match.row2][index] = true
+                                         result[match.row1][index + delay] = true
+                                         result[match.row2][index + delay] = true
+                                     }
+
                             }
                         }
                     }
@@ -480,6 +495,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 val pitch2 = parts[j].absPitches[index]
                 if (pitch2 == -1) continue
                 if( abs(pitch2 - pitch1) == interval ) result.add( Match(i, j, pitch1, pitch2))
+                    //.also{ println("pitch2:$pitch2 pitch1:$pitch1 interval:$interval")}
             }
         }
         return result

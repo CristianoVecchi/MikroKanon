@@ -156,7 +156,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val listState = rememberLazyListState()
     var selectedTab by remember{ mutableStateOf(model.lastScaffoldTab)}
     val verticalIntervals by model.intervalSet.observeAsState(listOf(-1))
-
+    val ensNames: List<String> = lang.ensembleNames + synthsNames
     MultiListDialog(ensemblesDialogData, dimensions, lang.OKbutton)
     ListDialog(listDialogData, dimensions, lang.OKbutton)
     MultiListDialog(doublingDialogData, dimensions, lang.OKbutton)
@@ -290,7 +290,6 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 when (optionName) {
 
                     "Ensemble" -> {
-                        val ensNames: List<String> = lang.ensembleNames + synthsNames
                         val ensIndexes = userOptions.ensembleTypes.extractIntsFromCsv()
                         SelectableCard(
                             text = "${lang.ensemble}: ${ensIndexes.joinToString(" + ") { ensNames[it] }}",
