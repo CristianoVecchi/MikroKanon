@@ -283,6 +283,32 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     pairs[cursor] = Pair( range, if(octave == -2) 0 else -2)
                                     rangeText = pairs.toIntPairsString()
                                 }
+                                CustomButton(
+                                    adaptSizeToIconButton = false,
+                                    text = octaves[5], // |8
+                                    fontSize = fontSizeOctave,
+                                    buttonSize = buttonSize.dp,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
+                                    val (range, octave) = pairs[cursor]
+                                    pairs[cursor] = Pair( range, if(octave == 3) 0 else 3)
+                                    rangeText = pairs.toIntPairsString()
+                                }
+                                CustomButton(
+                                    adaptSizeToIconButton = false,
+                                    text = octaves[6], // |15
+                                    fontSize = fontSizeOctave,
+                                    buttonSize = buttonSize.dp,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
+                                    val (range, octave) = pairs[cursor]
+                                    pairs[cursor] = Pair( range, if(octave == 4) 0 else 4)
+                                    rangeText = pairs.toIntPairsString()
+                                }
 
 
                             }

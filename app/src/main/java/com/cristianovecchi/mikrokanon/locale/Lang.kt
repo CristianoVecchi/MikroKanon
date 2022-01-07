@@ -181,7 +181,7 @@ fun getDynamicSymbols(): List<String>{
     else listOf("0","pppp","ppp","pp",  "p","mp","mf","f", "ff", "fff","ffff","fffff","<",">")
 }
 fun getOctaveSymbols(): List<String>{
-    return listOf("➘15","➘8", "", "➚8","➚15")
+    return listOf("➘15","➘8", "", "➚8","➚15", "\u21c58", "\u21c515")
 }
 fun getRibattutoSymbols(): List<String>{
     return listOf("", "\"", "\"\'", "\"\"")

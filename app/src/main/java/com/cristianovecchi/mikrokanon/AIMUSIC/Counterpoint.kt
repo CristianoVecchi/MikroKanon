@@ -408,9 +408,10 @@ data class Counterpoint(val parts: List<AbsPart>,
         parts.forEachIndexed { index, absPart ->
             if(index < nPartsToExplode){
                 val ensemble = ensembles[index]
+                val isUpperPart = index < this.parts.size / 2
                 val partTwins: List<AbsPart> =
                     absPart.divideWithSubSequencer(ensemble.octave,
-                        ensemble.getOctavedRangeByType(rangeType.first, rangeType.second), melodyType )
+                        ensemble.getOctavedRangeByType(rangeType.first, rangeType.second, isUpperPart), melodyType )
                 newParts.addAll(partTwins)
             } else {
                 newParts.add(absPart)

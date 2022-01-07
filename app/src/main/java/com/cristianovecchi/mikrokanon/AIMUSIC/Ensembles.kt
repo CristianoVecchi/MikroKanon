@@ -32,9 +32,13 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
         }
     }
 
-    fun getOctavedRangeByType(rangeType: Int, octaveTranspose: Int): IntRange {
+    fun getOctavedRangeByType(rangeType: Int, octaveTranspose: Int, upperPart: Boolean): IntRange {
         val range = getRangeByType(rangeType)
-        return range.octaveTranspose(octaveTranspose)
+        return when (octaveTranspose) {
+            3 -> if(upperPart) range.octaveTranspose(1) else range.octaveTranspose(-1)
+            4 -> if(upperPart) range.octaveTranspose(2) else range.octaveTranspose(-2)
+            else -> range.octaveTranspose(octaveTranspose)
+        }.also{println("range: $it rangeType:$rangeType octaveTranspose:$octaveTranspose upperPart:$upperPart")}
     }
 }
 

@@ -47,6 +47,7 @@ object CounterpointInterpreter {
 
         val computation = { part: AbsPart ->
             val partIndex = part.index!!
+            val isUpperPart = partIndex < counterpoint.parts.size / 2
             val ensemblePart = ensembleParts[partIndex]
             val channel =
                 if (partIndex < 9) partIndex else partIndex + 1 // skip percussion midi channel
@@ -71,8 +72,13 @@ object CounterpointInterpreter {
             var durIndex = 0
 
             // RANGES EXTENSION
-            val ranges = rangeTypes.map { ensemblePart.getOctavedRangeByType(it.first, it.second) }
-            val startOctave = (ensemblePart.octave + rangeTypes[0].second).coerceIn(0, 8)
+            val ranges = rangeTypes.map { ensemblePart.getOctavedRangeByType(it.first, it.second, isUpperPart) }
+            val octaveTranspose = when(rangeTypes[0].second){
+                3 -> if(isUpperPart) 1 else -1
+                4 -> if(isUpperPart) 2 else -2
+                else -> rangeTypes[0].second
+            }
+            val startOctave = (ensemblePart.octave + octaveTranspose).coerceIn(0, 8)
             //ACTUAL PITCHES
             val actualPitches = if (melodyTypes.size == 1 && rangeTypes.size == 1) {
                 Insieme.findMelody(

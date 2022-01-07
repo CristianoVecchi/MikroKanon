@@ -313,7 +313,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                     && (comes4Pitch == -1 || isIntervalInSet(
                         intervalSet,
                         duxPitch,
-                        comes3Pitch
+                        comes4Pitch
                     ))
                     // comes1 matching with comites 2 3 4
                     && (comes2.absPitches[duxIndex + delay1] == -1 || isIntervalInSet(
@@ -342,7 +342,7 @@ data class MikroKanon(val parts: List<AbsPart>,
                     //comes3 matching with comes 4
                     && (comes4.absPitches[duxIndex + delay3] == -1 || isIntervalInSet(
                         intervalSet,
-                        list4[absIndex], comes4.absPitches[duxIndex + delay2]
+                        list4[absIndex], comes4.absPitches[duxIndex + delay3]
                     ))
                 ) {
                     dux.absPitches.add(duxIndex, duxPitch)
