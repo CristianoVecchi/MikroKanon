@@ -37,7 +37,7 @@ import androidx.room.PrimaryKey
         val bpms: String,
 
         @ColumnInfo(name = "rhythm")
-        val rhythm: Int,
+        val rhythm: String,
 
         @ColumnInfo(name = "rhythm_shuffle")
         val rhythmShuffle: Int,
@@ -96,7 +96,7 @@ import androidx.room.PrimaryKey
             fun getDefaultUserOptionsData(): UserOptionsData{
                 return UserOptionsData(0,"2", "2|0","4|0","0",
                     0,0,
-                    "0.828", "90", 3,
+                    "0.828", "90", "3",
                     0,0, "1|1",0, "0",
                     0,0,0b0011110, 0b1111111,
                     0,0,0,1,

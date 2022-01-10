@@ -301,9 +301,15 @@ init{
                                 .map { it.toFloat() }
                         }
                     } ?: listOf(90f)
-                val rhythm: RhythmPatterns =
-                    RhythmPatterns.values()[userOptionsData.value?.let { userOptionsData.value!![0].rhythm }
-                        ?: 0]
+                val rhythm: List<RhythmPatterns> =
+                   userOptionsData.value?.let {
+                       val patterns = RhythmPatterns.values()
+                       if(simplify){
+                           listOf(patterns[userOptionsData.value!![0].rhythm.extractIntsFromCsv()[0]])
+                       } else {
+                           userOptionsData.value!![0].rhythm.extractIntsFromCsv().map{ patterns[it]}
+                       }
+                   } ?: listOf(RhythmPatterns.PLAIN_1_8)
                 val rhythmShuffle: Boolean =
                     0 != (userOptionsData.value?.let { userOptionsData.value!![0].rhythmShuffle }
                         ?: 0)
@@ -1308,7 +1314,7 @@ init{
                 newUserOptionsData = optionsDataClone.copy(bpms = value as String)
             }
             "rhythm" -> {
-                newUserOptionsData = optionsDataClone.copy(rhythm = value as Int)
+                newUserOptionsData = optionsDataClone.copy(rhythm = value as String)
             }
             "rhythmShuffle" -> {
                 newUserOptionsData = optionsDataClone.copy(rhythmShuffle = value as Int)

@@ -268,7 +268,7 @@ public class Insieme {
                for (int j = 0; j < pitches.length; j++) {
                    Integer note = pitches[j];
                    if(note == null) continue;
-                   if (Math.abs(newStart - note) == interval) {
+                   if (Math.abs(note - newStart) == interval) {
                        list.add(note);
                        newStart = note;
                        pitches[j] = null;
@@ -279,7 +279,7 @@ public class Insieme {
            }
            count++;
        }
-
+        System.out.println("Vector:"+ list.toString());
         return  (Integer[]) list.toArray(new Integer[0]);
     }
     // NOT -1 allowed

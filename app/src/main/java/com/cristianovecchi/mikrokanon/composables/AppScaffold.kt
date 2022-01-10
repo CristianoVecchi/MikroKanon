@@ -109,6 +109,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val ensemblesDialogData by lazy { mutableStateOf(MultiListDialogData())}
     //val nuancesDialogData by lazy { mutableStateOf(ListDialogData())}
     //val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
+    val rhythmDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val multiBpmDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val melodyTypesDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val rangeTypesDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
@@ -159,6 +160,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val ensNames: List<String> = lang.ensembleNames + synthsNames
     MultiListDialog(ensemblesDialogData, dimensions, lang.OKbutton)
     ListDialog(listDialogData, dimensions, lang.OKbutton)
+    RhythmDialog(rhythmDialogData, dimensions, patterns = RhythmPatterns.values().toList() )
     MultiListDialog(doublingDialogData, dimensions, lang.OKbutton)
     MultiListDialog(audio8DDialogData, dimensions, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
@@ -382,19 +384,19 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     }
                     "Rhythm" -> {
                         val rhythmNames = RhythmPatterns.getTitles()
-                        val rhythmIndex = userOptions.rhythm
+                        val rhythmPatterns = userOptions.rhythm.extractIntsFromCsv()
                         SelectableCard(
-                            text = "${lang.rhythm}: ${rhythmNames[rhythmIndex]}",
+                            text = "${lang.rhythm}: ${rhythmPatterns.joinToString(" + ") { rhythmNames[it] }}",
                             fontSize = fontSize,
                             colors = colors,
                             isSelected = true,
                             onClick = {
-                                listDialogData.value = ListDialogData(
-                                    true, rhythmNames, rhythmIndex, lang.selectRhythm
-                                ) { index ->
+                                rhythmDialogData.value = MultiNumberDialogData(
+                                    true, lang.selectRhythm, userOptions.rhythm, model = model
+                                ) { indices ->
                                     model.updateUserOptions(
                                         "rhythm",
-                                        index
+                                        indices
                                     )
                                     listDialogData.value =
                                         ListDialogData(itemList = listDialogData.value.itemList)

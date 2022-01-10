@@ -564,7 +564,10 @@ data class Counterpoint(val parts: List<AbsPart>,
             return Counterpoint((0 until nParts).map { AbsPart.emptyPart(nRests) }, emptyList(), 1.0f)
         }
         fun flourish(counterpoint: Counterpoint, intervalSet: List<Int>, horIntervalSet: List<Int>): Counterpoint{
-            val actualDirections = TREND.ASCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}
+            //val actualDirections = TREND.ASCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}
+            //counterpoint.display()
+            val ascDirections = TREND.ASCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}
+            val descDirections = TREND.DESCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}
             val maxSize = counterpoint.maxSize()
             val nParts = counterpoint.parts.size
             val newParts = (0 until nParts).map{ counterpoint.parts[it].copy( absPitches = mutableListOf() ) }
@@ -574,13 +577,15 @@ data class Counterpoint(val parts: List<AbsPart>,
                 for (partIndex in 0 until nParts) {
                     val absPitches = counterpoint.parts[partIndex].absPitches
                     val startNote = absPitches.getIntOrEmptyValue(index)
+                    val targetNote = counterpoint.getNextAbsPitch(partIndex, index, maxSize)
+                    if (targetNote == startNote) continue
                     val otherNotes =
                         absNotes.filterIndexed { i, _ -> i != partIndex }.filter { it != -1 }
                     val fioritura: List<Int> = Insieme.getPossibleAbsPitches(
                         otherNotes.toIntArray(),
                         intervalSet.toIntArray()
                     ).toList()
-                    fioriture[partIndex].addAll(fioritura.filter { it != startNote })
+                    fioriture[partIndex].addAll(fioritura.filter { it != startNote }.filter { it != targetNote })
                 }
                 //fioriture.map{ println(it)}
                 val bestFiorituraSize = fioriture.filterIndexed{ i, _-> counterpoint.getNextAbsPitch(i, index, maxSize) != -1}
@@ -594,11 +599,22 @@ data class Counterpoint(val parts: List<AbsPart>,
                         if(fioriture[i].size == bestFiorituraSize && counterpoint.getNextAbsPitch(i, index, maxSize) != -1)
                         {bestFiorituraIndex = i; break }
                     }
+                    val originNote = counterpoint.getAbsPitchInPosition(index, bestFiorituraIndex)
                     val targetNote = counterpoint.getNextAbsPitch(bestFiorituraIndex, index, maxSize)
-                    val fiorituraNotes: List<Int> = Insieme.orderAbsPitchesByTrend(fioriture[bestFiorituraIndex].toTypedArray(),
-                        targetNote, actualDirections.toTypedArray() ).toList().reversed().dropLastWhile { it ==targetNote }
+                    val diff = abs(targetNote-originNote)
+                    val actualDirections = if(originNote<targetNote){
+                        if(diff <= 6) ascDirections else descDirections
+                    } else {
+                        if(diff <= 6) descDirections else ascDirections
+                    }
+                    //println("part:$bestFiorituraIndex start:$originNote end:$targetNote diff:$diff dirs:$actualDirections")
+                    val bestFioritura = fioriture[bestFiorituraIndex]
+                    val fiorituraNotes: List<Int> = Insieme.orderAbsPitchesByTrend(bestFioritura.toTypedArray(),
+                        targetNote, actualDirections.toTypedArray() ).toList().reversed()
+                        .dropLastWhile { it ==targetNote }
+                        .dropWhile { !Insieme.isIntervalInSet(horIntervalSet.toIntArray(), originNote, it)}
+                    println("part:$bestFiorituraIndex start:$originNote end:$targetNote diff:$diff dirs:$actualDirections note:$bestFioritura fioritura:$fiorituraNotes")
                     if(fiorituraNotes.isNotEmpty()){
-
                         fiorituraNotes.forEach{ it ->
                             newParts.mapIndexed { i, absPart -> if(i == bestFiorituraIndex)
                                 absPart.absPitches.add(it)
