@@ -1,5 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import kotlin.math.absoluteValue
+
 object AIRhythm {
     @JvmStatic
     fun findOffBeats(nBeats: Int): IntArray {
@@ -38,18 +40,19 @@ val N3graziosetto = listOf(160,40,-120,40,-120)
 val N2 = listOf(240,240)
 val N2rhythmDotted = listOf(180,60,180,60)
 val N2détaché = listOf(180,-60,180,-60)
-val N1 = listOf(480)
+val N1 = listOf(480); val N1h = listOf(240)
 val Qx3staccato = listOf(120,-360,120,-360,120,-360)// Q = Quaver
 val Ox3staccato = listOf(60,-180,60,-180,60,-180)// O = Octave
-val N1dotted = listOf(720) // Octave x 3
+val N1dotted = listOf(720); val N1dottedH = listOf(360) // Octave x 3
 val N1rhythmDotted = listOf(360,120)
-val Ox4grz = listOf(240,60,-180,60,-180,60,-180)// Octave x 4 graziosetto
-val Ox3grz = listOf(240,60,-180,60,-180)// Octave x 3 graziosetto
-val Ox2grz = listOf(240,60,-180)// Octave x 2 graziosetto
-val H1 = listOf(960) // H = 2/4
+val Ox4grz = listOf(240,60,-180,60,-180,60,-180); val Ox4grzH = listOf(120,30,-90,30,-90,30,-90)// Octave x 4 graziosetto
+val Ox3grz = listOf(240,60,-180,60,-180); val Ox3grzH = listOf(120,30,-90,30,-90)// Octave x 3 graziosetto
+val Ox2grz = listOf(240,60,-180); val Ox2grzH = listOf(120,30,-90)// Octave x 2 graziosetto
+val H1 = listOf(960); val H1h = listOf(480) // H = 2/4
 enum class RhythmType{
     PLAIN, BALLET, PUNTATO, DANCE, RAGTIME, QUOTE, BULGARIAN, HEMIOLIA, FLUX
 }
+// WARNING: can't have two negative values coupled (ex: -80, -20 ... write -100)
 enum class RhythmPatterns(val type: RhythmType, val title: String, val values: List<Int>,val metro: Pair<Int,Int> = Pair(4,4)) {
     PLAIN_1_4(RhythmType.PLAIN,"Plain 1/4", listOf(480,480,480,480)),
     PLAIN_1_8(RhythmType.PLAIN,"Plain 1/8", listOf(240,240,240,240,240,240,240,240)),
@@ -107,18 +110,30 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     LUDUS(RhythmType.QUOTE,"Ludus",listOf(60,-180,60,-180,60,-180,60,-180,60,-180, 120,120,180,-60,60,-60,60,-60,480), Pair(5,8)),
     PRECIPITATO(RhythmType.QUOTE,"Precipitato",listOf(120,-120,240, 480,180,-60 ,30,-210,30,-210,
         120,-120,180,-60 ,120,-120,180,-60 ,30,-210,30,-210,30,-210),Pair(7,8)),
-    BULGARIAN1(RhythmType.BULGARIAN,"Bulgarian1 4+2+3",listOf(H1,N1,N1dotted).flatten(),Pair(9,8)),
-    BULGARIAN2(RhythmType.BULGARIAN,"Bulgarian2 2+2+3",listOf(N1,N1,N1dotted).flatten(),Pair(7,8)),
-    BULGARIAN3(RhythmType.BULGARIAN,"Bulgarian3 2+3",listOf(N1,N1dotted).flatten(),Pair(5,8)),
-    BULGARIAN4(RhythmType.BULGARIAN,"Bulgarian4 3+2+3",listOf(N1dotted,N1,N1dotted).flatten(),Pair(8,8)),
-    BULGARIAN5(RhythmType.BULGARIAN,"Bulgarian5 2+2+2+3",listOf(N1,N1,N1,N1dotted).flatten(),Pair(9,8)),
-    BULGARIAN6(RhythmType.BULGARIAN,"Bulgarian6 3+3+2",listOf(N1dotted,N1dotted,N1).flatten(),Pair(8,8)),
-    BULGARIAN1GRZ(RhythmType.BULGARIAN,"Bulg.1 grz. 4+2+3",listOf(Ox4grz,Ox2grz,Ox3grz).flatten(),Pair(9,8)),
-    BULGARIAN2GRZ(RhythmType.BULGARIAN,"Bulg.2 grz. 2+2+3",listOf(Ox2grz,Ox2grz,Ox3grz).flatten(),Pair(7,8)),
-    BULGARIAN3GRZ(RhythmType.BULGARIAN,"Bulg.3 grz. 2+3",listOf(Ox2grz,Ox3grz).flatten(),Pair(5,8)),
-    BULGARIAN4GRZ(RhythmType.BULGARIAN,"Bulg.4 grz. 3+2+3",listOf(Ox3grz,Ox2grz,Ox3grz).flatten(),Pair(8,8)),
-    BULGARIAN5GRZ(RhythmType.BULGARIAN,"Bulg.5 grz. 2+2+2+3",listOf(Ox2grz,Ox2grz,Ox2grz,Ox3grz).flatten(),Pair(9,8)),
-    BULGARIAN6GRZ(RhythmType.BULGARIAN,"Bulg.6 grz. 3+3+2",listOf(Ox3grz,Ox3grz,Ox2grz).flatten(),Pair(8,8)),
+    BULGARIAN1(RhythmType.BULGARIAN,"Bulgarian1 4+2+3♫",listOf(H1,N1,N1dotted).flatten(),Pair(9,8)),
+    BULGARIAN2(RhythmType.BULGARIAN,"Bulgarian2 2+2+3♫",listOf(N1,N1,N1dotted).flatten(),Pair(7,8)),
+    BULGARIAN3(RhythmType.BULGARIAN,"Bulgarian3 2+3♫",listOf(N1,N1dotted).flatten(),Pair(5,8)),
+    BULGARIAN4(RhythmType.BULGARIAN,"Bulgarian4 3+2+3♫",listOf(N1dotted,N1,N1dotted).flatten(),Pair(8,8)),
+    BULGARIAN5(RhythmType.BULGARIAN,"Bulgarian5 2+2+2+3♫",listOf(N1,N1,N1,N1dotted).flatten(),Pair(9,8)),
+    BULGARIAN6(RhythmType.BULGARIAN,"Bulgarian6 3+3+2♫",listOf(N1dotted,N1dotted,N1).flatten(),Pair(8,8)),
+    BULGARIAN1GRZ(RhythmType.BULGARIAN,"Bulg.1 grz. 4+2+3♫",listOf(Ox4grz,Ox2grz,Ox3grz).flatten(),Pair(9,8)),
+    BULGARIAN2GRZ(RhythmType.BULGARIAN,"Bulg.2 grz. 2+2+3♫",listOf(Ox2grz,Ox2grz,Ox3grz).flatten(),Pair(7,8)),
+    BULGARIAN3GRZ(RhythmType.BULGARIAN,"Bulg.3 grz. 2+3♫",listOf(Ox2grz,Ox3grz).flatten(),Pair(5,8)),
+    BULGARIAN4GRZ(RhythmType.BULGARIAN,"Bulg.4 grz. 3+2+3♫",listOf(Ox3grz,Ox2grz,Ox3grz).flatten(),Pair(8,8)),
+    BULGARIAN5GRZ(RhythmType.BULGARIAN,"Bulg.5 grz. 2+2+2+3♫",listOf(Ox2grz,Ox2grz,Ox2grz,Ox3grz).flatten(),Pair(9,8)),
+    BULGARIAN6GRZ(RhythmType.BULGARIAN,"Bulg.6 grz. 3+3+2♫",listOf(Ox3grz,Ox3grz,Ox2grz).flatten(),Pair(8,8)),
+    BULGARIAN1H(RhythmType.BULGARIAN,"Bulgarian1 4+2+3♬",listOf(H1h,N1h,N1dottedH).flatten(),Pair(9,8)),
+    BULGARIAN2H(RhythmType.BULGARIAN,"Bulgarian2 2+2+3♬",listOf(N1h,N1h,N1dottedH).flatten(),Pair(7,8)),
+    BULGARIAN3H(RhythmType.BULGARIAN,"Bulgarian3 2+3♬",listOf(N1h,N1dottedH).flatten(),Pair(5,8)),
+    BULGARIAN4H(RhythmType.BULGARIAN,"Bulgarian4 3+2+3♬",listOf(N1dotted,N1h,N1dottedH).flatten(),Pair(8,8)),
+    BULGARIAN5H(RhythmType.BULGARIAN,"Bulgarian5 2+2+2+3♬",listOf(N1h,N1h,N1h,N1dottedH).flatten(),Pair(9,8)),
+    BULGARIAN6H(RhythmType.BULGARIAN,"Bulgarian6 3+3+2♬",listOf(N1dottedH,N1dottedH,N1h).flatten(),Pair(8,8)),
+    BULGARIAN1GRZH(RhythmType.BULGARIAN,"Bulg.1 grz. 4+2+3♬",listOf(Ox4grzH,Ox2grzH,Ox3grzH).flatten(),Pair(9,8)),
+    BULGARIAN2GRZH(RhythmType.BULGARIAN,"Bulg.2 grz. 2+2+3♬",listOf(Ox2grzH,Ox2grzH,Ox3grzH).flatten(),Pair(7,8)),
+    BULGARIAN3GRZH(RhythmType.BULGARIAN,"Bulg.3 grz. 2+3♬",listOf(Ox2grzH,Ox3grzH).flatten(),Pair(5,8)),
+    BULGARIAN4GRZH(RhythmType.BULGARIAN,"Bulg.4 grz. 3+2+3♬",listOf(Ox3grzH,Ox2grzH,Ox3grzH).flatten(),Pair(8,8)),
+    BULGARIAN5GRZH(RhythmType.BULGARIAN,"Bulg.5 grz. 2+2+2+3♬",listOf(Ox2grzH,Ox2grzH,Ox2grzH,Ox3grzH).flatten(),Pair(9,8)),
+    BULGARIAN6GRZH(RhythmType.BULGARIAN,"Bulg.6 grz. 3+3+2♬",listOf(Ox3grzH,Ox3grzH,Ox2grzH).flatten(),Pair(8,8)),
 
     HEMIOLIA32(RhythmType.HEMIOLIA,"Hemiolia 3=2", listOf(120,60,60,120),Pair(3,16)),
     HEMIOLIA43(RhythmType.HEMIOLIA,"Hemiolia 4=3", listOf(180,60,120,120,60,180),Pair(3,8)),
@@ -143,6 +158,9 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     fun durationSum(nNotes: Int): Int{
        return RhythmPatterns.durationSum(nNotes, values)
     }
+    fun patternDuration(): Int {
+        return this.values.map{it.absoluteValue}.sum()
+    }
     fun nNotesLeftInThePattern(nNotes: Int) : Int {
         val nPositiveValues = nPositiveValues()
         return nPositiveValues - ( nNotes % nPositiveValues )
@@ -158,6 +176,26 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     fun metroDenominatorMidiValue(): Int {
         return denominatorMidiValue(this.metro.second)
     }
+
+    // can't have two negative values coupled (ex: -80, -20 ... write -100)
+    fun retrogradeValues(): List<Int> {
+        val size = values.size
+        if (size < 2) return values
+        val result = mutableListOf<List<Int>>()
+        var index = 0
+        while(index < size -1){
+            if(values[index+1]<0){
+                result.add(listOf(values[index], values[index+1]))
+                index += 2
+            } else {
+                result.add(listOf(values[index]))
+                index ++
+            }
+        }
+        if (index == size - 1) result.add(listOf(values[index-1]))
+        return result.reversed().flatten()
+    }
+
     companion object {
         fun durationSum(nNotes: Int, values: List<Int>): Int{
             var index = 0;
@@ -190,4 +228,8 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
             return values().map { it.title }
         }
     }
+}
+fun main(args : Array<String>){
+    println("${RhythmPatterns.GRAZIOSETTO_1_16_1_8T.values}  ->  ${RhythmPatterns.GRAZIOSETTO_1_16_1_8T.retrogradeValues()}")
+    println("${RhythmPatterns.DOTTED3_1_4.values}  ->  ${RhythmPatterns.DOTTED3_1_4.retrogradeValues()}")
 }

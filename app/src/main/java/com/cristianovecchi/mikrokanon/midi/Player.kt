@@ -92,7 +92,7 @@ object Player {
     fun playCounterpoint(
         mediaPlayer: MediaPlayer, looping: Boolean,
         counterpoints: List<Counterpoint?>, dynamics: List<Float>, bpms: List<Float>, shuffle: Float,
-        rhythm: List<RhythmPatterns>, ensembleTypes: List<EnsembleType>,
+        rhythm: List<Triple<RhythmPatterns,Boolean,Int>>, ensembleTypes: List<EnsembleType>,
         play: Boolean, midiFile: File, rhythmShuffle: Boolean = false, partsShuffle: Boolean = false,
         rowForms: List<Pair<Int,Int>> = listOf(Pair(0,1)), ritornello: Int = 0, transpose: List<Int> = listOf(0),
         doublingFlags: Int = 0, nuances: Int = 0,
@@ -102,7 +102,9 @@ object Player {
         glissandoFlags: Int = 0, audio8DFlags: Int = 0, vibrato: Int = 0
     ) : String {
         var error = ""
-        val durations = rhythm.fold(listOf<Int>()){acc, rhythmPatterns -> acc + rhythmPatterns.values }
+        val durations = rhythm.fold(listOf<Int>()){acc, triple ->
+            acc + if(triple.second) triple.first.retrogradeValues().repeat(triple.third) else triple.first.values.repeat(triple.third)
+        }
         val actualDurations = if (rhythmShuffle) listOf(*durations.toTypedArray(),*durations.toTypedArray(),*durations.toTypedArray()).shuffled() else durations
         val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0}?.parts?.size ?: 0
         val ensembleParts: List<EnsemblePart> = if(ensembleTypes.size == 1) Ensembles.getEnsemble(nParts, ensembleTypes[0])
@@ -111,7 +113,7 @@ object Player {
         val actualEnsembleParts = if (partsShuffle) ensembleParts.shuffled() else ensembleParts
         val firstCounterpoint = counterpoints.firstOrNull()
             ?: return "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
-        val nNotesToSkip = rhythm[0].nNotesLeftInThePattern(firstCounterpoint.nNotes())
+        val nNotesToSkip = rhythm[0].first.nNotesLeftInThePattern(firstCounterpoint.nNotes())
         //var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
         var actualCounterpoint = if (rowForms == listOf(Pair(1,1)) ) firstCounterpoint
             else Counterpoint.explodeRowFormsAddingCps(counterpoints, rowForms, nNotesToSkip)
@@ -135,7 +137,7 @@ object Player {
         // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
         //println("legatoTypes: $legatoTypes")
         if(legatoTypes != listOf(Pair(4,0))){
-            val maxLegato = rhythm.minByOrNull { it.metroDenominatorMidiValue() }!!.metroDenominatorMidiValue() / 3
+            val maxLegato = rhythm.minByOrNull { it.first.metroDenominatorMidiValue() }!!.first.metroDenominatorMidiValue() / 3
             val artMap = mapOf(0 to 1.0f, 1 to 0.125f, 2 to 0.25f, 3 to 0.75f, 4 to 1.0f, 5 to 1.125f, 6 to 1.25f )
             val legatos = legatoTypes.map{ artMap[it.first.absoluteValue]!! * (if(it.first<0) -1 else 1)}
             val legatoAlterationsAndDeltas = alterateBpmWithDistribution(legatos,0.005f, totalLength)
@@ -160,10 +162,10 @@ object Player {
         // from TimeSignature.class
 //        public static final int DEFAULT_METER = 24;
 //        public static final int DEFAULT_DIVISION = 8;
-        val ts = TimeSignature()
-        ts.setTimeSignature(rhythm[0].metro.first, rhythm[0].metro.second,
-                            TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION)
-        tempoTrack.insertEvent(ts);
+  //      val ts = TimeSignature()
+//        ts.setTimeSignature(rhythm[0].first.metro.first, rhythm[0].first.metro.second,
+//                            TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION)
+     //  tempoTrack.insertEvent(ts);
 
         //val t = Tempo()
         //t.bpm = bpm
@@ -202,10 +204,33 @@ object Player {
         }
 
         val tracks: java.util.ArrayList<MidiTrack> = java.util.ArrayList<MidiTrack>()
+        setTimeSignatures(tempoTrack, rhythm, totalLength)
         tracks.add(tempoTrack)
         tracks.addAll(counterpointTracks)
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
         return saveAndPlayMidiFile(mediaPlayer, midi, looping, play, midiFile)
+    }
+
+    private fun setTimeSignatures(tempoTrack: MidiTrack, rhythm: List<Triple<RhythmPatterns, Boolean, Int>>, totalLength: Long) {
+        var tick = 0L
+        var lastTick = 0L
+        var lastSignature = Pair(-1,-1)
+        val signatures: List<Pair<Int, Pair<Int,Int>>> = rhythm.map {
+            Pair(it.first.patternDuration() * it.third, Pair(it.first.metro.first, it.first.metro.second) )
+        }
+        var index = 0
+        while (tick < totalLength){
+            val newSignature = signatures[index].second
+            if(newSignature != lastSignature){
+                val ts = TimeSignature(tick, 0L, newSignature.first, newSignature.second,
+                        TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION )
+                tempoTrack.insertEvent(ts)
+                //println("SIGNATURE #$index: tick = $tick  metro = ${newSignature.first}/${newSignature.second}")
+                lastSignature = newSignature
+            }
+            tick += signatures[index].first
+            index = ++index % signatures.size
+        }
     }
 
     private fun alterateArticulation(ticks: IntArray, durations: IntArray,
@@ -885,6 +910,7 @@ object Player {
     }
 
 }
+
 
 
 

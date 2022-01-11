@@ -25,11 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.correctBpms
-import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.ui.Dimensions
-import com.cristianovecchi.mikrokanon.valueFromCsv
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -49,8 +47,10 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
             ListDialog(listDialogData, dimensions, lang.OKbutton)
             val width = if(dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
+            val height = (dimensions.height / dimensions.dpDensity).toInt().dp
+
             Surface(
-                modifier = Modifier.width(width).height(dimensions.dialogHeight),
+                modifier = Modifier.width(width).height(height),
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -60,21 +60,20 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(weights.first + weights.second)
+                        .weight(weights.first + weights.second / 6 * 5)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(weights.second)
+                        .weight(weights.second / 6)
                     val modifierC = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
                         .weight(weights.third)
                     var patternText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
-                    val setPattern = { index: Int, newPattern: Int ->
-
-                        val patternValues = patternText.extractIntsFromCsv().toMutableList()
-                        patternValues[index] = newPattern
-                        patternText = patternValues.joinToString(",")
+                    val setPattern = { index: Int, newPattern: Int, newRepetitions: Int ->
+                        val pairs = patternText.extractIntPairsFromCsv().toMutableList()
+                        pairs[index] = Pair(newPattern, newRepetitions)
+                        patternText = pairs.toIntPairsString()
                     }
                     val fontSize = dimensions.dialogFontSize.sp
                     val fontWeight = FontWeight.Normal
@@ -94,9 +93,9 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         val unselectionBorderColor = colors.selCardBorderColorUnselected
                         val intervalPadding = 4.dp
                         val innerPadding = 10.dp
-                        val patterns = patternText.extractIntsFromCsv()
+                        val pairs = patternText.extractIntPairsFromCsv()
                         val nCols = 1
-                        val nRows = (patterns.size / nCols) + 1
+                        val nRows = (pairs.size / nCols) + 1
                         val rows = (0 until nRows).toList()
                         LazyColumn(state = listState) {
                             items(rows) { row ->
@@ -108,8 +107,11 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     horizontalArrangement = Arrangement.Start
                                 ) {
                                     for (j in 0 until nCols) {
-                                        if (index != patterns.size) {
-                                            val text = patternNames[patterns[index]]
+                                        if (index != pairs.size) {
+                                            val pattern = pairs[index].first
+                                            val repetitions = pairs[index].second
+                                            val feature = if(repetitions >1 ) " (${repetitions}x)" else ""
+                                            val text = patternNames[pattern.absoluteValue-1] + feature
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -127,7 +129,7 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                             )
                                             {
                                                 Text(
-                                                    text = if (patterns[index] < 0) text.toString() else text.toString(),
+                                                    text = if (pattern < 0) "←$text" else text,
                                                     modifier = Modifier.padding(innerPadding),
                                                     style = TextStyle(fontSize = fontSize),
                                                     fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal
@@ -144,7 +146,55 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             }
                         }
                     }
+                    Row(
+                        modifier = modifierB.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
 
+                        val buttonSize = model.dimensions.dialogButtonSize
+                        CustomButton(
+                            adaptSizeToIconButton = true,
+                            iconId = model.iconMap["back"]!!,
+                            buttonSize = buttonSize.dp,
+                            iconColor = model.appColors.iconButtonIconColor,
+                            colors = model.appColors
+                        ) {
+                            val values = patternText.extractIntPairsFromCsv().toMutableList()
+                            val value = values[cursor]
+                            val pattern = value.first
+                            val repetitions = value.second
+                            setPattern(cursor, pattern * -1, repetitions)
+                        }
+                        CustomButton(
+                            adaptSizeToIconButton = true,
+                            iconId = model.iconMap["minus_one"]!!, // [+1] Icon
+                            buttonSize = buttonSize.dp,
+                            iconColor = model.appColors.iconButtonIconColor,
+                            colors = model.appColors
+                        ) {
+                            val values = patternText.extractIntPairsFromCsv().toMutableList()
+                            val value = values[cursor]
+                            val pattern = value.first
+                            var repetitions = value.second - 1
+                            repetitions = if(repetitions < 1) 1 else repetitions
+                            setPattern(cursor, pattern, repetitions)
+                        }
+                        CustomButton(
+                            adaptSizeToIconButton = true,
+                            iconId = model.iconMap["Scarlatti"]!!, // [+1] Icon
+                            buttonSize = buttonSize.dp,
+                            iconColor = model.appColors.iconButtonIconColor,
+                            colors = model.appColors
+                        ) {
+                            val values = patternText.extractIntPairsFromCsv().toMutableList()
+                            val value = values[cursor]
+                            val pattern = value.first
+                            val repetitions = value.second + 1
+                            setPattern(cursor, pattern, repetitions)
+                        }
+
+                    }
                             Row(
                                 modifier = modifierC.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -173,13 +223,15 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
                                 ) {
-                                    val values = patternText.extractIntsFromCsv().toMutableList()
+                                    val values = patternText.extractIntPairsFromCsv().toMutableList()
                                     val value = values[cursor]
+                                    val pattern = value.first.absoluteValue - 1
+                                    val repetitions = value.second
                                     listDialogData.value = ListDialogData(
-                                        true, patternNames, value, lang.selectRhythm
+                                        true, patternNames, pattern, lang.selectRhythm
                                     ) { index ->
-                                        values.set(cursor, index)
-                                        patternText = values.joinToString(",")
+                                        values[cursor] = Pair(index+1, repetitions)
+                                        patternText = values.toIntPairsString()
 
                                         listDialogData.value =
                                             ListDialogData(itemList = listDialogData.value.itemList)
@@ -194,13 +246,12 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
                                 ) {
-                                    val values = patternText.extractIntsFromCsv().toMutableList()
+                                    val values = patternText.split(",").toMutableList()
                                     if (values.size > 1) {
                                         values.removeAt(cursor)
                                         patternText = values.joinToString(",")
                                         val newCursor = if (values.size > 1) cursor - 1 else 0
                                         cursor = if (newCursor < 0) 0 else newCursor
-                                        patternText = values.joinToString(",")
                                     }
                                 }
                                 CustomButton(
@@ -211,13 +262,14 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
                                 ) {
-                                    val values = patternText.extractIntsFromCsv().toMutableList()
+                                    val values = patternText.extractIntPairsFromCsv().toMutableList()
                                     val value = values.last()
+                                    val pattern = value.first.absoluteValue - 1
                                     listDialogData.value = ListDialogData(
-                                        true, patternNames, value, lang.selectRhythm
+                                        true, patternNames, pattern, lang.selectRhythm
                                     ) { index ->
-                                        values.add(index)
-                                        patternText = values.joinToString(",")
+                                        values.add(Pair(index+1,1))
+                                        patternText = values.toIntPairsString()
                                         cursor = values.size - 1
 
                                         listDialogData.value =

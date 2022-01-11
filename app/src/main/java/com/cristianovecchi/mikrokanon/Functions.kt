@@ -87,6 +87,14 @@ fun ArrayList<Clip>.toAbsPitches(): List<Int> {
 fun List<Int>.toSequence(): ArrayList<Clip>{
     return ArrayList<Clip>( this.mapIndexed{index, pitch -> Clip(index,pitch)} ) // not complete
 }
+fun <E> List<E>.repeat(nTimes: Int): List<E> {
+    if (nTimes < 2) return this
+    val result = mutableListOf<E>()
+    (0 until nTimes).forEach { _ ->
+        result.addAll(this)
+    }
+    return result.toList()
+}
 fun MutableList<Int>.getIntOrEmptyValue(index: Int): Int {
     return if(index < this.size) this[index] else -1
 }

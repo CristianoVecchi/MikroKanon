@@ -121,6 +121,7 @@ class AppViewModel(
         "erase" to R.drawable.ic_baseline_cleaning_services_24,
         "free_parts" to R.drawable.ic_baseline_queue_music_24,
         "Scarlatti" to R.drawable.ic_baseline_exposure_plus_1_24,
+        "minus_one" to R.drawable.ic_baseline_minus_one_24,
         "transpose" to R.drawable.ic_baseline_unfold_more_24,
         "sort_up" to R.drawable.ic_baseline_trending_up_24,
         "sort_down" to R.drawable.ic_baseline_trending_down_24,
@@ -301,15 +302,17 @@ init{
                                 .map { it.toFloat() }
                         }
                     } ?: listOf(90f)
-                val rhythm: List<RhythmPatterns> =
-                   userOptionsData.value?.let {
-                       val patterns = RhythmPatterns.values()
-                       if(simplify){
-                           listOf(patterns[userOptionsData.value!![0].rhythm.extractIntsFromCsv()[0]])
-                       } else {
-                           userOptionsData.value!![0].rhythm.extractIntsFromCsv().map{ patterns[it]}
-                       }
-                   } ?: listOf(RhythmPatterns.PLAIN_1_8)
+                val rhythm: List<Triple<RhythmPatterns,Boolean,Int>> =
+                    (userOptionsData.value?.let {
+                        val patterns = RhythmPatterns.values()
+                        if(simplify){
+                            val pair = userOptionsData.value!![0].rhythm.extractIntPairsFromCsv()[0]
+                            listOf(Triple(patterns[pair.first.absoluteValue-1], pair.first<0, pair.second))
+                        } else {
+                            val pairs = userOptionsData.value!![0].rhythm.extractIntPairsFromCsv()
+                            pairs.map{Triple(patterns[it.first.absoluteValue-1], it.first<0, it.second) }
+                        }
+                    } ?: listOf(Triple(RhythmPatterns.PLAIN_1_8,false,1)) )
                 val rhythmShuffle: Boolean =
                     0 != (userOptionsData.value?.let { userOptionsData.value!![0].rhythmShuffle }
                         ?: 0)

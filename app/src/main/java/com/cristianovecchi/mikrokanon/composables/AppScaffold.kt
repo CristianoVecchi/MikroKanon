@@ -384,9 +384,14 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     }
                     "Rhythm" -> {
                         val rhythmNames = RhythmPatterns.getTitles()
-                        val rhythmPatterns = userOptions.rhythm.extractIntsFromCsv()
+                        val rhythmPatterns = userOptions.rhythm.extractIntPairsFromCsv()
+                        val rhythmTexts = rhythmPatterns.map{
+                            val arrow = if(it.first<0) "←" else ""
+                            val feature = if(it.second>1 ) " (${it.second}x)" else ""
+                            arrow + rhythmNames[it.first.absoluteValue - 1] + feature
+                        }
                         SelectableCard(
-                            text = "${lang.rhythm}: ${rhythmPatterns.joinToString(" + ") { rhythmNames[it] }}",
+                            text = "${lang.rhythm}: ${rhythmTexts.joinToString(" + ")}",
                             fontSize = fontSize,
                             colors = colors,
                             isSelected = true,
