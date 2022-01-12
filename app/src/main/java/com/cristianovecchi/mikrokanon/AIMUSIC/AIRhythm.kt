@@ -38,6 +38,7 @@ val N3 = listOf(160,160,160)
 val N3rhythmDotted = listOf(120,40,120,40,120,40)
 val N3graziosetto = listOf(160,40,-120,40,-120)
 val N2 = listOf(240,240)
+val N2grazioso = listOf(240,60-180)
 val N2rhythmDotted = listOf(180,60,180,60)
 val N2détaché = listOf(180,-60,180,-60)
 val N1 = listOf(480); val N1h = listOf(240)
@@ -49,44 +50,105 @@ val Ox4grz = listOf(240,60,-180,60,-180,60,-180); val Ox4grzH = listOf(120,30,-9
 val Ox3grz = listOf(240,60,-180,60,-180); val Ox3grzH = listOf(120,30,-90,30,-90)// Octave x 3 graziosetto
 val Ox2grz = listOf(240,60,-180); val Ox2grzH = listOf(120,30,-90)// Octave x 2 graziosetto
 val H1 = listOf(960); val H1h = listOf(480) // H = 2/4
+val METRO_2_4 = Pair(2,4)
+val METRO_3_4 = Pair(3,4)
+val METRO_4_4 = Pair(4,4)
 enum class RhythmType{
-    PLAIN, BALLET, PUNTATO, DANCE, RAGTIME, QUOTE, BULGARIAN, HEMIOLIA, FLUX
+     BASIC, PLAIN, BALLET, PUNTATO, DANCE, RAGTIME, QUOTE, BULGARIAN, HEMIOLIA, FLUX
 }
 // WARNING: can't have two negative values coupled (ex: -80, -20 ... write -100)
-enum class RhythmPatterns(val type: RhythmType, val title: String, val values: List<Int>,val metro: Pair<Int,Int> = Pair(4,4)) {
-    PLAIN_1_4(RhythmType.PLAIN,"Plain 1/4", listOf(480,480,480,480)),
-    PLAIN_1_8(RhythmType.PLAIN,"Plain 1/8", listOf(240,240,240,240,240,240,240,240)),
-    PLAIN_1_8T(RhythmType.PLAIN,"Plain 1/8t", listOf(160,160,160,160,160,160,160,160,160,160,160,160)),
-    PLAIN_1_16(RhythmType.PLAIN,"Plain 1/16", listOf(120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120)),
-    PLAIN_1_16T5(RhythmType.PLAIN,"Plain 1/16t(5)", listOf(96,96,96,96,96, 96,96,96,96,96),Pair(2,4)),
-    PLAIN_1_16T6(RhythmType.PLAIN,"Plain 1/16t(6)", listOf(80,80,80,80,80,80, 80,80,80,80,80,80),Pair(2,4)),
-    PLAIN_1_16T7(RhythmType.PLAIN,"Plain 1/16t(7)", listOf(N7, N7).flatten(),Pair(2,4)),
-    PLAIN_1_32(RhythmType.PLAIN,"Plain 1/32", listOf(60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,), Pair(2,4)),
-    PLAIN_1_32T9(RhythmType.PLAIN,"Plain 1/32t(9)", listOf(N9, N9).flatten(), Pair(2,4)),
-    STACCATO_1_16(RhythmType.BALLET,"Staccato 1/16",listOf(30,-90,30,-90,30,-90,30,-90,30,-90,30,-90,30,-90,30,-90), Pair(2,4)),
-    GRAZIOSO_1_8(RhythmType.BALLET,"Grazioso 1/8",listOf(240,60,-180,240,60,-180), Pair(2,4)),
-    GRAZIOSO_1_8T(RhythmType.BALLET,"Grazioso 1/8t",listOf(240,60,-180,60,-180,240,60,-180,60,-180), Pair(6,8)),
-    GRAZIOSO_1_16(RhythmType.BALLET,"Grazioso 1/16",listOf(120,30,-90,120,30,-90,120,30,-90,120,30,-90,), Pair(2,4)),
-    GRAZIOSETTO_1_16(RhythmType.BALLET,"Graziosetto 1/16",listOf(N4graziosetto, N4graziosetto).flatten(), Pair(2,4)),
-    GRAZIOSETTO_1_16_1_8T(RhythmType.BALLET,"Graziosetto 1/16 1/8t",listOf(N4graziosetto, N3graziosetto).flatten(), Pair(2,4)),
+enum class RhythmPatterns(val type: RhythmType, val title: String, val values: List<Int>,val metro: Pair<Int,Int> = METRO_4_4) {
+    BASIC_4(RhythmType.BASIC,"Basic ♩", listOf(480), METRO_2_4),
+    BASIC_8(RhythmType.BASIC,"Basic ♪", listOf(240), Pair(2,8)),
+    BASIC_16(RhythmType.BASIC,"Basic 16", listOf(120), Pair(2,16)),
+    BASIC_32(RhythmType.BASIC,"Basic 32", listOf(60), Pair(2,32)),
+    PLAIN_2_4_R4(RhythmType.PLAIN,"Plain 2/4♩♩", listOf(480,480), METRO_2_4),
+    PLAIN_3_4_R4(RhythmType.PLAIN,"Plain 3/4♩♩♩", listOf(480,480,480), METRO_3_4),
+    PLAIN_4_4_R4(RhythmType.PLAIN,"Plain 4/4♩♩♩♩", listOf(480,480,480,480)),
+    PLAIN_2_4_R8(RhythmType.PLAIN,"Plain 2/4♫♫", listOf(240,240,240,240), METRO_2_4),
+    PLAIN_3_4_R8(RhythmType.PLAIN,"Plain 3/4♫♫♫", listOf(240,240,240,240,240,240), METRO_3_4),
+    PLAIN_4_4_R8(RhythmType.PLAIN,"Plain 4/4♫♫♫♫", listOf(240,240,240,240,240,240,240,240)),
+    PLAIN_1_4_R8T(RhythmType.PLAIN,"Plain 1/4 ♪t", listOf(160,160,160), Pair(1,4)),
+    PLAIN_2_4_R8T(RhythmType.PLAIN,"Plain 2/4 ♪t", listOf(160,160,160,160,160,160), METRO_2_4),
+    PLAIN_3_4_R8T(RhythmType.PLAIN,"Plain 3/4 ♪t", listOf(160,160,160,160,160,160,160,160,160), METRO_3_4),
+    PLAIN_4_4_R8T(RhythmType.PLAIN,"Plain 4/4 ♪t", listOf(160,160,160,160,160,160,160,160,160,160,160,160)),
+    PLAIN_2_4_R16(RhythmType.PLAIN,"Plain 2/4 16", listOf(120,120,120,120,120,120,120,120)),
+    PLAIN_3_4_R16(RhythmType.PLAIN,"Plain 3/4 16", listOf(120,120,120,120,120,120,120,120,120,120,120,120)),
+    PLAIN_4_4_R16(RhythmType.PLAIN,"Plain 4/4 16", listOf(120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120)),
+    PLAIN_2_4_R16T5(RhythmType.PLAIN,"Plain 2/4 16t(5)", listOf(96,96,96,96,96, 96,96,96,96,96), METRO_2_4),
+    PLAIN_2_4_R16T6(RhythmType.PLAIN,"Plain 2/4 16t(6)", listOf(80,80,80,80,80,80, 80,80,80,80,80,80), METRO_2_4),
+    PLAIN_2_4_R16T7(RhythmType.PLAIN,"Plain 2/4 16t(7)", listOf(N7, N7).flatten(), METRO_2_4),
+    PLAIN_2_4_R32(RhythmType.PLAIN,"Plain 2/4 32", listOf(60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,), METRO_2_4),
+    PLAIN_2_4_R32T9(RhythmType.PLAIN,"Plain 2/4 32t(9)", listOf(N9, N9).flatten(), METRO_2_4),
+    PLAIN_2_8_R32T10(RhythmType.PLAIN,"Plain 2/8 32t(10)", N10, Pair(2,8)),
+    PLAIN_3_8_R8(RhythmType.PLAIN,"Plain 3/8♪", listOf(240,240,240), Pair(3,8)),
+    PLAIN_6_8_R8(RhythmType.PLAIN,"Plain 6/8♪", listOf(240,240,240,240,240,240), Pair(6,8)),
+    PLAIN_9_8_R8(RhythmType.PLAIN,"Plain 9/8♪", listOf(240,240,240,240,240,240,240,240,240), Pair(9,8)),
+    PLAIN_12_8_R8(RhythmType.PLAIN,"Plain 12/8♪", listOf(240,240,240,240,240,240,240,240,240,240,240,240), Pair(12,8)),
+    PLAIN_1_4_R4T_8T(RhythmType.PLAIN,"Plain 1/4♩♪t", listOf(320,160), Pair(1,4)),
+    PLAIN_2_4_R4T_8T(RhythmType.PLAIN,"Plain 2/4♩♪t", listOf(320,160,320,160), METRO_2_4),
+    PLAIN_3_4_R4T_8T(RhythmType.PLAIN,"Plain 3/4♩♪t", listOf(320,160,320,160,320,160), METRO_3_4),
+    PLAIN_4_4_R4T_8T(RhythmType.PLAIN,"Plain 4/4♩♪t", listOf(320,160,320,160,320,160,320,160), METRO_4_4),
+    PLAIN_3_8_R4_8(RhythmType.PLAIN,"Plain 3/8♩♪", listOf(480,240), Pair(3,8)),
+    PLAIN_6_8_R4_8(RhythmType.PLAIN,"Plain 6/8♩♪", listOf(480,240,480,240), Pair(6,8)),
+    PLAIN_9_8_R4_8(RhythmType.PLAIN,"Plain 9/8♩♪", listOf(480,240,480,240,480,240), Pair(9,8)),
+    PLAIN_12_8_R4_8(RhythmType.PLAIN,"Plain 12/8♩♪", listOf(480,240,480,240,480,240,480,240), Pair(12,8)),
+    PLAIN_3_16_R8_16(RhythmType.PLAIN,"Plain 3/16♪16", listOf(240,120), Pair(3,16)),
+    PLAIN_6_16_R8_16(RhythmType.PLAIN,"Plain 6/16♪16", listOf(240,120,240,120), Pair(6,16)),
+    PLAIN_9_16_R8_16(RhythmType.PLAIN,"Plain 9/16♪16", listOf(240,120,240,120,240,120), Pair(9,16)),
+    PLAIN_12_16_R8_16(RhythmType.PLAIN,"Plain 12/16♪16", listOf(240,120,240,120,240,120,240,120), Pair(12,16)),
+    STACCATO_2_8_R8(RhythmType.BALLET,"Staccato 2/8♪",listOf(60,-180,60,-180), Pair(2,8)),
+    STACCATO_3_8_R8(RhythmType.BALLET,"Staccato 3/8♪",listOf(60,-180,60,-180,60,-180), Pair(3,8)),
+    STACCATO_2_4_R8(RhythmType.BALLET,"Staccato 2/4♪",listOf(60,-180,60,-180,60,-180,60,-180), METRO_2_4),
+    STACCATO_2_4_R8T(RhythmType.BALLET,"Staccato 2/4♪t",listOf(40,-120,40,-120,40,-120,40,-120,40,-120,40,-120), METRO_2_4),
+    STACCATO_2_4_R16(RhythmType.BALLET,"Staccato 2/4 16",listOf(30,-90,30,-90,30,-90,30,-90,30,-90,30,-90,30,-90,30,-90), METRO_2_4),
+    GRAZIOSO_2_4_R8(RhythmType.BALLET,"Grazioso 2/4♪",listOf(240,60,-180,240,60,-180,240,60,-180,240,60,-180), METRO_2_4),
+    GRAZIOSO_2_4_R8T(RhythmType.BALLET,"Grazioso 2/4♪",listOf(160,40,-120,160,40,-120,160,40,-120, 160,40,-120,160,40,-120,160,40,-120), METRO_2_4),
+    GRAZIOSO_2_4_R16(RhythmType.BALLET,"Grazioso 2/4 16",listOf(120,30,-90,120,30,-90,120,30,-90,120,30,-90,120,30,-90,120,30,-90,120,30,-90,120,30,-90), METRO_2_4),
+    GRAZIOSO_1_4_R4T_8T(RhythmType.BALLET,"Grazioso 1/4♩♪t", listOf(320,40,-120), Pair(1,4)),
+    GRAZIOSO_2_4_R4T_8T(RhythmType.BALLET,"Grazioso 2/4♩♪t", listOf(320,40,-120,320,40,-120), METRO_2_4),
+    GRAZIOSO_3_4_R4T_8T(RhythmType.BALLET,"Grazioso 3/4♩♪t", listOf(320,40,-120,320,40,-120,320,40,-120), METRO_3_4),
+    GRAZIOSO_4_4_R4T_8T(RhythmType.BALLET,"Grazioso 4/4♩♪t", listOf(320,40,-120,320,40,-120,320,40,-120,320,40,-120), METRO_4_4),
+    GRAZIOSO_3_8_R4_8(RhythmType.BALLET,"Grazioso 3/8♩♪", listOf(480,60,-180), Pair(3,8)),
+    GRAZIOSO_6_8_R4_8(RhythmType.BALLET,"Grazioso 6/8♩♪", listOf(480,60,-180,480,60,-180), Pair(6,8)),
+    GRAZIOSO_9_8_R4_8(RhythmType.BALLET,"Grazioso 9/8♩♪", listOf(480,60,-180,480,60,-180,480,60,-180), Pair(9,8)),
+    GRAZIOSO_12_8_R4_8(RhythmType.BALLET,"Grazioso 12/8♩♪", listOf(480,60,-180,480,60,-180,480,60,-180,480,60,-180), Pair(12,8)),
+    GRAZIOSO_3_16_R8_16(RhythmType.BALLET,"Grazioso 3/16♪16", listOf(240,30,-90), Pair(3,16)),
+    GRAZIOSO_6_16_R8_16(RhythmType.BALLET,"Grazioso 6/16♪16", listOf(240,30,-90,240,30,-90), Pair(6,16)),
+    GRAZIOSO_9_16_R8_16(RhythmType.BALLET,"Grazioso 9/16♪16", listOf(240,30,-90,240,30,-90,240,30,-90), Pair(9,16)),
+    GRAZIOSO_12_16_R8_16(RhythmType.BALLET,"Grazioso 12/16♪16", listOf(240,30,-90,240,30,-90,240,30,-90,240,30,-90), Pair(12,16)),
+    GRAZIOSETTO_3_8_R8(RhythmType.BALLET,"Graziosetto 3/8♪",listOf(240,60,-180,60,-180), Pair(6,8)),
+    GRAZIOSETTO_6_8_R8(RhythmType.BALLET,"Graziosetto 6/8♪",listOf(240,60,-180,60,-180,240,60,-180,60,-180), Pair(6,8)),
+    GRAZIOSETTO_2_4_R16(RhythmType.BALLET,"Graziosetto 16",listOf(N4graziosetto, N4graziosetto).flatten(), METRO_2_4),
+    GRAZIOSETTO_2_4_R16_8T(RhythmType.BALLET,"Graziosetto 16+♪t",listOf(N4graziosetto, N3graziosetto).flatten(), METRO_2_4),
+    GRAZIOSETTO_FLUX_2343(RhythmType.BALLET,"Graziosetto Flux 2343",listOf(N2grazioso, N4graziosetto, N5graziosetto, N4graziosetto).flatten(), Pair(4,4)),
     GRAZIOSETTO_FLUX_3454(RhythmType.BALLET,"Graziosetto Flux 3454",listOf(N3graziosetto, N4graziosetto, N5graziosetto, N4graziosetto).flatten(), Pair(4,4)),
     GRAZIOSETTO_FLUX_4564(RhythmType.BALLET,"Graziosetto Flux 4565",listOf(N4graziosetto, N5graziosetto, N6graziosetto, N5graziosetto).flatten(), Pair(4,4)),
     GRAZIOSETTO_FLUX_345654(RhythmType.BALLET,"Graziosetto Flux 345654",listOf(N3graziosetto, N4graziosetto, N5graziosetto, N6graziosetto, N5graziosetto, N4graziosetto).flatten(), Pair(3,4)),
-    DOTTED_1_4(RhythmType.PUNTATO,"Dotted 1/4", listOf(360,120,360,120,360,120,360,120)),
-    DOTTED2_1_4(RhythmType.PUNTATO,"Dotted2 1/4", listOf(360,60,60,360,60,60,360,60,60,360,60,60)),
-    DOTTED3_1_4(RhythmType.PUNTATO,"Dotted3 1/4", listOf(300,60,60,60,300,60,60,60,300,60,60,60,300,60,60,60)),
+    GRAZIOSETTO_FLUX_23456543(RhythmType.BALLET,"Graziosetto Flux 23456543",listOf(N2grazioso, N3graziosetto, N4graziosetto, N5graziosetto, N6graziosetto, N5graziosetto, N4graziosetto, N3graziosetto).flatten()),
+    DOTTED1_1_4(RhythmType.PUNTATO,"Dotted1 1/4", listOf(360,120), Pair(1,4)),
+    DOTTED1_2_4(RhythmType.PUNTATO,"Dotted1 2/4", listOf(360,120,360,120), METRO_2_4),
+    DOTTED1_3_4(RhythmType.PUNTATO,"Dotted1 3/4", listOf(360,120,360,120,360,120), METRO_3_4),
+    DOTTED2_1_4(RhythmType.PUNTATO,"Dotted2 1/4", listOf(360,60,60), Pair(1,4)),
+    DOTTED2_2_4(RhythmType.PUNTATO,"Dotted2 2/4", listOf(360,60,60,360,60,60), METRO_2_4),
+    DOTTED2_3_4(RhythmType.PUNTATO,"Dotted2 3/4", listOf(360,60,60,360,60,60,360,60,60,360,60,60), METRO_3_4),
+    DOTTED3_1_4(RhythmType.PUNTATO,"Dotted3 1/4", listOf(300,60,60,60), Pair(1,4)),
+    DOTTED3_2_4(RhythmType.PUNTATO,"Dotted3 2/4", listOf(300,60,60,60,300,60,60,60), METRO_2_4),
+    DOTTED3_3_4(RhythmType.PUNTATO,"Dotted3 3/4", listOf(300,60,60,60,300,60,60,60,300,60,60,60), METRO_3_4),
+    DOTTED_FLUX_1232(RhythmType.PUNTATO,"Dotted Flux 1232",
+        listOf(N1rhythmDotted, N2rhythmDotted, N3rhythmDotted, N2rhythmDotted).flatten()),
+    DOTTED_FLUX_2343(RhythmType.PUNTATO,"Dotted Flux 2343",
+        listOf(N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N3rhythmDotted).flatten()),
+    DOTTED_FLUX_3454(RhythmType.PUNTATO,"Dotted Flux 3454",
+        listOf(N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N4rhythmDotted).flatten()),
     DOTTED_FLUX_123432(RhythmType.PUNTATO,"Dotted Flux 123432",
         listOf(N1rhythmDotted, N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N3rhythmDotted, N2rhythmDotted).flatten(),Pair(3,4)),
     DOTTED_FLUX_234543(RhythmType.PUNTATO,"Dotted Flux 234543",
         listOf(N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N4rhythmDotted, N3rhythmDotted).flatten(),Pair(3,4)),
-    DOTTED_FLUX_23456543(RhythmType.PUNTATO,"Dotted Flux 23456543",
-        listOf(N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N6rhythmDotted, N5rhythmDotted,N4rhythmDotted,N3rhythmDotted,).flatten(),Pair(4,4)),
-    DOTTED_FLUX_2343(RhythmType.PUNTATO,"Dotted Flux 2343",
-        listOf(N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N3rhythmDotted).flatten(),Pair(4,4)),
-    DOTTED_FLUX_3454(RhythmType.PUNTATO,"Dotted Flux 3454",
-        listOf(N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N4rhythmDotted).flatten(),Pair(4,4)),
     DOTTED_FLUX_12345432(RhythmType.PUNTATO,"Dotted Flux 12345432",
-        listOf(N1rhythmDotted, N2rhythmDotted,N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N4rhythmDotted,N3rhythmDotted, N2rhythmDotted).flatten(),Pair(4,4)),
+        listOf(N1rhythmDotted, N2rhythmDotted,N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N4rhythmDotted,N3rhythmDotted, N2rhythmDotted).flatten()),
+    DOTTED_FLUX_23456543(RhythmType.PUNTATO,"Dotted Flux 23456543",
+        listOf(N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N6rhythmDotted, N5rhythmDotted,N4rhythmDotted,N3rhythmDotted,).flatten()),
     DOTTED_FLUX_1234565432(RhythmType.PUNTATO,"Dotted Flux 1234565432",
         listOf(N1rhythmDotted,N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N6rhythmDotted, N5rhythmDotted,N4rhythmDotted, N3rhythmDotted, N2rhythmDotted).flatten(),Pair(5,4)),
     SNARE(RhythmType.DANCE,"Snare", listOf(90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,30,-30,30,-30,30,-30,30,-30)),
@@ -230,6 +292,6 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     }
 }
 fun main(args : Array<String>){
-    println("${RhythmPatterns.GRAZIOSETTO_1_16_1_8T.values}  ->  ${RhythmPatterns.GRAZIOSETTO_1_16_1_8T.retrogradeValues()}")
-    println("${RhythmPatterns.DOTTED3_1_4.values}  ->  ${RhythmPatterns.DOTTED3_1_4.retrogradeValues()}")
+    println("${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.values}  ->  ${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.retrogradeValues()}")
+    println("${RhythmPatterns.DOTTED3_2_4.values}  ->  ${RhythmPatterns.DOTTED3_2_4.retrogradeValues()}")
 }

@@ -312,7 +312,7 @@ init{
                             val pairs = userOptionsData.value!![0].rhythm.extractIntPairsFromCsv()
                             pairs.map{Triple(patterns[it.first.absoluteValue-1], it.first<0, it.second) }
                         }
-                    } ?: listOf(Triple(RhythmPatterns.PLAIN_1_8,false,1)) )
+                    } ?: listOf(Triple(RhythmPatterns.PLAIN_4_4_R16,false,1)) )
                 val rhythmShuffle: Boolean =
                     0 != (userOptionsData.value?.let { userOptionsData.value!![0].rhythmShuffle }
                         ?: 0)
