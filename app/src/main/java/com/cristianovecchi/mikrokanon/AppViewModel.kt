@@ -45,6 +45,7 @@ sealed class Computation(open val icon: String = "") {
     data class Round(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "round"): Computation()
     data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val values: List<Int>, override val icon: String = "cadenza"): Computation()
     data class Sort(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val sortType: Int, override val icon: String = "sort_up"): Computation()
+    data class UpsideDown(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "upside_down"): Computation()
     data class Scarlatti(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "Scarlatti"): Computation()
     data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "erase"): Computation()
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
@@ -121,11 +122,12 @@ class AppViewModel(
         "erase" to R.drawable.ic_baseline_cleaning_services_24,
         "free_parts" to R.drawable.ic_baseline_queue_music_24,
         "Scarlatti" to R.drawable.ic_baseline_exposure_plus_1_24,
-        "minus_one" to R.drawable.ic_baseline_minus_one_24,
+        "minus_one" to R.drawable.ic_baseline_exposure_neg_1_24,
         "transpose" to R.drawable.ic_baseline_unfold_more_24,
         "sort_up" to R.drawable.ic_baseline_trending_up_24,
         "sort_down" to R.drawable.ic_baseline_trending_down_24,
         "bar" to R.drawable.ic_baseline_bar_24,
+        "upside_down" to R.drawable.ic_baseline_expand_24
     )
     val stackIcons = mutableListOf<String>()
     private fun Stack<Computation>.pushAndDispatch(computation: Computation){
@@ -305,13 +307,13 @@ init{
                 val rhythm: List<Triple<RhythmPatterns,Boolean,Int>> =
                     (userOptionsData.value?.let {
                         val patterns = RhythmPatterns.values()
-                        if(simplify){
-                            val pair = userOptionsData.value!![0].rhythm.extractIntPairsFromCsv()[0]
-                            listOf(Triple(patterns[pair.first.absoluteValue-1], pair.first<0, pair.second))
-                        } else {
+//                        if(simplify){
+//                            val pair = userOptionsData.value!![0].rhythm.extractIntPairsFromCsv()[0]
+//                            listOf(Triple(patterns[pair.first.absoluteValue-1], pair.first<0, pair.second))
+//                        } else {
                             val pairs = userOptionsData.value!![0].rhythm.extractIntPairsFromCsv()
                             pairs.map{Triple(patterns[it.first.absoluteValue-1], it.first<0, it.second) }
-                        }
+//                        }
                     } ?: listOf(Triple(RhythmPatterns.PLAIN_4_4_R16,false,1)) )
                 val rhythmShuffle: Boolean =
                     0 != (userOptionsData.value?.let { userOptionsData.value!![0].rhythmShuffle }
@@ -464,6 +466,12 @@ init{
         val iconString = if(sortType == 0) "sort_up" else "sort_down"
         computationStack.pushAndDispatch(Computation.Sort(originalCounterpoints, null, index, sortType, iconString ))
         sortAllCounterpoints(originalCounterpoints, sortType, index)
+    }
+    val onUpsideDown = {
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        computationStack.pushAndDispatch(Computation.UpsideDown(originalCounterpoints, null, index))
+        upsideDownAllCounterpoints(originalCounterpoints,index)
     }
     val onEraseIntervals = {
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
@@ -697,6 +705,7 @@ init{
                     is Computation.Cadenza -> computationStack.lastElement()
                     is Computation.Scarlatti -> computationStack.lastElement()
                     is Computation.Sort -> computationStack.lastElement()
+                    is Computation.UpsideDown -> computationStack.lastElement()
                     is Computation.EraseIntervals -> computationStack.lastElement()
                     is Computation.Single-> computationStack.lastElement()
                     is Computation.Transposition-> computationStack.lastElement()
@@ -763,6 +772,9 @@ init{
                     }
                     is Computation.Sort -> {
                         sortAllCounterpoints( previousComputation.counterpoints,previousComputation.index, previousComputation.sortType)
+                    }
+                    is Computation.UpsideDown -> {
+                        upsideDownAllCounterpoints( previousComputation.counterpoints,previousComputation.index)
                     }
                     is Computation.Scarlatti -> {
                         duplicateAllPhrasesInCounterpoint( previousComputation.counterpoints[previousComputation.index],previousComputation.index)
@@ -1052,6 +1064,20 @@ init{
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpoints(newList, spread)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
+    private fun upsideDownAllCounterpoints(originalCounterpoints: List<Counterpoint>,index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = upsideDownCounterpoints(originalCounterpoints)
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                }
+                changeCounterpoints(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }

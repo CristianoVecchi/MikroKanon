@@ -40,9 +40,9 @@ data class ButtonsDialogData(
     val onCadenza: () -> Unit = {}, val onScarlatti: () -> Unit = {}, val onFlourish: () -> Unit = {},
     val onEraseIntervals: () -> Unit = {}, val onSingle: () -> Unit = {},
     val onMK5reducted: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
-    val onSort: (Int) -> Unit = {},
+    val onSort: (Int) -> Unit = {}, val onUpsideDown: () -> Unit = {},
     val onSavingCounterpoint: (Int) -> Unit = {},
-    val onSubmitButtonClick: () -> Unit = {})
+    val onSubmitButtonClick: () -> Unit = {}, )
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
                             val error:String = "",

@@ -294,4 +294,5 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
 fun main(args : Array<String>){
     println("${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.values}  ->  ${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.retrogradeValues()}")
     println("${RhythmPatterns.DOTTED3_2_4.values}  ->  ${RhythmPatterns.DOTTED3_2_4.retrogradeValues()}")
+    println("${RhythmPatterns.BULGARIAN3GRZ.retrogradeValues() + RhythmPatterns.BULGARIAN3GRZ.values}")
 }

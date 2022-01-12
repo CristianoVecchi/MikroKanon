@@ -83,9 +83,6 @@ var start = true
                                         }
                                         findNavController().navigate(R.id.outputFragment)
                                     },
-                                    onSort = { sortType ->
-
-                                    },
                                     onWave = { nWaves, list ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onWaveFromFirstSelection(nWaves, list)

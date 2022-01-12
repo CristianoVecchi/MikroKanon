@@ -193,11 +193,27 @@ fun BoostedMikroKanonsButtons(
     }
 }
 @Composable
+fun NotFromSelectorButtons(
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
+    onUpsideDown: () -> Unit, onSort: (Int) -> Unit
+) {
+    Row{
+        CustomButton(iconId = model.iconMap["sort_up"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+            onSort(0)
+        }
+        CustomButton(iconId = model.iconMap["sort_down"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+            onSort(1)
+        }
+        CustomButton(iconId = model.iconMap["upside_down"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+            onUpsideDown()
+        }
+    }
+}
+@Composable
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
     onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
-    onScarlatti: () -> Unit, onSort: (Int) -> Unit,
-    onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit,
+    onScarlatti: () -> Unit, onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit
 ) {
     Column {
         Row{
@@ -212,14 +228,6 @@ fun SpecialFunctions1Buttons(
             }
             CustomButton(iconId = model.iconMap["Scarlatti"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onScarlatti()
-            }
-        }
-        Row{
-            CustomButton(iconId = model.iconMap["sort_up"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-                onSort(0)
-            }
-            CustomButton(iconId = model.iconMap["sort_down"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-                onSort(1)
             }
         }
         Row {

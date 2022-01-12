@@ -76,8 +76,11 @@ class OutputFragment: Fragment() {
                                         )
                                     }
                                 },
-                                onSort= { sortType ->
+                                onSort = { sortType ->
                                     model.onSortCounterpoints(sortType)
+                                },
+                                onUpsideDown = {
+                                    model.onUpsideDown()
                                 },
                                 onSavingCounterpoint= { position ->
                                     model.selectedCounterpoint.value?.let{

@@ -279,7 +279,7 @@ public class Insieme {
            }
            count++;
        }
-        System.out.println("Vector:"+ list.toString());
+       // System.out.println("Vector:"+ list.toString());
         return  (Integer[]) list.toArray(new Integer[0]);
     }
     // NOT -1 allowed

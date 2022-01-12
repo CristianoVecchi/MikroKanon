@@ -540,6 +540,9 @@ data class Counterpoint(val parts: List<AbsPart>,
         return parts.joinToString(partSeparator) { it.absPitches.joinToString(",") }
     }
 
+    fun upsideDown(): Counterpoint {
+        return this.copy(parts = parts.reversed())
+    }
 
 
     companion object {
@@ -613,7 +616,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                         targetNote, actualDirections.toTypedArray() ).toList().reversed()
                         .dropLastWhile { it ==targetNote }
                         .dropWhile { !Insieme.isIntervalInSet(horIntervalSet.toIntArray(), originNote, it)}
-                    println("part:$bestFiorituraIndex start:$originNote end:$targetNote diff:$diff dirs:$actualDirections note:$bestFioritura fioritura:$fiorituraNotes")
+                    //println("part:$bestFiorituraIndex start:$originNote end:$targetNote diff:$diff dirs:$actualDirections note:$bestFioritura fioritura:$fiorituraNotes")
                     if(fiorituraNotes.isNotEmpty()){
                         fiorituraNotes.forEach{ it ->
                             newParts.mapIndexed { i, absPart -> if(i == bestFiorituraIndex)

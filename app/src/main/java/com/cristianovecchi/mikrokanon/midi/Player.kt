@@ -105,6 +105,7 @@ object Player {
         val durations = rhythm.fold(listOf<Int>()){acc, triple ->
             acc + if(triple.second) triple.first.retrogradeValues().repeat(triple.third) else triple.first.values.repeat(triple.third)
         }
+        //println("durations: $durations")
         val actualDurations = if (rhythmShuffle) listOf(*durations.toTypedArray(),*durations.toTypedArray(),*durations.toTypedArray()).shuffled() else durations
         val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0}?.parts?.size ?: 0
         val ensembleParts: List<EnsemblePart> = if(ensembleTypes.size == 1) Ensembles.getEnsemble(nParts, ensembleTypes[0])

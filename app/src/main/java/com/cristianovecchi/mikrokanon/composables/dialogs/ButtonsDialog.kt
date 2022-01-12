@@ -48,7 +48,25 @@ fun ButtonsDialog(
                     ) {
                         items((0..5).toList()) { item ->
                             when (item) {
-                                0 -> SpecialFunctions1Buttons(
+                                0 -> if(!workingOnSequences) {
+                                    NotFromSelectorButtons(
+                                        model = buttonsDialogData.value.model,
+                                        buttonSize = buttonSize,
+                                        fontSize = fontSize,
+                                        colors = model.appColors,
+                                        onSort = buttonsDialogData.value.onSort,
+                                        onUpsideDown = buttonsDialogData.value.onUpsideDown
+                                    ) }
+                                    else {
+                                        BoostedMikroKanonsButtons(
+                                            model = buttonsDialogData.value.model,
+                                            buttonSize = buttonSize,
+                                            fontSize = fontSize,
+                                            colors = model.appColors,
+                                            onMK5reductedClick = buttonsDialogData.value.onMK5reducted
+                                        )
+                                    }
+                                1 -> SpecialFunctions1Buttons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonSize,
                                     fontSize = fontSize,
@@ -61,10 +79,10 @@ fun ButtonsDialog(
                                     onSingle = buttonsDialogData.value.onSingle,
                                     onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution,
                                     onDoppelgänger = buttonsDialogData.value.onDoppelgänger,
-                                    onSort = buttonsDialogData.value.onSort
+
                                 )
-                                1 -> Spacer(modifier = Modifier.height(6.dp))
-                                2 -> WavesButtons(
+                                2 -> Spacer(modifier = Modifier.height(6.dp))
+                                3 -> WavesButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActiveWaves,
                                     buttonSize = buttonSize,
@@ -74,7 +92,7 @@ fun ButtonsDialog(
                                     onWave4Click = buttonsDialogData.value.onWave4,
                                     onWave6Click = buttonsDialogData.value.onWave6
                                 )
-                                3 -> PedalsButtons(
+                                4 -> PedalsButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActivePedals,
                                     buttonSize = buttonSize,
@@ -84,15 +102,6 @@ fun ButtonsDialog(
                                     onPedal3Click = buttonsDialogData.value.onPedal3,
                                     onPedal5Click = buttonsDialogData.value.onPedal5
                                 )
-                                4 -> if(workingOnSequences){
-                                    BoostedMikroKanonsButtons(
-                                        model = buttonsDialogData.value.model,
-                                        buttonSize = buttonSize,
-                                        fontSize = fontSize,
-                                        colors = model.appColors,
-                                        onMK5reductedClick = buttonsDialogData.value.onMK5reducted
-                                    )
-                                }
                                 5 -> SavingButtons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonSize,

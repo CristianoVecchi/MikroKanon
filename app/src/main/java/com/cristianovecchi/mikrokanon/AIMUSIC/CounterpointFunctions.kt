@@ -80,6 +80,9 @@ suspend fun eraseHorizontalIntervalsOnCounterpoints(horIntervalSet: List<Int>, o
 suspend fun sortColumnsOnCounterpoints(originalCounterpoints: List<Counterpoint>, sortType: Int ): List<Counterpoint>{
      return originalCounterpoints.map{ it.sortColumns(sortType) }
 }
+suspend fun upsideDownCounterpoints(originalCounterpoints: List<Counterpoint>): List<Counterpoint>{
+     return originalCounterpoints.map{ it.upsideDown() }
+}
 suspend fun reduceCounterpointsToSinglePart(originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{ it.reduceToSinglePart() }
 }
