@@ -1,7 +1,13 @@
 package com.cristianovecchi.mikrokanon.locale
 
+import android.annotation.SuppressLint
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
+import com.google.android.material.timepicker.TimeFormat
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 enum class MBTI(val character: String, val intervals: Set<Int>){
     ISTJ("The Inspector", setOf(6, 4,8, 3,9 )),
@@ -39,7 +45,7 @@ enum class LANGUAGES(val language:String){
     el("Ελληνικά"),en("English"),es("Español"),
     fr("Français"),
     hi("हिन्दी"),id("Bahasa Indonesia"),it("Italiano"),
-    ko("한국어") ,jp("日本語"),
+    ko("한국어") ,ja("日本語"),
      pt("Português"), ru("Русский"),
     sw("Kiswahili"),zh("中文");
     companion object {
@@ -52,7 +58,7 @@ enum class LANGUAGES(val language:String){
                 "es" -> es.language
                 "fr" -> fr.language
                 "ko" -> ko.language
-                "jp" -> jp.language
+                "ja" -> ja.language
                 "hi" -> hi.language
                 "id" -> id.language
                 "it" -> it.language
@@ -110,7 +116,7 @@ val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orques
     "Cañas dobles", "Clarinetes", "Fagotes", "Violonchelos", "Piano","Arpa", "Pierrot","Barroco","Instrumentos de cuerda pulsada","Escalofriante")
 val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기","가믈란", "색소폰", "플루트",
     "더블 리드", "클라리넷", "바순", "첼로 스", "피아노","하프","피에로","바로크","발현악기","유령 같은")
-val ensembleNamesJp = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器","ガムラン","サックス", "フルート",
+val ensembleNamesJa = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器","ガムラン","サックス", "フルート",
     "ダブルリード", "クラリネット", "ファゴット", "チェロ", "ピアノ","ハープ", "ピエロ", "バロック","撥弦楽器","不気味な")
 val ensembleNamesId = listOf("Alat musik dawai membungkuk", "Instrumen musik tiup kayu", "Orkestra dawai", "Instrumen musik tiup logam", "Gamelan","Saxophone", "Seruling",
     "Alang-alang ganda", "Klarinet", "Bassoon", "Cellos", "Piano", "Harpa", "Pierrot", "Baroque", "Dawai yang dipetik","Menyeramkan")
@@ -227,7 +233,7 @@ val doublingKo = listOf("단2도","장2도","단3도","장3도","완전4도",
     "완전8도","단9도","장9도","단10도","장10도","완전11도",
     "완전8도+트라이톤","완전12도","단13도","장13도","단14도","장14도",
     "완전15도")
-val doublingJp = listOf("短2度","長2度","短3度","長3度","4度",
+val doublingJa = listOf("短2度","長2度","短3度","長3度","4度",
 "増4度","5度","短6度","長6度","短7度","長7度",
 "8度","短9度","長9度","短10度","長10度","11度",
     "増11度","12度","短13度","長13度","短14度","長14度","15度")
@@ -268,6 +274,21 @@ val rangeTypeMap = mapOf(
 val legatoTypeMap = mapOf(
     0 to "S+", 1 to "S", 2 to "P", 3 to "A", 4 to "L", 5 to "L+"
 )
+
+val convertToLocaleDate = { timestamps:List<String>, langDef:String ->
+    //println("langDef = $langDef")
+    val locale = Locale(langDef)
+    val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, 3, locale) // timeFormat: 0,1,3
+    timestamps.map{
+        if(it.isNotEmpty()){
+            //val sdf = SimpleDateFormat("dd/MM/yyyy hh:mm:ss a", locale)
+            val netDate = Date(it.toLong())
+            dateFormat.format(netDate)
+        } else {
+            ""
+        }
+    }
+}
 
 data class Lang( // English by default
     val noteNames: List<String> = NoteNamesEn.values().map { it.toString() },
@@ -352,7 +373,8 @@ data class Lang( // English by default
     val selectHorizontalIntervals: String = "Select the melodic intervals for the functions!",
     val clearSlots: String = "Clear slots",
     val selectSlots: String = "Select slots to clear!",
-    val slotNumbers: List<String> = listOf("1","2","3","4","5","6","7","8","9","A","B","C","D","E","F","G")
+    val slotNumbers: List<String> = listOf("1","2","3","4","5","6","7","8","9","A","B","C","D","E","F","G"),
+    //val convertToDate: (Long) -> String = toDateEn
     ){
 
 
@@ -753,7 +775,7 @@ data class Lang( // English by default
                 choose2ndSequence = "2番目のシーケンスを選択してください！",
                 repeatSequence = "シーケンスを繰り返します",
                 selectEnsemble = "アンサんブルを選いしてください！",
-                ensembleNames = ensembleNamesJp,
+                ensembleNames = ensembleNamesJa,
                 range = "拡大",
                 selectRange = "拡張子を選択してください！",
                 rangeOptions = listOf("無料", "楽器の", "区切り", "ほぼ閉じている", "閉じている"),
@@ -774,7 +796,7 @@ data class Lang( // English by default
                 ensemble = "アンサンブル",
                 selectRhythm = "リズムを選んでください！",
                 selectDoubling = "倍増の間隔を選択してください！",
-                doublingNames = doublingJp,
+                doublingNames = doublingJa,
                 selectAudio8D = "AUDIO 8Dで音楽の声を選びましょう！",
                 rhythm = "リズム",
                 rhythmShuffle  = "混合リズム",

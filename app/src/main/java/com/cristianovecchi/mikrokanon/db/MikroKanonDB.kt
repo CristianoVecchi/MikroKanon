@@ -141,7 +141,7 @@ class DataGenerator {
             )
         }
         fun getCounterpointsData(): List<CounterpointData>{
-            return Array(16){ CounterpointData.getDefaultCounterpointData()}.toList()
+            return List(16){ CounterpointData.getDefaultCounterpointData()}
         }
     }
 

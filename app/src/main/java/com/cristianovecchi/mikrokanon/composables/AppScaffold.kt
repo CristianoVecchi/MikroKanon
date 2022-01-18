@@ -171,9 +171,8 @@ fun SettingsDrawer(model: AppViewModel,
     RhythmDialog(rhythmDialogData, dimensions, patterns = RhythmPatterns.values().toList() )
     MultiListDialog(doublingDialogData, dimensions, lang.OKbutton)
     MultiListDialog(audio8DDialogData, dimensions, lang.OKbutton)
-    val timestamps = if(allCounterpointsData.isNotEmpty()) allCounterpointsData.map{
-        if(it == null || it?.timestamp == null || it.timestamp == -1L) ""
-        else it.timestamp.toString()} else List(16){""}
+
+
     MultiListDialog(clearSlotsDialogData, dimensions, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
     val intervalsForGlissando = createGlissandoIntervals(lang.doublingNames)
@@ -765,7 +764,11 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                     val fontSize = dimensions.optionsFontSize
                     when (optionName) {
                         "Clear Slots" -> {
-                            val names = (0..15).map{ "${lang.slotNumbers[it]}: ${timestamps[it]}"}
+                            val timestamps = if(allCounterpointsData.isNotEmpty()) allCounterpointsData.map{
+                                if(it == null || it?.timestamp == null || it.timestamp == -1L) ""
+                                else it.timestamp.toString()} else List(16){""}
+                            val timestampsToDates = convertToLocaleDate(timestamps, model.getUserLangDef())
+                            val names = (0..15).map{ "${lang.slotNumbers[it]}: ${timestampsToDates[it]}"}
                             SelectableCard(
                                 text = lang.clearSlots,
                                 fontSize = fontSize,
