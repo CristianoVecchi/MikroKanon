@@ -303,8 +303,9 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
 
                     "Ensemble" -> {
                         val ensIndexes = userOptions.ensembleTypes.extractIntsFromCsv()
+                        val nl = newLineOrNot(ensIndexes, 2)
                         SelectableCard(
-                            text = "${lang.ensemble}: ${ensIndexes.joinToString(" + ") { ensNames[it] }}",
+                            text = "${lang.ensemble}: $nl${ensIndexes.joinToString(" + ") { ensNames[it] }}",
                             fontSize = fontSize,
                             colors = colors,
                             isSelected = true,
@@ -325,7 +326,8 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         val flags = userOptions.glissandoFlags
                         val intsFromFlags = convertFlagsToInts(flags).map { it - 1 }
                         val isOn = flags > 0
-                        val text = if (!isOn) lang.glissando else "${lang.glissando}: ${
+                        val nl = newLineOrNot(intsFromFlags, 2)
+                        val text = if (!isOn) lang.glissando else "${lang.glissando}: $nl${
                             intsFromFlags.joinToString(separator = ", ") { intervalsForGlissando[it] }
                         }"
                         SelectableCard(
@@ -400,8 +402,9 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                             val feature = if(it.second>1 ) " (${it.second}x)" else ""
                             arrow + rhythmNames[it.first.absoluteValue - 1] + feature
                         }
+                        val nl = newLineOrNot(rhythmTexts, 2)
                         SelectableCard(
-                            text = "${lang.rhythm}: ${rhythmTexts.joinToString(" + ")}",
+                            text = "${lang.rhythm}: $nl${rhythmTexts.joinToString(" + ")}",
                             fontSize = fontSize,
                             colors = colors,
                             isSelected = true,
@@ -453,7 +456,8 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         val flags = userOptions.doublingFlags
                         val intsFromFlags = convertFlagsToInts(flags).map { it - 1 }
                         val isOn = flags > 0
-                        val text = if (!isOn) lang.doubling else "${lang.doubling}: ${
+                        val nl = newLineOrNot(intsFromFlags, 2)
+                        val text = if (!isOn) lang.doubling else "${lang.doubling}: $nl${
                             intsFromFlags.joinToString(
                                 separator = ", "
                             ) { lang.doublingNames[it] }
@@ -480,7 +484,8 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         val flags = userOptions.audio8DFlags
                         val intsFromFlags = convertFlagsToInts(flags)
                         val isOn = flags > 0
-                        val text = if (!isOn) lang.audio8D else "${lang.audio8D}: ${
+                        val nl = newLineOrNot(intsFromFlags, 7)
+                        val text = if (!isOn) lang.audio8D else "${lang.audio8D}: $nl${
                             intsFromFlags.joinToString(
                                 separator = ", "
                             ) { (it+1).toString() }
@@ -518,11 +523,13 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         "Range" -> {
                             //val rangeOptions: List<String> = lang.rangeOptions
                             val rangeTypes = userOptions.rangeTypes
+                            val rangePairs = rangeTypes.extractIntPairsFromCsv()
                             val octaves = getOctaveSymbols()
+                            val nl = newLineOrNot(rangePairs, 4)
                             SelectableCard(
-                                text = "${lang.range}: ${
-                                    rangeTypes.extractIntPairsFromCsv()
-                                        .joinToString("  ") { "${rangeTypeMap[it.first]!!}${octaves[it.second + 2]}" }
+                                text = "${lang.range}: $nl${
+                                    rangePairs.joinToString("  ") { "${rangeTypeMap[it.first]!!}${octaves[it.second + 2]}" }
+                                    
                                 }",
                                 fontSize = fontSize,
                                 colors = colors,
@@ -543,8 +550,10 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         "Melody" -> {
                             //val melodyOptions: List<String> = lang.melodyOptions
                             val melodyTypes = userOptions.melodyTypes
+                            val melodyInts = melodyTypes.extractIntsFromCsv()
+                            val nl = newLineOrNot(melodyInts, 9)
                             SelectableCard(
-                                text = "${lang.melody}: ${melodyTypes.extractIntsFromCsv().map{melodyTypeMap[it]}.joinToString("  ") }",
+                                text = "${lang.melody}: $nl${melodyInts.map{melodyTypeMap[it]}.joinToString("  ") }",
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = true,
@@ -565,10 +574,10 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                             //val rangeOptions: List<String> = lang.rangeOptions
                             val legatoTypes = userOptions.legatoTypes
                             val ribattutos = getRibattutoSymbols()
+                            val description = legatoTypes.describeForArticulation(legatoTypeMap)
+                            val nl = if(description.length<11) "" else "\n"
                             SelectableCard(
-                                text = "${lang.articulation}: ${
-                                    legatoTypes.describeForArticulation(legatoTypeMap)
-                                }",
+                                text = "${lang.articulation}: $nl$description",
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = true,
@@ -589,8 +598,10 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         "Dynamics" -> {
                             val dynamics = userOptions.dynamics
                             val symbols = getDynamicSymbols()
+                            val description = dynamics.describeForDynamic(model.dynamicMap, symbols[12], symbols[13])
+                            val nl = if(description.length<21) "" else "\n"
                             SelectableCard(
-                                text = "${lang.dynamics}: ${dynamics.describeForDynamic(model.dynamicMap, symbols[12], symbols[13])}",
+                                text = "${lang.dynamics}:  $nl$description",
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = true,
@@ -609,8 +620,10 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         }
                         "BPM" -> {
                             val bpms = userOptions.bpms
+                            val description = bpms.describe()
+                            val nl = if(description.length<15) "" else "\n"
                             SelectableCard(
-                                text = "${lang.bpm}: ${bpms.describe()}",
+                                text = "${lang.bpm}: $nl$description",
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = true,
@@ -631,9 +644,10 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                             val formsCsv = userOptions.rowForms
                             val isOn = formsCsv != "1"
                             val formPairs = formsCsv.extractIntPairsFromCsv()
+                            val nl = newLineOrNot(formPairs, 5)
                             SelectableCard(
                                 text = if(isOn)
-                                    "${lang.rowForms}: ${
+                                    "${lang.rowForms}: $nl${
                                         formPairs.joinToString(" ") {
                                            it.describeSingleRowForm(rowFormsMap, lang.slotNumbers)
                                         }
@@ -662,8 +676,10 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         "Transpose" -> {
                             val transposeCsv = userOptions.transpose
                             val isOn = transposeCsv != "0"
+                            val description = transposeCsv.describeForTranspose(intervalsForTranspose)
+                            val nl = if(description.length<15) "" else "\n"
                             SelectableCard(
-                                text = if(isOn) "${lang.transpose}: ${transposeCsv.describeForTranspose(intervalsForTranspose)}" else lang.transpose,
+                                text = if(isOn) "${lang.transpose}: $nl$description" else lang.transpose,
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = isOn,
@@ -790,7 +806,8 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                             val intsFromFlags = convertFlagsToInts(flags)
                             val isOn = flags != 0
                             val intervalNames = lang.intervalSet.map { it.replace("\n", " / ") }
-                            val text = if (!isOn) lang.detector else "${lang.detector}: ${
+                            val nl = newLineOrNot(intsFromFlags, 3)
+                            val text = if (!isOn) lang.detector else "${lang.detector}: $nl${
                                 intsFromFlags.joinToString(
                                     separator = ", "
                                 ) { intervalNames[it] }
@@ -920,7 +937,8 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                             val flags = userOptions.zodiacFlags
                             val intsFromFlags = convertFlagsToInts(flags)
                             val isOn = flags > 0
-                            val text = if (!isOn) lang.zodiac else "${lang.zodiac}: ${
+                            val nl = newLineOrNot(intsFromFlags, 3)
+                            val text = if (!isOn) lang.zodiac else "${lang.zodiac}: $nl${
                                 intsFromFlags.joinToString(
                                     separator = ", "
                                 ) { lang.zodiacOptions[it] }
@@ -958,7 +976,8 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                  else verticalIntervals.toSet()
                             )
                             val isOn = mbtis.isNotEmpty()
-                            val text = if (!isOn) lang.mbti else "${lang.mbti}: ${
+                            val nl = newLineOrNot(mbtis, 4)
+                            val text = if (!isOn) lang.mbti else "${lang.mbti}: $nl${
                                 mbtis.joinToString(
                                     separator = " + "
                                 ) { it.name }

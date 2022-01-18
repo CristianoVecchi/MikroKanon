@@ -69,6 +69,9 @@ fun convertFlagsToInts(flags: Int): Set<Int>{
     }
     return result.toSet()
 }
+fun newLineOrNot(list: Collection<Any>, newLineFromN: Int ): String{
+    return if(list.size < newLineFromN) "" else "\n"
+}
 fun ArrayList<Clip>.toStringAll(notesNames: List<String>, zodiacSigns: Boolean, emoji: Boolean): String {
     return if (this.isNotEmpty()) {
         if(zodiacSigns){
