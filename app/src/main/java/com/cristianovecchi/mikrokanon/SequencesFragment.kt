@@ -69,7 +69,7 @@ var start = true
                         // A surface container using the 'background' color from the theme
                         Surface(color = MaterialTheme.colors.background) {
 
-                            AppScaffold(model = model, model.userOptionsData.asFlow()) {
+                            AppScaffold(model = model, model.userOptionsData.asFlow(), model.allCounterpointsData.asFlow()) {
                                 SequenceSelector(model = model, userOptionsDataFlow = model.userOptionsData.asFlow(),
                                     onAdd = { list, editing ->
                                         val bundle = Bundle()

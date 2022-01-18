@@ -245,9 +245,9 @@ fun String.extractIntPairsFromCsv(): List<Pair<Int,Int>>{
 fun  MutableList<Pair<Int,Int>>.toIntPairsString(): String {
     return this.joinToString(",") { "${it.first}|${it.second}" }
 }
-fun Pair<Int, Int>.describeSingleBpm(rowFormsMap: Map<Int, String>): String {
+fun Pair<Int, Int>.describeSingleRowForm(rowFormsMap: Map<Int, String>, numbers: List<String>): String {
     val openBracket = (if(this.first < 0) "(" else "" )
-    val counterpointNumber = (if (this.first.absoluteValue == 1) "" else "${this.first.absoluteValue-1}")
+    val counterpointNumber = (if (this.first.absoluteValue == 1) "" else numbers[this.first.absoluteValue-2])
     val rowForm = rowFormsMap[this.second.absoluteValue]
     val closeBracket = (if(this.first < 0) ")" else "")
     val separator = (if(this.second < 0)" |" else "")

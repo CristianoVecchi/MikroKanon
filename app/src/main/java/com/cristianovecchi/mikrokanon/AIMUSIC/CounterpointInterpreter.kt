@@ -35,8 +35,11 @@ object CounterpointInterpreter {
         ): List<TrackData> {
 //        counterpoint.display()
 //        durations.also{println("Durations: $it")}
-        //var result = mutableListOf<TrackData>()
-
+        val durSize = durations.size
+        val actualDurations = IntArray(counterpoint.nNotes() * 2 +1)// note + optional rests + optional initial rest
+        (0 until counterpoint.nNotes() * 2 +1).forEach{
+            actualDurations[it] = durations[it % durSize]
+        }
         if (counterpoint.parts.size > 15) {
             println("WARNING: Counterpoint n. parts: ${counterpoint.parts.size}")
         }
@@ -126,7 +129,8 @@ object CounterpointInterpreter {
                 val velocity = velocities[index]
                 var gliss = glissandoChecks[index]
                 //println("pitch: $pitch vel: $velocity")
-                var dur = durations[durIndex % durations.size]
+                //var dur = durations[durIndex % durations.size]
+                var dur = actualDurations[durIndex]
                 if (dur < 0) { // negative values are considered as rests
                     dur *= -1
                     tick += dur
@@ -134,7 +138,8 @@ object CounterpointInterpreter {
                 } else {
                     if (pitch != -1) {
                         while (index + 1 < actualPitches.size && actualPitches[index + 1] == pitch) {
-                            var nextDur = durations[(durIndex + 1) % durations.size]
+                            //var nextDur = durations[(durIndex + 1) % durations.size]
+                            var nextDur = actualDurations[durIndex + 1]
                             gliss = glissandoChecks[index + 1]
                             if (nextDur < 0) {
                                 gliss = 0

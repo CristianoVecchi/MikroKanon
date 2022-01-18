@@ -46,7 +46,7 @@ class InputFragment(): Fragment() {
             setContent {
                 MikroKanonTheme(model) {
                     Surface(color = MaterialTheme.colors.background) {
-                        AppScaffold(model = model, model.userOptionsData.asFlow()) {
+                        AppScaffold(model = model, model.userOptionsData.asFlow(), model.allCounterpointsData.asFlow()) {
                             AbstractNoteSequenceEditor(list,
                                 model = model,
                                 editing,

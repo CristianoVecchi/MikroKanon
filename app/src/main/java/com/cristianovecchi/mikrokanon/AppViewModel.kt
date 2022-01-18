@@ -148,6 +148,7 @@ class AppViewModel(
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
     val MAX_PARTS = 12
+    val MAX_NOTES_MK = 27
 
     private val  maxVisibleCounterpoints: Int = 74
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
@@ -201,7 +202,7 @@ class AppViewModel(
     private val mk4deepSearchCache = HashMap<CacheKey, List<Counterpoint>>()
     private val mk5reductedCache = HashMap<CacheKey, List<Counterpoint>>()
 
-    val savedCounterpoints: Array<Counterpoint?> = Array(8) { null }
+    val savedCounterpoints: Array<Counterpoint?> = Array(16) { null }
 
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -885,7 +886,7 @@ init{
         viewModelScope.launch(Dispatchers.Main){
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
-                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.take(MAX_NOTES_MK).toList()
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if(mk4cache.containsKey(key) && !deepSearch) {
                     changeCounterpoints(mk4cache[key]!!, true)
@@ -923,7 +924,7 @@ init{
         viewModelScope.launch(Dispatchers.Main) {
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if (sequenceToMikroKanons.value!!.isNotEmpty()) {
-                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.take(MAX_NOTES_MK).toList()
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if (mk5reductedCache.containsKey(key) ) {
                     changeCounterpoints(mk5reductedCache[key]!!, true)
@@ -1278,17 +1279,28 @@ init{
         _sequences.value = allSequencesData.value!!.map{sequenceDataToSequence(it)}
     }
     fun retrieveCounterpointsFromDB(){
-
-        allCounterpointsData.value!!.forEachIndexed { index, counterpoint ->
+        allCounterpointsData.value?.forEachIndexed { index, counterpoint ->
             val newCounterpoint = if (counterpoint.parts.isEmpty()) null
-            else Counterpoint.createFromCsv(counterpoint.parts)
+            else Counterpoint.createFromCsv(counterpoint.parts, timestamp = counterpoint.timestamp)
             savedCounterpoints[index] = newCounterpoint
         }
     }
     fun saveCounterpointInDb(position: Int, counterpoint: Counterpoint) {
-        val counterpointData = CounterpointData(position.toLong()+1L, counterpoint.convertPartsToCsv())
+        val timestamp = System.currentTimeMillis()
+        savedCounterpoints[position] = counterpoint.copy(timestamp = timestamp)
+        val counterpointData = CounterpointData(position.toLong()+1L, counterpoint.convertPartsToCsv(), timestamp)
         viewModelScope.launch(Dispatchers.IO) {
             counterpointRepository.updateCounterpoint(counterpointData)
+        }
+    }
+    fun clearCounterpointsInDb(numbers: Set<Int>){
+        val defaultCounterpoint = CounterpointData.getDefaultCounterpointData()
+        numbers.forEach {
+            savedCounterpoints[it] = null
+            viewModelScope.launch(Dispatchers.IO) {
+                val clearedCounterpoint = defaultCounterpoint.copy(id = it.toLong()+1L)
+                counterpointRepository.updateCounterpoint(clearedCounterpoint)
+            }
         }
     }
     fun displaySavedCounterpoints(){

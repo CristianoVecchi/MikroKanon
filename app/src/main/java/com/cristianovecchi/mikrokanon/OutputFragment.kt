@@ -62,7 +62,7 @@ class OutputFragment: Fragment() {
             setContent {
                 MikroKanonTheme(model) {
                     Surface(color = MaterialTheme.colors.background) {
-                       AppScaffold(model = model, model.userOptionsData.asFlow()) {
+                       AppScaffold(model = model, model.userOptionsData.asFlow(), model.allCounterpointsData.asFlow()) {
                             ResultDisplay(
                                 model = model,
                                 model.iconMap,
@@ -85,6 +85,7 @@ class OutputFragment: Fragment() {
                                 onSavingCounterpoint= { position ->
                                     model.selectedCounterpoint.value?.let{
                                         model.saveCounterpointInDb(position, it.copy())
+                                        model.retrieveCounterpointsFromDB()
                                     }
                                 },
                                 onKP = { index, repeat ->

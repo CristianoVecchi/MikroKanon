@@ -15,10 +15,13 @@ data class CounterpointData(
     @ColumnInfo(name = "parts")
     val parts: String,
 
+    @ColumnInfo(name = "timestamp")
+    val timestamp: Long,
+
 ){
     companion object{
         fun getDefaultCounterpointData(): CounterpointData{
-            return CounterpointData(0, "")
+            return CounterpointData(0, "", -1L)
         }
     }
 }

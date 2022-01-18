@@ -64,7 +64,7 @@ enum class TREND(val directions: List<Int>){
 @Parcelize
 data class Counterpoint(val parts: List<AbsPart>,
                         val intervalSet: List<Int> = (0..11).toList(),
-                        var emptiness: Float? = null) : Parcelable {
+                        var emptiness: Float? = null, var timestamp: Long? = null) : Parcelable {
 
     init {
         emptiness ?: findEmptiness().also<Float> { it -> emptiness = it }
@@ -546,11 +546,11 @@ data class Counterpoint(val parts: List<AbsPart>,
 
 
     companion object {
-        fun createFromCsv(doubleLevelCsv: String, partSeparator: String = "\n"): Counterpoint{
+        fun createFromCsv(doubleLevelCsv: String, partSeparator: String = "\n", timestamp: Long? = null): Counterpoint{
             val newParts = doubleLevelCsv.split(partSeparator)
                 .map{ csvPart -> csvPart.split(',').map{it.toInt()}}
                 .map{ intsPart -> AbsPart(intsPart.toMutableList())}
-            return Counterpoint(newParts)
+            return Counterpoint(newParts, timestamp = timestamp)
         }
         fun createSeparatorCounterpoint(nParts: Int, nNotesToSkip: Int) : Counterpoint{
             val absPart = AbsPart( (0 until nNotesToSkip).map{ -1 }.toMutableList() )

@@ -129,36 +129,26 @@ fun SequenceEditingButtons(
 }
 @Composable
 fun SavingButtons(
-    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
+    colors: AppColors, numbers: List<String>,
     onSavingCounterpoint: (Int) -> Unit
 ) {
     Column{
-        Row {
-            CustomButton(iconId = model.iconMap["save"]!!, text = "1", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                onSavingCounterpoint(0)
-            }
-            CustomButton(iconId = model.iconMap["save"]!!, text = "2", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                onSavingCounterpoint(1)
-            }
-            CustomButton(iconId = model.iconMap["save"]!!, text = "3", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                onSavingCounterpoint(2)
-            }
-            CustomButton(iconId = model.iconMap["save"]!!, text = "4", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                onSavingCounterpoint(3)
-            }
-        }
-        Row {
-            CustomButton(iconId = model.iconMap["save"]!!, text = "5", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                onSavingCounterpoint(4)
-            }
-            CustomButton(iconId = model.iconMap["save"]!!, text = "6", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                onSavingCounterpoint(5)
-            }
-            CustomButton(iconId = model.iconMap["save"]!!, text = "7", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                onSavingCounterpoint(6)
-            }
-            CustomButton(iconId = model.iconMap["save"]!!, text = "8", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                onSavingCounterpoint(7)
+        (0 until 4).forEach{
+            val step = it * 4
+            Row {
+                CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+0], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                    onSavingCounterpoint(step+0)
+                }
+                CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+1], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                    onSavingCounterpoint(step+1)
+                }
+                CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+2], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                    onSavingCounterpoint(step+2)
+                }
+                CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+3], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                    onSavingCounterpoint(step+3)
+                }
             }
         }
     }

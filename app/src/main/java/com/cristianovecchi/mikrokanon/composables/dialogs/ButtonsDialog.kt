@@ -5,8 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.composables.*
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
@@ -24,6 +23,7 @@ fun ButtonsDialog(
     dimensions: Dimensions,
     okText: String = "OK",
     model: AppViewModel,
+    language: Lang,
     workingOnSequences: Boolean = false,
     onDismissRequest: () -> Unit = {
         buttonsDialogData.value = ButtonsDialogData(model = model)
@@ -79,10 +79,8 @@ fun ButtonsDialog(
                                     onSingle = buttonsDialogData.value.onSingle,
                                     onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution,
                                     onDoppelgänger = buttonsDialogData.value.onDoppelgänger,
-
                                 )
-                                2 -> Spacer(modifier = Modifier.height(6.dp))
-                                3 -> WavesButtons(
+                                2 -> WavesButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActiveWaves,
                                     buttonSize = buttonSize,
@@ -92,7 +90,7 @@ fun ButtonsDialog(
                                     onWave4Click = buttonsDialogData.value.onWave4,
                                     onWave6Click = buttonsDialogData.value.onWave6
                                 )
-                                4 -> PedalsButtons(
+                                3 -> PedalsButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActivePedals,
                                     buttonSize = buttonSize,
@@ -102,11 +100,13 @@ fun ButtonsDialog(
                                     onPedal3Click = buttonsDialogData.value.onPedal3,
                                     onPedal5Click = buttonsDialogData.value.onPedal5
                                 )
+                                4 -> Spacer(modifier = Modifier.height(6.dp))
                                 5 -> SavingButtons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonSize,
                                     fontSize = fontSize,
                                     colors = model.appColors,
+                                    numbers = language.slotNumbers,
                                     onSavingCounterpoint = buttonsDialogData.value.onSavingCounterpoint)
 
                             }

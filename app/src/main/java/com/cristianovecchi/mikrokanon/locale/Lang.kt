@@ -263,7 +263,7 @@ val melodyTypeMap = mapOf(
     0 to "≈", 1 to "√", 2 to "➚", 3 to "➘"
 )
 val rangeTypeMap = mapOf(
-    0 to "@", 1 to "I", 2 to "[--]", 3 to "[-]", 4 to "[ ]"
+    0 to "∞", 1 to "I", 2 to "[--]", 3 to "[-]", 4 to "[ ]"
 )
 val legatoTypeMap = mapOf(
     0 to "S+", 1 to "S", 2 to "P", 3 to "A", 4 to "L", 5 to "L+"
@@ -350,6 +350,9 @@ data class Lang( // English by default
     val selectSpecialFunction: String = "Select a function!",
     val selectCadenzaForm: String = "Select a cadenza form!",
     val selectHorizontalIntervals: String = "Select the melodic intervals for the functions!",
+    val clearSlots: String = "Clear slots",
+    val selectSlots: String = "Select slots to clear!",
+    val slotNumbers: List<String> = listOf("1","2","3","4","5","6","7","8","9","A","B","C","D","E","F","G")
     ){
 
 

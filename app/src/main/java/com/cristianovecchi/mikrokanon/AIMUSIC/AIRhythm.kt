@@ -14,6 +14,7 @@ object AIRhythm {
         return offBeats
     }
 }
+
 val N10 = listOf(48,48,48,48,48,48,48,48,48,48)
 val N10h = listOf(48,48,48,48,48)
 val N9 = listOf(54,53,53,54,53,53,54,53,53)
@@ -58,10 +59,12 @@ enum class RhythmType{
 }
 // WARNING: can't have two negative values coupled (ex: -80, -20 ... write -100)
 enum class RhythmPatterns(val type: RhythmType, val title: String, val values: List<Int>,val metro: Pair<Int,Int> = METRO_4_4) {
-    BASIC_4(RhythmType.BASIC,"Basic ♩", listOf(480), METRO_2_4),
-    BASIC_8(RhythmType.BASIC,"Basic ♪", listOf(240), Pair(2,8)),
-    BASIC_16(RhythmType.BASIC,"Basic 16", listOf(120), Pair(2,16)),
-    BASIC_32(RhythmType.BASIC,"Basic 32", listOf(60), Pair(2,32)),
+    BASIC_4(RhythmType.BASIC,"Basic ♩", listOf(480), Pair(1,4)),
+    BASIC_8(RhythmType.BASIC,"Basic ♪", listOf(240), Pair(1,8)),
+    BASIC_16(RhythmType.BASIC,"Basic 16", listOf(120), Pair(1,16)),
+    BASIC_32(RhythmType.BASIC,"Basic 32", listOf(60), Pair(1,32)),
+    BASIC_64(RhythmType.BASIC,"Basic 64", listOf(30), Pair(1,64)),
+    BASIC_128(RhythmType.BASIC,"Basic 128", listOf(15), Pair(1,128)),
     PLAIN_2_4_R4(RhythmType.PLAIN,"Plain 2/4♩♩", listOf(480,480), METRO_2_4),
     PLAIN_3_4_R4(RhythmType.PLAIN,"Plain 3/4♩♩♩", listOf(480,480,480), METRO_3_4),
     PLAIN_4_4_R4(RhythmType.PLAIN,"Plain 4/4♩♩♩♩", listOf(480,480,480,480)),
@@ -72,8 +75,8 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     PLAIN_2_4_R8T(RhythmType.PLAIN,"Plain 2/4 ♪t", listOf(160,160,160,160,160,160), METRO_2_4),
     PLAIN_3_4_R8T(RhythmType.PLAIN,"Plain 3/4 ♪t", listOf(160,160,160,160,160,160,160,160,160), METRO_3_4),
     PLAIN_4_4_R8T(RhythmType.PLAIN,"Plain 4/4 ♪t", listOf(160,160,160,160,160,160,160,160,160,160,160,160)),
-    PLAIN_2_4_R16(RhythmType.PLAIN,"Plain 2/4 16", listOf(120,120,120,120,120,120,120,120)),
-    PLAIN_3_4_R16(RhythmType.PLAIN,"Plain 3/4 16", listOf(120,120,120,120,120,120,120,120,120,120,120,120)),
+    PLAIN_2_4_R16(RhythmType.PLAIN,"Plain 2/4 16", listOf(120,120,120,120,120,120,120,120), METRO_2_4),
+    PLAIN_3_4_R16(RhythmType.PLAIN,"Plain 3/4 16", listOf(120,120,120,120,120,120,120,120,120,120,120,120), METRO_3_4),
     PLAIN_4_4_R16(RhythmType.PLAIN,"Plain 4/4 16", listOf(120,120,120,120,120,120,120,120,120,120,120,120,120,120,120,120)),
     PLAIN_2_4_R16T5(RhythmType.PLAIN,"Plain 2/4 16t(5)", listOf(96,96,96,96,96, 96,96,96,96,96), METRO_2_4),
     PLAIN_2_4_R16T6(RhythmType.PLAIN,"Plain 2/4 16t(6)", listOf(80,80,80,80,80,80, 80,80,80,80,80,80), METRO_2_4),
@@ -103,7 +106,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     STACCATO_2_4_R8T(RhythmType.BALLET,"Staccato 2/4♪t",listOf(40,-120,40,-120,40,-120,40,-120,40,-120,40,-120), METRO_2_4),
     STACCATO_2_4_R16(RhythmType.BALLET,"Staccato 2/4 16",listOf(30,-90,30,-90,30,-90,30,-90,30,-90,30,-90,30,-90,30,-90), METRO_2_4),
     GRAZIOSO_2_4_R8(RhythmType.BALLET,"Grazioso 2/4♪",listOf(240,60,-180,240,60,-180,240,60,-180,240,60,-180), METRO_2_4),
-    GRAZIOSO_2_4_R8T(RhythmType.BALLET,"Grazioso 2/4♪",listOf(160,40,-120,160,40,-120,160,40,-120, 160,40,-120,160,40,-120,160,40,-120), METRO_2_4),
+    GRAZIOSO_2_4_R8T(RhythmType.BALLET,"Grazioso 2/4♪t",listOf(160,40,-120,160,40,-120,160,40,-120, 160,40,-120,160,40,-120,160,40,-120), METRO_2_4),
     GRAZIOSO_2_4_R16(RhythmType.BALLET,"Grazioso 2/4 16",listOf(120,30,-90,120,30,-90,120,30,-90,120,30,-90,120,30,-90,120,30,-90,120,30,-90,120,30,-90), METRO_2_4),
     GRAZIOSO_1_4_R4T_8T(RhythmType.BALLET,"Grazioso 1/4♩♪t", listOf(320,40,-120), Pair(1,4)),
     GRAZIOSO_2_4_R4T_8T(RhythmType.BALLET,"Grazioso 2/4♩♪t", listOf(320,40,-120,320,40,-120), METRO_2_4),
@@ -283,16 +286,48 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
                 32 -> 60
                 2 -> 960
                 64 -> 30
+                128 -> 15
                 else -> 480
             }
         }
         fun getTitles(): List<String> {
             return values().map { it.title }
         }
+
+        fun mergeSequenceOfOnesInMetro(duration: Int, metro: Pair<Int, Int>): Pair<Int, Int> {
+            val denominatorMIDI = denominatorMidiValue(metro.second)
+            val numerator = duration / denominatorMIDI
+            return Pair(numerator, metro.second)
+        }
     }
 }
+fun List<Int>.mergeNegativeValues(): List<Int> {
+    val result = mutableListOf<Int>()
+    var index = 0
+    var previousIsNegative = false
+    this.forEach {
+        if(it < 0) {
+            if (previousIsNegative) {
+                result[result.size - 1] = it + result.last()
+            } else {
+                result.add(it)
+            }
+            previousIsNegative = true
+        } else {
+            result.add(it)
+            previousIsNegative = false
+        }
+    }
+    return result.toList()
+}
 fun main(args : Array<String>){
-    println("${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.values}  ->  ${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.retrogradeValues()}")
-    println("${RhythmPatterns.DOTTED3_2_4.values}  ->  ${RhythmPatterns.DOTTED3_2_4.retrogradeValues()}")
-    println("${RhythmPatterns.BULGARIAN3GRZ.retrogradeValues() + RhythmPatterns.BULGARIAN3GRZ.values}")
+    println("${listOf(-20,100,-40,-30,-5,60,-80,-10,90,-90).mergeNegativeValues()}")
+    println("${listOf(-20,-40,200, 100,-40,-30,-5,60,-80,-10,90,5,-90,-40).mergeNegativeValues()}")
+    println("${listOf(-20,-40,200, 100,-40,-30,-5,60,-80,-10,-7,90,5,-15,80,-90,-40).mergeNegativeValues()}")
+    println("${RhythmPatterns.STACCATO_2_8_R8.values}  +  ${RhythmPatterns.MAPLE_LEAF_1.values}")
+    println("${(RhythmPatterns.STACCATO_2_8_R8.values 
+            + RhythmPatterns.MAPLE_LEAF_1.values).mergeNegativeValues()}")
+//    println("${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.values}  ->  ${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.retrogradeValues()}")
+//    println("${RhythmPatterns.DOTTED3_2_4.values}  ->  ${RhythmPatterns.DOTTED3_2_4.retrogradeValues()}")
+//    println("${RhythmPatterns.BULGARIAN3GRZ.retrogradeValues() + RhythmPatterns.BULGARIAN3GRZ.values}")
 }

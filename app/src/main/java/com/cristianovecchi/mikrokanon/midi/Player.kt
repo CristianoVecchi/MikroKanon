@@ -104,7 +104,7 @@ object Player {
         var error = ""
         val durations = rhythm.fold(listOf<Int>()){acc, triple ->
             acc + if(triple.second) triple.first.retrogradeValues().repeat(triple.third) else triple.first.values.repeat(triple.third)
-        }
+        }.mergeNegativeValues()
         //println("durations: $durations")
         val actualDurations = if (rhythmShuffle) listOf(*durations.toTypedArray(),*durations.toTypedArray(),*durations.toTypedArray()).shuffled() else durations
         val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0}?.parts?.size ?: 0
@@ -130,6 +130,7 @@ object Player {
         val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(actualCounterpoint, actualDurations, actualEnsembleParts,
                                                                     nuances, doublingFlags, rangeTypes, melodyTypes,
                                                                     glissando, audio8D, vibratoExtensions[vibrato])
+        //counterpointTrackData.forEach{ println(it.pitches.contentToString())}
         if (counterpointTrackData.isEmpty()) return "No Tracks in Counterpoint!!!"
 
         val totalLength = (counterpointTrackData.filter{it.ticks.isNotEmpty()}.maxOfOrNull{ it.ticks.last() + it.durations.last()} ?: 0).toLong()//.also{println("Total length: $it")} // Empty tracks have 0 length
@@ -164,7 +165,7 @@ object Player {
 //        public static final int DEFAULT_METER = 24;
 //        public static final int DEFAULT_DIVISION = 8;
   //      val ts = TimeSignature()
-//        ts.setTimeSignature(rhythm[0].first.metro.first, rhythm[0].first.metro.second,
+//        ts.setTimeSignature(actualRhythm[0].first.metro.first, actualRhythm[0].first.metro.second,
 //                            TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION)
      //  tempoTrack.insertEvent(ts);
 
@@ -212,21 +213,23 @@ object Player {
         return saveAndPlayMidiFile(mediaPlayer, midi, looping, play, midiFile)
     }
 
-    private fun setTimeSignatures(tempoTrack: MidiTrack, rhythm: List<Triple<RhythmPatterns, Boolean, Int>>, totalLength: Long) {
+    fun setTimeSignatures(tempoTrack: MidiTrack, rhythm: List<Triple<RhythmPatterns, Boolean, Int>>, totalLength: Long) {
         var tick = 0L
-        var lastTick = 0L
         var lastSignature = Pair(-1,-1)
         val signatures: List<Pair<Int, Pair<Int,Int>>> = rhythm.map {
             Pair(it.first.patternDuration() * it.third, Pair(it.first.metro.first, it.first.metro.second) )
         }
         var index = 0
         while (tick < totalLength){
-            val newSignature = signatures[index].second
+            var newSignature = signatures[index].second
+            if (newSignature.first == 1){
+                newSignature = RhythmPatterns.mergeSequenceOfOnesInMetro(signatures[index].first, newSignature)
+            }
             if(newSignature != lastSignature){
                 val ts = TimeSignature(tick, 0L, newSignature.first, newSignature.second,
                         TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION )
                 tempoTrack.insertEvent(ts)
-                //println("SIGNATURE #$index: tick = $tick  metro = ${newSignature.first}/${newSignature.second}")
+               // println("SIGNATURE #$index: tick = $tick  metro = ${newSignature.first}/${newSignature.second}")
                 lastSignature = newSignature
             }
             tick += signatures[index].first
@@ -911,6 +914,22 @@ object Player {
     }
 
 }
+
+
+//fun main(args : Array<String>){
+//    val tr1 = Triple(RhythmPatterns.PLAIN_4_4_R16, false, 3)
+//    val tr2 = Triple(RhythmPatterns.BASIC_8, false, 2)
+//    val tr3 = Triple(RhythmPatterns.PLAIN_3_4_R16, false, 2)
+//    val tr4 = Triple(RhythmPatterns.BASIC_32, false, 23)
+//    val tr5 = Triple(RhythmPatterns.BASIC_32, false, 7)
+//    val tr5adding = Triple(RhythmPatterns.BASIC_32, false, 7)
+//    val tr6 = Triple(RhythmPatterns.BASIC_16, false, 1)
+//    val rhythm = listOf(tr1, tr2, tr3, tr4, tr5, tr5adding, tr6)
+//    val tempoTrack = MidiTrack()
+//    Player.setTimeSignatures(tempoTrack, rhythm, 50000L)
+//}
+
+
 
 
 

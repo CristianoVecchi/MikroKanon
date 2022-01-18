@@ -28,6 +28,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
+import com.cristianovecchi.mikrokanon.db.CounterpointData
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.*
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
@@ -38,7 +39,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlin.math.absoluteValue
 
 @Composable
-fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>, content: @Composable () -> Unit) {
+fun AppScaffold(model: AppViewModel,
+                userOptionsDataFlow: Flow<List<UserOptionsData>>,
+                counterpointsDataFlow: Flow<List<CounterpointData>>,
+                content: @Composable () -> Unit) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
@@ -56,7 +60,7 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
             //.background(colors.selCardBorderColorSelected),
             //.border(1.dp, Color.Transparent),
         scaffoldState = scaffoldState,
-        drawerContent = { SettingsDrawer(model, userOptionsDataFlow)},
+        drawerContent = { SettingsDrawer(model, userOptionsDataFlow, counterpointsDataFlow)},
         topBar = {
             val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
             CreditsDialog(creditsDialogData, dimensions)
@@ -103,7 +107,9 @@ fun AppScaffold(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsD
 
 
 @Composable
-fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptionsData>>){
+fun SettingsDrawer(model: AppViewModel,
+                   userOptionsDataFlow: Flow<List<UserOptionsData>>,
+                   counterpointsDataFlow: Flow<List<CounterpointData>>){
 
     val listDialogData by lazy { mutableStateOf(ListDialogData())}
     val ensemblesDialogData by lazy { mutableStateOf(MultiListDialogData())}
@@ -119,6 +125,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     val rowFormsDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val audio8DDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    val clearSlotsDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val glissandoDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
@@ -145,11 +152,12 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
         "Spacer",
         "Export MIDI",
 
-        "Detector","Detector Extension",
+        "Clear Slots", "Detector","Detector Extension",
         //"Colors",
         "Custom Colors","Language","Zodiac","MBTI","Spacer","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
+    val allCounterpointsData by counterpointsDataFlow.collectAsState(initial = listOf())
     //val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val lang = Lang.provideLanguage(model.getUserLangDef())
     val userOptions = if(userOptionsData.isEmpty()) UserOptionsData.getDefaultUserOptionsData()
@@ -163,6 +171,10 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     RhythmDialog(rhythmDialogData, dimensions, patterns = RhythmPatterns.values().toList() )
     MultiListDialog(doublingDialogData, dimensions, lang.OKbutton)
     MultiListDialog(audio8DDialogData, dimensions, lang.OKbutton)
+    val timestamps = if(allCounterpointsData.isNotEmpty()) allCounterpointsData.map{
+        if(it == null || it?.timestamp == null || it.timestamp == -1L) ""
+        else it.timestamp.toString()} else List(16){""}
+    MultiListDialog(clearSlotsDialogData, dimensions, lang.OKbutton)
     //BpmDialog(bpmDialogData, lang.OKbutton)
     val intervalsForGlissando = createGlissandoIntervals(lang.doublingNames)
 
@@ -176,8 +188,7 @@ fun SettingsDrawer(model: AppViewModel, userOptionsDataFlow: Flow<List<UserOptio
     TransposeDialog(transposeDialogData, dimensions,
         intervalsForTranspose, lang.OKbutton)
     val formsNames = listOf("unrelated", lang.original, lang.inverse, lang.retrograde, lang.invRetrograde)
-    RowFormsDialog(rowFormsDialogData, dimensions,
-        formsNames, lang.OKbutton)
+    RowFormsDialog(rowFormsDialogData, dimensions, formsNames, lang.slotNumbers)
     ExportDialog(exportDialogData, lang.OKbutton)
     CreditsDialog(creditsDialogData, dimensions, lang.OKbutton)
     //MultiListDialog(intervalSetDialogData, dimensions.sequenceDialogFontSize, lang.OKbutton)
@@ -625,7 +636,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 text = if(isOn)
                                     "${lang.rowForms}: ${
                                         formPairs.joinToString(" ") {
-                                           it.describeSingleBpm(rowFormsMap)
+                                           it.describeSingleRowForm(rowFormsMap, lang.slotNumbers)
                                         }
                                     }"
                                 else lang.rowForms,
@@ -753,6 +764,24 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 items(optionNames) { optionName ->
                     val fontSize = dimensions.optionsFontSize
                     when (optionName) {
+                        "Clear Slots" -> {
+                            val names = (0..15).map{ "${lang.slotNumbers[it]}: ${timestamps[it]}"}
+                            SelectableCard(
+                                text = lang.clearSlots,
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = true,
+                                onClick = {
+                                    doublingDialogData.value = MultiListDialogData(
+                                        true, names, setOf(), lang.selectSlots
+                                    ) { indexes ->
+                                        model.clearCounterpointsInDb(indexes.toSortedSet())
+                                        model.retrieveCounterpointsFromDB()
+                                        doublingDialogData.value =
+                                            MultiListDialogData(itemList = doublingDialogData.value.itemList)
+                                    }
+                                })
+                        }
                         "Detector" -> {
                             val flags = userOptions.detectorFlags
                             val intsFromFlags = convertFlagsToInts(flags)

@@ -22,19 +22,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.describeSingleBpm
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
-import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.getOctaveSymbols
-import com.cristianovecchi.mikrokanon.locale.melodyTypeMap
 import com.cristianovecchi.mikrokanon.locale.rangeTypeMap
 import com.cristianovecchi.mikrokanon.toIntPairsString
-import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
-import kotlin.math.absoluteValue
 
 @Composable
 fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,

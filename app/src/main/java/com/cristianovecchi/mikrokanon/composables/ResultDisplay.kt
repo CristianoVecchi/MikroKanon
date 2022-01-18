@@ -181,7 +181,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         }
                     })
 
-                ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model)
+                ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model, language)
                 MultiListDialog(intervalSetDialogData, dimensions, language.OKbutton)
                 TransposeDialog(transposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
