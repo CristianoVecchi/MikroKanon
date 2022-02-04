@@ -38,7 +38,7 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
             3 -> if(upperPart) range.octaveTranspose(1) else range.octaveTranspose(-1)
             4 -> if(upperPart) range.octaveTranspose(2) else range.octaveTranspose(-2)
             else -> range.octaveTranspose(octaveTranspose)
-        }.also{println("range: $it rangeType:$rangeType octaveTranspose:$octaveTranspose upperPart:$upperPart")}
+        }//.also{println("range: $it rangeType:$rangeType octaveTranspose:$octaveTranspose upperPart:$upperPart")}
     }
 }
 

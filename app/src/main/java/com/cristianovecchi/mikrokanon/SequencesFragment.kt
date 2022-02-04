@@ -43,7 +43,6 @@ var start = true
                         model.createVerticalIntervalSet(verticalIntervalSetFlag, "SequencesFragment")
                         start = false
                     }
-
                 }
             }
         }
@@ -101,6 +100,10 @@ var start = true
                                     onScarlatti = { list ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onScarlattiFromSelector(list)
+                                    },
+                                    onOverlap = { list, position ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onOverlapFromSelector(list, position)
                                     },
                                     onFlourish = { list ->
                                         findNavController().navigate(R.id.outputFragment)

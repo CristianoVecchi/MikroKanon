@@ -52,7 +52,7 @@ fun CustomButton(iconId: Int = -1, text: String = "",
                 ),
                 onClick = { if (isActive) onClick() })
             {
-                Row() {
+                Row {
                     Icon(
                         modifier = Modifier.size(buttonSize/3 + buttonSize/7),
                         painter = painterResource(id = iconId),
@@ -203,22 +203,32 @@ fun NotFromSelectorButtons(
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
     onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
+    onOverlap: () -> Unit,
     onScarlatti: () -> Unit, onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit
 ) {
     Column {
-        Row{
-            CustomButton(iconId = model.iconMap["single"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-                onSingle()
+        Row {
+            CustomButton(iconId = model.iconMap["Scarlatti"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onScarlatti()
+            }
+            CustomButton(iconId = model.iconMap["overlap"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onOverlap()
             }
             CustomButton(iconId = model.iconMap["doppelgänger"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onDoppelgänger()
             }
+        }
+        Row{
+            CustomButton(iconId = model.iconMap["single"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onSingle()
+            }
+            CustomButton(iconId = model.iconMap["fioritura"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onFlourish()
+            }
             CustomButton(iconId = model.iconMap["erase"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onEraseIntervals()
             }
-            CustomButton(iconId = model.iconMap["Scarlatti"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-                onScarlatti()
-            }
+
         }
         Row {
             CustomButton(iconId = model.iconMap["tritone_substitution"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
@@ -229,9 +239,6 @@ fun SpecialFunctions1Buttons(
             }
             CustomButton(iconId = model.iconMap["cadenza"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onCadenza()
-            }
-            CustomButton(iconId = model.iconMap["fioritura"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-                onFlourish()
             }
 
         }

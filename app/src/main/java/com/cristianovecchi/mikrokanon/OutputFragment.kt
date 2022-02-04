@@ -109,6 +109,9 @@ class OutputFragment: Fragment() {
                                 onScarlatti = {
                                     model.onScarlatti()
                                 },
+                                onOverlap = { index ->
+                                    model.onOverlap(index)
+                                },
                                 onEraseIntervals = {
                                     model.onEraseIntervals()
                                 },

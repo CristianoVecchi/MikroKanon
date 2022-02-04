@@ -226,6 +226,13 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         return checkedResult.toList()//.also{println("SubSequencesRepetitions: " + it)}
     }
 
+    fun insert(index: Int, nColumns: Int, value: Int): AbsPart {
+        val newAbsPitches = absPitches.toMutableList()
+        for (i in 0 until nColumns){
+            newAbsPitches.add(index,value)
+        }
+        return AbsPart(newAbsPitches, rowForm, transpose, delay)
+    }
 
 
 }

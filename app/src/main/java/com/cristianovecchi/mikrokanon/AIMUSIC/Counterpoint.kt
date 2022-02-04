@@ -313,6 +313,11 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun addEmptyColumn(){
         parts.map { absPart -> absPart.absPitches.add(-1) }
     }
+    fun addEmptyColumns(index: Int, nColumns: Int): Counterpoint {
+        if(nColumns == 0) return this.copy()
+        val newParts = parts.map{ absPart -> absPart.insert(index, nColumns, -1)}
+        return this.copy(parts = newParts).also{ it.findEmptiness()}
+    }
     fun sortColumns(sortType: Int): Counterpoint {
         if(parts[0].absPitches.isEmpty()) return this
         val clone = this.normalizePartsSize(false)
@@ -542,6 +547,78 @@ data class Counterpoint(val parts: List<AbsPart>,
 
     fun upsideDown(): Counterpoint {
         return this.copy(parts = parts.reversed())
+    }
+
+
+    fun fullyOverlap(counterpoint2nd: Counterpoint): List<Counterpoint> {
+        var counterpoint1st = this.normalizePartsSize(true)
+        val original = counterpoint2nd.normalizePartsSize(true)
+        val size1st = this.maxSize()
+        val size2nd = original.maxSize()
+        println("OVERLAP: 1st_size=$size1st 2nd_size=$size2nd")
+        if(size1st == 0 || size2nd == 0) return listOf(this.copy())
+        val result = mutableListOf<Counterpoint>()
+        val firstIsShorter = size1st <= size2nd
+        val diff = (size2nd - size1st).absoluteValue
+        val inverse = original.inverse()
+        val retrograde = original.retrograde()
+        val inverseRetrograde = retrograde.inverse()
+        if(firstIsShorter){
+            for(step in (0..diff)){
+                val count1st = counterpoint1st.addEmptyColumns(0, step)
+                for(transpose in (0 until 12)){
+                    result.add(count1st.overlap(original.transpose(transpose)))
+                    result.add(count1st.overlap(inverse.transpose(transpose)))
+                    result.add(count1st.overlap(retrograde.transpose(transpose)))
+                    result.add(count1st.overlap(inverseRetrograde.transpose(transpose)))
+                    println("step:$step transpose:$transpose")
+                }
+            }
+        } else {
+            for(step in (0..diff)){
+                val orig = original.addEmptyColumns(0, step)
+                val inv = inverse.addEmptyColumns(0, step)
+                val retr = retrograde.addEmptyColumns(0, step)
+                val invRetr = inverseRetrograde.addEmptyColumns(0, step)
+                for(transpose in (0 until 12)){
+                    result.add(counterpoint1st.overlap(orig.transpose(transpose)))
+                    result.add(counterpoint1st.overlap(inv.transpose(transpose)))
+                    result.add(counterpoint1st.overlap(retr.transpose(transpose)))
+                    result.add(counterpoint1st.overlap(invRetr.transpose(transpose)))
+                    println("step:$step transpose:$transpose")
+                }
+            }
+        }
+        return result.toList()
+    }
+    fun overlap(counterpoint: Counterpoint): Counterpoint{
+        val newParts = this.parts + counterpoint.parts
+        return this.copy(parts = newParts).normalizePartsSize(true)
+    }
+    fun checkVerticalFaults(intervalSet: List<Int>): Int {
+        if(parts.size < 2) return 0
+        var faults = 0
+        (0 until maxSize() ).forEach{ index ->
+            faults += checkVerticalFaultsInColumn(intervalSet, index)
+        }
+        return faults
+    }
+    fun checkVerticalFaultsInColumn(intervalSet: List<Int>, index: Int): Int {
+        val nCells = parts.size
+        if(nCells < 2) return 0
+        var faults = 0
+        for(cell in 0 until (nCells - 1)){
+           // println("$cell  $index")
+            val cellValue = parts[cell].absPitches[index]
+            if(cellValue == -1) continue
+            for(cell2nd in cell+1 until nCells ){
+                val cell2ndValue = parts[cell2nd].absPitches[index]
+                if(cell2ndValue == -1) continue
+                val interval = (cell2ndValue - cellValue).absoluteValue
+                if (!intervalSet.contains(interval)) faults++
+            }
+        }
+        return faults
     }
 
 

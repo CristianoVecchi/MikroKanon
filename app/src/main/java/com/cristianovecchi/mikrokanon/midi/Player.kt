@@ -411,6 +411,18 @@ object Player {
         }
         return mt
     }
+    private fun insertDoublingNote(mt: MidiTrack, start: Long, duration: Long, channel: Int,
+                                   pitch: Int, velOn: Int, velOff: Int){
+        var actualPitch = pitch
+        while (actualPitch > 108){
+            actualPitch -= 12
+        }
+        val dur = duration - separator
+        val on = NoteOn(start, channel, actualPitch, velOn)
+        val off = NoteOff(start + dur, channel, actualPitch, velOff)
+        mt.insertEvent(on)
+        mt.insertEvent(off)
+    }
     private var separator = 1
     private var lastIsGliss = false
     private fun insertNoteWithGlissando(
@@ -868,7 +880,9 @@ object Player {
                 val gliss = glissando[i]
                 val duration = durations[i]
                 val articulationDuration = articulationDurations[i]
-                val dur = if(articulationDuration > duration && (glissando[(i+1) % glissando.size] >0 || gliss >0)  )
+                val overLegato = articulationDuration > duration
+//                val attackDelay = if(lastIsGliss && (articulationDuration == duration || overLegato)) 127 else 0
+                val dur = if(overLegato && (glissando[(i+1) % glissando.size] >0 || gliss >0)  )
                     duration.toLong() else articulationDuration.toLong()
                 val pitch = pitches[i]
                 val velocity = velocities[i]
@@ -881,9 +895,9 @@ object Player {
                     velocities[i], velocityOff, gliss
                 )
                 doubling.forEach {
-                    insertNoteWithGlissando(
+                    insertDoublingNote(
                         track, tick, dur, channel, pitch + it,
-                        velocity, velocityOff, gliss
+                        velocity, velocityOff
                     )
                 }
             }

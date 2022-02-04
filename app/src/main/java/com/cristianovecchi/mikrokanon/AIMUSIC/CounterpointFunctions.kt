@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import androidx.lifecycle.LiveData
 import com.cristianovecchi.mikrokanon.pmap
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
@@ -73,6 +74,11 @@ suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounte
 }
 suspend fun duplicateAllInCounterpoint(counterpoint: Counterpoint ): List<Counterpoint>{
      return counterpoint.duplicateAllPhrases()
+}
+suspend fun overlapCounterpointsSortingByFaults(counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint, intervalSet: List<Int>, maxParts: Int): List<Counterpoint> {
+     return counterpoint1st.fullyOverlap(counterpoint2nd)
+          .map{ it.cutExtraParts(maxParts)}
+          .sortedBy{ it.checkVerticalFaults(intervalSet)}
 }
 suspend fun eraseHorizontalIntervalsOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{it.eraseIntervalsOnBothNotes(horIntervalSet)}

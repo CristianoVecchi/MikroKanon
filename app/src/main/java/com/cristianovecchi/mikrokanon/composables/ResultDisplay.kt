@@ -2,15 +2,12 @@ package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -46,6 +43,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onRound: () -> Unit = {},
                   onCadenza: (List<Int>) -> Unit = {},
                   onScarlatti: () -> Unit = {},
+                  onOverlap: (Int) -> Unit,
                   onEraseIntervals: () -> Unit = {},
                   onSingle: () -> Unit = {},
                   onDoppelgänger: () -> Unit = {},
@@ -92,6 +90,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
     val transposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val selectCounterpointDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
 
 
     val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
@@ -180,11 +179,12 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                             onKP(index, repeat); scrollToTopList = true
                         }
                     })
-
                 ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model, language)
                 MultiListDialog(intervalSetDialogData, dimensions, language.OKbutton)
                 TransposeDialog(transposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
+                SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
+                    dimensions = dimensions,model = model,language = language)
                 // STACK ICONS
                 Row(modifier = Modifier
                     .fillMaxWidth()
@@ -292,6 +292,15 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                         }
                                                 },
                                     onScarlatti = { onScarlatti(); close() },
+                                    onOverlap = {
+                                        buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+                                        selectCounterpointDialogData.value = ButtonsDialogData(true,
+                                            language.selectToOverlap, model,
+                                            onSavingCounterpoint = { position ->
+                                                onOverlap(position)
+                                                selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
+                                            })
+                                    },
                                     onFlourish = {onFlourish(); close(); scrollToTopList = false},
                                     onEraseIntervals = { onEraseIntervals(); close() },
                                     onSingle = { onSingle(); close() },

@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -36,6 +35,7 @@ fun SequenceSelector(model: AppViewModel,
                      onRound: (ArrayList<Clip>) -> Unit,
                      onCadenza: (ArrayList<Clip>, List<Int>) -> Unit,
                      onScarlatti: (ArrayList<Clip>) -> Unit,
+                     onOverlap: (ArrayList<Clip>, Int) -> Unit,
                      onFlourish: (ArrayList<Clip>) -> Unit,
                      onEraseIntervals: (ArrayList<Clip>) -> Unit,
                      onSingle: (ArrayList<Clip>) -> Unit,
@@ -81,6 +81,7 @@ fun SequenceSelector(model: AppViewModel,
             val dialogState by lazy { mutableStateOf(false) }
             val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
             val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+            val selectCounterpointDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
             val buttonSize = dimensions.selectorButtonSize
             val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
             SequencesDialog(dialogState = dialogState, dimensions = dimensions,
@@ -98,6 +99,8 @@ fun SequenceSelector(model: AppViewModel,
             val onSelectComposition = { index: Int ->
                 onSelect(index)
             }
+            SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
+                dimensions = dimensions,model = model,language = language)
             CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
             SequenceScrollableColumn( listState = listState, colors = appColors,
                 modifier = modifier3, fontSize = dimensions.selectorClipFontSize,
@@ -157,6 +160,15 @@ fun SequenceSelector(model: AppViewModel,
                                     }
                                 },
                                 onScarlatti = { onScarlatti(sequences[selected]) },
+                                onOverlap = {
+                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+                                    selectCounterpointDialogData.value = ButtonsDialogData(true,
+                                    language.selectToOverlap, model,
+                                    onSavingCounterpoint = { position ->
+                                        onOverlap(sequences[selected],position)
+                                        selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
+                                    })
+                                },
                                 onFlourish = { onFlourish(sequences[selected]) },
                                 onEraseIntervals = { onEraseIntervals(sequences[selected]) },
                                 onSingle = { onSingle(sequences[selected]) },

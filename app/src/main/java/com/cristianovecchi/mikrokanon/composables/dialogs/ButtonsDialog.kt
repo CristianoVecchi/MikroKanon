@@ -74,6 +74,7 @@ fun ButtonsDialog(
                                     onRound = buttonsDialogData.value.onRound,
                                     onCadenza = buttonsDialogData.value.onCadenza,
                                     onScarlatti = buttonsDialogData.value.onScarlatti,
+                                    onOverlap = buttonsDialogData.value.onOverlap,
                                     onFlourish = buttonsDialogData.value.onFlourish,
                                     onEraseIntervals = buttonsDialogData.value.onEraseIntervals,
                                     onSingle = buttonsDialogData.value.onSingle,
