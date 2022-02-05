@@ -67,6 +67,7 @@ class OutputFragment: Fragment() {
                                 model = model,
                                 model.iconMap,
                                 model.selectedCounterpoint.asFlow(),
+                                model.elaborating.asFlow(),
                                 onClick = { counterpoint ->
                                     if(counterpoint == model.selectedCounterpoint.value!!){
                                         model.onPlay(true, true) // play without build the entire structure
@@ -111,6 +112,9 @@ class OutputFragment: Fragment() {
                                 },
                                 onOverlap = { index ->
                                     model.onOverlap(index)
+                                },
+                                onGlue = { index ->
+                                    model.onGlue(index)
                                 },
                                 onEraseIntervals = {
                                     model.onEraseIntervals()

@@ -36,6 +36,7 @@ fun SequenceSelector(model: AppViewModel,
                      onCadenza: (ArrayList<Clip>, List<Int>) -> Unit,
                      onScarlatti: (ArrayList<Clip>) -> Unit,
                      onOverlap: (ArrayList<Clip>, Int) -> Unit,
+                     onGlue: (ArrayList<Clip>, Int) -> Unit,
                      onFlourish: (ArrayList<Clip>) -> Unit,
                      onEraseIntervals: (ArrayList<Clip>) -> Unit,
                      onSingle: (ArrayList<Clip>) -> Unit,
@@ -164,10 +165,19 @@ fun SequenceSelector(model: AppViewModel,
                                     buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                     selectCounterpointDialogData.value = ButtonsDialogData(true,
                                     language.selectToOverlap, model,
-                                    onSavingCounterpoint = { position ->
+                                    onCounterpointSelected = { position ->
                                         onOverlap(sequences[selected],position)
                                         selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
                                     })
+                                },
+                                onGlue = {
+                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+                                    selectCounterpointDialogData.value = ButtonsDialogData(true,
+                                        language.selectToGlue, model,
+                                        onCounterpointSelected = { position ->
+                                            onGlue(sequences[selected],position)
+                                            selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
+                                        })
                                 },
                                 onFlourish = { onFlourish(sequences[selected]) },
                                 onEraseIntervals = { onEraseIntervals(sequences[selected]) },
@@ -177,7 +187,7 @@ fun SequenceSelector(model: AppViewModel,
                                 onPedal3 = { onPedal(3, sequences[selected]) },
                                 onPedal5 = { onPedal(5, sequences[selected]) },
                                 onMK5reducted = { onMikroKanons5reducted(sequences[selected]) },
-                                onSavingCounterpoint = { position -> onLoadingCounterpoint(position)}
+                                onCounterpointSelected = { position -> onLoadingCounterpoint(position)}
                             )
                             {
 

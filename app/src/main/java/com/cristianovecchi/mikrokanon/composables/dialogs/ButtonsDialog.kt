@@ -75,6 +75,7 @@ fun ButtonsDialog(
                                     onCadenza = buttonsDialogData.value.onCadenza,
                                     onScarlatti = buttonsDialogData.value.onScarlatti,
                                     onOverlap = buttonsDialogData.value.onOverlap,
+                                    onGlue = buttonsDialogData.value.onGlue,
                                     onFlourish = buttonsDialogData.value.onFlourish,
                                     onEraseIntervals = buttonsDialogData.value.onEraseIntervals,
                                     onSingle = buttonsDialogData.value.onSingle,
@@ -102,13 +103,13 @@ fun ButtonsDialog(
                                     onPedal5Click = buttonsDialogData.value.onPedal5
                                 )
                                 4 -> Spacer(modifier = Modifier.height(6.dp))
-                                5 -> SavingButtons(
+                                5 -> SlotButtons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonSize,
                                     fontSize = fontSize,
                                     colors = model.appColors,
                                     numbers = language.slotNumbers,
-                                    onSavingCounterpoint = buttonsDialogData.value.onSavingCounterpoint)
+                                    onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected)
 
                             }
 

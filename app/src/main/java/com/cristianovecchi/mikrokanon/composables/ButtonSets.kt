@@ -128,26 +128,26 @@ fun SequenceEditingButtons(
     }
 }
 @Composable
-fun SavingButtons(
+fun SlotButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
     colors: AppColors, numbers: List<String>,
-    onSavingCounterpoint: (Int) -> Unit
+    onCounterpointSelected: (Int) -> Unit
 ) {
     Column{
         (0 until 4).forEach{
             val step = it * 4
             Row {
                 CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+0], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                    onSavingCounterpoint(step+0)
+                    onCounterpointSelected(step+0)
                 }
                 CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+1], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                    onSavingCounterpoint(step+1)
+                    onCounterpointSelected(step+1)
                 }
                 CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+2], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                    onSavingCounterpoint(step+2)
+                    onCounterpointSelected(step+2)
                 }
                 CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+3], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                    onSavingCounterpoint(step+3)
+                    onCounterpointSelected(step+3)
                 }
             }
         }
@@ -203,7 +203,7 @@ fun NotFromSelectorButtons(
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
     onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
-    onOverlap: () -> Unit,
+    onOverlap: () -> Unit, onGlue: () -> Unit,
     onScarlatti: () -> Unit, onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit
 ) {
     Column {
@@ -240,7 +240,9 @@ fun SpecialFunctions1Buttons(
             CustomButton(iconId = model.iconMap["cadenza"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onCadenza()
             }
-
+            CustomButton(iconId = model.iconMap["glue"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onGlue()
+            }
         }
     }
 

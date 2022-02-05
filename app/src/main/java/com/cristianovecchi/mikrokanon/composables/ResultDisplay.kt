@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   selectedCounterpointFlow: Flow<Counterpoint>,
+                  elaboratingFlow: Flow<Boolean>,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
                   onTranspose: (List<Int>) -> Unit,
                   onWave: (Int) -> Unit,
@@ -44,6 +45,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onCadenza: (List<Int>) -> Unit = {},
                   onScarlatti: () -> Unit = {},
                   onOverlap: (Int) -> Unit,
+                  onGlue: (Int) -> Unit,
                   onEraseIntervals: () -> Unit = {},
                   onSingle: () -> Unit = {},
                   onDoppelgänger: () -> Unit = {},
@@ -74,7 +76,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
 
-    val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
+    val elaborating: Boolean by elaboratingFlow.collectAsState(initial = false)
     val playing by model.playing.asFlow().collectAsState(initial = false)
     var scrollToTopList by remember{mutableStateOf(false)}
     val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, specialFunctions = true,freeparts = true))
@@ -91,7 +93,6 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val transposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val selectCounterpointDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
-
 
     val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
 
@@ -296,8 +297,17 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                         buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                         selectCounterpointDialogData.value = ButtonsDialogData(true,
                                             language.selectToOverlap, model,
-                                            onSavingCounterpoint = { position ->
+                                            onCounterpointSelected = { position ->
                                                 onOverlap(position)
+                                                selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
+                                            })
+                                    },
+                                    onGlue = {
+                                        buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+                                        selectCounterpointDialogData.value = ButtonsDialogData(true,
+                                            language.selectToOverlap, model,
+                                            onCounterpointSelected = { position ->
+                                                onGlue(position)
                                                 selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
                                             })
                                     },
@@ -306,7 +316,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                     onSingle = { onSingle(); close() },
                                     onSort = { sortType -> onSort(sortType); close() },
                                     onUpsideDown = { onUpsideDown(); close()},
-                                    onSavingCounterpoint = { position -> onSavingCounterpoint(position); close()},
+                                    onCounterpointSelected = { position -> onSavingCounterpoint(position); close()},
                                     onDoppelgänger = { onDoppelgänger(); close()},
                                     onPedal1 = { onPedal(1); close() },
                                     onPedal3 = { onPedal(3); close() },

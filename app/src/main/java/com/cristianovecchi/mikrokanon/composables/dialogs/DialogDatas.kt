@@ -38,11 +38,12 @@ data class ButtonsDialogData(
     val onPedal1: () -> Unit = {}, val onPedal3: () -> Unit = {}, val onPedal5: () -> Unit = {},
     val onTritoneSubstitution: () -> Unit = {}, val onRound: () -> Unit = {},
     val onCadenza: () -> Unit = {}, val onScarlatti: () -> Unit = {},
-    val onOverlap: () -> Unit = {}, val onFlourish: () -> Unit = {},
+    val onOverlap: () -> Unit = {}, val onGlue: () -> Unit = {},
+    val onFlourish: () -> Unit = {},
     val onEraseIntervals: () -> Unit = {}, val onSingle: () -> Unit = {},
     val onMK5reducted: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
     val onSort: (Int) -> Unit = {}, val onUpsideDown: () -> Unit = {},
-    val onSavingCounterpoint: (Int) -> Unit = {},
+    val onCounterpointSelected: (Int) -> Unit = {},
     val onSubmitButtonClick: (Any?) -> Unit = {}, )
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",

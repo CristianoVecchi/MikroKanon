@@ -48,13 +48,13 @@ fun SelectCounterpointDialog(
                     ) {
                         items((0..0).toList()) { item ->
                             when (item) {
-                                0 -> SavingButtons(
+                                0 -> SlotButtons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonSize,
                                     fontSize = fontSize,
                                     colors = model.appColors,
                                     numbers = language.slotNumbers,
-                                    onSavingCounterpoint = buttonsDialogData.value.onSavingCounterpoint
+                                    onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected
                                 )
                             }
                         }

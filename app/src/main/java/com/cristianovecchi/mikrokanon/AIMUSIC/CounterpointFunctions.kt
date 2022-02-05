@@ -75,10 +75,13 @@ suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounte
 suspend fun duplicateAllInCounterpoint(counterpoint: Counterpoint ): List<Counterpoint>{
      return counterpoint.duplicateAllPhrases()
 }
-suspend fun overlapCounterpointsSortingByFaults(counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint, intervalSet: List<Int>, maxParts: Int): List<Counterpoint> {
-     return counterpoint1st.fullyOverlap(counterpoint2nd)
+suspend fun overlapCounterpointsSortingByFaults(context: CoroutineContext, counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint, intervalSet: List<Int>, maxParts: Int): List<Counterpoint> {
+     return counterpoint1st.transposingOverlap(context, counterpoint2nd)
           .map{ it.cutExtraParts(maxParts)}
           .sortedBy{ it.checkVerticalFaults(intervalSet)}
+}
+suspend fun glueCounterpoints(counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint): List<Counterpoint>{
+     return counterpoint1st.transposingGlueWithRowFormsOf2nd(counterpoint2nd, true)
 }
 suspend fun eraseHorizontalIntervalsOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{it.eraseIntervalsOnBothNotes(horIntervalSet)}

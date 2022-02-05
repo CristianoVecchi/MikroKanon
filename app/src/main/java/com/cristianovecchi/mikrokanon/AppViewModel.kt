@@ -48,6 +48,7 @@ sealed class Computation(open val icon: String = "") {
     data class UpsideDown(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "upside_down"): Computation()
     data class Scarlatti(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "Scarlatti"): Computation()
     data class Overlap(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "overlap"): Computation()
+    data class Glue(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "glue"): Computation()
     data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "erase"): Computation()
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
     data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "doppelgänger"): Computation()
@@ -130,6 +131,7 @@ class AppViewModel(
         "bar" to R.drawable.ic_baseline_bar_24,
         "upside_down" to R.drawable.ic_baseline_expand_24,
         "overlap" to R.drawable.ic_baseline_compress_24,
+        "glue" to R.drawable.ic_baseline_view_week_24,
     )
     val stackIcons = mutableListOf<String>()
     private fun Stack<Computation>.pushAndDispatch(computation: Computation){
@@ -458,15 +460,28 @@ init{
             computationStack.pushAndDispatch(Computation.Overlap(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone(),list))
             overlapBothCounterpoints(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone())
         }
-
     }
     val onOverlap = { position: Int ->
         val counterpoint2nd = savedCounterpoints[position]
-        if(counterpoint2nd != null && counterpoint2nd.parts.size < MAX_PARTS){
-            computationStack.pushAndDispatch(Computation.Overlap(selectedCounterpoint.value!!.clone(), counterpoint2nd.clone(), null))
+        if (counterpoint2nd != null && counterpoint2nd.parts.size < MAX_PARTS) {
+            computationStack.pushAndDispatch(Computation.Overlap(selectedCounterpoint.value!!.clone(),counterpoint2nd.clone(), null))
             overlapBothCounterpoints(selectedCounterpoint.value!!.clone(), counterpoint2nd.clone())
         }
-
+    }
+    val onGlueFromSelector = { list: ArrayList<Clip>, position: Int ->
+        if(savedCounterpoints[position] != null ){
+            changeFirstSequence(list)
+            convertFirstSequenceToSelectedCounterpoint()
+            computationStack.pushAndDispatch(Computation.Glue(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone(),list))
+            glueBothCounterpoints(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone())
+        }
+    }
+    val onGlue= { position: Int ->
+        val counterpoint2nd = savedCounterpoints[position]
+        if (counterpoint2nd != null) {
+            computationStack.pushAndDispatch(Computation.Glue(selectedCounterpoint.value!!.clone(),counterpoint2nd.clone(), null))
+            glueBothCounterpoints(selectedCounterpoint.value!!.clone(), counterpoint2nd.clone())
+        }
     }
     val onScarlattiFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
@@ -725,6 +740,7 @@ init{
                     is Computation.Cadenza -> computationStack.lastElement()
                     is Computation.Scarlatti -> computationStack.lastElement()
                     is Computation.Overlap -> computationStack.lastElement()
+                    is Computation.Glue -> computationStack.lastElement()
                     is Computation.Sort -> computationStack.lastElement()
                     is Computation.UpsideDown -> computationStack.lastElement()
                     is Computation.EraseIntervals -> computationStack.lastElement()
@@ -802,6 +818,9 @@ init{
                     }
                     is Computation.Overlap -> {
                         overlapBothCounterpoints( previousComputation.counterpoint1st, previousComputation.counterpoint2nd)
+                    }
+                    is Computation.Glue -> {
+                        glueBothCounterpoints( previousComputation.counterpoint1st, previousComputation.counterpoint2nd)
                     }
                     is Computation.EraseIntervals -> {
                         eraseIntervalsOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
@@ -1068,13 +1087,31 @@ init{
             var newList: List<Counterpoint>
             val spread = userOptionsData.value!![0].spread != 0
             viewModelScope.launch(Dispatchers.Main){
+                _elaborating.value = true
                 withContext(Dispatchers.Default){
-                    newList = overlapCounterpointsSortingByFaults(counterpoint1st, counterpoint2nd, intervalSet.value!!, MAX_PARTS)
+                    newList = overlapCounterpointsSortingByFaults(
+                        this.coroutineContext.job,
+                        counterpoint1st, counterpoint2nd, intervalSet.value!!, MAX_PARTS)
                     newList = if(spread) newList.pmap{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                              else newList
                 }
                 changeCounterpoints(newList, true)
-            }
+                _elaborating.value = false
+            }.also{  jobQueue.add(it)  }
+        }
+    }
+    private fun glueBothCounterpoints(counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint){
+        if(!counterpoint1st.isEmpty() && !counterpoint2nd.isEmpty()){
+            var newList: List<Counterpoint>
+            val spread = userOptionsData.value!![0].spread != 0
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = glueCounterpoints(counterpoint1st, counterpoint2nd)
+                        .pmapIf(spread){it.spreadAsPossible()}
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                }
+                changeCounterpoints(newList, true)
+            }.also{  jobQueue.add(it)  }
         }
     }
 

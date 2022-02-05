@@ -7,9 +7,13 @@ import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.getIntOrEmptyValue
 import com.cristianovecchi.mikrokanon.tritoneSubstitutionOnIntervalSet
 import kotlinx.android.parcel.Parcelize
+import kotlinx.coroutines.job
+import kotlinx.coroutines.withContext
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.absoluteValue
+import kotlin.math.max
 
 fun main(args : Array<String>){
 //    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8)
@@ -97,6 +101,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         val nParts = this.parts.size
         val nPartsToAdd = counterpoint.parts.size
         val diff = nParts - counterpoint.parts.size
+        println("diff: $diff")
         val newParts = when {
             diff == 0 -> parts.mapIndexed { index, absPart ->
                 absPart.enqueue( counterpoint.parts[index]) }
@@ -120,7 +125,6 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
             else -> listOf()
         }
-
         return Counterpoint(newParts, intervalSet)//.also{ it.display(); println()}
     }
     fun inverse(): Counterpoint {
@@ -548,48 +552,83 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun upsideDown(): Counterpoint {
         return this.copy(parts = parts.reversed())
     }
-
-
-    fun fullyOverlap(counterpoint2nd: Counterpoint): List<Counterpoint> {
-        var counterpoint1st = this.normalizePartsSize(true)
-        val original = counterpoint2nd.normalizePartsSize(true)
-        val size1st = this.maxSize()
-        val size2nd = original.maxSize()
-        println("OVERLAP: 1st_size=$size1st 2nd_size=$size2nd")
-        if(size1st == 0 || size2nd == 0) return listOf(this.copy())
-        val result = mutableListOf<Counterpoint>()
-        val firstIsShorter = size1st <= size2nd
-        val diff = (size2nd - size1st).absoluteValue
-        val inverse = original.inverse()
-        val retrograde = original.retrograde()
+    fun centerVertically(counterpoint2nd: Counterpoint): Pair<Counterpoint, Counterpoint>{
+        val nParts1st = this.parts.size
+        val nParts2nd = counterpoint2nd.parts.size
+        val nParts = max(nParts1st,nParts2nd)
+        return Pair(
+            this.shiftDown((nParts - nParts1st) shr 1),
+            counterpoint2nd.shiftDown((nParts - nParts2nd) shr 1)
+        )
+    }
+    fun transposingGlueWithRowFormsOf2nd(counterpoint2nd: Counterpoint, centerVertically: Boolean): List<Counterpoint>{
+        val (counterpoint1st, original2nd) = this.normalizePartsSize(false)
+                                                .centerVertically(counterpoint2nd.normalizePartsSize(false))
+        val inverse = original2nd.inverse()
+        val retrograde = original2nd.retrograde()
         val inverseRetrograde = retrograde.inverse()
-        if(firstIsShorter){
-            for(step in (0..diff)){
-                val count1st = counterpoint1st.addEmptyColumns(0, step)
-                for(transpose in (0 until 12)){
-                    result.add(count1st.overlap(original.transpose(transpose)))
-                    result.add(count1st.overlap(inverse.transpose(transpose)))
-                    result.add(count1st.overlap(retrograde.transpose(transpose)))
-                    result.add(count1st.overlap(inverseRetrograde.transpose(transpose)))
-                    println("step:$step transpose:$transpose")
-                }
-            }
+        val result = mutableListOf<Counterpoint>()
+        for(transpose in (0 until 12)){
+            result.add(counterpoint1st.enqueue(original2nd).transpose(transpose))
+            result.add(counterpoint1st.enqueue(inverse).transpose(transpose))
+            result.add(counterpoint1st.enqueue(retrograde).transpose(transpose))
+            result.add(counterpoint1st.enqueue(inverseRetrograde).transpose(transpose))
+        }
+        result.forEach{ it.findEmptiness()}
+        return result.toList()
+    }
+    suspend fun transposingOverlap(context: CoroutineContext, counterpoint2nd: Counterpoint): List<Counterpoint> =
+        withContext(context) {
+        val counterpoint1st = this@Counterpoint.normalizePartsSize(true)
+        val original2nd = counterpoint2nd.normalizePartsSize(true)
+        val size1st = this@Counterpoint.maxSize()
+        val size2nd = original2nd.maxSize()
+        //println("OVERLAP: 1st_size=$size1st 2nd_size=$size2nd")
+        var result = mutableListOf<Counterpoint>()
+        if(size1st == 0 || size2nd == 0) {
+            result.add(this@Counterpoint.copy())
         } else {
-            for(step in (0..diff)){
-                val orig = original.addEmptyColumns(0, step)
-                val inv = inverse.addEmptyColumns(0, step)
-                val retr = retrograde.addEmptyColumns(0, step)
-                val invRetr = inverseRetrograde.addEmptyColumns(0, step)
-                for(transpose in (0 until 12)){
-                    result.add(counterpoint1st.overlap(orig.transpose(transpose)))
-                    result.add(counterpoint1st.overlap(inv.transpose(transpose)))
-                    result.add(counterpoint1st.overlap(retr.transpose(transpose)))
-                    result.add(counterpoint1st.overlap(invRetr.transpose(transpose)))
-                    println("step:$step transpose:$transpose")
+            val firstIsShorter = size1st <= size2nd
+            val diff = (size2nd - size1st).absoluteValue
+            val inverse = original2nd.inverse()
+            val retrograde = original2nd.retrograde()
+            val inverseRetrograde = retrograde.inverse()
+            try {
+                val job = context.job
+                if(firstIsShorter){
+                 mainLoop@  for(step in (0..diff)){
+                        val count1st = counterpoint1st.addEmptyColumns(0, step)
+                        for(transpose in (0 until 12)){
+                            if(!job.isActive) break@mainLoop
+                            result.add(count1st.overlap(original2nd.transpose(transpose)))
+                            result.add(count1st.overlap(inverse.transpose(transpose)))
+                            result.add(count1st.overlap(retrograde.transpose(transpose)))
+                            result.add(count1st.overlap(inverseRetrograde.transpose(transpose)))
+                            println("step:$step transpose:$transpose")
+                        }
+                    }
+                } else {
+                    mainLoop@ for(step in (0..diff)){
+                        val orig = original2nd.addEmptyColumns(0, step)
+                        val inv = inverse.addEmptyColumns(0, step)
+                        val retr = retrograde.addEmptyColumns(0, step)
+                        val invRetr = inverseRetrograde.addEmptyColumns(0, step)
+                        for(transpose in (0 until 12)){
+                            if(!job.isActive) break@mainLoop
+                            result.add(counterpoint1st.overlap(orig.transpose(transpose)))
+                            result.add(counterpoint1st.overlap(inv.transpose(transpose)))
+                            result.add(counterpoint1st.overlap(retr.transpose(transpose)))
+                            result.add(counterpoint1st.overlap(invRetr.transpose(transpose)))
+                            println("step:$step transpose:$transpose")
+                        }
+                    }
                 }
+            }  catch (ex: OutOfMemoryError){
+                println("Out of memory in Overlap Computation, result list is partial")
+                result = result.take(40).toMutableList()
             }
         }
-        return result.toList()
+        result.toList()
     }
     fun overlap(counterpoint: Counterpoint): Counterpoint{
         val newParts = this.parts + counterpoint.parts
