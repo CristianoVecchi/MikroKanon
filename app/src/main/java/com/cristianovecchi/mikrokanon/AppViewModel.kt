@@ -48,6 +48,7 @@ sealed class Computation(open val icon: String = "") {
     data class UpsideDown(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "upside_down"): Computation()
     data class Scarlatti(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "Scarlatti"): Computation()
     data class Overlap(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "overlap"): Computation()
+    data class Crossover(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "crossover"): Computation()
     data class Glue(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "glue"): Computation()
     data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "erase"): Computation()
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
@@ -131,6 +132,7 @@ class AppViewModel(
         "bar" to R.drawable.ic_baseline_bar_24,
         "upside_down" to R.drawable.ic_baseline_expand_24,
         "overlap" to R.drawable.ic_baseline_compress_24,
+        "crossover" to R.drawable.ic_baseline_crossover_24,
         "glue" to R.drawable.ic_baseline_view_week_24,
     )
     val stackIcons = mutableListOf<String>()
@@ -453,19 +455,23 @@ init{
         computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, index, values))
         cadenzasOnCounterpoints(originalCounterpoints, index, values)
     }
-    val onOverlapFromSelector = { list: ArrayList<Clip>, position: Int ->
+    val onOverlapFromSelector = { list: ArrayList<Clip>, position: Int, crossover: Boolean ->
         if(savedCounterpoints[position] != null ){
             changeFirstSequence(list)
             convertFirstSequenceToSelectedCounterpoint()
-            computationStack.pushAndDispatch(Computation.Overlap(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone(),list))
-            overlapBothCounterpoints(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone())
+            val computation = if(crossover) Computation.Crossover(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone(),list)
+                else Computation.Overlap(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone(),list)
+            computationStack.pushAndDispatch(computation)
+            overlapBothCounterpoints(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone(), crossover)
         }
     }
-    val onOverlap = { position: Int ->
+    val onOverlap = { position: Int , crossover: Boolean->
         val counterpoint2nd = savedCounterpoints[position]
         if (counterpoint2nd != null && counterpoint2nd.parts.size < MAX_PARTS) {
-            computationStack.pushAndDispatch(Computation.Overlap(selectedCounterpoint.value!!.clone(),counterpoint2nd.clone(), null))
-            overlapBothCounterpoints(selectedCounterpoint.value!!.clone(), counterpoint2nd.clone())
+            val computation = if(crossover) Computation.Crossover(selectedCounterpoint.value!!.clone(),counterpoint2nd.clone(), null)
+                else Computation.Overlap(selectedCounterpoint.value!!.clone(),counterpoint2nd.clone(), null)
+            computationStack.pushAndDispatch(computation)
+            overlapBothCounterpoints(selectedCounterpoint.value!!.clone(), counterpoint2nd.clone(), crossover)
         }
     }
     val onGlueFromSelector = { list: ArrayList<Clip>, position: Int ->
@@ -740,6 +746,7 @@ init{
                     is Computation.Cadenza -> computationStack.lastElement()
                     is Computation.Scarlatti -> computationStack.lastElement()
                     is Computation.Overlap -> computationStack.lastElement()
+                    is Computation.Crossover -> computationStack.lastElement()
                     is Computation.Glue -> computationStack.lastElement()
                     is Computation.Sort -> computationStack.lastElement()
                     is Computation.UpsideDown -> computationStack.lastElement()
@@ -817,7 +824,10 @@ init{
                         duplicateAllPhrasesInCounterpoint( previousComputation.counterpoints[previousComputation.index],previousComputation.index)
                     }
                     is Computation.Overlap -> {
-                        overlapBothCounterpoints( previousComputation.counterpoint1st, previousComputation.counterpoint2nd)
+                        overlapBothCounterpoints( previousComputation.counterpoint1st, previousComputation.counterpoint2nd, false)
+                    }
+                    is Computation.Crossover -> {
+                        overlapBothCounterpoints( previousComputation.counterpoint1st, previousComputation.counterpoint2nd, true)
                     }
                     is Computation.Glue -> {
                         glueBothCounterpoints( previousComputation.counterpoint1st, previousComputation.counterpoint2nd)
@@ -887,7 +897,7 @@ init{
                 withContext(Dispatchers.Default){
                     newList = waves(originalCounterpoints,intervalSet.value!!, nWaves)
                             .sortedBy { it.emptiness }.take(maxVisibleCounterpoints)
-                            .mapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible()}
+                            .mapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                             .sortedBy { it.emptiness }
                 }
                 changeCounterpoints(newList, true)
@@ -903,7 +913,7 @@ init{
             withContext(Dispatchers.Default){
                 newList = freeParts(selectedCounterpoint.value!!,  intervalSet.value!!, directions)
                     .sortedBy { it.emptiness }.take(maxVisibleCounterpoints)
-                    .mapIf(spreadWherePossible){it.spreadAsPossible()}
+                    .mapIf(spreadWherePossible){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                     .sortedBy { it.emptiness }
             }
             changeCounterpoints(newList, true)
@@ -946,7 +956,7 @@ init{
                             )
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                                 .take(maxVisibleCounterpoints)
-                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible() }
+                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
                     //val newList: List<Counterpoint> = def.await()
@@ -982,7 +992,7 @@ init{
                             )
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                                 .take(maxVisibleCounterpoints)
-                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible() }
+                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
                         //val newList: List<Counterpoint> = def.await()
@@ -1008,7 +1018,7 @@ init{
                     withContext(Dispatchers.Default) {
                         newList = mikroKanons3(sequenceToMikroKanons.value!!,intervalSet.value!!, 6)
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(maxVisibleCounterpoints)
-                            .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible()}
+                            .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                     }
                     mk3cache[key] = newList
@@ -1025,7 +1035,7 @@ init{
             withContext(Dispatchers.Default){
                 newList = mikroKanons2(sequenceToMikroKanons.value!!,intervalSet.value!!, 7)
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(maxVisibleCounterpoints)
-                    .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible()}
+                    .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpoints(newList, true)
@@ -1074,7 +1084,7 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = duplicateAllInCounterpoint(originalCounterpoint)
-                        .pmapIf(spread){it.spreadAsPossible()}
+                        .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpoints(newList, true)
@@ -1082,7 +1092,7 @@ init{
             }
         }
     }
-    private fun overlapBothCounterpoints(counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint){
+    private fun overlapBothCounterpoints(counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint, crossover: Boolean){
         if(!counterpoint1st.isEmpty() && !counterpoint2nd.isEmpty()){
             var newList: List<Counterpoint>
             val spread = userOptionsData.value!![0].spread != 0
@@ -1091,8 +1101,9 @@ init{
                 withContext(Dispatchers.Default){
                     newList = overlapCounterpointsSortingByFaults(
                         this.coroutineContext.job,
-                        counterpoint1st, counterpoint2nd, intervalSet.value!!, MAX_PARTS)
-                    newList = if(spread) newList.pmap{it.spreadAsPossible()}.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                        counterpoint1st, counterpoint2nd, intervalSet.value!!, MAX_PARTS, crossover)
+                    newList = if(spread) newList.pmap{it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                              else newList
                 }
                 changeCounterpoints(newList, true)
@@ -1107,7 +1118,7 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = glueCounterpoints(counterpoint1st, counterpoint2nd)
-                        .pmapIf(spread){it.spreadAsPossible()}
+                        .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpoints(newList, true)
@@ -1135,7 +1146,7 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = sortColumnsOnCounterpoints(originalCounterpoints, sortType)
-                        .pmapIf(spread){it.spreadAsPossible()}
+                        .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpoints(newList, spread)
@@ -1164,7 +1175,7 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = reduceCounterpointsToSinglePart(originalCounterpoints)
-                        .pmapIf(spread){it.spreadAsPossible()}
+                        .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpoints(newList, spread)
@@ -1190,7 +1201,7 @@ init{
                 withContext(Dispatchers.Default){
                     newList = explodeCounterpointsToDoppelgänger(originalCounterpoints,
                         MAX_PARTS, ensTypes, rangeType, melodyType )
-                        .pmapIf(spread){it.spreadAsPossible()}
+                        .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpoints(newList, true)
@@ -1244,7 +1255,7 @@ init{
                     newList = addSequence(selectedCounterpoint.value!! , sequenceToAdd.value!!, intervalSet.value!! ,repeat, 7)
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }.take(maxVisibleCounterpoints)
                         .pmapIf(userOptionsData.value!![0].spread != 0){
-                            it.spreadAsPossible(true)}
+                            it.spreadAsPossible(true, intervalSet = intervalSet.value!!)}
                         //.map{ it.emptiness = it.findEmptiness(); it}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }

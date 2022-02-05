@@ -110,8 +110,8 @@ class OutputFragment: Fragment() {
                                 onScarlatti = {
                                     model.onScarlatti()
                                 },
-                                onOverlap = { index ->
-                                    model.onOverlap(index)
+                                onOverlap = { index, crossover ->
+                                    model.onOverlap(index, crossover)
                                 },
                                 onGlue = { index ->
                                     model.onGlue(index)

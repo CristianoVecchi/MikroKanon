@@ -75,8 +75,10 @@ suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounte
 suspend fun duplicateAllInCounterpoint(counterpoint: Counterpoint ): List<Counterpoint>{
      return counterpoint.duplicateAllPhrases()
 }
-suspend fun overlapCounterpointsSortingByFaults(context: CoroutineContext, counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint, intervalSet: List<Int>, maxParts: Int): List<Counterpoint> {
-     return counterpoint1st.transposingOverlap(context, counterpoint2nd)
+suspend fun overlapCounterpointsSortingByFaults(context: CoroutineContext, counterpoint1st: Counterpoint,
+                                                counterpoint2nd: Counterpoint, intervalSet: List<Int>,
+                                                maxParts: Int, crossover: Boolean): List<Counterpoint> {
+     return counterpoint1st.transposingOverlap(context, counterpoint2nd, crossover)
           .map{ it.cutExtraParts(maxParts)}
           .sortedBy{ it.checkVerticalFaults(intervalSet)}
 }

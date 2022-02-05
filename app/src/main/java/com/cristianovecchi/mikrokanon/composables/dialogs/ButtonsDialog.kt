@@ -75,6 +75,7 @@ fun ButtonsDialog(
                                     onCadenza = buttonsDialogData.value.onCadenza,
                                     onScarlatti = buttonsDialogData.value.onScarlatti,
                                     onOverlap = buttonsDialogData.value.onOverlap,
+                                    onCrossover = buttonsDialogData.value.onCrossover,
                                     onGlue = buttonsDialogData.value.onGlue,
                                     onFlourish = buttonsDialogData.value.onFlourish,
                                     onEraseIntervals = buttonsDialogData.value.onEraseIntervals,

@@ -235,7 +235,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         if(this.isEmpty() || this.parts.size == 1) return true
         return this.parts.map{it.absPitches.size}.toSet().size == 1
     }
-    fun spreadAsPossible(findEmptiness: Boolean = true) : Counterpoint {
+    fun spreadAsPossible(findEmptiness: Boolean = true, intervalSet: List<Int> = this.intervalSet) : Counterpoint {
         val clone = this.normalizePartsSize(false) // cloning is necessary in a coroutine context
         //clone.display()
         for(partIndex in clone.parts.indices){
@@ -577,7 +577,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         result.forEach{ it.findEmptiness()}
         return result.toList()
     }
-    suspend fun transposingOverlap(context: CoroutineContext, counterpoint2nd: Counterpoint): List<Counterpoint> =
+    suspend fun transposingOverlap(context: CoroutineContext, counterpoint2nd: Counterpoint, crossover: Boolean): List<Counterpoint> =
         withContext(context) {
         val counterpoint1st = this@Counterpoint.normalizePartsSize(true)
         val original2nd = counterpoint2nd.normalizePartsSize(true)
@@ -585,7 +585,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         val size2nd = original2nd.maxSize()
         //println("OVERLAP: 1st_size=$size1st 2nd_size=$size2nd")
         var result = mutableListOf<Counterpoint>()
-        if(size1st == 0 || size2nd == 0) {
+        if(size1st == 0 || size2nd == 0 || (size1st == 1 && crossover) ) {
             result.add(this@Counterpoint.copy())
         } else {
             val firstIsShorter = size1st <= size2nd
@@ -593,10 +593,11 @@ data class Counterpoint(val parts: List<AbsPart>,
             val inverse = original2nd.inverse()
             val retrograde = original2nd.retrograde()
             val inverseRetrograde = retrograde.inverse()
+            val stepRange = if(crossover) (1 until size1st) else (0..diff)
             try {
                 val job = context.job
-                if(firstIsShorter){
-                 mainLoop@  for(step in (0..diff)){
+                if(firstIsShorter && !crossover){
+                 mainLoop@  for(step in stepRange){
                         val count1st = counterpoint1st.addEmptyColumns(0, step)
                         for(transpose in (0 until 12)){
                             if(!job.isActive) break@mainLoop
@@ -608,7 +609,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                         }
                     }
                 } else {
-                    mainLoop@ for(step in (0..diff)){
+                    mainLoop@ for(step in stepRange){
                         val orig = original2nd.addEmptyColumns(0, step)
                         val inv = inverse.addEmptyColumns(0, step)
                         val retr = retrograde.addEmptyColumns(0, step)

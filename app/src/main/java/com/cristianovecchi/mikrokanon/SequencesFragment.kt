@@ -101,10 +101,10 @@ var start = true
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onScarlattiFromSelector(list)
                                     },
-                                    onOverlap = { list, position ->
+                                    onOverlap = { list, position, crossover ->
                                         model.savedCounterpoints[position]?.let{
                                             findNavController().navigate(R.id.outputFragment)
-                                            model.onOverlapFromSelector(list, position)
+                                            model.onOverlapFromSelector(list, position, crossover)
                                         }
                                     },
                                     onGlue = { list, position ->

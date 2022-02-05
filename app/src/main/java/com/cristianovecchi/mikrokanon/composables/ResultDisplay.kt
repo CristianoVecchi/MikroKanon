@@ -44,7 +44,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onRound: () -> Unit = {},
                   onCadenza: (List<Int>) -> Unit = {},
                   onScarlatti: () -> Unit = {},
-                  onOverlap: (Int) -> Unit,
+                  onOverlap: (Int, Boolean) -> Unit,
                   onGlue: (Int) -> Unit,
                   onEraseIntervals: () -> Unit = {},
                   onSingle: () -> Unit = {},
@@ -298,7 +298,16 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                         selectCounterpointDialogData.value = ButtonsDialogData(true,
                                             language.selectToOverlap, model,
                                             onCounterpointSelected = { position ->
-                                                onOverlap(position)
+                                                onOverlap(position, false)
+                                                selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
+                                            })
+                                    },
+                                    onCrossover = {
+                                        buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+                                        selectCounterpointDialogData.value = ButtonsDialogData(true,
+                                            language.selectToCrossOver, model,
+                                            onCounterpointSelected = { position ->
+                                                onOverlap(position, true)
                                                 selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
                                             })
                                     },

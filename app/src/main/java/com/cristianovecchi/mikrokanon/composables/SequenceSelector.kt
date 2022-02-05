@@ -35,7 +35,7 @@ fun SequenceSelector(model: AppViewModel,
                      onRound: (ArrayList<Clip>) -> Unit,
                      onCadenza: (ArrayList<Clip>, List<Int>) -> Unit,
                      onScarlatti: (ArrayList<Clip>) -> Unit,
-                     onOverlap: (ArrayList<Clip>, Int) -> Unit,
+                     onOverlap: (ArrayList<Clip>, Int, Boolean) -> Unit,
                      onGlue: (ArrayList<Clip>, Int) -> Unit,
                      onFlourish: (ArrayList<Clip>) -> Unit,
                      onEraseIntervals: (ArrayList<Clip>) -> Unit,
@@ -166,9 +166,18 @@ fun SequenceSelector(model: AppViewModel,
                                     selectCounterpointDialogData.value = ButtonsDialogData(true,
                                     language.selectToOverlap, model,
                                     onCounterpointSelected = { position ->
-                                        onOverlap(sequences[selected],position)
+                                        onOverlap(sequences[selected],position, false)
                                         selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
                                     })
+                                },
+                                onCrossover = {
+                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+                                    selectCounterpointDialogData.value = ButtonsDialogData(true,
+                                        language.selectToCrossOver, model,
+                                        onCounterpointSelected = { position ->
+                                            onOverlap(sequences[selected],position, true)
+                                            selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
+                                        })
                                 },
                                 onGlue = {
                                     buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
