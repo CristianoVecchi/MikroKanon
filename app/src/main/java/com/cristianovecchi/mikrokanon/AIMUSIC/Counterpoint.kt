@@ -298,6 +298,9 @@ data class Counterpoint(val parts: List<AbsPart>,
             println("Part #$index: ${Clip.convertAbsPitchesToClipText(absPart.absPitches, noteNames)}")
         }
     }
+    fun findAndSetEmptiness() {
+        this.emptiness = findEmptiness()
+    }
     fun findEmptiness() : Float {
         if (parts.isEmpty()) return 1f
         val maxSize = parts.maxOf { it.absPitches.size }
@@ -573,11 +576,12 @@ data class Counterpoint(val parts: List<AbsPart>,
             result.add(counterpoint1st.enqueue(retrograde).transpose(transpose))
             result.add(counterpoint1st.enqueue(inverseRetrograde).transpose(transpose))
         }
-        result.forEach{ it.findEmptiness()}
+        result.forEach{ it.findAndSetEmptiness()}
         return result.toList()
     }
     suspend fun transposingOverlap(context: CoroutineContext, counterpoint2nd: Counterpoint,
-                                   crossover: Boolean, compression: Boolean = true): List<Counterpoint> =
+                                   crossover: Boolean, intervalSet: List<Int>,
+                                   compression: Boolean = true): List<Counterpoint> =
         withContext(context) {
         val counterpoint1st = this@Counterpoint.normalizePartsSize(true)
         val original2nd = counterpoint2nd.normalizePartsSize(true)
@@ -593,20 +597,24 @@ data class Counterpoint(val parts: List<AbsPart>,
             val inverse = original2nd.inverse()
             val retrograde = original2nd.retrograde()
             val inverseRetrograde = retrograde.inverse()
-            val stepRange = if(crossover) (1 until size1st) else (0..diff)
+            val stepRange: IntRange = if(crossover){
+                    if(firstIsShorter) (1 until size1st) else ((size1st-size2nd  + 1) until size1st)
+            } else {(0..diff)}
             try {
                 val job = context.job
                 if(firstIsShorter && !crossover){
                  mainLoop@  for(step in stepRange){
                         val count1st = counterpoint1st.addEmptyColumns(0, step)
+                        val partialResult =  mutableListOf<Counterpoint>()
                         for(transpose in (0 until 12)){
                             if(!job.isActive) break@mainLoop
-                            result.add(count1st.overlap(original2nd.transpose(transpose)))
-                            result.add(count1st.overlap(inverse.transpose(transpose)))
-                            result.add(count1st.overlap(retrograde.transpose(transpose)))
-                            result.add(count1st.overlap(inverseRetrograde.transpose(transpose)))
-                            println("step:$step transpose:$transpose")
+                            partialResult.add(count1st.overlap(original2nd.transpose(transpose)))
+                            partialResult.add(count1st.overlap(inverse.transpose(transpose)))
+                            partialResult.add(count1st.overlap(retrograde.transpose(transpose)))
+                            partialResult.add(count1st.overlap(inverseRetrograde.transpose(transpose)))
+                            //println("step:$step transpose:$transpose")
                         }
+                        result.addAll(partialResult.sortedBy{ it.checkVerticalFaults(intervalSet)}.take(16))
                     }
                 } else {
                     mainLoop@ for(step in stepRange){
@@ -614,14 +622,16 @@ data class Counterpoint(val parts: List<AbsPart>,
                         val inv = inverse.addEmptyColumns(0, step)
                         val retr = retrograde.addEmptyColumns(0, step)
                         val invRetr = inverseRetrograde.addEmptyColumns(0, step)
+                        val partialResult =  mutableListOf<Counterpoint>()
                         for(transpose in (0 until 12)){
                             if(!job.isActive) break@mainLoop
-                            result.add(counterpoint1st.overlap(orig.transpose(transpose)))
-                            result.add(counterpoint1st.overlap(inv.transpose(transpose)))
-                            result.add(counterpoint1st.overlap(retr.transpose(transpose)))
-                            result.add(counterpoint1st.overlap(invRetr.transpose(transpose)))
-                            println("step:$step transpose:$transpose")
+                            partialResult.add(counterpoint1st.overlap(orig.transpose(transpose)))
+                            partialResult.add(counterpoint1st.overlap(inv.transpose(transpose)))
+                            partialResult.add(counterpoint1st.overlap(retr.transpose(transpose)))
+                            partialResult.add(counterpoint1st.overlap(invRetr.transpose(transpose)))
+                            //println("step:$step transpose:$transpose")
                         }
+                        result.addAll(partialResult.sortedBy{ it.checkVerticalFaults(intervalSet)}.take(4))
                     }
                 }
             }  catch (ex: OutOfMemoryError){
@@ -655,9 +665,12 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
         }
         val newParts = parts.filterIndexed { index, _ -> !deletedParts.contains(index) }
-        return copy(parts = newParts).apply {
-            findEmptiness()
-        }
+        val result = this.copy(parts = newParts)
+        result.findAndSetEmptiness()
+        return result
+//        return copy(parts = newParts).apply {
+//            findEmptiness()
+//        }
     }
     fun overlap(counterpoint: Counterpoint): Counterpoint{
         val newParts = this.parts + counterpoint.parts
