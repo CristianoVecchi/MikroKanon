@@ -233,6 +233,24 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         }
         return AbsPart(newAbsPitches, rowForm, transpose, delay)
     }
+    fun isCompressable(absPart2nd: AbsPart): Boolean{
+        var isCompressable = true
+        val absPitches2nd = absPart2nd.absPitches
+        for(i in 0 until absPitches2nd.size){
+            if(absPitches2nd[i] != -1 && absPitches[i] != -1){
+                isCompressable = false
+                break
+            }
+        }
+        return isCompressable
+    }
+    fun compress(absPart2nd: AbsPart){
+        val absPitches2nd = absPart2nd.absPitches
+        for(i in 0 until absPitches2nd.size){
+            if(absPitches2nd[i] == -1) continue
+            absPitches[i] = absPitches2nd[i]
+        }
+    }
 
 
 }

@@ -1,7 +1,6 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import android.os.Parcelable
-import androidx.compose.ui.text.createTextLayoutResult
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.getIntOrEmptyValue
@@ -577,7 +576,8 @@ data class Counterpoint(val parts: List<AbsPart>,
         result.forEach{ it.findEmptiness()}
         return result.toList()
     }
-    suspend fun transposingOverlap(context: CoroutineContext, counterpoint2nd: Counterpoint, crossover: Boolean): List<Counterpoint> =
+    suspend fun transposingOverlap(context: CoroutineContext, counterpoint2nd: Counterpoint,
+                                   crossover: Boolean, compression: Boolean = true): List<Counterpoint> =
         withContext(context) {
         val counterpoint1st = this@Counterpoint.normalizePartsSize(true)
         val original2nd = counterpoint2nd.normalizePartsSize(true)
@@ -629,7 +629,35 @@ data class Counterpoint(val parts: List<AbsPart>,
                 result = result.take(40).toMutableList()
             }
         }
-        result.toList()
+        if(compression){
+            val fromPart = this@Counterpoint.parts.size
+            result.map{ it.compress(fromPart)}
+        } else {
+            result.toList()
+        }
+    }
+    fun compress(fromPart: Int): Counterpoint {
+        val nParts1st = parts.size
+        if (fromPart >= nParts1st) return this
+        val totalSize = parts.size
+        val compressedParts = mutableListOf<Int>()
+        val deletedParts = mutableListOf<Int>()
+        deletableLoop@ for (i in fromPart until totalSize) {
+            for (j in 0 until fromPart) {
+                val deletable = parts[i]
+                val compressable = parts[j]
+                if (!compressedParts.contains(j) && compressable.isCompressable(deletable)) {
+                    compressable.compress(deletable)
+                    compressedParts.add(j)
+                    deletedParts.add(i)
+                    continue@deletableLoop
+                }
+            }
+        }
+        val newParts = parts.filterIndexed { index, _ -> !deletedParts.contains(index) }
+        return copy(parts = newParts).apply {
+            findEmptiness()
+        }
     }
     fun overlap(counterpoint: Counterpoint): Counterpoint{
         val newParts = this.parts + counterpoint.parts
