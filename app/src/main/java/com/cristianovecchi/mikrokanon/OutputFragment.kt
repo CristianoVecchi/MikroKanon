@@ -46,6 +46,7 @@ class OutputFragment: Fragment() {
                         model.dispatchIntervals()
                     }
                     model.setAppColors(it[0].colors)
+                    model.counterpointView = it[0].counterpointView
                     model.refreshZodiacFlags()
                 }
             }

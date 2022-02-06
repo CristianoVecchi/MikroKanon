@@ -1493,6 +1493,9 @@ init{
             "colors" -> {
                 newUserOptionsData  = optionsDataClone.copy(colors = value as String)
             }
+            "counterpointView" -> {
+                newUserOptionsData  = optionsDataClone.copy(counterpointView = value as Int)
+            }
             "language" -> {
                 newUserOptionsData  = optionsDataClone.copy(language = value as String)
             }
@@ -1514,6 +1517,7 @@ init{
     }
     var usingCustomColors: Boolean = false
     var appColors: AppColors = AppColors.allBlack()
+    var counterpointView = 0
     var lastIndexCustomColors = -1
     var lastAppColors = ""
     fun setAppColors(defs: String){

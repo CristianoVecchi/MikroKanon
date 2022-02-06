@@ -602,7 +602,9 @@ data class Counterpoint(val parts: List<AbsPart>,
             } else {(0..diff)}
             try {
                 val job = context.job
-                if(firstIsShorter && !crossover){
+                val crossoverTake = 4
+                val overlapTake = 16
+                if(firstIsShorter && !crossover){ // shift the first counterpoint (overlap)
                  mainLoop@  for(step in stepRange){
                         val count1st = counterpoint1st.addEmptyColumns(0, step)
                         val partialResult =  mutableListOf<Counterpoint>()
@@ -612,11 +614,10 @@ data class Counterpoint(val parts: List<AbsPart>,
                             partialResult.add(count1st.overlap(inverse.transpose(transpose)))
                             partialResult.add(count1st.overlap(retrograde.transpose(transpose)))
                             partialResult.add(count1st.overlap(inverseRetrograde.transpose(transpose)))
-                            //println("step:$step transpose:$transpose")
                         }
-                        result.addAll(partialResult.sortedBy{ it.checkVerticalFaults(intervalSet)}.take(16))
+                        result.addAll(partialResult.sortedBy{ it.checkVerticalFaults(intervalSet)}.take(overlapTake))
                     }
-                } else {
+                } else { // shift the second counterpoint (crossover or overlap)
                     mainLoop@ for(step in stepRange){
                         val orig = original2nd.addEmptyColumns(0, step)
                         val inv = inverse.addEmptyColumns(0, step)
@@ -629,9 +630,9 @@ data class Counterpoint(val parts: List<AbsPart>,
                             partialResult.add(counterpoint1st.overlap(inv.transpose(transpose)))
                             partialResult.add(counterpoint1st.overlap(retr.transpose(transpose)))
                             partialResult.add(counterpoint1st.overlap(invRetr.transpose(transpose)))
-                            //println("step:$step transpose:$transpose")
                         }
-                        result.addAll(partialResult.sortedBy{ it.checkVerticalFaults(intervalSet)}.take(4))
+                        val take = if(crossover) crossoverTake else overlapTake
+                        result.addAll(partialResult.sortedBy{ it.checkVerticalFaults(intervalSet)}.take(take))
                     }
                 }
             }  catch (ex: OutOfMemoryError){

@@ -134,6 +134,7 @@ fun SettingsDrawer(model: AppViewModel,
     val detectorDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val detExtensionDialogData by lazy { mutableStateOf(ListDialogData())}
     val colorsDialogData by lazy { mutableStateOf(ListDialogData())}
+   // val counterpointViewDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val customColorsDialogData by lazy { mutableStateOf(CustomColorsDialogData(model = model))}
     val ritornelloDialogData by lazy {mutableStateOf(ListDialogData())}
     val vibratoDialogData by lazy {mutableStateOf(ListDialogData())}
@@ -154,7 +155,7 @@ fun SettingsDrawer(model: AppViewModel,
 
         "Clear Slots", "Detector","Detector Extension",
         //"Colors",
-        "Custom Colors","Language","Zodiac","MBTI","Spacer","Credits")
+        "Custom Colors", "Counterpoint View", "Language","Zodiac","MBTI","Spacer","Credits")
     //val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val allCounterpointsData by counterpointsDataFlow.collectAsState(initial = listOf())
@@ -906,6 +907,28 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                         )
                                         customColorsDialogData.value =
                                             CustomColorsDialogData(model = model)
+                                    }
+                                })
+                        }
+                        "Counterpoint View" -> {
+                            val counterpointViewOptions: List<String> = lang.counterpointViewOptions
+                            val counterpointViewIndex = userOptions.counterpointView
+
+                            SelectableCard(
+                                text = "${lang.counterpointView}: ${counterpointViewOptions[counterpointViewIndex]}",
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = true,
+                                onClick = {
+                                    listDialogData.value = ListDialogData(
+                                        true, counterpointViewOptions, counterpointViewIndex, lang.selectCounterpointView
+                                    ) { index ->
+                                        model.updateUserOptions(
+                                            "counterpointView",
+                                            index
+                                        )
+                                        listDialogData.value =
+                                            ListDialogData(itemList = listDialogData.value.itemList)
                                     }
                                 })
                         }

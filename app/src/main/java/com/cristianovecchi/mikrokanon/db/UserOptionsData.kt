@@ -83,6 +83,9 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "colors")
         val colors: String,
 
+        @ColumnInfo(name = "counterpoint_view")
+        val counterpointView: Int,
+
         @ColumnInfo(name = "language")
         val language: String,
 
@@ -102,7 +105,8 @@ import androidx.room.PrimaryKey
                     0,0,0,1,
                      //"System|0" ,
                      "579|0" , // priority on custom color 579
-                    "System", 0, 1 )
+                    0,"System", 0, 1 )
+
             }
         }
     }

@@ -79,7 +79,6 @@ suspend fun overlapCounterpointsSortingByFaults(context: CoroutineContext, count
                                                 counterpoint2nd: Counterpoint, intervalSet: List<Int>,
                                                 maxParts: Int, crossover: Boolean): List<Counterpoint> {
      val shouldCompress = counterpoint1st.parts.size + counterpoint2nd.parts.size > maxParts
-     println("compress: $shouldCompress")
      return counterpoint1st.transposingOverlap(context, counterpoint2nd, crossover, intervalSet, shouldCompress)
           .map{ it.cutExtraParts(maxParts)}
           .sortedBy{ it.checkVerticalFaults(intervalSet)}

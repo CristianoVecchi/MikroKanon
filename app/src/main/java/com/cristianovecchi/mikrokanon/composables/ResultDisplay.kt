@@ -73,6 +73,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val language = Lang.provideLanguage(model.getUserLangDef())
     val notesNames = language.noteNames
     val colors = model.appColors
+    val counterpointView = model.counterpointView
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
 
@@ -113,14 +114,18 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
             Box(modifier = modifierAbove) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), state = listState)
                 {
-                    itemsIndexed(counterpointsData) { _ , counterpointsData ->
+                    itemsIndexed(counterpointsData) { _, counterpointsData ->
                         val counterpoint = counterpointsData.first
                         val parts = counterpointsData.second
                         val maxSize = parts.maxOf { it.size }
 
-                        var redNotes: List<List<Boolean>>? = if(detectorIntervalSet.isNotEmpty())
-                            counterpoint.detectParallelIntervals(detectorIntervalSet, detectorExtensions) else null
-                        redNotes =  if (redNotes?.flatten()?.count{ it } ?: 0 == 0) null else redNotes
+                        var redNotes: List<List<Boolean>>? = if (detectorIntervalSet.isNotEmpty())
+                            counterpoint.detectParallelIntervals(
+                                detectorIntervalSet,
+                                detectorExtensions
+                            ) else null
+                        redNotes =
+                            if (redNotes?.flatten()?.count { it } ?: 0 == 0) null else redNotes
 
                         val _clipsText: MutableList<List<String>> = mutableListOf()
                         for (i in 0 until maxSize) {
@@ -133,15 +138,29 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         }
                         val clipsText = _clipsText.toList()
 
-                        NoteTable(
-                            model,
-                            counterpoint,
-                            clipsText, colors,
-                            dimensions.outputNoteTableFontSize, dimensions.outputNoteTableCellWidth,
-                            redNotes,
-                            onClick = { onClick(counterpoint); })
-
-                       // if(model.selectedCounterpoint.value!! == counterpoint) indexSelected = index
+                        when (counterpointView) {
+                            0 -> NoteCounterpointView(
+                                model,
+                                counterpoint,
+                                clipsText,
+                                colors,
+                                dimensions.outputNoteTableFontSize,
+                                dimensions.outputNoteTableCellWidth,
+                                redNotes,
+                                onClick = { onClick(counterpoint); })
+                            1 -> MarbleCounterpointView(
+                                model = model,
+                                counterpoint = counterpoint,
+                                clipsText = clipsText,
+                                colors = colors,
+                                totalWidthDp = dimensions.width,
+                                totalHeightDp = 360,
+                                padding = 10,
+                                dpDensity = dimensions.dpDensity,
+                                redNotes = redNotes,
+                                onClick = { onClick(counterpoint); })
+                            else -> Unit
+                        }
                     }
                 }
                 if(scrollToTopList && !elaborating) {
@@ -383,7 +402,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 }
             }
             Column(
-                modifier = Modifier.background(colors.buttonsDisplayBackgroundColor)
+                modifier = Modifier
+                    .background(colors.buttonsDisplayBackgroundColor)
                     .padding(start = 10.dp, top = 8.dp, end = 15.dp, bottom = 15.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
