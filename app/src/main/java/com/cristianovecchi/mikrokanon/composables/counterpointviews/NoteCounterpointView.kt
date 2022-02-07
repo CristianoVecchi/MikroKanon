@@ -1,4 +1,4 @@
-package com.cristianovecchi.mikrokanon.composables
+package com.cristianovecchi.mikrokanon.composables.counterpointviews
 
 
 import androidx.compose.animation.animateColorAsState

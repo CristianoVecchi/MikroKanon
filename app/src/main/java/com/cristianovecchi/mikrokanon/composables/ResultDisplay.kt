@@ -4,7 +4,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -26,7 +25,11 @@ import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
+import com.cristianovecchi.mikrokanon.composables.counterpointviews.*
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
+import com.cristianovecchi.mikrokanon.convertFlagsToInts
+import com.cristianovecchi.mikrokanon.convertIntsToFlags
+import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
@@ -36,7 +39,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-@ExperimentalFoundationApi
 @Composable
 fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   selectedCounterpointFlow: Flow<Counterpoint>,
@@ -155,7 +157,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                     dimensions.outputNoteTableFontSize,
                                     dimensions.outputNoteTableCellWidth,
                                     redNotes,
-                                    onClick = { onClick(counterpoint); })
+                                    onClick = { onClick(counterpoint) })
                             }
                             1 -> MarbleCounterpointView(
                                 model = model,
@@ -167,8 +169,21 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                 padding = 10,
                                 dpDensity = dimensions.dpDensity,
                                 redNotes = redNotes,
-                                onLongClick = {},
-                                onClick = { onClick(counterpoint); })
+                                onClick = { onClick(counterpoint) })
+                            2 -> Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+                                    GraphCounterpointView(
+                                        model = model,
+                                        counterpoint = counterpoint,
+                                        ribattutos = counterpointsData.second,
+                                        colors = colors,
+                                        totalWidthDp = dimensions.width / 4 * 3,
+                                        totalHeightDp = dimensions.width / 4 * 3,
+                                        dpDensity = dimensions.dpDensity,
+                                        redNotes = redNotes,
+                                        padding = 10,
+                                        onClick = { onClick(counterpoint) })
+                                 }
+
                             else -> Unit
                         }
                     }
@@ -219,7 +234,12 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 Row(modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 15.dp, bottom = 10.dp)
-                    .clickable{ model.updateUserOptions("counterpointView", ++model.counterpointView % 2)},
+                    .clickable {
+                        model.updateUserOptions(
+                            "counterpointView",
+                            ++model.counterpointView % 3
+                        )
+                    },
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     val stackIconSize = dimensions.outputStackIconSize

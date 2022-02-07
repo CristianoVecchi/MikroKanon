@@ -1,4 +1,4 @@
-package com.cristianovecchi.mikrokanon.composables
+package com.cristianovecchi.mikrokanon.composables.counterpointviews
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateIntAsState
@@ -18,11 +18,10 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.ui.AppColors
 
-@ExperimentalFoundationApi
 @Composable
 fun MarbleCounterpointView(model: AppViewModel, counterpoint: Counterpoint, ribattutos: List<List<Any>>, colors: AppColors,
                            totalWidthDp: Int, totalHeightDp: Int, dpDensity: Float, padding: Int, redNotes: List<List<Boolean>>? = null,
-                           onLongClick: () -> Unit, onClick: (Counterpoint) -> Unit){
+                           onClick: (Counterpoint) -> Unit){
 
     val errorColor = Color.Red
     val error = redNotes != null
@@ -33,13 +32,12 @@ fun MarbleCounterpointView(model: AppViewModel, counterpoint: Counterpoint, riba
     val cellLightColor by animateColorAsState( if(isSelected) colors.cellLightColorSelected else colors.cellLightColorUnselected )
     val selectionColor = if(error) errorColor else colors.selectionBorderColor
     val textColor by animateColorAsState( if(isSelected) colors.cellTextColorSelected else colors.cellTextColorUnselected )
-    val alphas = colors.alphas
+    //val alphas = colors.alphas
 
     Canvas(modifier = Modifier.width((totalWidthDp / dpDensity).dp).height((totalHeightDp / dpDensity).dp)
         .padding(padding.dp)
         .border(BorderStroke(borderWidth.dp, selectionColor))
-        .combinedClickable(
-            //onLongClick = { onLongClick()},
+        .clickable(
             onClick = {onClick(counterpoint)}
         )
         ) {
