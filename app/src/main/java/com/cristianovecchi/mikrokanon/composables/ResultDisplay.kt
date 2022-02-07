@@ -1,7 +1,10 @@
 package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -33,6 +36,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
+@ExperimentalFoundationApi
 @Composable
 fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   selectedCounterpointFlow: Flow<Counterpoint>,
@@ -75,7 +79,9 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val colors = model.appColors
     val counterpointView = model.counterpointView
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
-    val counterpointsData: List<Pair<Counterpoint, List<List<String>>>> = counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
+    val counterpointsData: List<Pair<Counterpoint, List<List<Any>>>> =
+        if(counterpointView == 0) counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
+        else counterpoints.map{Pair(it, it.getRibattutos())}
 
     val elaborating: Boolean by elaboratingFlow.collectAsState(initial = false)
     val playing by model.playing.asFlow().collectAsState(initial = false)
@@ -127,37 +133,41 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         redNotes =
                             if (redNotes?.flatten()?.count { it } ?: 0 == 0) null else redNotes
 
-                        val _clipsText: MutableList<List<String>> = mutableListOf()
-                        for (i in 0 until maxSize) {
-                            val col: MutableList<String> = mutableListOf()
-                            for (j in parts.indices) {
-                                val text = if (i < parts[j].size) parts[j][i] else ""
-                                col.add(text)
-                            }
-                            _clipsText.add(col.toList())
-                        }
-                        val clipsText = _clipsText.toList()
+
 
                         when (counterpointView) {
-                            0 -> NoteCounterpointView(
-                                model,
-                                counterpoint,
-                                clipsText,
-                                colors,
-                                dimensions.outputNoteTableFontSize,
-                                dimensions.outputNoteTableCellWidth,
-                                redNotes,
-                                onClick = { onClick(counterpoint); })
+                            0 -> {
+                                val _clipsText: MutableList<List<String>> = mutableListOf()
+                                for (i in 0 until maxSize) {
+                                    val col: MutableList<String> = mutableListOf()
+                                    for (j in parts.indices) {
+                                        val text = if (i < parts[j].size) parts[j][i] as String else ""
+                                        col.add(text)
+                                    }
+                                    _clipsText.add(col.toList())
+                                }
+                                val clipsText = _clipsText.toList()
+                                NoteCounterpointView(
+                                    model,
+                                    counterpoint,
+                                    clipsText,
+                                    colors,
+                                    dimensions.outputNoteTableFontSize,
+                                    dimensions.outputNoteTableCellWidth,
+                                    redNotes,
+                                    onClick = { onClick(counterpoint); })
+                            }
                             1 -> MarbleCounterpointView(
                                 model = model,
                                 counterpoint = counterpoint,
-                                clipsText = clipsText,
+                                ribattutos = counterpointsData.second,
                                 colors = colors,
                                 totalWidthDp = dimensions.width,
                                 totalHeightDp = 360,
                                 padding = 10,
                                 dpDensity = dimensions.dpDensity,
                                 redNotes = redNotes,
+                                onLongClick = {},
                                 onClick = { onClick(counterpoint); })
                             else -> Unit
                         }
@@ -208,8 +218,10 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 // STACK ICONS
                 Row(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp, end = 15.dp, bottom = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween){
+                    .padding(start = 10.dp, end = 15.dp, bottom = 10.dp)
+                    .clickable{ model.updateUserOptions("counterpointView", ++model.counterpointView % 2)},
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ){
                     val stackIconSize = dimensions.outputStackIconSize
                     val percentFontSize = dimensions.outputPercentFontSize
                     Row{

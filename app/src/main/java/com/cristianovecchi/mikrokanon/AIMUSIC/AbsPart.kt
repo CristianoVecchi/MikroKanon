@@ -252,11 +252,28 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         }
     }
 
+    fun getRibattutos(): List<Boolean>{
+        val size = absPitches.size
+        if(size == 0) return listOf()
+        if(size == 1) return listOf(false)
+        val result = mutableListOf<Boolean>()
+        for(i in 0 until size-1){
+            when (absPitches[i]) {
+                -1 -> result.add(false)
+                absPitches[i+1] -> result.add(true)
+                else -> result.add(false)
+            }
+        }
+        result.add(false)
+        return result.toList()
+    }
+
 
 }
 fun main(args : Array<String>){
     val part = AbsPart(mutableListOf(9,0,4,5,1,-1,-1,4,4,5,-1,5,7,8,1,1))
-    println(Insieme.findMelody(0, part.absPitches.toIntArray(),
-        21,108,3).contentToString())
+    println(part.getRibattutos())
+//    println(Insieme.findMelody(0, part.absPitches.toIntArray(),
+//        21,108,3).contentToString())
     //println(part.subSequences())
 }

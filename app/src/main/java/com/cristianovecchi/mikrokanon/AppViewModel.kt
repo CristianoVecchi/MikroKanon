@@ -154,7 +154,8 @@ class AppViewModel(
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
     val MAX_PARTS = 12
-    val MAX_NOTES_MK = 27
+    val MAX_NOTES_MK_4 = 27
+    val MAX_NOTES_MK_5RED = 21
 
     private val  MAX_VISIBLE_COUNTERPOINTS: Int = 74
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
@@ -938,7 +939,7 @@ init{
         viewModelScope.launch(Dispatchers.Main){
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
-                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.take(MAX_NOTES_MK).toList()
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.take(MAX_NOTES_MK_4).toList()
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if(mk4cache.containsKey(key) && !deepSearch) {
                     changeCounterpointsWithLimit(mk4cache[key]!!, true)
@@ -976,7 +977,7 @@ init{
         viewModelScope.launch(Dispatchers.Main) {
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if (sequenceToMikroKanons.value!!.isNotEmpty()) {
-                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.take(MAX_NOTES_MK).toList()
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.take(MAX_NOTES_MK_5RED).toList()
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if (mk5reductedCache.containsKey(key) ) {
                     changeCounterpointsWithLimit(mk5reductedCache[key]!!, true)

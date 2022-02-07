@@ -703,6 +703,10 @@ data class Counterpoint(val parts: List<AbsPart>,
         return faults
     }
 
+    fun getRibattutos(): List<List<Boolean>> {
+        return parts.map { it.getRibattutos() }
+    }
+
 
     companion object {
         fun createFromCsv(doubleLevelCsv: String, partSeparator: String = "\n", timestamp: Long? = null): Counterpoint{

@@ -36,7 +36,9 @@ data class AppColors(
     val buttonsDisplayBackgroundColor: Color = Color(0.30f,0.30f,1.0f,1.0f),
 
     val drawerBackgroundColor: Color = Color(0.2f,0.2f,1.0f,1.0f),
-    val inputBackgroundColor: Color = Color(0.3f,0.3f,0.6f,1.0f)
+    val inputBackgroundColor: Color = Color(0.3f,0.3f,0.6f,1.0f),
+
+    val alphas: Array<Float> = (0..12).map { 1f - it * 0.03f }.toTypedArray()
 ){
     companion object{
         fun allBlack(): AppColors{
