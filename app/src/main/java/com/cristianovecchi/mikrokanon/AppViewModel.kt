@@ -36,7 +36,7 @@ sealed class Computation(open val icon: String = "") {
     data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int, val repeat: Boolean, override val icon: String = "counterpoint"): Computation()
     data class FirstFromWave(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val nWaves: Int, override val icon: String = "waves"): Computation()
     data class FirstFromLoading(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val position: Int, override val icon: String = "save"): Computation()
-    data class Pedal(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, val intervalSet: List<Int>, val nPedals: Int, override val icon: String = "pedal"): Computation()
+    data class Pedal(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, val nPedals: Int, override val icon: String = "pedal"): Computation()
     data class FurtherFromKP(val counterpoint: Counterpoint, val indexSequenceToAdd: Int, val repeat: Boolean, override val icon: String = "counterpoint"): Computation()
     data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int, override val icon: String = "waves"): Computation()
     data class FirstFromFreePart(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val trend: TREND, override val icon: String = "free_parts"): Computation()
@@ -154,8 +154,11 @@ class AppViewModel(
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
     val MAX_PARTS = 12
-    val MAX_NOTES_MK_4 = 27
-    val MAX_NOTES_MK_5RED = 21
+    val MAX_NOTES_MK_2= 200
+    val MAX_NOTES_MK_3 = 74
+    val MAX_NOTES_MK_4 = 32
+    val MAX_NOTES_MK_4DEEP = 18
+    val MAX_NOTES_MK_5RED = 25
 
     private val  MAX_VISIBLE_COUNTERPOINTS: Int = 74
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
@@ -468,7 +471,7 @@ init{
     }
     val onOverlap = { position: Int , crossover: Boolean->
         val counterpoint2nd = savedCounterpoints[position]
-        if (counterpoint2nd != null && counterpoint2nd.parts.size < MAX_PARTS) {
+        if (counterpoint2nd != null ) {
             val computation = if(crossover) Computation.Crossover(selectedCounterpoint.value!!.clone(),counterpoint2nd.clone(), null)
                 else Computation.Overlap(selectedCounterpoint.value!!.clone(),counterpoint2nd.clone(), null)
             computationStack.pushAndDispatch(computation)
@@ -629,13 +632,13 @@ init{
     val onPedalFromSelector = { nPedals: Int, list: ArrayList<Clip>->
         changeFirstSequence(list)
         computationStack.pushAndDispatch(Computation.Pedal(selectedCounterpoint.value!!.clone(),
-            ArrayList(firstSequence.value!!), intervalSet.value!!.toList(), nPedals))
+            ArrayList(firstSequence.value!!), nPedals))
         convertFirstSequenceToSelectedCounterpoint()
         findPedal(nPedals, list)
     }
     val onPedal= { nPedals: Int ->
         computationStack.pushAndDispatch(Computation.Pedal(selectedCounterpoint.value!!.clone(),
-            null,intervalSet.value!!.toList(), nPedals))
+            null, nPedals))
         findPedal(nPedals,null)
     }
     val onFreePartFromFirstSelection = { list: ArrayList<Clip>, trend: TREND ->
@@ -885,7 +888,7 @@ init{
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = waves(listOf(Counterpoint.counterpointFromClipList(firstSequence.value!!)), intervalSet.value!!,nWaves)
+                newList = waves(listOf(Counterpoint.counterpointFromClipList(firstSequence.value!!)), intervalSet.value!! ,intervalSetHorizontal.value!!, nWaves)
             }
             changeCounterpointsWithLimit(newList, true)
         }
@@ -896,7 +899,7 @@ init{
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
-                    newList = waves(originalCounterpoints,intervalSet.value!!, nWaves)
+                    newList = waves(originalCounterpoints,intervalSet.value!!, intervalSetHorizontal.value!!, nWaves)
                             .sortedBy { it.emptiness }//.take(maxVisibleCounterpoints)
                             .mapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                             .sortedBy { it.emptiness }
@@ -924,7 +927,7 @@ init{
         }
     }
 
-    private val jobQueue = java.util.LinkedList<Job>()
+    private val jobQueue = LinkedList<Job>()
     private fun cancelPreviousMKjobs() {
         if(jobQueue.isNotEmpty()) {
             viewModelScope.launch(Dispatchers.Main) {
@@ -939,7 +942,8 @@ init{
         viewModelScope.launch(Dispatchers.Main){
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
-                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.take(MAX_NOTES_MK_4).toList()
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
+                    .take( if(deepSearch) MAX_NOTES_MK_4DEEP else MAX_NOTES_MK_4 )
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if(mk4cache.containsKey(key) && !deepSearch) {
                     changeCounterpointsWithLimit(mk4cache[key]!!, true)
@@ -951,12 +955,12 @@ init{
                        // val def = async(Dispatchers.Default + MKjob) {
                            val newList = withContext(Dispatchers.Default){
                             mikroKanons4(this.coroutineContext.job,
-                                sequenceToMikroKanons.value!!,
+                                sequence,
                                 deepSearch,
-                                intervalSet.value!!
+                                intervalSet.value!!,
+                                MAX_VISIBLE_COUNTERPOINTS
                             )
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                                .take(MAX_VISIBLE_COUNTERPOINTS)
                                 .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
@@ -977,7 +981,7 @@ init{
         viewModelScope.launch(Dispatchers.Main) {
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if (sequenceToMikroKanons.value!!.isNotEmpty()) {
-                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.take(MAX_NOTES_MK_5RED).toList()
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_5RED)
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if (mk5reductedCache.containsKey(key) ) {
                     changeCounterpointsWithLimit(mk5reductedCache[key]!!, true)
@@ -988,11 +992,11 @@ init{
                         val newList = withContext(Dispatchers.Default) {
                             mikroKanons5reducted(
                                 this.coroutineContext.job,
-                                sequenceToMikroKanons.value!!,
-                                intervalSet.value!!
+                                sequence,
+                                intervalSet.value!!,
+                                MAX_VISIBLE_COUNTERPOINTS
                             )
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                                .take(MAX_VISIBLE_COUNTERPOINTS)
                                 .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
@@ -1009,7 +1013,7 @@ init{
     private fun findCounterpointsByMikroKanons3(){
          viewModelScope.launch(Dispatchers.Main){
             if(sequenceToMikroKanons.value!!.isNotEmpty()) {
-                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_3)
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if(mk3cache.containsKey(key)) {
                     changeCounterpointsWithLimit(mk3cache[key]!!, true)
@@ -1017,7 +1021,7 @@ init{
                     val newList: List<Counterpoint>
                     _elaborating.value = true
                     withContext(Dispatchers.Default) {
-                        newList = mikroKanons3(sequenceToMikroKanons.value!!,intervalSet.value!!, 6)
+                        newList = mikroKanons3(sequence,intervalSet.value!!, 6)
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
                             .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
@@ -1034,7 +1038,8 @@ init{
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = mikroKanons2(sequenceToMikroKanons.value!!,intervalSet.value!!, 7)
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_2)
+                newList = mikroKanons2(sequence,intervalSet.value!!, 7)
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
                     .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
@@ -1410,109 +1415,21 @@ init{
             userRepository.insertUserOptions(newUserOptionsData)
         }
     }
-
     fun updateUserOptions(key: String, value: Any){
-        var newUserOptionsData: UserOptionsData? = null
+        println("$key: $value")
         val optionsDataClone = if(userOptionsData.value!!.isEmpty())
                                 UserOptionsData.getDefaultUserOptionsData()
                                 else userOptionsData.value!![0].copy()
         when(key){
-            "ensembleTypes" -> {
-                newUserOptionsData = optionsDataClone.copy(ensembleTypes = value as String)
-            }
-            "rangeTypes" -> {
-                newUserOptionsData = optionsDataClone.copy(rangeTypes = value as String)
-            }
-            "legatoTypes" -> {
-                newUserOptionsData = optionsDataClone.copy(legatoTypes = value as String)
-            }
-            "melodyTypes" -> {
-                newUserOptionsData = optionsDataClone.copy(melodyTypes = value as String)
-            }
-            "glissandoFlags" -> {
-                newUserOptionsData  = optionsDataClone.copy(glissandoFlags = value as Int)
-            }
-            "vibrato" -> {
-                newUserOptionsData  = optionsDataClone.copy(vibrato = value as Int)
-            }
-            "dynamics" -> {
-                newUserOptionsData = optionsDataClone.copy(dynamics = value as String)
-            }
-            "bpms" -> {
-                newUserOptionsData = optionsDataClone.copy(bpms = value as String)
-            }
-            "rhythm" -> {
-                newUserOptionsData = optionsDataClone.copy(rhythm = value as String)
-            }
-            "rhythmShuffle" -> {
-                newUserOptionsData = optionsDataClone.copy(rhythmShuffle = value as Int)
-            }
-            "partsShuffle" -> {
-                newUserOptionsData = optionsDataClone.copy(partsShuffle = value as Int)
-            }
-            "rowForms" -> {
-                newUserOptionsData = optionsDataClone.copy(rowForms = value as String)
-            }
-//            "rowFormsFlags" -> {
-//                var flags = value as Int
-//                flags = if(flags and 0b10000 > 0 && flags and 0b1110 == 0) 1 else flags // deactivate separator if row forms are unactive
-//                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = flags)
-//            }
-            "ritornello" -> {
-                newUserOptionsData  = optionsDataClone.copy(ritornello = value as Int)
-            }
-            "transpose" -> {
-                newUserOptionsData = optionsDataClone.copy(transpose = value as String)
-            }
-            "doublingFlags" -> {
-                newUserOptionsData  = optionsDataClone.copy(doublingFlags = value as Int)
-            }
-            "audio8DFlags" -> {
-                newUserOptionsData  = optionsDataClone.copy(audio8DFlags = value as Int)
-            }
-            "intSetVertFlags" -> {
-                newUserOptionsData  = optionsDataClone.copy(intSetVertFlags = value as Int)
-            }
-            "intSetHorFlags" -> {
-                newUserOptionsData  = optionsDataClone.copy(intSetHorFlags = value as Int)
-            }
-            "spread" -> {
-                newUserOptionsData  = optionsDataClone.copy(spread = value as Int)
-                clearMKcaches()
-            }
-            "deepSearch" -> {
-                newUserOptionsData  = optionsDataClone.copy(deepSearch = value as Int)
-                mk4cache.clear()
-                mk4deepSearchCache.clear()
-            }
-            "detectorFlags" -> {
-                newUserOptionsData  = optionsDataClone.copy(detectorFlags = value as Int)
-            }
-            "detectorExtension" -> {
-                newUserOptionsData  = optionsDataClone.copy(detectorExtension = value as Int)
-            }
-            "colors" -> {
-                newUserOptionsData  = optionsDataClone.copy(colors = value as String)
-            }
-            "counterpointView" -> {
-                newUserOptionsData  = optionsDataClone.copy(counterpointView = value as Int)
-            }
-            "language" -> {
-                newUserOptionsData  = optionsDataClone.copy(language = value as String)
-            }
-            "zodiacFlags" -> {
-                newUserOptionsData  = optionsDataClone.copy(zodiacFlags = value as Int)
-            }
-            "nuances" -> {
-                newUserOptionsData  = optionsDataClone.copy(nuances = value as Int)
-            }
+            "spread" -> clearMKcaches()
+            "deepSearch" -> { mk4cache.clear(); mk4deepSearchCache.clear() }
         }
-        newUserOptionsData?.let {
+        UserOptionsData.updateUserOptionsData(optionsDataClone, key, value).apply{
             viewModelScope.launch(Dispatchers.IO) {
                 if(userOptionsData.value!!.isNotEmpty()){
                     userRepository.deleteAllUserOptions()
                 }
-                userRepository.insertUserOptions(newUserOptionsData)
+                userRepository.insertUserOptions(this@apply)
             }
         }
     }

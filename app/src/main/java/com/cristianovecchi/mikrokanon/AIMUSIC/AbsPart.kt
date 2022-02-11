@@ -201,7 +201,7 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         result.forEach{ pair ->
             val sequenceSize = pair.second - pair.first
             val divisors = (sequenceSize downTo 1).filter{ sequenceSize % it == 0 }//.also{println("divisors: "+it)}
-            if (sequenceSize == 1 || divisors == listOf(1)) {
+            if (sequenceSize in 1..3 || divisors == listOf(1)) {
                 checkedResult.add(pair)
             } else {
                 val sequence = this.absPitches.subList(pair.first, pair.second)
@@ -271,9 +271,9 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
 
 }
 fun main(args : Array<String>){
-    val part = AbsPart(mutableListOf(9,0,4,5,1,-1,-1,4,4,5,-1,5,7,8,1,1))
-    println(part.getRibattutos())
+    val part = AbsPart(mutableListOf(-1,-1, 9,0,4,5,1,-1,-1,4,4,5,-1,5,7,8,1,1))
+    //println(part.getRibattutos())
 //    println(Insieme.findMelody(0, part.absPitches.toIntArray(),
 //        21,108,3).contentToString())
-    //println(part.subSequences())
+    println(part.subSequences())
 }

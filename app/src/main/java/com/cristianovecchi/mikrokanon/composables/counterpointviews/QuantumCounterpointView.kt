@@ -27,9 +27,9 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @Composable
-fun GraphCounterpointView(model: AppViewModel, counterpoint: Counterpoint, ribattutos: List<List<Any>>, colors: AppColors,
-                           totalWidthDp: Int, totalHeightDp: Int, dpDensity: Float, padding: Int, redNotes: List<List<Boolean>>? = null,
-                           onClick: (Counterpoint) -> Unit){
+fun QuantumCounterpointView(model: AppViewModel, counterpoint: Counterpoint, ribattutos: List<List<Any>>, colors: AppColors,
+                            totalWidthDp: Int, totalHeightDp: Int, dpDensity: Float, padding: Int, redNotes: List<List<Boolean>>? = null,
+                            onClick: (Counterpoint) -> Unit){
 
     val errorColor = Color.Red
     val error = redNotes != null
@@ -53,7 +53,7 @@ fun GraphCounterpointView(model: AppViewModel, counterpoint: Counterpoint, ribat
         val maxLength = counterpoint.maxSize()
         val strokeWidth = 8f
         val colorStep = 0.03f
-        var newTextColor = textColor.shift(-colorStep * nParts)
+        var newTextColor = textColor.shift(-colorStep * (nParts-1))
         val allX = this.size.width
         val allY = this.size.height
         val allXhalf = allX / 2f
@@ -65,7 +65,6 @@ fun GraphCounterpointView(model: AppViewModel, counterpoint: Counterpoint, ribat
             val part = counterpoint.parts[noteY]
             var x = allX / 2f
             var y = allY / 2f
-            var dx = 0.0; var dy = 0.0
             var angle = 90.0
             for(noteX in 0 until maxLength){
                 val value = if (noteX < part.absPitches.size) part.absPitches[noteX] else -1
@@ -76,13 +75,13 @@ fun GraphCounterpointView(model: AppViewModel, counterpoint: Counterpoint, ribat
                 val ny = (y + sin(radAngle) * segment).toFloat()
 
                 val lineColor = if(value == -1) Color.Transparent else if(error && redNotes!![noteY][noteX]) errorColor else newTextColor
-               // drawLine(lineColor, Offset(0f,0f), Offset(allX, allY), strokeWidth = strokeWidth)
                 drawLine(lineColor, Offset(x, y), Offset(nx, ny), strokeWidth = strokeWidth, cap = StrokeCap.Round)
                 x = nx; y = ny
 
             }
             newTextColor = newTextColor.shift(colorStep)
         }
+//      ANGLES TEST
 //        val angles = listOf(0.0, 30.0, 60.0, 90.0)
 //        for(a in angles){
 //            val x = allX / 2f

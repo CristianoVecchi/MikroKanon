@@ -137,8 +137,8 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun getAbsPitches(): List<List<Int>>{
         return parts.map{ it.absPitches }
     }
-    fun addWave(intervalSet: List<Int>, startAbsPitch: Int, steps: List<Int> ): Counterpoint {
-        return findWave(this, intervalSet, startAbsPitch, steps )
+    fun addWave(intervalSet: List<Int>, horIntervalSet: List<Int>, startAbsPitch: Int, steps: List<Int> ): Counterpoint {
+        return findWave(this, intervalSet, horIntervalSet, startAbsPitch, steps )
     }
     fun nNotes(): Int {
         if (parts.isEmpty()) return 0
@@ -805,16 +805,17 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
             return Counterpoint(parts, counterpoint.intervalSet)
         }
-        fun findWave(counterpoint: Counterpoint, intervalSet: List<Int>, startAbsPitch : Int,
+        fun findWave(counterpoint: Counterpoint, intervalSet: List<Int>, horIntervalSet: List<Int>, startAbsPitch : Int,
                      steps: List<Int>, trend: List<Int> = TREND.ASCENDANT_STATIC.directions ) : Counterpoint {
             val result = mutableListOf<Int>()
             var index = 0
             val maxSize: Int = counterpoint.parts.maxOf { it.absPitches.size }
             var lastAbsPitch = startAbsPitch
             val absSteps = steps.map{(startAbsPitch + it) % 12}
+            val filteredTrend = trend.filter{ horIntervalSet.contains(it)}
             while(index < maxSize){
                 var resultPitch = -1
-                val trendSteps = trend.map{(lastAbsPitch + it) % 12}.filter{absSteps.contains(it)}
+                val trendSteps = filteredTrend.map{(lastAbsPitch + it) % 12}.filter{absSteps.contains(it)}
                 trendSteps@for(step in trendSteps) {
                     val matchValues = counterpoint.getColumnValues(index)
                     val isValid = matchValues.map{
@@ -831,29 +832,29 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
             return Counterpoint(listOf(*counterpoint.parts.toTypedArray(), AbsPart(result)), intervalSet)
         }
-        fun findAllWithWaves(counterpoints: List<Counterpoint>, intervalSet: List<Int>, nWaves: Int) : List<Counterpoint>{
-            return counterpoints.map{ findOneWithWaves(it, intervalSet, nWaves)}
+        fun findAllWithWaves(counterpoints: List<Counterpoint>, intervalSet: List<Int>, horIntervalSet: List<Int>, nWaves: Int) : List<Counterpoint>{
+            return counterpoints.map{ findOneWithWaves(it, intervalSet, horIntervalSet, nWaves)}
         }
-        fun findOneWithWaves(counterpoint: Counterpoint, intervalSet: List<Int>, nWaves: Int, nPartsLimit: Int = 12) : Counterpoint{
+        fun findOneWithWaves(counterpoint: Counterpoint, intervalSet: List<Int>, horIntervalSet: List<Int>, nWaves: Int, nPartsLimit: Int = 12) : Counterpoint{
             val steps4 = (0..3).toList()
             val steps3 = (0..2).toList()
             val steps2 = (0..1).toList()
             return when (nWaves){
-                3 -> counterpoint.addWave(intervalSet, 0, steps4)
-                    .addWave(intervalSet, 4, steps4)
-                    .addWave(intervalSet, 8, steps4)
+                3 -> counterpoint.addWave(intervalSet, horIntervalSet, 0, steps4)
+                    .addWave(intervalSet, horIntervalSet,4, steps4)
+                    .addWave(intervalSet, horIntervalSet,8, steps4)
                     .cutExtraParts(nPartsLimit)
-                4 -> counterpoint.addWave(intervalSet, 0, steps3)
-                    .addWave(intervalSet, 3, steps3)
-                    .addWave(intervalSet, 6, steps3)
-                    .addWave(intervalSet, 9, steps3)
+                4 -> counterpoint.addWave(intervalSet, horIntervalSet,0, steps3)
+                    .addWave(intervalSet, horIntervalSet,3, steps3)
+                    .addWave(intervalSet, horIntervalSet,6, steps3)
+                    .addWave(intervalSet, horIntervalSet,9, steps3)
                     .cutExtraParts(nPartsLimit)
-                6 -> counterpoint.addWave(intervalSet, 0, steps2)
-                    .addWave(intervalSet, 2, steps2)
-                    .addWave(intervalSet, 4, steps2)
-                    .addWave(intervalSet, 6, steps2)
-                    .addWave(intervalSet, 8, steps2)
-                    .addWave(intervalSet, 10, steps2)
+                6 -> counterpoint.addWave(intervalSet,horIntervalSet, 0, steps2)
+                    .addWave(intervalSet, horIntervalSet,2, steps2)
+                    .addWave(intervalSet, horIntervalSet,4, steps2)
+                    .addWave(intervalSet, horIntervalSet,6, steps2)
+                    .addWave(intervalSet, horIntervalSet,8, steps2)
+                    .addWave(intervalSet, horIntervalSet,10, steps2)
                     .cutExtraParts(nPartsLimit)
                 else -> counterpoint
             }

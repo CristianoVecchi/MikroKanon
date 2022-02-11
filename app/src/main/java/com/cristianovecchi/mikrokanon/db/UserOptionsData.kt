@@ -5,8 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
-
-    @Entity(tableName = "useroptions_data")
+@Entity(tableName = "useroptions_data")
     data class UserOptionsData(
         @PrimaryKey(autoGenerate = true)
         @ColumnInfo(name = "id")
@@ -96,7 +95,7 @@ import androidx.room.PrimaryKey
         val nuances: Int,
     ){
         companion object{
-            fun getDefaultUserOptionsData(): UserOptionsData{
+            fun getDefaultUserOptionsData(): UserOptionsData {
                 return UserOptionsData(0,"2", "2|0","4|0","0",
                     0,0,
                     "0.828", "90", "20|1",
@@ -106,7 +105,101 @@ import androidx.room.PrimaryKey
                      //"System|0" ,
                      "579|0" , // priority on custom color 579
                     0,"System", 0, 1 )
-
+            }
+            fun updateUserOptionsData(
+                optionsDataClone: UserOptionsData,
+                key: String,
+                value: Any
+            ): UserOptionsData {
+                return when (key) {
+                    "ensembleTypes" -> {
+                        optionsDataClone.copy(ensembleTypes = value as String)
+                    }
+                    "rangeTypes" -> {
+                        optionsDataClone.copy(rangeTypes = value as String)
+                    }
+                    "legatoTypes" -> {
+                        optionsDataClone.copy(legatoTypes = value as String)
+                    }
+                    "melodyTypes" -> {
+                        optionsDataClone.copy(melodyTypes = value as String)
+                    }
+                    "glissandoFlags" -> {
+                        optionsDataClone.copy(glissandoFlags = value as Int)
+                    }
+                    "vibrato" -> {
+                        optionsDataClone.copy(vibrato = value as Int)
+                    }
+                    "dynamics" -> {
+                        optionsDataClone.copy(dynamics = value as String)
+                    }
+                    "bpms" -> {
+                        optionsDataClone.copy(bpms = value as String)
+                    }
+                    "rhythm" -> {
+                        optionsDataClone.copy(rhythm = value as String)
+                    }
+                    "rhythmShuffle" -> {
+                        optionsDataClone.copy(rhythmShuffle = value as Int)
+                    }
+                    "partsShuffle" -> {
+                        optionsDataClone.copy(partsShuffle = value as Int)
+                    }
+                    "rowForms" -> {
+                        optionsDataClone.copy(rowForms = value as String)
+                    }
+//            "rowFormsFlags" -> {
+//                var flags = value as Int
+//                flags = if(flags and 0b10000 > 0 && flags and 0b1110 == 0) 1 else flags // deactivate separator if row forms are unactive
+//                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = flags)
+//            }
+                    "ritornello" -> {
+                        optionsDataClone.copy(ritornello = value as Int)
+                    }
+                    "transpose" -> {
+                        optionsDataClone.copy(transpose = value as String)
+                    }
+                    "doublingFlags" -> {
+                        optionsDataClone.copy(doublingFlags = value as Int)
+                    }
+                    "audio8DFlags" -> {
+                        optionsDataClone.copy(audio8DFlags = value as Int)
+                    }
+                    "intSetVertFlags" -> {
+                        optionsDataClone.copy(intSetVertFlags = value as Int)
+                    }
+                    "intSetHorFlags" -> {
+                        optionsDataClone.copy(intSetHorFlags = value as Int)
+                    }
+                    "spread" -> {
+                        optionsDataClone.copy(spread = value as Int)
+                    }
+                    "deepSearch" -> {
+                        optionsDataClone.copy(deepSearch = value as Int)
+                    }
+                    "detectorFlags" -> {
+                        optionsDataClone.copy(detectorFlags = value as Int)
+                    }
+                    "detectorExtension" -> {
+                        optionsDataClone.copy(detectorExtension = value as Int)
+                    }
+                    "colors" -> {
+                        optionsDataClone.copy(colors = value as String)
+                    }
+                    "counterpointView" -> {
+                        optionsDataClone.copy(counterpointView = value as Int)
+                    }
+                    "language" -> {
+                        optionsDataClone.copy(language = value as String)
+                    }
+                    "zodiacFlags" -> {
+                        optionsDataClone.copy(zodiacFlags = value as Int)
+                    }
+                    "nuances" -> {
+                        optionsDataClone.copy(nuances = value as Int)
+                    }
+                    else -> optionsDataClone.copy()
+                }
             }
         }
     }

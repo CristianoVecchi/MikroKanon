@@ -6,8 +6,8 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 
-suspend fun waves(counterpoints: List<Counterpoint>, intervalSet: List<Int>, nWaves: Int) : List<Counterpoint>{
-     return Counterpoint.findAllWithWaves(counterpoints,  intervalSet, nWaves)
+suspend fun waves(counterpoints: List<Counterpoint>, intervalSet: List<Int>, horIntervalSet: List<Int>, nWaves: Int) : List<Counterpoint>{
+     return Counterpoint.findAllWithWaves(counterpoints,  intervalSet, horIntervalSet, nWaves)
 }
 suspend fun freeParts(counterpoint: Counterpoint, intervalSet: List<Int>, directions: List<Int>) : List<Counterpoint>{
     return Counterpoint.findAllFreeParts(counterpoint, intervalSet, directions)
@@ -27,9 +27,10 @@ fun convertIntervalSetToByte(intervalSet: IntArray): Int {
 }
 suspend fun mikroKanons4(
      context: CoroutineContext,
-     sequence: List<Clip>,
+     sequence: List<Int>,
      deepSearch: Boolean,
-     intervalSet: List<Int>
+     intervalSet: List<Int>,
+     maxNresults: Int
 ): List<Counterpoint> = withContext(context){
      val emptinessGate = if(!deepSearch) 1.0f else when (intervalSet.size) {
           0 -> 0.69f
@@ -42,25 +43,28 @@ suspend fun mikroKanons4(
           else -> 0.001f
      }
      val depth = if(deepSearch) 4 else 2
-      MikroKanon.findAll4AbsPartMikroKanonsParallel(context, sequence.map { it.abstractNote },  intervalSet, depth, emptinessGate)
+      MikroKanon.findAll4AbsPartMikroKanonsParallel(context, sequence,
+           intervalSet, depth, emptinessGate, maxNresults)
           .pmap { it.toCounterpoint() }
 }
 suspend fun mikroKanons5reducted(
      context: CoroutineContext,
-     sequence: List<Clip>,
-     intervalSet: List<Int>
+     sequence: List<Int>,
+     intervalSet: List<Int>,
+     maxNresults: Int
 ): List<Counterpoint> = withContext(context){
      val emptinessGate = 1.0f
      val depth = 2
-     MikroKanon.findAll5AbsPartMikroKanonsParallelReducted(context, sequence.map { it.abstractNote },  intervalSet, depth, emptinessGate)
+     MikroKanon.findAll5AbsPartMikroKanonsParallelReducted(context, sequence,
+          intervalSet, depth, emptinessGate, maxNresults)
           .pmap { it.toCounterpoint() }
 }
-suspend fun mikroKanons3(sequence: List<Clip>, intervalSet: List<Int>, depth: Int = 6): List<Counterpoint>{
-     return MikroKanon.findAll3AbsPartMikroKanonsParallel(sequence.map { it.abstractNote }, intervalSet, depth)
+suspend fun mikroKanons3(sequence: List<Int>, intervalSet: List<Int>, depth: Int = 6): List<Counterpoint>{
+     return MikroKanon.findAll3AbsPartMikroKanonsParallel(sequence, intervalSet, depth)
                                    .pmap { it.toCounterpoint() }
 }
-suspend fun mikroKanons2(sequence: List<Clip>, intervalSet: List<Int>, depth: Int = 6): List<Counterpoint>{
-     return MikroKanon.findAll2AbsPartMikroKanons(sequence.map { it.abstractNote }, intervalSet, depth)
+suspend fun mikroKanons2(sequence: List<Int>, intervalSet: List<Int>, depth: Int = 6): List<Counterpoint>{
+     return MikroKanon.findAll2AbsPartMikroKanons(sequence, intervalSet, depth)
           .pmap { it.toCounterpoint() }
 }
 suspend fun flourish(originalCounterpoints: List<Counterpoint>, intervalSet: List<Int>, horIntervalSet: List<Int>): List<Counterpoint>{

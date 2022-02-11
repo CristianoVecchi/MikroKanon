@@ -41,16 +41,18 @@ fun MarbleCounterpointView(model: AppViewModel, counterpoint: Counterpoint, riba
             onClick = {onClick(counterpoint)}
         )
         ) {
-        val cellWidth = ((100f / ribattutos[0].size) * ((this.size.width) )/ 100f)
-        val cellHeight = ((100f / ribattutos.size) * ((this.size.height ) ) / 100f)
+        val nParts = counterpoint.parts.size
+        val maxLength = counterpoint.maxSize()
+        val cellWidth = ((100f / maxLength) * ((this.size.width) )/ 100f)
+        val cellHeight = ((100f / nParts) * ((this.size.height ) ) / 100f)
         val cellWidthHalf = cellWidth / 2
         val cellHeightHalf = cellHeight / 2
         val minDimensionHalf = if(cellWidth <= cellHeight) cellWidth * 0.4f else cellHeight * 0.4f
         val strokeWidth = minDimensionHalf * 2
             drawRect(cellDarkColor, Offset(0f,0f ),
             Size(this.size.width, this.size.height ))
-        val maxLength = counterpoint.maxSize()
-        for(y in ribattutos.indices){
+
+        for(y in 0 until nParts){
             val part = counterpoint.parts[y]
             for(x in 0 until maxLength){
                 if((x + y) % 2 == 0) {

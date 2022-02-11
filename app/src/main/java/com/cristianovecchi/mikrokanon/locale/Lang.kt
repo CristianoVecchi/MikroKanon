@@ -361,7 +361,7 @@ data class Lang( // English by default
     val customColors: String = "Colors",
     val counterpointView: String = "View",
     val selectCounterpointView: String = "Select a counterpoint view!",
-    val counterpointViewOptions: List<String> = listOf("Notes", "Marbles", "Graph"),
+    val counterpointViewOptions: List<String> = listOf("Notes", "Marbles", "Quantum"),
     val language: String = "Language",
     val zodiac: String = "Zodiac",
     val zodiacOptions: List<String> = listOf("Planets", "Signs", "Emojis"),

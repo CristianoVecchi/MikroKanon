@@ -1,7 +1,6 @@
 package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,6 +32,7 @@ import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
+import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import com.cristianovecchi.mikrokanon.ui.shift
 
 import kotlinx.coroutines.delay
@@ -171,17 +171,42 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                 redNotes = redNotes,
                                 onClick = { onClick(counterpoint) })
                             2 -> Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                                    GraphCounterpointView(
+                                val squareSide = (dimensions.width / 4 * 3)
+                                Column(Modifier.width((dimensions.width / 4 / 2 /dimensions.dpDensity).dp)
+                                    .height((squareSide / dimensions.dpDensity).dp)
+                                    .clickable( onClick = {
+                                            val colorDefs = extractColorDefs(userOptionsData[0].colors)
+                                            val  colorIndex = (model.lastIndexCustomColors - 1).coerceIn(0, G.getArraySize() -1)
+                                            model.updateUserOptions(
+                                                "colors",
+                                                "$colorIndex||${colorDefs.app}"
+                                            )
+                                        }
+                                    )
+                                ){}
+                                QuantumCounterpointView(
                                         model = model,
                                         counterpoint = counterpoint,
                                         ribattutos = counterpointsData.second,
                                         colors = colors,
-                                        totalWidthDp = dimensions.width / 4 * 3,
-                                        totalHeightDp = dimensions.width / 4 * 3,
+                                        totalWidthDp = squareSide,
+                                        totalHeightDp = squareSide,
                                         dpDensity = dimensions.dpDensity,
                                         redNotes = redNotes,
                                         padding = 10,
                                         onClick = { onClick(counterpoint) })
+                                Column(Modifier.width((dimensions.width / 4 / 2 /dimensions.dpDensity).dp)
+                                    .height((squareSide / dimensions.dpDensity).dp)
+                                    .clickable( onClick = {
+                                        val colorDefs = extractColorDefs(userOptionsData[0].colors)
+                                        val  colorIndex = (model.lastIndexCustomColors +1 ).coerceIn(0, G.getArraySize() -1)
+                                        model.updateUserOptions(
+                                            "colors",
+                                            "$colorIndex||${colorDefs.app}"
+                                        )
+                                    }
+                                    )
+                                ){}
                                  }
 
                             else -> Unit

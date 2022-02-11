@@ -7763,6 +7763,199 @@
 
         <item>#8ad2ce</item>
     </array>
+
+    <array name="colors_668">
+        <item>#eecd39</item>
+        <item>#6d598d</item>
+        <item>#4d396d</item>
+
+        <item>#fd8c00</item>
+        <item>#dc4c1e</item>
+        <item>#cc3c0e</item>
+
+        <item>#99aa3f</item>
+    </array>
+    <array name="colors_669">
+        <item>#cc3c0e</item>
+        <item>#6d598d</item>
+        <item>#5d497d</item>
+
+        <item>#fd8c00</item>
+        <item>#99aa3f</item>
+        <item>#798a1f</item>
+
+        <item>#eecd39</item>
+    </array>
+    <array name="colors_670">
+        <item>#eecd39</item>
+        <item>#dc4c1e</item>
+        <item>#cc3c0e</item>
+
+        <item>#fd8c00</item>
+        <item>#6d598d</item>
+        <item>#5d497d</item>
+
+        <item>#99aa3f</item>
+    </array>
+    <array name="colors_671">
+        <item>#6d598d</item>
+        <item>#eecd39</item>
+        <item>#cead19</item>
+
+        <item>#fd8c00</item>
+        <item>#99aa3f</item>
+        <item>#899a2f</item>
+
+        <item>#cc3c0e</item>
+    </array>
+    <array name="colors_672">
+        <item>#d27746</item>
+        <item>#2c8de4</item>
+        <item>#1c7dd4</item>
+
+        <item>#f59bd5</item>
+        <item>#ccdd10</item>
+        <item>#bccd00</item>
+
+        <item>#f4c900</item>
+    </array>
+    <array name="colors_673">
+        <item>#f4c900</item>
+        <item>#f59bd5</item>
+        <item>#d57bb5</item>
+
+        <item>#bccd00</item>
+        <item>#d27746</item>
+        <item>#c26736</item>
+
+        <item>#1c7dd4</item>
+    </array>
+    <array name="colors_674">
+        <item>#f59bd5</item>
+        <item>#1c7dd4</item>
+        <item>#0c6dc4</item>
+
+        <item>#f4c900</item>
+        <item>#dced20</item>
+        <item>#bccd00</item>
+
+        <item>#d27746</item>
+    </array>
+    <array name="colors_675">
+        <item>#1c7dd4</item>
+        <item>#dced20</item>
+        <item>#bccd00</item>
+
+        <item>#f4c900</item>
+        <item>#d27746</item>
+        <item>#b25726</item>
+
+        <item>#f59bd5</item>
+    </array>
+    <array name="colors_676">
+        <item>#22c2a1</item>
+        <item>#138abe</item>
+        <item>#037aae</item>
+
+        <item>#fbde23</item>
+        <item>#ed3431</item>
+        <item>#cd1411</item>
+
+        <item>#9bbafb</item>
+    </array>
+    <array name="colors_677">
+        <item>#fbde23</item>
+        <item>#22c2a1</item>
+        <item>#02a281</item>
+
+        <item>#ed3431</item>
+        <item>#9bbafb</item>
+        <item>#7b9adb</item>
+
+        <item>#138abe</item>
+    </array>
+    <array name="colors_678">
+        <item>#ed3431</item>
+        <item>#138abe</item>
+        <item>#037aae</item>
+
+        <item>#22c2a1</item>
+        <item>#fbde23</item>
+        <item>#dbbe03</item>
+
+        <item>#9bbafb</item>
+    </array>
+    <array name="colors_679">
+        <item>#138abe</item>
+        <item>#ed3431</item>
+        <item>#cd1411</item>
+
+        <item>#9bbafb</item>
+        <item>#22c2a1</item>
+        <item>#01a281</item>
+
+        <item>#fbde23</item>
+    </array>
+    <array name="colors_680">
+        <item>#4999d4</item>
+        <item>#251d17</item>
+        <item>#150d07</item>
+
+        <item>#fad704</item>
+        <item>#6d8295</item>
+        <item>#4d6275</item>
+
+        <item>#ffdaca</item>
+    </array>
+    <array name="colors_681">
+        <item>#fad704</item>
+        <item>#4999d4</item>
+        <item>#2979b4</item>
+
+        <item>#251d17</item>
+        <item>#8da2b5</item>
+        <item>#6d8295</item>
+
+        <item>#ffdaca</item>
+    </array>
+    <array name="colors_682">
+        <item>#ffdaca</item>
+        <item>#6d8295</item>
+        <item>#4d6275</item>
+
+        <item>#4999d4</item>
+        <item>#453d37</item>
+        <item>#251d17</item>
+
+        <item>#fad704</item>
+    </array>
+    <array name="colors_683">
+        <item>#251d17</item>
+        <item>#ffdaca</item>
+        <item>#dfbaaa</item>
+
+        <item>#fad704</item>
+        <item>#4999d4</item>
+        <item>#2979b4</item>
+
+        <item>#6d8295</item>
+    </array>
+    <array name="colors_684">
+        <item>#6d8295</item>
+        <item>#4999d4</item>
+        <item>#3989c4</item>
+
+        <item>#ffdaca</item>
+        <item>#352d27</item>
+        <item>#251d17</item>
+
+        <item>#fad704</item>
+    </array>
+
+
+
+
+
     <array name="zodiacRGB">
         <item>#ff5555</item>
         <item>#d5802b</item>
