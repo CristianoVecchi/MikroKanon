@@ -82,9 +82,11 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val counterpointView = model.counterpointView
     val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<Any>>>> =
-        if(counterpointView == 0) counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
-        else counterpoints.map{Pair(it, it.getRibattutos())}
-
+        when (counterpointView){
+            0 -> counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
+            1 -> counterpoints.map{Pair(it, it.getRibattutos())}
+            else -> counterpoints.map{Pair(it, listOf(listOf()))}
+        }
     val elaborating: Boolean by elaboratingFlow.collectAsState(initial = false)
     val playing by model.playing.asFlow().collectAsState(initial = false)
     var scrollToTopList by remember{mutableStateOf(false)}
@@ -126,7 +128,6 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         val counterpoint = counterpointsData.first
                         val parts = counterpointsData.second
                         val maxSize = parts.maxOf { it.size }
-
                         var redNotes: List<List<Boolean>>? = if (detectorIntervalSet.isNotEmpty())
                             counterpoint.detectParallelIntervals(
                                 detectorIntervalSet,
@@ -134,9 +135,6 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                             ) else null
                         redNotes =
                             if (redNotes?.flatten()?.count { it } ?: 0 == 0) null else redNotes
-
-
-
                         when (counterpointView) {
                             0 -> {
                                 val _clipsText: MutableList<List<String>> = mutableListOf()
@@ -187,7 +185,6 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                 QuantumCounterpointView(
                                         model = model,
                                         counterpoint = counterpoint,
-                                        ribattutos = counterpointsData.second,
                                         colors = colors,
                                         totalWidthDp = squareSide,
                                         totalHeightDp = squareSide,

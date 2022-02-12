@@ -22,6 +22,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
 import com.cristianovecchi.mikrokanon.db.*
 import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
+import com.cristianovecchi.mikrokanon.midi.launchPlayer
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
@@ -214,7 +215,7 @@ class AppViewModel(
 
     val savedCounterpoints: Array<Counterpoint?> = Array(16) { null }
 
-    val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
+    val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKlastPlay.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 //        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
 //     else {
@@ -275,153 +276,27 @@ init{
            _selectedCounterpoint.value = counterpointToPlay
                onPlay(true, true)
         }
-
         if (selCpSaved != null) {
             _selectedCounterpoint.value = selCpSaved.clone()
         }
     }
     val onPlay = { createAndPlay: Boolean, simplify: Boolean  ->
-
-            var error = "ERROR: NO FILE"
-            if (userOptionsData.value!!.isEmpty()) {
-                insertUserOptionData(UserOptionsData.getDefaultUserOptionsData())
+        var error = "ERROR: NO FILE"
+        if (userOptionsData.value!!.isEmpty()) {
+            insertUserOptionData(UserOptionsData.getDefaultUserOptionsData())
+        }
+        if (!selectedCounterpoint.value!!.isEmpty()) {
+            if (mediaPlayer == null) {
+                mediaPlayer = MediaPlayer()
+                mediaPlayer?.setOnCompletionListener { onStop() }
             }
-            if (!selectedCounterpoint.value!!.isEmpty()) {
-                if (mediaPlayer == null) {
-                    mediaPlayer = MediaPlayer()
-                    mediaPlayer?.setOnCompletionListener { onStop() }
-                }
-                val ensTypes: List<EnsembleType> =
-                    userOptionsData.value?.let {
-                        userOptionsData.value!![0].ensembleTypes
-                            .extractIntsFromCsv().map { EnsembleType.values()[it] }
-                    }
-                        ?: listOf(EnsembleType.STRING_ORCHESTRA)
-                val dynamics: List<Float> =
-                    if (simplify) {
-                        listOf(1f)
-                    } else {
-                        userOptionsData.value?.let {
-                            userOptionsData.value!![0].dynamics.extractFloatsFromCsv()
-                        }
-                    } ?: listOf(1f)
-                val bpms: List<Float> =
-                    userOptionsData.value?.let {
-                        if (simplify) {
-                            userOptionsData.value!![0].bpms.extractIntsFromCsv()
-                                .map { it.toFloat() }.take(1)
-                        } else {
-                            userOptionsData.value!![0].bpms.extractIntsFromCsv()
-                                .map { it.toFloat() }
-                        }
-                    } ?: listOf(90f)
-                val rhythm: List<Triple<RhythmPatterns,Boolean,Int>> =
-                    (userOptionsData.value?.let {
-                        val patterns = RhythmPatterns.values()
-//                        if(simplify){
-//                            val pair = userOptionsData.value!![0].rhythm.extractIntPairsFromCsv()[0]
-//                            listOf(Triple(patterns[pair.first.absoluteValue-1], pair.first<0, pair.second))
-//                        } else {
-                            val pairs = userOptionsData.value!![0].rhythm.extractIntPairsFromCsv()
-                            pairs.map{Triple(patterns[it.first.absoluteValue-1], it.first<0, it.second) }
-//                        }
-                    } ?: listOf(Triple(RhythmPatterns.PLAIN_4_4_R16,false,1)) )
-                val rhythmShuffle: Boolean =
-                    0 != (userOptionsData.value?.let { userOptionsData.value!![0].rhythmShuffle }
-                        ?: 0)
-                val partsShuffle: Boolean =
-                    0 != (userOptionsData.value?.let { userOptionsData.value!![0].partsShuffle }
-                        ?: 0)
-                val rowForms: List<Pair<Int, Int>> =
-                    userOptionsData.value?.let {
-                        if (simplify) {
-                            listOf(Pair(1, 1))
-                        } else {
-                            userOptionsData.value!![0].rowForms.extractIntPairsFromCsv()
-                        }
-                    } ?: listOf(Pair(1, 1)) // ORIGINAL by default || 0 is unused
-                val doublingFlags: Int =
-                    userOptionsData.value?.let { userOptionsData.value!![0].doublingFlags }
-                        ?: 0
-                val audio8DFlags: Int =
-                    userOptionsData.value?.let {
-                        if (simplify) {
-                            0
-                        } else {
-                            userOptionsData.value!![0].audio8DFlags
-                        }
-                    } ?: 0
-                val ritornello: Int =
-                    userOptionsData.value?.let {
-                        if (simplify) {
-                            0
-                        } else {
-                            userOptionsData.value!![0].ritornello
-                        }
-                    } ?: 0
-                val transpose: List<Int> =
-                    userOptionsData.value?.let { userOptionsData.value!![0].transpose.extractIntsFromCsv() }
-                        ?: listOf(0)
-                val nuances: Int =
-                    userOptionsData.value?.let { userOptionsData.value!![0].nuances }
-                        ?: 1
-                val rangeTypes: List<Pair<Int, Int>> =
-                    userOptionsData.value?.let {
-                        if (simplify) {
-                            listOf(userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()[0])
-                        } else {
-                            userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()
-                        }
-                    } ?: listOf(Pair(2, 0))
-                val legatoTypes: List<Pair<Int, Int>> =
-                    userOptionsData.value?.let {
-                        if (simplify) {
-                            listOf(userOptionsData.value!![0].legatoTypes.extractIntPairsFromCsv()[0])
-                        } else {
-                            userOptionsData.value!![0].legatoTypes.extractIntPairsFromCsv()
-                        }
-                    } ?: listOf(Pair(4, 0))
-                val melodyTypes: List<Int> =
-                    userOptionsData.value?.let {
-                        if (simplify) {
-                            listOf(userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()[0])
-                        } else {
-                            userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()
-                        }
-                    } ?: listOf(0)
-                val glissandoFlags: Int =
-                    userOptionsData.value?.let { userOptionsData.value!![0].glissandoFlags }
-                        ?: 0
-                val vibrato: Int =
-                    userOptionsData.value?.let { userOptionsData.value!![0].vibrato }
-                        ?: 0
-                //selectedCounterpoint.value!!.display()
-                error = Player.playCounterpoint(
-                    mediaPlayer!!,
-                    false,
-                    listOf(selectedCounterpoint.value!!) + savedCounterpoints.toList(),
-                    dynamics,
-                    bpms,
-                    0f,
-                    rhythm,
-                    ensTypes,
-                    createAndPlay,
-                    midiPath,
-                    rhythmShuffle,
-                    partsShuffle,
-                    rowForms,
-                    ritornello,
-                    transpose,
-                    doublingFlags,
-                    nuances,
-                    rangeTypes,
-                    legatoTypes,
-                    melodyTypes,
-                    glissandoFlags,
-                    audio8DFlags,
-                    vibrato
-                )
+            val counterpoints = listOf(selectedCounterpoint.value!!) + savedCounterpoints.toList()
+            userOptionsData.value?.let{
+                error = launchPlayer(
+                    userOptionsData.value!![0], createAndPlay, simplify,
+                    mediaPlayer!!, midiPath, counterpoints)
             }
+        }
         mediaPlayer?.let { if (it.isPlaying) _playing.value = true }
         error.also { println(it) }
     }
@@ -979,7 +854,6 @@ init{
     }
     private fun findCounterpointsByMikroKanons5reducted() {
         viewModelScope.launch(Dispatchers.Main) {
-            val deepSearch = userOptionsData.value!![0].deepSearch != 0
             if (sequenceToMikroKanons.value!!.isNotEmpty()) {
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_5RED)
                 val key = CacheKey(sequence, intervalSet.value!!)
@@ -1002,7 +876,6 @@ init{
                         }
                         //val newList: List<Counterpoint> = def.await()
                         mk5reductedCache[key] = newList
-
                         changeCounterpointsWithLimit(newList, true)
                         _elaborating.value = false
                     }.also { time -> println("MK5reducted executed in $time ms") }

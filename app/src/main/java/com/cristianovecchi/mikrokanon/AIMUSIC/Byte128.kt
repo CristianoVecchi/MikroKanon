@@ -59,7 +59,7 @@ data class Byte128(var lowByte: Int = 0, var byte2nd: Int = 0, var byte3rd: Int 
     companion object{
         fun extractByte128(pitches: MutableList<Int>, restValue: Int = -1): Byte128{
             return empty().apply {
-                pitches.forEachIndexed(){ i, pitch -> if(pitch != restValue) this.bitOn(i)}
+                pitches.forEachIndexed(){ i, pitch -> if (pitch != restValue) this.bitOn(i)}
             }
         }
         fun empty(): Byte128{

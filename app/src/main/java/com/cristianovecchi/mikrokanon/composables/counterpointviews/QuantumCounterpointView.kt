@@ -27,7 +27,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @Composable
-fun QuantumCounterpointView(model: AppViewModel, counterpoint: Counterpoint, ribattutos: List<List<Any>>, colors: AppColors,
+fun QuantumCounterpointView(model: AppViewModel, counterpoint: Counterpoint, colors: AppColors,
                             totalWidthDp: Int, totalHeightDp: Int, dpDensity: Float, padding: Int, redNotes: List<List<Boolean>>? = null,
                             onClick: (Counterpoint) -> Unit){
 
@@ -62,12 +62,12 @@ fun QuantumCounterpointView(model: AppViewModel, counterpoint: Counterpoint, rib
             Offset(0f,0f ), Size( allX, allY ) )
 
         for(noteY in nParts-1 downTo 0){
-            val part = counterpoint.parts[noteY]
+            val partPitches = counterpoint.parts[noteY].absPitches
             var x = allX / 2f
             var y = allY / 2f
-            var angle = 90.0
+            var angle = -90.0
             for(noteX in 0 until maxLength){
-                val value = if (noteX < part.absPitches.size) part.absPitches[noteX] else -1
+                val value = if (noteX < partPitches.size) partPitches[noteX] else -1
                 angle = if (value==-1) angle else (value - 3) * 30.0
                 angle = if(angle < 0.0) angle + 360.0 else angle
                 val radAngle = Math.toRadians(angle)

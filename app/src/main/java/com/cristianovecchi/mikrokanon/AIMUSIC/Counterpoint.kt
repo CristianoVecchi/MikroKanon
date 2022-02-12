@@ -13,51 +13,9 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.max
+import kotlin.math.pow
+import kotlin.system.measureTimeMillis
 
-fun main(args : Array<String>){
-//    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8)
-//    val mssq = MelodySubSequencer(pitches.toIntArray())
-//    mssq.assignVelocities(0.90f, 0.50f)
-//    mssq.printSubSequences()
-//    val absPitches1 = mutableListOf(-1,1,0,6,11,5,7,8,8,3,3,3,6,9)
-//    val absPitches2 = mutableListOf(1,11,2,10,3,-1,9,6)
-//    val absPitches3 = mutableListOf(1,11,2,10)
-//    val absPitches1 = mutableListOf(0, 4, 7, 11, 2, 6, 9)
-//    val absPitches2 = mutableListOf(-1, 0, 4, 7, 11, 2, 6, 9)
-//    val absPitches3 = mutableListOf(-1,2, 0, -1, -1, 10, -1, 7, 5, 9, 10, 0, 2)
-    val absPitches1 = mutableListOf(0, 4, 7, 11, 2, 6, 9)
-    val absPitches2 = mutableListOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,0,1)
-    val absPitches3 = mutableListOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11,0)
-
-    val absParts = listOf(
-        //AbsPart(absPitches1),
-        AbsPart(absPitches2),
-        AbsPart(absPitches3),
-    )
-    val pentatonicIntervalSet = listOf(2, 10, 3, 9, 4, 8, 5, 7)
-    val counterpoint = Counterpoint(absParts, pentatonicIntervalSet)
-    counterpoint.display()
-    val detection = counterpoint.detectParallelIntervals(listOf(0,1,11))
-    detection.forEach { println(it) }
-//    val counterpoint2 = Counterpoint.findWave(counterpoint,pentatonicIntervalSet,3,
-//        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions)
-//    val counterpoint3 = Counterpoint.findWave(counterpoint2,pentatonicIntervalSet,6,
-//        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions).displayInNotes()
-    //val normCounterpoint = counterpoint.normalizePartsSize(true)
-    //normCounterpoint.displayInNotes()
-    //normCounterpoint.addCadenzas(listOf(1,11))//.displayInNotes()
-//    println("emptiness: ${counterpoint.emptiness}")
-//    val counterpointRound = counterpoint.normalizePartsSize(true).buildRound()
-//    counterpointRound.display()
-//    println("emptiness: ${counterpointRound.emptiness}")
-//    println("emptiness: ${counterpointRound.findEmptiness()}")
-
-//    Counterpoint.expand(counterpoint, 2).display()
-//    val repeatedSequence = Collections.nCopies(3, absPitches1).flatten()
-//    println(repeatedSequence)
-//    val list = listOf(-1,-1,0,10,5,6,11,2,-1,-1,3,-1,10)
-//    println(Insieme.linearMelody(4,list.toIntArray(),21,108).asList())
-}
 enum class TREND(val directions: List<Int>){
     ASCENDANT_DYNAMIC(Insieme.TREND_ASCENDANT_DYNAMIC.toList()),
     DESCENDANT_DYNAMIC(Insieme.TREND_DESCENDANT_DYNAMIC.toList()),
@@ -295,7 +253,8 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
     fun displayInNotes(noteNames: List<String> = NoteNamesEn.values().map{it.toString()}) {
         parts.forEachIndexed { index, absPart ->
-            println("Part #$index: ${Clip.convertAbsPitchesToClipText(absPart.absPitches, noteNames)}")
+            val notes = Clip.convertAbsPitchesToClipText(absPart.absPitches, noteNames)
+            println("Part #$index: $notes")
         }
     }
     fun findAndSetEmptiness() {
@@ -707,38 +666,57 @@ data class Counterpoint(val parts: List<AbsPart>,
         return parts.map { it.getRibattutos() }
     }
 
-
     companion object {
-        fun createFromCsv(doubleLevelCsv: String, partSeparator: String = "\n", timestamp: Long? = null): Counterpoint{
+        fun createFromCsv(
+            doubleLevelCsv: String,
+            partSeparator: String = "\n",
+            timestamp: Long? = null
+        ): Counterpoint {
             val newParts = doubleLevelCsv.split(partSeparator)
-                .map{ csvPart -> csvPart.split(',').map{it.toInt()}}
-                .map{ intsPart -> AbsPart(intsPart.toMutableList())}
+                .map { csvPart -> csvPart.split(',').map { it.toInt() } }
+                .map { intsPart -> AbsPart(intsPart.toMutableList()) }
             return Counterpoint(newParts, timestamp = timestamp)
         }
-        fun createSeparatorCounterpoint(nParts: Int, nNotesToSkip: Int) : Counterpoint{
-            val absPart = AbsPart( (0 until nNotesToSkip).map{ -1 }.toMutableList() )
-            val newParts = (0 until nParts).map{ absPart }
+
+        fun createSeparatorCounterpoint(nParts: Int, nNotesToSkip: Int): Counterpoint {
+            val absPart = AbsPart((0 until nNotesToSkip).map { -1 }.toMutableList())
+            val newParts = (0 until nParts).map { absPart }
             return Counterpoint(newParts)
         }
-        fun counterpointFromClipList(clipList: List<Clip>) : Counterpoint{
+
+        fun counterpointFromClipList(clipList: List<Clip>): Counterpoint {
             return Counterpoint(listOf(AbsPart.absPartfromClipList(clipList)))
         }
-        fun empty(): Counterpoint{
+
+        fun empty(): Counterpoint {
             return Counterpoint(emptyList(), emptyList(), 1.0f)
         }
-        fun empty(nParts: Int, nRests: Int = 0): Counterpoint{
-            return Counterpoint((0 until nParts).map { AbsPart.emptyPart(nRests) }, emptyList(), 1.0f)
+
+        fun empty(nParts: Int, nRests: Int = 0): Counterpoint {
+            return Counterpoint(
+                (0 until nParts).map { AbsPart.emptyPart(nRests) },
+                emptyList(),
+                1.0f
+            )
         }
-        fun flourish(counterpoint: Counterpoint, intervalSet: List<Int>, horIntervalSet: List<Int>): Counterpoint{
+
+        fun flourish(
+            counterpoint: Counterpoint,
+            intervalSet: List<Int>,
+            horIntervalSet: List<Int>
+        ): Counterpoint {
             //val actualDirections = TREND.ASCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}
             //counterpoint.display()
-            val ascDirections = TREND.ASCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}
-            val descDirections = TREND.DESCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}
+            val ascDirections =
+                TREND.ASCENDANT_DYNAMIC.directions.filter { horIntervalSet.contains(it) }
+            val descDirections =
+                TREND.DESCENDANT_DYNAMIC.directions.filter { horIntervalSet.contains(it) }
             val maxSize = counterpoint.maxSize()
             val nParts = counterpoint.parts.size
-            val newParts = (0 until nParts).map{ counterpoint.parts[it].copy( absPitches = mutableListOf() ) }
-            columns@for (index in 0 until maxSize){
-                val fioriture: List<MutableList<Int>> = (0 until nParts).map{ mutableListOf() }
+            val newParts =
+                (0 until nParts).map { counterpoint.parts[it].copy(absPitches = mutableListOf()) }
+            columns@ for (index in 0 until maxSize) {
+                val fioriture: List<MutableList<Int>> = (0 until nParts).map { mutableListOf() }
                 val absNotes = counterpoint.getColumnValuesWithEmptyValues(index)
                 for (partIndex in 0 until nParts) {
                     val absPitches = counterpoint.parts[partIndex].absPitches
@@ -751,48 +729,73 @@ data class Counterpoint(val parts: List<AbsPart>,
                         otherNotes.toIntArray(),
                         intervalSet.toIntArray()
                     ).toList()
-                    fioriture[partIndex].addAll(fioritura.filter { it != startNote }.filter { it != targetNote })
+                    fioriture[partIndex].addAll(fioritura.filter { it != startNote }
+                        .filter { it != targetNote })
                 }
                 //fioriture.map{ println(it)}
-                val bestFiorituraSize = fioriture.filterIndexed{ i, _-> counterpoint.getNextAbsPitch(i, index, maxSize) != -1}
-                    .maxOfOrNull{ it.size } ?: 0
+                val bestFiorituraSize = fioriture.filterIndexed { i, _ ->
+                    counterpoint.getNextAbsPitch(
+                        i,
+                        index,
+                        maxSize
+                    ) != -1
+                }
+                    .maxOfOrNull { it.size } ?: 0
                 newParts.mapIndexed { i, absPart -> absPart.absPitches.add(absNotes[i]) }
-                if(bestFiorituraSize == 0){
+                if (bestFiorituraSize == 0) {
                     continue@columns
                 } else {
                     var bestFiorituraIndex: Int = -1
-                    for(i in fioriture.indices) {
-                        if(fioriture[i].size == bestFiorituraSize && counterpoint.getNextAbsPitch(i, index, maxSize) != -1)
-                        {bestFiorituraIndex = i; break }
+                    for (i in fioriture.indices) {
+                        if (fioriture[i].size == bestFiorituraSize && counterpoint.getNextAbsPitch(
+                                i,
+                                index,
+                                maxSize
+                            ) != -1
+                        ) {
+                            bestFiorituraIndex = i; break
+                        }
                     }
                     val originNote = counterpoint.getAbsPitchInPosition(index, bestFiorituraIndex)
-                    val targetNote = counterpoint.getNextAbsPitch(bestFiorituraIndex, index, maxSize)
-                    val diff = abs(targetNote-originNote)
-                    val actualDirections = if(originNote<targetNote){
-                        if(diff <= 6) ascDirections else descDirections
+                    val targetNote =
+                        counterpoint.getNextAbsPitch(bestFiorituraIndex, index, maxSize)
+                    val diff = abs(targetNote - originNote)
+                    val actualDirections = if (originNote < targetNote) {
+                        if (diff <= 6) ascDirections else descDirections
                     } else {
-                        if(diff <= 6) descDirections else ascDirections
+                        if (diff <= 6) descDirections else ascDirections
                     }
                     //println("part:$bestFiorituraIndex start:$originNote end:$targetNote diff:$diff dirs:$actualDirections")
                     val bestFioritura = fioriture[bestFiorituraIndex]
-                    val fiorituraNotes: List<Int> = Insieme.orderAbsPitchesByTrend(bestFioritura.toTypedArray(),
-                        targetNote, actualDirections.toTypedArray() ).toList().reversed()
-                        .dropLastWhile { it ==targetNote }
-                        .dropWhile { !Insieme.isIntervalInSet(horIntervalSet.toIntArray(), originNote, it)}
+                    val fiorituraNotes: List<Int> = Insieme.orderAbsPitchesByTrend(
+                        bestFioritura.toTypedArray(),
+                        targetNote, actualDirections.toTypedArray()
+                    ).toList().reversed()
+                        .dropLastWhile { it == targetNote }
+                        .dropWhile {
+                            !Insieme.isIntervalInSet(
+                                horIntervalSet.toIntArray(),
+                                originNote,
+                                it
+                            )
+                        }
                     //println("part:$bestFiorituraIndex start:$originNote end:$targetNote diff:$diff dirs:$actualDirections note:$bestFioritura fioritura:$fiorituraNotes")
-                    if(fiorituraNotes.isNotEmpty()){
-                        fiorituraNotes.forEach{ it ->
-                            newParts.mapIndexed { i, absPart -> if(i == bestFiorituraIndex)
-                                absPart.absPitches.add(it)
-                            else absPart.absPitches.add(absNotes[i])}
+                    if (fiorituraNotes.isNotEmpty()) {
+                        fiorituraNotes.forEach { it ->
+                            newParts.mapIndexed { i, absPart ->
+                                if (i == bestFiorituraIndex)
+                                    absPart.absPitches.add(it)
+                                else absPart.absPitches.add(absNotes[i])
+                            }
                         }
                     }
                 }
             }
             return Counterpoint(newParts, counterpoint.intervalSet)
         }
-        fun expand(counterpoint: Counterpoint, nTimes: Int): Counterpoint{
-            if(nTimes <= 0) return counterpoint
+
+        fun expand(counterpoint: Counterpoint, nTimes: Int): Counterpoint {
+            if (nTimes <= 0) return counterpoint
             val parts = mutableListOf<AbsPart>()
             counterpoint.parts.forEach { oldPart ->
                 val pitches = mutableListOf<Int>()
@@ -805,130 +808,181 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
             return Counterpoint(parts, counterpoint.intervalSet)
         }
-        fun findWave(counterpoint: Counterpoint, intervalSet: List<Int>, horIntervalSet: List<Int>, startAbsPitch : Int,
-                     steps: List<Int>, trend: List<Int> = TREND.ASCENDANT_STATIC.directions ) : Counterpoint {
+
+        fun findWave(
+            counterpoint: Counterpoint,
+            intervalSet: List<Int>,
+            horIntervalSet: List<Int>,
+            startAbsPitch: Int,
+            steps: List<Int>,
+            trend: List<Int> = TREND.ASCENDANT_STATIC.directions
+        ): Counterpoint {
             val result = mutableListOf<Int>()
             var index = 0
             val maxSize: Int = counterpoint.parts.maxOf { it.absPitches.size }
             var lastAbsPitch = startAbsPitch
-            val absSteps = steps.map{(startAbsPitch + it) % 12}
-            val filteredTrend = trend.filter{ horIntervalSet.contains(it)}
-            while(index < maxSize){
+            val absSteps = steps.map { (startAbsPitch + it) % 12 }
+            val filteredTrend = trend.filter { horIntervalSet.contains(it) }
+            while (index < maxSize) {
                 var resultPitch = -1
-                val trendSteps = filteredTrend.map{(lastAbsPitch + it) % 12}.filter{absSteps.contains(it)}
-                trendSteps@for(step in trendSteps) {
+                val trendSteps =
+                    filteredTrend.map { (lastAbsPitch + it) % 12 }.filter { absSteps.contains(it) }
+                trendSteps@ for (step in trendSteps) {
                     val matchValues = counterpoint.getColumnValues(index)
-                    val isValid = matchValues.map{
-                        it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(),it,step)
-                    }.fold(true) { acc, b ->  acc && b}
+                    val isValid = matchValues.map {
+                        it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(), it, step)
+                    }.fold(true) { acc, b -> acc && b }
                     if (isValid) {
-                        resultPitch= step
+                        resultPitch = step
                         lastAbsPitch = step
                         break@trendSteps
                     }
                 }
                 result.add(resultPitch)
-                index ++
+                index++
             }
-            return Counterpoint(listOf(*counterpoint.parts.toTypedArray(), AbsPart(result)), intervalSet)
+            return Counterpoint(
+                listOf(*counterpoint.parts.toTypedArray(), AbsPart(result)),
+                intervalSet
+            )
         }
-        fun findAllWithWaves(counterpoints: List<Counterpoint>, intervalSet: List<Int>, horIntervalSet: List<Int>, nWaves: Int) : List<Counterpoint>{
-            return counterpoints.map{ findOneWithWaves(it, intervalSet, horIntervalSet, nWaves)}
+
+        fun findAllWithWaves(
+            counterpoints: List<Counterpoint>,
+            intervalSet: List<Int>,
+            horIntervalSet: List<Int>,
+            nWaves: Int
+        ): List<Counterpoint> {
+            return counterpoints.map { findOneWithWaves(it, intervalSet, horIntervalSet, nWaves) }
         }
-        fun findOneWithWaves(counterpoint: Counterpoint, intervalSet: List<Int>, horIntervalSet: List<Int>, nWaves: Int, nPartsLimit: Int = 12) : Counterpoint{
+
+        fun findOneWithWaves(
+            counterpoint: Counterpoint,
+            intervalSet: List<Int>,
+            horIntervalSet: List<Int>,
+            nWaves: Int,
+            nPartsLimit: Int = 12
+        ): Counterpoint {
             val steps4 = (0..3).toList()
             val steps3 = (0..2).toList()
             val steps2 = (0..1).toList()
-            return when (nWaves){
+            return when (nWaves) {
                 3 -> counterpoint.addWave(intervalSet, horIntervalSet, 0, steps4)
-                    .addWave(intervalSet, horIntervalSet,4, steps4)
-                    .addWave(intervalSet, horIntervalSet,8, steps4)
+                    .addWave(intervalSet, horIntervalSet, 4, steps4)
+                    .addWave(intervalSet, horIntervalSet, 8, steps4)
                     .cutExtraParts(nPartsLimit)
-                4 -> counterpoint.addWave(intervalSet, horIntervalSet,0, steps3)
-                    .addWave(intervalSet, horIntervalSet,3, steps3)
-                    .addWave(intervalSet, horIntervalSet,6, steps3)
-                    .addWave(intervalSet, horIntervalSet,9, steps3)
+                4 -> counterpoint.addWave(intervalSet, horIntervalSet, 0, steps3)
+                    .addWave(intervalSet, horIntervalSet, 3, steps3)
+                    .addWave(intervalSet, horIntervalSet, 6, steps3)
+                    .addWave(intervalSet, horIntervalSet, 9, steps3)
                     .cutExtraParts(nPartsLimit)
-                6 -> counterpoint.addWave(intervalSet,horIntervalSet, 0, steps2)
-                    .addWave(intervalSet, horIntervalSet,2, steps2)
-                    .addWave(intervalSet, horIntervalSet,4, steps2)
-                    .addWave(intervalSet, horIntervalSet,6, steps2)
-                    .addWave(intervalSet, horIntervalSet,8, steps2)
-                    .addWave(intervalSet, horIntervalSet,10, steps2)
+                6 -> counterpoint.addWave(intervalSet, horIntervalSet, 0, steps2)
+                    .addWave(intervalSet, horIntervalSet, 2, steps2)
+                    .addWave(intervalSet, horIntervalSet, 4, steps2)
+                    .addWave(intervalSet, horIntervalSet, 6, steps2)
+                    .addWave(intervalSet, horIntervalSet, 8, steps2)
+                    .addWave(intervalSet, horIntervalSet, 10, steps2)
                     .cutExtraParts(nPartsLimit)
                 else -> counterpoint
             }
         }
-        fun findFreePart(counterpoint: Counterpoint, intervalSet: List<Int>, startAbsPitch : Int, trend: List<Int> ) : Counterpoint {
+
+        fun findFreePart(
+            counterpoint: Counterpoint,
+            intervalSet: List<Int>,
+            startAbsPitch: Int,
+            trend: List<Int>
+        ): Counterpoint {
             var result = mutableListOf<Int>()
-            val verticalList = listOf(0,1,2,3,4,5,6,7,8,9,10,11)
-            val directions: Array<Int> = Insieme.extractDirectionsFromIntervalSet(verticalList.toTypedArray(), trend.toTypedArray())
+            val verticalList = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+            val directions: Array<Int> = Insieme.extractDirectionsFromIntervalSet(
+                verticalList.toTypedArray(),
+                trend.toTypedArray()
+            )
             var index = 0
             //counterpoint.display()
             val maxSize: Int = counterpoint.maxSize()
             var lastAbsPitch = startAbsPitch
-            while(index < maxSize){
+            while (index < maxSize) {
                 var resultPitch = -1
-                directions@for(dir in directions) {
+                directions@ for (dir in directions) {
                     var newAbsPitch = lastAbsPitch + dir
-                    if( newAbsPitch > 11) newAbsPitch -= 12
+                    if (newAbsPitch > 11) newAbsPitch -= 12
                     val matchValues = mutableListOf<Int>()
-                    for(j in counterpoint.parts.indices) {
-                        if(index<counterpoint.parts[j].absPitches.size){
+                    for (j in counterpoint.parts.indices) {
+                        if (index < counterpoint.parts[j].absPitches.size) {
                             matchValues.add(counterpoint.parts[j].absPitches[index])
                         }
                     }
-                    val isValid = matchValues.map{
-                        it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(),it,newAbsPitch)
-                    }.fold(true) { acc, b ->  acc && b}
+                    val isValid = matchValues.map {
+                        it == -1 || Insieme.isIntervalInSet(
+                            intervalSet.toIntArray(),
+                            it,
+                            newAbsPitch
+                        )
+                    }.fold(true) { acc, b -> acc && b }
                     if (isValid) {
-                        resultPitch= newAbsPitch
+                        resultPitch = newAbsPitch
                         lastAbsPitch = newAbsPitch
                         break@directions
                     }
                 }
                 result.add(resultPitch)
-                index ++
+                index++
             }
-            return Counterpoint(listOf(*counterpoint.parts.toTypedArray(), AbsPart(result)), intervalSet)
+            return Counterpoint(
+                listOf(*counterpoint.parts.toTypedArray(), AbsPart(result)),
+                intervalSet
+            )
         }
-        fun findAllFreeParts(counterpoint: Counterpoint, intervalSet: List<Int>, trend: List<Int>) : List<Counterpoint> {
+
+        fun findAllFreeParts(
+            counterpoint: Counterpoint,
+            intervalSet: List<Int>,
+            trend: List<Int>
+        ): List<Counterpoint> {
             val result = mutableListOf<Counterpoint>()
             (0..11).forEach() {
                 result.add(findFreePart(counterpoint, intervalSet, it, trend))
             }
             return result.distinctBy { it.parts } // several counterpoints could be equal
         }
-        fun findCounterpoint(target: Counterpoint, sequence: List<Int>, intervalSet: List<Int>,
-                             delay: Int, transpose: Int, rowForm: RowForm) : Counterpoint{
+
+        fun findCounterpoint(
+            target: Counterpoint, sequence: List<Int>, intervalSet: List<Int>,
+            delay: Int, transpose: Int, rowForm: RowForm
+        ): Counterpoint {
             var result = mutableListOf<Int>()
 
             var actualSeq = sequence.toMutableList()
-            when (rowForm){
-                INVERSE -> actualSeq = Insieme.invertAbsPitches(actualSeq.toIntArray()).toMutableList()
+            when (rowForm) {
+                INVERSE -> actualSeq =
+                    Insieme.invertAbsPitches(actualSeq.toIntArray()).toMutableList()
                 RETROGRADE -> actualSeq = actualSeq.reversed().toMutableList()
-                INV_RETROGRADE -> actualSeq = Insieme.invertAbsPitches(actualSeq.toIntArray()).reversedArray().toMutableList()
-                else -> {}
+                INV_RETROGRADE -> actualSeq =
+                    Insieme.invertAbsPitches(actualSeq.toIntArray()).reversedArray().toMutableList()
+                else -> {
+                }
             }
-            actualSeq = actualSeq.map {Insieme.transposeAbsPitch(it, transpose) }.toMutableList()
-            for(i in 0 until delay) {
+            actualSeq = actualSeq.map { Insieme.transposeAbsPitch(it, transpose) }.toMutableList()
+            for (i in 0 until delay) {
                 result.add(-1)
             }
             var resultIndex = delay
             var actualSeqIndex = 0
             while (actualSeqIndex < actualSeq.size) {
                 val matchValues = mutableListOf<Int>()
-                for(j in target.parts.indices){
-                    if( resultIndex < target.parts[j].absPitches.size) matchValues.add(target.parts[j].absPitches[resultIndex])
+                for (j in target.parts.indices) {
+                    if (resultIndex < target.parts[j].absPitches.size) matchValues.add(target.parts[j].absPitches[resultIndex])
                     else {
                         matchValues.add(-1)
                     }
                 }
                 val newAbsPitch = actualSeq[actualSeqIndex]
-                val isValid = matchValues.map{
-                    it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(),it,newAbsPitch)
-                }.fold(true) { acc, b ->  acc && b}
-                if(isValid) {
+                val isValid = matchValues.map {
+                    it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(), it, newAbsPitch)
+                }.fold(true) { acc, b -> acc && b }
+                if (isValid) {
                     actualSeqIndex++
                     result.add(newAbsPitch)
                 } else {
@@ -941,20 +995,35 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
 
 
-        fun findAllCounterpointsWithRepeatedSequence(target: Counterpoint, sequence: List<Int>,
-                                                     intervalSet: List<Int>, deepness: Int): List<Counterpoint>{
+        fun findAllCounterpointsWithRepeatedSequence(
+            target: Counterpoint, sequence: List<Int>,
+            intervalSet: List<Int>, deepness: Int
+        ): List<Counterpoint> {
             val maxSize: Int = target.parts.maxOf { it.absPitches.size }
-            val nRepetitions = if(sequence.size > maxSize) 2 else maxSize/sequence.size + 1
+            val nRepetitions = if (sequence.size > maxSize) 2 else maxSize / sequence.size + 1
             val repeatedSequence = Collections.nCopies(nRepetitions, sequence).flatten()
             return findAllCounterpoints(target, repeatedSequence, intervalSet, deepness)
         }
-        fun findAllCounterpoints(target: Counterpoint, sequence: List<Int>, intervalSet: List<Int>, deepness: Int) : List<Counterpoint> {
+
+        fun findAllCounterpoints(
+            target: Counterpoint,
+            sequence: List<Int>,
+            intervalSet: List<Int>,
+            deepness: Int
+        ): List<Counterpoint> {
             val result = mutableListOf<Counterpoint>()
-            for(delay in 0 until deepness) {
+            for (delay in 0 until deepness) {
                 var counterpoint: Counterpoint
                 for (transpose in 0 until 12) {
                     for (form in 0 until 4) {
-                        counterpoint = findCounterpoint(target, sequence, intervalSet, delay, transpose, values()[form])
+                        counterpoint = findCounterpoint(
+                            target,
+                            sequence,
+                            intervalSet,
+                            delay,
+                            transpose,
+                            values()[form]
+                        )
                         result.add(counterpoint)
                     }
                 }
@@ -962,52 +1031,64 @@ data class Counterpoint(val parts: List<AbsPart>,
             return result
         }
 
-        fun explodeRowForms(counterpoint: Counterpoint, rowFormsFlags: Int, nNotesToSkip: Int = 0, addFinal: Boolean = false): Counterpoint {
+        fun explodeRowForms(
+            counterpoint: Counterpoint,
+            rowFormsFlags: Int,
+            nNotesToSkip: Int = 0,
+            addFinal: Boolean = false
+        ): Counterpoint {
             //val separator = rowFormsFlags and 0b10000 != 0
             val separator = nNotesToSkip > 0
-            val separatorCounterpoint: Counterpoint? = if(separator)
+            val separatorCounterpoint: Counterpoint? = if (separator)
                 Counterpoint.createSeparatorCounterpoint(counterpoint.parts.size, nNotesToSkip)
             else null
             val original = counterpoint.normalizePartsSize(true)
             var result = original.clone()
-            result = if(separator) result.enqueue(separatorCounterpoint!!) else result
-            result = if(rowFormsFlags and RowForm.RETROGRADE.flag != 0) result.enqueue(original.retrograde()) else result
-            result = if(separator) result.enqueue(separatorCounterpoint!!) else result
-            result = if(rowFormsFlags and RowForm.INVERSE.flag != 0) result.enqueue(original.inverse()) else result
-            result = if(separator) result.enqueue(separatorCounterpoint!!) else result
-            result = if(rowFormsFlags and RowForm.INV_RETROGRADE.flag != 0) result.enqueue(original.inverse().retrograde()) else result
-            result = if(separator && addFinal) result.enqueue(separatorCounterpoint!!) else result
+            result = if (separator) result.enqueue(separatorCounterpoint!!) else result
+            result =
+                if (rowFormsFlags and RowForm.RETROGRADE.flag != 0) result.enqueue(original.retrograde()) else result
+            result = if (separator) result.enqueue(separatorCounterpoint!!) else result
+            result =
+                if (rowFormsFlags and RowForm.INVERSE.flag != 0) result.enqueue(original.inverse()) else result
+            result = if (separator) result.enqueue(separatorCounterpoint!!) else result
+            result = if (rowFormsFlags and RowForm.INV_RETROGRADE.flag != 0) result.enqueue(
+                original.inverse().retrograde()
+            ) else result
+            result = if (separator && addFinal) result.enqueue(separatorCounterpoint!!) else result
             return result
         }
-        fun explodeRowFormsAddingCps(counterpoints: List<Counterpoint?>,
-                                     rowForms: List<Pair<Int,Int>> = listOf(Pair(1,1)),
-                                     nNotesToSkip: Int = 0): Counterpoint {
+
+        fun explodeRowFormsAddingCps(
+            counterpoints: List<Counterpoint?>,
+            rowForms: List<Pair<Int, Int>> = listOf(Pair(1, 1)),
+            nNotesToSkip: Int = 0
+        ): Counterpoint {
             //val separator = rowFormsFlags and 0b10000 != 0
-            val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0}?.parts?.size ?: 0
+            val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
             if (nParts == 0) return empty()
-            val separator = nNotesToSkip > 0 && rowForms.any{ it.second < 0}
-            val containsShadows = rowForms.any{ it.first < 0}
-            val separatorCounterpoint: Counterpoint? = if(separator)
+            val separator = nNotesToSkip > 0 && rowForms.any { it.second < 0 }
+            val containsShadows = rowForms.any { it.first < 0 }
+            val separatorCounterpoint: Counterpoint? = if (separator)
                 Counterpoint.createSeparatorCounterpoint(nParts, nNotesToSkip)
             else null
 
             var result = empty(nParts)
             val actualCounterpoints =
-                counterpoints.map{
+                counterpoints.map {
                     it?.normalizePartsSize(false)
                         ?.shiftDown((nParts - it.parts.size) shr 1)
                 }
-            val shadowCounterpoints = if(containsShadows)
-                actualCounterpoints.map{
+            val shadowCounterpoints = if (containsShadows)
+                actualCounterpoints.map {
                     it?.tritoneSubstitution()
                 } else listOf()
 
-            rowForms.forEach{ rowForm ->
-                val original = if(rowForm.first > 0) actualCounterpoints[rowForm.first -1]
-                                else shadowCounterpoints[rowForm.first.absoluteValue -1]
+            rowForms.forEach { rowForm ->
+                val original = if (rowForm.first > 0) actualCounterpoints[rowForm.first - 1]
+                else shadowCounterpoints[rowForm.first.absoluteValue - 1]
 
-                original?.let{
-                    result = when(rowForm.second) {
+                original?.let {
+                    result = when (rowForm.second) {
                         1 -> result.enqueue(original.clone())
                         2 -> result.enqueue(original.inverse())
                         3 -> result.enqueue(original.retrograde())
@@ -1016,7 +1097,8 @@ data class Counterpoint(val parts: List<AbsPart>,
                         -2 -> result.enqueue(original.inverse()).enqueue(separatorCounterpoint!!)
                         -3 -> result.enqueue(original.retrograde())
                             .enqueue(separatorCounterpoint!!)
-                        -4 -> result.enqueue(original.inverse().retrograde()).enqueue(separatorCounterpoint!!)
+                        -4 -> result.enqueue(original.inverse().retrograde())
+                            .enqueue(separatorCounterpoint!!)
                         else -> result
                     }
                 }
@@ -1026,25 +1108,29 @@ data class Counterpoint(val parts: List<AbsPart>,
             return result
         }
 
-        fun explodeRowForms(counterpoint: Counterpoint, rowForms: List<Int> = listOf(1), nNotesToSkip: Int = 0): Counterpoint {
+        fun explodeRowForms(
+            counterpoint: Counterpoint,
+            rowForms: List<Int> = listOf(1),
+            nNotesToSkip: Int = 0
+        ): Counterpoint {
             //val separator = rowFormsFlags and 0b10000 != 0
             if (counterpoint.parts.isEmpty()) return counterpoint
-            val separator = nNotesToSkip > 0 && rowForms.any{ it < 0}
-            val separatorCounterpoint: Counterpoint? = if(separator)
+            val separator = nNotesToSkip > 0 && rowForms.any { it < 0 }
+            val separatorCounterpoint: Counterpoint? = if (separator)
                 Counterpoint.createSeparatorCounterpoint(counterpoint.parts.size, nNotesToSkip)
             else null
             val original = counterpoint.normalizePartsSize(true)
-            var result = when(rowForms[0].absoluteValue){
+            var result = when (rowForms[0].absoluteValue) {
                 1 -> original.clone()
                 2 -> original.inverse()
                 3 -> original.retrograde()
                 4 -> original.inverse().retrograde()
                 else -> original.clone()
             }
-            result  = if (rowForms[0] <0) result.enqueue(separatorCounterpoint!!) else result
-            if (rowForms.size > 1){
-                 (1 until rowForms.size).forEach{
-                    result = when(rowForms[it]) {
+            result = if (rowForms[0] < 0) result.enqueue(separatorCounterpoint!!) else result
+            if (rowForms.size > 1) {
+                (1 until rowForms.size).forEach {
+                    result = when (rowForms[it]) {
                         1 -> result.enqueue(original.clone())
                         2 -> result.enqueue(original.inverse())
                         3 -> result.enqueue(original.retrograde())
@@ -1052,7 +1138,8 @@ data class Counterpoint(val parts: List<AbsPart>,
                         -1 -> result.enqueue(original.clone()).enqueue(separatorCounterpoint!!)
                         -2 -> result.enqueue(original.inverse()).enqueue(separatorCounterpoint!!)
                         -3 -> result.enqueue(original.retrograde()).enqueue(separatorCounterpoint!!)
-                        -4 -> result.enqueue(original.inverse().retrograde()).enqueue(separatorCounterpoint!!)
+                        -4 -> result.enqueue(original.inverse().retrograde())
+                            .enqueue(separatorCounterpoint!!)
                         else -> result
                     }
                 }
@@ -1060,41 +1147,232 @@ data class Counterpoint(val parts: List<AbsPart>,
             return result
         }
 
-        fun addBestPedal(counterpoint: Counterpoint, intervalSet: List<Int>): Pair<Counterpoint, List<Int>> {
-            val alreadyPresentPedals: List<Int> = (0..11).filter{ pitch ->
-                counterpoint.parts.map{ it.absPitches}.any{ it.all { it == pitch }}
+        fun addBestPedal(
+            counterpoint: Counterpoint,
+            intervalSet: List<Int>
+        ): Pair<Counterpoint, List<Int>> {
+            val alreadyPresentPedals: List<Int> = (0..11).filter { pitch ->
+                counterpoint.parts.map { it.absPitches }.any { it.all { it == pitch } }
             }
+
             data class Pedal(val pitch: Int, val intervalCounts: ArrayList<Int>)
+
             val pedals = mutableListOf<Pedal>()
             val nSize = counterpoint.maxSize()
-            for(pitch in 0..11){
+            for (pitch in 0..11) {
                 if (alreadyPresentPedals.contains(pitch)) continue
-                var intervalCount = ArrayList(listOf(0,0,0,0,0,0,0))
-                for(part in counterpoint.parts){
+                var intervalCount = ArrayList(listOf(0, 0, 0, 0, 0, 0, 0))
+                for (part in counterpoint.parts) {
                     Insieme.incrementIntervalCount(intervalCount, pitch, part.absPitches)
                 }
                 pedals.add(Pedal(pitch, intervalCount))
             }
-            return if(pedals.isNotEmpty()){
-                val sortedPedals = pedals.sortedBy { Insieme.intervalSetDifference(it.intervalCounts, intervalSet) }
-                val minDifference = sortedPedals.take(1).map { Insieme.intervalSetDifference(it.intervalCounts, intervalSet) }[0]
+            return if (pedals.isNotEmpty()) {
+                val sortedPedals = pedals.sortedBy {
+                    Insieme.intervalSetDifference(
+                        it.intervalCounts,
+                        intervalSet
+                    )
+                }
+                val minDifference = sortedPedals.take(1)
+                    .map { Insieme.intervalSetDifference(it.intervalCounts, intervalSet) }[0]
                 val bestPedal: Pedal =
-                    sortedPedals.filter{Insieme.intervalSetDifference(it.intervalCounts, intervalSet) == minDifference }
-                        .minByOrNull { Insieme.intervalSetDifferenceCount(it.intervalCounts, intervalSet) }
+                    sortedPedals.filter {
+                        Insieme.intervalSetDifference(
+                            it.intervalCounts,
+                            intervalSet
+                        ) == minDifference
+                    }
+                        .minByOrNull {
+                            Insieme.intervalSetDifferenceCount(
+                                it.intervalCounts,
+                                intervalSet
+                            )
+                        }
                         ?: sortedPedals.take(1)[0]
-                Pair(counterpoint.addPedal(bestPedal.pitch),
-                    Insieme.convertIntervalCountToIntervalSet(bestPedal.intervalCounts).toList())
+                Pair(
+                    counterpoint.addPedal(bestPedal.pitch),
+                    Insieme.convertIntervalCountToIntervalSet(bestPedal.intervalCounts).toList()
+                )
             } else {
                 Pair(counterpoint, intervalSet)
             }
         }
 
-        fun addPedals(nPedals: Int, counterpoint: Counterpoint, intervalSet: List<Int>, nPartsLimit: Int = 12): Counterpoint {
-            return (0 until nPedals).fold(counterpoint){
-                    accCounterpoint, _ -> accCounterpoint.addBestPedal(intervalSet)
+        fun addPedals(
+            nPedals: Int,
+            counterpoint: Counterpoint,
+            intervalSet: List<Int>,
+            nPartsLimit: Int = 12
+        ): Counterpoint {
+            return (0 until nPedals).fold(counterpoint) { accCounterpoint, _ ->
+                accCounterpoint.addBestPedal(intervalSet)
             }.cutExtraParts(nPartsLimit)
         }
+
+        fun createFromIntList(absPitches: List<Int>): Counterpoint {
+            return Counterpoint(mutableListOf(AbsPart(absPitches.toMutableList()))).apply {
+                emptiness = 0f
+            }
+        }
+        fun createFromIntLists(absPitchesLists: List<List<Int>>): Counterpoint {
+            val absParts = absPitchesLists.map{AbsPart(it.toMutableList())}
+            return Counterpoint(absParts).apply {
+                findAndSetEmptiness()
+            }
+        }
+
+        fun findMazes(sequences: List<List<Int>>, intervalSet: List<Int>, maxLimit: Int = 5): List<Counterpoint> {
+            val nParts = sequences.size
+            if (nParts == 0) return listOf()
+            if (nParts == 1) return listOf(Counterpoint.createFromIntList(sequences[0]))
+            val result = mutableListOf(List(nParts) { listOf<Int>() })
+
+            val indices = IntArray(nParts) { 0 }
+            val actions = (1 until 2.0.pow(nParts.toDouble()).toInt())
+                .map { it.toString(radix = 2).padStart(nParts, '0').reversed() }
+            //println("$actions")
+            val lastColumn = IntArray(nParts) { -1 }
+            val partial = List(nParts) { listOf<Int>() }
+            extractMazes(nParts, sequences, indices, actions,
+                        lastColumn, intervalSet.toIntArray(), partial, result, maxLimit, 0)
+            return result.map{createFromIntLists(it)}
+        }
+
+        private fun extractMazes(
+            nParts: Int, sequences: List<List<Int>>, indices: IntArray, actions: List<String>,
+            lastColumn: IntArray, intervalSet: IntArray,
+            partial: List<List<Int>>, result: MutableList<List<List<Int>>>, maxLimit: Int, nResults: Int
+        ) {
+            //val columns = mutableListOf<IntArray>()
+            var saveColumn = IntArray(nParts){-1}
+            //println("newIndices: ${newIndices.contentToString()}")
+            actionsLoop@ for (action in actions) {
+                val newColumn = lastColumn.copyOf()
+                val ends = BooleanArray(nParts){false}
+                val indicesToIncrement = mutableListOf<Int>()
+                for (partIndex in 0 until nParts) {
+
+                    val sequence = sequences[partIndex]
+                    val sequenceIndex = indices[partIndex]
+                    if (sequenceIndex == sequence.size) ends[partIndex] = true
+                    when (action[partIndex]) {
+                        //'0' -> { newColumn[partIndex] = -1}
+                        '0' -> {
+                            if(sequenceIndex < sequence.size ){ // doesn't repeat the last note
+                                newColumn[partIndex] = lastColumn[partIndex]
+                            }
+                        }
+                        '1' -> {
+                           // println("sequenceIndex:$sequenceIndex sequenceSize:${sequence.size}")
+                            if (sequenceIndex >= sequence.size) {
+                                newColumn[partIndex] = -1
+                            } else {
+                                val newPitch = sequence[sequenceIndex]
+                                    newColumn[partIndex] = newPitch
+                                    indicesToIncrement.add(partIndex)
+                                }
+                            }
+                        else -> Unit
+                        }
+                    }
+                    val newRests = newColumn.count{it == -1}
+                    if(ends.all{ it } || newRests < nParts - 1){
+                        if (!newColumn.contentEquals(lastColumn) && !newColumn.contentEquals(saveColumn)) { //
+                            //println("newColumn: ${newColumn.contentToString()}")
+                            saveColumn = newColumn.copyOf()
+                            if(Insieme.areAbsPitchesValid(newColumn, intervalSet)) {
+                                val newPartial = if(newColumn.count{it == -1} == nParts) partial.map{ it }
+                                    else newColumn.mapIndexed { index, pitch -> partial[index] + pitch }
+//                                println("partial:");println(Counterpoint.createFromIntLists(newPartial).displayInNotes())
+//                                println("nEnds: $nEnds")
+
+                                if(ends.all{ it }){
+                                    result.add(newPartial)
+                                } else {
+                                    val newIndices = indices.copyOf()
+                                    indicesToIncrement.forEach{newIndices[it]++}
+                                    println("nResults=$nResults")
+                                    if(nResults + 1 <= maxLimit){
+                                        extractMazes(
+                                            nParts, sequences, newIndices.copyOf(), actions,
+                                            newColumn.copyOf(), intervalSet, newPartial, result,
+                                            maxLimit, nResults+1
+                                        )
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+        }
+
+        fun addingAbsPitchIsValid(
+            pitches: IntArray,
+            intervalSet: List<Int>,
+            newAbsPitch: Int
+        ): Boolean {
+            if (newAbsPitch == -1) return true
+            return pitches.map {
+                it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(), it, newAbsPitch)
+            }.fold(true) { acc, b -> acc && b }
+        }
     }
+
+}
+fun main(args : Array<String>){
+    val pentatonicIntervalSet = listOf(2, 10, 3, 9, 4, 8, 5, 7)
+    val absPitches1 = mutableListOf(0, 1, 2, 11, 2, 6, 9)
+    val absPitches2 = mutableListOf(2, 3, 4, 4)//5, 6, 7, 8, 9, 10,11,0,1)
+    val absPitches3 = mutableListOf(4, 5, 6)//, 3, 4, 5, 6, 7, 8, 9, 10,11,0)
+    val sequences = listOf(absPitches1, absPitches2, absPitches3)
+    val mazes: List<Counterpoint>
+    val ms = measureTimeMillis {
+        mazes = Counterpoint.findMazes(sequences, pentatonicIntervalSet, maxLimit = 3).sortedBy { it.emptiness }
+    }
+    val notes = listOf("C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "__")
+    mazes.take(12).forEach { it.displayInNotes(); println() }
+    println("maze in $ms ms, nResults: ${mazes.size}")
+    //println(Insieme.areAbsPitchesValid(absPitches1.toIntArray(), pentatonicIntervalSet.toIntArray() ))
+//    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8)
+//    val mssq = MelodySubSequencer(pitches.toIntArray())
+//    mssq.assignVelocities(0.90f, 0.50f)
+//    mssq.printSubSequences()
+//    val absPitches1 = mutableListOf(-1,1,0,6,11,5,7,8,8,3,3,3,6,9)
+//    val absPitches2 = mutableListOf(1,11,2,10,3,-1,9,6)
+//    val absPitches3 = mutableListOf(1,11,2,10)
+//    val absPitches1 = mutableListOf(0, 4, 7, 11, 2, 6, 9)
+//    val absPitches2 = mutableListOf(-1, 0, 4, 7, 11, 2, 6, 9)
+//    val absPitches3 = mutableListOf(-1,2, 0, -1, -1, 10, -1, 7, 5, 9, 10, 0, 2)
+//    val absParts = listOf(
+//        //AbsPart(absPitches1),
+//        AbsPart(absPitches2),
+//        AbsPart(absPitches3),
+//    )
+//    val pentatonicIntervalSet = listOf(2, 10, 3, 9, 4, 8, 5, 7)
+//    val counterpoint = Counterpoint(absParts, pentatonicIntervalSet)
+//    counterpoint.display()
+//    val detection = counterpoint.detectParallelIntervals(listOf(0,1,11))
+//    detection.forEach { println(it) }
+//    val counterpoint2 = Counterpoint.findWave(counterpoint,pentatonicIntervalSet,3,
+//        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions)
+//    val counterpoint3 = Counterpoint.findWave(counterpoint2,pentatonicIntervalSet,6,
+//        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions).displayInNotes()
+    //val normCounterpoint = counterpoint.normalizePartsSize(true)
+    //normCounterpoint.displayInNotes()
+    //normCounterpoint.addCadenzas(listOf(1,11))//.displayInNotes()
+//    println("emptiness: ${counterpoint.emptiness}")
+//    val counterpointRound = counterpoint.normalizePartsSize(true).buildRound()
+//    counterpointRound.display()
+//    println("emptiness: ${counterpointRound.emptiness}")
+//    println("emptiness: ${counterpointRound.findEmptiness()}")
+
+//    Counterpoint.expand(counterpoint, 2).display()
+//    val repeatedSequence = Collections.nCopies(3, absPitches1).flatten()
+//    println(repeatedSequence)
+//    val list = listOf(-1,-1,0,10,5,6,11,2,-1,-1,3,-1,10)
+//    println(Insieme.linearMelody(4,list.toIntArray(),21,108).asList())
 }
 
 

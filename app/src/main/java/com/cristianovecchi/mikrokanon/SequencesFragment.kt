@@ -62,7 +62,6 @@ var start = true
 //            model.createVerticalIntervalSet(verticalIntervalSetFlag)
 //        }
         return ComposeView(requireContext()).apply {
-            if(true){
                 setContent {
                     MikroKanonTheme(model) {
                         // A surface container using the 'background' color from the theme
@@ -162,8 +161,6 @@ var start = true
                         }
                     }
                 }
-            }
-
         }
     }
 }

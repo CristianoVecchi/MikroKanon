@@ -244,6 +244,21 @@ public class Insieme {
         }
         return false;
     }
+    public static boolean areAbsPitchesValid(int[] pitches, int[] intervalSet ){
+        int length = pitches.length;
+        if(length < 2) return true;
+        int pitch1, pitch2;
+        for(int i = 0; i < length - 1; i++){
+            pitch1 = pitches[i];
+            if(pitch1 == -1) continue;
+            for(int j = i +1; j < length; j++){
+                pitch2 = pitches[j];
+                if(pitch2 == -1) continue;
+                if(!isIntervalInSet(intervalSet, pitch1, pitch2)) return false;
+            }
+        }
+        return true;
+    }
     @NotNull
     public static Integer[] getPossibleAbsPitches(@NotNull int[] otherPitches, @NotNull int[] intervalSet) {
         Set<Integer> set = new LinkedHashSet<>();

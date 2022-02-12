@@ -82,7 +82,7 @@ data class Clip(
                 9 -> notesNames[5]
                 10 -> "${notesNames[6]}♭" //Bb
                 11 -> notesNames[6]
-                else -> ""
+                else -> "_"
             }
         }
         fun convertAbsToZodiacSign(absPitch: Int, emoji: Boolean): String {
