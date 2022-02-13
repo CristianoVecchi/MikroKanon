@@ -3,11 +3,11 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 import android.os.Parcelable
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
+import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.getIntOrEmptyValue
 import com.cristianovecchi.mikrokanon.tritoneSubstitutionOnIntervalSet
 import kotlinx.android.parcel.Parcelize
-import kotlinx.coroutines.job
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
@@ -1222,90 +1222,112 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
         }
 
-        fun findMazes(sequences: List<List<Int>>, intervalSet: List<Int>, maxLimit: Int = 5): List<Counterpoint> {
+        suspend fun findMazes(context: CoroutineContext, sequences: List<List<Int>>,
+                      intervalSet: List<Int>, maxLimit: Int = 5): List<Counterpoint> {
             val nParts = sequences.size
             if (nParts == 0) return listOf()
             if (nParts == 1) return listOf(Counterpoint.createFromIntList(sequences[0]))
             val result = mutableListOf(List(nParts) { listOf<Int>() })
 
             val indices = IntArray(nParts) { 0 }
-            val actions = (1 until 2.0.pow(nParts.toDouble()).toInt())
-                .map { it.toString(radix = 2).padStart(nParts, '0').reversed() }
-            //println("$actions")
+            val actions = (0 until 3.0.pow(nParts.toDouble()).toInt())
+                .map { it.toString(radix = 3).padStart(nParts, '0').reversed() }
+                .filter{ string -> !string.all{ch -> ch.equals("2")}}
+                .filter{ string -> !string.all{ch -> ch.equals("0")}}
+//            println("${actions.takeLast(10)}")
+//            println("actions size = ${actions.size}")
+            val formattedSequences = sequences.map{ it.cutAdjacentRepetitions() }
             val lastColumn = IntArray(nParts) { -1 }
-            val partial = List(nParts) { listOf<Int>() }
-            extractMazes(nParts, sequences, indices, actions,
+            val partial = Array(nParts) { listOf<Int>() }
+            extractMazes(context, nParts, formattedSequences, indices, actions,
                         lastColumn, intervalSet.toIntArray(), partial, result, maxLimit, 0)
             return result.map{createFromIntLists(it)}
         }
 
-        private fun extractMazes(
-            nParts: Int, sequences: List<List<Int>>, indices: IntArray, actions: List<String>,
-            lastColumn: IntArray, intervalSet: IntArray,
-            partial: List<List<Int>>, result: MutableList<List<List<Int>>>, maxLimit: Int, nResults: Int
+        private suspend fun extractMazes(context: CoroutineContext,
+                                         nParts: Int, sequences: List<List<Int>>, indices: IntArray, actions: List<String>,
+                                         lastColumn: IntArray, intervalSet: IntArray,
+                                         partial: Array<List<Int>>, result: MutableList<List<List<Int>>>, maxLimit: Int, nResults: Int
         ) {
-            //val columns = mutableListOf<IntArray>()
+            val columnsAndIndicesIncr: MutableList<Pair<IntArray, MutableSet<Int>>> = mutableListOf()
+            val job = context.job
             var saveColumn = IntArray(nParts){-1}
             //println("newIndices: ${newIndices.contentToString()}")
             actionsLoop@ for (action in actions) {
-                val newColumn = lastColumn.copyOf()
+                if(!job.isActive) break@actionsLoop
+                val newColumn = lastColumn.copyOf()//IntArray(nParts){-1}
                 val ends = BooleanArray(nParts){false}
-                val indicesToIncrement = mutableListOf<Int>()
+                val indicesToIncrement = mutableSetOf<Int>()
+                println("Action = $action")
                 for (partIndex in 0 until nParts) {
-
                     val sequence = sequences[partIndex]
                     val sequenceIndex = indices[partIndex]
                     if (sequenceIndex == sequence.size) ends[partIndex] = true
+                    println("action in part#$partIndex: ${action[partIndex]}")
                     when (action[partIndex]) {
-                        //'0' -> { newColumn[partIndex] = -1}
-                        '0' -> {
-                            if(sequenceIndex < sequence.size ){ // doesn't repeat the last note
-                                newColumn[partIndex] = lastColumn[partIndex]
-                            }
-                        }
                         '1' -> {
-                           // println("sequenceIndex:$sequenceIndex sequenceSize:${sequence.size}")
+                            // println("sequenceIndex:$sequenceIndex sequenceSize:${sequence.size}")
                             if (sequenceIndex >= sequence.size) {
                                 newColumn[partIndex] = -1
                             } else {
                                 val newPitch = sequence[sequenceIndex]
-                                    newColumn[partIndex] = newPitch
-                                    indicesToIncrement.add(partIndex)
-                                }
+                                newColumn[partIndex] = newPitch
+                                indicesToIncrement.add(partIndex)
                             }
+                        }
+                        '0' -> {
+                            //if(sequenceIndex < sequence.size ){ // doesn't repeat the last note
+                                newColumn[partIndex] = lastColumn[partIndex]
+                            //}
+                        }
+                        '2' -> { newColumn[partIndex] = -1}
                         else -> Unit
                         }
                     }
                     val newRests = newColumn.count{it == -1}
-                    if(ends.all{ it } || newRests < nParts - 1){
-                        if (!newColumn.contentEquals(lastColumn) && !newColumn.contentEquals(saveColumn)) { //
+                    if(ends.all{ it }){
+                        val newPartial = //if(newRests == nParts) partial.map{ it } else
+                        newColumn.mapIndexed { index, pitch -> partial[index] + pitch }
+                        result.add(newPartial)
+                    } else if(!newColumn.contentEquals(lastColumn) && !newColumn.contentEquals(saveColumn)){
                             //println("newColumn: ${newColumn.contentToString()}")
                             saveColumn = newColumn.copyOf()
                             if(Insieme.areAbsPitchesValid(newColumn, intervalSet)) {
-                                val newPartial = if(newColumn.count{it == -1} == nParts) partial.map{ it }
-                                    else newColumn.mapIndexed { index, pitch -> partial[index] + pitch }
 //                                println("partial:");println(Counterpoint.createFromIntLists(newPartial).displayInNotes())
 //                                println("nEnds: $nEnds")
 
-                                if(ends.all{ it }){
-                                    result.add(newPartial)
-                                } else {
-                                    val newIndices = indices.copyOf()
-                                    indicesToIncrement.forEach{newIndices[it]++}
-                                    println("nResults=$nResults")
-                                    if(nResults + 1 <= maxLimit){
-                                        extractMazes(
-                                            nParts, sequences, newIndices.copyOf(), actions,
-                                            newColumn.copyOf(), intervalSet, newPartial, result,
-                                            maxLimit, nResults+1
-                                        )
-                                    }
+                                        columnsAndIndicesIncr.add(Pair(newColumn,indicesToIncrement))
 
                                 }
-                            }
-                        }
+
+
                     }
                 }
+
+            val partialLastIndex = partial[0].size -1
+            val realLastColumn = if(partialLastIndex == -1) listOf(-1,-1,-1,-1).toIntArray()
+            else partial.map{ it[partialLastIndex] }.toIntArray()
+            val pairs = columnsAndIndicesIncr.sortedBy { pair -> pair.first.count { absPitch -> absPitch == -1 } }
+                .filter{!realLastColumn.contentEquals(it.first)}
+            //println("colAndIncr=${columnsAndIndicesIncr.size} pairs=${pairs.size}")
+            for(pair in pairs){
+                if(!job.isActive) break
+                val (newColumn, indicesToIncrement) = pair
+                if(!realLastColumn.contentEquals(newColumn)){
+                    val newIndices = indices.copyOf()
+                    indicesToIncrement.forEach{newIndices[it]++}
+                    val newPartial = newColumn.mapIndexed { index, pitch -> partial[index] + pitch }.toTypedArray()
+                    extractMazes( context,
+                        nParts, sequences, newIndices.copyOf(), actions,
+                        newColumn.copyOf(), intervalSet, newPartial, result,
+                        maxLimit, nResults+1
+                    )
+                    break
+                } else {
+                    println("newColumn: ${newColumn.contentToString()} realLastColumn: ${realLastColumn.contentToString()}")
+                }
+
+            }
         }
 
         fun addingAbsPitchIsValid(
@@ -1318,22 +1340,32 @@ data class Counterpoint(val parts: List<AbsPart>,
                 it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(), it, newAbsPitch)
             }.fold(true) { acc, b -> acc && b }
         }
+        fun mazeTest(sequences: List<MutableList<Int>>){
+            val pentatonicIntervalSet = listOf(2, 10, 3, 9, 4, 8, 5, 7)
+            val ms = measureTimeMillis {
+                runBlocking {
+                    launch{
+                        val mazes: List<Counterpoint>
+                        val ms = measureTimeMillis {
+                            mazes = Counterpoint.findMazes(this.coroutineContext, sequences, pentatonicIntervalSet, maxLimit = 3).sortedBy { it.emptiness }
+                            mazes.take(12).forEach { it.displayInNotes(); println() }
+                        }
+                        println("maze in $ms ms, nResults: ${mazes.size}")
+                    }
+                }
+            }
+        }
     }
-
 }
+
 fun main(args : Array<String>){
     val pentatonicIntervalSet = listOf(2, 10, 3, 9, 4, 8, 5, 7)
     val absPitches1 = mutableListOf(0, 1, 2, 11, 2, 6, 9)
     val absPitches2 = mutableListOf(2, 3, 4, 4)//5, 6, 7, 8, 9, 10,11,0,1)
     val absPitches3 = mutableListOf(4, 5, 6)//, 3, 4, 5, 6, 7, 8, 9, 10,11,0)
     val sequences = listOf(absPitches1, absPitches2, absPitches3)
-    val mazes: List<Counterpoint>
-    val ms = measureTimeMillis {
-        mazes = Counterpoint.findMazes(sequences, pentatonicIntervalSet, maxLimit = 3).sortedBy { it.emptiness }
-    }
     val notes = listOf("C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "__")
-    mazes.take(12).forEach { it.displayInNotes(); println() }
-    println("maze in $ms ms, nResults: ${mazes.size}")
+    Counterpoint.mazeTest(sequences)
     //println(Insieme.areAbsPitchesValid(absPitches1.toIntArray(), pentatonicIntervalSet.toIntArray() ))
 //    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8)
 //    val mssq = MelodySubSequencer(pitches.toIntArray())

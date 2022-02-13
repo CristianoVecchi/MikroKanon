@@ -19,6 +19,7 @@ import com.cristianovecchi.mikrokanon.ui.Dimensions
 @Composable
 fun SequencesDialog(dialogState: MutableState<Boolean>, sequencesList: List<String>,
                     dimensions: Dimensions, title: String, repeatText: String, okText: String = "OK",
+                    showRepeatButton: Boolean = true,
                     onSubmitButtonClick: (Int, Boolean) -> Unit) {
     SingleSelectDialog(
         dialogState = dialogState,
@@ -26,6 +27,7 @@ fun SequencesDialog(dialogState: MutableState<Boolean>, sequencesList: List<Stri
         repeatText = repeatText, okText = okText,
         sequencesList = sequencesList,
         dimensions = dimensions,
+        showRepeatButton = showRepeatButton,
         onSubmitButtonClick = {  index, repeated -> onSubmitButtonClick(index, repeated)},
         onDismissRequest = { dialogState.value = false }
     )
@@ -37,6 +39,7 @@ fun SingleSelectDialog(
     sequencesList: List<String>,
     defaultSelected: Int = -1,
     dimensions:Dimensions,
+    showRepeatButton: Boolean = true,
     onSubmitButtonClick: (Int, Boolean) -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -87,14 +90,17 @@ fun SingleSelectDialog(
                         ) {
                             Text(text = okText, style = TextStyle(fontSize = fontSize.sp))
                         }
-                        Row{
-                            Checkbox(
-                                checked = repeated,
-                                onCheckedChange = { checked ->
-                                    repeated = !repeated
-                                }
-                            )
-                            Text(text = repeatText)
+                        if(showRepeatButton){
+                            Row{
+                                Checkbox(
+                                    checked = repeated,
+                                    onCheckedChange = { checked ->
+                                        repeated = !repeated
+                                    }
+                                )
+                                Text(text = repeatText)
+                            }
+
                         }
 
                     }

@@ -155,6 +155,10 @@ var start = true
                                     onMikroKanons5reducted = { list ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onMikroKanons5reducted(list)
+                                    },
+                                    onMaze = { indices ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onMaze(indices)
                                     }
                                 )
                             }

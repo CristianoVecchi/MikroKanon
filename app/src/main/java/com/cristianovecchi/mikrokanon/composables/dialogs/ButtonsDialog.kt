@@ -63,7 +63,8 @@ fun ButtonsDialog(
                                             buttonSize = buttonSize,
                                             fontSize = fontSize,
                                             colors = model.appColors,
-                                            onMK5reductedClick = buttonsDialogData.value.onMK5reducted
+                                            onMK5reductedClick = buttonsDialogData.value.onMK5reducted,
+                                            onMaze = buttonsDialogData.value.onMaze
                                         )
                                     }
                                 1 -> SpecialFunctions1Buttons(

@@ -47,17 +47,18 @@ suspend fun mikroKanons4(
            intervalSet, depth, emptinessGate, maxNresults)
           .pmap { it.toCounterpoint() }
 }
-suspend fun mikroKanons5reducted(
-     context: CoroutineContext,
-     sequence: List<Int>,
-     intervalSet: List<Int>,
-     maxNresults: Int
-): List<Counterpoint> = withContext(context){
+suspend fun mikroKanons5reducted(context: CoroutineContext, sequence: List<Int>,
+                                 intervalSet: List<Int>, maxNresults: Int):
+        List<Counterpoint> = withContext(context){
      val emptinessGate = 1.0f
      val depth = 2
      MikroKanon.findAll5AbsPartMikroKanonsParallelReducted(context, sequence,
           intervalSet, depth, emptinessGate, maxNresults)
           .pmap { it.toCounterpoint() }
+}
+suspend fun maze(context: CoroutineContext, sequences: List<List<Int>>, intervalSet: List<Int>):
+List<Counterpoint> = withContext(context){
+     Counterpoint.findMazes( context, sequences, intervalSet )
 }
 suspend fun mikroKanons3(sequence: List<Int>, intervalSet: List<Int>, depth: Int = 6): List<Counterpoint>{
      return MikroKanon.findAll3AbsPartMikroKanonsParallel(sequence, intervalSet, depth)

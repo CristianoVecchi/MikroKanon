@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
+import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
@@ -47,7 +48,8 @@ fun SequenceSelector(model: AppViewModel,
                      onMikroKanons2: (ArrayList<Clip>) -> Unit,
                      onMikroKanons3: (ArrayList<Clip>) -> Unit,
                      onMikroKanons4: (ArrayList<Clip>) -> Unit,
-                     onMikroKanons5reducted: (ArrayList<Clip>) -> Unit
+                     onMikroKanons5reducted: (ArrayList<Clip>) -> Unit,
+                     onMaze: (List<Int>) -> Unit
                     )
 {
 
@@ -83,6 +85,7 @@ fun SequenceSelector(model: AppViewModel,
             val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
             val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
             val selectCounterpointDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
+            val multiSequenceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
             val buttonSize = dimensions.selectorButtonSize
             val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
             SequencesDialog(dialogState = dialogState, dimensions = dimensions,
@@ -110,6 +113,7 @@ fun SequenceSelector(model: AppViewModel,
                 sequences = sequences,
                 selected = selected, onSelect = onSelectComposition
             )
+            MultiSequenceDialog(multiSequenceDialogData, dimensions, sequencesToString )
 
             Column(modifier1) {
                 Row(modifier = Modifier.fillMaxSize(),horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
@@ -196,6 +200,18 @@ fun SequenceSelector(model: AppViewModel,
                                 onPedal3 = { onPedal(3, sequences[selected]) },
                                 onPedal5 = { onPedal(5, sequences[selected]) },
                                 onMK5reducted = { onMikroKanons5reducted(sequences[selected]) },
+                                onMaze = {
+                                         onMaze(listOf(1,2,3,4))//,6,7,8,9,10, 11))
+//                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+//                                    val sequencesCsv = "$selected|1"
+//                                    multiSequenceDialogData.value = MultiNumberDialogData(true,
+//                                        language.addSequencesToMaze, sequencesCsv, 0, 1000, model = model,
+//                                    ){ newValues ->
+//                                        val indices = newValues.extractIntPairsFromCsv().map{ it.first }
+//                                        //model.cadenzaValues = newValues
+//                                        onMaze( indices ) // CADENZA DIALOG OK BUTTON
+//                                    }
+                                },
                                 onCounterpointSelected = { position -> onLoadingCounterpoint(position)}
                             )
                             {

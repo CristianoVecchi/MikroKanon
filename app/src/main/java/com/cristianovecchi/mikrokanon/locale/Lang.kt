@@ -370,6 +370,7 @@ data class Lang( // English by default
     val selectMbti: String = "Select MBTI!",
     val credits: String = "Credits",
     val choose2ndSequence: String = "Choose the second sequence!",
+    val chooseAnotherSequence: String = "Choose another sequence!",
 
     val selectSpecialFunction: String = "Select a function!",
     val selectCadenzaForm: String = "Select a cadenza form!",
@@ -380,6 +381,7 @@ data class Lang( // English by default
     val clearSlots: String = "Clear slots",
     val selectSlots: String = "Select slots to clear!",
     val slotNumbers: List<String> = listOf("1","2","3","4","5","6","7","8","9","A","B","C","D","E","F","G"),
+    val addSequencesToMaze: String = "Add other sequences in the maze!"
     //val convertToDate: (Long) -> String = toDateEn
     ){
 

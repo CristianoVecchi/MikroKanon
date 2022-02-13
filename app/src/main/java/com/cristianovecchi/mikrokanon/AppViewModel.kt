@@ -51,6 +51,7 @@ sealed class Computation(open val icon: String = "") {
     data class Overlap(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "overlap"): Computation()
     data class Crossover(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "crossover"): Computation()
     data class Glue(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "glue"): Computation()
+    data class Maze(val sequenceIndices: List<Int>, override val icon: String = "maze"): Computation()
     data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "erase"): Computation()
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
     data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "doppelgänger"): Computation()
@@ -135,6 +136,7 @@ class AppViewModel(
         "overlap" to R.drawable.ic_baseline_compress_24,
         "crossover" to R.drawable.ic_baseline_crossover_24,
         "glue" to R.drawable.ic_baseline_view_week_24,
+        "maze" to R.drawable.ic_baseline_account_tree_24
     )
     val stackIcons = mutableListOf<String>()
     private fun Stack<Computation>.pushAndDispatch(computation: Computation){
@@ -160,6 +162,8 @@ class AppViewModel(
     val MAX_NOTES_MK_4 = 32
     val MAX_NOTES_MK_4DEEP = 18
     val MAX_NOTES_MK_5RED = 25
+    val MAX_SEQUENCES_IN_MAZE = 4
+    val MAX_NOTES_IN_MAZE = listOf<Int>(0, 99,99,99,99,99,99, 24,24, 16,14, 10,8)
 
     private val  MAX_VISIBLE_COUNTERPOINTS: Int = 74
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
@@ -558,6 +562,11 @@ init{
         if (list.isNotEmpty()) changeSequenceToMikroKanons(list)
         findCounterpointsByMikroKanons5reducted()
     }
+    val onMaze = {indices: List<Int> ->
+        println("Maze indices: $indices")
+        computationStack.pushAndDispatch(Computation.Maze(indices))
+            findMazes(indices)
+    }
     val onBack = {
         if(computationStack.size > 1) {
             refreshComputation(true)
@@ -627,6 +636,7 @@ init{
                     is Computation.Overlap -> computationStack.lastElement()
                     is Computation.Crossover -> computationStack.lastElement()
                     is Computation.Glue -> computationStack.lastElement()
+                    is Computation.Maze -> computationStack.lastElement()
                     is Computation.Sort -> computationStack.lastElement()
                     is Computation.UpsideDown -> computationStack.lastElement()
                     is Computation.EraseIntervals -> computationStack.lastElement()
@@ -666,7 +676,6 @@ init{
                         onKPfurtherSelections(previousComputation.indexSequenceToAdd,previousComputation.repeat)
                     }
                     is Computation.MikroKanonOnly -> {
-                        println(sequenceToMikroKanons.value!!)
                         when (previousComputation.nParts) {
                             2 -> onMikroKanons2(ArrayList(sequenceToMikroKanons.value!!))
                             3 -> onMikroKanons3(ArrayList(sequenceToMikroKanons.value!!))
@@ -674,6 +683,9 @@ init{
                             5 -> onMikroKanons5reducted(ArrayList(sequenceToMikroKanons.value!!))
                             else -> Unit
                         }
+                    }
+                    is Computation.Maze -> {
+                        findMazes(previousComputation.sequenceIndices)
                     }
                     is Computation.TritoneSubstitution -> {
                             tritoneSubstitutionOnCounterpoints(previousComputation.counterpoints, previousComputation.index)
@@ -882,6 +894,29 @@ init{
                 }
             }
         }.also { jobQueue.add(it) }
+    }
+    private fun findMazes(sequenceIndices: List<Int>) {
+        val intSequences = sequences.value?.let {
+            sequenceIndices.filter { it < sequences.value!!.size }
+                .map { seq -> sequences.value!![seq].map { it.abstractNote } }
+        } ?: listOf()
+            viewModelScope.launch(Dispatchers.Main) {
+                measureTimeMillis {
+                    _elaborating.value = true
+                    // val def = async(Dispatchers.Default + MKjob) {
+                    val maxNotesInMaze = MAX_NOTES_IN_MAZE[intSequences.size]
+                    val newList = withContext(Dispatchers.Default) {
+                        maze(this.coroutineContext.job, intSequences.map{it.take(maxNotesInMaze)}, intervalSet.value!!)
+                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                            .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                    }
+                    //val newList: List<Counterpoint> = def.await()
+                    changeCounterpointsWithLimit(newList, true)
+                    println("Maze list size = ${newList.size}")
+                    _elaborating.value = false
+                }.also { time -> println("Maze executed in $time ms ") }
+            }.also { jobQueue.add(it) }
     }
     private fun findCounterpointsByMikroKanons3(){
          viewModelScope.launch(Dispatchers.Main){

@@ -98,6 +98,17 @@ fun <E> List<E>.repeat(nTimes: Int): List<E> {
     }
     return result.toList()
 }
+fun <E> List<E>.cutAdjacentRepetitions(): List<E> {
+    val size = this.size
+    if(size < 2) return this
+    val result = mutableListOf<E>()
+    for (i in 0 until size-1){
+        val element = this[i]
+        if(element != this[i+1]) result.add(element)
+    }
+    result.add(this[size-1])
+    return  result.toList()
+}
 fun MutableList<Int>.getIntOrEmptyValue(index: Int): Int {
     return if(index < this.size) this[index] else -1
 }
