@@ -22,6 +22,12 @@ class OutputFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         model = (activity as MainActivity).model
+            model.stackSize.removeObservers(viewLifecycleOwner)
+         model.allCounterpointsData.removeObservers(viewLifecycleOwner)
+         model.userOptionsData.removeObservers(viewLifecycleOwner)
+
+         model.selectedCounterpoint.removeObservers(viewLifecycleOwner)
+
         model.selectedCounterpoint.observe(viewLifecycleOwner){
             if(model.selectedCounterpoint.value!!.parts.isNotEmpty()) {
                 model.changeActiveButtons( if(model.selectedCounterpoint.value!!.parts.size >= 12)
@@ -68,6 +74,7 @@ class OutputFragment: Fragment() {
                                 model = model,
                                 model.iconMap,
                                 model.selectedCounterpoint.asFlow(),
+                                model.counterpoints.asFlow(),
                                 model.elaborating.asFlow(),
                                 onClick = { counterpoint ->
                                     if(counterpoint == model.selectedCounterpoint.value!!){
@@ -149,9 +156,11 @@ class OutputFragment: Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+
+    override fun onDestroyView() {
+       // println("OutputFragment view destroyed.")
 //        model.createVerticalIntervalSet(model.intervalSet.value!!, "Destroy OutputFragment")
-       model.saveVerticalIntervalSet("Destroy OutputFragment")
+       model.saveVerticalIntervalSet("Destroy view OutputFragment")
+        super.onDestroyView()
     }
 }

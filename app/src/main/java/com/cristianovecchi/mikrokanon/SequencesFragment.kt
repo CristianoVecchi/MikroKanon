@@ -18,13 +18,19 @@ import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 
 class SequencesFragment(): Fragment() {
 var start = true
+    lateinit var model: AppViewModel
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
        // val model = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
-        val model = (activity as MainActivity).model
+        model = (activity as MainActivity).model
+        model.setInitialBlankState()
+        model.allSequencesData.removeObservers(viewLifecycleOwner)
+        model.allCounterpointsData.removeObservers(viewLifecycleOwner)
+        model.userOptionsData.removeObservers(viewLifecycleOwner)
+        model.selectedSequence.removeObservers(viewLifecycleOwner)
         model.allSequencesData.observe(viewLifecycleOwner){
             model.retrieveSequencesFromDB()
         }
@@ -56,7 +62,7 @@ var start = true
 //        model.userOptionsData.observe(viewLifecycleOwner){
 //            //model.selectLanguage(model.getUserLangDef())
 //        }
-        model.setInitialBlankState()
+
 //        if(model.userOptionsData.value != null && model.userOptionsData.value!!.isNotEmpty()){
 //            val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
 //            model.createVerticalIntervalSet(verticalIntervalSetFlag)
@@ -166,5 +172,14 @@ var start = true
                     }
                 }
         }
+    }
+    override fun onDestroyView() {
+       // println("SequencesFragment view destroyed.")
+        model.saveVerticalIntervalSet("Destroy view OutputFragment")
+        super.onDestroyView()
+
+
+//        model.createVerticalIntervalSet(model.intervalSet.value!!, "Destroy OutputFragment")
+
     }
 }

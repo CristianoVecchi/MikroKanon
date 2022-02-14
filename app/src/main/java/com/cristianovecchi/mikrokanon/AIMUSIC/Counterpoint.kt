@@ -30,6 +30,9 @@ data class Counterpoint(val parts: List<AbsPart>,
     init {
         emptiness ?: findEmptiness().also<Float> { it -> emptiness = it }
     }
+    fun countAbsPitches(): Int {
+        return parts.map{ it.absPitches }.fold(0){acc, pitches -> acc + pitches.size}
+    }
     fun maxSize(): Int {
         return parts.maxOf { it.absPitches.size }
     }

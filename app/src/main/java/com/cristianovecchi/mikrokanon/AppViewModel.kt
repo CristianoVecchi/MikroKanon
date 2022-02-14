@@ -78,6 +78,17 @@ class AppViewModel(
     private val userRepository: UserOptionsDataRepository,
 ) : AndroidViewModel(application), LifecycleObserver {
 
+    companion object{
+        const val MAX_PITCHES_IN_CACHE = 50000
+        const val MAX_PARTS = 12
+        const val MAX_NOTES_MK_2= 200
+        const val MAX_NOTES_MK_3 = 74
+        const val MAX_NOTES_MK_4 = 32
+        const val MAX_NOTES_MK_4DEEP = 18
+        const val MAX_NOTES_MK_5RED = 25
+        val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,24, 16,14, 10,8)
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onLifeCycleStop() {
         onStop()
@@ -156,14 +167,6 @@ class AppViewModel(
     }
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
-    val MAX_PARTS = 12
-    val MAX_NOTES_MK_2= 200
-    val MAX_NOTES_MK_3 = 74
-    val MAX_NOTES_MK_4 = 32
-    val MAX_NOTES_MK_4DEEP = 18
-    val MAX_NOTES_MK_5RED = 25
-    val MAX_SEQUENCES_IN_MAZE = 4
-    val MAX_NOTES_IN_MAZE = listOf<Int>(0, 99,99,99,99,99,99, 24,24, 16,14, 10,8)
 
     private val  MAX_VISIBLE_COUNTERPOINTS: Int = 74
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
@@ -211,11 +214,24 @@ class AppViewModel(
 
     private val computationStack = Stack<Computation>()
 
-    private data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
-    private val mk3cache = HashMap<CacheKey, List<Counterpoint>>()
-    private val mk4cache = HashMap<CacheKey, List<Counterpoint>>()
-    private val mk4deepSearchCache = HashMap<CacheKey, List<Counterpoint>>()
-    private val mk5reductedCache = HashMap<CacheKey, List<Counterpoint>>()
+    data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
+    private val mk3cache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private val mk4cache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private val mk4deepSearchCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private val mk5reductedCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private fun HashMap<CacheKey, Pair<List<Counterpoint>,Long>>.insertAndClear(key: CacheKey, counterpoints: List<Counterpoint>, timestamp: Long){
+
+            val intAmount = this.values.map{it.first}.fold(0){ acc1, list -> acc1 + list.fold(0){acc2, counterpoint -> acc2 + counterpoint.countAbsPitches()} }
+            val listAmount = counterpoints.fold(0){acc, counterpoint -> acc + counterpoint.countAbsPitches()}
+            println("Cache size: $intAmount, new list size: $listAmount, limit: $MAX_PITCHES_IN_CACHE")
+            if(this.isNotEmpty()){
+            if(intAmount + listAmount > MAX_PITCHES_IN_CACHE) {
+                remove(keys.sortedBy { this[it]?.second }[0])
+            }
+        }
+        this[key] = Pair(counterpoints, timestamp)
+        println()
+    }
 
     val savedCounterpoints: Array<Counterpoint?> = Array(16) { null }
 
@@ -833,9 +849,9 @@ init{
                     .take( if(deepSearch) MAX_NOTES_MK_4DEEP else MAX_NOTES_MK_4 )
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if(mk4cache.containsKey(key) && !deepSearch) {
-                    changeCounterpointsWithLimit(mk4cache[key]!!, true)
+                    changeCounterpointsWithLimit(mk4cache[key]!!.first, true)
                 }else if(mk4deepSearchCache.containsKey(key) && deepSearch) {
-                    changeCounterpointsWithLimit(mk4deepSearchCache[key]!!, true)
+                    changeCounterpointsWithLimit(mk4deepSearchCache[key]!!.first, true)
                 }else {
                    measureTimeMillis{
                     _elaborating.value = true
@@ -853,9 +869,9 @@ init{
                         }
                     //val newList: List<Counterpoint> = def.await()
                     if (deepSearch) {
-                        mk4deepSearchCache[key] = newList
+                        mk4deepSearchCache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
                     } else {
-                        mk4cache[key] = newList
+                        mk4cache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
                     }
                     changeCounterpointsWithLimit(newList, true)
                     _elaborating.value = false
@@ -870,7 +886,7 @@ init{
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_5RED)
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if (mk5reductedCache.containsKey(key) ) {
-                    changeCounterpointsWithLimit(mk5reductedCache[key]!!, true)
+                    changeCounterpointsWithLimit(mk5reductedCache[key]!!.first, true)
                 } else {
                     measureTimeMillis {
                         _elaborating.value = true
@@ -887,8 +903,8 @@ init{
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
                         //val newList: List<Counterpoint> = def.await()
-                        mk5reductedCache[key] = newList
-                        changeCounterpointsWithLimit(newList, true)
+                        mk5reductedCache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
+                        changeCounterpointsWithLimit(newList, true, )
                         _elaborating.value = false
                     }.also { time -> println("MK5reducted executed in $time ms") }
                 }
@@ -924,7 +940,7 @@ init{
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_3)
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if(mk3cache.containsKey(key)) {
-                    changeCounterpointsWithLimit(mk3cache[key]!!, true)
+                    changeCounterpointsWithLimit(mk3cache[key]!!.first, true)
                 }else {
                     val newList: List<Counterpoint>
                     _elaborating.value = true
@@ -934,7 +950,7 @@ init{
                             .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                     }
-                    mk3cache[key] = newList
+                    mk3cache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
                     _elaborating.value = false
                     changeCounterpointsWithLimit(newList, true)
                 }

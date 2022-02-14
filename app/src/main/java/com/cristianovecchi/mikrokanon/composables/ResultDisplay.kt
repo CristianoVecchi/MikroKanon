@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   selectedCounterpointFlow: Flow<Counterpoint>,
+                  counterpointsFlow: Flow<List<Counterpoint>>,
                   elaboratingFlow: Flow<Boolean>,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
                   onTranspose: (List<Int>) -> Unit,
@@ -80,7 +81,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val notesNames = language.noteNames
     val colors = model.appColors
     val counterpointView = model.counterpointView
-    val counterpoints by model.counterpoints.asFlow().collectAsState(initial = emptyList())
+    val counterpoints by counterpointsFlow.collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<Any>>>> =
         when (counterpointView){
             0 -> counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
