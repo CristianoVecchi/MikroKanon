@@ -27,10 +27,6 @@ var start = true
        // val model = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         model = (activity as MainActivity).model
         model.setInitialBlankState()
-        model.allSequencesData.removeObservers(viewLifecycleOwner)
-        model.allCounterpointsData.removeObservers(viewLifecycleOwner)
-        model.userOptionsData.removeObservers(viewLifecycleOwner)
-        model.selectedSequence.removeObservers(viewLifecycleOwner)
         model.allSequencesData.observe(viewLifecycleOwner){
             model.retrieveSequencesFromDB()
         }

@@ -22,12 +22,6 @@ class OutputFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         model = (activity as MainActivity).model
-            model.stackSize.removeObservers(viewLifecycleOwner)
-         model.allCounterpointsData.removeObservers(viewLifecycleOwner)
-         model.userOptionsData.removeObservers(viewLifecycleOwner)
-
-         model.selectedCounterpoint.removeObservers(viewLifecycleOwner)
-
         model.selectedCounterpoint.observe(viewLifecycleOwner){
             if(model.selectedCounterpoint.value!!.parts.isNotEmpty()) {
                 model.changeActiveButtons( if(model.selectedCounterpoint.value!!.parts.size >= 12)

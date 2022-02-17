@@ -79,7 +79,7 @@ class AppViewModel(
 ) : AndroidViewModel(application), LifecycleObserver {
 
     companion object{
-        const val MAX_PITCHES_IN_CACHE = 50000
+        const val MAX_PITCHES_IN_CACHE = 60000
         const val MAX_PARTS = 12
         const val MAX_NOTES_MK_2= 200
         const val MAX_NOTES_MK_3 = 74
@@ -234,7 +234,6 @@ class AppViewModel(
     }
 
     val savedCounterpoints: Array<Counterpoint?> = Array(16) { null }
-
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKlastPlay.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 //        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
@@ -1346,7 +1345,7 @@ init{
                                 else userOptionsData.value!![0].copy()
         when(key){
             "spread" -> clearMKcaches()
-            "deepSearch" -> { mk4cache.clear(); mk4deepSearchCache.clear() }
+            "deepSearch" -> { mk5reductedCache.clear() ;mk4cache.clear(); mk4deepSearchCache.clear() }
         }
         UserOptionsData.updateUserOptionsData(optionsDataClone, key, value).apply{
             viewModelScope.launch(Dispatchers.IO) {

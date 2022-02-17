@@ -827,10 +827,8 @@ public class Insieme {
             canoneInverso.add(nuovaNota);
             //System.out.println("Dopo la trasformazione note"+ nota);
         }
-
         //System.out.println("Dopo la trasformazione "+ confr);
         return canoneInverso;
-
     }
     /*public static Vector<Integer[]> doTokens(int[] melody ,int pauseValue ){
 

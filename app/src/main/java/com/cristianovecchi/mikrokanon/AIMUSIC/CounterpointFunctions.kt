@@ -58,7 +58,7 @@ suspend fun mikroKanons5reducted(context: CoroutineContext, sequence: List<Int>,
 }
 suspend fun maze(context: CoroutineContext, sequences: List<List<Int>>, intervalSet: List<Int>):
 List<Counterpoint> = withContext(context){
-     Counterpoint.findMazes( context, sequences, intervalSet )
+     Counterpoint.findMazesWithRowForms( context, sequences, intervalSet)
 }
 suspend fun mikroKanons3(sequence: List<Int>, intervalSet: List<Int>, depth: Int = 6): List<Counterpoint>{
      return MikroKanon.findAll3AbsPartMikroKanonsParallel(sequence, intervalSet, depth)

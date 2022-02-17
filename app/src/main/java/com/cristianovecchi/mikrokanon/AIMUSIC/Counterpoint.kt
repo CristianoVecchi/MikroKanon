@@ -1224,27 +1224,51 @@ data class Counterpoint(val parts: List<AbsPart>,
                 findAndSetEmptiness()
             }
         }
-
+        suspend fun findMazesWithRowForms(context: CoroutineContext, sequences: List<List<Int>>,
+                              intervalSet: List<Int>, msTimeLimit: Long = 30000L): List<Counterpoint> {
+            val nParts = sequences.size
+            if (nParts == 0) return listOf()
+            if (nParts == 1) return listOf(Counterpoint.createFromIntList(sequences[0]))
+            val result = mutableListOf<Counterpoint>()
+            val rows = (0 until 4.0.pow(nParts.toDouble()).toInt())
+                .map { it.toString(radix = 4).padStart(nParts, '0').reversed() }
+            val job = context.job
+            var count = 0
+            val start = System.currentTimeMillis()
+            for (actionRow in rows){
+                if(!job.isActive || System.currentTimeMillis() - start > msTimeLimit) break
+                val tuple = mutableListOf<List<Int>>()
+                for (partIndex in 0 until nParts){
+                    val sequence = sequences[partIndex]
+                    when (actionRow[partIndex]){
+                        '0' -> tuple.add(sequence.toList())
+                        '1' ->  tuple.add(Insieme.invertAbsPitches(sequence.toIntArray()).toList())
+                        '2' -> tuple.add(sequence.reversed())
+                        else -> tuple.add(Insieme.invertAbsPitches(sequence.toIntArray()).toList().reversed())
+                    }
+                }
+                count++
+                result.addAll(findMazes(context, tuple, intervalSet, 5).sortedBy { it.emptiness }.take(1))
+            }
+            return result.toList()
+        }
         suspend fun findMazes(context: CoroutineContext, sequences: List<List<Int>>,
                       intervalSet: List<Int>, maxLimit: Int = 5): List<Counterpoint> {
             val nParts = sequences.size
             if (nParts == 0) return listOf()
             if (nParts == 1) return listOf(Counterpoint.createFromIntList(sequences[0]))
             val result = mutableListOf(List(nParts) { listOf<Int>() })
-
             val indices = IntArray(nParts) { 0 }
             val actions = (0 until 3.0.pow(nParts.toDouble()).toInt())
                 .map { it.toString(radix = 3).padStart(nParts, '0').reversed() }
-                .filter{ string -> !string.all{ch -> ch.equals("2")}}
-                .filter{ string -> !string.all{ch -> ch.equals("0")}}
-//            println("${actions.takeLast(10)}")
-//            println("actions size = ${actions.size}")
+                .filter{ string -> !string.all{ch -> ch == '2'}}
+                .filter{ string -> !string.all{ch -> ch == '0'}}
             val formattedSequences = sequences.map{ it.cutAdjacentRepetitions() }
             val lastColumn = IntArray(nParts) { -1 }
             val partial = Array(nParts) { listOf<Int>() }
             extractMazes(context, nParts, formattedSequences, indices, actions,
                         lastColumn, intervalSet.toIntArray(), partial, result, maxLimit, 0)
-            return result.map{createFromIntLists(it)}
+            return result.map{createFromIntLists(it)}//.filter{ !it.isEmpty()}
         }
 
         private suspend fun extractMazes(context: CoroutineContext,
@@ -1254,22 +1278,17 @@ data class Counterpoint(val parts: List<AbsPart>,
         ) {
             val columnsAndIndicesIncr: MutableList<Pair<IntArray, MutableSet<Int>>> = mutableListOf()
             val job = context.job
-            var saveColumn = IntArray(nParts){-1}
-            //println("newIndices: ${newIndices.contentToString()}")
             actionsLoop@ for (action in actions) {
-                if(!job.isActive) break@actionsLoop
-                val newColumn = lastColumn.copyOf()//IntArray(nParts){-1}
-                val ends = BooleanArray(nParts){false}
+                if (!job.isActive) break@actionsLoop
+                val newColumn = IntArray(nParts){-1}
+                val ends = BooleanArray(nParts) { false }
                 val indicesToIncrement = mutableSetOf<Int>()
-                println("Action = $action")
                 for (partIndex in 0 until nParts) {
                     val sequence = sequences[partIndex]
                     val sequenceIndex = indices[partIndex]
                     if (sequenceIndex == sequence.size) ends[partIndex] = true
-                    println("action in part#$partIndex: ${action[partIndex]}")
                     when (action[partIndex]) {
                         '1' -> {
-                            // println("sequenceIndex:$sequenceIndex sequenceSize:${sequence.size}")
                             if (sequenceIndex >= sequence.size) {
                                 newColumn[partIndex] = -1
                             } else {
@@ -1279,57 +1298,38 @@ data class Counterpoint(val parts: List<AbsPart>,
                             }
                         }
                         '0' -> {
-                            //if(sequenceIndex < sequence.size ){ // doesn't repeat the last note
-                                newColumn[partIndex] = lastColumn[partIndex]
-                            //}
+                            newColumn[partIndex] = lastColumn[partIndex]
                         }
-                        '2' -> { newColumn[partIndex] = -1}
                         else -> Unit
-                        }
-                    }
-                    val newRests = newColumn.count{it == -1}
-                    if(ends.all{ it }){
-                        val newPartial = //if(newRests == nParts) partial.map{ it } else
-                        newColumn.mapIndexed { index, pitch -> partial[index] + pitch }
-                        result.add(newPartial)
-                    } else if(!newColumn.contentEquals(lastColumn) && !newColumn.contentEquals(saveColumn)){
-                            //println("newColumn: ${newColumn.contentToString()}")
-                            saveColumn = newColumn.copyOf()
-                            if(Insieme.areAbsPitchesValid(newColumn, intervalSet)) {
-//                                println("partial:");println(Counterpoint.createFromIntLists(newPartial).displayInNotes())
-//                                println("nEnds: $nEnds")
-
-                                        columnsAndIndicesIncr.add(Pair(newColumn,indicesToIncrement))
-
-                                }
-
-
                     }
                 }
-
-            val partialLastIndex = partial[0].size -1
-            val realLastColumn = if(partialLastIndex == -1) listOf(-1,-1,-1,-1).toIntArray()
-            else partial.map{ it[partialLastIndex] }.toIntArray()
+                if (Insieme.areAbsPitchesValid(newColumn, intervalSet)) {
+                    if (ends.all { it }) {
+                        val newRests = newColumn.count { it == -1 }
+                        val newPartial = if(newRests == nParts || newColumn.contentEquals(lastColumn)) partial.map{ it }
+                        else newColumn.mapIndexed { index, pitch -> partial[index] + pitch }
+                        if(newPartial.all{ it.isNotEmpty() }) result.add(newPartial)
+                    } else {
+                        columnsAndIndicesIncr.add(Pair(newColumn, indicesToIncrement))
+                    }
+                }
+            }
             val pairs = columnsAndIndicesIncr.sortedBy { pair -> pair.first.count { absPitch -> absPitch == -1 } }
-                .filter{!realLastColumn.contentEquals(it.first)}
-            //println("colAndIncr=${columnsAndIndicesIncr.size} pairs=${pairs.size}")
+                .filter{!lastColumn.contentEquals(it.first)}
             for(pair in pairs){
                 if(!job.isActive) break
                 val (newColumn, indicesToIncrement) = pair
-                if(!realLastColumn.contentEquals(newColumn)){
                     val newIndices = indices.copyOf()
                     indicesToIncrement.forEach{newIndices[it]++}
                     val newPartial = newColumn.mapIndexed { index, pitch -> partial[index] + pitch }.toTypedArray()
+                if(newColumn.count { it == -1 } != nParts){
                     extractMazes( context,
                         nParts, sequences, newIndices.copyOf(), actions,
                         newColumn.copyOf(), intervalSet, newPartial, result,
                         maxLimit, nResults+1
                     )
                     break
-                } else {
-                    println("newColumn: ${newColumn.contentToString()} realLastColumn: ${realLastColumn.contentToString()}")
                 }
-
             }
         }
 

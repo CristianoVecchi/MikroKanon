@@ -201,25 +201,21 @@ fun SequenceSelector(model: AppViewModel,
                                 onPedal5 = { onPedal(5, sequences[selected]) },
                                 onMK5reducted = { onMikroKanons5reducted(sequences[selected]) },
                                 onMaze = {
-                                         onMaze(listOf(1,2,3,4))//,6,7,8,9,10, 11))
-//                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
-//                                    val sequencesCsv = "$selected|1"
-//                                    multiSequenceDialogData.value = MultiNumberDialogData(true,
-//                                        language.addSequencesToMaze, sequencesCsv, 0, 1000, model = model,
-//                                    ){ newValues ->
-//                                        val indices = newValues.extractIntPairsFromCsv().map{ it.first }
-//                                        //model.cadenzaValues = newValues
-//                                        onMaze( indices ) // CADENZA DIALOG OK BUTTON
-//                                    }
+                                         //onMaze(listOf(1,2,3,4))//,6,7,8,9,10, 11))
+                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+                                    val sequencesCsv = "$selected|1"
+                                    multiSequenceDialogData.value = MultiNumberDialogData(true,
+                                        language.addSequencesToMaze, sequencesCsv, 0, 1000, model = model,
+                                    ){ newValues ->
+                                        val indices = newValues.extractIntPairsFromCsv().map{ it.first }
+                                        //model.cadenzaValues = newValues
+                                        onMaze( indices ) // CADENZA DIALOG OK BUTTON
+                                    }
                                 },
                                 onCounterpointSelected = { position -> onLoadingCounterpoint(position)}
                             )
-                            {
-
-                            }
                         }
                     )
-
                     FreePartsButtons(
                         colors = appColors,
                         fontSize = dimensions.selectorFPbuttonFontSize, isActive = activeButtons.freeparts,
