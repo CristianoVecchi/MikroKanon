@@ -103,9 +103,17 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         return count.toFloat() / pitches.size
     }
 
-    fun transpose(transposition: Int): AbsPart {
+    fun transpose(transposition: Int, newRowForm: Int = 1): AbsPart {
         val newPart = absPitches.map{ if(it != -1) it + transposition else -1}.map{ if(it>11) it - 12 else it}
-        return AbsPart(newPart.toMutableList(),rowForm,transpose,delay)
+        var newAbsPart = AbsPart(newPart.toMutableList(), this.rowForm ,transpose,delay)
+        newAbsPart = when(newRowForm){
+            1 -> newAbsPart
+            2 -> newAbsPart.inverse()
+            3 -> newAbsPart.retrograde()
+            4 -> newAbsPart.inverse().retrograde()
+            else -> newAbsPart
+        }
+        return newAbsPart
     }
 
     fun divideWithSubSequencer(octave: Int, range: IntRange, melodyType: Int): List<AbsPart> {

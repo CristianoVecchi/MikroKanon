@@ -45,7 +45,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   counterpointsFlow: Flow<List<Counterpoint>>,
                   elaboratingFlow: Flow<Boolean>,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
-                  onTranspose: (List<Int>) -> Unit,
+                  onTranspose: (List<Pair<Int,Int>>) -> Unit,
                   onWave: (Int) -> Unit,
                   onTritoneSubstitution: () -> Unit = {},
                   onRound: () -> Unit = {},
@@ -330,9 +330,9 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                          onExpand = { if (!elaborating) onExpand(); scrollToTopList = false },
                          onTranspose = {  if (!elaborating) {
                              transposeDialogData.value = MultiNumberDialogData(
-                                 true, language.selectTranspositions,
+                                 true, language.selectTranspositions, value = "0|1",
                                  model = model) { transpositions ->
-                                 onTranspose(transpositions.extractIntsFromCsv())
+                                 onTranspose(transpositions.extractIntPairsFromCsv())
                                  transposeDialogData.value = MultiNumberDialogData(model = model)
 
                              }

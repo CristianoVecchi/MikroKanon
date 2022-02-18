@@ -81,9 +81,9 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
                     userOptionsData.ritornello
                 }
             } ?: 0
-        val transpose: List<Int> =
-            userOptionsData?.let { userOptionsData.transpose.extractIntsFromCsv() }
-                ?: listOf(0)
+        val transpose: List<Pair<Int,Int>> =
+            userOptionsData?.let { userOptionsData.transpose.extractIntPairsFromCsv() }
+                ?: listOf(Pair(0,1))
         val nuances: Int =
             userOptionsData?.let { userOptionsData.nuances }
                 ?: 1

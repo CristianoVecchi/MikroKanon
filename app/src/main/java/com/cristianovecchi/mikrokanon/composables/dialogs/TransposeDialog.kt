@@ -23,7 +23,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.CustomButton
+import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
+import com.cristianovecchi.mikrokanon.locale.rowFormsMap
+import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
@@ -37,10 +40,13 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
+            val inverseSymbol = rowFormsMap[2]!!
+            val retrogradeSymbol = rowFormsMap[3]!!
             val width = if(dimensions.width <=884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
-            val height = if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
-            else dimensions.dialogHeight
+            val height = (dimensions.height / dimensions.dpDensity).toInt().dp
+//            val height = if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
+//            else dimensions.dialogHeight
             Surface(
                 modifier = Modifier.width(width).height(height),
                 shape = RoundedCornerShape(10.dp)
@@ -55,7 +61,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         .weight(weights.first)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(weights.second)
+                        .weight(weights.second)//  + weights.third/2)
                     val modifierC = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
@@ -63,9 +69,9 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     var transposeText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     var cursor by remember{ mutableStateOf(0) }
                     val setTranspose = { index: Int, newTranspose: Int ->
-                        val bpmValues = transposeText.extractIntsFromCsv().toMutableList()
-                        bpmValues[index] = newTranspose
-                        transposeText = bpmValues.joinToString(",")
+                        val bpmValues = transposeText.extractIntPairsFromCsv().toMutableList()
+                        bpmValues[index] = Pair(newTranspose, bpmValues[index].second)
+                        transposeText = bpmValues.toIntPairsString()
                     }
                     val fontSize = dimensions.dialogFontSize.sp
                     val fontWeight = FontWeight.Normal
@@ -85,8 +91,8 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         val unselectionBorderColor = colors.selCardBorderColorUnselected
                         val intervalPadding = 4.dp
                         val innerPadding = 10.dp
-                        val transpositions = transposeText.extractIntsFromCsv()
-                        val nCols = 4
+                        val transpositions = transposeText.extractIntPairsFromCsv()
+                        val nCols = 3
                         val nRows = (transpositions.size / nCols) + 1
                         val rows = (0 until nRows).toList()
                         LazyColumn(state = listState) {
@@ -100,7 +106,8 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 ) {
                                     for (j in 0 until nCols) {
                                         if (index != transpositions.size) {
-                                            val text = intervals[transpositions[index]]
+                                            val text = intervals[transpositions[index].first]
+                                            val features = if(transpositions[index].second == 1) "" else " " + rowFormsMap[transpositions[index].second]!!
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -118,7 +125,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                             )
                                             {
                                                 Text(
-                                                    text = text,
+                                                    text = text + features,
                                                     modifier = Modifier.padding(innerPadding),
                                                     style = TextStyle(fontSize = if (cursor == index) fontSize else fontSize),
                                                     fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal
@@ -279,6 +286,55 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             }
                         }
 
+                        // Inverse and Retrograde Buttons
+                        Row(modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically) {
+                            Button(modifier = Modifier
+                                .padding(buttonPadding),
+                                onClick = {
+                                    val pairs = transposeText.extractIntPairsFromCsv().toMutableList()
+                                    val (transpose, rowForm) = pairs[cursor]
+                                    val newRowForm = when(rowForm){
+                                        1 -> 2
+                                        2 -> 1
+                                        3 -> 4
+                                        4 -> 3
+                                        else -> 1
+                                    }
+                                    pairs[cursor] = Pair( transpose, newRowForm)
+                                    transposeText = pairs.toIntPairsString()
+                                })
+                            {
+                                Text(
+                                    text = inverseSymbol,
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
+                            Button(modifier = Modifier
+                                .padding(buttonPadding),
+                                onClick = {
+                                    val pairs =
+                                        transposeText.extractIntPairsFromCsv().toMutableList()
+                                    val (transpose, rowForm) = pairs[cursor]
+                                    val newRowForm = when (rowForm) {
+                                        1 -> 3
+                                        3 -> 1
+                                        2 -> 4
+                                        4 -> 2
+                                        else -> 1
+                                    }
+                                    pairs[cursor] = Pair(transpose, newRowForm)
+                                    transposeText = pairs.toIntPairsString()
+                                })
+                            {
+                                Text(
+                                    text = retrogradeSymbol,
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                )
+                            }
+                        }
+
 
                     } // end modifierB
                     Row(
@@ -306,10 +362,10 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = transposeText.extractIntsFromCsv().toMutableList()
+                                val values = transposeText.extractIntPairsFromCsv().toMutableList()
                                 if(values.size > 1) {
                                     values.removeAt(cursor)
-                                    transposeText = values.joinToString(",")
+                                    transposeText = values.toIntPairsString()
                                     val newCursor = if(values.size > 1) cursor-1 else 0
                                     cursor = if(newCursor < 0) 0 else newCursor
                                 }
@@ -322,10 +378,10 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = transposeText.extractIntsFromCsv().toMutableList()
+                                val values = transposeText.extractIntPairsFromCsv().toMutableList()
                                 val lastValue = values[values.size -1]
                                 values.add(lastValue)
-                                transposeText = values.joinToString(",")
+                                transposeText = values.toIntPairsString()
                                 cursor = values.size - 1
                             }
                     }

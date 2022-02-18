@@ -262,7 +262,7 @@ fun getIntervalsForTranspose(intervalSet: List<String> = intervalSetEn): List<St
         split[5][0], split[4][1], split[3][1], split[2][1], split[1][1], split[0][1])
 }
 val rowFormsMap = mapOf(
-    1 to "O", 2 to "I" , 3 to "R", 4 to "RI", -1 to "O |", -2 to "I |" , -3 to "R |", -4 to "RI |"
+    1 to "O", 2 to "I" , 3 to "R", 4 to "IR", -1 to "O |", -2 to "I |" , -3 to "R |", -4 to "IR |"
 )
 //"≈≈≈≈≈", "√√√√√", "➚➚➚➚➚", "➘➘➘➘➘")
 val melodyTypeMap = mapOf(

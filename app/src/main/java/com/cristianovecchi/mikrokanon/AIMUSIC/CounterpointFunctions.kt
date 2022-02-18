@@ -109,7 +109,7 @@ suspend fun explodeCounterpointsToDoppelgänger(originalCounterpoints: List<Coun
 suspend fun findPedalsOnCounterpoint(nPedals:Int, counterpoint: Counterpoint, intervalSet: List<Int>): Counterpoint{
      return Counterpoint.addPedals(nPedals, counterpoint,  intervalSet)
 }
-suspend fun transposeAllCounterpoints(originalCounterpoints: List<Counterpoint>, transpositions: List<Int>): List<Counterpoint>{
+suspend fun transposeAllCounterpoints(originalCounterpoints: List<Counterpoint>, transpositions: List<Pair<Int,Int>>): List<Counterpoint>{
      return originalCounterpoints.map{it.ritornello(transpositions.size - 1, transpositions)}
 }
 suspend fun expand(originalCounterpoints: List<Counterpoint>, extension: Int): List<Counterpoint>{

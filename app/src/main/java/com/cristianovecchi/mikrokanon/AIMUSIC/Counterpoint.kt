@@ -482,30 +482,30 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun tritoneSubstitution(): Counterpoint {
         return Counterpoint(parts.map{ it.tritoneSubstitution()}, tritoneSubstitutionOnIntervalSet(intervalSet))
     }
-    fun transpose(transposition: Int): Counterpoint{
-        if (transposition == 0) return this.clone()
-        val newParts = this.parts.map{ it.transpose(transposition)}
+    fun transpose(transposition: Int, rowForm: Int = 1): Counterpoint{
+        if (transposition == 0 && rowForm == 1) return this.clone()
+        val newParts = this.parts.map{ it.transpose(transposition, rowForm)}
         return Counterpoint(newParts, this.intervalSet, this.emptiness)
     }
-    fun ritornello(ritornello: Int, transpositions: List<Int> = listOf(0)): Counterpoint {
+    fun ritornello(ritornello: Int, transpositions: List<Pair<Int,Int>> = listOf(Pair(0,1))): Counterpoint {
        // println(ritornello)
        // println(transpositions)
         val normalized = if(this.isNormalized()) this else this.normalizePartsSize(false)
-        if (transpositions.all{ it == 0}) {
+        if (transpositions.all{ it == Pair(0,1)}) {
             if (ritornello == 0) return normalized
             var newCounterpoint = this.normalizePartsSize(false)
             for (i in 0 until ritornello){
                 newCounterpoint = newCounterpoint.enqueue(normalized)
             }
-            newCounterpoint.emptiness = newCounterpoint.findEmptiness()
-            return newCounterpoint
+            return newCounterpoint.apply { findAndSetEmptiness() }
         } else {
-            var newCounterpoint = this.normalizePartsSize(false).transpose(transpositions[0])
+            var newCounterpoint = this.normalizePartsSize(false).transpose(transpositions[0].first, transpositions[0].second)
             for (i in 0 until ritornello){
-                newCounterpoint = newCounterpoint.enqueue(normalized.transpose(transpositions[(i + 1) % transpositions.size]))
+                val (transpose, rowForm) = transpositions[(i + 1) % transpositions.size]
+                newCounterpoint = newCounterpoint.enqueue(normalized.transpose(transpose, rowForm))
             }
-            newCounterpoint.emptiness = newCounterpoint.findEmptiness()
-            return newCounterpoint
+
+            return newCounterpoint.apply { findAndSetEmptiness() }
         }
     }
     fun convertPartsToCsv(partSeparator: String = "\n"): String{
@@ -572,10 +572,16 @@ data class Counterpoint(val parts: List<AbsPart>,
                         val partialResult =  mutableListOf<Counterpoint>()
                         for(transpose in (0 until 12)){
                             if(!job.isActive) break@mainLoop
-                            partialResult.add(count1st.overlap(original2nd.transpose(transpose)))
+                            partialResult.add(count1st.overlap(original2nd.transpose(
+                                transpose
+                            )))
                             partialResult.add(count1st.overlap(inverse.transpose(transpose)))
-                            partialResult.add(count1st.overlap(retrograde.transpose(transpose)))
-                            partialResult.add(count1st.overlap(inverseRetrograde.transpose(transpose)))
+                            partialResult.add(count1st.overlap(retrograde.transpose(
+                                transpose
+                            )))
+                            partialResult.add(count1st.overlap(inverseRetrograde.transpose(
+                                transpose
+                            )))
                         }
                         result.addAll(partialResult.sortedBy{ it.checkVerticalFaults(intervalSet)}.take(overlapTake))
                     }
@@ -588,10 +594,18 @@ data class Counterpoint(val parts: List<AbsPart>,
                         val partialResult =  mutableListOf<Counterpoint>()
                         for(transpose in (0 until 12)){
                             if(!job.isActive) break@mainLoop
-                            partialResult.add(counterpoint1st.overlap(orig.transpose(transpose)))
-                            partialResult.add(counterpoint1st.overlap(inv.transpose(transpose)))
-                            partialResult.add(counterpoint1st.overlap(retr.transpose(transpose)))
-                            partialResult.add(counterpoint1st.overlap(invRetr.transpose(transpose)))
+                            partialResult.add(counterpoint1st.overlap(orig.transpose(
+                                transpose
+                            )))
+                            partialResult.add(counterpoint1st.overlap(inv.transpose(
+                                transpose
+                            )))
+                            partialResult.add(counterpoint1st.overlap(retr.transpose(
+                                transpose
+                            )))
+                            partialResult.add(counterpoint1st.overlap(invRetr.transpose(
+                                transpose
+                            )))
                         }
                         val take = if(crossover) crossoverTake else overlapTake
                         result.addAll(partialResult.sortedBy{ it.checkVerticalFaults(intervalSet)}.take(take))

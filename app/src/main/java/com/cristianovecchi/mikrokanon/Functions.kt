@@ -129,7 +129,7 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
         if(flags and 0b10000 > 0) result.addAll(listOf(5,7))
         if(flags and 0b100000 > 0) result.add(6)
         if(flags and 0b1000000 > 0) result.add(0)
-        return result.toList()
+        return result.toList().sorted()
     }
 
     fun createFlagsFromIntervalSet(intervalSet: List<Int>): Int{
@@ -314,8 +314,8 @@ fun String.describeForDynamic(map: Map<Float, String>, ascendingSymbol: String, 
     }
 }
 fun String.describeForTranspose(intervals: List<String>): String {
-    val ints = this.extractIntsFromCsv()
-    return ints.map{ intervals[it] }.joinToString(", ")
+    val pairs = this.extractIntPairsFromCsv()
+    return pairs.joinToString(", ") { intervals[it.first] + if(it.second==1) "" else " " + rowFormsMap[it.second] }
 }
 fun correctBpms(bpms: String): String{
     val result = bpms.extractIntsFromCsv().toMutableList()

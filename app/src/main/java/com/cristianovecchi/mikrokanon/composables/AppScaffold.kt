@@ -676,9 +676,9 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                         }
                         "Transpose" -> {
                             val transposeCsv = userOptions.transpose
-                            val isOn = transposeCsv != "0"
+                            val isOn = transposeCsv != "0|1"
                             val description = transposeCsv.describeForTranspose(intervalsForTranspose)
-                            val nl = if(description.length<15) "" else "\n"
+                            val nl = if(description.length<8) "" else "\n"
                             SelectableCard(
                                 text = if(isOn) "${lang.transpose}: $nl$description" else lang.transpose,
                                 fontSize = fontSize,
@@ -686,7 +686,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                                 isSelected = isOn,
                                 onClick = {
                                     transposeDialogData.value = MultiNumberDialogData(
-                                        true, "${lang.selectTranspositions}", transposeCsv,
+                                        true, lang.selectTranspositions, transposeCsv,
                                         model = model) { transpositions ->
                                         model.updateUserOptions(
                                             "transpose",

@@ -121,7 +121,7 @@ object Player {
         partsShuffle: Boolean = false,
         rowForms: List<Pair<Int, Int>> = listOf(Pair(0, 1)),
         ritornello: Int = 0,
-        transpose: List<Int> = listOf(0),
+        transpose: List<Pair<Int,Int>> = listOf(Pair(0,1)),
         doublingFlags: Int = 0,
         nuances: Int = 0,
         rangeTypes: List<Pair<Int, Int>> = listOf(Pair(2, 0)),
@@ -156,7 +156,7 @@ object Player {
         else Counterpoint.explodeRowFormsAddingCps(counterpoints, rowForms, nNotesToSkip)
         actualCounterpoint =
             if (ritornello > 0) actualCounterpoint.ritornello(ritornello, transpose)
-            else actualCounterpoint.transpose(transpose[0])
+            else actualCounterpoint.transpose(transpose[0].first, transpose[0].second)
         val glissando: List<Int> =
             if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
         val audio8D: List<Int> =

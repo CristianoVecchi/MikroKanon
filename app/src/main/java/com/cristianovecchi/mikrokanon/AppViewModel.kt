@@ -56,7 +56,7 @@ sealed class Computation(open val icon: String = "") {
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
     data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "doppelgänger"): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2, override val icon: String = "expand") : Computation()
-    data class Transposition(val counterpoints: List<Counterpoint>, val transpositions: List<Int>, val index: Int, override val icon: String = "transpose") : Computation()
+    data class Transposition(val counterpoints: List<Counterpoint>, val transpositions: List<Pair<Int,Int>>, val index: Int, override val icon: String = "transpose") : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int, override val icon: String = "tritone_substitution") : Computation()
 }
 
@@ -64,9 +64,7 @@ data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean =
                          val undo: Boolean = false, val expand: Boolean = true,
                          val waves: Boolean = false, val pedals: Boolean = true,
                          val counterpoint: Boolean = false, val specialFunctions: Boolean = false,
-                         val freeparts: Boolean = false, val playOrStop: Boolean = true) {
-}
-
+                         val freeparts: Boolean = false, val playOrStop: Boolean = true)
 enum class ScaffoldTabs {
     SOUND, BUILDING, SETTINGS
 }
@@ -168,7 +166,7 @@ class AppViewModel(
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
 
-    private val  MAX_VISIBLE_COUNTERPOINTS: Int = 74
+    private val  MAX_VISIBLE_COUNTERPOINTS: Int = 42
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
 
     private val _activeButtons = MutableLiveData(ActiveButtons())
@@ -219,10 +217,12 @@ class AppViewModel(
     private val mk4cache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
     private val mk4deepSearchCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
     private val mk5reductedCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private val mazeCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
     private fun HashMap<CacheKey, Pair<List<Counterpoint>,Long>>.insertAndClear(key: CacheKey, counterpoints: List<Counterpoint>, timestamp: Long){
 
             val intAmount = this.values.map{it.first}.fold(0){ acc1, list -> acc1 + list.fold(0){acc2, counterpoint -> acc2 + counterpoint.countAbsPitches()} }
             val listAmount = counterpoints.fold(0){acc, counterpoint -> acc + counterpoint.countAbsPitches()}
+        println("key: ${key.sequence} ${key.intervalSet}")
             println("Cache size: $intAmount, new list size: $listAmount, limit: $MAX_PITCHES_IN_CACHE")
             if(this.isNotEmpty()){
             if(intAmount + listAmount > MAX_PITCHES_IN_CACHE) {
@@ -436,8 +436,8 @@ init{
         computationStack.pushAndDispatch(Computation.Single(originalCounterpoints, null, index))
         singleOnCounterpoints(originalCounterpoints, index)
     }
-    val onSimpleTransposition = { transpositions: List<Int> ->
-        if(transpositions != listOf( 0 )){
+    val onSimpleTransposition = { transpositions: List<Pair<Int,Int>> ->
+        if(transpositions != listOf( Pair(0,1) )){
             val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
             val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
             computationStack.pushAndDispatch(Computation.Transposition(originalCounterpoints, transpositions, index))
@@ -916,21 +916,27 @@ init{
                 .map { seq -> sequences.value!![seq].map { it.abstractNote } }
         } ?: listOf()
             viewModelScope.launch(Dispatchers.Main) {
-                measureTimeMillis {
-                    _elaborating.value = true
-                    // val def = async(Dispatchers.Default + MKjob) {
-                    val maxNotesInMaze = MAX_NOTES_IN_MAZE[intSequences.size]
-                    val newList = withContext(Dispatchers.Default) {
-                        maze(this.coroutineContext.job, intSequences.map{it.take(maxNotesInMaze)}, intervalSet.value!!)
-                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                            .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
-                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                    }
-                    //val newList: List<Counterpoint> = def.await()
-                    changeCounterpointsWithLimit(newList, true)
-                    println("Maze list size = ${newList.size}")
-                    _elaborating.value = false
-                }.also { time -> println("Maze executed in $time ms ") }
+                val sequence = intSequences.reduce{ acc, seq -> acc + seq }
+                val key = CacheKey(sequence, intervalSet.value!!)
+                if (mazeCache.containsKey(key) ) {
+                    changeCounterpointsWithLimit(mazeCache[key]!!.first, true)
+                } else {
+                    measureTimeMillis {
+                        _elaborating.value = true
+                        // val def = async(Dispatchers.Default + MKjob) {
+                        val maxNotesInMaze = MAX_NOTES_IN_MAZE[intSequences.size]
+                        val newList = withContext(Dispatchers.Default) {
+                            maze(this.coroutineContext.job, intSequences.map{it.take(maxNotesInMaze)}, intervalSet.value!!)
+                                .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                                .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                        }
+                        mazeCache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
+                        changeCounterpointsWithLimit(newList, true)
+                        println("Maze list size = ${newList.size}")
+                        _elaborating.value = false
+                    }.also { time -> println("Maze executed in $time ms ") }
+                }
             }.also { jobQueue.add(it) }
     }
     private fun findCounterpointsByMikroKanons3(){
@@ -1150,7 +1156,7 @@ init{
             }
         }
     }
-    private fun transposeOnCounterpoints(originalCounterpoints: List<Counterpoint>, transpositions: List<Int>, index: Int){
+    private fun transposeOnCounterpoints(originalCounterpoints: List<Counterpoint>, transpositions: List<Pair<Int,Int>>, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){

@@ -45,8 +45,8 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
             val playing by model.playing.asFlow().collectAsState(initial = false)
             val width = if(dimensions.width <=884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
-            val height = if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
-            else dimensions.dialogHeight
+            //val height = if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
+            val height = (dimensions.height / dimensions.dpDensity).toInt().dp
             Surface(
                 modifier = Modifier.width(width).height(height),
                 shape = RoundedCornerShape(10.dp)
