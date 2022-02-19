@@ -14,6 +14,10 @@ fun ArrayList<Clip>.transpose(transpose: Int): List<Int>{
     return this.map{ it.abstractNote }
                 .map{ if (it == -1) -1 else (it + transpose) % 12}
 }
+fun List<Int>.transpose(transpose: Int): List<Int>{
+    if(transpose == 0) return this
+    return this.map{ if (it == -1) -1 else (it + transpose) % 12}
+}
 fun ArrayList<Clip>.toStringAll(notesNames: List<String>, zodiacSigns: Boolean, emoji: Boolean): String {
     return if (this.isNotEmpty()) {
         if(zodiacSigns){

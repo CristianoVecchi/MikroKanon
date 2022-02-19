@@ -35,7 +35,7 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
-                        dimensions: Dimensions, sequenceTexts: List<String>,
+                        dimensions: Dimensions,
                         onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) }) {
 
     if (multiNumberDialogData.value.dialogState) {
@@ -45,7 +45,8 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
         val notesNames = lang.noteNames
         //val sequenceTexts = sequences.map{ it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
         val listDialogData by lazy { mutableStateOf(ListDialogData())}
-
+        val allSequences = model.sequences.value!!.map{ it.map{it.abstractNote}.cutAdjacentRepetitions()}.map{ Clip.convertAbsPitchesToClips(it)}
+        var sequences by mutableStateOf(multiNumberDialogData.value.intSequences.map{it.cutAdjacentRepetitions()})
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
 
             ListDialog(listDialogData, dimensions, lang.OKbutton)
@@ -75,17 +76,17 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                         //.fillMaxSize()
                         .padding(8.dp)
                         .weight(weights.third / 3 * 2)
-                    var sequencesCsv by remember { mutableStateOf(multiNumberDialogData.value.value) }
-                    val pairs = sequencesCsv.extractIntPairsFromCsv()
-                    val allSequences = model.sequences.value!!
-                    val sequences = pairs.filter{ it.first < allSequences.size }.map{ allSequences[it.first]}
+                    //var sequencesCsv by remember { mutableStateOf(multiNumberDialogData.value.value) }
+                    //val pairs = sequencesCsv.extractIntPairsFromCsv()
+                    //val sequences = pairs.filter{ it.first < allSequences.size }.map{ allSequences[it.first]}
+
                     var cursor by remember { mutableStateOf(0) }
                     val transposeMap = remember { mutableStateMapOf<Int, Int>()}
-                    val setPattern = { index: Int, newPattern: Int, newRepetitions: Int ->
-                        val pairs = sequencesCsv.extractIntPairsFromCsv().toMutableList()
-                        pairs[index] = Pair(newPattern, newRepetitions)
-                        sequencesCsv = pairs.toIntPairsString()
-                    }
+//                    val setPattern = { index: Int, newPattern: Int, newRepetitions: Int ->
+//                        val pairs = sequencesCsv.extractIntPairsFromCsv().toMutableList()
+//                        pairs[index] = Pair(newPattern, newRepetitions)
+//                        sequencesCsv = pairs.toIntPairsString()
+//                    }
                     val fontSize = dimensions.dialogFontSize.sp
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
@@ -105,7 +106,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                         val intervalPadding = 4.dp
                         val innerPadding = 10.dp
                         val nCols = 1
-                        val nRows = (pairs.size / nCols) + 1
+                        val nRows = (sequences.size / nCols) + 1
                         val rows = (0 until nRows).toList()
                         LazyColumn(state = listState) {
                             items(rows) { row ->
@@ -117,8 +118,8 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                                     horizontalArrangement = Arrangement.Start
                                 ) {
                                     for (j in 0 until nCols) {
-                                        if (index != pairs.size) {
-                                            val sequenceIndex = pairs[index].first
+                                        if (index != sequences.size) {
+                                            //val sequenceIndex = sequences[index].first
                                             //val repetitions = pairs[index].second
                                             //val feature = if(repetitions >1 ) " (${repetitions}x)" else ""
                                             val transpose = if(transposeMap.contains(index)) transposeMap[index]!! else 0
@@ -199,10 +200,12 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val values = sequencesCsv.extractIntPairsFromCsv().toMutableList()
+                            //val values = sequencesCsv.extractIntPairsFromCsv().toMutableList()
                             transposeMap.swap(cursor, cursor -1)
-                            cursor = values.swap(cursor, cursor - 1)
-                            sequencesCsv = values.toIntPairsString()
+                            val mutableSequences = sequences.toMutableList()
+                            cursor = mutableSequences.swap(cursor, cursor - 1)
+                            sequences = mutableSequences.toList()
+                            //sequencesCsv = values.toIntPairsString()
                         }
                         CustomButton(
                             adaptSizeToIconButton = true,
@@ -211,10 +214,12 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val values = sequencesCsv.extractIntPairsFromCsv().toMutableList()
+                            //val values = sequencesCsv.extractIntPairsFromCsv().toMutableList()
                             transposeMap.swap(cursor, cursor + 1)
-                            cursor = values.swap(cursor, cursor + 1)
-                            sequencesCsv = values.toIntPairsString()
+                            val mutableSequences = sequences.toMutableList()
+                            cursor = mutableSequences.swap(cursor, cursor + 1)
+                            sequences = mutableSequences.toList()
+                            //sequencesCsv = values.toIntPairsString()
                         }
                     }
                     Row(
@@ -248,16 +253,24 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val values = sequencesCsv.extractIntPairsFromCsv().toMutableList()
-                            val value = values[cursor]
-                            val sequence = value.first
-                            val repetitions = value.second
-
+//                            val values = sequencesCsv.extractIntPairsFromCsv().toMutableList()
+//                            val value = values[cursor]
+//                            val sequence = value.first
+//                            val repetitions = value.second
+                            val sequence = sequences[cursor]
+                            val newSequencesAll = (allSequences + sequences.map{Clip.convertAbsPitchesToClips(it)}).distinctBy{it.map{it.abstractNote}}
+                            val newSequenceTexts = newSequencesAll.map{ it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
+                            val newIndex = newSequencesAll.indexOfFirst {
+                                it.map{it.abstractNote} == sequence }
                             listDialogData.value = ListDialogData(
-                                true, sequenceTexts, sequence, lang.selectRhythm
+                                true, newSequenceTexts, newIndex, lang.selectRhythm
                             ) { index ->
-                                values[cursor] = Pair(index, repetitions)
-                                sequencesCsv = values.toIntPairsString()
+//                                values[cursor] = Pair(index, repetitions)
+//                                sequencesCsv = values.toIntPairsString()
+                                val newSequence = newSequencesAll[index].map{it.abstractNote}
+                                val mutableSequences = sequences.toMutableList()
+                                mutableSequences[cursor] = newSequence
+                                sequences = mutableSequences.toList()
                                 transposeMap[cursor]?.let{
                                     transposeMap[cursor] = 0 }
                                 listDialogData.value =
@@ -273,12 +286,13 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val values = sequencesCsv.split(",").toMutableList()
-                            if (values.size > 1) {
-                                values.removeAt(cursor)
+                            if (sequences.size > 1) {
+                                val mutableSequences = sequences.toMutableList()
+                                mutableSequences.removeAt(cursor)
+                                sequences = mutableSequences.toList()
                                 transposeMap.removeAndScale(cursor)
-                                sequencesCsv = values.joinToString(",")
-                                val newCursor = if (values.size > 1) cursor - 1 else 0
+                                //sequencesCsv = values.joinToString(",")
+                                val newCursor = if (sequences.size > 1) cursor - 1 else 0
                                 cursor = if (newCursor < 0) 0 else newCursor
                             }
                         }
@@ -290,16 +304,20 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val values = sequencesCsv.extractIntPairsFromCsv().toMutableList()
-                            val value = values.last()
-                            val sequence = value.first
+                            val sequence = sequences[cursor]
+                            val newSequencesAll = (allSequences + multiNumberDialogData.value.intSequences
+                                .map{Clip.convertAbsPitchesToClips(it.cutAdjacentRepetitions())})
+                                .distinctBy{it.map{it.abstractNote}}
+                            val newSequenceTexts = newSequencesAll.map{ it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
+                            val newIndex = newSequencesAll.indexOfFirst {
+                                it.map{it.abstractNote} == sequence }
                             listDialogData.value = ListDialogData(
-                                true, sequenceTexts, sequence, lang.chooseAnotherSequence
+                                true, newSequenceTexts, newIndex, lang.chooseAnotherSequence
                             ) { index ->
-                                values.add(Pair(index,1))
-
-                                sequencesCsv = values.toIntPairsString()
-                                cursor = values.size - 1
+                                val mutableSequences = sequences.toMutableList()
+                                mutableSequences.add(newSequencesAll[index].map{it.abstractNote})
+                                sequences = mutableSequences.toList()
+                                cursor = sequences.size - 1
                                 transposeMap.insertAndScale(cursor, 0)
                                 listDialogData.value =
                                     ListDialogData(itemList = listDialogData.value.itemList)

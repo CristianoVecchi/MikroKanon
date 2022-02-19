@@ -118,6 +118,9 @@ class OutputFragment: Fragment() {
                                 onGlue = { index ->
                                     model.onGlue(index)
                                 },
+                                onMaze = { intSequences ->
+                                    model.onMaze(intSequences)
+                                },
                                 onEraseIntervals = {
                                     model.onEraseIntervals()
                                 },

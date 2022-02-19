@@ -174,14 +174,11 @@ fun MikroKanonsButtons(
 @Composable
 fun BoostedMikroKanonsButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
-    onMK5reductedClick: () -> Unit, onMaze: () -> Unit
+    onMK5reductedClick: () -> Unit
 ) {
     Row(){
         CustomButton(iconId = model.iconMap["mikrokanon"]!!, text = "5", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
             onMK5reductedClick()
-        }
-        CustomButton(iconId = model.iconMap["maze"]!!, isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-            onMaze()
         }
     }
 }
@@ -206,7 +203,7 @@ fun NotFromSelectorButtons(
 fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
     onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
-    onOverlap: () -> Unit, onCrossover: () -> Unit, onGlue: () -> Unit,
+    onOverlap: () -> Unit, onCrossover: () -> Unit, onGlue: () -> Unit, onMaze: () -> Unit,
     onScarlatti: () -> Unit, onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit
 ) {
     Column {
@@ -219,6 +216,9 @@ fun SpecialFunctions1Buttons(
             }
             CustomButton(iconId = model.iconMap["crossover"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onCrossover()
+            }
+            CustomButton(iconId = model.iconMap["maze"]!!, isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                onMaze()
             }
 
         }

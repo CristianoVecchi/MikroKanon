@@ -64,7 +64,6 @@ fun ButtonsDialog(
                                             fontSize = fontSize,
                                             colors = model.appColors,
                                             onMK5reductedClick = buttonsDialogData.value.onMK5reducted,
-                                            onMaze = buttonsDialogData.value.onMaze
                                         )
                                     }
                                 1 -> SpecialFunctions1Buttons(
@@ -78,6 +77,7 @@ fun ButtonsDialog(
                                     onOverlap = buttonsDialogData.value.onOverlap,
                                     onCrossover = buttonsDialogData.value.onCrossover,
                                     onGlue = buttonsDialogData.value.onGlue,
+                                    onMaze = buttonsDialogData.value.onMaze,
                                     onFlourish = buttonsDialogData.value.onFlourish,
                                     onEraseIntervals = buttonsDialogData.value.onEraseIntervals,
                                     onSingle = buttonsDialogData.value.onSingle,

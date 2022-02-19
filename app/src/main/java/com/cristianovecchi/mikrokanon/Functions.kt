@@ -89,10 +89,10 @@ fun SnapshotStateMap<Int,Int>.swap(fromIndex: Int, toIndex: Int){
     value1?.let{this[toIndex] = it}
     value2?.let{this[fromIndex] = it}
 }
-fun MutableList<Pair<Int,Int>>.swap(fromIndex: Int, toIndex: Int, oldIndex: Int = fromIndex): Int{
+fun MutableList<List<Int>>.swap(fromIndex: Int, toIndex: Int, oldIndex: Int = fromIndex): Int{
     return if(fromIndex in this.indices && toIndex in this.indices){
-        val swap = this[fromIndex].copy()
-        this[fromIndex] = this[toIndex].copy()
+        val swap = this[fromIndex].toList()
+        this[fromIndex] = this[toIndex].toList()
         this[toIndex] = swap
         toIndex // newIndex
     } else {

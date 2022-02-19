@@ -114,7 +114,7 @@ fun SequenceSelector(model: AppViewModel,
                 sequences = sequences,
                 selected = selected, onSelect = onSelectComposition
             )
-            MultiSequenceDialog(multiSequenceDialogData, dimensions, sequencesToString )
+            MultiSequenceDialog(multiSequenceDialogData, dimensions)
 
             Column(modifier1) {
                 Row(modifier = Modifier.fillMaxSize(),horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
@@ -204,9 +204,9 @@ fun SequenceSelector(model: AppViewModel,
                                 onMaze = {
                                          //onMaze(listOf(1,2,3,4))//,6,7,8,9,10, 11))
                                     buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
-                                    val sequencesCsv = "$selected|1"
+                                    val intSequences = listOf(sequences[selected].map{ it.abstractNote })
                                     multiSequenceDialogData.value = MultiNumberDialogData(true,
-                                        language.addSequencesToMaze, sequencesCsv, 0, 1000, model = model,
+                                        language.addSequencesToMaze, intSequences = intSequences, model = model,
                                         dispatchIntLists = { intSequences ->
                                             onMaze(intSequences)
                                         }

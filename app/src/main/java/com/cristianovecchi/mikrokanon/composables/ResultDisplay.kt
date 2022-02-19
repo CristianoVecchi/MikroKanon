@@ -54,6 +54,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                   onScarlatti: () -> Unit = {},
                   onOverlap: (Int, Boolean) -> Unit,
                   onGlue: (Int) -> Unit,
+                  onMaze: (List<List<Int>>) -> Unit,
                   onEraseIntervals: () -> Unit = {},
                   onSingle: () -> Unit = {},
                   onDoppelgänger: () -> Unit = {},
@@ -106,6 +107,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val transposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val selectCounterpointDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
+    val multiSequenceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
 
     val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
 
@@ -254,6 +256,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
                 SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                     dimensions = dimensions,model = model,language = language)
+                MultiSequenceDialog(multiSequenceDialogData, dimensions)
                 // STACK ICONS
                 Row(modifier = Modifier
                     .fillMaxWidth()
@@ -394,6 +397,17 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                                 onGlue(position)
                                                 selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
                                             })
+                                    },
+                                    onMaze = {
+                                        //onMaze(listOf(1,2,3,4))//,6,7,8,9,10, 11))
+                                        buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+                                        val inputIntSequences = selCounterpoint.parts.map{ it.absPitches.toList() }
+                                        multiSequenceDialogData.value = MultiNumberDialogData(true,
+                                            language.addSequencesToMaze, intSequences = inputIntSequences, model = model,
+                                            dispatchIntLists = { intSequences ->
+                                                onMaze(intSequences)
+                                            }
+                                        )
                                     },
                                     onFlourish = {onFlourish(); close(); scrollToTopList = false},
                                     onEraseIntervals = { onEraseIntervals(); close() },
