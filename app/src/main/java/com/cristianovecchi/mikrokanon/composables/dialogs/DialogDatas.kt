@@ -20,6 +20,7 @@ data class NumberDialogData(val dialogState: Boolean = false, val title:String =
 
 data class MultiNumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="0",
                                  val min: Int = 0, val max: Int = 360, val model: AppViewModel,
+                                 val dispatchIntLists: (List<List<Int>>) -> Unit = {},
                                  val onSubmitButtonClick: (String) -> Unit = {})
 
 data class MultiFloatDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="1.0",

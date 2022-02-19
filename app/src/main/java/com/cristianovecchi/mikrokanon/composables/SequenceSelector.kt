@@ -16,6 +16,7 @@ import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
+import com.cristianovecchi.mikrokanon.AIMUSIC.toStringAll
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
@@ -49,7 +50,7 @@ fun SequenceSelector(model: AppViewModel,
                      onMikroKanons3: (ArrayList<Clip>) -> Unit,
                      onMikroKanons4: (ArrayList<Clip>) -> Unit,
                      onMikroKanons5reducted: (ArrayList<Clip>) -> Unit,
-                     onMaze: (List<Int>) -> Unit
+                     onMaze: (List<List<Int>>) -> Unit
                     )
 {
 
@@ -206,11 +207,10 @@ fun SequenceSelector(model: AppViewModel,
                                     val sequencesCsv = "$selected|1"
                                     multiSequenceDialogData.value = MultiNumberDialogData(true,
                                         language.addSequencesToMaze, sequencesCsv, 0, 1000, model = model,
-                                    ){ newValues ->
-                                        val indices = newValues.extractIntPairsFromCsv().map{ it.first }
-                                        //model.cadenzaValues = newValues
-                                        onMaze( indices ) // CADENZA DIALOG OK BUTTON
-                                    }
+                                        dispatchIntLists = { intSequences ->
+                                            onMaze(intSequences)
+                                        }
+                                    )
                                 },
                                 onCounterpointSelected = { position -> onLoadingCounterpoint(position)}
                             )

@@ -3,6 +3,7 @@ package com.cristianovecchi.mikrokanon
 import android.content.res.Resources
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsemblePart
@@ -20,6 +21,7 @@ import java.util.stream.Stream
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.absoluteValue
+import kotlin.math.min
 
 fun tritoneSubstitution(absPitch: Int): Int {
     return when (absPitch) {
@@ -72,23 +74,30 @@ fun convertFlagsToInts(flags: Int): Set<Int>{
 fun newLineOrNot(list: Collection<Any>, newLineFromN: Int ): String{
     return if(list.size < newLineFromN) "" else "\n"
 }
-fun ArrayList<Clip>.toStringAll(notesNames: List<String>, zodiacSigns: Boolean, emoji: Boolean): String {
-    return if (this.isNotEmpty()) {
-        if(zodiacSigns){
-            this.map { clip -> clip.findZodiacSign(emoji) }.reduce { acc, string -> "$acc $string" }
-        } else {
-            this.map { clip -> clip.findText(notesNames = notesNames) }.reduce { acc, string -> "$acc $string" }
-        }
-
+fun SnapshotStateMap<Int,Int>.removeAndScale(index: Int){
+    if(this.containsKey(index)) this.remove(index)
+    this.keys.sorted().map{ if(it > index) {this[it-1]= this[it]!!; this.remove(it)}}
+}
+fun SnapshotStateMap<Int,Int>.insertAndScale(index: Int, value: Int){
+    this.keys.sortedDescending().map{ if(it >= index) {this[it+1]= this[it]!!; this.remove(it)} }
+    this[index] = value
+}
+fun SnapshotStateMap<Int,Int>.swap(fromIndex: Int, toIndex: Int){
+    val value1 = this[fromIndex]
+    val value2 = this[toIndex]
+    remove(fromIndex); remove(toIndex)
+    value1?.let{this[toIndex] = it}
+    value2?.let{this[fromIndex] = it}
+}
+fun MutableList<Pair<Int,Int>>.swap(fromIndex: Int, toIndex: Int, oldIndex: Int = fromIndex): Int{
+    return if(fromIndex in this.indices && toIndex in this.indices){
+        val swap = this[fromIndex].copy()
+        this[fromIndex] = this[toIndex].copy()
+        this[toIndex] = swap
+        toIndex // newIndex
     } else {
-        "empty Sequence"
+        oldIndex.coerceIn(0, this.size -1)
     }
-}
-fun ArrayList<Clip>.toAbsPitches(): List<Int> {
-    return this.map { it.abstractNote }
-}
-fun List<Int>.toSequence(): ArrayList<Clip>{
-    return ArrayList<Clip>( this.mapIndexed{index, pitch -> Clip(index,pitch)} ) // not complete
 }
 fun <E> List<E>.repeat(nTimes: Int): List<E> {
     if (nTimes < 2) return this

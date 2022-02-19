@@ -51,7 +51,7 @@ sealed class Computation(open val icon: String = "") {
     data class Overlap(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "overlap"): Computation()
     data class Crossover(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "crossover"): Computation()
     data class Glue(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "glue"): Computation()
-    data class Maze(val sequenceIndices: List<Int>, override val icon: String = "maze"): Computation()
+    data class Maze(val intSequences: List<List<Int>>, override val icon: String = "maze"): Computation()
     data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "erase"): Computation()
     data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
     data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "doppelgänger"): Computation()
@@ -234,7 +234,7 @@ class AppViewModel(
     }
 
     val savedCounterpoints: Array<Counterpoint?> = Array(16) { null }
-    val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKlastPlay.mid")
+    val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MK_lastPlay.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 //        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
 //     else {
@@ -577,10 +577,10 @@ init{
         if (list.isNotEmpty()) changeSequenceToMikroKanons(list)
         findCounterpointsByMikroKanons5reducted()
     }
-    val onMaze = {indices: List<Int> ->
-        println("Maze indices: $indices")
-        computationStack.pushAndDispatch(Computation.Maze(indices))
-            findMazes(indices)
+    val onMaze = {intSequences: List<List<Int>> ->
+        println("Maze intSequences: $intSequences")
+        computationStack.pushAndDispatch(Computation.Maze(intSequences))
+            findMazes(intSequences)
     }
     val onBack = {
         if(computationStack.size > 1) {
@@ -700,7 +700,7 @@ init{
                         }
                     }
                     is Computation.Maze -> {
-                        findMazes(previousComputation.sequenceIndices)
+                        findMazes(previousComputation.intSequences)
                     }
                     is Computation.TritoneSubstitution -> {
                             tritoneSubstitutionOnCounterpoints(previousComputation.counterpoints, previousComputation.index)
@@ -910,11 +910,7 @@ init{
             }
         }.also { jobQueue.add(it) }
     }
-    private fun findMazes(sequenceIndices: List<Int>) {
-        val intSequences = sequences.value?.let {
-            sequenceIndices.filter { it < sequences.value!!.size }
-                .map { seq -> sequences.value!![seq].map { it.abstractNote } }
-        } ?: listOf()
+    private fun findMazes(intSequences: List<List<Int>>) {
             viewModelScope.launch(Dispatchers.Main) {
                 val sequence = intSequences.reduce{ acc, seq -> acc + seq }
                 val key = CacheKey(sequence, intervalSet.value!!)
@@ -1041,7 +1037,7 @@ init{
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                              else newList
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimit(newList, true, MAX_VISIBLE_COUNTERPOINTS * 2)
                 _elaborating.value = false
             }.also{  jobQueue.add(it)  }
         }

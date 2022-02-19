@@ -9,6 +9,26 @@ import kotlinx.android.parcel.Parcelize
 import kotlin.math.abs
 import kotlin.random.Random
 
+fun ArrayList<Clip>.transpose(transpose: Int): List<Int>{
+    if(transpose == 0) return this.map{ it.abstractNote}
+    return this.map{ it.abstractNote }
+                .map{ if (it == -1) -1 else (it + transpose) % 12}
+}
+fun ArrayList<Clip>.toStringAll(notesNames: List<String>, zodiacSigns: Boolean, emoji: Boolean): String {
+    return if (this.isNotEmpty()) {
+        if(zodiacSigns){
+            this.map { clip -> clip.findZodiacSign(emoji) }.reduce { acc, string -> "$acc $string" }
+        } else {
+            this.map { clip -> clip.findText(notesNames = notesNames) }.reduce { acc, string -> "$acc $string" }
+        }
+
+    } else {
+        "empty Sequence"
+    }
+}
+fun ArrayList<Clip>.toAbsPitches(): List<Int> {
+    return this.map { it.abstractNote }
+}
 @Parcelize // remove?
 data class Clip(
     val id: Int = -1,
@@ -48,7 +68,15 @@ data class Clip(
             if(absPitch < 0) return absPitch + 12
             return absPitch
         }
-        fun convertAbsToNameAndAx(absPitch: Int, noteNames: List<String> ): Pair<NoteNamesEn, Accidents> {
+        fun convertAbsPitchesToClips(absPitches: List<Int>): ArrayList<Clip>{
+            return ArrayList(
+                absPitches.map{
+                    val pair = convertAbsToNameAndAx(it)
+                    Clip(abstractNote = it, name = pair.first, ax = pair.second)
+                }
+            )
+        }
+        fun convertAbsToNameAndAx(absPitch: Int, noteNames: List<String> = NoteNamesEn.values().map{it.name}): Pair<NoteNamesEn, Accidents> {
             return when (absPitch) {
                 0 -> Pair( NoteNamesEn.C, Accidents.NATURAL )
                 1 -> Pair( NoteNamesEn.C, Accidents.SHARP ) //C#
