@@ -84,7 +84,8 @@ class AppViewModel(
         const val MAX_NOTES_MK_4 = 32
         const val MAX_NOTES_MK_4DEEP = 18
         const val MAX_NOTES_MK_5RED = 25
-        val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,24, 16,14, 10,8)
+        const val MAX_SEQUENCES_IN_MAZE = 10
+        val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,24, 16,14)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
