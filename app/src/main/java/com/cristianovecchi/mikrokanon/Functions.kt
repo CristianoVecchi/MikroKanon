@@ -1,27 +1,20 @@
 package com.cristianovecchi.mikrokanon
 
 import android.content.res.Resources
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
-import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
+import com.cristianovecchi.mikrokanon.AIMUSIC.ChangeData
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsemblePart
 import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme
 import com.cristianovecchi.mikrokanon.locale.getRibattutoSymbols
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import kotlinx.coroutines.*
-import kotlinx.coroutines.GlobalScope.coroutineContext
-import java.lang.StringBuilder
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import java.util.stream.Stream
 import kotlin.collections.ArrayList
-import kotlin.coroutines.CoroutineContext
 import kotlin.math.absoluteValue
-import kotlin.math.min
 
 fun tritoneSubstitution(absPitch: Int): Int {
     return when (absPitch) {
@@ -442,27 +435,62 @@ fun convertRYBtoRGB(red: Float, yellow: Float, blue: Float): Triple<Float, Float
         1.0f + B * (-0.4f + Y * 0.6f) - Y + R * ( -1.0f + B * (0.9f + Y * -1.1f) + Y )
     )
 }
+fun combineRangesAndEnsembleParts(rangeTypes: List<Pair<Int,Int>>, ensemblePartList: List<EnsemblePart>): List<Pair<Pair<Int,Int>, EnsemblePart>>{
+    val result = mutableListOf<Pair<Pair<Int,Int>, EnsemblePart>>()
+    val size = rangeTypes.size * ensemblePartList.size
+    val rangeTypesTicks = size.toLong().divideDistributingRest(rangeTypes.size).sums()
+    val ensemblePartsTicks = size.toLong().divideDistributingRest(ensemblePartList.size).sums()
+    val allTicks = (rangeTypesTicks + ensemblePartsTicks).toSet().sorted()
+    var rangesIndex = 0
+    var ensemblesIndex = 0
+    allTicks.forEach{
+        when {
+            rangeTypesTicks.contains(it) && ensemblePartsTicks.contains(it) -> {
+                result.add(Pair(rangeTypes[rangesIndex], ensemblePartList[ensemblesIndex]))
+                rangesIndex++; ensemblesIndex++
+            }
+            rangeTypesTicks.contains(it) -> {
+                result.add(Pair(rangeTypes[rangesIndex], ensemblePartList[ensemblesIndex]))
+                rangesIndex++
+            }
+            ensemblePartsTicks.contains(it) -> {
+                result.add(Pair(rangeTypes[rangesIndex], ensemblePartList[ensemblesIndex]))
+                ensemblesIndex++
+            }
+        }
+    }
+    return result.toList()
+}
 
-fun findMelodyWithStructure(octave: Int, absPitches: IntArray ,
-lowerLimits: IntArray, upperLimits: IntArray,  melodyTypes: IntArray): IntArray {
+
+
+fun findMelodyWithStructure(
+    octave: Int,
+    absPitches: IntArray,
+    lowerLimits: IntArray,
+    upperLimits: IntArray,
+    melodyTypes: IntArray,
+    ensembleParts: List<EnsemblePart>
+): Pair<IntArray, List<ChangeData>> {// :Pair<IntArray, List<ChangeData>> <- n of note when instrument changes and n of instrument
 
     val melTypes = mutableListOf<Int>()
     val lowLimits = mutableListOf<Int>()
     val upLimits = mutableListOf<Int>()
-    val durs = mutableListOf<Int>()
+    val nNoteGroups = mutableListOf<Int>()
     val melTicks = absPitches.size.toLong().divideDistributingRest(melodyTypes.size).sums()//.also{ println("melTicks: $it")}
     val rangeTicks = absPitches.size.toLong().divideDistributingRest(lowerLimits.size).sums()//.also{ println("rangeTicks: $it")}
     val allTicks = (melTicks + rangeTicks).toSet().sorted()
     var lastTick = 0
     var melIndex = 0
-    var lowIndex = 0
-    allTicks.forEach{
+    var lowIndex = 0 // index of ranges
+
+    allTicks.forEachIndexed{ index, it ->
         when{
             melTicks.contains(it) && rangeTicks.contains(it) -> {
                 melTypes.add(melodyTypes[melIndex])
                 lowLimits.add(lowerLimits[lowIndex])
                 upLimits.add(upperLimits[lowIndex]) // lowers and uppers share the same index
-                durs.add(it.toInt() - lastTick)
+                nNoteGroups.add(it.toInt() - lastTick)
                 lastTick = it.toInt()
                 melIndex++
                 lowIndex++
@@ -471,7 +499,7 @@ lowerLimits: IntArray, upperLimits: IntArray,  melodyTypes: IntArray): IntArray 
                 melTypes.add(melodyTypes[melIndex])
                 lowLimits.add(lowerLimits[lowIndex])
                 upLimits.add(upperLimits[lowIndex]) // lowers and uppers share the same index
-                durs.add(it.toInt() - lastTick)
+                nNoteGroups.add(it.toInt() - lastTick)
                 lastTick = it.toInt()
                 melIndex++
             }
@@ -479,7 +507,7 @@ lowerLimits: IntArray, upperLimits: IntArray,  melodyTypes: IntArray): IntArray 
                 melTypes.add(melodyTypes[melIndex])
                 lowLimits.add(lowerLimits[lowIndex])
                 upLimits.add(upperLimits[lowIndex]) // lowers and uppers share the same index
-                durs.add(it.toInt() - lastTick)
+                nNoteGroups.add(it.toInt() - lastTick)
                 lastTick = it.toInt()
                 lowIndex++
             }
@@ -492,23 +520,35 @@ lowerLimits: IntArray, upperLimits: IntArray,  melodyTypes: IntArray): IntArray 
 
     var lastOctave = octave
     var lastTick2 = 0
+    var lastInstrument = Int.MIN_VALUE
+    val changes = mutableListOf<ChangeData>()
 
-    val sequences = durs.mapIndexed{ index, dur ->
-        val subSequence = absPitches.copyOfRange(lastTick2, lastTick2 + dur)//.also{println("subSequence $index: ${it.contentToString()}")}
+    val sequences = nNoteGroups.mapIndexed{ index, nNotes ->
+        val subSequence = absPitches.copyOfRange(lastTick2, lastTick2 + nNotes)//.also{println("subSequence $index: ${it.contentToString()}")}
         val sequence = Insieme.findMelody(lastOctave, subSequence,
                 lowLimits[index], upLimits[index], melTypes[index])
         lastOctave = sequence.lastOrNull { it != -1 }?.let{ last -> last / 12 -1} ?: lastOctave // sequence could be empty
-        lastTick2 += dur
+        val newInstrument = ensembleParts[index].instrument
+        if(newInstrument != lastInstrument){
+            changes.add(ChangeData(lastTick2, newInstrument))
+            lastInstrument = newInstrument
+        }
+        lastTick2 += nNotes
         sequence
     }
     //sequences.forEach{println("subSequence: ${it.contentToString()}")}
-    return sequences.reduce{ acc, arr -> acc + arr}//.also{println("Result sequence: ${it.contentToString()}")}
+    return Pair(sequences.reduce{ acc, arr -> acc + arr}, changes.toList())//.also{println("Result sequence: ${it.contentToString()}")}
 }
 
 fun List<Long>.sums(start: Long = 0): List<Long>{
     var last = start
     return this.map{ last += it; last }
 }
+fun List<Int>.sums(start: Int = 0): List<Int>{
+    var last = start
+    return this.map{ last += it; last }
+}
+
 
 
 

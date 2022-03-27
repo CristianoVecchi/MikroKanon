@@ -17,10 +17,15 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
     val (pitches, ticks, durations, velocities, glissando) = trackData
     val articulationDurations = trackData.articulationDurations ?: durations
 
-    // STEREO AND INSTRUMENTS
-    val pc: MidiEvent =
-        ProgramChange(0, channel, trackData.instrument) // cambia strumento
-    track.insertEvent(pc)
+    // Instrument changes
+    println()
+    println("CHANNEL: $channel")
+    trackData.changes.forEach{
+        println(it)
+        val pc: MidiEvent = ProgramChange(it.tick, channel, it.instrument) // cambia strumento
+        track.insertEvent(pc)
+    }
+    // STEREO
     val panStep: Int = 127 / nParts
     val pans = (0 until nParts).map { it * panStep + panStep / 2 }//.also { println(it) }
     if (!trackData.audio8D) { // set a fixed pan if 8D AUDIO is not set on this track
@@ -107,8 +112,10 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
             tempoTick += audio8Ddeltas[i]
         }
     }
+
     return track
 }
+
 fun setTimeSignatures(
     tempoTrack: MidiTrack,
     rhythm: List<Triple<RhythmPatterns, Boolean, Int>>,

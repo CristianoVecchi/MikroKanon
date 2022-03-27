@@ -2,7 +2,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 
 import android.os.Build
-import androidx.annotation.RequiresApi
+import com.cristianovecchi.mikrokanon.combineRangesAndEnsembleParts
 import com.cristianovecchi.mikrokanon.findMelodyWithStructure
 import java.util.stream.Collectors
 
@@ -13,13 +13,17 @@ fun findTopNuances(stabilities: List<Float>, minNuance: Float, maxNuance: Float)
     val orderedStabilities = stabilities.sorted()
     return (0 until n).map{ steps[orderedStabilities.indexOf(stabilities[it])]}
 }
+data class ChangeData(val noteIndex: Int, val instrument: Int)
+data class TickChangeData(val tick: Long, val instrument: Int)
+
 data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: IntArray,
                      val velocities: IntArray,val glissando: IntArray,  val attacks: IntArray,
                      val isPreviousRest: BooleanArray,
                      var articulationDurations: IntArray? = null,
                      val channel: Int,  val velocityOff: Int = 80,
                      val vibrato: Int, val doublingFlags: Int = 0, val instrument: Int = 0,
-                     val audio8D: Boolean = false, val partIndex: Int )
+                     val audio8D: Boolean = false, val partIndex: Int,
+                     val changes: List<TickChangeData> = listOf()  )// tick + instrument
 
 object CounterpointInterpreter {
     fun doTheMagic(counterpoint: Counterpoint,
@@ -50,6 +54,7 @@ object CounterpointInterpreter {
 
         val computation = { part: AbsPart ->
             val partIndex = part.index!!
+            var changeIndex = 0
             val isUpperPart = partIndex < counterpoint.parts.size / 2
             val ensemblePart = ensembleParts[partIndex]
             val channel =
@@ -61,6 +66,7 @@ object CounterpointInterpreter {
             val velocitiesData = mutableListOf<Int>()
             val glissandoData = mutableListOf<Int>()
             val previousIsRestData = mutableListOf<Boolean>()
+            val tickChangesData = mutableListOf<TickChangeData>()
 
 
 //            if(glissando.isNotEmpty()){
@@ -73,30 +79,42 @@ object CounterpointInterpreter {
             var tick = 0
             var index = 0
             var durIndex = 0
+            //COMBINE RANGE TYPES AND ENSEMBLE MIXES for each part
+            val ensemblePartList = listOf(
+                ensemblePart.copy(),
+                EnsemblePart(FLUTE,4),
+                ensemblePart.copy(),
+                EnsemblePart(TRUMPET,5),
+                ensemblePart.copy())
+            val rangesAndEnsembleParts = combineRangesAndEnsembleParts(rangeTypes, ensemblePartList)
 
             // RANGES EXTENSION
-            val ranges = rangeTypes.map { ensemblePart.getOctavedRangeByType(it.first, it.second, isUpperPart) }
+            //val ranges = rangeTypes.map { ensemblePart.getOctavedRangeByType(it.first, it.second, isUpperPart) }
+            val ranges = rangesAndEnsembleParts.map { it.second.getOctavedRangeByType(it.first.first, it.first.second, isUpperPart) }
+            println(rangesAndEnsembleParts)
             val octaveTranspose = when(rangeTypes[0].second){
                 3 -> if(isUpperPart) 1 else -1
                 4 -> if(isUpperPart) 2 else -2
                 else -> rangeTypes[0].second
             }
             val startOctave = (ensemblePart.octave + octaveTranspose).coerceIn(0, 8)
-            //ACTUAL PITCHES
-            val actualPitches = if (melodyTypes.size == 1 && rangeTypes.size == 1) {
-                Insieme.findMelody(
+            //ACTUAL PITCHES AND CHANGES
+            // val (actualPitches, changes) =
+            val (actualPitches, changesData) = if (melodyTypes.size == 1 && rangesAndEnsembleParts.size == 1) {
+                Pair(Insieme.findMelody(
                     startOctave,
                     part.absPitches.toIntArray(),
                     ranges[0].first,
                     ranges[0].last,
-                    melodyTypes[0]
-                )
+                    melodyTypes[0]),
+                    listOf(ChangeData(0,ensemblePart.instrument)))
             } else {
-                findMelodyWithStructure(startOctave, part.absPitches.toIntArray(),
-                    ranges.map { it.first }.toIntArray(), ranges.map { it.last }.toIntArray(),
-                    melodyTypes.toIntArray()
-                )
+                    findMelodyWithStructure(startOctave, part.absPitches.toIntArray(),
+                        ranges.map { it.first }.toIntArray(), ranges.map { it.last }.toIntArray(),
+                        melodyTypes.toIntArray(), rangesAndEnsembleParts.map{it.second})
+
             }
+            println("ChangesData: $changesData")
 
             // NUANCES
             val lowLimit = 0.4f
@@ -124,7 +142,10 @@ object CounterpointInterpreter {
                 Insieme.checkIntervalsInPitches(actualPitches, glissando.toIntArray())
             var isPreviousRest = true
             while (index < actualPitches.size) {
-
+                if(index == changesData[changeIndex].noteIndex){
+                    tickChangesData.add(TickChangeData(tick.toLong(), changesData[changeIndex].instrument))
+                    changeIndex = ++changeIndex % changesData.size
+                }
                 val pitch = actualPitches[index]
                 val velocity = velocities[index]
                 var gliss = glissandoChecks[index]
@@ -147,10 +168,13 @@ object CounterpointInterpreter {
                                 dur += nextDur
                                 durIndex++
                             } else {
-
                                 dur += nextDur
                                 index++
                                 durIndex++
+                                if(index == changesData[changeIndex].noteIndex){
+                                    tickChangesData.add(TickChangeData(tick.toLong(), changesData[changeIndex].instrument))
+                                    changeIndex = ++changeIndex % changesData.size
+                                }
                             }
                         }
                         ticksData.add(tick)
@@ -168,13 +192,13 @@ object CounterpointInterpreter {
                     durIndex++
                 }
             }
-
+            println("Do the magic: Channel: $channel $tickChangesData")
             TrackData(
                 pitchesData.toIntArray(), ticksData.toIntArray(), durationsData.toIntArray(),
                 velocitiesData.toIntArray(), glissandoData.toIntArray(), IntArray(pitchesData.size),
                 previousIsRestData.toBooleanArray(),null,
                 channel, 80, vibrato, doublingFlags,
-                ensemblePart.instrument, audio8D.contains(partIndex), partIndex
+                ensemblePart.instrument, audio8D.contains(partIndex), partIndex, tickChangesData
             )
         }
         // CREATION OF TRACKS
