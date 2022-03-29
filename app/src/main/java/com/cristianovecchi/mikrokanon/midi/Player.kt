@@ -114,7 +114,7 @@ object Player {
         bpms: List<Float>,
         shuffle: Float,
         rhythm: List<Triple<RhythmPatterns, Boolean, Int>>,
-        ensembleTypes: List<EnsembleType>,
+        ensemblesList: List<List<EnsembleType>>,
         play: Boolean,
         midiFile: File,
         rhythmShuffle: Boolean = false,
@@ -143,11 +143,11 @@ object Player {
             *durations.toTypedArray()
         ).shuffled() else durations
         val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
-        val ensembleParts: List<EnsemblePart> =
-            if (ensembleTypes.size == 1) Ensembles.getEnsemble(nParts, ensembleTypes[0])
-            else Ensembles.getEnsembleMix(nParts, ensembleTypes)
+        val ensemblePartsList: List<List<EnsemblePart>> =
+            if (ensemblesList.size == 1) listOf(Ensembles.getEnsemble(nParts, ensemblesList[0][0]))
+            else Ensembles.getEnsemblesListMix(nParts, ensemblesList)
         //ensembleParts.display()
-        val actualEnsembleParts = if (partsShuffle) ensembleParts.shuffled() else ensembleParts
+        val actualEnsemblePartsList = if (partsShuffle) ensemblePartsList.map{ it.shuffled() } else ensemblePartsList
         val firstCounterpoint = counterpoints.firstOrNull()
             ?: return "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
         val nNotesToSkip = rhythm[0].first.nNotesLeftInThePattern(firstCounterpoint.nNotes())
@@ -167,7 +167,7 @@ object Player {
         if (actualCounterpoint.parts[0].absPitches.size == 0) return "Counterpoint parts are empty!!!"
 
         val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
-            actualCounterpoint, actualDurations, actualEnsembleParts,
+            actualCounterpoint, actualDurations, actualEnsemblePartsList,
             nuances, doublingFlags, rangeTypes, melodyTypes,
             glissando, audio8D, vibratoExtensions[vibrato]
         )
@@ -226,7 +226,7 @@ object Player {
             }
         }
 
-
+        //if(counterpointTrackData.map{it.changes.size}.toSet().size != 1) throw Exception("WARNING: SOME CHANGE DATA HAS BEEN SKIPPED!!!")
         // TRANSFORM DATATRACKS IN MIDITRACKS
         val counterpointTracks =
             counterpointTrackData.map { convertToMidiTrack(it, counterpointTrackData.size) }

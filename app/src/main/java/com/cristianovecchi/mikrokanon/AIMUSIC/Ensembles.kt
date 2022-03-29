@@ -52,6 +52,11 @@ object Ensembles {
         return (0 until nParts).toList().map{
             mix[it % types.size][it]}
     }
+    fun getEnsemblesListMix(nParts: Int, ensemblesList: List<List<EnsembleType>>): List<List<EnsemblePart>>{
+        return ensemblesList.map {
+            getEnsembleMix(nParts, it)
+        }
+    }
     fun getEnsemble(nParts: Int, type: EnsembleType): List<EnsemblePart> {
         return when (type) {
             EnsembleType.STRINGS -> getStrings(nParts)

@@ -5,6 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AIMUSIC.ChangeData
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsemblePart
+import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
 import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme
 import com.cristianovecchi.mikrokanon.locale.getRibattutoSymbols
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
@@ -258,6 +259,10 @@ fun String.extractIntPairsFromCsv(): List<Pair<Int,Int>>{
     val pairs = this.split(',')
     return pairs.map{ val split = it.split('|'); Pair(split[0].toInt(), split[1].toInt())}
 }
+fun String.extractIntListsFromCsv(): List<List<Int>>{
+    val list = this.split(',')
+    return list.map{ subList -> subList.split('|').map{it.toInt()}}
+}
 fun  MutableList<Pair<Int,Int>>.toIntPairsString(): String {
     return this.joinToString(",") { "${it.first}|${it.second}" }
 }
@@ -271,6 +276,14 @@ fun Pair<Int, Int>.describeSingleRowForm(rowFormsMap: Map<Int, String>, numbers:
 }
 fun String.extractFloatsFromCsv(): List<Float>{
     return this.split(',').mapNotNull { it.toFloat() }
+}
+fun describeEnsembles(ensListIndexes: List<List<Int>>, ensNames: List<String>): String {
+    if(ensListIndexes.size ==1){
+        return ensListIndexes[0].joinToString(", ") {ensNames[it]}
+    }
+    return ensListIndexes.foldIndexed(""){ index, acc, ensList ->
+        acc + "\n${index+1}:  ${ensList.joinToString(", ") {ensNames[it]}}"
+    }
 }
 fun String.describe(): String {
     val ints = this.extractIntsFromCsv()

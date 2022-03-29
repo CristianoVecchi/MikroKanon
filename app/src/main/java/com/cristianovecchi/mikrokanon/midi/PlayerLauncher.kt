@@ -6,6 +6,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.extractFloatsFromCsv
+import com.cristianovecchi.mikrokanon.extractIntListsFromCsv
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import java.io.File
@@ -13,12 +14,12 @@ import kotlin.math.absoluteValue
 
 fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simplify: Boolean,
                  mediaPlayer: MediaPlayer, midiPath: File, counterpoints: List<Counterpoint?>): String{
-        val ensTypes: List<EnsembleType> =
+        val ensList: List<List<EnsembleType>> =
             userOptionsData?.let {
-                userOptionsData.ensembleTypes
-                    .extractIntsFromCsv().map { EnsembleType.values()[it] }
+                userOptionsData.ensemblesList
+                    .extractIntListsFromCsv().map { singleEnsembleGroup -> singleEnsembleGroup.map{EnsembleType.values()[it]} }
             }
-                ?: listOf(EnsembleType.STRING_ORCHESTRA)
+                ?: listOf(listOf(EnsembleType.STRING_ORCHESTRA))
         val dynamics: List<Float> =
             if (simplify) {
                 listOf(1f)
@@ -126,7 +127,7 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
             bpms,
             0f,
             rhythm,
-            ensTypes,
+            ensList,
             createAndPlay,
             midiPath,
             rhythmShuffle,

@@ -21,14 +21,14 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                      val isPreviousRest: BooleanArray,
                      var articulationDurations: IntArray? = null,
                      val channel: Int,  val velocityOff: Int = 80,
-                     val vibrato: Int, val doublingFlags: Int = 0, val instrument: Int = 0,
+                     val vibrato: Int, val doublingFlags: Int = 0,
                      val audio8D: Boolean = false, val partIndex: Int,
                      val changes: List<TickChangeData> = listOf()  )// tick + instrument
 
 object CounterpointInterpreter {
     fun doTheMagic(counterpoint: Counterpoint,
                    durations: List<Int> = listOf(240), // 1/8
-                   ensembleParts: List<EnsemblePart>,
+                   ensemblePartList: List<List<EnsemblePart>>,
                    nuances: Int,
                    doublingFlags: Int,
                    rangeTypes: List<Pair<Int,Int>>,
@@ -56,7 +56,7 @@ object CounterpointInterpreter {
             val partIndex = part.index!!
             var changeIndex = 0
             val isUpperPart = partIndex < counterpoint.parts.size / 2
-            val ensemblePart = ensembleParts[partIndex]
+            val ensemblePartSequence = ensemblePartList.map{it[partIndex]}
             val channel =
                 if (partIndex < 9) partIndex else partIndex + 1 // skip percussion midi channel
 
@@ -80,24 +80,19 @@ object CounterpointInterpreter {
             var index = 0
             var durIndex = 0
             //COMBINE RANGE TYPES AND ENSEMBLE MIXES for each part
-            val ensemblePartList = listOf(
-                ensemblePart.copy(),
-                EnsemblePart(FLUTE,4),
-                ensemblePart.copy(),
-                EnsemblePart(TRUMPET,5),
-                ensemblePart.copy())
-            val rangesAndEnsembleParts = combineRangesAndEnsembleParts(rangeTypes, ensemblePartList)
+
+            val rangesAndEnsembleParts = combineRangesAndEnsembleParts(rangeTypes, ensemblePartSequence)
 
             // RANGES EXTENSION
             //val ranges = rangeTypes.map { ensemblePart.getOctavedRangeByType(it.first, it.second, isUpperPart) }
             val ranges = rangesAndEnsembleParts.map { it.second.getOctavedRangeByType(it.first.first, it.first.second, isUpperPart) }
-            println(rangesAndEnsembleParts)
+            println("rangeAndEnsembleParts: " + rangesAndEnsembleParts)
             val octaveTranspose = when(rangeTypes[0].second){
                 3 -> if(isUpperPart) 1 else -1
                 4 -> if(isUpperPart) 2 else -2
                 else -> rangeTypes[0].second
             }
-            val startOctave = (ensemblePart.octave + octaveTranspose).coerceIn(0, 8)
+            val startOctave = (ensemblePartSequence[0].octave + octaveTranspose).coerceIn(0, 8)
             //ACTUAL PITCHES AND CHANGES
             // val (actualPitches, changes) =
             val (actualPitches, changesData) = if (melodyTypes.size == 1 && rangesAndEnsembleParts.size == 1) {
@@ -107,7 +102,7 @@ object CounterpointInterpreter {
                     ranges[0].first,
                     ranges[0].last,
                     melodyTypes[0]),
-                    listOf(ChangeData(0,ensemblePart.instrument)))
+                    listOf(ChangeData(0,ensemblePartSequence[0].instrument)))
             } else {
                     findMelodyWithStructure(startOctave, part.absPitches.toIntArray(),
                         ranges.map { it.first }.toIntArray(), ranges.map { it.last }.toIntArray(),
@@ -198,7 +193,7 @@ object CounterpointInterpreter {
                 velocitiesData.toIntArray(), glissandoData.toIntArray(), IntArray(pitchesData.size),
                 previousIsRestData.toBooleanArray(),null,
                 channel, 80, vibrato, doublingFlags,
-                ensemblePart.instrument, audio8D.contains(partIndex), partIndex, tickChangesData
+                audio8D.contains(partIndex), partIndex, tickChangesData
             )
         }
         // CREATION OF TRACKS

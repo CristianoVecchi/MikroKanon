@@ -1119,10 +1119,10 @@ init{
         if(!selectedCounterpoint.value!!.isEmpty()){
             val spread = userOptionsData.value!![0].spread != 0
             var newList: List<Counterpoint>
-            val ensTypes: List<EnsembleType> =
-                userOptionsData.value?.let { userOptionsData.value!![0].ensembleTypes
-                    .extractIntsFromCsv().map{EnsembleType.values()[it]}}
-                    ?: listOf(EnsembleType.STRING_ORCHESTRA)
+            val ensList: List<List<EnsembleType>> =
+                userOptionsData.value?.let { listOf(userOptionsData.value!![0].ensemblesList
+                    .extractIntListsFromCsv()[0].map{EnsembleType.values()[it]})}
+                    ?: listOf(listOf(EnsembleType.STRING_ORCHESTRA))
             val rangeType: Pair<Int,Int> =
                 userOptionsData.value?.let { userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()[0] }
                     ?: Pair(2,0)
@@ -1132,7 +1132,7 @@ init{
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = explodeCounterpointsToDoppelgänger(originalCounterpoints,
-                        MAX_PARTS, ensTypes, rangeType, melodyType )
+                        MAX_PARTS, ensList[0], rangeType, melodyType )
                         .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }

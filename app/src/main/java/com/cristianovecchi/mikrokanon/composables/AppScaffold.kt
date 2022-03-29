@@ -112,7 +112,7 @@ fun SettingsDrawer(model: AppViewModel,
                    counterpointsDataFlow: Flow<List<CounterpointData>>){
 
     val listDialogData by lazy { mutableStateOf(ListDialogData())}
-    val ensemblesDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    val ensemblesDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     //val nuancesDialogData by lazy { mutableStateOf(ListDialogData())}
     //val bpmDialogData by lazy { mutableStateOf(NumberDialogData())}
     val rhythmDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
@@ -167,7 +167,7 @@ fun SettingsDrawer(model: AppViewModel,
     var selectedTab by remember{ mutableStateOf(model.lastScaffoldTab)}
     val verticalIntervals by model.intervalSet.observeAsState(listOf(-1))
     val ensNames: List<String> = lang.ensembleNames + synthsNames
-    MultiListDialog(ensemblesDialogData, dimensions, lang.OKbutton)
+    EnsembleDialog(ensemblesDialogData, dimensions)
     ListDialog(listDialogData, dimensions, lang.OKbutton)
     RhythmDialog(rhythmDialogData, dimensions, patterns = RhythmPatterns.values().toList() )
     MultiListDialog(doublingDialogData, dimensions, lang.OKbutton)
@@ -303,23 +303,25 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
                 when (optionName) {
 
                     "Ensemble" -> {
-                        val ensIndexes = userOptions.ensembleTypes.extractIntsFromCsv()
-                        val nl = newLineOrNot(ensIndexes, 2)
+                        val ensListIndexes = userOptions.ensemblesList.extractIntListsFromCsv()
+
                         SelectableCard(
-                            text = "${lang.ensemble}: $nl${ensIndexes.joinToString(" + ") { ensNames[it] }}",
+                            text = "${lang.ensemble}: ${describeEnsembles(ensListIndexes, ensNames)}",
                             fontSize = fontSize,
                             colors = colors,
                             isSelected = true,
                             onClick = {
-                                ensemblesDialogData.value = MultiListDialogData(
-                                    true, ensNames, ensIndexes.toSet(), lang.selectEnsemble
-                                ) { indexes ->
+                                ensemblesDialogData.value = MultiNumberDialogData(
+                                    true, lang.selectEnsemble, userOptions.ensemblesList,
+                                    model = model, names = ensNames,
+                                    intSequences = ensListIndexes
+                                ) { ensListsList ->
                                     model.updateUserOptions(
-                                        "ensembleTypes",
-                                        if(indexes.isEmpty()) "2" else indexes.joinToString(",")
+                                        "ensemblesList",
+                                        ensListsList
                                     )
                                     ensemblesDialogData.value =
-                                        MultiListDialogData(itemList = ensemblesDialogData.value.itemList)
+                                        MultiNumberDialogData(model = model)
                                 }
                             })
                     }
@@ -1054,5 +1056,7 @@ Row(Modifier, horizontalArrangement = Arrangement.SpaceEvenly) {
         }
     }
 }
+
+
 
 

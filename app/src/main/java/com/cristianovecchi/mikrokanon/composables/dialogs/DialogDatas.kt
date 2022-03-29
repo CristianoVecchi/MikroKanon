@@ -15,11 +15,13 @@ data class MultiListDialogData(val dialogState: Boolean = false, val itemList: L
                                val dialogTitle: String = "",
                                val onSubmitButtonClick: (List<Int>) -> Unit = {} )
 
+
 data class NumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:Int = 0,
                             val min: Int = 0, val max: Int = 360, val onSubmitButtonClick: (Int) -> Unit = {})
 
 data class MultiNumberDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="0",
                                  val min: Int = 0, val max: Int = 360, val model: AppViewModel,
+                                 val names: List<String> = listOf(),
                                  val intSequences: List<List<Int>> = listOf(),
                                  val dispatchIntLists: (List<List<Int>>) -> Unit = {},
                                  val onSubmitButtonClick: (String) -> Unit = {})

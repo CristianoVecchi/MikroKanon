@@ -11,8 +11,8 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "id")
         val id: Long,
 
-        @ColumnInfo(name = "ensemble_types")
-        val ensembleTypes: String,
+        @ColumnInfo(name = "ensembles_list")
+        val ensemblesList: String,
 
         @ColumnInfo(name = "range_types")
         val rangeTypes: String,
@@ -112,8 +112,8 @@ import androidx.room.PrimaryKey
                 value: Any
             ): UserOptionsData {
                 return when (key) {
-                    "ensembleTypes" -> {
-                        optionsDataClone.copy(ensembleTypes = value as String)
+                    "ensemblesList" -> {
+                        optionsDataClone.copy(ensemblesList = value as String)
                     }
                     "rangeTypes" -> {
                         optionsDataClone.copy(rangeTypes = value as String)

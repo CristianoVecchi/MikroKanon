@@ -20,10 +20,15 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
     // Instrument changes
     println()
     println("CHANNEL: $channel")
+    var lastTick = -1L // avoid overriding
     trackData.changes.forEach{
-        println(it)
-        val pc: MidiEvent = ProgramChange(it.tick, channel, it.instrument) // cambia strumento
-        track.insertEvent(pc)
+        if(it.tick > lastTick){
+            println(it)
+            val pc: MidiEvent = ProgramChange(it.tick, channel, it.instrument) // cambia strumento
+            track.insertEvent(pc)
+            lastTick = it.tick
+        }
+
     }
     // STEREO
     val panStep: Int = 127 / nParts
