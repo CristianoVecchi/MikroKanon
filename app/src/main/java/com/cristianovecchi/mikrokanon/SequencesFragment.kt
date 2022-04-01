@@ -158,6 +158,10 @@ var start = true
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onMikroKanons5reducted(list)
                                     },
+                                    onMikroKanons6reducted = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onMikroKanons6reducted(list)
+                                    },
                                     onMaze = { intSequences ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onMaze(intSequences)

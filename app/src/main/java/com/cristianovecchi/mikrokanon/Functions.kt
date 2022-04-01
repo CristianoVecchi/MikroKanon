@@ -29,7 +29,6 @@ fun tritoneSubstitution(absPitch: Int): Int {
     }
 }
 fun tritoneSubstitutionOnIntervalSet(intervalSet: List<Int>): List<Int> {
-
     intervalSet.toMutableList().apply {
         if (containsAll(listOf(1, 11, 5, 7))) return intervalSet
 
@@ -44,9 +43,6 @@ fun tritoneSubstitutionOnIntervalSet(intervalSet: List<Int>): List<Int> {
     }
     return intervalSet
 }
-
-
-
 fun convertGlissandoFlags(glissandoFlags: Int): List<Int>{
     val intervals = listOf( 1, -1, 2, -2, 3, -3, 4,-4, 5,-5,6,-6,7,-7,8,-8,9,-9,10,-10,11,-11,12,-12)
     return convertFlagsToInts(glissandoFlags).map { intervals[it-1] }
@@ -64,9 +60,6 @@ fun convertFlagsToInts(flags: Int): Set<Int>{
         }
     }
     return result.toSet()
-}
-fun newLineOrNot(list: Collection<Any>, newLineFromN: Int ): String{
-    return if(list.size < newLineFromN) "" else "\n"
 }
 fun SnapshotStateMap<Int,Int>.removeAndScale(index: Int){
     if(this.containsKey(index)) this.remove(index)
@@ -134,7 +127,6 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
         if(flags and 0b1000000 > 0) result.add(0)
         return result.toList().sorted()
     }
-
     fun createFlagsFromIntervalSet(intervalSet: List<Int>): Int{
         var flags = 0
         intervalSet.apply{
@@ -249,164 +241,6 @@ fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuratio
     return Pair(bpms, deltas.toList() )
 }
 
-
-
-fun String.extractIntsFromCsv(): List<Int>{
-    //if(this.isEmpty() ) return listOf(0)
-    return this.split(',').mapNotNull { it.toInt()}
-}
-fun String.extractIntPairsFromCsv(): List<Pair<Int,Int>>{
-    val pairs = this.split(',')
-    return pairs.map{ val split = it.split('|'); Pair(split[0].toInt(), split[1].toInt())}
-}
-fun String.extractIntListsFromCsv(): List<List<Int>>{
-    val list = this.split(',')
-    return list.map{ subList -> subList.split('|').map{it.toInt()}}
-}
-fun  MutableList<Pair<Int,Int>>.toIntPairsString(): String {
-    return this.joinToString(",") { "${it.first}|${it.second}" }
-}
-fun Pair<Int, Int>.describeSingleRowForm(rowFormsMap: Map<Int, String>, numbers: List<String>): String {
-    val openBracket = (if(this.first < 0) "(" else "" )
-    val counterpointNumber = (if (this.first.absoluteValue == 1) "" else numbers[this.first.absoluteValue-2])
-    val rowForm = rowFormsMap[this.second.absoluteValue]
-    val closeBracket = (if(this.first < 0) ")" else "")
-    val separator = (if(this.second < 0)" |" else "")
-    return openBracket + counterpointNumber + rowForm +closeBracket + separator
-}
-fun String.extractFloatsFromCsv(): List<Float>{
-    return this.split(',').mapNotNull { it.toFloat() }
-}
-fun describeEnsembles(ensListIndexes: List<List<Int>>, ensNames: List<String>): String {
-    if(ensListIndexes.size ==1){
-        return ensListIndexes[0].joinToString(", ") {ensNames[it]}
-    }
-    return ensListIndexes.foldIndexed(""){ index, acc, ensList ->
-        acc + "\n${index+1}:  ${ensList.joinToString(", ") {ensNames[it]}}"
-    }
-}
-fun String.describe(): String {
-    val ints = this.extractIntsFromCsv()
-    return ints.foldIndexed("") { index, acc, i ->
-        when {
-            index == 0 -> acc + i.absoluteValue.toString()
-            i < 0 -> "$acc | ${i.absoluteValue}"
-            ints[index - 1].absoluteValue > i.absoluteValue -> "$acc ➘ $i"
-            ints[index - 1].absoluteValue < i.absoluteValue -> "$acc ➚ $i"
-            ints[index - 1].absoluteValue == i.absoluteValue -> "$acc - $i"
-            else -> acc + i.toString()
-        }
-    }
-}
-fun String.describeForArticulation(legatoMap: Map<Int, String>): String {
-    val (ints, ribs) = this.extractIntPairsFromCsv().unzip()
-    val ribSymbols = getRibattutoSymbols()
-    return ints.foldIndexed("") { index, acc, i ->
-        val name = legatoMap[i.absoluteValue -1]!!
-        val ribattuto = ribSymbols[ribs[index]]
-        //val previousRibattuto = if(index == 0) ribattuto else ribSymbols[ribs[index-1]]
-        when {
-            index == 0 -> acc + name + ribattuto
-            i < 0 -> "$acc | $name$ribattuto"
-            ints[index - 1].absoluteValue > i.absoluteValue -> "$acc ➘ $name$ribattuto"
-            ints[index - 1].absoluteValue < i.absoluteValue -> "$acc ➚ $name$ribattuto"
-            ints[index - 1].absoluteValue == i.absoluteValue -> "$acc - $name$ribattuto"
-            else -> acc + i.toString()
-        }
-    }
-}
-fun String.describeForDynamic(map: Map<Float, String>, ascendingSymbol: String, descendingSymbol: String) : String {
-    val floats = this.extractFloatsFromCsv()
-    return floats.foldIndexed("") { index, acc, i ->
-        when {
-            index == 0 -> acc + map[i.absoluteValue]!!
-            i < 0 -> "$acc | ${map[i.absoluteValue]!!}"
-            floats[index - 1].absoluteValue > i.absoluteValue -> "$acc $descendingSymbol ${map[i]!!}"
-            floats[index - 1].absoluteValue < i.absoluteValue -> "$acc $ascendingSymbol ${map[i]!!}"
-            floats[index - 1].absoluteValue == i.absoluteValue -> "$acc - ${map[i]!!}"
-            else -> acc + i.toString()
-        }
-    }
-}
-fun String.describeForTranspose(intervals: List<String>): String {
-    val pairs = this.extractIntPairsFromCsv()
-    return pairs.joinToString(", ") { intervals[it.first] + if(it.second==1) "" else " " + rowFormsMap[it.second] }
-}
-fun correctBpms(bpms: String): String{
-    val result = bpms.extractIntsFromCsv().toMutableList()
-    if (result.all{ it.absoluteValue == result[0].absoluteValue}) return result[0].absoluteValue.toString()
-    repeat(2){
-        if (result[0] < 0) result[0] = result[0].absoluteValue
-        if (result.size > 1){
-            if (result[1] < 0)  result.add(1, result[0])
-            (1 until result.size).forEach{ index ->
-                if (result[index-1].absoluteValue == result[index].absoluteValue) result[index] = result[index].absoluteValue
-            }
-            (1 until result.size - 1).forEach{ index ->
-                if (result[index] < 0 && result[index+1] < 0 ) result.add(index+1, result[index].absoluteValue)
-            }
-            if (result.last() < 0) result.add(result.last().absoluteValue)
-        }
-    }
-    return result.joinToString(",")
-}
-fun correctDynamics(dynamics: String): String{
-    val result = dynamics.extractFloatsFromCsv().toMutableList()
-    if (result.all{ it.absoluteValue == result[0].absoluteValue}) return result[0].absoluteValue.toString()
-    repeat(2){
-        if (result[0] < 0f) result[0] = result[0].absoluteValue
-        if (result.size > 1){
-            if (result[1] < 0f)  result.add(1, result[0])
-            (1 until result.size).forEach{ index ->
-                if (result[index-1].absoluteValue == result[index].absoluteValue) result[index] = result[index].absoluteValue
-            }
-            (1 until result.size - 1).forEach{ index ->
-                if (result[index] < 0f && result[index+1] < 0f ) result.add(index+1, result[index].absoluteValue)
-            }
-            if (result.last() < 0f) result.add(result.last().absoluteValue)
-        }
-    }
-    return result.joinToString(",")
-}
-fun correctLegatos(legatos: String): String{
-    //println("legatos: $legatos")
-    val (leg, rib) = legatos.extractIntPairsFromCsv().unzip()
-    val result = leg.toMutableList()
-    val result2 = rib.toMutableList()
-    if (result.all{ it.absoluteValue == result[0].absoluteValue} && result2.all{ it.absoluteValue == result2[0].absoluteValue})
-        return "${result[0].absoluteValue}|${result2[0].absoluteValue}"
-    repeat(2){
-        if (result[0] < 0f) result[0] = result[0].absoluteValue
-        if (result.size > 1){
-            if (result[1] < 0f)  result.add(1, result[0])
-            (1 until result.size).forEach{ index ->
-                if (result[index-1].absoluteValue == result[index].absoluteValue) result[index] = result[index].absoluteValue
-            }
-            (1 until result.size - 1).forEach{ index ->
-                if (result[index] < 0f && result[index+1] < 0f ) {
-                    result.add(index+1, result[index].absoluteValue)
-                    result2.add(index+1, result2[index].absoluteValue)
-                }
-            }
-            if (result.last() < 0f) {
-                result.add(result.last().absoluteValue)
-                result2.add(result2.last().absoluteValue)
-            }
-        }
-    }
-    return result.zip(result2){a, b -> "$a|$b" }.joinToString(",")//.also{println("res: $it")}
-}
-fun String.valueFromCsv(index: Int): Int {
-    return this.extractIntsFromCsv()[index]
-}
-fun Color.toHexString(): String {
-    return "#${this.red.toColorHexString()}${this.green.toColorHexString()}${this.blue.toColorHexString()}"
-}
-
-fun Float.toColorHexString(): String {
-    return (255 * this).toInt().toString(16).padStart(2,'0')
-}
-
 // bytes = first the low 7 bits, second the high 7 bits - volume is from 0x0000 to 0x3FFF
 fun Float.convertDynamicToBytes(): Pair<Int, Int> {
     val fl = this.coerceIn(0f,1f)
@@ -433,21 +267,8 @@ fun Long.divideDistributingRest(divisor: Int): MutableList<Long>{
     return list
 }
 
-fun  List<EnsemblePart>.display() {
-    this.forEach {  println(it) }
-    println()
-}
 
-fun convertRYBtoRGB(red: Float, yellow: Float, blue: Float): Triple<Float, Float, Float>{
-    val R = red*red*(3f-red-red)
-    val Y = yellow*yellow*(3f-yellow-yellow)
-    val B = blue*blue*(3f-blue-blue)
-    return Triple(
-        1.0f + B * ( R * (0.337f + Y * -0.137f) + (-0.837f + Y * -0.163f) ),
-        1.0f + B * ( -0.627f + Y * 0.287f) + R * (-1.0f + Y * (0.5f + B * -0.693f) - B * (-0.627f) ),
-        1.0f + B * (-0.4f + Y * 0.6f) - Y + R * ( -1.0f + B * (0.9f + Y * -1.1f) + Y )
-    )
-}
+
 fun combineRangesAndEnsembleParts(rangeTypes: List<Pair<Int,Int>>, ensemblePartList: List<EnsemblePart>): List<Pair<Pair<Int,Int>, EnsemblePart>>{
     val result = mutableListOf<Pair<Pair<Int,Int>, EnsemblePart>>()
     val size = rangeTypes.size * ensemblePartList.size
@@ -475,8 +296,6 @@ fun combineRangesAndEnsembleParts(rangeTypes: List<Pair<Int,Int>>, ensemblePartL
     return result.toList()
 }
 
-
-
 fun findMelodyWithStructure(
     octave: Int,
     absPitches: IntArray,
@@ -490,6 +309,7 @@ fun findMelodyWithStructure(
     val lowLimits = mutableListOf<Int>()
     val upLimits = mutableListOf<Int>()
     val nNoteGroups = mutableListOf<Int>()
+    val nEnsembles = mutableListOf<EnsemblePart>()
     val melTicks = absPitches.size.toLong().divideDistributingRest(melodyTypes.size).sums()//.also{ println("melTicks: $it")}
     val rangeTicks = absPitches.size.toLong().divideDistributingRest(lowerLimits.size).sums()//.also{ println("rangeTicks: $it")}
     val allTicks = (melTicks + rangeTicks).toSet().sorted()
@@ -503,6 +323,7 @@ fun findMelodyWithStructure(
                 melTypes.add(melodyTypes[melIndex])
                 lowLimits.add(lowerLimits[lowIndex])
                 upLimits.add(upperLimits[lowIndex]) // lowers and uppers share the same index
+                nEnsembles.add(ensembleParts[lowIndex])
                 nNoteGroups.add(it.toInt() - lastTick)
                 lastTick = it.toInt()
                 melIndex++
@@ -512,6 +333,7 @@ fun findMelodyWithStructure(
                 melTypes.add(melodyTypes[melIndex])
                 lowLimits.add(lowerLimits[lowIndex])
                 upLimits.add(upperLimits[lowIndex]) // lowers and uppers share the same index
+                nEnsembles.add(ensembleParts[lowIndex])
                 nNoteGroups.add(it.toInt() - lastTick)
                 lastTick = it.toInt()
                 melIndex++
@@ -520,6 +342,7 @@ fun findMelodyWithStructure(
                 melTypes.add(melodyTypes[melIndex])
                 lowLimits.add(lowerLimits[lowIndex])
                 upLimits.add(upperLimits[lowIndex]) // lowers and uppers share the same index
+                nEnsembles.add(ensembleParts[lowIndex])
                 nNoteGroups.add(it.toInt() - lastTick)
                 lastTick = it.toInt()
                 lowIndex++
@@ -541,7 +364,7 @@ fun findMelodyWithStructure(
         val sequence = Insieme.findMelody(lastOctave, subSequence,
                 lowLimits[index], upLimits[index], melTypes[index])
         lastOctave = sequence.lastOrNull { it != -1 }?.let{ last -> last / 12 -1} ?: lastOctave // sequence could be empty
-        val newInstrument = ensembleParts[index].instrument
+        val newInstrument = nEnsembles[index].instrument
         if(newInstrument != lastInstrument){
             changes.add(ChangeData(lastTick2, newInstrument))
             lastInstrument = newInstrument
@@ -565,60 +388,7 @@ fun List<Int>.sums(start: Int = 0): List<Int>{
 
 
 
-fun main(args : Array<String>){
-    val colorsRYB = listOf(
-        Triple(1f,0.333f,0.333f),
-        Triple(0.833f, 0.5f,0.166f),
-        Triple(0.666f,0.666f,0f),
-        Triple(0.5f,0.833f,0.166f),
 
-       // Triple(0.333f,1f,0.333f),
-        Triple(0f,1f,0f),
-        Triple(0.166f,0.833f,0.5f),
-        Triple(0f,0.666f,0.666f),
-        Triple(0.166f,0.5f,0.833f),
-
-        Triple(0.333f,0.333f,1f),
-        Triple(0.5f,0.166f,0.833f),
-        Triple(0.666f,0f,0.666f),
-        Triple(0.833f,0.166f,0.5f),
-    )
-    colorsRYB.map{ convertRYBtoRGB(it.first, it.second, it.third)}
-        .map{ Color(it.first, it.second, it.third)}
-        .forEach {  println("color: ${it.toHexString()} R:${it.red} G:${it.green} B:${it.blue}")}
-    //    val string = "4|0,4|0"
-//    //string.extractIntPairsFromCsv().also{println(it)}
-//    correctLegatos(string).also{println("RESULT: $it")}
-//    val pairs = listOf(
-//        Pair(836L,127),
-//        Pair(500L,78),
-//        Pair(343L,45),
-//        Pair(1947L,37),
-//        Pair(12L,127),
-//        Pair(689L,78),
-//        Pair(100L,45),
-//        Pair(4L,3),
-//    )
-//    pairs.forEach {
-//        println("${it.first} / ${it.second} -> ${it.first.divideDistributingRest(it.second)}")
-//        println("check sum: ${it.first.divideDistributingRest(it.second).sum()}")
-//        println()
-//    }
-//    var success = true
-//    for(i in 0..100){
-//        val pair = Pair(Random().nextInt(10000).toLong(), Random().nextInt(10000)).also{println(it)}
-//        val list = pair.first.divideDistributingRest(pair.second)
-//        println(list)
-//        println()
-//        if(list.sum() != pair.first){
-//            println("TEST FAILED with: $pair")
-//            success = false
-//        }
-//    }
-//    if(success){
-//        println("SUCCESS!!!")
-//    }
-}
 
 
 

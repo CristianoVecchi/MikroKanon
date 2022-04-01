@@ -76,6 +76,9 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
     fun nEmptyNotes() : Int {
         return absPitches.count { it == -1 }
     }
+    fun isBlank(): Boolean {
+        return absPitches.all { it == -1 }
+    }
     fun repeat(nTimes: Int) : AbsPart {
         if(nTimes == 0) return this.clone()
         val newAbsPitches = mutableListOf<Int>()

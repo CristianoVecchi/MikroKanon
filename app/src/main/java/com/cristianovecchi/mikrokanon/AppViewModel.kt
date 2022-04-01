@@ -59,15 +59,12 @@ sealed class Computation(open val icon: String = "") {
     data class Transposition(val counterpoints: List<Counterpoint>, val transpositions: List<Pair<Int,Int>>, val index: Int, override val icon: String = "transpose") : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int, override val icon: String = "tritone_substitution") : Computation()
 }
-
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
                          val undo: Boolean = false, val expand: Boolean = true,
                          val waves: Boolean = false, val pedals: Boolean = true,
                          val counterpoint: Boolean = false, val specialFunctions: Boolean = false,
                          val freeparts: Boolean = false, val playOrStop: Boolean = true)
-enum class ScaffoldTabs {
-    SOUND, BUILDING, SETTINGS
-}
+enum class ScaffoldTabs { SOUND, BUILDING, SETTINGS }
 
 class AppViewModel(
     application: Application,
@@ -77,6 +74,7 @@ class AppViewModel(
 ) : AndroidViewModel(application), LifecycleObserver {
 
     companion object{
+        const val MAX_VISIBLE_COUNTERPOINTS = 42
         const val MAX_PITCHES_IN_CACHE = 60000
         const val MAX_PARTS = 12
         const val MAX_NOTES_MK_2= 200
@@ -84,6 +82,7 @@ class AppViewModel(
         const val MAX_NOTES_MK_4 = 32
         const val MAX_NOTES_MK_4DEEP = 18
         const val MAX_NOTES_MK_5RED = 25
+        const val MAX_NOTES_MK_6RED = 20
         const val MAX_SEQUENCES_IN_MAZE = 10
         val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,24, 16,14)
     }
@@ -166,8 +165,6 @@ class AppViewModel(
     }
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
-
-    private val  MAX_VISIBLE_COUNTERPOINTS: Int = 42
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
 
     private val _activeButtons = MutableLiveData(ActiveButtons())
@@ -218,6 +215,7 @@ class AppViewModel(
     private val mk4cache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
     private val mk4deepSearchCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
     private val mk5reductedCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private val mk6reductedCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
     private val mazeCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
     private fun HashMap<CacheKey, Pair<List<Counterpoint>,Long>>.insertAndClear(key: CacheKey, counterpoints: List<Counterpoint>, timestamp: Long){
 
@@ -241,15 +239,13 @@ class AppViewModel(
 //     else {
 //        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
 //    }
-init{
-
-    val size = getDeviceResolution()
-    val displayMetricsDensity = Resources.getSystem().displayMetrics.density
-    dimensions = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
-}
+    init{
+        val size = getDeviceResolution()
+        val displayMetricsDensity = Resources.getSystem().displayMetrics.density
+        dimensions = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
+    }
     fun getContext(): Context {
-        return getApplication<MikroKanonApplication>()
-            .applicationContext
+        return getApplication<MikroKanonApplication>().applicationContext
     }
     private fun getDeviceResolution(): Point {
         val windowManager: WindowManager = getApplication<MikroKanonApplication>()
@@ -328,7 +324,6 @@ init{
         changeSequenceSelection(-1)
         updateSequence(index, ArrayList(sequences.value!![index].map{ it.tritoneSubstitution() }) )
     }
-
     val onTritoneSubstitution = {
         val previousComputation = computationStack.peek()!!
         if(previousComputation is Computation.TritoneSubstitution) {
@@ -578,6 +573,16 @@ init{
         if (list.isNotEmpty()) changeSequenceToMikroKanons(list)
         findCounterpointsByMikroKanons5reducted()
     }
+    val onMikroKanons6reducted = {list: ArrayList<Clip> ->
+        computationStack.pushAndDispatch(
+            Computation.MikroKanonOnly(
+                selectedCounterpoint.value!!.clone(),
+                ArrayList(sequenceToMikroKanons.value!!), 6
+            )
+        )
+        if (list.isNotEmpty()) changeSequenceToMikroKanons(list)
+        findCounterpointsByMikroKanons6reducted()
+    }
     val onMaze = {intSequences: List<List<Int>> ->
         println("Maze intSequences: $intSequences")
         computationStack.pushAndDispatch(Computation.Maze(intSequences))
@@ -697,6 +702,7 @@ init{
                             3 -> onMikroKanons3(ArrayList(sequenceToMikroKanons.value!!))
                             4 -> onMikroKanons4(ArrayList(sequenceToMikroKanons.value!!))
                             5 -> onMikroKanons5reducted(ArrayList(sequenceToMikroKanons.value!!))
+                            6 -> onMikroKanons6reducted(ArrayList(sequenceToMikroKanons.value!!))
                             else -> Unit
                         }
                     }
@@ -836,7 +842,7 @@ init{
             viewModelScope.launch(Dispatchers.Main) {
                 while ( jobQueue.isNotEmpty()){
                     val job = jobQueue.poll()
-                    job?.cancel()
+                    job?.cancelAndJoin()
                 }
             }
         }
@@ -904,6 +910,37 @@ init{
                         }
                         //val newList: List<Counterpoint> = def.await()
                         mk5reductedCache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
+                        changeCounterpointsWithLimit(newList, true, )
+                        _elaborating.value = false
+                    }.also { time -> println("MK5reducted executed in $time ms") }
+                }
+            }
+        }.also { jobQueue.add(it) }
+    }
+    private fun findCounterpointsByMikroKanons6reducted() {
+        viewModelScope.launch(Dispatchers.Main) {
+            if (sequenceToMikroKanons.value!!.isNotEmpty()) {
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_6RED)
+                val key = CacheKey(sequence, intervalSet.value!!)
+                if (mk6reductedCache.containsKey(key) ) {
+                    changeCounterpointsWithLimit(mk6reductedCache[key]!!.first, true)
+                } else {
+                    measureTimeMillis {
+                        _elaborating.value = true
+                        // val def = async(Dispatchers.Default + MKjob) {
+                        val newList = withContext(Dispatchers.Default) {
+                            mikroKanons6reducted(
+                                this.coroutineContext.job,
+                                sequence,
+                                intervalSet.value!!,
+                                MAX_VISIBLE_COUNTERPOINTS
+                            )
+                                .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                                .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                        }
+                        //val newList: List<Counterpoint> = def.await()
+                        mk6reductedCache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
                         changeCounterpointsWithLimit(newList, true, )
                         _elaborating.value = false
                     }.also { time -> println("MK5reducted executed in $time ms") }

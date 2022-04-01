@@ -18,6 +18,10 @@ enum class EnsembleType {
     ICE_RAIN, SOUNDTRACK, CRYSTAL, ATMOSPHERE,
     BRIGHTNESS, GOBLINS, ECHO_DROPS, SCI_FI
 }
+fun  List<EnsemblePart>.display() {
+    this.forEach {  println(it) }
+    println()
+}
 data class EnsemblePart( val instrument: Int, val octave: Int,
                          val allRange: IntRange = PIANO_ALL,
                          val colorRange: IntRange = allRange){ // if colorRange is not specified, allRange will be taken
@@ -41,9 +45,6 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
         }//.also{println("range: $it rangeType:$rangeType octaveTranspose:$octaveTranspose upperPart:$upperPart")}
     }
 }
-
-
-
 
 object Ensembles {
     fun getEnsembleMix(nParts: Int, types: List<EnsembleType>):  List<EnsemblePart> {

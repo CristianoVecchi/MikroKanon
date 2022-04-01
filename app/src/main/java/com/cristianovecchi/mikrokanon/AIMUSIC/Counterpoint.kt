@@ -47,6 +47,9 @@ data class Counterpoint(val parts: List<AbsPart>,
         return if(this.parts.size <= nPartsLimit) this
         else this.copy(parts = this.parts.take(nPartsLimit))
     }
+    fun cutBlankParts(): Counterpoint {
+        return this.copy(parts = parts.filter{ !it.isBlank()} )
+    }
     fun getColumnValues(index: Int): List<Int>{
         return parts.filter{index < it.absPitches.size }.map{ it.absPitches[index] }
     }
@@ -328,7 +331,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
 
         result.emptiness = result.findEmptiness()
-        return result
+        return result.cutBlankParts()
     }
     fun addCadenzas(horizontalIntervalSet: List<Int>, values: List<Int> = listOf(0,1,0,1,1)): Counterpoint{
         val clone = this.normalizePartsSize(false)
@@ -624,9 +627,8 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
     }
     fun compress(fromPart: Int): Counterpoint {
-        val nParts1st = parts.size
-        if (fromPart >= nParts1st) return this
         val totalSize = parts.size
+        if (fromPart >= totalSize) return this
         val compressedParts = mutableListOf<Int>()
         val deletedParts = mutableListOf<Int>()
         deletableLoop@ for (i in fromPart until totalSize) {

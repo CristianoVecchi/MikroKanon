@@ -45,8 +45,8 @@ data class ButtonsDialogData(
     val onOverlap: () -> Unit = {}, val onCrossover: () -> Unit = {},
     val onGlue: () -> Unit = {}, val onFlourish: () -> Unit = {},
     val onEraseIntervals: () -> Unit = {}, val onSingle: () -> Unit = {},
-    val onMK5reducted: () -> Unit = {}, val onMaze: () -> Unit = {},
-    val onDoppelgänger: () -> Unit = {},
+    val onMK5reducted: () -> Unit = {},  val onMK6reducted: () -> Unit = {},
+    val onMaze: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
     val onSort: (Int) -> Unit = {}, val onUpsideDown: () -> Unit = {},
     val onCounterpointSelected: (Int) -> Unit = {},
     val onSubmitButtonClick: (Any?) -> Unit = {}, )

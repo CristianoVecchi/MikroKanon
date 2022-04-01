@@ -139,3 +139,75 @@ fun extractColorDefs(defs: String): ColorDefs{
     return if(couple[0].isDigitsOnly()) ColorDefs(couple[1],couple[0].toInt(),true)
     else ColorDefs(couple[0], couple[1].toInt(),false)
 }
+
+fun Color.toHexString(): String {
+    return "#${this.red.toColorHexString()}${this.green.toColorHexString()}${this.blue.toColorHexString()}"
+}
+
+fun Float.toColorHexString(): String {
+    return (255 * this).toInt().toString(16).padStart(2,'0')
+}
+fun convertRYBtoRGB(red: Float, yellow: Float, blue: Float): Triple<Float, Float, Float>{
+    val R = red*red*(3f-red-red)
+    val Y = yellow*yellow*(3f-yellow-yellow)
+    val B = blue*blue*(3f-blue-blue)
+    return Triple(
+        1.0f + B * ( R * (0.337f + Y * -0.137f) + (-0.837f + Y * -0.163f) ),
+        1.0f + B * ( -0.627f + Y * 0.287f) + R * (-1.0f + Y * (0.5f + B * -0.693f) - B * (-0.627f) ),
+        1.0f + B * (-0.4f + Y * 0.6f) - Y + R * ( -1.0f + B * (0.9f + Y * -1.1f) + Y )
+    )
+}
+fun main(args : Array<String>){
+    val colorsRYB = listOf(
+        Triple(1f,0.333f,0.333f),
+        Triple(0.833f, 0.5f,0.166f),
+        Triple(0.666f,0.666f,0f),
+        Triple(0.5f,0.833f,0.166f),
+
+        // Triple(0.333f,1f,0.333f),
+        Triple(0f,1f,0f),
+        Triple(0.166f,0.833f,0.5f),
+        Triple(0f,0.666f,0.666f),
+        Triple(0.166f,0.5f,0.833f),
+
+        Triple(0.333f,0.333f,1f),
+        Triple(0.5f,0.166f,0.833f),
+        Triple(0.666f,0f,0.666f),
+        Triple(0.833f,0.166f,0.5f),
+    )
+    colorsRYB.map{ convertRYBtoRGB(it.first, it.second, it.third)}
+        .map{ Color(it.first, it.second, it.third) }
+        .forEach {  println("color: ${it.toHexString()} R:${it.red} G:${it.green} B:${it.blue}")}
+    //    val string = "4|0,4|0"
+//    //string.extractIntPairsFromCsv().also{println(it)}
+//    correctLegatos(string).also{println("RESULT: $it")}
+//    val pairs = listOf(
+//        Pair(836L,127),
+//        Pair(500L,78),
+//        Pair(343L,45),
+//        Pair(1947L,37),
+//        Pair(12L,127),
+//        Pair(689L,78),
+//        Pair(100L,45),
+//        Pair(4L,3),
+//    )
+//    pairs.forEach {
+//        println("${it.first} / ${it.second} -> ${it.first.divideDistributingRest(it.second)}")
+//        println("check sum: ${it.first.divideDistributingRest(it.second).sum()}")
+//        println()
+//    }
+//    var success = true
+//    for(i in 0..100){
+//        val pair = Pair(Random().nextInt(10000).toLong(), Random().nextInt(10000)).also{println(it)}
+//        val list = pair.first.divideDistributingRest(pair.second)
+//        println(list)
+//        println()
+//        if(list.sum() != pair.first){
+//            println("TEST FAILED with: $pair")
+//            success = false
+//        }
+//    }
+//    if(success){
+//        println("SUCCESS!!!")
+//    }
+}

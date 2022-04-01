@@ -11,7 +11,7 @@ import java.lang.reflect.Field
 import kotlin.math.absoluteValue
 
 
-// General Constants
+// General Constants and functions for AIColor converted in Kotlin
 class G {
  companion object{
      const val quarter: Long = 480

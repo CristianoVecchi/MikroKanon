@@ -226,7 +226,7 @@ object Player {
             }
         }
 
-        //if(counterpointTrackData.map{it.changes.size}.toSet().size != 1) throw Exception("WARNING: SOME CHANGE DATA HAS BEEN SKIPPED!!!")
+        //if(counterpointTrackData.map{println(it.changes);it.changes.size}.toSet().size != 1) throw Exception("WARNING: SOME CHANGE DATA HAS BEEN SKIPPED!!!")
         // TRANSFORM DATATRACKS IN MIDITRACKS
         val counterpointTracks =
             counterpointTrackData.map { convertToMidiTrack(it, counterpointTrackData.size) }
