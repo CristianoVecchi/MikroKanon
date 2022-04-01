@@ -74,42 +74,48 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
-    val detectorIntervalSet: List<Int> = if(userOptionsData.isNotEmpty())
+    val detectorIntervalSet: List<Int> by derivedStateOf {
+        if(userOptionsData.isNotEmpty())
         createIntervalSetFromFlags(userOptionsData[0].detectorFlags)
         else listOf()
-    val detectorExtensions: List<Int> = if(userOptionsData.isNotEmpty()) (1..userOptionsData[0].detectorExtension).toList()
-    else listOf()
-    val language = Lang.provideLanguage(model.getUserLangDef())
-    val notesNames = language.noteNames
-    val colors = model.appColors
-    val counterpointView = model.counterpointView
-    val counterpoints by counterpointsFlow.collectAsState(initial = emptyList())
-    val counterpointsData: List<Pair<Counterpoint, List<List<Any>>>> =
-        when (counterpointView){
-            0 -> counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
-            1 -> counterpoints.map{Pair(it, it.getRibattutos())}
-            else -> counterpoints.map{Pair(it, listOf(listOf()))}
+    }
+    val detectorExtensions: List<Int> by derivedStateOf {
+        if (userOptionsData.isNotEmpty()) (1..userOptionsData[0].detectorExtension).toList()
+        else listOf()
+    }
+        val language = Lang.provideLanguage(model.getUserLangDef())
+        val notesNames = language.noteNames
+        val colors = model.appColors
+        val counterpointView = model.counterpointView
+        val counterpoints by counterpointsFlow.collectAsState(initial = emptyList())
+        val counterpointsData: List<Pair<Counterpoint, List<List<Any>>>> by derivedStateOf {
+            when (counterpointView){
+                0 -> counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
+                1 -> counterpoints.map{Pair(it, it.getRibattutos())}
+                else -> counterpoints.map{Pair(it, listOf(listOf()))}
+            }
         }
-    val elaborating: Boolean by elaboratingFlow.collectAsState(initial = false)
-    val playing by model.playing.asFlow().collectAsState(initial = false)
-    var scrollToTopList by remember{mutableStateOf(false)}
-    val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, specialFunctions = true,freeparts = true))
 
-    val elaboratingBackgroundColor by animateColorAsState(
-        if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
-    val backgroundColor = colors.sequencesListBackgroundColor
-    val buttonsBackgroundColor = colors.buttonsDisplayBackgroundColor
-    val dimensions = model.dimensions
+        val elaborating: Boolean by elaboratingFlow.collectAsState(initial = false)
+        val playing by model.playing.asFlow().collectAsState(initial = false)
+        var scrollToTopList by remember{mutableStateOf(false)}
+        val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, specialFunctions = true,freeparts = true))
 
-    val dialogState = remember { mutableStateOf(false) }
-    val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
-    val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
-    val transposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
-    val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
-    val selectCounterpointDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
-    val multiSequenceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+        val elaboratingBackgroundColor by animateColorAsState(
+            if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
+        val backgroundColor = colors.sequencesListBackgroundColor
+        val buttonsBackgroundColor = colors.buttonsDisplayBackgroundColor
+        val dimensions = model.dimensions
 
-    val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
+        val dialogState by lazy { mutableStateOf(false) }
+        val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
+        val intervalSetDialogData by lazy { mutableStateOf(MultiListDialogData())}
+        val transposeDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+        val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+        val selectCounterpointDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
+        val multiSequenceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+
+        val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
 
         Column(
             modifier = Modifier
@@ -177,25 +183,25 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                 Column(Modifier.width((dimensions.width / 4 / 2 /dimensions.dpDensity).dp)
                                     .height((squareSide / dimensions.dpDensity).dp)
                                     .clickable( onClick = {
-                                            val colorDefs = extractColorDefs(userOptionsData[0].colors)
-                                            val  colorIndex = (model.lastIndexCustomColors - 1).coerceIn(0, G.getArraySize() -1)
-                                            model.updateUserOptions(
-                                                "colors",
-                                                "$colorIndex||${colorDefs.app}"
-                                            )
-                                        }
+                                        val colorDefs = extractColorDefs(userOptionsData[0].colors)
+                                        val  colorIndex = (model.lastIndexCustomColors - 1).coerceIn(0, G.getArraySize() -1)
+                                        model.updateUserOptions(
+                                            "colors",
+                                            "$colorIndex||${colorDefs.app}"
+                                        )
+                                    }
                                     )
                                 ){}
                                 QuantumCounterpointView(
-                                        model = model,
-                                        counterpoint = counterpoint,
-                                        colors = colors,
-                                        totalWidthDp = squareSide,
-                                        totalHeightDp = squareSide,
-                                        dpDensity = dimensions.dpDensity,
-                                        redNotes = redNotes,
-                                        padding = 10,
-                                        onClick = { onClick(counterpoint) })
+                                    model = model,
+                                    counterpoint = counterpoint,
+                                    colors = colors,
+                                    totalWidthDp = squareSide,
+                                    totalHeightDp = squareSide,
+                                    dpDensity = dimensions.dpDensity,
+                                    redNotes = redNotes,
+                                    padding = 10,
+                                    onClick = { onClick(counterpoint) })
                                 Column(Modifier.width((dimensions.width / 4 / 2 /dimensions.dpDensity).dp)
                                     .height((squareSide / dimensions.dpDensity).dp)
                                     .clickable( onClick = {
@@ -208,7 +214,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                     }
                                     )
                                 ){}
-                                 }
+                            }
 
                             else -> Unit
                         }
@@ -229,7 +235,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                         horizontalAlignment = Alignment.CenterHorizontally)
                     {
                         CircularProgressIndicator(color = Color.White,
-                        strokeWidth = 6.dp)
+                            strokeWidth = 6.dp)
                     }
                 }
             }
@@ -240,7 +246,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
             ) {
 
 
-                val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
+                val sequencesToString by lazy {model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }}
                 SequencesDialog(dialogState = dialogState, dimensions = dimensions,
                     title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
                     sequencesList = sequencesToString,
@@ -316,33 +322,33 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                 val flags = model.userOptionsData.value!![0].intSetHorFlags
                                 val intsFromFlags = convertFlagsToInts(flags)
                                 val intervalNames = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet.map{ it.replace("\n"," / ") }
-                                    intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
-                                        intsFromFlags.toSet(), dialogTitle = "${language.selectHorizontalIntervals}" // \n${language.FPremember}"
-                                    ) { indexes ->
-                                        model.updateUserOptions(
-                                            "intSetHorFlags",
-                                            if(indexes.isEmpty()) 0b1111111 else convertIntsToFlags(indexes.toSortedSet())
-                                        )
-                                        intervalSetDialogData.value = MultiListDialogData(itemList = intervalSetDialogData.value.itemList)
-                                    }
+                                intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
+                                    intsFromFlags.toSet(), dialogTitle = "${language.selectHorizontalIntervals}" // \n${language.FPremember}"
+                                ) { indexes ->
+                                    model.updateUserOptions(
+                                        "intSetHorFlags",
+                                        if(indexes.isEmpty()) 0b1111111 else convertIntsToFlags(indexes.toSortedSet())
+                                    )
+                                    intervalSetDialogData.value = MultiListDialogData(itemList = intervalSetDialogData.value.itemList)
+                                }
 
                             }
                         }
 
                     }
                     ExtensionButtons(model = model, isActive = activeButtons.expand, buttonSize = buttonSize, colors = colors,
-                         onExpand = { if (!elaborating) onExpand(); scrollToTopList = false },
-                         onTranspose = {  if (!elaborating) {
-                             transposeDialogData.value = MultiNumberDialogData(
-                                 true, language.selectTranspositions, value = "0|1",
-                                 model = model) { transpositions ->
-                                 onTranspose(transpositions.extractIntPairsFromCsv())
-                                 transposeDialogData.value = MultiNumberDialogData(model = model)
+                        onExpand = { if (!elaborating) onExpand(); scrollToTopList = false },
+                        onTranspose = {  if (!elaborating) {
+                            transposeDialogData.value = MultiNumberDialogData(
+                                true, language.selectTranspositions, value = "0|1",
+                                model = model) { transpositions ->
+                                onTranspose(transpositions.extractIntPairsFromCsv())
+                                transposeDialogData.value = MultiNumberDialogData(model = model)
 
-                             }
-                             scrollToTopList = false
                             }
-                         }
+                            scrollToTopList = false
+                        }
+                        }
                     )
 
                     // Add and Special Functions
@@ -369,7 +375,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                             model.cadenzaValues = newValues
                                             onCadenza( newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
                                         }
-                                                },
+                                    },
                                     onScarlatti = { onScarlatti(); close() },
                                     onOverlap = {
                                         buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
@@ -419,7 +425,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                     onPedal1 = { onPedal(1); close() },
                                     onPedal3 = { onPedal(3); close() },
                                     onPedal5 = { onPedal(5); close() },
-                                    )
+                                )
                                 {
                                     close()
                                 }
@@ -485,4 +491,5 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 ) { scrollToTopList = true }
             }
         }
-}
+    }
+

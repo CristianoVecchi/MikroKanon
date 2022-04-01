@@ -97,7 +97,8 @@ class AppViewModel(
     }
 
     var dimensions: Dimensions
-    var lastScaffoldTab = ScaffoldTabs.SETTINGS
+    val _lastScaffoldTab = MutableLiveData(ScaffoldTabs.SETTINGS)
+    val lastScaffoldTab: LiveData<ScaffoldTabs> = _lastScaffoldTab
     // + 0.86f
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
     var cadenzaValues ="0,1,0,1,1"
@@ -637,8 +638,8 @@ class AppViewModel(
 //
     }
 
-    private fun refreshComputation(stepBack: Boolean){
-            if (!elaborating.value!!) {
+    fun refreshComputation(stepBack: Boolean){
+            if (!elaborating.value!! && computationStack.isNotEmpty()) {
                 _elaborating.value = true
                 val previousIntervalSet: List<Int>? = if (computationStack.lastElement() is Computation.TritoneSubstitution)
                     (computationStack.lastElement() as Computation.TritoneSubstitution).intervalSet
@@ -1300,6 +1301,7 @@ class AppViewModel(
         mk4cache.clear()
         mk4deepSearchCache.clear()
         mk5reductedCache.clear()
+        mk6reductedCache.clear()
     }
 
     // ROOM ---------------------------------------------------------------------
