@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.composables.*
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 import kotlin.system.measureTimeMillis
 
@@ -48,6 +49,7 @@ class OutputFragment: Fragment() {
                     model.setAppColors(it[0].colors)
                     model.counterpointView = it[0].counterpointView
                     model.refreshZodiacFlags()
+                    model._language.value = Lang.provideLanguage(model.getUserLangDef())
                 }
             }
         }

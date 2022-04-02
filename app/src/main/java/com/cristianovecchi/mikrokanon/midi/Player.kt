@@ -144,7 +144,7 @@ object Player {
         ).shuffled() else durations
         val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
         val ensemblePartsList: List<List<EnsemblePart>> =
-            if (ensemblesList.size == 1) listOf(Ensembles.getEnsemble(nParts, ensemblesList[0][0]))
+            if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
             else Ensembles.getEnsemblesListMix(nParts, ensemblesList)
         //ensembleParts.display()
         val actualEnsemblePartsList = if (partsShuffle) ensemblePartsList.map{ it.shuffled() } else ensemblePartsList
@@ -286,7 +286,7 @@ object Player {
         tracks.add(tempoTrack)
         tracks.addAll(counterpointTracks)
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
-        return saveAndPlayMidiFile(mediaPlayer, midi, looping, play, midiFile)
+        return saveAndPlayMidiFile(mediaPlayer, midi, looping, play, midiFile, actualCounterpoint.nNotes())
     }
 
     fun saveAndPlayMidiFile(
@@ -294,7 +294,8 @@ object Player {
         midi: MidiFile,
         looping: Boolean,
         play: Boolean,
-        midiFile: File?
+        midiFile: File?,
+        nNotesCounterpoint: Int = 0
     ): String {
         if (mediaPlayer.isPlaying) {
             mediaPlayer.stop()
@@ -307,7 +308,7 @@ object Player {
         // ------------- WARNING!!!! -------------
         //DOESN'T WORK FOR LATEST ANDROID VERSIONS
         output = midiFile
-        var error = ""
+        var error = nNotesCounterpoint.toString()
         //createDialog(output.toString());
         //mediaPlayer2 = new MediaPlayer();
         try {

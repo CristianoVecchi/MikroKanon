@@ -14,6 +14,7 @@ import androidx.lifecycle.asFlow
 import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.composables.AppScaffold
 import com.cristianovecchi.mikrokanon.composables.SequenceSelector
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 
 class SequencesFragment(): Fragment() {
@@ -40,6 +41,7 @@ var start = true
                     model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                     model.setAppColors(it[0].colors)
                     model.refreshZodiacFlags()
+                    model._language.value = Lang.provideLanguage(model.getUserLangDef())
                     if(start){
                         val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
                         model.createVerticalIntervalSet(verticalIntervalSetFlag, "SequencesFragment")

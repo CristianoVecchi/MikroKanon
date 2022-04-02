@@ -19,6 +19,10 @@ fun String.extractIntPairsFromCsv(): List<Pair<Int,Int>>{
     val pairs = this.split(',')
     return pairs.map{ val split = it.split('|'); Pair(split[0].toInt(), split[1].toInt())}
 }
+fun String.extractLongPairsFromCsv(): List<Pair<Long,Long>>{
+    val pairs = this.split(',')
+    return pairs.map{ val split = it.split('|'); Pair(split[0].toLong(), split[1].toLong())}
+}
 fun String.extractIntListsFromCsv(): List<List<Int>>{
     val list = this.split(',')
     return list.map{ subList -> subList.split('|').map{it.toInt()}}
@@ -39,7 +43,9 @@ fun String.extractFloatsFromCsv(): List<Float>{
 }
 fun describeEnsembles(ensListIndexes: List<List<Int>>, ensNames: List<String>): String {
     if(ensListIndexes.size ==1){
-        return ensListIndexes[0].joinToString(", ") {ensNames[it]}
+        val ensIndexes = ensListIndexes[0]
+        val nl = newLineOrNot(ensIndexes, 2)
+        return "$nl${ensIndexes.joinToString(" + ") { ensNames[it] }}"
     }
     return ensListIndexes.foldIndexed(""){ index, acc, ensList ->
         acc + "\n${index+1}:  ${ensList.joinToString(", ") {ensNames[it]}}"

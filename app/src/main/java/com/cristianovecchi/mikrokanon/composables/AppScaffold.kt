@@ -154,7 +154,7 @@ fun SettingsDrawer(model: AppViewModel,
 
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val allCounterpointsData by counterpointsDataFlow.collectAsState(initial = listOf())
-    val lang = Lang.provideLanguage(model.getUserLangDef())
+    val lang by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val userOptions by derivedStateOf{
         if  (userOptionsData.isEmpty()) UserOptionsData . getDefaultUserOptionsData ()
         else userOptionsData[0]
@@ -658,20 +658,26 @@ fun SettingsDrawer(model: AppViewModel,
                             }
 
                             "Export MIDI" -> {
-                                SelectableCard(text = lang.exportMidi, fontSize = fontSize, colors = colors, isSelected = true, onClick = {
-                                    val path = model.midiPath.absolutePath.toString()
-                                    var error = model.onPlay(false, false)
-                                    if (error.isEmpty()){
+                                val (nNotes, timestamp) = userOptions.lastPlayData.extractLongPairsFromCsv()[0]
+                                val isOn = timestamp > -1
+                                val text = if(isOn) ": $nNotes♪\n${convertToLocaleDate(listOf(timestamp.toString()), model.getUserLangDef())[0]}"
+                                    else ""
+                                SelectableCard(text = lang.exportMidi + text, fontSize = fontSize, colors = colors, isSelected = isOn,
+                                    onClick = {
                                         model.shareMidi(model.midiPath)
-                                    } else {
-                                        exportDialogData.value = ExportDialogData(true,"EXPORT MIDI",
-                                            "", error = lang.playToCreate
-                                        ) {
-
-                                            exportDialogData.value = ExportDialogData(path = path, error = error)
-                                        }
-                                    }
-                                })
+//                                        val path = model.midiPath.absolutePath.toString()
+//                                        var error = model.onPlay(false, false)
+//                                        if (error.isEmpty()){
+//                                            model.shareMidi(model.midiPath)
+//                                        } else {
+//                                            exportDialogData.value = ExportDialogData(true,"EXPORT MIDI",
+//                                                "", error = lang.playToCreate
+//                                            ) {
+//
+//                                                exportDialogData.value = ExportDialogData(path = path, error = error)
+//                                            }
+//                                        }
+                                     })
                             }
 
                         }

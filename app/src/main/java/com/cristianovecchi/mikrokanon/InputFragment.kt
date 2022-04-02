@@ -13,6 +13,7 @@ import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.composables.AbstractNoteSequenceEditor
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.composables.AppScaffold
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 import java.util.ArrayList
 
@@ -39,6 +40,7 @@ class InputFragment(): Fragment() {
                 if(it!!.isNotEmpty()) {
                     model.setAppColors(it[0].colors)
                     model.refreshZodiacFlags()
+                    model._language.value = Lang.provideLanguage(model.getUserLangDef())
                 }
             }
         }

@@ -56,11 +56,11 @@ fun SequenceSelector(model: AppViewModel,
 {
 
     val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons())
-    //model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
-    userOptionsDataFlow.collectAsState(initial = listOf()).value
+    model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
+    //val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     //if(userOptionsData.isNotEmpty()) model.setAppColors(userOptionsData[0].colors)
-    var appColors = model.appColors
-    var language = Lang.provideLanguage(model.getUserLangDef())
+    val appColors = model.appColors
+    val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val backgroundColor = appColors.sequencesListBackgroundColor
     val buttonsBackgroundColor = appColors.buttonsDisplayBackgroundColor
     val listState = rememberLazyListState()

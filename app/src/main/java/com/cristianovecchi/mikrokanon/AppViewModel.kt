@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
 import com.cristianovecchi.mikrokanon.db.*
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.midi.launchPlayer
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
@@ -28,6 +29,7 @@ import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import kotlin.math.absoluteValue
 import kotlin.system.measureTimeMillis
 
@@ -97,6 +99,8 @@ class AppViewModel(
     }
 
     var dimensions: Dimensions
+    var _language = MutableLiveData(Lang.provideLanguage(getSystemLangDef()))
+    var language: LiveData<Lang> = _language
     val _lastScaffoldTab = MutableLiveData(ScaffoldTabs.SETTINGS)
     val lastScaffoldTab: LiveData<ScaffoldTabs> = _lastScaffoldTab
     // + 0.86f
@@ -244,7 +248,15 @@ class AppViewModel(
         val size = getDeviceResolution()
         val displayMetricsDensity = Resources.getSystem().displayMetrics.density
         dimensions = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
+//        viewModelScope.launch{
+//            userRepository.userOptions.collect {
+//                setAppColors(it[0].colors)
+//                if(it.isNotEmpty()){
+//                    _language.value = Lang.provideLanguage(getUserLangDef())
+//                }
+//            }
     }
+
     fun getContext(): Context {
         return getApplication<MikroKanonApplication>().applicationContext
     }
@@ -315,7 +327,11 @@ class AppViewModel(
             }
         }
         mediaPlayer?.let { if (it.isPlaying) _playing.value = true }
-        error.also { println(it) }
+        error.also { println("MIDI building ends with: $it") }
+        error.toIntOrNull()?.let{
+            val timestamp = System.currentTimeMillis()
+            updateUserOptions("lastPlayData", "$it|$timestamp")
+        }
     }
     val dispatchIntervals = {
         if(computationStack.isNotEmpty())
@@ -1460,8 +1476,6 @@ class AppViewModel(
             zodiacEmojisActive = (flags and 4) == 4
         }
     }
-
-
 }
 
 

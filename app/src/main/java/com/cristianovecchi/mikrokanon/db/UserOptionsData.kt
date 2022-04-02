@@ -93,6 +93,9 @@ import androidx.room.PrimaryKey
 
         @ColumnInfo(name = "nuances")
         val nuances: Int,
+
+        @ColumnInfo(name = "lastplay_data")
+        val lastPlayData: String,
     ){
         companion object{
             fun getDefaultUserOptionsData(): UserOptionsData {
@@ -104,7 +107,7 @@ import androidx.room.PrimaryKey
                     0,0,0,1,
                      //"System|0" ,
                      "579|0" , // priority on custom color 579
-                    0,"System", 0, 1 )
+                    0,"System", 0, 1 ,"0|-1")
             }
             fun updateUserOptionsData(
                 optionsDataClone: UserOptionsData,
@@ -197,6 +200,9 @@ import androidx.room.PrimaryKey
                     }
                     "nuances" -> {
                         optionsDataClone.copy(nuances = value as Int)
+                    }
+                    "lastPlayData" -> {
+                        optionsDataClone.copy(lastPlayData = value as String)
                     }
                     else -> optionsDataClone.copy()
                 }

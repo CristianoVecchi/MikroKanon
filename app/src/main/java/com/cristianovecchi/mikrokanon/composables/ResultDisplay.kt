@@ -83,8 +83,8 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
         if (userOptionsData.isNotEmpty()) (1..userOptionsData[0].detectorExtension).toList()
         else listOf()
     }
-        val language = Lang.provideLanguage(model.getUserLangDef())
-        val notesNames = language.noteNames
+    val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
+    val notesNames = language.noteNames
         val colors = model.appColors
         val counterpointView = model.counterpointView
         val counterpoints by counterpointsFlow.collectAsState(initial = emptyList())

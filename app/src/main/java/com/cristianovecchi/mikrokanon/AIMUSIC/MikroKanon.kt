@@ -1069,6 +1069,7 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                 val delay5: Int = delay1 - 1 + delay2 - 1 + delay3 - 1 + 2, val form5: Int
             )
             val mostImportantTranspose = intervalSet.filter{ it < 7}.maxOrNull() ?: 0
+            val secondImportantTranspose = (12 - mostImportantTranspose) % 12
             val nParams =
                 ((depth - 1) * (depth - 1) * (depth - 1)) * 12 * 4 * 12 * 4 * 12 * 4 //*4 Out of memory!
             //println("MK5reducted nParams = $nParams")
@@ -1113,7 +1114,7 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                                                         delay2, tr2, form2,
                                                         delay3, tr3, form3,
                                                         form4 = 0,
-                                                        form5 = 0
+                                                        form5 = 1 // inverse
                                                     )
                                                     count++
                                                     // }
@@ -1147,8 +1148,8 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                                     it.delay2, completeForms[it.transpose2][it.form2],
                                     it.delay3, completeForms[it.transpose3][it.form3],
                                     it.delay4, completeForms[mostImportantTranspose][it.form4],
-                                    it.delay5, completeForms[0][it.form5],
-                                    listOf(it.transpose1, it.transpose2, it.transpose3, mostImportantTranspose ,0),
+                                    it.delay5, completeForms[secondImportantTranspose][it.form5],
+                                    listOf(it.transpose1, it.transpose2, it.transpose3, mostImportantTranspose , secondImportantTranspose),
                                     listOf(it.form1, it.form2, it.form3, it.form4, it.form5)
                                 )
                                 if (deepSearch) {
@@ -1191,8 +1192,8 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                                 it.delay4,
                                 completeForms[mostImportantTranspose][it.form4],
                                 it.delay5,
-                                completeForms[0][it.form5],
-                                listOf(it.transpose1, it.transpose2, it.transpose3, mostImportantTranspose, 0),
+                                completeForms[secondImportantTranspose][it.form5],
+                                listOf(it.transpose1, it.transpose2, it.transpose3, mostImportantTranspose, secondImportantTranspose),
                                 listOf(it.form1, it.form2, it.form3, it.form4, it.form5)
                             )
                             if (deepSearch) {
