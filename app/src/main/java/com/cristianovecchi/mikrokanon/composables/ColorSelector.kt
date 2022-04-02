@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.composables
 
+import android.util.Size
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -27,6 +29,7 @@ import kotlin.math.roundToInt
 fun ColorSelector(widths: Triple<Int, Int, Int> = Triple(50,50,50), height: Dp,
                   barHeight: Int = (height.value / 8f).toInt(), //+ (height.value % 4f).toInt(),
     startColor: Color = Color.Black, refresh: Boolean, dispatchColor : (Color) -> Unit ) {
+
     var sizeR by remember { mutableStateOf(IntSize.Zero) }
     var sizeG by remember { mutableStateOf(IntSize.Zero) }
     var sizeB by remember { mutableStateOf(IntSize.Zero) }
@@ -56,18 +59,20 @@ fun ColorSelector(widths: Triple<Int, Int, Int> = Triple(50,50,50), height: Dp,
     if(sizeR.height == 0 || sizeG.height == 0 || sizeB.height == 0) dispatchColor(startColor)
     else dispatchColor(Color(red,green,blue))
 
-    Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-        Column(Modifier.weight(1f).onGloballyPositioned { coordinates ->
-            sizeR = coordinates.size}){
+    val (wR, wG, wB) = widths
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+
+        Column(Modifier.width(wR.dp).onGloballyPositioned { coordinates ->
+            sizeR = IntSize(wR, coordinates.size.height)}){
             Box(
                 Modifier
-                    .background(Color(red, 0f, 0f)).size(sizeR.width.toDp().dp+1.dp, height)
+                    .background(Color(red, 0f, 0f)).size(wR.dp, height)
             ) {
                 Box(
                     Modifier
                         .offset { IntOffset(0, redY.roundToInt()) }
                         .background(Color.White)
-                        .size(sizeR.width.toDp().dp+1.dp, barHeight.toDp().dp +1.dp)
+                        .size(wR.dp, barHeight.toDp().dp +1.dp)
                         .pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 change.consumeAllChanges()
@@ -78,15 +83,16 @@ fun ColorSelector(widths: Triple<Int, Int, Int> = Triple(50,50,50), height: Dp,
                 )
             }
         }
-        Column(Modifier.weight(1f).onGloballyPositioned { coordinates -> sizeG = coordinates.size})
+        Column(Modifier.width(wG.dp).onGloballyPositioned { coordinates ->
+            sizeG = IntSize(wG, coordinates.size.height)})
          {
-            Box(Modifier.background(Color(0f, green, 0f)).size(sizeG.width.toDp().dp+1.dp, height ))
+            Box(Modifier.background(Color(0f, green, 0f)).size(wG.dp, height ))
              {
                 Box(
                     Modifier
                         .offset { IntOffset(0, greenY.roundToInt()) }
                         .background(Color.White)
-                        .size(sizeG.width.toDp().dp+1.dp, barHeight.toDp().dp+1.dp)
+                        .size(wG.dp, barHeight.toDp().dp+1.dp)
                         .pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 change.consumeAllChanges()
@@ -97,13 +103,14 @@ fun ColorSelector(widths: Triple<Int, Int, Int> = Triple(50,50,50), height: Dp,
                 )
             }
         }
-        Column(Modifier.weight(1f).onGloballyPositioned { coordinates -> sizeB = coordinates.size })
+        Column(Modifier.width(wB.dp).onGloballyPositioned { coordinates ->
+            sizeB = IntSize(wB, coordinates.size.height)} )
         {
-            Box(Modifier.background(Color(0f, 0f, blue)).size(sizeB.width.toDp().dp+1.dp, height))
+            Box(Modifier.background(Color(0f, 0f, blue)).size(wB.dp, height))
             {
                 Box(Modifier.offset { IntOffset(0, blueY.roundToInt()) }
                             .background(Color.White)
-                            .size(sizeB.width.toDp().dp+1.dp, barHeight.toDp().dp+1.dp)
+                            .size(wB.dp, barHeight.toDp().dp+1.dp)
                             .pointerInput(Unit) {
                                 detectDragGestures { change, dragAmount ->
                                     change.consumeAllChanges()

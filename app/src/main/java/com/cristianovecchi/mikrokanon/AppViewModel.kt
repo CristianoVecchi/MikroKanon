@@ -88,16 +88,6 @@ class AppViewModel(
         const val MAX_SEQUENCES_IN_MAZE = 10
         val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,24, 16,14)
     }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onLifeCycleStop() {
-        onStop()
-    }
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun onLifeCyclePause() {
-        onStop()
-    }
-
     var dimensions: Dimensions
     var _language = MutableLiveData(Lang.provideLanguage(getSystemLangDef()))
     var language: LiveData<Lang> = _language
@@ -209,33 +199,11 @@ class AppViewModel(
 
     private var _selectedCounterpoint = MutableLiveData(Counterpoint.empty())
     val selectedCounterpoint : LiveData<Counterpoint> = _selectedCounterpoint
-    val allSequencesData: LiveData<List<SequenceData>> = sequenceRepository.allSequences.asLiveData()
-    val allCounterpointsData: LiveData<List<CounterpointData>> = counterpointRepository.counterpoints.asLiveData()
-    val userOptionsData: LiveData<List<UserOptionsData>> = userRepository.userOptions.asLiveData()
+    val allSequencesData: LiveData<List<SequenceData>>
+    val allCounterpointsData: LiveData<List<CounterpointData>>
+    val userOptionsData: LiveData<List<UserOptionsData>>
 
     private val computationStack = Stack<Computation>()
-
-    data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
-    private val mk3cache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
-    private val mk4cache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
-    private val mk4deepSearchCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
-    private val mk5reductedCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
-    private val mk6reductedCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
-    private val mazeCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
-    private fun HashMap<CacheKey, Pair<List<Counterpoint>,Long>>.insertAndClear(key: CacheKey, counterpoints: List<Counterpoint>, timestamp: Long){
-
-            val intAmount = this.values.map{it.first}.fold(0){ acc1, list -> acc1 + list.fold(0){acc2, counterpoint -> acc2 + counterpoint.countAbsPitches()} }
-            val listAmount = counterpoints.fold(0){acc, counterpoint -> acc + counterpoint.countAbsPitches()}
-        println("key: ${key.sequence} ${key.intervalSet}")
-            println("Cache size: $intAmount, new list size: $listAmount, limit: $MAX_PITCHES_IN_CACHE")
-            if(this.isNotEmpty()){
-            if(intAmount + listAmount > MAX_PITCHES_IN_CACHE) {
-                remove(keys.sortedBy { this[it]?.second }[0])
-            }
-        }
-        this[key] = Pair(counterpoints, timestamp)
-        println()
-    }
 
     val savedCounterpoints: Array<Counterpoint?> = Array(16) { null }
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MK_lastPlay.mid")
@@ -248,6 +216,10 @@ class AppViewModel(
         val size = getDeviceResolution()
         val displayMetricsDensity = Resources.getSystem().displayMetrics.density
         dimensions = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
+        allSequencesData = sequenceRepository.allSequences.asLiveData()
+        allCounterpointsData = counterpointRepository.counterpoints.asLiveData()
+        userOptionsData = userRepository.userOptions.asLiveData()
+        //userRepository.userOptions
 //        viewModelScope.launch{
 //            userRepository.userOptions.collect {
 //                setAppColors(it[0].colors)
@@ -277,6 +249,20 @@ class AppViewModel(
             println("SIZE X = $w   SIZE Y = $h")
             size
         }
+    }
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onLifeCycleStop() {
+        onStop()
+    }
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onLifeCyclePause() {
+        onStop()
+    }
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE) // for foldable devices
+    fun onLifeCycleCreate() {
+        val size = getDeviceResolution()
+        val displayMetricsDensity = Resources.getSystem().displayMetrics.density
+        dimensions = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
     }
 
     // macro Functions called by fragments -----------------------------------------------------
@@ -1232,7 +1218,6 @@ class AppViewModel(
             }
         }
     }
-
     private fun addSequenceToCounterpoint(repeat: Boolean){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
@@ -1250,11 +1235,11 @@ class AppViewModel(
         }
     }
 
+    // LIVEDATA SETTERS ---------------------------------------------------------------------
     private fun convertFirstSequenceToSelectedCounterpoint() {
         val newCounterpoint = Counterpoint.counterpointFromClipList(firstSequence.value!!)
         _selectedCounterpoint.value = newCounterpoint
     }
-
     fun setInitialBlankState() {
         cancelPreviousMKjobs()
         _elaborating.value = false
@@ -1267,7 +1252,6 @@ class AppViewModel(
         changeSelectedCounterpoint(Counterpoint.empty())
         changeSequenceSelection(-1)
     }
-
     fun changeActiveButtons(newActiveButtons: ActiveButtons){
         _activeButtons.value = newActiveButtons
     }
@@ -1299,6 +1283,8 @@ class AppViewModel(
     fun changeSequenceSelection(newIndex: Int) {
         _selectedSequence.value = newIndex
     }
+
+    // INTERVAL SETS ----------------------------------------------------------------------
     fun removeIntervalsAndRefresh(list: List<Int>){
         val newList = intervalSet.value!!.toMutableList()
         newList.removeAll(list)
@@ -1311,13 +1297,21 @@ class AppViewModel(
         changeIntervalSet(newList)
         dispatchIntervals()
     }
-
-    fun clearMKcaches() {
-        mk3cache.clear()
-        mk4cache.clear()
-        mk4deepSearchCache.clear()
-        mk5reductedCache.clear()
-        mk6reductedCache.clear()
+    fun createHorizontalIntervalSet(horizontalIntervalSetFlag: Int) {
+        _intervalSetHorizontal.value = createIntervalSetFromFlags(horizontalIntervalSetFlag)
+    }
+    fun createVerticalIntervalSet(verticalIntervalSetFlag: Int, from: String) {
+        println("Creating Vert Interval Set: ${intervalSet.value!!} from $from")
+        _intervalSet.value = createIntervalSetFromFlags(verticalIntervalSetFlag)
+    }
+    fun createVerticalIntervalSet(intervalSet: List<Int>, from: String) {
+        println("Creating Vert Interval Set: $intervalSet from $from")
+        _intervalSet.value = intervalSet.sorted()
+    }
+    fun saveVerticalIntervalSet(from: String) {
+        println("Saving Vert Interval Set: ${intervalSet.value!!} from $from")
+        val flags = createFlagsFromIntervalSet(intervalSet.value!!)
+        updateUserOptions("intSetVertFlags", flags)
     }
 
     // ROOM ---------------------------------------------------------------------
@@ -1346,7 +1340,6 @@ class AppViewModel(
             }
         }
     }
-
     fun retrieveSequencesFromDB(){
         sequenceDataMap.clear()
         _sequences.value = allSequencesData.value!!.map{sequenceDataToSequence(it)}
@@ -1381,13 +1374,11 @@ class AppViewModel(
             it.forEach { each -> println(each) }
         }
     }
-
     private fun sequenceDataToSequence(sequenceData: SequenceData) : ArrayList<Clip>{
         val sequence = ArrayList(sequenceData.clips.map {  Clip.clipDataToClip(it) } )
         sequenceDataMap[sequence] = sequenceData
         return sequence
     }
-
     fun insertUserOptionData(newUserOptionsData: UserOptionsData){
         viewModelScope.launch(Dispatchers.IO) {
             if(userOptionsData.value!!.isNotEmpty()){
@@ -1414,6 +1405,7 @@ class AppViewModel(
             }
         }
     }
+    // COLORS -------------------------------------------------------------------------------------
     var usingCustomColors: Boolean = false
     var appColors: AppColors = AppColors.allBlack()
     var counterpointView = 0
@@ -1436,6 +1428,8 @@ class AppViewModel(
             }
         }
     }
+
+    // LANGUAGE --------------------------------------------------------------------------
     fun getSystemAppColorsName(): String{
         return AppColorThemes.GEMINI_BLUE.title
     }
@@ -1448,23 +1442,6 @@ class AppViewModel(
     fun getSystemLangDef(): String {
         return Locale.getDefault().language
     }
-
-    fun createHorizontalIntervalSet(horizontalIntervalSetFlag: Int) {
-        _intervalSetHorizontal.value = createIntervalSetFromFlags(horizontalIntervalSetFlag)
-    }
-    fun createVerticalIntervalSet(verticalIntervalSetFlag: Int, from: String) {
-        println("Creating Vert Interval Set: ${intervalSet.value!!} from $from")
-        _intervalSet.value = createIntervalSetFromFlags(verticalIntervalSetFlag)
-    }
-    fun createVerticalIntervalSet(intervalSet: List<Int>, from: String) {
-        println("Creating Vert Interval Set: $intervalSet from $from")
-        _intervalSet.value = intervalSet.sorted()
-    }
-    fun saveVerticalIntervalSet(from: String) {
-        println("Saving Vert Interval Set: ${intervalSet.value!!} from $from")
-        val flags = createFlagsFromIntervalSet(intervalSet.value!!)
-        updateUserOptions("intSetVertFlags", flags)
-    }
     var zodiacPlanetsActive = false
     var zodiacSignsActive = false
     var zodiacEmojisActive = false
@@ -1475,6 +1452,35 @@ class AppViewModel(
             zodiacSignsActive = (flags and 2) == 2
             zodiacEmojisActive = (flags and 4) == 4
         }
+    }
+
+    // MK CACHES ----------------------------------------------------------------------------
+    data class CacheKey(val sequence: List<Int>, val intervalSet: List<Int>)
+    private val mk3cache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private val mk4cache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private val mk4deepSearchCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private val mk5reductedCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private val mk6reductedCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private val mazeCache = HashMap<CacheKey, Pair<List<Counterpoint>,Long >>()
+    private fun HashMap<CacheKey, Pair<List<Counterpoint>,Long>>.insertAndClear(key: CacheKey, counterpoints: List<Counterpoint>, timestamp: Long){
+        val intAmount = this.values.map{it.first}.fold(0){ acc1, list -> acc1 + list.fold(0){acc2, counterpoint -> acc2 + counterpoint.countAbsPitches()} }
+        val listAmount = counterpoints.fold(0){acc, counterpoint -> acc + counterpoint.countAbsPitches()}
+        println("key: ${key.sequence} ${key.intervalSet}")
+        println("Cache size: $intAmount, new list size: $listAmount, limit: $MAX_PITCHES_IN_CACHE")
+        if(this.isNotEmpty()){
+            if(intAmount + listAmount > MAX_PITCHES_IN_CACHE) {
+                remove(keys.sortedBy { this[it]?.second }[0])
+            }
+        }
+        this[key] = Pair(counterpoints, timestamp)
+        println()
+    }
+    fun clearMKcaches() {
+        mk3cache.clear()
+        mk4cache.clear()
+        mk4deepSearchCache.clear()
+        mk5reductedCache.clear()
+        mk6reductedCache.clear()
     }
 }
 

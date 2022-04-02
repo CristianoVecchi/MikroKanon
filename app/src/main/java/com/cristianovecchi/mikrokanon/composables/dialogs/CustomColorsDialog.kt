@@ -88,19 +88,19 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                     val h = dimensions.dialogHeight / 7//80.dp
                     var size by remember { mutableStateOf(IntSize.Zero) }
                     val w = if (size.width == 0) listOf(0,0,0,0,0,0) else
-                            ((size.width - padding) / dimensions.dpDensity + (size.width - padding) % dimensions.dpDensity + 1 ).toLong().divideDistributingRest(6).map{it.toInt()}
+                            ((size.width - padding) / dimensions.dpDensity + (size.width - padding) % dimensions.dpDensity ).toLong().divideDistributingRest(6).map{it.toInt()}
                     Box(
                         Modifier
                             .fillMaxWidth()
                             .height(h)
                             .onGloballyPositioned { coordinates ->
                                 size = coordinates.size
-                            }){
+                            }.background(Color.White),
+                    ){
 
                         Row(
-                            Modifier
-                                .height(h)
-                                .background(customColor), horizontalArrangement = Arrangement.SpaceEvenly) {
+                            Modifier.fillMaxWidth()
+                                .height(h), horizontalArrangement = Arrangement.Center) {
                             Box(
                                 Modifier
                                     .size(w[0].dp, h)
@@ -144,9 +144,10 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
 
                     }
 
-                    Row(Modifier.fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
 
                             ColorSelector(
+                                widths = Triple(w[0]+w[1], w[2]+w[3], w[4]+w[5]),
                                 height = dimensions.dialogHeight / 6 * 4,
                                startColor = back1Color.copy(),
                                 refresh = customColorsDialogData.value.isRefreshing
