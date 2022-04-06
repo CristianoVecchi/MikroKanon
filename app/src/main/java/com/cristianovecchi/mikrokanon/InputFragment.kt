@@ -41,6 +41,7 @@ class InputFragment(): Fragment() {
                     model.setAppColors(it[0].colors)
                     model.refreshZodiacFlags()
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())
+                    model.spread = it[0].spread
                 }
             }
         }
@@ -48,9 +49,10 @@ class InputFragment(): Fragment() {
             setContent {
                 MikroKanonTheme(model) {
                     Surface(color = MaterialTheme.colors.background) {
-                        AppScaffold(model = model, model.userOptionsData.asFlow(), model.allCounterpointsData.asFlow()) {
+                        AppScaffold(model = model, model.dimensions.asFlow(), model.userOptionsData.asFlow(), model.allCounterpointsData.asFlow()) {
                             AbstractNoteSequenceEditor(list,
                                 model = model,
+                                model.dimensions.asFlow(),
                                 editing,
                                 iconMap = model.iconMap,
                                 done_action = { list, editing ->

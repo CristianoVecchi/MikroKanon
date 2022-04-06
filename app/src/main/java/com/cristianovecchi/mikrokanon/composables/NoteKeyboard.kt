@@ -28,6 +28,7 @@ import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getZodiacSigns
 import com.cristianovecchi.mikrokanon.ui.AppColors
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.ui.shift
 
 enum class NoteNamesEn(val abs:Int) {
@@ -72,7 +73,7 @@ fun NoteKeyboard(
                                     zodiacSigns[5], zodiacSigns[7], zodiacSigns[9], zodiacSigns[11])
                 else language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)
-    val dimensions = model.dimensions
+    val dimensions  by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
     val buttonSize = dimensions.inputButtonSize
     val fontSize = dimensions.inputButtonFontSize
     val buttonInfos = listOf(

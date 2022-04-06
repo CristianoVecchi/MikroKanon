@@ -31,15 +31,13 @@ import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.db.CounterpointData
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.*
-import com.cristianovecchi.mikrokanon.ui.AppColorThemes
-import com.cristianovecchi.mikrokanon.ui.extractColorDefs
-import com.cristianovecchi.mikrokanon.ui.pxToSp
-import com.cristianovecchi.mikrokanon.ui.shift
+import com.cristianovecchi.mikrokanon.ui.*
 import kotlinx.coroutines.flow.Flow
 import kotlin.math.absoluteValue
 
 @Composable
 fun AppScaffold(model: AppViewModel,
+                dimensionsFlow: Flow<Dimensions>,
                 userOptionsDataFlow: Flow<List<UserOptionsData>>,
                 counterpointsDataFlow: Flow<List<CounterpointData>>,
                 content: @Composable () -> Unit) {
@@ -47,7 +45,7 @@ fun AppScaffold(model: AppViewModel,
     val scope = rememberCoroutineScope()
     val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val colors = model.appColors
-    val dimensions = model.dimensions
+    val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
     val titleStyle = SpanStyle(
         fontSize = dimensions.titleTextSize.first.sp,
         color = colors.cellTextColorSelected)
@@ -60,7 +58,7 @@ fun AppScaffold(model: AppViewModel,
             //.background(colors.selCardBorderColorSelected),
             //.border(1.dp, Color.Transparent),
         scaffoldState = scaffoldState,
-        drawerContent = { SettingsDrawer(model, userOptionsDataFlow, counterpointsDataFlow)},
+        drawerContent = { SettingsDrawer(model, dimensionsFlow, userOptionsDataFlow, counterpointsDataFlow)},
         topBar = {
             val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
             CreditsDialog(creditsDialogData, dimensions)
@@ -107,7 +105,7 @@ fun AppScaffold(model: AppViewModel,
 
 
 @Composable
-fun SettingsDrawer(model: AppViewModel,
+fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                    userOptionsDataFlow: Flow<List<UserOptionsData>>,
                    counterpointsDataFlow: Flow<List<CounterpointData>>){
 
@@ -135,7 +133,7 @@ fun SettingsDrawer(model: AppViewModel,
     val vibratoDialogData by lazy {mutableStateOf(ListDialogData())}
     val zodiacDialogData by lazy{ mutableStateOf(MultiListDialogData())}
 
-    val dimensions = model.dimensions
+    val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
     val colors = model.appColors
     val optionNames= listOf("Ensemble", "Glissando","Vibrato","Nuances",
         "Rhythm",  "Rhythm Shuffle", "Parts Shuffle","Doubling","8D AUDIO",
@@ -164,7 +162,7 @@ fun SettingsDrawer(model: AppViewModel,
 
         EnsembleDialog(ensemblesDialogData, dimensions)
         ListDialog(listDialogData, dimensions, lang.OKbutton)
-        RhythmDialog(rhythmDialogData, dimensions, patterns = RhythmPatterns.values().toList() )
+        RhythmDialog(rhythmDialogData, model.dimensions.asFlow(), patterns = RhythmPatterns.values().toList() )
         MultiListDialog(doublingDialogData, dimensions, lang.OKbutton)
         MultiListDialog(audio8DDialogData, dimensions, lang.OKbutton)
         MultiListDialog(clearSlotsDialogData, dimensions, lang.OKbutton)
@@ -637,7 +635,6 @@ fun SettingsDrawer(model: AppViewModel,
                                             "spread",
                                             if (isOn) 1 else 0
                                         )
-                                        model.clearMKcaches()
                                         model.refreshComputation(false)
                                     })
                             }
@@ -683,6 +680,17 @@ fun SettingsDrawer(model: AppViewModel,
                         }
                     }
 
+                }
+            }
+            ScaffoldTabs.ACCOMPANIST -> {
+                LazyColumn(modifier = tabModifier, state = listState)
+                {
+                    items(optionNames) { optionName ->
+                        val fontSize = dimensions.optionsFontSize
+                        when (optionName) {
+
+                        }
+                    }
                 }
             }
             ScaffoldTabs.SETTINGS -> {

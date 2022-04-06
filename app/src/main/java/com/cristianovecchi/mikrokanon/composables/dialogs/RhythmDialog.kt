@@ -24,22 +24,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.ui.Dimensions
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
 fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
-                 dimensions: Dimensions, patterns: List<RhythmPatterns>, okText: String = "OK",
+                 dimensionsFlow: Flow<Dimensions>, patterns: List<RhythmPatterns>, okText: String = "OK",
                  onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) }) {
 
     if (multiNumberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
             val patternNames = patterns.map{ it.title }
             val listDialogData by lazy { mutableStateOf(ListDialogData())}
-
+            val dimensions by dimensionsFlow.collectAsState(initial = Dimensions.default())
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
             val lang = Lang.provideLanguage(model.getUserLangDef())
@@ -150,8 +152,7 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
-                        val buttonSize = model.dimensions.dialogButtonSize
+                        val buttonSize = dimensions.dialogButtonSize
                         CustomButton(
                             adaptSizeToIconButton = true,
                             iconId = model.iconMap["back"]!!,
@@ -200,7 +201,7 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
 
-                                val buttonSize = model.dimensions.dialogButtonSize
+                                val buttonSize = dimensions.dialogButtonSize
                                 CustomButton(
                                     adaptSizeToIconButton = true,
                                     text = "",

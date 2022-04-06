@@ -13,12 +13,16 @@ import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
+import com.cristianovecchi.mikrokanon.ui.Dimensions
+import kotlinx.coroutines.flow.Flow
 import kotlin.collections.HashMap
 
 @Composable
-fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppViewModel, editing: Boolean,
+fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppViewModel,
+                               dimensionsFlow: Flow<Dimensions>,
+                               editing: Boolean,
                                iconMap: Map<String,Int> = HashMap(), done_action: (ArrayList<Clip>, Boolean) -> Unit) {
-    val dimensions = model.dimensions
+    val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
     val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
     model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val appColors = model.appColors

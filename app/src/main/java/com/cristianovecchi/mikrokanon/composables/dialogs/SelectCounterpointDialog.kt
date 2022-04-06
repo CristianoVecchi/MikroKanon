@@ -25,6 +25,7 @@ fun SelectCounterpointDialog(
     model: AppViewModel,
     language: Lang,
     workingOnSequences: Boolean = false,
+    filledSlots: Set<Int>,
     onDismissRequest: () -> Unit = {
         buttonsDialogData.value = ButtonsDialogData(model = model)
     }
@@ -54,6 +55,7 @@ fun SelectCounterpointDialog(
                                     fontSize = fontSize,
                                     colors = model.appColors,
                                     numbers = language.slotNumbers,
+                                    filled = filledSlots,
                                     onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected
                                 )
                             }

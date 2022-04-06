@@ -52,7 +52,10 @@ data class Dimensions( // 1600px width and over
     val fullDialogWeights: Triple<Float, Float, Float> = Triple(4f, 4f, 1f),
     val listDialogWeights: Pair<Float, Float> = Pair(6f, 1f)
 ){
+
+
     companion object {
+        val default = provideDimensions(720, 1280, 2.0f)
         fun provideDimensions(width: Int, height: Int, dpDensity: Float) : Dimensions {
             println("DISPLAY [ X=$width Y=$height dpDensity=$dpDensity ]")
             return if (width == 1080 && height in 1920..2159){
@@ -233,7 +236,9 @@ data class Dimensions( // 1600px width and over
                 outputIntervalSetFontSize= (outputButtonSizePx /5).pxToSp,
                 outputWeights= Pair(16f,6f)
             )
-
+        }
+        fun default(): Dimensions {
+            return Dimensions.default
         }
     }
 }

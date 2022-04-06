@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.getNoteAndRestSymbols
@@ -235,8 +236,8 @@ fun CadenzaDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, di
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.Bottom
                         ) {
-
-                            val buttonSize = model.dimensions.inputButtonSize - 10.dp
+                            val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                            val buttonSize = dimensions.inputButtonSize - 10.dp
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "",

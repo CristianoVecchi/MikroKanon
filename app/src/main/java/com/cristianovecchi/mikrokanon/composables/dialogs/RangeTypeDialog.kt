@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
 import com.cristianovecchi.mikrokanon.locale.getOctaveSymbols
@@ -223,8 +224,9 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 modifier = Modifier.width(IntrinsicSize.Max),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                val buttonSize = model.dimensions.dialogButtonSize / 3 * 2
-                                val fontSizeOctave = model.dimensions.dialogFontSize
+                                val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                                val buttonSize = dimensions.dialogButtonSize / 3 * 2
+                                val fontSizeOctave = dimensions.dialogFontSize
                                 CustomButton(
                                     adaptSizeToIconButton = false,
                                     text = octaves[4], // +15

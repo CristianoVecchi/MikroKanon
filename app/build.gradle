@@ -85,6 +85,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.6'
 
+
     //MIDI
     //https://github.com/LeffelMania/android-midi-lib.git
     //implementation "com.github.owncloud:LeffelMania/android-midi-lib" // not working

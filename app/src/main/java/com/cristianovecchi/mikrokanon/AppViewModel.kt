@@ -66,7 +66,7 @@ data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean =
                          val waves: Boolean = false, val pedals: Boolean = true,
                          val counterpoint: Boolean = false, val specialFunctions: Boolean = false,
                          val freeparts: Boolean = false, val playOrStop: Boolean = true)
-enum class ScaffoldTabs { SOUND, BUILDING, SETTINGS }
+enum class ScaffoldTabs { SOUND, BUILDING, ACCOMPANIST, SETTINGS }
 
 class AppViewModel(
     application: Application,
@@ -88,7 +88,8 @@ class AppViewModel(
         const val MAX_SEQUENCES_IN_MAZE = 10
         val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,24, 16,14)
     }
-    var dimensions: Dimensions
+    var _dimensions: MutableLiveData<Dimensions> = MutableLiveData(Dimensions.default())
+    val dimensions: LiveData<Dimensions> = _dimensions
     var _language = MutableLiveData(Lang.provideLanguage(getSystemLangDef()))
     var language: LiveData<Lang> = _language
     val _lastScaffoldTab = MutableLiveData(ScaffoldTabs.SETTINGS)
@@ -140,7 +141,8 @@ class AppViewModel(
         "overlap" to R.drawable.ic_baseline_compress_24,
         "crossover" to R.drawable.ic_baseline_crossover_24,
         "glue" to R.drawable.ic_baseline_view_week_24,
-        "maze" to R.drawable.ic_baseline_account_tree_24
+        "maze" to R.drawable.ic_baseline_account_tree_24,
+        "accompanist" to R.drawable.ic_baseline_brush_24
     )
     val stackIcons = mutableListOf<String>()
     private fun Stack<Computation>.pushAndDispatch(computation: Computation){
@@ -161,6 +163,7 @@ class AppViewModel(
     private var mediaPlayer: MediaPlayer? = null
     private var lastIndex = 0
     private val sequenceDataMap = HashMap<ArrayList<Clip>, SequenceData>(emptyMap())
+    var spread = 0
 
     private val _activeButtons = MutableLiveData(ActiveButtons())
     val activeButtons : LiveData<ActiveButtons> = _activeButtons
@@ -206,6 +209,13 @@ class AppViewModel(
     private val computationStack = Stack<Computation>()
 
     val savedCounterpoints: Array<Counterpoint?> = Array(16) { null }
+    private val _filledSlots = MutableLiveData(setOf<Int>())
+    val filledSlots: LiveData<Set<Int>> = _filledSlots
+    fun refreshFilledSlots(){
+            val result = mutableListOf<Int>()
+            savedCounterpoints.forEachIndexed { index, counterpoint ->  counterpoint?.let{ result.add(index)}}
+            _filledSlots.value = result.toSet()
+        }
     val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MK_lastPlay.mid")
 //    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 //        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
@@ -215,7 +225,7 @@ class AppViewModel(
     init{
         val size = getDeviceResolution()
         val displayMetricsDensity = Resources.getSystem().displayMetrics.density
-        dimensions = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
+        _dimensions.value = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
         allSequencesData = sequenceRepository.allSequences.asLiveData()
         allCounterpointsData = counterpointRepository.counterpoints.asLiveData()
         userOptionsData = userRepository.userOptions.asLiveData()
@@ -262,7 +272,7 @@ class AppViewModel(
     fun onLifeCycleCreate() {
         val size = getDeviceResolution()
         val displayMetricsDensity = Resources.getSystem().displayMetrics.density
-        dimensions = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
+        _dimensions.value = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
     }
 
     // macro Functions called by fragments -----------------------------------------------------
@@ -813,7 +823,7 @@ class AppViewModel(
                 withContext(Dispatchers.Default){
                     newList = waves(originalCounterpoints,intervalSet.value!!, intervalSetHorizontal.value!!, nWaves)
                             .sortedBy { it.emptiness }//.take(maxVisibleCounterpoints)
-                            .mapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                            .mapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                             .sortedBy { it.emptiness }
                 }
                 changeCounterpointsWithLimit(newList, true)
@@ -823,13 +833,12 @@ class AppViewModel(
 
     private fun findFreeParts(trend: TREND){
         var newList: List<Counterpoint>
-        val spreadWherePossible = userOptionsData.value!![0].spread != 0
         val directions = trend.directions.filter{ intervalSetHorizontal.value!!.contains(it)}
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = freeParts(selectedCounterpoint.value!!,  intervalSet.value!!, directions)
                     .sortedBy { it.emptiness }//.take(maxVisibleCounterpoints)
-                    .mapIf(spreadWherePossible){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .mapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                     .sortedBy { it.emptiness }
             }
             changeCounterpointsWithLimit(newList, true)
@@ -873,7 +882,7 @@ class AppViewModel(
                                 MAX_VISIBLE_COUNTERPOINTS
                             )
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                                .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
                     //val newList: List<Counterpoint> = def.await()
@@ -908,7 +917,7 @@ class AppViewModel(
                                 MAX_VISIBLE_COUNTERPOINTS
                             )
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                                .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
                         //val newList: List<Counterpoint> = def.await()
@@ -939,7 +948,7 @@ class AppViewModel(
                                 MAX_VISIBLE_COUNTERPOINTS
                             )
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                                .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
                         //val newList: List<Counterpoint> = def.await()
@@ -965,7 +974,7 @@ class AppViewModel(
                         val newList = withContext(Dispatchers.Default) {
                             maze(this.coroutineContext.job, intSequences.map{it.take(maxNotesInMaze)}, intervalSet.value!!)
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                                .pmapIf(userOptionsData.value!![0].spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                                .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
                         mazeCache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
@@ -989,7 +998,7 @@ class AppViewModel(
                     withContext(Dispatchers.Default) {
                         newList = mikroKanons3(sequence,intervalSet.value!!, 6)
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
-                            .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                            .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                     }
                     mk3cache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
@@ -1007,7 +1016,7 @@ class AppViewModel(
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_2)
                 newList = mikroKanons2(sequence,intervalSet.value!!, 7)
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
-                    .pmapIf(userOptionsData.value!![0].spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimit(newList, true)
@@ -1052,11 +1061,10 @@ class AppViewModel(
     private fun duplicateAllPhrasesInCounterpoint(originalCounterpoint: Counterpoint,index: Int){
         if(!originalCounterpoint.isEmpty()){
             var newList: List<Counterpoint>
-            val spread = userOptionsData.value!![0].spread != 0
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = duplicateAllInCounterpoint(originalCounterpoint)
-                        .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                        .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimit(newList, true)
@@ -1067,14 +1075,13 @@ class AppViewModel(
     private fun overlapBothCounterpoints(counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint, crossover: Boolean){
         if(!counterpoint1st.isEmpty() && !counterpoint2nd.isEmpty()){
             var newList: List<Counterpoint>
-            val spread = userOptionsData.value!![0].spread != 0
             viewModelScope.launch(Dispatchers.Main){
                 _elaborating.value = true
                 withContext(Dispatchers.Default){
                     newList = overlapCounterpointsSortingByFaults(
                         this.coroutineContext.job,
                         counterpoint1st, counterpoint2nd, intervalSet.value!!, MAX_PARTS, crossover)
-                    newList = if(spread) newList.pmap{it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    newList = if(spread != 0) newList.pmap{it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                              else newList
                 }
@@ -1086,11 +1093,10 @@ class AppViewModel(
     private fun glueBothCounterpoints(counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint){
         if(!counterpoint1st.isEmpty() && !counterpoint2nd.isEmpty()){
             var newList: List<Counterpoint>
-            val spread = userOptionsData.value!![0].spread != 0
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = glueCounterpoints(counterpoint1st, counterpoint2nd)
-                        .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                        .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimit(newList, true)
@@ -1113,15 +1119,13 @@ class AppViewModel(
     private fun sortAllCounterpoints(originalCounterpoints: List<Counterpoint>, sortType: Int, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
-
-            val spread = userOptionsData.value!![0].spread != 0
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = sortColumnsOnCounterpoints(originalCounterpoints, sortType)
-                        .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                        .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, spread)
+                changeCounterpointsWithLimit(newList, spread != 0)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
@@ -1143,21 +1147,19 @@ class AppViewModel(
     private fun singleOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
-            val spread = userOptionsData.value!![0].spread != 0
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = reduceCounterpointsToSinglePart(originalCounterpoints)
-                        .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                        .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, spread)
+                changeCounterpointsWithLimit(newList, spread != 0)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
     }
     private fun doppelgängerOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
-            val spread = userOptionsData.value!![0].spread != 0
             var newList: List<Counterpoint>
             val ensList: List<List<EnsembleType>> =
                 userOptionsData.value?.let { listOf(userOptionsData.value!![0].ensemblesList
@@ -1173,7 +1175,7 @@ class AppViewModel(
                 withContext(Dispatchers.Default){
                     newList = explodeCounterpointsToDoppelgänger(originalCounterpoints,
                         MAX_PARTS, ensList[0], rangeType, melodyType )
-                        .pmapIf(spread){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                        .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimit(newList, true)
@@ -1225,7 +1227,7 @@ class AppViewModel(
                 withContext(Dispatchers.Default){
                     newList = addSequence(selectedCounterpoint.value!! , sequenceToAdd.value!!, intervalSet.value!! ,repeat, 7)
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
-                        .pmapIf(userOptionsData.value!![0].spread != 0){
+                        .pmapIf(spread != 0){
                             it.spreadAsPossible(true, intervalSet = intervalSet.value!!)}
                         //.map{ it.emptiness = it.findEmptiness(); it}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }

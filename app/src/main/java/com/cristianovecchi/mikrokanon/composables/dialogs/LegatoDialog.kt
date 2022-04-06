@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.*
@@ -232,7 +233,8 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 modifier = Modifier.width(IntrinsicSize.Max),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                val buttonSize = model.dimensions.selectorButtonSize / 2
+                                val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                                val buttonSize = dimensions.selectorButtonSize / 2
                                 val fontSizeOctave = dimensions.dialogFontSize / 3 * 2
                                 CustomButton(
                                     adaptSizeToIconButton = false,

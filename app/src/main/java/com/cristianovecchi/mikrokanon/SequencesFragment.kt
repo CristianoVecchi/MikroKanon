@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.ComposeView
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asFlow
+import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.composables.AppScaffold
 import com.cristianovecchi.mikrokanon.composables.SequenceSelector
@@ -33,6 +34,7 @@ var start = true
         }
         model.allCounterpointsData.observe(viewLifecycleOwner){
             model.retrieveCounterpointsFromDB()
+            model.refreshFilledSlots()
             //model.displaySavedCounterpoints()
         }
         model.userOptionsData.observe(viewLifecycleOwner){
@@ -41,6 +43,7 @@ var start = true
                     model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                     model.setAppColors(it[0].colors)
                     model.refreshZodiacFlags()
+                    model.spread = it[0].spread
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())
                     if(start){
                         val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
@@ -71,8 +74,11 @@ var start = true
                         // A surface container using the 'background' color from the theme
                         Surface(color = MaterialTheme.colors.background) {
 
-                            AppScaffold(model = model, model.userOptionsData.asFlow(), model.allCounterpointsData.asFlow()) {
-                                SequenceSelector(model = model, userOptionsDataFlow = model.userOptionsData.asFlow(),
+                            AppScaffold(model = model, model.dimensions.asFlow(), model.userOptionsData.asFlow(), model.allCounterpointsData.asFlow()) {
+                                SequenceSelector(
+                                    model = model,
+                                    model.dimensions.asFlow(),
+                                    userOptionsDataFlow = model.userOptionsData.asFlow(),
                                     onAdd = { list, editing ->
                                         val bundle = Bundle()
                                         bundle.putParcelableArrayList("list", list)

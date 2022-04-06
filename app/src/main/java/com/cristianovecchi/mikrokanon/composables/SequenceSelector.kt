@@ -13,10 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
-import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
-import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
-import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
-import com.cristianovecchi.mikrokanon.AIMUSIC.toStringAll
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
@@ -27,6 +24,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SequenceSelector(model: AppViewModel,
+                     dimensionsFlow: Flow<Dimensions>,
                      userOptionsDataFlow: Flow<List<UserOptionsData>>,
                      onSelect: (Int) -> Unit = model::changeSequenceSelection,
                      onDelete: (Int) -> Unit = model::deleteSequence,
@@ -66,7 +64,7 @@ fun SequenceSelector(model: AppViewModel,
     val listState = rememberLazyListState()
 
     val notesNames = language.noteNames
-    val dimensions = model.dimensions
+    val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
     val weights = dimensions.selectorWeights
         Column(modifier = Modifier
             .fillMaxHeight()
@@ -90,6 +88,7 @@ fun SequenceSelector(model: AppViewModel,
             val multiSequenceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
             val buttonSize = dimensions.selectorButtonSize
             val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
+            val filledSlots by model.filledSlots.asFlow().collectAsState(initial = setOf())
             SequencesDialog(dialogState = dialogState, dimensions = dimensions,
                 title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
                 sequencesList = sequencesToString,
@@ -101,12 +100,12 @@ fun SequenceSelector(model: AppViewModel,
                 }
             )
             ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, workingOnSequences = true,
-                model = model, language = language)
+                model = model, language = language, filledSlots = filledSlots )
             val onSelectComposition = { index: Int ->
                 onSelect(index)
             }
             SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
-                dimensions = dimensions,model = model,language = language)
+                dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
             CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
             SequenceScrollableColumn( listState = listState, colors = appColors,
                 modifier = modifier3, fontSize = dimensions.selectorClipFontSize,

@@ -33,6 +33,7 @@ import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
+import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import com.cristianovecchi.mikrokanon.ui.shift
 
@@ -41,7 +42,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 @Composable
-fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
+fun ResultDisplay(model: AppViewModel,
+                  dimensionsFlow: Flow<Dimensions>,
+                  iconMap: Map<String, Int>,
                   selectedCounterpointFlow: Flow<Counterpoint>,
                   counterpointsFlow: Flow<List<Counterpoint>>,
                   elaboratingFlow: Flow<Boolean>,
@@ -105,7 +108,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
             if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
         val backgroundColor = colors.sequencesListBackgroundColor
         val buttonsBackgroundColor = colors.buttonsDisplayBackgroundColor
-        val dimensions = model.dimensions
+        val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
 
         val dialogState by lazy { mutableStateOf(false) }
         val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
@@ -180,11 +183,15 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                 onClick = { onClick(counterpoint) })
                             2 -> Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
                                 val squareSide = (dimensions.width / 4 * 3)
-                                Column(Modifier.width((dimensions.width / 4 / 2 /dimensions.dpDensity).dp)
+                                Column(Modifier
+                                    .width((dimensions.width / 4 / 2 / dimensions.dpDensity).dp)
                                     .height((squareSide / dimensions.dpDensity).dp)
-                                    .clickable( onClick = {
+                                    .clickable(onClick = {
                                         val colorDefs = extractColorDefs(userOptionsData[0].colors)
-                                        val  colorIndex = (model.lastIndexCustomColors - 1).coerceIn(0, G.getArraySize() -1)
+                                        val colorIndex = (model.lastIndexCustomColors - 1).coerceIn(
+                                            0,
+                                            G.getArraySize() - 1
+                                        )
                                         model.updateUserOptions(
                                             "colors",
                                             "$colorIndex||${colorDefs.app}"
@@ -202,11 +209,15 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                                     redNotes = redNotes,
                                     padding = 10,
                                     onClick = { onClick(counterpoint) })
-                                Column(Modifier.width((dimensions.width / 4 / 2 /dimensions.dpDensity).dp)
+                                Column(Modifier
+                                    .width((dimensions.width / 4 / 2 / dimensions.dpDensity).dp)
                                     .height((squareSide / dimensions.dpDensity).dp)
-                                    .clickable( onClick = {
+                                    .clickable(onClick = {
                                         val colorDefs = extractColorDefs(userOptionsData[0].colors)
-                                        val  colorIndex = (model.lastIndexCustomColors +1 ).coerceIn(0, G.getArraySize() -1)
+                                        val colorIndex = (model.lastIndexCustomColors + 1).coerceIn(
+                                            0,
+                                            G.getArraySize() - 1
+                                        )
                                         model.updateUserOptions(
                                             "colors",
                                             "$colorIndex||${colorDefs.app}"
@@ -245,7 +256,7 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-
+                val filledSlots by model.filledSlots.asFlow().collectAsState(initial = setOf())
                 val sequencesToString by lazy {model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }}
                 SequencesDialog(dialogState = dialogState, dimensions = dimensions,
                     title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
@@ -256,12 +267,12 @@ fun ResultDisplay(model: AppViewModel, iconMap: Map<String, Int>,
                             onKP(index, repeat); scrollToTopList = true
                         }
                     })
-                ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model, language)
+                ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model, language, filledSlots = filledSlots)
                 MultiListDialog(intervalSetDialogData, dimensions, language.OKbutton)
                 TransposeDialog(transposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
                 SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
-                    dimensions = dimensions,model = model,language = language)
+                    dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
                 MultiSequenceDialog(multiSequenceDialogData, dimensions)
                 // STACK ICONS
                 Row(modifier = Modifier

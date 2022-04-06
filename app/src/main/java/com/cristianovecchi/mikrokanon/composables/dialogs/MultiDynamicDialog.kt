@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
@@ -332,8 +333,8 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
-                            val buttonSize = model.dimensions.dialogButtonSize
+                            val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                            val buttonSize = dimensions.dialogButtonSize
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "",

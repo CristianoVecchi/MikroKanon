@@ -33,6 +33,7 @@ class OutputFragment: Fragment() {
         }
         model.allCounterpointsData.observe(viewLifecycleOwner){
             model.retrieveCounterpointsFromDB()
+            model.refreshFilledSlots()
         }
         if(model.userOptionsData.value != null && model.userOptionsData.value!!.isNotEmpty()){
             val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
@@ -50,6 +51,7 @@ class OutputFragment: Fragment() {
                     model.counterpointView = it[0].counterpointView
                     model.refreshZodiacFlags()
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())
+                    model.spread = it[0].spread
                 }
             }
         }
@@ -65,9 +67,10 @@ class OutputFragment: Fragment() {
             setContent {
                 MikroKanonTheme(model) {
                     Surface(color = MaterialTheme.colors.background) {
-                       AppScaffold(model = model, model.userOptionsData.asFlow(), model.allCounterpointsData.asFlow()) {
+                       AppScaffold(model = model, model.dimensions.asFlow(), model.userOptionsData.asFlow(), model.allCounterpointsData.asFlow()) {
                             ResultDisplay(
                                 model = model,
+                                model.dimensions.asFlow(),
                                 model.iconMap,
                                 model.selectedCounterpoint.asFlow(),
                                 model.counterpoints.asFlow(),

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.toStringAll
@@ -146,7 +147,8 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val buttonSize = model.dimensions.dialogButtonSize
+                        val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                        val buttonSize = dimensions.dialogButtonSize
                         CustomButton(
                             adaptSizeToIconButton = true,
                             text = "➚",
@@ -203,8 +205,8 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
-                        val buttonSize = model.dimensions.dialogButtonSize
+                        val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                        val buttonSize = dimensions.dialogButtonSize
                         CustomButton(
                             adaptSizeToIconButton = true,
                             text = "",

@@ -130,23 +130,23 @@ fun SequenceEditingButtons(
 @Composable
 fun SlotButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
-    colors: AppColors, numbers: List<String>,
+    colors: AppColors, numbers: List<String>, filled: Set<Int>,
     onCounterpointSelected: (Int) -> Unit
 ) {
     Column{
         (0 until 4).forEach{
             val step = it * 4
             Row {
-                CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+0], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(step+0)) numbers[step+0] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
                     onCounterpointSelected(step+0)
                 }
-                CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+1], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(step+1)) numbers[step+1] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
                     onCounterpointSelected(step+1)
                 }
-                CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+2], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(step+2)) numbers[step+2] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
                     onCounterpointSelected(step+2)
                 }
-                CustomButton(iconId = model.iconMap["save"]!!, text = numbers[step+3], isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(step+3)) numbers[step+3] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
                     onCounterpointSelected(step+3)
                 }
             }
