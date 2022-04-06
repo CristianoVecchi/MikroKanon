@@ -73,7 +73,7 @@ fun NoteKeyboard(
                                     zodiacSigns[5], zodiacSigns[7], zodiacSigns[9], zodiacSigns[11])
                 else language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)
-    val dimensions  by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+    val dimensions  by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
     val buttonSize = dimensions.inputButtonSize
     val fontSize = dimensions.inputButtonFontSize
     val buttonInfos = listOf(

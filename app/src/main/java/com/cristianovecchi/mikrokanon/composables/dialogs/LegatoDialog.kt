@@ -233,7 +233,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 modifier = Modifier.width(IntrinsicSize.Max),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                                val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                                 val buttonSize = dimensions.selectorButtonSize / 2
                                 val fontSizeOctave = dimensions.dialogFontSize / 3 * 2
                                 CustomButton(

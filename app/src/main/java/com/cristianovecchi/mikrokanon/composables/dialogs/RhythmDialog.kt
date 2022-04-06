@@ -33,15 +33,14 @@ import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
-fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
-                 dimensionsFlow: Flow<Dimensions>, patterns: List<RhythmPatterns>, okText: String = "OK",
+fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dimensions: Dimensions,
+                 patterns: List<RhythmPatterns>, okText: String = "OK",
                  onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) }) {
 
     if (multiNumberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
             val patternNames = patterns.map{ it.title }
             val listDialogData by lazy { mutableStateOf(ListDialogData())}
-            val dimensions by dimensionsFlow.collectAsState(initial = Dimensions.default())
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
             val lang = Lang.provideLanguage(model.getUserLangDef())

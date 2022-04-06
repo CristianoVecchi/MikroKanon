@@ -236,7 +236,7 @@ fun CadenzaDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, di
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.Bottom
                         ) {
-                            val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                            val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                             val buttonSize = dimensions.inputButtonSize - 10.dp
                             CustomButton(
                                 adaptSizeToIconButton = true,

@@ -43,9 +43,12 @@ fun AppScaffold(model: AppViewModel,
                 content: @Composable () -> Unit) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
-    val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
-    val colors = model.appColors
-    val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+    val colors by derivedStateOf {
+        if(userOptionsData.isNotEmpty()) model.setAppColors(userOptionsData[0].colors)
+        model.appColors // default ALL BLACK
+    }
+    val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
     val titleStyle = SpanStyle(
         fontSize = dimensions.titleTextSize.first.sp,
         color = colors.cellTextColorSelected)
@@ -138,7 +141,6 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
     val optionNames= listOf("Ensemble", "Glissando","Vibrato","Nuances",
         "Rhythm",  "Rhythm Shuffle", "Parts Shuffle","Doubling","8D AUDIO",
 
-        "Spread where possible", "Deep Search in 4 part MK",
         "BPM", "Dynamics",
         "Range","Melody","Articulation",
         "Spacer",
@@ -146,6 +148,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         "Spacer",
         "Export MIDI",
 
+        "Spread where possible", "Deep Search in 4 part MK",
         "Clear Slots", "Detector","Detector Extension",
         //"Colors",
         "Custom Colors", "Counterpoint View", "Language","Zodiac","MBTI","Spacer","Credits")
@@ -162,7 +165,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
 
         EnsembleDialog(ensemblesDialogData, dimensions)
         ListDialog(listDialogData, dimensions, lang.OKbutton)
-        RhythmDialog(rhythmDialogData, model.dimensions.asFlow(), patterns = RhythmPatterns.values().toList() )
+        RhythmDialog(rhythmDialogData, dimensions, patterns = RhythmPatterns.values().toList() )
         MultiListDialog(doublingDialogData, dimensions, lang.OKbutton)
         MultiListDialog(audio8DDialogData, dimensions, lang.OKbutton)
         MultiListDialog(clearSlotsDialogData, dimensions, lang.OKbutton)
@@ -622,37 +625,6 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                     })
                             }
 
-                            "Spread where possible" -> {
-                                var isOn = userOptions.spread != 0
-                                SelectableCard(
-                                    text = lang.spreadWherePossible,
-                                    colors = colors,
-                                    fontSize = fontSize,
-                                    isSelected = isOn,
-                                    onClick = {
-                                        isOn = !isOn
-                                        model.updateUserOptions(
-                                            "spread",
-                                            if (isOn) 1 else 0
-                                        )
-                                        model.refreshComputation(false)
-                                    })
-                            }
-                            "Deep Search in 4 part MK" -> {
-                                var isOn = userOptions.deepSearch != 0
-                                SelectableCard(
-                                    text = lang.deepSearch,
-                                    fontSize = fontSize,
-                                    colors = colors,
-                                    isSelected = isOn,
-                                    onClick = {
-                                        isOn = !isOn
-                                        model.updateUserOptions(
-                                            "deepSearch",
-                                            if (isOn) 1 else 0
-                                        )
-                                    })
-                            }
 
                             "Export MIDI" -> {
                                 val (nNotes, timestamp) = userOptions.lastPlayData.extractLongPairsFromCsv()[0]
@@ -699,6 +671,39 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                     items(optionNames) { optionName ->
                         val fontSize = dimensions.optionsFontSize
                         when (optionName) {
+                            "Spread where possible" -> {
+                                var isOn = userOptions.spread != 0
+                                SelectableCard(
+                                    text = lang.spreadWherePossible,
+                                    colors = colors,
+                                    fontSize = fontSize,
+                                    isSelected = isOn,
+                                    onClick = {
+                                        isOn = !isOn
+                                        val newSpread = if (isOn) 1 else 0
+                                        model.spread = newSpread
+                                        model.updateUserOptions(
+                                            "spread",
+                                            newSpread
+                                        )
+                                        model.refreshComputation(false)
+                                    })
+                            }
+                            "Deep Search in 4 part MK" -> {
+                                var isOn = userOptions.deepSearch != 0
+                                SelectableCard(
+                                    text = lang.deepSearch,
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isOn,
+                                    onClick = {
+                                        isOn = !isOn
+                                        model.updateUserOptions(
+                                            "deepSearch",
+                                            if (isOn) 1 else 0
+                                        )
+                                    })
+                            }
                             "Clear Slots" -> {
                                 val timestamps = if(allCounterpointsData.isNotEmpty()) allCounterpointsData.map{
                                     if(it == null || it?.timestamp == null || it.timestamp == -1L) ""

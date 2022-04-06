@@ -1,9 +1,6 @@
 package com.cristianovecchi.mikrokanon.db
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -13,6 +10,9 @@ interface UserOptionsDataDao {
 
     @Insert
     fun insertAllUserOptions(vararg userOptionsData: UserOptionsData)
+
+    @Update
+    fun updateUserOptions(userOptionsData: UserOptionsData)
 
     @Delete
     fun deleteUserOptions(userOptionsData: UserOptionsData)

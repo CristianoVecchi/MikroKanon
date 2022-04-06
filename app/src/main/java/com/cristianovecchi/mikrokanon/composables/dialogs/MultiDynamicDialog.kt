@@ -333,7 +333,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                            val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                             val buttonSize = dimensions.dialogButtonSize
                             CustomButton(
                                 adaptSizeToIconButton = true,

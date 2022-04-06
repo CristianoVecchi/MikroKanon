@@ -54,10 +54,12 @@ fun SequenceSelector(model: AppViewModel,
 {
 
     val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons())
-    model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
-    //val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
-    //if(userOptionsData.isNotEmpty()) model.setAppColors(userOptionsData[0].colors)
-    val appColors = model.appColors
+    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())// to force recomposing when options change
+    val appColors by derivedStateOf {
+        if(userOptionsData.isNotEmpty()) model.setAppColors(userOptionsData[0].colors)
+        model.appColors // default ALL BLACK
+    }
+
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val backgroundColor = appColors.sequencesListBackgroundColor
     val buttonsBackgroundColor = appColors.buttonsDisplayBackgroundColor

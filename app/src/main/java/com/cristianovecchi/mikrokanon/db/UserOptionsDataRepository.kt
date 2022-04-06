@@ -20,6 +20,14 @@ class UserOptionsDataRepository(private val userOptionsDataDao: UserOptionsDataD
         userOptionsDataDao.insertAllUserOptions(userOptionsData)
         //println("UserOptions INSERTED: ${userOptionsData.toString()}")
     }
+
+    @Suppress("RedundantSuspendModifier")
+    @WorkerThread
+    suspend fun updateUserOptions(userOptionsData: UserOptionsData) {
+        userOptionsDataDao.updateUserOptions(userOptionsData)
+        //println("UserOptions INSERTED: ${userOptionsData.toString()}")
+    }
+
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun deleteUserOptions(userOptionsData: UserOptionsData) {
@@ -27,6 +35,7 @@ class UserOptionsDataRepository(private val userOptionsDataDao: UserOptionsDataD
         //println("userOptions DELETED: ${userOptionsData.toString()}")
 
     }
+
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
     suspend fun deleteAllUserOptions() {

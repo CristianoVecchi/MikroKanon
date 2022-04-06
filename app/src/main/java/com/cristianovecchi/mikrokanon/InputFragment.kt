@@ -38,7 +38,6 @@ class InputFragment(): Fragment() {
         model.userOptionsData.observe(viewLifecycleOwner){
             model.userOptionsData.value.let {
                 if(it!!.isNotEmpty()) {
-                    model.setAppColors(it[0].colors)
                     model.refreshZodiacFlags()
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())
                     model.spread = it[0].spread

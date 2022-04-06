@@ -47,7 +47,6 @@ class OutputFragment: Fragment() {
                         model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                         model.dispatchIntervals()
                     }
-                    model.setAppColors(it[0].colors)
                     model.counterpointView = it[0].counterpointView
                     model.refreshZodiacFlags()
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())

@@ -112,44 +112,45 @@ import androidx.room.PrimaryKey
             fun updateUserOptionsData(
                 optionsDataClone: UserOptionsData,
                 key: String,
-                value: Any
+                value: Any,
+                id: Long = optionsDataClone.id
             ): UserOptionsData {
                 return when (key) {
                     "ensemblesList" -> {
-                        optionsDataClone.copy(ensemblesList = value as String)
+                        optionsDataClone.copy(id = id, ensemblesList = value as String)
                     }
                     "rangeTypes" -> {
-                        optionsDataClone.copy(rangeTypes = value as String)
+                        optionsDataClone.copy(id = id, rangeTypes = value as String)
                     }
                     "legatoTypes" -> {
-                        optionsDataClone.copy(legatoTypes = value as String)
+                        optionsDataClone.copy(id = id, legatoTypes = value as String)
                     }
                     "melodyTypes" -> {
-                        optionsDataClone.copy(melodyTypes = value as String)
+                        optionsDataClone.copy(id = id, melodyTypes = value as String)
                     }
                     "glissandoFlags" -> {
-                        optionsDataClone.copy(glissandoFlags = value as Int)
+                        optionsDataClone.copy(id = id, glissandoFlags = value as Int)
                     }
                     "vibrato" -> {
-                        optionsDataClone.copy(vibrato = value as Int)
+                        optionsDataClone.copy(id = id, vibrato = value as Int)
                     }
                     "dynamics" -> {
-                        optionsDataClone.copy(dynamics = value as String)
+                        optionsDataClone.copy(id = id, dynamics = value as String)
                     }
                     "bpms" -> {
-                        optionsDataClone.copy(bpms = value as String)
+                        optionsDataClone.copy(id = id, bpms = value as String)
                     }
                     "rhythm" -> {
-                        optionsDataClone.copy(rhythm = value as String)
+                        optionsDataClone.copy(id = id, rhythm = value as String)
                     }
                     "rhythmShuffle" -> {
-                        optionsDataClone.copy(rhythmShuffle = value as Int)
+                        optionsDataClone.copy(id = id, rhythmShuffle = value as Int)
                     }
                     "partsShuffle" -> {
-                        optionsDataClone.copy(partsShuffle = value as Int)
+                        optionsDataClone.copy(id = id, partsShuffle = value as Int)
                     }
                     "rowForms" -> {
-                        optionsDataClone.copy(rowForms = value as String)
+                        optionsDataClone.copy(id = id, rowForms = value as String)
                     }
 //            "rowFormsFlags" -> {
 //                var flags = value as Int
@@ -157,52 +158,52 @@ import androidx.room.PrimaryKey
 //                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = flags)
 //            }
                     "ritornello" -> {
-                        optionsDataClone.copy(ritornello = value as Int)
+                        optionsDataClone.copy(id = id, ritornello = value as Int)
                     }
                     "transpose" -> {
-                        optionsDataClone.copy(transpose = value as String)
+                        optionsDataClone.copy(id = id, transpose = value as String)
                     }
                     "doublingFlags" -> {
-                        optionsDataClone.copy(doublingFlags = value as Int)
+                        optionsDataClone.copy(id = id, doublingFlags = value as Int)
                     }
                     "audio8DFlags" -> {
-                        optionsDataClone.copy(audio8DFlags = value as Int)
+                        optionsDataClone.copy(id = id, audio8DFlags = value as Int)
                     }
                     "intSetVertFlags" -> {
-                        optionsDataClone.copy(intSetVertFlags = value as Int)
+                        optionsDataClone.copy(id = id, intSetVertFlags = value as Int)
                     }
                     "intSetHorFlags" -> {
-                        optionsDataClone.copy(intSetHorFlags = value as Int)
+                        optionsDataClone.copy(id = id, intSetHorFlags = value as Int)
                     }
                     "spread" -> {
-                        optionsDataClone.copy(spread = value as Int)
+                        optionsDataClone.copy(id = id, spread = value as Int)
                     }
                     "deepSearch" -> {
-                        optionsDataClone.copy(deepSearch = value as Int)
+                        optionsDataClone.copy(id = id, deepSearch = value as Int)
                     }
                     "detectorFlags" -> {
-                        optionsDataClone.copy(detectorFlags = value as Int)
+                        optionsDataClone.copy(id = id, detectorFlags = value as Int)
                     }
                     "detectorExtension" -> {
-                        optionsDataClone.copy(detectorExtension = value as Int)
+                        optionsDataClone.copy(id = id, detectorExtension = value as Int)
                     }
                     "colors" -> {
-                        optionsDataClone.copy(colors = value as String)
+                        optionsDataClone.copy(id = id, colors = value as String)
                     }
                     "counterpointView" -> {
-                        optionsDataClone.copy(counterpointView = value as Int)
+                        optionsDataClone.copy(id = id, counterpointView = value as Int)
                     }
                     "language" -> {
-                        optionsDataClone.copy(language = value as String)
+                        optionsDataClone.copy(id = id, language = value as String)
                     }
                     "zodiacFlags" -> {
-                        optionsDataClone.copy(zodiacFlags = value as Int)
+                        optionsDataClone.copy(id = id, zodiacFlags = value as Int)
                     }
                     "nuances" -> {
-                        optionsDataClone.copy(nuances = value as Int)
+                        optionsDataClone.copy(id = id, nuances = value as Int)
                     }
                     "lastPlayData" -> {
-                        optionsDataClone.copy(lastPlayData = value as String)
+                        optionsDataClone.copy(id = id, lastPlayData = value as String)
                     }
                     else -> optionsDataClone.copy()
                 }

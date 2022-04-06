@@ -200,7 +200,7 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
 
                             }
                         }
-                        val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                        val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                         val buttonSize = dimensions.dialogButtonSize
                         Row(
                             modifier = modifierC.fillMaxWidth(),

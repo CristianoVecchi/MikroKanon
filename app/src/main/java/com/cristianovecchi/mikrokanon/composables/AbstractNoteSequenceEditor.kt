@@ -24,8 +24,11 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                                iconMap: Map<String,Int> = HashMap(), done_action: (ArrayList<Clip>, Boolean) -> Unit) {
     val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
     val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
-    model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
-    val appColors = model.appColors
+    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+    val appColors by derivedStateOf {
+        if(userOptionsData.isNotEmpty()) model.setAppColors(userOptionsData[0].colors)
+        model.appColors // default ALL BLACK
+    }
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val notesNames = language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)

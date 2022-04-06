@@ -224,7 +224,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 modifier = Modifier.width(IntrinsicSize.Max),
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
-                                val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
+                                val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                                 val buttonSize = dimensions.dialogButtonSize / 3 * 2
                                 val fontSizeOctave = dimensions.dialogFontSize
                                 CustomButton(

@@ -24,10 +24,7 @@ import com.cristianovecchi.mikrokanon.db.*
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.midi.launchPlayer
-import com.cristianovecchi.mikrokanon.ui.AppColorThemes
-import com.cristianovecchi.mikrokanon.ui.AppColors
-import com.cristianovecchi.mikrokanon.ui.Dimensions
-import com.cristianovecchi.mikrokanon.ui.extractColorDefs
+import com.cristianovecchi.mikrokanon.ui.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlin.math.absoluteValue
@@ -88,6 +85,7 @@ class AppViewModel(
         const val MAX_SEQUENCES_IN_MAZE = 10
         val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,24, 16,14)
     }
+    val iconMap = Icons.provideIcons()
     var _dimensions: MutableLiveData<Dimensions> = MutableLiveData(Dimensions.default())
     val dimensions: LiveData<Dimensions> = _dimensions
     var _language = MutableLiveData(Lang.provideLanguage(getSystemLangDef()))
@@ -98,52 +96,7 @@ class AppViewModel(
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
     var cadenzaValues ="0,1,0,1,1"
     val dynamicMap: Map<Float,String> =  dynamicSteps.zip(getDynamicSymbols()).toMap()
-    val iconMap = mapOf(
 
-        "mikrokanon" to R.drawable.ic_baseline_clear_all_24,
-        "counterpoint" to R.drawable.ic_baseline_drag_handle_24,
-        "special_functions" to R.drawable.ic_baseline_apps_24,
-        "done" to R.drawable.ic_baseline_done_24,
-        "add" to R.drawable.ic_baseline_add_24,
-        "delete" to R.drawable.ic_baseline_delete_forever_24,
-        "edit" to R.drawable.ic_baseline_edit_24,
-        "undo" to R.drawable.ic_baseline_undo_24,
-        "forward" to R.drawable.ic_baseline_arrow_forward_24,
-        "full_forward" to R.drawable.ic_baseline_fast_forward_24,
-        "back" to R.drawable.ic_baseline_arrow_back_24,
-        "full_back" to R.drawable.ic_baseline_fast_rewind_24,
-        "play" to R.drawable.ic_baseline_play_arrow_24,
-        "stop" to R.drawable.ic_baseline_stop_24,
-        "expand" to R.drawable.ic_baseline_sync_alt_24,
-        "waves" to R.drawable.ic_baseline_waves_24,
-        "horizontal_movements" to R.drawable.ic_baseline_insights_24,
-        "idea" to R.drawable.ic_baseline_emoji_objects_24,
-        "tritone_substitution" to R.drawable.ic_baseline_360_24,
-        "fioritura" to R.drawable.ic_baseline_wb_sunny_24,
-        "round" to R.drawable.ic_baseline_directions_boat_24,
-        "pedal" to R.drawable.ic_baseline_anchor_24,
-        "cadenza" to R.drawable.ic_baseline_autofps_select_24,
-        "single" to R.drawable.ic_baseline_single_24,
-        "sound" to R.drawable.ic_baseline_music_note_24,
-        "building" to R.drawable.ic_baseline_account_balance_24,
-        "settings" to R.drawable.ic_baseline_settings_24,
-        "doppelgänger" to R.drawable.ic_baseline_shuffle_24,
-        "save" to R.drawable.ic_baseline_save_24,
-        "erase" to R.drawable.ic_baseline_cleaning_services_24,
-        "free_parts" to R.drawable.ic_baseline_queue_music_24,
-        "Scarlatti" to R.drawable.ic_baseline_exposure_plus_1_24,
-        "minus_one" to R.drawable.ic_baseline_exposure_neg_1_24,
-        "transpose" to R.drawable.ic_baseline_unfold_more_24,
-        "sort_up" to R.drawable.ic_baseline_trending_up_24,
-        "sort_down" to R.drawable.ic_baseline_trending_down_24,
-        "bar" to R.drawable.ic_baseline_bar_24,
-        "upside_down" to R.drawable.ic_baseline_expand_24,
-        "overlap" to R.drawable.ic_baseline_compress_24,
-        "crossover" to R.drawable.ic_baseline_crossover_24,
-        "glue" to R.drawable.ic_baseline_view_week_24,
-        "maze" to R.drawable.ic_baseline_account_tree_24,
-        "accompanist" to R.drawable.ic_baseline_brush_24
-    )
     val stackIcons = mutableListOf<String>()
     private fun Stack<Computation>.pushAndDispatch(computation: Computation){
         push(computation)
@@ -1355,7 +1308,7 @@ class AppViewModel(
     }
     fun saveCounterpointInDb(position: Int, counterpoint: Counterpoint) {
         val timestamp = System.currentTimeMillis()
-        savedCounterpoints[position] = counterpoint.copy(timestamp = timestamp)
+        //savedCounterpoints[position] = counterpoint.copy(timestamp = timestamp)
         val counterpointData = CounterpointData(position.toLong()+1L, counterpoint.convertPartsToCsv(), timestamp)
         viewModelScope.launch(Dispatchers.IO) {
             counterpointRepository.updateCounterpoint(counterpointData)
@@ -1364,7 +1317,7 @@ class AppViewModel(
     fun clearCounterpointsInDb(numbers: Set<Int>){
         val defaultCounterpoint = CounterpointData.getDefaultCounterpointData()
         numbers.forEach {
-            savedCounterpoints[it] = null
+            //savedCounterpoints[it] = null
             viewModelScope.launch(Dispatchers.IO) {
                 val clearedCounterpoint = defaultCounterpoint.copy(id = it.toLong()+1L)
                 counterpointRepository.updateCounterpoint(clearedCounterpoint)
@@ -1398,12 +1351,13 @@ class AppViewModel(
             "spread" -> clearMKcaches()
             "deepSearch" -> { mk5reductedCache.clear() ;mk4cache.clear(); mk4deepSearchCache.clear() }
         }
-        UserOptionsData.updateUserOptionsData(optionsDataClone, key, value).apply{
+        UserOptionsData.updateUserOptionsData(optionsDataClone, key, value, 1).apply{
             viewModelScope.launch(Dispatchers.IO) {
-                if(userOptionsData.value!!.isNotEmpty()){
-                    userRepository.deleteAllUserOptions()
-                }
-                userRepository.insertUserOptions(this@apply)
+                userRepository.updateUserOptions(this@apply)
+//                if(userOptionsData.value!!.isNotEmpty()){
+//                    userRepository.deleteAllUserOptions()
+//                }
+//                userRepository.insertUserOptions(this@apply)
             }
         }
     }

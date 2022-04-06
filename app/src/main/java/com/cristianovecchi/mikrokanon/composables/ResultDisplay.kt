@@ -76,7 +76,11 @@ fun ResultDisplay(model: AppViewModel,
 {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    val userOptionsData = model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
+    val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
+    val colors by derivedStateOf {
+        if(userOptionsData.isNotEmpty()) model.setAppColors(userOptionsData[0].colors)
+        model.appColors // default ALL BLACK
+    }
     val detectorIntervalSet: List<Int> by derivedStateOf {
         if(userOptionsData.isNotEmpty())
         createIntervalSetFromFlags(userOptionsData[0].detectorFlags)
@@ -88,7 +92,6 @@ fun ResultDisplay(model: AppViewModel,
     }
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val notesNames = language.noteNames
-        val colors = model.appColors
         val counterpointView = model.counterpointView
         val counterpoints by counterpointsFlow.collectAsState(initial = emptyList())
         val counterpointsData: List<Pair<Counterpoint, List<List<Any>>>> by derivedStateOf {

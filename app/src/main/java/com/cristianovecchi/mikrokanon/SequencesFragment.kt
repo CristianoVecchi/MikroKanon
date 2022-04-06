@@ -41,7 +41,6 @@ var start = true
             model.userOptionsData.value.let {
                 if(it!!.isNotEmpty()) {
                     model.createHorizontalIntervalSet(it[0].intSetHorFlags)
-                    model.setAppColors(it[0].colors)
                     model.refreshZodiacFlags()
                     model.spread = it[0].spread
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())
