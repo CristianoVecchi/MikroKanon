@@ -19,11 +19,70 @@ fun Array<IntArray>.findBestChordPosition(
     }
     return result
 }
+fun List<Bar>.splitBarsInTwoParts(): List<Bar>{
+    val result = mutableListOf<Bar>()
+    for (bar in this) {
+        println("Input "+ bar)
+        val (numerator, denominator) = bar.metro
+        val quantumDur = RhythmPatterns.denominatorMidiValue(denominator).toLong()
+        if(bar.duration < quantumDur * numerator){ // don't split
+            result.add(bar)
+        } else {
+            val den2nd = numerator / 2
+            val den1st = den2nd + numerator % 2
+            val duration1st = quantumDur * den1st
+            result.add(Bar(Pair(den1st, denominator),bar.tick, duration1st, minVelocity = bar.minVelocity).also { println(it) })
+            result.add(Bar(Pair(den2nd, denominator),bar.tick + duration1st, quantumDur * den2nd, minVelocity = bar.minVelocity).also { println(it) })
+        }
+    }
+    return result.toList()
+}
+fun List<Bar>.resizeLastBar(totalDuration: Long): List<Bar>{
+    val result = mutableListOf<Bar>()
+    var indexLastBar = 0
+    while(this[indexLastBar].tick  + this[indexLastBar].duration < totalDuration){
+        ++indexLastBar
+    }
+    val realSequence = this.subList(0, indexLastBar)
+    val diff = totalDuration - realSequence.sumBy { it.duration.toInt() }
+    //println("Bar duration = ${realSequence.sumBy { it.duration.toInt() }} Total duration = $totalDuration  Diff = $diff ")
+    if(diff == 0L) return realSequence
+    result.addAll(realSequence)
+    val lastBar = this[indexLastBar]
+    result.add(lastBar.copy(duration = diff))
+    return result.toList()
+}
+fun List<Bar>.mergeOnesInMetro(): List<Bar>{
+    val result = mutableListOf<Bar>()
+    var index = 0
+    var lastMetro = Pair(-1,-1)
+    var lastBar = Bar(Pair(-1,-1),0L,0L, minVelocity = 0)
+    while(index < size){
+        val bar = this[index]
+        if(bar.metro.first != 1){
+            result.add(bar)
+            lastMetro = bar.metro
+            lastBar = bar
+        } else {
+            if(lastMetro != bar.metro){
+                result.add(bar)
+                lastMetro = bar.metro
+                lastBar = bar
+            } else {
+                lastBar.duration += bar.duration
+                lastBar.metro = Pair(lastBar.metro.first +1, lastBar.metro.second)
+            }
+        }
+        index++
+    }
+
+    return result.toList()
+}
 
 
-data class Bar(val metro: Pair<Int,Int> = METRO_4_4, val tick: Long, val duration: Long,
+data class Bar(var metro: Pair<Int,Int> = METRO_4_4, val tick: Long, var duration: Long,
                var dodecaByte1stHalf: Int? = null, var dodecaByte2ndHalf: Int? = null,
-                var chord1: Chord? = null, var chord2: Chord? = null){
+                var chord1: Chord? = null, var chord2: Chord? = null, var minVelocity: Int? = null){
     fun findChordFaultsGrid(): Array<IntArray>{
         val jazzChordBytes = JazzChord.values().map { it.dbyte }
         val chordFaultsGrid = Array(12) {IntArray(jazzChordBytes.size)}

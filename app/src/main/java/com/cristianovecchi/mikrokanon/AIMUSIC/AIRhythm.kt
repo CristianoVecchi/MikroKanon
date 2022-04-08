@@ -187,18 +187,18 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     BULGARIAN4GRZ(RhythmType.BULGARIAN,"Bulg.4 grz. 3+2+3♫",listOf(Ox3grz,Ox2grz,Ox3grz).flatten(),Pair(8,8)),
     BULGARIAN5GRZ(RhythmType.BULGARIAN,"Bulg.5 grz. 2+2+2+3♫",listOf(Ox2grz,Ox2grz,Ox2grz,Ox3grz).flatten(),Pair(9,8)),
     BULGARIAN6GRZ(RhythmType.BULGARIAN,"Bulg.6 grz. 3+3+2♫",listOf(Ox3grz,Ox3grz,Ox2grz).flatten(),Pair(8,8)),
-    BULGARIAN1H(RhythmType.BULGARIAN,"Bulgarian1 4+2+3♬",listOf(H1h,N1h,N1dottedH).flatten(),Pair(9,8)),
-    BULGARIAN2H(RhythmType.BULGARIAN,"Bulgarian2 2+2+3♬",listOf(N1h,N1h,N1dottedH).flatten(),Pair(7,8)),
-    BULGARIAN3H(RhythmType.BULGARIAN,"Bulgarian3 2+3♬",listOf(N1h,N1dottedH).flatten(),Pair(5,8)),
-    BULGARIAN4H(RhythmType.BULGARIAN,"Bulgarian4 3+2+3♬",listOf(N1dotted,N1h,N1dottedH).flatten(),Pair(8,8)),
-    BULGARIAN5H(RhythmType.BULGARIAN,"Bulgarian5 2+2+2+3♬",listOf(N1h,N1h,N1h,N1dottedH).flatten(),Pair(9,8)),
-    BULGARIAN6H(RhythmType.BULGARIAN,"Bulgarian6 3+3+2♬",listOf(N1dottedH,N1dottedH,N1h).flatten(),Pair(8,8)),
-    BULGARIAN1GRZH(RhythmType.BULGARIAN,"Bulg.1 grz. 4+2+3♬",listOf(Ox4grzH,Ox2grzH,Ox3grzH).flatten(),Pair(9,8)),
-    BULGARIAN2GRZH(RhythmType.BULGARIAN,"Bulg.2 grz. 2+2+3♬",listOf(Ox2grzH,Ox2grzH,Ox3grzH).flatten(),Pair(7,8)),
-    BULGARIAN3GRZH(RhythmType.BULGARIAN,"Bulg.3 grz. 2+3♬",listOf(Ox2grzH,Ox3grzH).flatten(),Pair(5,8)),
-    BULGARIAN4GRZH(RhythmType.BULGARIAN,"Bulg.4 grz. 3+2+3♬",listOf(Ox3grzH,Ox2grzH,Ox3grzH).flatten(),Pair(8,8)),
-    BULGARIAN5GRZH(RhythmType.BULGARIAN,"Bulg.5 grz. 2+2+2+3♬",listOf(Ox2grzH,Ox2grzH,Ox2grzH,Ox3grzH).flatten(),Pair(9,8)),
-    BULGARIAN6GRZH(RhythmType.BULGARIAN,"Bulg.6 grz. 3+3+2♬",listOf(Ox3grzH,Ox3grzH,Ox2grzH).flatten(),Pair(8,8)),
+    BULGARIAN1H(RhythmType.BULGARIAN,"Bulgarian1 4+2+3♬",listOf(H1h,N1h,N1dottedH).flatten(),Pair(9,16)),
+    BULGARIAN2H(RhythmType.BULGARIAN,"Bulgarian2 2+2+3♬",listOf(N1h,N1h,N1dottedH).flatten(),Pair(7,16)),
+    BULGARIAN3H(RhythmType.BULGARIAN,"Bulgarian3 2+3♬",listOf(N1h,N1dottedH).flatten(),Pair(5,16)),
+    BULGARIAN4H(RhythmType.BULGARIAN,"Bulgarian4 3+2+3♬",listOf(N1dotted,N1h,N1dottedH).flatten(),Pair(8,16)),
+    BULGARIAN5H(RhythmType.BULGARIAN,"Bulgarian5 2+2+2+3♬",listOf(N1h,N1h,N1h,N1dottedH).flatten(),Pair(9,16)),
+    BULGARIAN6H(RhythmType.BULGARIAN,"Bulgarian6 3+3+2♬",listOf(N1dottedH,N1dottedH,N1h).flatten(),Pair(8,16)),
+    BULGARIAN1GRZH(RhythmType.BULGARIAN,"Bulg.1 grz. 4+2+3♬",listOf(Ox4grzH,Ox2grzH,Ox3grzH).flatten(),Pair(9,16)),
+    BULGARIAN2GRZH(RhythmType.BULGARIAN,"Bulg.2 grz. 2+2+3♬",listOf(Ox2grzH,Ox2grzH,Ox3grzH).flatten(),Pair(7,16)),
+    BULGARIAN3GRZH(RhythmType.BULGARIAN,"Bulg.3 grz. 2+3♬",listOf(Ox2grzH,Ox3grzH).flatten(),Pair(5,16)),
+    BULGARIAN4GRZH(RhythmType.BULGARIAN,"Bulg.4 grz. 3+2+3♬",listOf(Ox3grzH,Ox2grzH,Ox3grzH).flatten(),Pair(8,16)),
+    BULGARIAN5GRZH(RhythmType.BULGARIAN,"Bulg.5 grz. 2+2+2+3♬",listOf(Ox2grzH,Ox2grzH,Ox2grzH,Ox3grzH).flatten(),Pair(9,16)),
+    BULGARIAN6GRZH(RhythmType.BULGARIAN,"Bulg.6 grz. 3+3+2♬",listOf(Ox3grzH,Ox3grzH,Ox2grzH).flatten(),Pair(8,16)),
 
     HEMIOLIA32(RhythmType.HEMIOLIA,"Hemiolia 3=2", listOf(120,60,60,120),Pair(3,16)),
     HEMIOLIA43(RhythmType.HEMIOLIA,"Hemiolia 4=3", listOf(180,60,120,120,60,180),Pair(3,8)),
@@ -225,6 +225,9 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     }
     fun patternDuration(): Int {
         return this.values.map{it.absoluteValue}.sum()
+    }
+    fun barDuration(): Int {
+        return metro.first * RhythmPatterns.denominatorMidiValue(metro.second)
     }
     fun nNotesLeftInThePattern(nNotes: Int) : Int {
         val nPositiveValues = nPositiveValues()

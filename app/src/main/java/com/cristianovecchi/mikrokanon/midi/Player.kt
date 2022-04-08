@@ -309,34 +309,39 @@ object Player {
 //            bars.forEach { println(it) }
 //            if (bars.sumBy { it.duration.toInt() }
 //                    .toLong() != totalLength) println("BAR DURATIONS IS WRONG!!!")
-            assignDodecaBytesToBars(bars.toTypedArray(), counterpointTrackData, false)
-//            bars.forEach{ print("${it.dodecaByte1stHalf!!.toString(2)} ")}
-            val chordFaultsGrids = bars.map{ it.findChordFaultsGrid()}
+    println(bars)
+            val doubledBars = bars.mergeOnesInMetro()
+                                    .resizeLastBar(totalLength)
+                                    .splitBarsInTwoParts()
+            println(doubledBars)
+            assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
+//            doubledBars.forEach{ print("${it.dodecaByte1stHalf!!.toString(2)} ")}
+            val chordFaultsGrids = doubledBars.map{ it.findChordFaultsGrid()}
            // chordFaultsGrids[0].forEach{println(it.contentToString())}
 
             val jazzChords = JazzChord.values()
 
             val priority = listOf(5,11, 10,4, 3,9, 8,2, 1,7, 6,0).toIntArray()
-            var lastRoot = (Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
+            var lastRoot = (Insieme.trovaFond(doubledBars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
             //println("start root = $lastRoot")
-            for(index in bars.indices){
+            for(index in doubledBars.indices){
                 val chordPosition = chordFaultsGrids[index].findBestChordPosition(lastRoot, priority)
                 val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
-                bars[index].chord1 = chord
+                doubledBars[index].chord1 = chord
                 lastRoot = chordPosition.first
                // println("lastRoot = $lastRoot")
             }
             val chordsTrack = MidiTrack()
             val chordsChannel = 15
             val pc: MidiEvent = ProgramChange(0L, chordsChannel, STRING_ORCHESTRA) // cambia strumento
-            val chordVelocity = 55
+
             chordsTrack.insertEvent(pc)
-            bars.forEach { bar ->
+            doubledBars.forEach { bar ->
                 val chord = bar.chord1!!
                 val noteNames = Lang.italian().noteNames
                 println("Chord: ${bar.dodecaByte1stHalf!!.toString(2)} ${chord.name}")
             }
-            findChordNotes(chordsTrack, chordsChannel, bars, chordVelocity, chordVelocity + 10)
+            findChordNotes(chordsTrack, chordsChannel, doubledBars, 15, 10)
             tracks.add(chordsTrack)
 
         }

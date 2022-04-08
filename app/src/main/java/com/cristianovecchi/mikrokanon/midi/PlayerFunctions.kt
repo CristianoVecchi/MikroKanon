@@ -10,8 +10,9 @@ import com.leff.midi.event.*
 import com.leff.midi.event.meta.TimeSignature
 import kotlin.math.abs
 
-fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, chordVelocity: Int, rootVelocity: Int, justVoicing: Boolean = false) {
-    data class Note(val pitch: Int, val tick: Long, var duration: Long)
+fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = false) {
+    data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
 
     val notes = mutableListOf<Note>()
     val roots = mutableListOf<Note>()
@@ -23,18 +24,19 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, 
             if (bar.chord1!!.absoluteNotes.contains(absPitch)) contains[index] = true
         }
         var index = 0
-        var lastNote = Note(-1, 0, 0)
+        var lastNote = Note(-1, 0, 0,0)
         while (index < contains.size) {
             if (contains[index]) {
+                val bar = bars[index]
                 if (lastNote.pitch == -1) {
-                    lastNote = Note(absPitch, bars[index].tick, bars[index].duration)
+                    lastNote = Note(absPitch, bar.tick, bar.duration, bar.minVelocity!!)
                 } else {
-                    lastNote.duration += bars[index].duration
+                    lastNote.duration += bar.duration
                 }
             } else {
                 if (lastNote.pitch != -1) {
                     notes.add(lastNote)
-                    lastNote = Note(-1, 0, 0)
+                    lastNote = Note(-1, 0, 0,0)
                 }
             }
             index++
@@ -44,13 +46,13 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, 
         }
     }
     if(!justVoicing){
-        var lastRoot = Note(-1,0,0)
+        var lastRoot = Note(-1,0,0, 0)
         var index = 0
         while (index < bars.size) {
             val bar = bars[index]
             val newRoot = bar.chord1!!.root
             if (newRoot != lastRoot.pitch) {
-                    lastRoot = Note(newRoot, bar.tick, bar.duration)
+                    lastRoot = Note(newRoot, bar.tick, bar.duration, bar.minVelocity!!-5)
                     roots.add(lastRoot)
             } else {
                 lastRoot.duration += bar.duration
@@ -65,7 +67,7 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, 
         for (octave in 4..7) {
             Player.insertNoteWithGlissando(
                 chordsTrack, tick, duration, chordsChannel,
-                octave * 12 + absPitch, chordVelocity, 70, 0
+                octave * 12 + absPitch, it.velocity - diffChordVelocity, 70, 0
             )
         }
     }
@@ -78,7 +80,7 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, 
             for (octave in 1..3) {
                 Player.insertNoteWithGlissando(
                     chordsTrack, tick, duration, chordsChannel,
-                    octave * 12 + absPitch, rootVelocity, 70 + 10, 0
+                    octave * 12 + absPitch, it.velocity - diffRootVelocity, 70 + 10, 0
                 )
             }
         }
@@ -102,7 +104,7 @@ fun insertChordNotes(chordsTrack: MidiTrack, channel: Int, root: Int,
     }
 }
 fun assignDodecaBytesToBars(bars: Array<Bar>, counterpointTrackData: List<TrackData>, withArticulation: Boolean = false) {
-    bars.forEach { it.dodecaByte1stHalf = 0 ; it.dodecaByte2ndHalf = 0 }
+    bars.forEach { it.dodecaByte1stHalf = 0 ; it.dodecaByte2ndHalf = 0 ; it.minVelocity = 127}
     counterpointTrackData.forEach{ trackData ->
         val durations = if(trackData.articulationDurations != null && withArticulation) trackData.articulationDurations!! else trackData.durations
         var barIndex = 0
@@ -110,11 +112,13 @@ fun assignDodecaBytesToBars(bars: Array<Bar>, counterpointTrackData: List<TrackD
         while(pitchIndex < trackData.pitches.size){
             val bar = bars[barIndex]
             val pitch = trackData.pitches[pitchIndex]
+            val velocity = trackData.velocities[pitchIndex]
             val barEnd = bar.tick + bar.duration
             val pitchStart = trackData.ticks[pitchIndex]
             val pitchEnd = pitchStart + durations[pitchIndex]
             if(trackData.ticks[pitchIndex] < barEnd ){
                 bar.dodecaByte1stHalf = bar.dodecaByte1stHalf?.or((1 shl (pitch % 12)))
+                if(velocity < bar.minVelocity!! ) bar.minVelocity = velocity
                 if(pitchEnd > barEnd) barIndex++ else pitchIndex++
 
             } else {
@@ -246,11 +250,12 @@ fun setTimeSignatures(
     var lastSignature = Pair(-1, -1)
     val signatures: List<Pair<Int, Pair<Int, Int>>> = rhythm.map {
         val patternDuration = it.first.patternDuration()
+        val barDuration = it.first.barDuration()
         val nRepetitions = it.third
         val metro = it.first.metro
-        for(i in 0 until nRepetitions){
-            bars.add(Bar(metro, barTick, patternDuration.toLong()))
-            barTick += patternDuration
+        for(i in 0 until nRepetitions * (patternDuration/barDuration)){
+            bars.add(Bar(metro, barTick, barDuration.toLong()))
+            barTick += barDuration
         }
         Pair(patternDuration * nRepetitions, metro)
     }
