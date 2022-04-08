@@ -16,6 +16,7 @@ const val DOUBLEBASS = 43
 const val PIZZICATO = 45
 const val HARP = 46
 const val STRING_ORCHESTRA = 48
+const val SLOW_STRINGS = 49
 const val TRUMPET = 56
 const val TROMBONE = 57
 const val TUBA = 58

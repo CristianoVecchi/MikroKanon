@@ -10,6 +10,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.BebopBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParker
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParkerBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.DEF.MIDDLE_C
+import com.cristianovecchi.mikrokanon.locale.Lang
 
 import com.leff.midi.MidiFile
 import com.leff.midi.MidiTrack
@@ -121,7 +122,7 @@ object Player {
         partsShuffle: Boolean = false,
         rowForms: List<Pair<Int, Int>> = listOf(Pair(0, 1)),
         ritornello: Int = 0,
-        transpose: List<Pair<Int,Int>> = listOf(Pair(0,1)),
+        transpose: List<Pair<Int, Int>> = listOf(Pair(0, 1)),
         doublingFlags: Int = 0,
         nuances: Int = 0,
         rangeTypes: List<Pair<Int, Int>> = listOf(Pair(2, 0)),
@@ -132,22 +133,15 @@ object Player {
         vibrato: Int = 0
     ): String {
         // Triple: Pattern, isRetrograde, nRepetitions
-        val durations = rhythm.fold(listOf<Int>()) { acc, triple ->
-            acc + if (triple.second) triple.first.retrogradeValues()
-                .repeat(triple.third) else triple.first.values.repeat(triple.third)
-        }.mergeNegativeValues()
-        //println("durations: $durations")
-        val actualDurations = if (rhythmShuffle) listOf(
-            *durations.toTypedArray(),
-            *durations.toTypedArray(),
-            *durations.toTypedArray()
-        ).shuffled() else durations
+
+
         val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
         val ensemblePartsList: List<List<EnsemblePart>> =
             if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
             else Ensembles.getEnsemblesListMix(nParts, ensemblesList)
         //ensembleParts.display()
-        val actualEnsemblePartsList = if (partsShuffle) ensemblePartsList.map{ it.shuffled() } else ensemblePartsList
+        val actualEnsemblePartsList =
+            if (partsShuffle) ensemblePartsList.map { it.shuffled() } else ensemblePartsList
         val firstCounterpoint = counterpoints.firstOrNull()
             ?: return "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
         val nNotesToSkip = rhythm[0].first.nNotesLeftInThePattern(firstCounterpoint.nNotes())
@@ -165,9 +159,32 @@ object Player {
 
         if (actualCounterpoint.isEmpty()) return "Counterpoint to play is empty!!!"
         if (actualCounterpoint.parts[0].absPitches.size == 0) return "Counterpoint parts are empty!!!"
+        val nTotalNotes = actualCounterpoint.nNotes()
+
+        val durations = rhythm.fold(listOf<Int>()) { acc, triple ->
+            acc + if (triple.second) triple.first.retrogradeValues()
+                .repeat(triple.third) else triple.first.values.repeat(triple.third)
+        }.mergeNegativeValues()
+        val nRhythmSteps = durations.filter { it > -1 }.count()
+        //println("durations: $durations")
+        val actualRhythm = {
+            val actualRhythm = mutableListOf<Triple<RhythmPatterns, Boolean, Int>>()
+            (0 until (nTotalNotes / nRhythmSteps + (if (nTotalNotes % nRhythmSteps == 0) 0 else 1))).forEach { _ ->
+                actualRhythm.addAll(rhythm)
+            }
+            actualRhythm.toList()
+        }
+        val actualDurations = {
+            val actualDurations =
+                IntArray(nTotalNotes * 2 + 1)// note + optional rests + optional initial rest
+            (0 until nTotalNotes * 2 + 1).forEach {
+                actualDurations[it] = durations[it % durations.size]
+            }
+            if (rhythmShuffle) durations.shuffled().toIntArray() else actualDurations
+        }
 
         val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
-            actualCounterpoint, actualDurations, actualEnsemblePartsList,
+            actualCounterpoint, actualDurations(), actualEnsemblePartsList,
             nuances, doublingFlags, rangeTypes, melodyTypes,
             glissando, audio8D, vibratoExtensions[vibrato]
         )
@@ -282,12 +299,45 @@ object Player {
         }
 
         val tracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
-        setTimeSignatures(tempoTrack, rhythm, totalLength)
+        val bars = setTimeSignatures(tempoTrack, actualRhythm(), totalLength)
         tracks.add(tempoTrack)
         tracks.addAll(counterpointTracks)
+
+        // JAZZ HARM
+        val jazz = true
+        if (jazz) {
+//            bars.forEach { println(it) }
+//            if (bars.sumBy { it.duration.toInt() }
+//                    .toLong() != totalLength) println("BAR DURATIONS IS WRONG!!!")
+            assignDodecaBytesToBars(bars.toTypedArray(), counterpointTrackData, false)
+//            bars.forEach{ print("${it.dodecaByte1stHalf!!.toString(2)} ")}
+            val chordFaultsGrids = bars.map{ it.findChordFaultsGrid()}
+            val jazzChords = JazzChord.values()
+            bars.forEachIndexed{ index, bar ->
+                val chordPosition = chordFaultsGrids[index].findBestChordPosition()
+                val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
+                bar.chord1 = chord
+            }
+            val chordsTrack = MidiTrack()
+            val chordsChannel = 15
+            val pc: MidiEvent = ProgramChange(0L, chordsChannel, STRING_ORCHESTRA) // cambia strumento
+            val chordVelocity = 55
+            chordsTrack.insertEvent(pc)
+            bars.forEach{ bar ->
+                val chord = bar.chord1!!
+                val noteNames = Lang.italian().noteNames
+                println("Chord: ${bar.dodecaByte1stHalf!!.toString(2)} ${chord.name}")
+                insertChordNotes(chordsTrack, chordsChannel, chord.root, chord.absoluteNotes, bar.tick, bar.duration, chordVelocity)
+            }
+            tracks.add(chordsTrack)
+
+        }
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
-        return saveAndPlayMidiFile(mediaPlayer, midi, looping, play, midiFile, actualCounterpoint.nNotes())
+        return saveAndPlayMidiFile(mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
     }
+
+
+
 
     fun saveAndPlayMidiFile(
         mediaPlayer: MediaPlayer,

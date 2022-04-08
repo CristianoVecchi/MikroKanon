@@ -770,16 +770,16 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                                     } else {
                                         //println("NEW GATE: $gate")
                                         gate = emptiness
-                                        mk
+                                        MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                            mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                                     }
                                 } else {
-                                    mk
+                                    MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                        mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                                 }
                             }
                             //}.filter{ it != null }.map{ it as MikroKanon}.toList()
                         }.filter { it != null }
-                        .map { it -> MikroKanonByte128(extractByte128(it!!.parts[0].absPitches),
-                            it.delays!!, it.transpositions!!, it.forms!!,it.duxLength!!)}
                         .collect(Collectors.toList<MikroKanonByte128>())
                         .sortedBy{ it.nRests() }.take(maxNresults)
                         .map{ mkb ->
@@ -802,16 +802,16 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                                 if (emptiness > gate) null else {
                                     //println("NEW GATE: $gate")
                                     gate = emptiness
-                                    mk
+                                    MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                        mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                                 }
                             } else {
-                                mk
+                                MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                    mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                             }
                         }
-                    }.filterNotNull().map{ MikroKanonByte128(
-                        extractByte128(it.parts[0].absPitches),
-                        it.delays!!, it.transpositions!!, it.forms!!,it.duxLength!!
-                    )}.sortedBy{ it.nRests() }.take(maxNresults)
+                    }.filterNotNull()
+                        .sortedBy{ it.nRests() }.take(maxNresults)
                         .map{ mkb ->
                             val comes = (0 until 3).map{ completeForms[mkb.transpositions[it]][mkb.forms[it]]}
                             mkb.toMikroKanon(absPitches, comes, intervalSet)}
@@ -996,16 +996,16 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                                     } else {
                                         //println("NEW GATE: $gate")
                                         gate = emptiness
-                                        mk
+                                        MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                            mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                                     }
                                 } else {
-                                    mk
+                                    MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                        mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                                 }
                             }
                             //}.filter{ it != null }.map{ it as MikroKanon}.toList()
                         }.filter { it != null }
-                        .map { it -> MikroKanonByte128(extractByte128(it!!.parts[0].absPitches),
-                                it.delays!!, it.transpositions!!, it.forms!!,it.duxLength!!)}
                         .collect(Collectors.toList<MikroKanonByte128>())
                         .sortedBy{ it.nRests() }.take(maxNresults)
                         .map{ mkb ->
@@ -1034,16 +1034,16 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                                 if (emptiness > gate) null else {
                                     //println("NEW GATE: $gate")
                                     gate = emptiness
-                                    mk
+                                    MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                        mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                                 }
                             } else {
-                                mk
+                                MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                    mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                             }
                         }
-                    }.filterNotNull().map{ MikroKanonByte128(
-                        extractByte128(it.parts[0].absPitches),
-                        it.delays!!, it.transpositions!!, it.forms!!,it.duxLength!!
-                    )}.sortedBy{ it.nRests() }.take(maxNresults)
+                    }.filterNotNull()
+                        .sortedBy{ it.nRests() }.take(maxNresults)
                         .map{ mkb ->
                             val comes = (0 until 4).map{ completeForms[mkb.transpositions[it]][mkb.forms[it]]}
                             mkb.toMikroKanon(absPitches, comes, intervalSet)}
@@ -1162,16 +1162,16 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                                     } else {
                                         //println("NEW GATE: $gate")
                                         gate = emptiness
-                                        mk
+                                        MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                            mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                                     }
                                 } else {
-                                    mk
+                                    MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                    mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                                 }
                             }
                             //}.filter{ it != null }.map{ it as MikroKanon}.toList()
                         }.filter { it != null }
-                        .map { it -> MikroKanonByte128(extractByte128(it!!.parts[0].absPitches),
-                            it.delays!!, it.transpositions!!, it.forms!!,it.duxLength!!)}
                         .collect(Collectors.toList<MikroKanonByte128>())
                         .sortedBy{ it.nRests() }.take(maxNresults)
                         .map{ mkb ->
@@ -1202,16 +1202,16 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                                 if (emptiness > gate) null else {
                                     //println("NEW GATE: $gate")
                                     gate = emptiness
-                                    mk
+                                    MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                        mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                                 }
                             } else {
-                                mk
+                                MikroKanonByte128(extractByte128(mk.parts[0].absPitches),
+                                    mk.delays!!, mk.transpositions!!, mk.forms!!,mk.duxLength!!)
                             }
                         }
-                    }.filterNotNull().map{ MikroKanonByte128(
-                        extractByte128(it.parts[0].absPitches),
-                        it.delays!!, it.transpositions!!, it.forms!!,it.duxLength!!
-                    )}.sortedBy{ it.nRests() }.take(maxNresults)
+                    }.filterNotNull()
+                        .sortedBy{ it.nRests() }.take(maxNresults)
                         .map{ mkb ->
                             val comes = (0 until 5).map{ completeForms[mkb.transpositions[it]][mkb.forms[it]]}
                             mkb.toMikroKanon(absPitches, comes, intervalSet)}

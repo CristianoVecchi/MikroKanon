@@ -27,7 +27,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
 
 object CounterpointInterpreter {
     fun doTheMagic(counterpoint: Counterpoint,
-                   durations: List<Int> = listOf(240), // 1/8
+                   durations: IntArray = intArrayOf(240), // 1/8
                    ensemblePartList: List<List<EnsemblePart>>,
                    nuances: Int,
                    doublingFlags: Int,

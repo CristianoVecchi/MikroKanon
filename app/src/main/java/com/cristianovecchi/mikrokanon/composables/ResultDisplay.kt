@@ -33,6 +33,7 @@ import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
+import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import com.cristianovecchi.mikrokanon.ui.shift
@@ -77,19 +78,17 @@ fun ResultDisplay(model: AppViewModel,
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-    val colors by derivedStateOf {
-        if(userOptionsData.isNotEmpty()) model.setAppColors(userOptionsData[0].colors)
-        model.appColors // default ALL BLACK
+    val triple by derivedStateOf {
+        if(userOptionsData.isNotEmpty()) {
+            model.setAppColors(userOptionsData[0].colors)
+            Triple(
+                model.appColors,
+                createIntervalSetFromFlags(userOptionsData[0].detectorFlags),
+                (1..userOptionsData[0].detectorExtension).toList()
+            )
+        } else Triple(model.appColors, listOf(), listOf())
     }
-    val detectorIntervalSet: List<Int> by derivedStateOf {
-        if(userOptionsData.isNotEmpty())
-        createIntervalSetFromFlags(userOptionsData[0].detectorFlags)
-        else listOf()
-    }
-    val detectorExtensions: List<Int> by derivedStateOf {
-        if (userOptionsData.isNotEmpty()) (1..userOptionsData[0].detectorExtension).toList()
-        else listOf()
-    }
+    val (colors, detectorIntervalSet, detectorExtensions) = triple
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val notesNames = language.noteNames
         val counterpointView = model.counterpointView

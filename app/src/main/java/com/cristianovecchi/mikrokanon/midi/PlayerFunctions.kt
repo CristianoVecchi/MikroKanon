@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.midi
 
+import com.cristianovecchi.mikrokanon.AIMUSIC.Bar
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.TrackData
 import com.cristianovecchi.mikrokanon.alterateBpmWithDistribution
@@ -8,7 +9,44 @@ import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.TimeSignature
 
+fun insertChordNotes(chordsTrack: MidiTrack, channel: Int, root: Int,
+                     absPitches: IntArray, tick: Long, duration: Long, velocity: Int, justVoicing: Boolean = false) {
+    if(!justVoicing){
+        for(octave in 1..2){
+            Player.insertNoteWithGlissando(chordsTrack, tick, duration, channel,
+                octave * 12 + root, velocity, 70,0)
 
+        }
+    }
+    for(octave in 3..6){
+        for(absPitch in absPitches){
+            Player.insertNoteWithGlissando(chordsTrack, tick, duration, channel,
+                octave * 12 + absPitch, velocity, 70,0)
+        }
+    }
+}
+fun assignDodecaBytesToBars(bars: Array<Bar>, counterpointTrackData: List<TrackData>, withArticulation: Boolean = false) {
+    bars.forEach { it.dodecaByte1stHalf = 0 ; it.dodecaByte2ndHalf = 0 }
+    counterpointTrackData.forEach{ trackData ->
+        val durations = if(trackData.articulationDurations != null && withArticulation) trackData.articulationDurations!! else trackData.durations
+        var barIndex = 0
+        var pitchIndex = 0
+        while(pitchIndex < trackData.pitches.size){
+            val bar = bars[barIndex]
+            val pitch = trackData.pitches[pitchIndex]
+            val barEnd = bar.tick + bar.duration
+            val pitchStart = trackData.ticks[pitchIndex]
+            val pitchEnd = pitchStart + durations[pitchIndex]
+            if(trackData.ticks[pitchIndex] < barEnd ){
+                bar.dodecaByte1stHalf = bar.dodecaByte1stHalf?.or((1 shl (pitch % 12)))
+                if(pitchEnd > barEnd) barIndex++ else pitchIndex++
+
+            } else {
+                barIndex++
+            }
+        }
+    }
+}
 fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
     val track = MidiTrack()
     val channel = trackData.channel
@@ -125,14 +163,20 @@ fun setTimeSignatures(
     tempoTrack: MidiTrack,
     rhythm: List<Triple<RhythmPatterns, Boolean, Int>>,
     totalLength: Long
-) {
+): List<Bar> {
+    val bars = mutableListOf<Bar>()
     var tick = 0L
+    var barTick = 0L
     var lastSignature = Pair(-1, -1)
     val signatures: List<Pair<Int, Pair<Int, Int>>> = rhythm.map {
-        Pair(
-            it.first.patternDuration() * it.third,
-            Pair(it.first.metro.first, it.first.metro.second)
-        )
+        val patternDuration = it.first.patternDuration()
+        val nRepetitions = it.third
+        val metro = it.first.metro
+        for(i in 0 until nRepetitions){
+            bars.add(Bar(metro, barTick, patternDuration.toLong()))
+            barTick += patternDuration
+        }
+        Pair(patternDuration * nRepetitions, metro)
     }
     var index = 0
     while (tick < totalLength) {
@@ -153,6 +197,7 @@ fun setTimeSignatures(
         tick += signatures[index].first
         index = ++index % signatures.size
     }
+    return bars.toList()
 }
 
 fun alterateArticulation(
