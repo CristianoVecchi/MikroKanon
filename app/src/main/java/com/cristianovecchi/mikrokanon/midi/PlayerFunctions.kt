@@ -8,6 +8,82 @@ import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.TimeSignature
+import kotlin.math.abs
+
+fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, chordVelocity: Int, rootVelocity: Int, justVoicing: Boolean = false) {
+    data class Note(val pitch: Int, val tick: Long, var duration: Long)
+
+    val notes = mutableListOf<Note>()
+    val roots = mutableListOf<Note>()
+    for (absPitch in 0..11) {
+        val barIndex = 0
+        val alreadyPresent = false
+        val contains = BooleanArray(bars.size) { false }
+        bars.forEachIndexed { index, bar ->
+            if (bar.chord1!!.absoluteNotes.contains(absPitch)) contains[index] = true
+        }
+        var index = 0
+        var lastNote = Note(-1, 0, 0)
+        while (index < contains.size) {
+            if (contains[index]) {
+                if (lastNote.pitch == -1) {
+                    lastNote = Note(absPitch, bars[index].tick, bars[index].duration)
+                } else {
+                    lastNote.duration += bars[index].duration
+                }
+            } else {
+                if (lastNote.pitch != -1) {
+                    notes.add(lastNote)
+                    lastNote = Note(-1, 0, 0)
+                }
+            }
+            index++
+        }
+        if (lastNote.pitch != -1) {
+            notes.add(lastNote)
+        }
+    }
+    if(!justVoicing){
+        var lastRoot = Note(-1,0,0)
+        var index = 0
+        while (index < bars.size) {
+            val bar = bars[index]
+            val newRoot = bar.chord1!!.root
+            if (newRoot != lastRoot.pitch) {
+                    lastRoot = Note(newRoot, bar.tick, bar.duration)
+                    roots.add(lastRoot)
+            } else {
+                lastRoot.duration += bar.duration
+            }
+            index ++
+        }
+    }
+    notes.sortedBy { it.tick }.forEach {
+        val absPitch = it.pitch
+        val tick = it.tick
+        val duration = it.duration
+        for (octave in 4..7) {
+            Player.insertNoteWithGlissando(
+                chordsTrack, tick, duration, chordsChannel,
+                octave * 12 + absPitch, chordVelocity, 70, 0
+            )
+        }
+    }
+    if(!justVoicing){
+        roots.sortedBy { it.tick }.forEach {
+            //println("Root: $it")
+            val absPitch = it.pitch
+            val tick = it.tick
+            val duration = it.duration
+            for (octave in 1..3) {
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, duration, chordsChannel,
+                    octave * 12 + absPitch, rootVelocity, 70 + 10, 0
+                )
+            }
+        }
+    }
+}
 
 fun insertChordNotes(chordsTrack: MidiTrack, channel: Int, root: Int,
                      absPitches: IntArray, tick: Long, duration: Long, velocity: Int, justVoicing: Boolean = false) {

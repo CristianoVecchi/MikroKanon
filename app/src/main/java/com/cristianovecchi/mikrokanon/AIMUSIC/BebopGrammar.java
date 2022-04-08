@@ -12,14 +12,17 @@ public class BebopGrammar {
         Integer[] valuesMajor7add11aum = {0b001010010001,0b100101000100}; // beat notes and passage notes for Major7#11
         grammar.put(JazzChord.MAJOR11AUM,valuesMajor7add11aum);
 
-        Integer[] valuesMajorDoubleHarm = {0b100010010001,0b000100100010}; // beat notes and passage notes for Major7 DoubleHarmonic Scale
-        grammar.put(JazzChord.DOUBLEHARM,valuesMajorDoubleHarm);
+//        Integer[] valuesMajorDoubleHarm = {0b100010010001,0b000100100010}; // beat notes and passage notes for Major7 DoubleHarmonic Scale
+//        grammar.put(JazzChord.DOUBLEHARM,valuesMajorDoubleHarm);
 
         Integer[] valuesMinor7 = {0b010010001001,0b101000100100}; // beat notes and passage notes for minor7
         grammar.put(JazzChord.MINOR,valuesMinor7);
 
         Integer[] valuesMinor7add11 = {0b010010101001,0b101001010100}; // beat notes and passage notes for minor7add11
         grammar.put(JazzChord.MINOR11,valuesMinor7add11);
+
+        Integer[] valuesMinor7b9add11b13= {0b010010001001,0b100100100010}; // beat notes and passage notes for minor7add11
+        grammar.put(JazzChord.MINOR9MIN11MIN13,valuesMinor7b9add11b13);
 
 
         Integer[] valuesDom7 = {0b010010010001,0b101000100100}; // beat notes and passage notes for dominant 7

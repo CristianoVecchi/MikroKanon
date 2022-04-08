@@ -312,31 +312,37 @@ object Player {
             assignDodecaBytesToBars(bars.toTypedArray(), counterpointTrackData, false)
 //            bars.forEach{ print("${it.dodecaByte1stHalf!!.toString(2)} ")}
             val chordFaultsGrids = bars.map{ it.findChordFaultsGrid()}
+           // chordFaultsGrids[0].forEach{println(it.contentToString())}
+
             val jazzChords = JazzChord.values()
-            bars.forEachIndexed{ index, bar ->
-                val chordPosition = chordFaultsGrids[index].findBestChordPosition()
+
+            val priority = listOf(5,11, 10,4, 3,9, 8,2, 1,7, 6,0).toIntArray()
+            var lastRoot = (Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
+            //println("start root = $lastRoot")
+            for(index in bars.indices){
+                val chordPosition = chordFaultsGrids[index].findBestChordPosition(lastRoot, priority)
                 val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
-                bar.chord1 = chord
+                bars[index].chord1 = chord
+                lastRoot = chordPosition.first
+               // println("lastRoot = $lastRoot")
             }
             val chordsTrack = MidiTrack()
             val chordsChannel = 15
             val pc: MidiEvent = ProgramChange(0L, chordsChannel, STRING_ORCHESTRA) // cambia strumento
             val chordVelocity = 55
             chordsTrack.insertEvent(pc)
-            bars.forEach{ bar ->
+            bars.forEach { bar ->
                 val chord = bar.chord1!!
                 val noteNames = Lang.italian().noteNames
                 println("Chord: ${bar.dodecaByte1stHalf!!.toString(2)} ${chord.name}")
-                insertChordNotes(chordsTrack, chordsChannel, chord.root, chord.absoluteNotes, bar.tick, bar.duration, chordVelocity)
             }
+            findChordNotes(chordsTrack, chordsChannel, bars, chordVelocity, chordVelocity + 10)
             tracks.add(chordsTrack)
 
         }
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
         return saveAndPlayMidiFile(mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
     }
-
-
 
 
     fun saveAndPlayMidiFile(
