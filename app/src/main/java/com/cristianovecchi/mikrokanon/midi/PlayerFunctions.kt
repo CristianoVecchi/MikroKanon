@@ -136,12 +136,12 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
     val articulationDurations = trackData.articulationDurations ?: durations
 
     // Instrument changes
-    println()
-    println("CHANNEL: $channel")
+//    println()
+//    println("CHANNEL: $channel")
     var lastTick = -1L // avoid overriding
     trackData.changes.forEach{
         if(it.tick > lastTick){
-            println(it)
+//            println(it)
             val pc: MidiEvent = ProgramChange(it.tick, channel, it.instrument) // cambia strumento
             track.insertEvent(pc)
             lastTick = it.tick

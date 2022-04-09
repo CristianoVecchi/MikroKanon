@@ -86,7 +86,7 @@ object CounterpointInterpreter {
             // RANGES EXTENSION
             //val ranges = rangeTypes.map { ensemblePart.getOctavedRangeByType(it.first, it.second, isUpperPart) }
             val ranges = rangesAndEnsembleParts.map { it.second.getOctavedRangeByType(it.first.first, it.first.second, isUpperPart) }
-            println("rangeAndEnsembleParts: " + rangesAndEnsembleParts)
+            //println("rangeAndEnsembleParts: " + rangesAndEnsembleParts)
             val octaveTranspose = when(rangeTypes[0].second){
                 3 -> if(isUpperPart) 1 else -1
                 4 -> if(isUpperPart) 2 else -2
@@ -109,7 +109,7 @@ object CounterpointInterpreter {
                         melodyTypes.toIntArray(), rangesAndEnsembleParts.map{it.second})
 
             }
-            println("ChangesData: $changesData")
+            //println("ChangesData: $changesData")
 
             // NUANCES
             val lowLimit = 0.4f
@@ -187,7 +187,7 @@ object CounterpointInterpreter {
                     durIndex++
                 }
             }
-            println("Do the magic: Channel: $channel $tickChangesData")
+            //println("Do the magic: Channel: $channel $tickChangesData")
             TrackData(
                 pitchesData.toIntArray(), ticksData.toIntArray(), durationsData.toIntArray(),
                 velocitiesData.toIntArray(), glissandoData.toIntArray(), IntArray(pitchesData.size),

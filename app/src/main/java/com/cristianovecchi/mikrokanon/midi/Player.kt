@@ -169,7 +169,11 @@ object Player {
         //println("durations: $durations")
         val actualRhythm = {
             val actualRhythm = mutableListOf<Triple<RhythmPatterns, Boolean, Int>>()
-            (0 until (nTotalNotes / nRhythmSteps + (if (nTotalNotes % nRhythmSteps == 0) 0 else 1))).forEach { _ ->
+            if(nTotalNotes>=nRhythmSteps){
+                (0..(nTotalNotes / nRhythmSteps + (if (nTotalNotes % nRhythmSteps == 0) 0 else 1))).forEach { _ ->
+                    actualRhythm.addAll(rhythm)
+                }
+            } else {
                 actualRhythm.addAll(rhythm)
             }
             actualRhythm.toList()
@@ -309,39 +313,49 @@ object Player {
 //            bars.forEach { println(it) }
 //            if (bars.sumBy { it.duration.toInt() }
 //                    .toLong() != totalLength) println("BAR DURATIONS IS WRONG!!!")
-    println(bars)
+    //println(bars)
             val doubledBars = bars.mergeOnesInMetro()
                                     .resizeLastBar(totalLength)
                                     .splitBarsInTwoParts()
-            println(doubledBars)
+            //println(doubledBars)
             assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
 //            doubledBars.forEach{ print("${it.dodecaByte1stHalf!!.toString(2)} ")}
-            val chordFaultsGrids = doubledBars.map{ it.findChordFaultsGrid()}
+
            // chordFaultsGrids[0].forEach{println(it.contentToString())}
 
-            val jazzChords = JazzChord.values()
+
 
             val priority = listOf(5,11, 10,4, 3,9, 8,2, 1,7, 6,0).toIntArray()
             var lastRoot = (Insieme.trovaFond(doubledBars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
             //println("start root = $lastRoot")
-            for(index in doubledBars.indices){
-                val chordPosition = chordFaultsGrids[index].findBestChordPosition(lastRoot, priority)
+            var previousChord = JazzChord.EMPTY
+            doubledBars.forEach {
+                val chordFaultsGrid =  it.findChordFaultsGrid()
+                val priority = JazzChord.findRootMovementPriority(previousChord)
+                val chordPosition = chordFaultsGrid.findBestChordPosition(lastRoot, priority)
+                val jazzChords = JazzChord.selectChordArea(previousChord)
                 val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
-                doubledBars[index].chord1 = chord
+                it.chord1 = chord
                 lastRoot = chordPosition.first
-               // println("lastRoot = $lastRoot")
+                previousChord = chord.chord
             }
+
+               // println("lastRoot = $lastRoot")
             val chordsTrack = MidiTrack()
             val chordsChannel = 15
-            val pc: MidiEvent = ProgramChange(0L, chordsChannel, STRING_ORCHESTRA) // cambia strumento
+            val randomInstrument = listOf(
+                STRING_ORCHESTRA, SYN_BRASS_AND_LEAD, CHURCH_ORGAN, ACCORDION,
+                CRYSTAL, BLUES_ORGAN, ELECTRIC_PIANO_2, TREMOLO_STRINGS, MUTED_TRUMPET,
+                SYNTH_STRINGS_1, SYN_FANTASIA, VOICE_OOHS, FRENCH_HORN, BRASS_ENSEMBLE
+            )
+            val pc: MidiEvent = ProgramChange(0L, chordsChannel, randomInstrument.shuffled()[0]) // cambia strumento
 
             chordsTrack.insertEvent(pc)
             doubledBars.forEach { bar ->
                 val chord = bar.chord1!!
-                val noteNames = Lang.italian().noteNames
                 println("Chord: ${bar.dodecaByte1stHalf!!.toString(2)} ${chord.name}")
             }
-            findChordNotes(chordsTrack, chordsChannel, doubledBars, 15, 10)
+            findChordNotes(chordsTrack, chordsChannel, doubledBars, 15, 8)
             tracks.add(chordsTrack)
 
         }

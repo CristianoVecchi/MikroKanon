@@ -22,7 +22,7 @@ fun Array<IntArray>.findBestChordPosition(
 fun List<Bar>.splitBarsInTwoParts(): List<Bar>{
     val result = mutableListOf<Bar>()
     for (bar in this) {
-        println("Input "+ bar)
+        //println("Input "+ bar)
         val (numerator, denominator) = bar.metro
         val quantumDur = RhythmPatterns.denominatorMidiValue(denominator).toLong()
         if(bar.duration < quantumDur * numerator){ // don't split
@@ -31,8 +31,8 @@ fun List<Bar>.splitBarsInTwoParts(): List<Bar>{
             val den2nd = numerator / 2
             val den1st = den2nd + numerator % 2
             val duration1st = quantumDur * den1st
-            result.add(Bar(Pair(den1st, denominator),bar.tick, duration1st, minVelocity = bar.minVelocity).also { println(it) })
-            result.add(Bar(Pair(den2nd, denominator),bar.tick + duration1st, quantumDur * den2nd, minVelocity = bar.minVelocity).also { println(it) })
+            result.add(Bar(Pair(den1st, denominator),bar.tick, duration1st, minVelocity = bar.minVelocity))
+            result.add(Bar(Pair(den2nd, denominator),bar.tick + duration1st, quantumDur * den2nd, minVelocity = bar.minVelocity))
         }
     }
     return result.toList()
@@ -40,12 +40,16 @@ fun List<Bar>.splitBarsInTwoParts(): List<Bar>{
 fun List<Bar>.resizeLastBar(totalDuration: Long): List<Bar>{
     val result = mutableListOf<Bar>()
     var indexLastBar = 0
-    while(this[indexLastBar].tick  + this[indexLastBar].duration < totalDuration){
-        ++indexLastBar
+    this.forEachIndexed{ i, it ->
+        print("$i:${it.tick}-${it.tick+it.duration}, ")
+    }
+    for(i in this.indices){
+        if(this[i].tick  + this[i].duration >= totalDuration) break
+        indexLastBar++
     }
     val realSequence = this.subList(0, indexLastBar)
     val diff = totalDuration - realSequence.sumBy { it.duration.toInt() }
-    //println("Bar duration = ${realSequence.sumBy { it.duration.toInt() }} Total duration = $totalDuration  Diff = $diff ")
+    println("Bar duration = ${realSequence.sumBy { it.duration.toInt() }} Total duration = $totalDuration  Diff = $diff LastBarIndex=$indexLastBar ")
     if(diff == 0L) return realSequence
     result.addAll(realSequence)
     val lastBar = this[indexLastBar]
@@ -75,7 +79,7 @@ fun List<Bar>.mergeOnesInMetro(): List<Bar>{
         }
         index++
     }
-
+    println("mergeOneInMetro: nBars=${this.size} nResults=${result.size}")
     return result.toList()
 }
 
