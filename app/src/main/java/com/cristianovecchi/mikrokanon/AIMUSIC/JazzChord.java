@@ -42,22 +42,40 @@ public enum JazzChord {
         }
         return priorityFrom2and5;
     }
-    public static JazzChord[] selectChordArea(JazzChord previousChord){
+    public static JazzChord[] selectChordArea_11(JazzChord previousChord){
         switch (previousChord){
             case MAJOR: case MAJOR11AUM: case MINOR7MAJ:
-                return SECOND_GRADE_AREA;
+                return SECOND_GRADE_AREA_11;
             case HALFDIM: case DIM: case MINOR: case MINOR11: case MINOR9MIN11MIN13:
-                return DOMINANT_AREA;
+                return DOMINANT_AREA_11;
             case DOM: case DOMALT: case DOM9MIN: case SUS4: case DOM11AUM: case DOM5AUM11AUM: case DOMEXATONAL: case EMPTY:
-                return TONIC_AREA;
+                return TONIC_AREA_11;
         }
-        return TONIC_AREA;
+        return TONIC_AREA_11;
     }
-    public static JazzChord[] TONIC_AREA = {MAJOR, MINOR, MAJOR11AUM, MINOR11, MINOR7MAJ,
+    public static JazzChord[] selectChordArea_no_11(JazzChord previousChord){
+        switch (previousChord){
+            case MAJOR: case MINOR7MAJ:
+                return SECOND_GRADE_AREA_NO_11;
+            case HALFDIM: case DIM: case MINOR:
+                return DOMINANT_AREA_NO_11;
+            case DOM: case DOMALT: case DOM9MIN: case SUS4: case DOMEXATONAL: case EMPTY:
+                return TONIC_AREA_NO_11;
+        }
+        return TONIC_AREA_NO_11;
+    }
+    public static JazzChord[] TONIC_AREA_NO_11= {MAJOR, MINOR, MINOR7MAJ,
+            DOM, DOMALT, DOM9MIN, SUS4, DOMEXATONAL, HALFDIM, DIM, EMPTY};
+    public static JazzChord[] SECOND_GRADE_AREA_NO_11 = {HALFDIM, DIM, MINOR,
+            DOM, DOMALT, DOM9MIN, SUS4, DOMEXATONAL, MAJOR, MINOR7MAJ, EMPTY};
+    public static JazzChord[] DOMINANT_AREA_NO_11 = {DOM, DOMALT, DOM9MIN, SUS4, DOMEXATONAL,
+            HALFDIM, DIM, MAJOR, MINOR, MINOR7MAJ, EMPTY};
+
+    public static JazzChord[] TONIC_AREA_11 = {MAJOR, MINOR, MAJOR11AUM, MINOR11, MINOR7MAJ,
     DOM, DOMALT, DOM9MIN, SUS4, DOM11AUM, DOM5AUM11AUM, DOMEXATONAL, MINOR9MIN11MIN13, HALFDIM, DIM, EMPTY};
-    public static JazzChord[] SECOND_GRADE_AREA = {HALFDIM, DIM, MINOR, MINOR11, MINOR9MIN11MIN13,
+    public static JazzChord[] SECOND_GRADE_AREA_11 = {HALFDIM, DIM, MINOR, MINOR11, MINOR9MIN11MIN13,
             DOM, DOMALT, DOM9MIN, SUS4, DOM11AUM,DOM5AUM11AUM, DOMEXATONAL, MAJOR, MAJOR11AUM, MINOR7MAJ, EMPTY};
-    public static JazzChord[] DOMINANT_AREA = {DOM, DOMALT, DOM9MIN, SUS4, DOM11AUM,DOM5AUM11AUM, DOMEXATONAL,
+    public static JazzChord[] DOMINANT_AREA_11 = {DOM, DOMALT, DOM9MIN, SUS4, DOM11AUM,DOM5AUM11AUM, DOMEXATONAL,
     HALFDIM, DIM, MAJOR, MINOR, MAJOR11AUM, MINOR11, MINOR7MAJ, MINOR9MIN11MIN13, EMPTY};
 
     public int getDbyte() {

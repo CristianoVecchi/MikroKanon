@@ -1,15 +1,89 @@
 package com.cristianovecchi.mikrokanon.midi
 
 import com.cristianovecchi.mikrokanon.AIMUSIC.Bar
+import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.AIMUSIC.TrackData
 import com.cristianovecchi.mikrokanon.alterateBpmWithDistribution
+import com.cristianovecchi.mikrokanon.convertDodecabyteToInts
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.TimeSignature
 import kotlin.math.abs
-
+fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, roots: MutableList<Int>,
+                                     diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = false) {
+    data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
+    val notes = mutableListOf<Note>()
+    val rootNotes = mutableListOf<Note>()
+    for (absPitch in 0..11) {
+        val contains = BooleanArray(bars.size) { false }
+        bars.forEachIndexed { index, bar ->
+            if (convertDodecabyteToInts(bar.dodecaByte1stHalf!!).contains(absPitch)) contains[index] = true
+        }
+        var index = 0
+        var lastNote = Note(-1, 0, 0,0)
+        while (index < contains.size) {
+            if (contains[index]) {
+                val bar = bars[index]
+                if (lastNote.pitch == -1) {
+                    lastNote = Note(absPitch, bar.tick, bar.duration, bar.minVelocity!!)
+                } else {
+                    lastNote.duration += bar.duration
+                }
+            } else {
+                if (lastNote.pitch != -1) {
+                    notes.add(lastNote)
+                    lastNote = Note(-1, 0, 0,0)
+                }
+            }
+            index++
+        }
+        if (lastNote.pitch != -1) {
+            notes.add(lastNote)
+        }
+    }
+    if(!justVoicing){
+        var lastRootNote = Note(-1,0,0, 0)
+        var index = 0
+        while (index < roots.size) {
+            val bar = bars[index]
+            val newRoot = roots[index]
+            if (newRoot != lastRootNote.pitch) {
+                lastRootNote = Note(newRoot, bar.tick, bar.duration, bar.minVelocity!!-5)
+                rootNotes.add(lastRootNote)
+            } else {
+                lastRootNote.duration += bar.duration
+            }
+            index ++
+        }
+    }
+    notes.sortedBy { it.tick }.forEach {
+        val absPitch = it.pitch
+        val tick = it.tick
+        val duration = it.duration
+        for (octave in 4..7) {
+            Player.insertNoteWithGlissando(
+                chordsTrack, tick, duration, chordsChannel,
+                octave * 12 + absPitch, it.velocity - diffChordVelocity, 70, 0
+            )
+        }
+    }
+    if(!justVoicing){
+        rootNotes.sortedBy { it.tick }.forEach {
+            //println("Root: $it")
+            val absPitch = it.pitch
+            val tick = it.tick
+            val duration = it.duration
+            for (octave in 1..4) {
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, duration, chordsChannel,
+                    octave * 12 + absPitch, it.velocity - diffRootVelocity, 70 + 10, 0
+                )
+            }
+        }
+    }
+}
 fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = false) {
     data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
@@ -17,8 +91,6 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
     val notes = mutableListOf<Note>()
     val roots = mutableListOf<Note>()
     for (absPitch in 0..11) {
-        val barIndex = 0
-        val alreadyPresent = false
         val contains = BooleanArray(bars.size) { false }
         bars.forEachIndexed { index, bar ->
             if (bar.chord1!!.absoluteNotes.contains(absPitch)) contains[index] = true
@@ -77,7 +149,7 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
             val absPitch = it.pitch
             val tick = it.tick
             val duration = it.duration
-            for (octave in 1..3) {
+            for (octave in 1..4) {
                 Player.insertNoteWithGlissando(
                     chordsTrack, tick, duration, chordsChannel,
                     octave * 12 + absPitch, it.velocity - diffRootVelocity, 70 + 10, 0

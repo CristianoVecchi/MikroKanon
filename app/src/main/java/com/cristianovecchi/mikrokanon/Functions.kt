@@ -61,6 +61,15 @@ fun convertFlagsToInts(flags: Int): Set<Int>{
     }
     return result.toSet()
 }
+fun convertDodecabyteToInts(flags: Int): Set<Int>{
+    val result = mutableSetOf<Int>()
+    for (i in 0..11) {
+        if (1 shl i and flags > 0) {
+            result.add(i)
+        }
+    }
+    return result.toSet()
+}
 fun SnapshotStateMap<Int,Int>.removeAndScale(index: Int){
     if(this.containsKey(index)) this.remove(index)
     this.keys.sorted().map{ if(it > index) {this[it-1]= this[it]!!; this.remove(it)}}

@@ -25,7 +25,7 @@ fun List<Bar>.splitBarsInTwoParts(): List<Bar>{
         //println("Input "+ bar)
         val (numerator, denominator) = bar.metro
         val quantumDur = RhythmPatterns.denominatorMidiValue(denominator).toLong()
-        if(bar.duration < quantumDur * numerator){ // don't split
+        if(bar.duration < quantumDur * numerator || numerator == 1){ // don't split
             result.add(bar)
         } else {
             val den2nd = numerator / 2
@@ -87,8 +87,8 @@ fun List<Bar>.mergeOnesInMetro(): List<Bar>{
 data class Bar(var metro: Pair<Int,Int> = METRO_4_4, val tick: Long, var duration: Long,
                var dodecaByte1stHalf: Int? = null, var dodecaByte2ndHalf: Int? = null,
                 var chord1: Chord? = null, var chord2: Chord? = null, var minVelocity: Int? = null){
-    fun findChordFaultsGrid(): Array<IntArray>{
-        val jazzChordBytes = JazzChord.values().map { it.dbyte }
+    fun findChordFaultsGrid(jazzChords: Array<JazzChord>): Array<IntArray>{
+        val jazzChordBytes = jazzChords.map { it.dbyte }
         val chordFaultsGrid = Array(12) {IntArray(jazzChordBytes.size)}
         dodecaByte1stHalf?.let{
             jazzChordBytes.forEachIndexed{ jazzChordIndex, jazzChordByte ->

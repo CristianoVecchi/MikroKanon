@@ -307,61 +307,30 @@ object Player {
         tracks.add(tempoTrack)
         tracks.addAll(counterpointTracks)
 
+
         // JAZZ HARM
-        val jazz = true
+        val jazz = false
         if (jazz) {
-//            bars.forEach { println(it) }
-//            if (bars.sumBy { it.duration.toInt() }
-//                    .toLong() != totalLength) println("BAR DURATIONS IS WRONG!!!")
-    //println(bars)
             val doubledBars = bars.mergeOnesInMetro()
-                                    .resizeLastBar(totalLength)
-                                    .splitBarsInTwoParts()
-            //println(doubledBars)
+                .resizeLastBar(totalLength)
+                .splitBarsInTwoParts()
             assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
-//            doubledBars.forEach{ print("${it.dodecaByte1stHalf!!.toString(2)} ")}
-
-           // chordFaultsGrids[0].forEach{println(it.contentToString())}
-
-
-
-            val priority = listOf(5,11, 10,4, 3,9, 8,2, 1,7, 6,0).toIntArray()
-            var lastRoot = (Insieme.trovaFond(doubledBars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
-            //println("start root = $lastRoot")
-            var previousChord = JazzChord.EMPTY
-            doubledBars.forEach {
-                val chordFaultsGrid =  it.findChordFaultsGrid()
-                val priority = JazzChord.findRootMovementPriority(previousChord)
-                val chordPosition = chordFaultsGrid.findBestChordPosition(lastRoot, priority)
-                val jazzChords = JazzChord.selectChordArea(previousChord)
-                val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
-                it.chord1 = chord
-                lastRoot = chordPosition.first
-                previousChord = chord.chord
-            }
-
-               // println("lastRoot = $lastRoot")
-            val chordsTrack = MidiTrack()
-            val chordsChannel = 15
-            val randomInstrument = listOf(
-                STRING_ORCHESTRA, SYN_BRASS_AND_LEAD, CHURCH_ORGAN, ACCORDION,
-                CRYSTAL, BLUES_ORGAN, ELECTRIC_PIANO_2, TREMOLO_STRINGS, MUTED_TRUMPET,
-                SYNTH_STRINGS_1, SYN_FANTASIA, VOICE_OOHS, FRENCH_HORN, BRASS_ENSEMBLE
-            )
-            val pc: MidiEvent = ProgramChange(0L, chordsChannel, randomInstrument.shuffled()[0]) // cambia strumento
-
-            chordsTrack.insertEvent(pc)
-            doubledBars.forEach { bar ->
-                val chord = bar.chord1!!
-                println("Chord: ${bar.dodecaByte1stHalf!!.toString(2)} ${chord.name}")
-            }
-            findChordNotes(chordsTrack, chordsChannel, doubledBars, 15, 8)
+            val chordsTrack = createJazzChordsTrack(doubledBars, false)
             tracks.add(chordsTrack)
-
+        }
+        val xwh = true// extended weighted harmony
+        if (xwh) {
+            val doubledBars = bars.mergeOnesInMetro()
+                .resizeLastBar(totalLength)
+                .splitBarsInTwoParts()
+            assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
+            val chordsTrack = createExtendedWeightedHarmonyTrack(doubledBars)
+            tracks.add(chordsTrack)
         }
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
         return saveAndPlayMidiFile(mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
     }
+
 
 
     fun saveAndPlayMidiFile(
