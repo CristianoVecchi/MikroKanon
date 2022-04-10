@@ -19,6 +19,7 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
     for (absPitch in 0..11) {
         val contains = BooleanArray(bars.size) { false }
         bars.forEachIndexed { index, bar ->
+           // println("Bar$index = ${bar.dodecaByte1stHalf!!.toString(2)}")
             if (convertDodecabyteToInts(bar.dodecaByte1stHalf!!).contains(absPitch)) contains[index] = true
         }
         var index = 0
@@ -59,6 +60,7 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
         }
     }
     notes.sortedBy { it.tick }.forEach {
+        //print("Chord note: ${it.pitch}, ")
         val absPitch = it.pitch
         val tick = it.tick
         val duration = it.duration
@@ -176,7 +178,7 @@ fun insertChordNotes(chordsTrack: MidiTrack, channel: Int, root: Int,
     }
 }
 fun assignDodecaBytesToBars(bars: Array<Bar>, counterpointTrackData: List<TrackData>, withArticulation: Boolean = false) {
-    bars.forEach { it.dodecaByte1stHalf = 0 ; it.dodecaByte2ndHalf = 0 ; it.minVelocity = 127}
+    bars.forEach { it.dodecaByte1stHalf = 0 ; it.dodecaByte2ndHalf = 0 ; it.minVelocity = 80}
     counterpointTrackData.forEach{ trackData ->
         val durations = if(trackData.articulationDurations != null && withArticulation) trackData.articulationDurations!! else trackData.durations
         var barIndex = 0

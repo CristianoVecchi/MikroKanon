@@ -175,6 +175,8 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     LUDUS(RhythmType.QUOTE,"Ludus",listOf(60,-180,60,-180,60,-180,60,-180,60,-180, 120,120,180,-60,60,-60,60,-60,480), Pair(5,8)),
     PRECIPITATO(RhythmType.QUOTE,"Precipitato",listOf(120,-120,240, 480,180,-60 ,30,-210,30,-210,
         120,-120,180,-60 ,120,-120,180,-60 ,30,-210,30,-210,30,-210),Pair(7,8)),
+    HAPPY_BIRTHDAY_1(RhythmType.QUOTE,"Birthday 1",listOf(320,160,480,480,480,480,-480), Pair(3,4)),
+    HAPPY_BIRTHDAY_2(RhythmType.QUOTE,"Birthday 2",listOf(320,160,480,480,480,480,480), Pair(3,4)),
     BULGARIAN1(RhythmType.BULGARIAN,"Bulgarian1 4+2+3♫",listOf(H1,N1,N1dotted).flatten(),Pair(9,8)),
     BULGARIAN2(RhythmType.BULGARIAN,"Bulgarian2 2+2+3♫",listOf(N1,N1,N1dotted).flatten(),Pair(7,8)),
     BULGARIAN3(RhythmType.BULGARIAN,"Bulgarian3 2+3♫",listOf(N1,N1dotted).flatten(),Pair(5,8)),
