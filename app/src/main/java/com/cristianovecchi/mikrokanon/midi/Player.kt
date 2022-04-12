@@ -169,6 +169,7 @@ object Player {
         //println("durations: $durations")
         val actualRhythm = {
             val actualRhythm = mutableListOf<Triple<RhythmPatterns, Boolean, Int>>()
+            //println("TOTAL NOTES: $nTotalNotes   STEPS: $nRhythmSteps")
             if(nTotalNotes>=nRhythmSteps){
                 (0..(nTotalNotes / nRhythmSteps + (if (nTotalNotes % nRhythmSteps == 0) 0 else 1))).forEach { _ ->
                     actualRhythm.addAll(rhythm)
@@ -308,23 +309,19 @@ object Player {
         tracks.addAll(counterpointTracks)
 
 
-        // JAZZ HARM
-        val jazz = false
-        if (jazz) {
+        // CHORD TRACK
+        val harmonization = Harmonization.FULL12
+        if (harmonization != Harmonization.NONE){
             val doubledBars = bars.mergeOnesInMetro()
                 .resizeLastBar(totalLength)
                 .splitBarsInTwoParts()
             assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
-            val chordsTrack = createJazzChordsTrack(doubledBars, false)
-            tracks.add(chordsTrack)
-        }
-        val xwh = true// extended weighted harmony
-        if (xwh) {
-            val doubledBars = bars.mergeOnesInMetro()
-                .resizeLastBar(totalLength)
-                .splitBarsInTwoParts()
-            assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
-            val chordsTrack = createExtendedWeightedHarmonyTrack(doubledBars)
+            val chordsTrack = when (harmonization){
+                Harmonization.NONE -> MidiTrack()
+                Harmonization.JAZZ -> createJazzChordsTrack(doubledBars, true)
+                Harmonization.XWH -> createExtendedWeightedHarmonyTrack(doubledBars)
+                Harmonization.FULL12 -> createFull12Track(doubledBars, 36)
+            }
             tracks.add(chordsTrack)
         }
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)

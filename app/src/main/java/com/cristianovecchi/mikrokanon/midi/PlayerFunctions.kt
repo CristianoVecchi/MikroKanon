@@ -59,20 +59,20 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
             index ++
         }
     }
-    notes.sortedBy { it.tick }.forEach {
-        //print("Chord note: ${it.pitch}, ")
-        val absPitch = it.pitch
-        val tick = it.tick
-        val duration = it.duration
-        for (octave in 4..7) {
-            Player.insertNoteWithGlissando(
-                chordsTrack, tick, duration, chordsChannel,
-                octave * 12 + absPitch, it.velocity - diffChordVelocity, 70, 0
-            )
-        }
-    }
+
     if(!justVoicing){
-        rootNotes.sortedBy { it.tick }.forEach {
+        rootNotes.sortedBy { it.tick }.forEach {notes.sortedBy { it.tick }.forEach {
+            //print("Chord note: ${it.pitch}, ")
+            val absPitch = it.pitch
+            val tick = it.tick
+            val duration = it.duration
+            for (octave in 4..7) {
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, duration, chordsChannel,
+                    octave * 12 + absPitch, it.velocity - diffChordVelocity, 70, 0
+                )
+            }
+        }
             //println("Root: $it")
             val absPitch = it.pitch
             val tick = it.tick
