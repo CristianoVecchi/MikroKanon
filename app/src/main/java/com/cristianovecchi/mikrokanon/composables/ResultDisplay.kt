@@ -11,7 +11,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -112,13 +111,13 @@ fun ResultDisplay(model: AppViewModel,
         val buttonsBackgroundColor = colors.buttonsDisplayBackgroundColor
         val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
 
-        val dialogState by lazy { mutableStateOf(false) }
-        val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
-        val intervalSetDialogData by lazy { mutableStateOf(MultiListDialogData())}
-        val transposeDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
-        val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
-        val selectCounterpointDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
-        val multiSequenceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+        val dialogState = remember { mutableStateOf(false) }
+        val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
+        val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
+        val transposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+        val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+        val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
+        val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
 
         val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
 
@@ -272,10 +271,10 @@ fun ResultDisplay(model: AppViewModel,
                 ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model, language, filledSlots = filledSlots)
                 MultiListDialog(intervalSetDialogData, dimensions, language.OKbutton)
                 TransposeDialog(transposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
-                CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
+                CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OKbutton, model)
                 SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                     dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
-                MultiSequenceDialog(multiSequenceDialogData, dimensions)
+                MultiSequenceDialog(multiSequenceDialogData, buttonsDialogData, dimensions, model)
                 // STACK ICONS
                 Row(modifier = Modifier
                     .fillMaxWidth()
@@ -381,49 +380,51 @@ fun ResultDisplay(model: AppViewModel,
                                     onTritoneSubstitution = { onTritoneSubstitution(); close() },
                                     onRound = { onRound(); close() },
                                     onCadenza = {
-                                        close();
                                         cadenzaDialogData.value = MultiNumberDialogData(true,
                                             language.selectCadenzaForm, model.cadenzaValues, 0, 16, model = model,
-                                        ){ newValues ->
-                                            model.cadenzaValues = newValues
-                                            onCadenza( newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
-                                        }
+                                            dispatchCsv= { newValues ->
+                                                close()
+                                                model.cadenzaValues = newValues
+                                                onCadenza( newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
+                                            }
+                                        )
                                     },
                                     onScarlatti = { onScarlatti(); close() },
                                     onOverlap = {
-                                        buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                         selectCounterpointDialogData.value = ButtonsDialogData(true,
                                             language.selectToOverlap, model,
                                             onCounterpointSelected = { position ->
+                                                close()
                                                 onOverlap(position, false)
                                                 selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
                                             })
                                     },
                                     onCrossover = {
-                                        buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                         selectCounterpointDialogData.value = ButtonsDialogData(true,
                                             language.selectToCrossOver, model,
                                             onCounterpointSelected = { position ->
+                                                close()
                                                 onOverlap(position, true)
                                                 selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
                                             })
                                     },
                                     onGlue = {
-                                        buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                         selectCounterpointDialogData.value = ButtonsDialogData(true,
                                             language.selectToOverlap, model,
                                             onCounterpointSelected = { position ->
+                                                close()
                                                 onGlue(position)
                                                 selectCounterpointDialogData.value = ButtonsDialogData(model = model) // Close Counterpoint Dialog
                                             })
                                     },
                                     onMaze = {
                                         //onMaze(listOf(1,2,3,4))//,6,7,8,9,10, 11))
-                                        buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
+                                        //buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                         val inputIntSequences = selCounterpoint.parts.map{ it.absPitches.toList() }
                                         multiSequenceDialogData.value = MultiNumberDialogData(true,
                                             language.addSequencesToMaze, intSequences = inputIntSequences, model = model,
                                             dispatchIntLists = { intSequences ->
+                                                close()
                                                 onMaze(intSequences)
                                             }
                                         )
@@ -433,19 +434,15 @@ fun ResultDisplay(model: AppViewModel,
                                     onSingle = { onSingle(); close() },
                                     onSort = { sortType -> onSort(sortType); close() },
                                     onUpsideDown = { onUpsideDown(); close()},
-                                    onCounterpointSelected = { position -> onSavingCounterpoint(position); close()},
+                                    onCounterpointSelected = { position -> onSavingCounterpoint(position)},
                                     onDoppelgänger = { onDoppelgänger(); close()},
                                     onPedal1 = { onPedal(1); close() },
                                     onPedal3 = { onPedal(3); close() },
                                     onPedal5 = { onPedal(5); close() },
                                 )
-                                {
-                                    close()
-                                }
                             }
                         }
                     )
-
                     FreePartsButtons(
                         colors = colors,
                         fontSize = dimensions.outputFPbuttonFontSize,

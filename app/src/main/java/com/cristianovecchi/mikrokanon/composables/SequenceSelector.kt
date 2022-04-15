@@ -83,11 +83,11 @@ fun SequenceSelector(model: AppViewModel,
             val selected by model.selectedSequence.observeAsState(initial = -1)
             val sequences by model.sequences.observeAsState(emptyList())
             //val snackbarVisibleState = remember { mutableStateOf(false) }
-            val dialogState by lazy { mutableStateOf(false) }
-            val buttonsDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
-            val cadenzaDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
-            val selectCounterpointDialogData by lazy { mutableStateOf(ButtonsDialogData(model = model))}
-            val multiSequenceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+            val dialogState = remember { mutableStateOf(false) }
+            val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
+            val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+            val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
+            val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val buttonSize = dimensions.selectorButtonSize
             val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
             val filledSlots by model.filledSlots.asFlow().collectAsState(initial = setOf())
@@ -108,7 +108,7 @@ fun SequenceSelector(model: AppViewModel,
             }
             SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                 dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
-            CadenzaDialog(cadenzaDialogData, dimensions, language.OKbutton)
+            CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OKbutton, model)
             SequenceScrollableColumn( listState = listState, colors = appColors,
                 modifier = modifier3, fontSize = dimensions.selectorClipFontSize,
                 notesNames = notesNames,
@@ -116,7 +116,7 @@ fun SequenceSelector(model: AppViewModel,
                 sequences = sequences,
                 selected = selected, onSelect = onSelectComposition
             )
-            MultiSequenceDialog(multiSequenceDialogData, dimensions)
+            MultiSequenceDialog(multiSequenceDialogData, buttonsDialogData, dimensions, model)
 
             Column(modifier1) {
                 Row(modifier = Modifier.fillMaxSize(),horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
@@ -148,6 +148,7 @@ fun SequenceSelector(model: AppViewModel,
                         buttonSize = buttonSize,
                         onAdd = { dialogState.value = true },
                         onSpecialFunctions = {
+                            val close = { buttonsDialogData.value = ButtonsDialogData(model = model) }
                             buttonsDialogData.value = ButtonsDialogData(true,
                                 language.selectSpecialFunction,
                                 model, isActiveWaves = activeButtons.waves,
@@ -159,17 +160,14 @@ fun SequenceSelector(model: AppViewModel,
                                 onRound = { onRound(sequences[selected]) },
                                // onCadenza = { onCadenza(sequences[selected]) },
                                 onCadenza = {
-                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                     cadenzaDialogData.value = MultiNumberDialogData(true,
                                     language.selectCadenzaForm, model.cadenzaValues, 0, 16, model = model,
-                                        ){ newValues ->
-                                        model.cadenzaValues = newValues
-                                        onCadenza(sequences[selected], newValues.extractIntsFromCsv()) // CADENZA DIALOG OK BUTTON
-                                    }
-                                },
+                                        dispatchCsv= { newValues ->
+                                            model.cadenzaValues = newValues
+                                            onCadenza( sequences[selected], newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
+                                        }) },
                                 onScarlatti = { onScarlatti(sequences[selected]) },
                                 onOverlap = {
-                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                     selectCounterpointDialogData.value = ButtonsDialogData(true,
                                     language.selectToOverlap, model,
                                     onCounterpointSelected = { position ->
@@ -178,7 +176,6 @@ fun SequenceSelector(model: AppViewModel,
                                     })
                                 },
                                 onCrossover = {
-                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                     selectCounterpointDialogData.value = ButtonsDialogData(true,
                                         language.selectToCrossOver, model,
                                         onCounterpointSelected = { position ->
@@ -187,7 +184,6 @@ fun SequenceSelector(model: AppViewModel,
                                         })
                                 },
                                 onGlue = {
-                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                     selectCounterpointDialogData.value = ButtonsDialogData(true,
                                         language.selectToGlue, model,
                                         onCounterpointSelected = { position ->
@@ -206,7 +202,6 @@ fun SequenceSelector(model: AppViewModel,
                                 onMK6reducted = { onMikroKanons6reducted(sequences[selected]) },
                                 onMaze = {
                                          //onMaze(listOf(1,2,3,4))//,6,7,8,9,10, 11))
-                                    buttonsDialogData.value = ButtonsDialogData(model = model)// Close Buttons Dialog
                                     val intSequences = listOf(sequences[selected].map{ it.abstractNote })
                                     multiSequenceDialogData.value = MultiNumberDialogData(true,
                                         language.addSequencesToMaze, intSequences = intSequences, model = model,

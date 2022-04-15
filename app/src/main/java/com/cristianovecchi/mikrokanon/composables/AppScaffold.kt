@@ -134,7 +134,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
     val customColorsDialogData by lazy { mutableStateOf(CustomColorsDialogData(model = model))}
     val ritornelloDialogData by lazy {mutableStateOf(ListDialogData())}
     val vibratoDialogData by lazy {mutableStateOf(ListDialogData())}
-    val zodiacDialogData by lazy{ mutableStateOf(MultiListDialogData())}
+    val zodiacDialogData by lazy { mutableStateOf(MultiListDialogData())}
 
     val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
     val colors = model.appColors

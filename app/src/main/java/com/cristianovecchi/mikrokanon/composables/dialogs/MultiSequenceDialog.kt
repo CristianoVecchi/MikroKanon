@@ -33,18 +33,21 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
+                        parentDialogData: MutableState<ButtonsDialogData>, // is necessary a reference for the parent dialog
                         dimensions: Dimensions,
+                        model: AppViewModel,
                         onDismissRequest: () -> Unit = {
                             multiNumberDialogData.value =
                                 MultiNumberDialogData(model = multiNumberDialogData.value.model,
-                                    value = multiNumberDialogData.value.value) }) {
+                                    value = multiNumberDialogData.value.value)
+                            //parentDialogData.value = ButtonsDialogData(model = model)
+                        }) {
     if (multiNumberDialogData.value.dialogState) {
-        val model = multiNumberDialogData.value.model
         val lang = Lang.provideLanguage(model.getUserLangDef())
         val notesNames = lang.noteNames
-        val listDialogData by lazy { mutableStateOf(ListDialogData())}
+        val listDialogData = remember { mutableStateOf(ListDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            ListDialog(listDialogData, dimensions, lang.OKbutton)
+            ListDialog(listDialogData, dimensions, lang.OKbutton, false, multiNumberDialogData)
             val width = if(dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             val height = (dimensions.height / dimensions.dpDensity).toInt().dp

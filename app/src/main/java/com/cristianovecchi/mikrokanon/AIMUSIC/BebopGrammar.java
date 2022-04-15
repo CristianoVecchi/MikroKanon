@@ -6,14 +6,39 @@ public class BebopGrammar {
     private static HashMap<JazzChord,Integer[]> grammar;
     public static void initGrammar(){
         grammar = new HashMap<>();
-        Integer[] valuesMajor7 = {0b001010010001,0b100100100100}; // beat notes and passage notes for Major7
-        grammar.put(JazzChord.MAJOR,valuesMajor7);
+        // JUST 7 or 6 CHORDS
+        Integer[] valuesMajorJust7M = {0b001010010001,0b100100100100}; // beat notes and passage notes for Major7 just 7
+        grammar.put(JazzChord.MAJOR_JUST7MAJ,valuesMajorJust7M);
 
+        Integer[] valuesMajorAdd6 = {0b001010010001,0b100100100100}; // beat notes and passage notes for Major add6
+        grammar.put(JazzChord.MAJOR_ADD6,valuesMajorAdd6);
+
+        Integer[] valuesMinorJust7 = {0b010010001001,0b101000100100}; // beat notes and passage notes for minor just 7
+        grammar.put(JazzChord.MINOR_JUST7,valuesMinorJust7);
+
+        Integer[] valuesMinorAdd6 = {0b001010001001,0b100100100100}; // beat notes and passage notes for minor add 6M
+        grammar.put(JazzChord.MINOR_ADD6,valuesMinorAdd6);
+
+        Integer[] valuesDomJust7 = {0b010010010001,0b101000100100}; // beat notes and passage notes for dominant 7 (just 7)
+        grammar.put(JazzChord.DOM_JUST7,valuesDomJust7);
+
+        Integer[] valuesHalfDimJust7 = {0b010001001001,0b100100100010}; // beat notes and passage notes for an Empty Chord: Solo style
+        grammar.put(JazzChord.HALFDIM_JUST7,valuesHalfDimJust7);
+
+        Integer[] valuesSus4just7 = {0b010010100001,0b101001000100}; // beat notes and passage notes for Sus4 (C D F F# G A Bb B)
+        grammar.put(JazzChord.SUS4_JUST7,valuesSus4just7);
+
+        Integer[] valuesDim = {0b001001001001,0b100100100100}; // beat notes and passage notes for dim (CD EbF F#G# AB) octatonica
+        grammar.put(JazzChord.DIM,valuesDim);
+        // FULL JAZZ CHORDS
         Integer[] valuesMajor7add11aum = {0b001010010001,0b100101000100}; // beat notes and passage notes for Major7#11
         grammar.put(JazzChord.MAJOR11AUM,valuesMajor7add11aum);
 
 //        Integer[] valuesMajorDoubleHarm = {0b100010010001,0b000100100010}; // beat notes and passage notes for Major7 DoubleHarmonic Scale
 //        grammar.put(JazzChord.DOUBLEHARM,valuesMajorDoubleHarm);
+
+        Integer[] valuesMajor7 = {0b001010010001,0b100100100100}; // beat notes and passage notes for Major7
+        grammar.put(JazzChord.MAJOR,valuesMajor7);
 
         Integer[] valuesMinor7 = {0b010010001001,0b101000100100}; // beat notes and passage notes for minor7
         grammar.put(JazzChord.MINOR,valuesMinor7);
@@ -57,8 +82,6 @@ public class BebopGrammar {
         Integer[] valuesSus4 = {0b010010100001,0b101001000100}; // beat notes and passage notes for Sus4 (C D F F# G A Bb B)
         grammar.put(JazzChord.SUS4,valuesSus4);
 
-       Integer[] valuesDim = {0b001001001001,0b100100100100}; // beat notes and passage notes for dim (CD EbF F#G# AB) octatonica
-        grammar.put(JazzChord.DIM,valuesDim);
     }
     public static Integer[] getBeatandPassageNotes(JazzChord jazzChord){
         Integer[] bytes = new Integer[2];

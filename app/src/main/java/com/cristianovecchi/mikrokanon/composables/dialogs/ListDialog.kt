@@ -24,7 +24,9 @@ import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
 fun ListDialog(listDialogData: MutableState<ListDialogData>, dimensions: Dimensions,
-               okText: String = "OK", fillPrevious: Boolean = false) {
+               okText: String = "OK", fillPrevious: Boolean = false,
+               parentDialogData: MutableState<out Any>? = null) // is necessary a reference for the parent dialog if this is used as child dialog
+{
     SingleSelectListDialog(
         listDialogData = listDialogData, dimensions = dimensions,
         okText = okText, fillPrevious,

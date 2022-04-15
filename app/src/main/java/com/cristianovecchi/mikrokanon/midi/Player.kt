@@ -310,7 +310,7 @@ object Player {
 
 
         // CHORD TRACK
-        val harmonization = Harmonization.FULL12
+        val harmonization = Harmonization.JAZZ
         if (harmonization != Harmonization.NONE){
             val doubledBars = bars.mergeOnesInMetro()
                 .resizeLastBar(totalLength)
@@ -318,9 +318,12 @@ object Player {
             assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
             val chordsTrack = when (harmonization){
                 Harmonization.NONE -> MidiTrack()
-                Harmonization.JAZZ -> createJazzChordsTrack(doubledBars, true)
+                Harmonization.POP -> createPopChordsTrack(doubledBars)
+                Harmonization.JAZZ -> createJazzChordsTrack(doubledBars, false)
+                Harmonization.JAZZ11 -> createJazzChordsTrack(doubledBars, true)
                 Harmonization.XWH -> createExtendedWeightedHarmonyTrack(doubledBars)
                 Harmonization.FULL12 -> createFull12Track(doubledBars, 36)
+
             }
             tracks.add(chordsTrack)
         }

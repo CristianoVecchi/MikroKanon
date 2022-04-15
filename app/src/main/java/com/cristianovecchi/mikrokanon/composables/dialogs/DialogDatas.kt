@@ -24,6 +24,7 @@ data class MultiNumberDialogData(val dialogState: Boolean = false, val title:Str
                                  val names: List<String> = listOf(),
                                  val intSequences: List<List<Int>> = listOf(),
                                  val dispatchIntLists: (List<List<Int>>) -> Unit = {},
+                                 val dispatchCsv: (String) -> Unit = {},
                                  val onSubmitButtonClick: (String) -> Unit = {})
 
 data class MultiFloatDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="1.0",

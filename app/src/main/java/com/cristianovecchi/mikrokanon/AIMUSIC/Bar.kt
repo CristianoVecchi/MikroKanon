@@ -40,16 +40,16 @@ fun List<Bar>.splitBarsInTwoParts(): List<Bar>{
 fun List<Bar>.resizeLastBar(totalDuration: Long): List<Bar>{
     val result = mutableListOf<Bar>()
     var indexLastBar = 0
-    this.forEachIndexed{ i, it ->
-        print("$i:${it.tick}-${it.tick+it.duration}, ")
-    }
+//    this.forEachIndexed{ i, it ->
+//        print("$i:${it.tick}-${it.tick+it.duration}, ")
+//    }
     for(i in this.indices){
         if(this[i].tick  + this[i].duration >= totalDuration) break
         indexLastBar++
     }
     val realSequence = this.subList(0, indexLastBar)
     val diff = totalDuration - realSequence.sumBy { it.duration.toInt() }
-    println("Bar duration = ${realSequence.sumBy { it.duration.toInt() }} Total duration = $totalDuration  Diff = $diff LastBarIndex=$indexLastBar ")
+//    println("Bar duration = ${realSequence.sumBy { it.duration.toInt() }} Total duration = $totalDuration  Diff = $diff LastBarIndex=$indexLastBar ")
     if(diff == 0L) return realSequence
     result.addAll(realSequence)
     val lastBar = this[indexLastBar]

@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.getNoteAndRestSymbols
@@ -23,9 +24,22 @@ import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 
 @Composable
-fun CadenzaDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dimensions: Dimensions,
-                  okText: String = "OK",
-                  onDismissRequest: () -> Unit = { multiNumberDialogData.value = MultiNumberDialogData(model = multiNumberDialogData.value.model, value = multiNumberDialogData.value.value) }) {
+fun CadenzaDialog(
+    multiNumberDialogData: MutableState<MultiNumberDialogData>,
+    parentDialogData: MutableState<ButtonsDialogData>, // is necessary a reference for the parent dialog
+    dimensions: Dimensions,
+    okText: String = "OK",
+    model: AppViewModel,
+    onDismissRequest: () -> Unit = {
+        multiNumberDialogData.value =
+            MultiNumberDialogData(
+                model = multiNumberDialogData.value.model,
+                value = multiNumberDialogData.value.value
+            )
+        //parentDialogData.value = ButtonsDialogData(model = model)
+
+    }
+) {
 
     if (multiNumberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
@@ -246,7 +260,7 @@ fun CadenzaDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, di
                                 iconColor = Color.Green,
                                 colors = model.appColors
                             ) {
-                                multiNumberDialogData.value.onSubmitButtonClick.invoke(cadenzaText)
+                                multiNumberDialogData.value.dispatchCsv.invoke(cadenzaText)
                                 onDismissRequest.invoke()
                             }
 
