@@ -299,24 +299,29 @@ object Player {
         tracks.addAll(counterpointTracks)
 
         // CHORD TRACK
-        val harmonizations = listOf<HarmonizationData>(
-            HarmonizationData(HarmonizationType.JAZZ11, 63, 0.8f),
-            HarmonizationData(HarmonizationType.JAZZ, 62, 0.6f),
-            HarmonizationData(HarmonizationType.NONE),
-            HarmonizationData(HarmonizationType.XWH, 54, 0.9f),
-        )
-
-        val doubledBars = bars.mergeOnesInMetro()
-            .resizeLastBar(totalLength)
-            .splitBarsInTwoParts()
-        assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
-        val barGroups = doubledBars.splitBarsInGroups(harmonizations.size)
-        val chordsTrack = MidiTrack()
-        addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations)
-        if(audio8D.isNotEmpty()){
-            setAudio8D(chordsTrack, 12, 15)
+//        val harmonizations = listOf<HarmonizationData>(
+//            HarmonizationData(HarmonizationType.JAZZ11, 63, 0.8f),
+//            HarmonizationData(HarmonizationType.JAZZ, 62, 0.6f),
+//            HarmonizationData(HarmonizationType.NONE),
+//            HarmonizationData(HarmonizationType.XWH, 54, 0.9f),
+//        )
+        // CHORD TRACK IF NEEDED
+        println(harmonizations)
+        if(harmonizations.isNotEmpty()){
+            val doubledBars = bars.mergeOnesInMetro()
+                .resizeLastBar(totalLength)
+                .splitBarsInTwoParts()
+            assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
+            val barGroups = if(harmonizations.size == 1) listOf(doubledBars) else doubledBars.splitBarsInGroups(harmonizations.size)
+            val chordsTrack = MidiTrack()
+            addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations)
+            if(audio8D.isNotEmpty()){
+                setAudio8D(chordsTrack, 12, 15)
+            }
+            tracks.add(chordsTrack)
         }
-        tracks.add(chordsTrack)
+
+
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
         return saveAndPlayMidiFile(mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
     }

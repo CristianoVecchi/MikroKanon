@@ -323,6 +323,9 @@ data class Lang( // English by default
     val nuances: String = "Nuances",
     val nuancesOptions: List<String> = listOf("None", "Exalt short notes", "Exalt long notes"),
     val selectNuances: String = "Select dynamic nuances!",
+    val harmony: String= "Harmony",
+    val selectHarmonizationType: String = "Select the harmonization type!",
+    val selectHarmonizationInstruments: String = "Select the harmonization instruments!",
     val dynamics: String = "Dynamics",
     val selectDynamicAlterations: String ="Select the dynamic alterations!",
     val bpm: String = "BPM",
@@ -384,6 +387,7 @@ data class Lang( // English by default
     val addSequencesToMaze: String = "Add other sequences in the maze!"
     //val convertToDate: (Long) -> String = toDateEn
     ){
+
 
 
     companion object {

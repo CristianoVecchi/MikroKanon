@@ -26,11 +26,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
+import com.cristianovecchi.mikrokanon.AIMUSIC.ListaStrumenti
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.db.CounterpointData
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.*
+import com.cristianovecchi.mikrokanon.midi.HarmonizationData
+import com.cristianovecchi.mikrokanon.midi.HarmonizationType
+import com.cristianovecchi.mikrokanon.midi.chordsInstruments
 import com.cristianovecchi.mikrokanon.ui.*
 import kotlinx.coroutines.flow.Flow
 import kotlin.math.absoluteValue
@@ -124,6 +128,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
     val rowFormsDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val audio8DDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    val harmonyDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val clearSlotsDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
@@ -147,6 +152,8 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         "Ritornello", "Transpose", "Row Forms",
         "Spacer",
         "Export MIDI",
+
+        "Harmony",
 
         "Spread where possible", "Deep Search in 4 part MK",
         "Clear Slots", "Detector","Detector Extension",
@@ -188,6 +195,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         CustomColorsDialog(customColorsDialogData, dimensions, lang.OKbutton)
         ListDialog(ritornelloDialogData, dimensions, lang.OKbutton, fillPrevious = true)
         ListDialog(vibratoDialogData, dimensions, lang.OKbutton,  fillPrevious = true)
+        HarmonyDialog(harmonyDialogData, dimensions)
 
         SettingTabs(selectedTab = selectedTab, dimensions = dimensions, colors = colors, model = model)
 
@@ -660,7 +668,32 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                     items(optionNames) { optionName ->
                         val fontSize = dimensions.optionsFontSize
                         when (optionName) {
-
+                            "Harmony" -> {
+                                var harmDatas = HarmonizationData.createHarmonizationsFromCsv(userOptions.harmonizations)
+                                harmDatas = if(harmDatas.isEmpty()) listOf(HarmonizationData()) else harmDatas
+                                val isSelected = !(harmDatas.size == 1 && harmDatas[0].type == HarmonizationType.NONE)
+                                SelectableCard(
+                                    text = if(!isSelected) lang.harmony
+                                            else "${lang.harmony}: \n\n${harmDatas.mapIndexed{i, hm -> 
+                                        "${i+1}: ${hm.describe()}"}.joinToString("\n\n")}",
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isSelected,
+                                    onClick = {
+                                        harmonyDialogData.value = MultiNumberDialogData(
+                                            true, lang.selectHarmonizationType,
+                                            model = model, names = chordsInstruments.map{ListaStrumenti.getNameByIndex(it)},
+                                            anySequence = harmDatas,
+                                        ) { harmonizationsCsv ->
+                                            model.updateUserOptions(
+                                                "harmonizations",
+                                                harmonizationsCsv
+                                            )
+                                            harmonyDialogData.value =
+                                                MultiNumberDialogData(model = model)
+                                        }
+                                    })
+                            }
                         }
                     }
                 }

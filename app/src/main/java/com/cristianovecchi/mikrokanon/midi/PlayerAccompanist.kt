@@ -9,8 +9,9 @@ import com.leff.midi.MidiTrack
 import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.ProgramChange
 
-enum class HarmonizationType {
-    NONE, POP, JAZZ, JAZZ11, XWH, FULL12
+enum class HarmonizationType(val title: String) {
+    NONE("No Harm."), POP("POP"), JAZZ("JAZZ"), JAZZ11("JAZZ 11"),
+    XWH("XW HARMONY"), FULL12("FULL 12")
 }
 val chordsInstruments = listOf(
     STRING_ORCHESTRA, HAMMOND_ORGAN, ACCORDION,
@@ -19,7 +20,15 @@ val chordsInstruments = listOf(
     62,63, 52, 53,54,
     //80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,99,100,101,102,103
 )
-data class HarmonizationData(val type: HarmonizationType, val instrument: Int = 0, val volume: Float = 0.2f){
+data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NONE,
+                             val instrument: Int = 48, val volume: Float = 0.3f){
+    fun describe(): String {
+        return if(type == HarmonizationType.NONE) "  ---  ${this.type.title}  ---"
+             else "  ---  ${this.type.title}  ---\n${ListaStrumenti.getNameByIndex(this.instrument)} ${String.format("%.0f%%",this.volume*100)}"
+    }
+    fun toCsv(): String {
+        return "${this.type.ordinal}|${this.instrument}|${this.volume}"
+    }
     companion object{
         fun createHarmonizationsFromCsv(csv: String): List<HarmonizationData>{
             if(csv.isBlank()) return listOf()

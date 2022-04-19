@@ -37,6 +37,9 @@ public class ListaStrumenti {
 		"124 - Telephone","125 - Helicopter","126 - Applause",
 		"127 - Gunshot"
 	};
+	public static String getNameByIndex(int index){
+		return str[index].substring(6);
+	}
 	public static int getIndexByName(String name){
 
 		for (int i = 0; i < str.length; i++) {

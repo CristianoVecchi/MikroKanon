@@ -23,6 +23,7 @@ data class MultiNumberDialogData(val dialogState: Boolean = false, val title:Str
                                  val min: Int = 0, val max: Int = 360, val model: AppViewModel,
                                  val names: List<String> = listOf(),
                                  val intSequences: List<List<Int>> = listOf(),
+                                 val anySequence: List<Any> = listOf(),
                                  val dispatchIntLists: (List<List<Int>>) -> Unit = {},
                                  val dispatchCsv: (String) -> Unit = {},
                                  val onSubmitButtonClick: (String) -> Unit = {})

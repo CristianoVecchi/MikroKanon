@@ -47,7 +47,8 @@ object Icons {
             "crossover" to R.drawable.ic_baseline_crossover_24,
             "glue" to R.drawable.ic_baseline_view_week_24,
             "maze" to R.drawable.ic_baseline_account_tree_24,
-            "accompanist" to R.drawable.ic_baseline_brush_24
+            "accompanist" to R.drawable.ic_baseline_brush_24,
+            "volume" to R.drawable.ic_baseline_volume_up_24
         )
     }
 }
