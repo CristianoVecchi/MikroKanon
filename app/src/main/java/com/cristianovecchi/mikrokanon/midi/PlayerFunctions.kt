@@ -11,6 +11,7 @@ import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.TimeSignature
 import kotlin.math.abs
+
 fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, roots: MutableList<Int>,
                                      diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = false) {
     data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
@@ -290,28 +291,29 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
         }
     }
     // STEREO ALTERATIONS FOR EACH TRACK
-    if(trackData.audio8D && track.lengthInTicks > 0){
+    if(trackData.audio8D && track.lengthInTicks > 0) {
         val nRevolutions = (12 - trackData.partIndex) * 2
-        //val panStep: Int = 127 / counterpoint.parts.size
-        val aims = mutableListOf<Float>()
-        for(i in 0 until nRevolutions){
-            aims.add(0f)
-            aims.add(127f)
-        }
-        aims.add(0f)
-        val audio8DalterationsAndDeltas = alterateBpmWithDistribution(aims, 2f, track.lengthInTicks)
-        val audio8Dalterations= audio8DalterationsAndDeltas.first
-        val audio8Ddeltas = audio8DalterationsAndDeltas.second.also{println(it)}
-        var tempoTick = 0L
-        (0 until audio8Dalterations.size -1).forEach { i -> // doesn't take the last bpm
-            val newPan = Controller(tempoTick, channel,10, audio8Dalterations[i].toInt())
-            track.insertEvent(newPan)
-            tempoTick += audio8Ddeltas[i]
-        }
+        setAudio8D(track, nRevolutions, channel)
     }
-
     return track
 }
+
+fun setAudio8D(track: MidiTrack, nRevolutions: Int, channel: Int) {
+    val aims = mutableListOf<Float>()
+    for(i in 0 until nRevolutions){
+        aims.add(0f)
+        aims.add(127f)
+    }
+    aims.add(0f)
+    val (audio8Dalterations, audio8Ddeltas) = alterateBpmWithDistribution(aims, 2f, track.lengthInTicks)
+    var tick = 0L
+    (0 until audio8Dalterations.size -1).forEach { i -> // doesn't take the last bpm
+        val newPan = Controller(tick, channel,10, audio8Dalterations[i].toInt())
+        track.insertEvent(newPan)
+        tick += audio8Ddeltas[i]
+    }
+}
+
 
 fun setTimeSignatures(
     tempoTrack: MidiTrack,

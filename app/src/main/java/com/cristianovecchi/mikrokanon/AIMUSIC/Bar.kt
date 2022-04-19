@@ -1,5 +1,22 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.divideDistributingRest
+
+
+fun List<Bar>.splitBarsInGroups(nGroups: Int):  List<List<Bar>>{
+    if(nGroups >= this.size){
+        return this.map{ listOf(it)}//.apply{ println("Size: ${this.size} Division: $this") }
+    }
+    val result = mutableListOf<List<Bar>>()
+    val division = this.size.toLong().divideDistributingRest(nGroups)
+    var index = 0
+    division.forEach {
+        result.add(this.subList(index, index + it.toInt()))
+        index += it.toInt()
+    }
+    //println("Size: ${this.size} Division: $division")
+    return result.toList()
+}
 fun Array<IntArray>.findBestChordPosition(
     lastRoot: Int,
     priority: IntArray = (0..11).toList().toIntArray()): Pair<Int, Int>{ // transposition, JazzChord type

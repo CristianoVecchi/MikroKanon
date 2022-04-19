@@ -118,6 +118,9 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
         val vibrato: Int =
             userOptionsData?.let { userOptionsData.vibrato }
                 ?: 0
+    val harmonizations: List<HarmonizationData> =
+        userOptionsData?.let {HarmonizationData.createHarmonizationsFromCsv(userOptionsData.harmonizations)}
+            ?: listOf()
         //selectedCounterpoint.value!!.display()
         return Player.playCounterpoint(
             mediaPlayer,
@@ -142,6 +145,7 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
             melodyTypes,
             glissandoFlags,
             audio8DFlags,
-            vibrato
+            vibrato,
+            harmonizations
         )
     }

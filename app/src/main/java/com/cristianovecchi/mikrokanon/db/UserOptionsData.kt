@@ -94,6 +94,9 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "nuances")
         val nuances: Int,
 
+        @ColumnInfo(name = "harmonizations")
+        val harmonizations: String,
+
         @ColumnInfo(name = "lastplay_data")
         val lastPlayData: String,
     ){
@@ -107,7 +110,7 @@ import androidx.room.PrimaryKey
                     0,0,0,1,
                      //"System|0" ,
                      "579|0" , // priority on custom color 579
-                    0,"System", 0, 1 ,"0|-1")
+                    0,"System", 0, 1 ,"","0|-1")
             }
             fun updateUserOptionsData(
                 optionsDataClone: UserOptionsData,
@@ -201,6 +204,9 @@ import androidx.room.PrimaryKey
                     }
                     "nuances" -> {
                         optionsDataClone.copy(id = id, nuances = value as Int)
+                    }
+                    "harmonizations" -> {
+                        optionsDataClone.copy(id = id, harmonizations = value as String)
                     }
                     "lastPlayData" -> {
                         optionsDataClone.copy(id = id, lastPlayData = value as String)

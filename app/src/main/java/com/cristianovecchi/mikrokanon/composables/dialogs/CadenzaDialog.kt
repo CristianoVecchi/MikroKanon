@@ -36,7 +36,7 @@ fun CadenzaDialog(
                 model = multiNumberDialogData.value.model,
                 value = multiNumberDialogData.value.value
             )
-        //parentDialogData.value = ButtonsDialogData(model = model)
+        parentDialogData.value = ButtonsDialogData(model = model)
 
     }
 ) {

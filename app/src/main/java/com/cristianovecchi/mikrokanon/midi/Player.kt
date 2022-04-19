@@ -130,11 +130,10 @@ object Player {
         melodyTypes: List<Int> = listOf(0),
         glissandoFlags: Int = 0,
         audio8DFlags: Int = 0,
-        vibrato: Int = 0
+        vibrato: Int = 0,
+        harmonizations: List<HarmonizationData> = listOf()
     ): String {
         // Triple: Pattern, isRetrograde, nRepetitions
-
-
         val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
         val ensemblePartsList: List<List<EnsemblePart>> =
             if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
@@ -215,14 +214,9 @@ object Player {
                 5 to 1.125f,
                 6 to 1.25f
             )
-            val legatos =
-                legatoTypes.map { articulationMap[it.first.absoluteValue]!! * (if (it.first < 0) -1 else 1) }
-            val legatoAlterationsAndDeltas =
-                alterateBpmWithDistribution(legatos, 0.005f, totalLength)
-            val legatoAlterations =
-                legatoAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
-            val legatoDeltas =
-                legatoAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
+            val legatos = legatoTypes.map { articulationMap[it.first.absoluteValue]!! * (if (it.first < 0) -1 else 1) }
+            val (legatoAlterations, legatoDeltas) = alterateBpmWithDistribution(legatos, 0.005f, totalLength)
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 counterpointTrackData.parallelStream().forEach {
                     it.articulationDurations = alterateArticulation(
@@ -272,10 +266,9 @@ object Player {
         //tempoTrack.insertEvent(t2)
         //val bpmAlterations = bpm.projectTo(bpm*2, 0.5f).projectTo(bpm, 0.5f).also{println(it)}
         // INSERT BPM ALTERATIONS
-        val bpmAlterationsAndDeltas = alterateBpmWithDistribution(bpms, 0.5f, totalLength)
+        val (bpmAlterations, bpmDeltas) = alterateBpmWithDistribution(bpms, 0.5f, totalLength)
         var tempoTick = 0L
-        val bpmAlterations = bpmAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
-        val bpmDeltas = bpmAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
+
         (0 until bpmAlterations.size - 1).forEach { index -> // doesn't take the last bpm
             val newTempo = Tempo(tempoTick, 0L, 500000)
             newTempo.bpm = bpmAlterations[index]
@@ -284,12 +277,9 @@ object Player {
         }
 
         //val dynamics = listOf(1f,0f,1f)
-        val dynamicAlterationsAndDeltas = alterateBpmWithDistribution(dynamics, 0.01f, totalLength)
+        val (dynamicAlterations, dynamicDeltas) = alterateBpmWithDistribution(dynamics, 0.01f, totalLength)
         tempoTick = 0L
-        val dynamicAlterations =
-            dynamicAlterationsAndDeltas.first//.also { println("${it.size} + $it") }
-        val dynamicDeltas =
-            dynamicAlterationsAndDeltas.second//.also { println("${it.size} + $it") }
+
         (0 until dynamicAlterations.size - 1).forEach { index -> // doesn't take the last dynamic
             // 0x7F = universal immediatly message, 0x7F = all devices, 0x04 = device control message, 0x01 = master volume
             // bytes = first the low 7 bits, second the high 7 bits - volume is from 0x0000 to 0x3FFF
@@ -308,25 +298,25 @@ object Player {
         tracks.add(tempoTrack)
         tracks.addAll(counterpointTracks)
 
-
         // CHORD TRACK
-        val harmonization = Harmonization.JAZZ
-        if (harmonization != Harmonization.NONE){
-            val doubledBars = bars.mergeOnesInMetro()
-                .resizeLastBar(totalLength)
-                .splitBarsInTwoParts()
-            assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
-            val chordsTrack = when (harmonization){
-                Harmonization.NONE -> MidiTrack()
-                Harmonization.POP -> createPopChordsTrack(doubledBars)
-                Harmonization.JAZZ -> createJazzChordsTrack(doubledBars, false)
-                Harmonization.JAZZ11 -> createJazzChordsTrack(doubledBars, true)
-                Harmonization.XWH -> createExtendedWeightedHarmonyTrack(doubledBars)
-                Harmonization.FULL12 -> createFull12Track(doubledBars, 36)
+        val harmonizations = listOf<HarmonizationData>(
+            HarmonizationData(HarmonizationType.JAZZ11, 63, 0.8f),
+            HarmonizationData(HarmonizationType.JAZZ, 62, 0.6f),
+            HarmonizationData(HarmonizationType.NONE),
+            HarmonizationData(HarmonizationType.XWH, 54, 0.9f),
+        )
 
-            }
-            tracks.add(chordsTrack)
+        val doubledBars = bars.mergeOnesInMetro()
+            .resizeLastBar(totalLength)
+            .splitBarsInTwoParts()
+        assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
+        val barGroups = doubledBars.splitBarsInGroups(harmonizations.size)
+        val chordsTrack = MidiTrack()
+        addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations)
+        if(audio8D.isNotEmpty()){
+            setAudio8D(chordsTrack, 12, 15)
         }
+        tracks.add(chordsTrack)
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
         return saveAndPlayMidiFile(mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
     }
