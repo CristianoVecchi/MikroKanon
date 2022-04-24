@@ -135,7 +135,7 @@ fun correctDynamics(dynamics: String): String{
     }
     return result.joinToString(",")
 }
-fun correctLegatos(legatos: String): String{
+fun correctLegatos(legatos: String): String {
     //println("legatos: $legatos")
     val (leg, rib) = legatos.extractIntPairsFromCsv().unzip()
     val result = leg.toMutableList()
@@ -145,7 +145,7 @@ fun correctLegatos(legatos: String): String{
     repeat(2){
         if (result[0] < 0f) result[0] = result[0].absoluteValue
         if (result.size > 1){
-            if (result[1] < 0f)  result.add(1, result[0])
+            if (result[1] < 0f)  {result.add(1, result[0]); result2.add(1, result2[0])}
             (1 until result.size).forEach{ index ->
                 if (result[index-1].absoluteValue == result[index].absoluteValue) result[index] = result[index].absoluteValue
             }

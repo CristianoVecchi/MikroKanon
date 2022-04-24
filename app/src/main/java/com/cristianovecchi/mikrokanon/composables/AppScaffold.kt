@@ -125,7 +125,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
     val legatoTypesDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val multiFloatDialogData by lazy { mutableStateOf(MultiFloatDialogData(model = model))}
     val transposeDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
-    val rowFormsDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val rowFormsDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))} // "remember" for play button
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val audio8DDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val harmonyDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
@@ -150,13 +150,13 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         "Range","Melody","Articulation",
         "Spacer",
         "Ritornello", "Transpose", "Row Forms",
-        "Spacer",
-        "Export MIDI",
 
         "Harmony",
 
+        "Clear Slots", "Spacer", "Export MIDI",
+
         "Spread where possible", "Deep Search in 4 part MK",
-        "Clear Slots", "Detector","Detector Extension",
+         "Detector","Detector Extension",
         //"Colors",
         "Custom Colors", "Counterpoint View", "Language","Zodiac","MBTI","Spacer","Credits")
 
@@ -632,31 +632,6 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                         }
                                     })
                             }
-
-
-                            "Export MIDI" -> {
-                                val (nNotes, timestamp) = userOptions.lastPlayData.extractLongPairsFromCsv()[0]
-                                val isOn = timestamp > -1
-                                val text = if(isOn) ": $nNotes♪\n${convertToLocaleDate(listOf(timestamp.toString()), model.getUserLangDef())[0]}"
-                                    else ""
-                                SelectableCard(text = lang.exportMidi + text, fontSize = fontSize, colors = colors, isSelected = isOn,
-                                    onClick = {
-                                        model.shareMidi(model.midiPath)
-//                                        val path = model.midiPath.absolutePath.toString()
-//                                        var error = model.onPlay(false, false)
-//                                        if (error.isEmpty()){
-//                                            model.shareMidi(model.midiPath)
-//                                        } else {
-//                                            exportDialogData.value = ExportDialogData(true,"EXPORT MIDI",
-//                                                "", error = lang.playToCreate
-//                                            ) {
-//
-//                                                exportDialogData.value = ExportDialogData(path = path, error = error)
-//                                            }
-//                                        }
-                                     })
-                            }
-
                         }
                     }
 
@@ -692,6 +667,63 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                             harmonyDialogData.value =
                                                 MultiNumberDialogData(model = model)
                                         }
+                                    })
+                            }
+                        }
+                    }
+                }
+            }
+            ScaffoldTabs.IO -> {
+                LazyColumn(modifier = tabModifier, state = listState)
+                {
+                    items(optionNames) { optionName ->
+                        val fontSize = dimensions.optionsFontSize
+                        when (optionName) {
+                            "Clear Slots" -> {
+                                val timestamps =
+                                    if (allCounterpointsData.isNotEmpty()) allCounterpointsData.map {
+                                        if (it == null || it?.timestamp == null || it.timestamp == -1L) ""
+                                        else it.timestamp.toString()
+                                    } else List(16) { "" }
+                                val timestampsToDates =
+                                    convertToLocaleDate(timestamps, model.getUserLangDef())
+                                val names =
+                                    (0..15).map { "${lang.slotNumbers[it]}: ${timestampsToDates[it]}" }
+                                SelectableCard(
+                                    text = lang.clearSlots,
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = true,
+                                    onClick = {
+                                        doublingDialogData.value = MultiListDialogData(
+                                            true, names, setOf(), lang.selectSlots
+                                        ) { indexes ->
+                                            model.clearCounterpointsInDb(indexes.toSortedSet())
+                                            model.retrieveCounterpointsFromDB()
+                                            doublingDialogData.value =
+                                                MultiListDialogData(itemList = doublingDialogData.value.itemList)
+                                        }
+                                    })
+                            }
+                            "Spacer" -> {
+                                Spacer(modifier = Modifier.height(spacerHeight.dp))
+                            }
+                            "Export MIDI" -> {
+                                val (nNotes, timestamp) = userOptions.lastPlayData.extractLongPairsFromCsv()[0]
+                                val isOn = timestamp > -1
+                                val text = if (isOn) ": $nNotes♪\n${
+                                    convertToLocaleDate(
+                                        listOf(timestamp.toString()),
+                                        model.getUserLangDef()
+                                    )[0]
+                                }"
+                                else ""
+                                SelectableCard(text = lang.exportMidi + text,
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isOn,
+                                    onClick = {
+                                        model.shareMidi(model.midiPath)
                                     })
                             }
                         }
@@ -735,28 +767,6 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                             "deepSearch",
                                             if (isOn) 1 else 0
                                         )
-                                    })
-                            }
-                            "Clear Slots" -> {
-                                val timestamps = if(allCounterpointsData.isNotEmpty()) allCounterpointsData.map{
-                                    if(it == null || it?.timestamp == null || it.timestamp == -1L) ""
-                                    else it.timestamp.toString()} else List(16){""}
-                                val timestampsToDates = convertToLocaleDate(timestamps, model.getUserLangDef())
-                                val names = (0..15).map{ "${lang.slotNumbers[it]}: ${timestampsToDates[it]}"}
-                                SelectableCard(
-                                    text = lang.clearSlots,
-                                    fontSize = fontSize,
-                                    colors = colors,
-                                    isSelected = true,
-                                    onClick = {
-                                        doublingDialogData.value = MultiListDialogData(
-                                            true, names, setOf(), lang.selectSlots
-                                        ) { indexes ->
-                                            model.clearCounterpointsInDb(indexes.toSortedSet())
-                                            model.retrieveCounterpointsFromDB()
-                                            doublingDialogData.value =
-                                                MultiListDialogData(itemList = doublingDialogData.value.itemList)
-                                        }
                                     })
                             }
                             "Detector" -> {
@@ -1009,6 +1019,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
             }
         }
     }
+
 
 
 

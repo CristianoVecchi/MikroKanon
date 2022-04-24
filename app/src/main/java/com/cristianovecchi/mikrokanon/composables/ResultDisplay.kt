@@ -32,7 +32,6 @@ import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
-import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import com.cristianovecchi.mikrokanon.ui.shift
@@ -103,7 +102,7 @@ fun ResultDisplay(model: AppViewModel,
         val elaborating: Boolean by elaboratingFlow.collectAsState(initial = false)
         val playing by model.playing.asFlow().collectAsState(initial = false)
         var scrollToTopList by remember{mutableStateOf(false)}
-        val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, specialFunctions = true,freeparts = true))
+        val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, specialFunctions = true,freeParts = true))
 
         val elaboratingBackgroundColor by animateColorAsState(
             if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
@@ -446,7 +445,7 @@ fun ResultDisplay(model: AppViewModel,
                     FreePartsButtons(
                         colors = colors,
                         fontSize = dimensions.outputFPbuttonFontSize,
-                        isActive = activeButtons.freeparts,
+                        isActive = activeButtons.freeParts,
                         onAscDynamicClick = {
                             if (!elaborating) onFreePart(TREND.ASCENDANT_DYNAMIC)
                             scrollToTopList = true

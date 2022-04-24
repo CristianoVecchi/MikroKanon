@@ -20,6 +20,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                      val velocities: IntArray,val glissando: IntArray,  val attacks: IntArray,
                      val isPreviousRest: BooleanArray,
                      var articulationDurations: IntArray? = null,
+                     var ribattutos: IntArray? = null,
                      val channel: Int,  val velocityOff: Int = 80,
                      val vibrato: Int, val doublingFlags: Int = 0,
                      val audio8D: Boolean = false, val partIndex: Int,
@@ -191,7 +192,7 @@ object CounterpointInterpreter {
             TrackData(
                 pitchesData.toIntArray(), ticksData.toIntArray(), durationsData.toIntArray(),
                 velocitiesData.toIntArray(), glissandoData.toIntArray(), IntArray(pitchesData.size),
-                previousIsRestData.toBooleanArray(),null,
+                previousIsRestData.toBooleanArray(),null, null,
                 channel, 80, vibrato, doublingFlags,
                 audio8D.contains(partIndex), partIndex, tickChangesData
             )

@@ -238,7 +238,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 val fontSizeOctave = dimensions.dialogFontSize / 3 * 2
                                 CustomButton(
                                     adaptSizeToIconButton = false,
-                                    text = ribattutos[3], //
+                                    text = ribattutos[6],
                                     fontSize = fontSizeOctave,
                                     buttonSize = buttonSize,
                                     iconColor = model.appColors.iconButtonIconColor,
@@ -246,12 +246,12 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 ) {
                                     val pairs = legatoText.extractIntPairsFromCsv().toMutableList()
                                     val (legato, ribattuto) = pairs[cursor]
-                                    pairs[cursor] = Pair( legato, if(ribattuto == 3) 0 else 3 )
+                                    pairs[cursor] = Pair( legato, if(ribattuto == 6) 1 else 6 )
                                     legatoText = pairs.toIntPairsString()
                                 }
                                 CustomButton(
                                     adaptSizeToIconButton = false,
-                                    text = ribattutos[2], // +8
+                                    text = ribattutos[5],
                                     fontSize = fontSizeOctave,
                                     buttonSize = buttonSize,
                                     iconColor = model.appColors.iconButtonIconColor,
@@ -259,12 +259,12 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 ) {
                                     val pairs = legatoText.extractIntPairsFromCsv().toMutableList()
                                     val (legato, ribattuto) = pairs[cursor]
-                                    pairs[cursor] = Pair( legato, if(ribattuto == 2) 0 else 2 )
+                                    pairs[cursor] = Pair( legato, if(ribattuto == 5) 1 else 5 )
                                     legatoText = pairs.toIntPairsString()
                                 }
                                 CustomButton(
                                     adaptSizeToIconButton = false,
-                                    text = ribattutos[1], // -8
+                                    text = ribattutos[4],
                                     fontSize = fontSizeOctave,
                                     buttonSize = buttonSize,
                                     iconColor = model.appColors.iconButtonIconColor,
@@ -272,16 +272,38 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 ) {
                                     val pairs = legatoText.extractIntPairsFromCsv().toMutableList()
                                     val (legato, ribattuto) = pairs[cursor]
-                                    pairs[cursor] = Pair( legato, if(ribattuto == 1) 0 else 1 )
+                                    pairs[cursor] = Pair( legato, if(ribattuto == 4) 1 else 4 )
                                     legatoText = pairs.toIntPairsString()
                                 }
-
-
-
+                                CustomButton(
+                                    adaptSizeToIconButton = false,
+                                    text = ribattutos[3],
+                                    fontSize = fontSizeOctave,
+                                    buttonSize = buttonSize,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val pairs = legatoText.extractIntPairsFromCsv().toMutableList()
+                                    val (legato, ribattuto) = pairs[cursor]
+                                    pairs[cursor] = Pair( legato, if(ribattuto == 3) 1 else 3 )
+                                    legatoText = pairs.toIntPairsString()
+                                }
+                                CustomButton(
+                                    adaptSizeToIconButton = false,
+                                    text = ribattutos[2],
+                                    fontSize = fontSizeOctave,
+                                    buttonSize = buttonSize,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val pairs = legatoText.extractIntPairsFromCsv().toMutableList()
+                                    val (legato, ribattuto) = pairs[cursor]
+                                    pairs[cursor] = Pair( legato, if(ribattuto == 2) 1 else 2 )
+                                    legatoText = pairs.toIntPairsString()
+                                }
                             }
                         }
                         val buttonSize = dimensions.dialogButtonSize.dp
-
 
                         Spacer(modifier = Modifier.height(6.dp))
                         Row(

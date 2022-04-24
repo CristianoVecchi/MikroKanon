@@ -62,8 +62,8 @@ data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean =
                          val undo: Boolean = false, val expand: Boolean = true,
                          val waves: Boolean = false, val pedals: Boolean = true,
                          val counterpoint: Boolean = false, val specialFunctions: Boolean = false,
-                         val freeparts: Boolean = false, val playOrStop: Boolean = true)
-enum class ScaffoldTabs { SOUND, BUILDING, ACCOMPANIST, SETTINGS }
+                         val freeParts: Boolean = false, val playOrStop: Boolean = true)
+enum class ScaffoldTabs { SOUND, BUILDING, ACCOMPANIST, IO, SETTINGS }
 
 class AppViewModel(
     application: Application,
@@ -94,7 +94,7 @@ class AppViewModel(
     val lastScaffoldTab: LiveData<ScaffoldTabs> = _lastScaffoldTab
     // + 0.86f
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
-    var cadenzaValues ="0,1,0,1,1"
+    var cadenzaValues = "0,1,0,1,1"
     val dynamicMap: Map<Float,String> =  dynamicSteps.zip(getDynamicSymbols()).toMap()
 
     val stackIcons = mutableListOf<String>()
@@ -176,20 +176,13 @@ class AppViewModel(
 //        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
 //    }
     init{
+        //RhythmPatterns.checkIntegrity()
         val size = getDeviceResolution()
         val displayMetricsDensity = Resources.getSystem().displayMetrics.density
         _dimensions.value = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
         allSequencesData = sequenceRepository.allSequences.asLiveData()
         allCounterpointsData = counterpointRepository.counterpoints.asLiveData()
         userOptionsData = userRepository.userOptions.asLiveData()
-        //userRepository.userOptions
-//        viewModelScope.launch{
-//            userRepository.userOptions.collect {
-//                setAppColors(it[0].colors)
-//                if(it.isNotEmpty()){
-//                    _language.value = Lang.provideLanguage(getUserLangDef())
-//                }
-//            }
     }
 
     fun getContext(): Context {

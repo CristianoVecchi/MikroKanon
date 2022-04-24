@@ -165,7 +165,7 @@ object Player {
                 .repeat(triple.third) else triple.first.values.repeat(triple.third)
         }.mergeNegativeValues()
         val nRhythmSteps = durations.filter { it > -1 }.count()
-        //println("durations: $durations")
+        println("durations: $durations")
         val actualRhythm = {
             val actualRhythm = mutableListOf<Triple<RhythmPatterns, Boolean, Int>>()
             //println("TOTAL NOTES: $nTotalNotes   STEPS: $nRhythmSteps")
@@ -215,33 +215,42 @@ object Player {
                 6 to 1.25f
             )
             val legatos = legatoTypes.map { articulationMap[it.first.absoluteValue]!! * (if (it.first < 0) -1 else 1) }
-            val (legatoAlterations, legatoDeltas) = alterateBpmWithDistribution(legatos, 0.005f, totalLength)
+            val ribattutos = legatoTypes.map { it.second }
+            println("Legatos: $legatos")
+            println("Ribattutos: $ribattutos")
+            val (legatoAlterations, ribattutoAlterations, legatoDeltas) = alterateLegatosWithDistribution(legatos, ribattutos,0.005f, totalLength)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 counterpointTrackData.parallelStream().forEach {
-                    it.articulationDurations = alterateArticulation(
+                    val pair = alterateArticulation(
                         it.ticks,
                         it.durations,
                         legatoAlterations,
+                        ribattutoAlterations,
                         legatoDeltas,
                         it.isPreviousRest,
                         maxLegato
                     )
+                    it.articulationDurations= pair.first
+                    it.ribattutos= pair.second
                 }
             } else {
                 counterpointTrackData.forEach {
-                    it.articulationDurations = alterateArticulation(
+                    val pair = alterateArticulation(
                         it.ticks,
                         it.durations,
                         legatoAlterations,
+                        ribattutoAlterations,
                         legatoDeltas,
                         it.isPreviousRest,
                         maxLegato
                     )
+                    it.articulationDurations= pair.first
+                    it.ribattutos= pair.second
                 }
             }
         }
-
+        println("TrackData 1 = ${counterpointTrackData[0]}")
         //if(counterpointTrackData.map{println(it.changes);it.changes.size}.toSet().size != 1) throw Exception("WARNING: SOME CHANGE DATA HAS BEEN SKIPPED!!!")
         // TRANSFORM DATATRACKS IN MIDITRACKS
         val counterpointTracks =
@@ -426,7 +435,7 @@ object Player {
 
     fun insertDoublingNote(
         mt: MidiTrack, start: Long, duration: Long, channel: Int,
-        pitch: Int, velOn: Int, velOff: Int
+        pitch: Int, velOn: Int, velOff: Int, ribattuto: Int = 1
     ) {
         var actualPitch = pitch
         while (actualPitch > 108) {
@@ -438,12 +447,43 @@ object Player {
         mt.insertEvent(on)
         mt.insertEvent(off)
     }
+    fun insertNoteWithRibattuto(
+        mt: MidiTrack, start: Long, dur: Long, channel: Int,
+        pitch: Int, velOn: Int, velOff: Int, ribattuto: Int = 1
+    ){
+        when (ribattuto){
+            1 -> insertSimpleNote(mt, start, dur, channel, pitch, velOn, velOff)
+            in 2..Int.MAX_VALUE -> {
+                val ribVelOff = 127
+                if(dur < 24 ) {
+                    insertSimpleNote(mt, start, dur, channel, pitch, velOn, ribVelOff)
+                } else {
+                    val divDur = dur / ribattuto
+                    if (divDur < 4) {
+                        insertSimpleNote(mt, start, dur, channel, pitch, velOn, velOff)
+                    } else {
+                        for( i in 0 until ribattuto){
+                            insertSimpleNote(mt, start + i * divDur, divDur, channel, pitch, velOn, ribVelOff)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fun insertSimpleNote(mt: MidiTrack, start: Long, dur: Long, channel: Int,
+                         pitch: Int, velOn: Int, velOff: Int){
+        //println("NOTE: start=$start dur=$dur pitch=$pitch ")
+        val on = NoteOn(start, channel, pitch, velOn)
+        val off = NoteOff(start + dur, channel, pitch, velOff)
+        mt.insertEvent(on)
+        mt.insertEvent(off)
+    }
 
     private var separator = 1
     private var lastIsGliss = false
     fun insertNoteWithGlissando(
         mt: MidiTrack, start: Long, duration: Long, channel: Int,
-        pitch: Int, velOn: Int, velOff: Int, gliss: Int
+        pitch: Int, velOn: Int, velOff: Int, gliss: Int, ribattuto: Int = 1
     ) {
         //println("pitch: $pitch   gliss: $gliss   duration: $duration  lastIsGliss: $lastIsGliss")
         val dur = duration - separator
@@ -454,10 +494,7 @@ object Player {
                 mt.insertEvent(pitchBendOff)
                 lastIsGliss = false
             }
-            val on = NoteOn(start, channel, pitch, velOn)
-            val off = NoteOff(start + dur, channel, pitch, velOff)
-            mt.insertEvent(on)
-            mt.insertEvent(off)
+            insertNoteWithRibattuto(mt, start, dur, channel, pitch, velOn, velOff, ribattuto)
         } else {
             lastIsGliss = true
             when (gliss) {

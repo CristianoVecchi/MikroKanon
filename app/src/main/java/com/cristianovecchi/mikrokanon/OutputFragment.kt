@@ -26,8 +26,8 @@ class OutputFragment: Fragment() {
         model.selectedCounterpoint.observe(viewLifecycleOwner){
             if(model.selectedCounterpoint.value!!.parts.isNotEmpty()) {
                 model.changeActiveButtons( if(model.selectedCounterpoint.value!!.parts.size >= 12)
-                    model.activeButtons.value!!.copy(counterpoint = false, freeparts = false, waves = false, pedals = false)
-                else model.activeButtons.value!!.copy(counterpoint = true, freeparts = true, waves = true, pedals = true)
+                    model.activeButtons.value!!.copy(counterpoint = false, freeParts = false, waves = false, pedals = false)
+                else model.activeButtons.value!!.copy(counterpoint = true, freeParts = true, waves = true, pedals = true)
                 )
             }
         }

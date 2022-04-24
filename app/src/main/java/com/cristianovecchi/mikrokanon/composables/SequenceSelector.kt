@@ -216,7 +216,7 @@ fun SequenceSelector(model: AppViewModel,
                     )
                     FreePartsButtons(
                         colors = appColors,
-                        fontSize = dimensions.selectorFPbuttonFontSize, isActive = activeButtons.freeparts,
+                        fontSize = dimensions.selectorFPbuttonFontSize, isActive = activeButtons.freeParts,
                         onAscDynamicClick = { onFreePart(sequences[selected], TREND.ASCENDANT_DYNAMIC ) },
                         onAscStaticClick = { onFreePart( sequences[selected], TREND.ASCENDANT_STATIC) },
                         onDescDynamicClick = { onFreePart( sequences[selected], TREND.DESCENDANT_DYNAMIC ) },

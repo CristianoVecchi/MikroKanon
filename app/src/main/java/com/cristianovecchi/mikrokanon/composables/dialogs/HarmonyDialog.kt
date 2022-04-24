@@ -188,7 +188,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 true,
                                 listOf("100%","90%","80%","70%","60%","50%","40%","30%","20%","10%"),
                                 10 - (harmData.volume * 10).toInt(),
-                                lang.selectHarmonizationInstruments
+                                lang.selectHarmonizationVolume
                             ) { volumeIndex ->
                                 val newHarmDatas = harmDatas.toMutableList()
                                 newHarmDatas[cursor] = harmDatas[cursor].copy(volume = (10 - volumeIndex) / 10f)

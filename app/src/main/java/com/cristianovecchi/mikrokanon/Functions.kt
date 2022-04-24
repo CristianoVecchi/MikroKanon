@@ -236,6 +236,40 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
 fun alterateBpm(bpmValues: List<Float>, step:Float): List<Float>{
     return bpmValues.fold(listOf()) {acc, nextBpm -> acc.projectTo(nextBpm, step)}
 }
+fun alterateLegatosWithDistribution(legatoValues: List<Float>, ribattutos: List<Int>,
+                                    step:Float, totalDuration: Long): Triple<List<Float>, List<Int>, List<Long>>{
+    //println("values: $bpmValues")
+    if(legatoValues.size == 1){
+        return Triple(listOf(legatoValues[0],0f), ribattutos, listOf(totalDuration))
+    }
+    val sectionDuration = totalDuration / (legatoValues.count{it >= 0} - 1)
+    //println("total: $totalDuration | section: $sectionDuration")
+    val deltas: MutableList<Long> = mutableListOf()
+    val ribattutoAlterations = mutableListOf<Int>()
+    var lastSize = 0
+    var ribIndex = 0
+    val firstIsStatic = legatoValues[0] == legatoValues[1]
+    var actualRibattutos = ribattutos.filterIndexed { index, _ -> legatoValues[index] >= 0  }
+    actualRibattutos = if(firstIsStatic) actualRibattutos.drop(1) else actualRibattutos
+    //println("actual ribattutos: $actualRibattutos")
+    val bpms: List<Float> = legatoValues.foldIndexed<Float, List<Float>>(listOf()) {
+            index, acc, nextBpm ->
+        acc.projectTo(nextBpm, step, deltas, sectionDuration).apply {
+            val newSize = this.size
+            if (!(index == 0 && firstIsStatic)){
+                if (nextBpm >= 0) {
+                    //println("last size = $lastSize  new size = $newSize $this")
+                    ribattutoAlterations.addAll(List(newSize - lastSize -1) { actualRibattutos[ribIndex] })
+                    lastSize = newSize - 1
+                    ribIndex++
+                }
+            }
+        }
+    }
+    deltas.add(0) // to set the same lenght - last value is unused
+    ribattutoAlterations.add(1)
+    return Triple(bpms, ribattutoAlterations.toList(), deltas.toList())
+}
 fun alterateBpmWithDistribution(bpmValues: List<Float>, step:Float, totalDuration: Long): Pair<List<Float>, List<Long>>{
     //println("values: $bpmValues")
     if(bpmValues.size == 1){

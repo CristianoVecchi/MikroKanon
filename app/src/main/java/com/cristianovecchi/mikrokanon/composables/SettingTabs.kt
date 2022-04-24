@@ -111,6 +111,35 @@ fun SettingTabs(selectedTab: ScaffoldTabs, dimensions: Dimensions, colors: AppCo
             Modifier
                 .weight(1f)
                 .background(
+                    if (selectedTab == ScaffoldTabs.IO) colors.drawerBackgroundColor
+                    else colors.drawerBackgroundColor.shift(-0.2f)
+                )
+                .clickable(onClick = {
+                    model._lastScaffoldTab.value = ScaffoldTabs.IO
+                }), horizontalAlignment = Alignment.CenterHorizontally,
+        )
+        {
+            IconButton(modifier = androidx.compose.ui.Modifier
+                .background(
+                    if (selectedTab == ScaffoldTabs.IO) colors.drawerBackgroundColor else colors.drawerBackgroundColor.shift(
+                        -0.2f
+                    ), RoundedCornerShape(4.dp)
+                )
+                .then(Modifier.size(buttonSize / 4 * 3)), onClick = { model._lastScaffoldTab.value = ScaffoldTabs.IO }
+            )
+            {
+                Icon(
+                    modifier = Modifier.size(iconSize),
+                    painter = painterResource(id = model.iconMap["save"]!!),
+                    contentDescription = null, // decorative element
+                    tint = if(selectedTab == ScaffoldTabs.IO) colors.selCardTextColorSelected else colors.selCardTextColorUnselected.shift(-0.2f)
+                )
+            }
+        }
+        Column(
+            Modifier
+                .weight(1f)
+                .background(
                     if (selectedTab == ScaffoldTabs.SETTINGS) colors.drawerBackgroundColor
                     else colors.drawerBackgroundColor.shift(-0.2f)
                 )

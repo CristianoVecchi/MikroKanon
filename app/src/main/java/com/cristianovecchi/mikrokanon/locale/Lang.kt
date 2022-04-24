@@ -190,7 +190,7 @@ fun getOctaveSymbols(): List<String>{
     return listOf("➘15","➘8", "", "➚8","➚15", "\u21c58", "\u21c515")
 }
 fun getRibattutoSymbols(): List<String>{
-    return listOf("", "\"", "\"\'", "\"\"")
+    return listOf("","", "\"", "\"\'", "\"\"", "\"\"\'", "\"\"\"")
 }
 
 val doublingDe = listOf("kleine Sekunde", "große Sekunde", "kleine Terz", "große Terz", "Quarte",
@@ -326,6 +326,7 @@ data class Lang( // English by default
     val harmony: String= "Harmony",
     val selectHarmonizationType: String = "Select the harmonization type!",
     val selectHarmonizationInstruments: String = "Select the harmonization instruments!",
+    val selectHarmonizationVolume: String = "Select the harmonization volume!",
     val dynamics: String = "Dynamics",
     val selectDynamicAlterations: String ="Select the dynamic alterations!",
     val bpm: String = "BPM",

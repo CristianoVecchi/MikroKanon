@@ -13,13 +13,14 @@ enum class HarmonizationType(val title: String) {
     NONE("No Harm."), POP("POP"), JAZZ("JAZZ"), JAZZ11("JAZZ 11"),
     XWH("XW HARMONY"), FULL12("FULL 12")
 }
-val chordsInstruments = listOf(
-    STRING_ORCHESTRA, HAMMOND_ORGAN, ACCORDION,
-    TREMOLO_STRINGS,
-    SYNTH_STRINGS_1, SYN_FANTASIA, VOICE_OOHS, BRASS_ENSEMBLE,
-    62,63, 52, 53,54,
-    //80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,99,100,101,102,103
-)
+//val chordsInstruments = listOf(
+//    STRING_ORCHESTRA, HAMMOND_ORGAN, ACCORDION,
+//    TREMOLO_STRINGS,
+//    SYNTH_STRINGS_1, SYN_FANTASIA, BRASS_ENSEMBLE,
+//    62,63, 52, 53,54,
+//    //80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,99,100,101,102,103
+//)
+val chordsInstruments = (0..103).toList()
 data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NONE,
                              val instrument: Int = 48, val volume: Float = 0.3f){
     fun describe(): String {
@@ -93,7 +94,7 @@ fun createFull12HarmonizedTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrum
         }
     }
     val chordsChannel = 15
-    val pc: MidiEvent = ProgramChange(0L, chordsChannel, instrument) // cambia strumento
+    val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento
     chordsTrack.insertEvent(pc)
 //    println("${bars.map{ convertFlagsToInts(it.dodecaByte1stHalf!!)}}")
 //    println("XWH roots: $roots")
@@ -144,7 +145,7 @@ fun createExtendedWeightedHarmonyTrack(chordsTrack: MidiTrack, bars: List<Bar>, 
     }
     val chordsChannel = 15
 
-    val pc: MidiEvent = ProgramChange(0L, chordsChannel, instrument) // cambia strumento
+    val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento
     chordsTrack.insertEvent(pc)
 
     println("${bars.map{ convertFlagsToInts(it.dodecaByte1stHalf!!)}}")
@@ -169,7 +170,7 @@ fun createPopChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: In
         println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
     }
     val chordsChannel = 15
-    val pc: MidiEvent = ProgramChange(0L, chordsChannel, instrument) // cambia strumento
+    val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento
     chordsTrack.insertEvent(pc)
     findChordNotes(chordsTrack, chordsChannel, bars, diffChordVelocity, diffChordVelocity / 2)
 }
@@ -179,9 +180,8 @@ fun createJazzChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, with11: Boole
     var lastRoot = (Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
     var previousChord = JazzChord.EMPTY
     //println("start root = $lastRoot")
-    val selectChordArea = { previousChord: JazzChord ->
-        if (with11) JazzChord.selectChordArea_11(previousChord) else JazzChord.selectChordArea_no_11(previousChord)
-    }
+    val selectChordArea = if(with11) { previousChord: JazzChord -> JazzChord.selectChordArea_11(previousChord)}
+         else {previousChord:JazzChord -> JazzChord.selectChordArea_no_11(previousChord)}
     bars.forEach {
         val jazzChords = selectChordArea(previousChord)
         val chordFaultsGrid =  it.findChordFaultsGrid(jazzChords)
@@ -196,7 +196,7 @@ fun createJazzChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, with11: Boole
     }
 
     val chordsChannel = 15
-    val pc: MidiEvent = ProgramChange(0L, chordsChannel, instrument) // cambia strumento
+    val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento
 
     chordsTrack.insertEvent(pc)
     findChordNotes(chordsTrack, chordsChannel, bars, diffChordVelocity, diffChordVelocity / 2)

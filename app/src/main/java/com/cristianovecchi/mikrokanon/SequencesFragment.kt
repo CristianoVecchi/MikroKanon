@@ -5,13 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.material.*
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asFlow
-import androidx.lifecycle.distinctUntilChanged
 import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.composables.AppScaffold
 import com.cristianovecchi.mikrokanon.composables.SequenceSelector
@@ -56,7 +53,7 @@ var start = true
         model.selectedSequence.observe(viewLifecycleOwner){
             model.changeActiveButtons( if(model.selectedSequence.value!! != -1 )
                 ActiveButtons(editing = true, mikrokanon = true, counterpoint = true,
-                    specialFunctions = true, freeparts = true, waves = true, pedals = true)
+                    specialFunctions = true, freeParts = true, waves = true, pedals = true)
             else ActiveButtons() )
         }
 //        model.userOptionsData.observe(viewLifecycleOwner){

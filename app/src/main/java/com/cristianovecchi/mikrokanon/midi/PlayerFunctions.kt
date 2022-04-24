@@ -209,6 +209,7 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
     val velocityOff = trackData.velocityOff
     val (pitches, ticks, durations, velocities, glissando) = trackData
     val articulationDurations = trackData.articulationDurations ?: durations
+    val ribattutos = trackData.ribattutos ?: IntArray(pitches.size){ 1 }
 
     // Instrument changes
 //    println()
@@ -239,6 +240,7 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
             val gliss = glissando[i]
             val duration = durations[i]
             val articulationDuration = articulationDurations[i]
+            val ribattuto = ribattutos[i]
             val overLegato = articulationDuration > duration
 //                val attackDelay = if(lastIsGliss && (articulationDuration == duration || overLegato)) 127 else 0
             val dur = if(overLegato && (glissando[(i+1) % glissando.size] >0 || gliss >0)  )
@@ -256,7 +258,7 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
 //                }
             Player.insertNoteWithGlissando(
                 track, tick, dur, channel, pitches[i],
-                velocities[i], velocityOff, gliss
+                velocities[i], velocityOff, gliss, ribattuto
             )
 //                lastIsGliss = gliss > 0
         }
@@ -268,24 +270,24 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
             val gliss = glissando[i]
             val duration = durations[i]
             val articulationDuration = articulationDurations[i]
+            val ribattuto = ribattutos[i]
             val overLegato = articulationDuration > duration
 //                val attackDelay = if(lastIsGliss && (articulationDuration == duration || overLegato)) 127 else 0
             val dur = if(overLegato && (glissando[(i+1) % glissando.size] >0 || gliss >0)  )
                 duration.toLong() else articulationDuration.toLong()
             val pitch = pitches[i]
             val velocity = velocities[i]
-
             if (trackData.vibrato != 0) {
                 addVibratoToTrack(track, tick, dur, channel, vibrato)
             }
             Player.insertNoteWithGlissando(
                 track, tick, dur, channel, pitches[i],
-                velocities[i], velocityOff, gliss
+                velocities[i], velocityOff, gliss, ribattuto
             )
             doubling.forEach {
                 Player.insertDoublingNote(
                     track, tick, dur, channel, pitch + it,
-                    velocity, velocityOff
+                    velocity, velocityOff, ribattuto
                 )
             }
         }
@@ -359,15 +361,18 @@ fun setTimeSignatures(
 
 fun alterateArticulation(
     ticks: IntArray, durations: IntArray,
-    legatoAlterations: List<Float>, legatoDeltas: List<Long>,
+    legatoAlterations: List<Float>, ribattutosAlterations: List<Int>, legatoDeltas: List<Long>,
     previousIsRest: BooleanArray, maxLegato: Int
-): IntArray {
-    if (durations.isEmpty()) return IntArray(0)
+): Pair<IntArray, IntArray> {
+    if (durations.isEmpty()) return Pair(IntArray(0), IntArray(0))
     val result = IntArray(durations.size)
+    val resultRibattutos = IntArray(durations.size)
+
     var alterationIndex = 0
     var alterationTick = 0
     var durIndex = 0
     var legatoAlteration: Float
+    var ribattutoAlteration: Int
     var newDur: Int
     var nextDur: Int
     var thisDur: Int
@@ -379,18 +384,22 @@ fun alterateArticulation(
                 alterationIndex++
             }
             legatoAlteration = legatoAlterations[alterationIndex]
+            ribattutoAlteration = ribattutosAlterations[alterationIndex]
             thisDur = durations[durIndex]
             if (legatoAlteration <= 1.0) {
                 newDur = (thisDur * legatoAlteration).toInt()
                 result[durIndex] = if (newDur < 12) 12 else newDur
+                resultRibattutos[durIndex] = ribattutoAlteration
             } else {
                 if (previousIsRest[durIndex + 1]) { // there is a rest between notes, legato is not requested
                     result[durIndex] = thisDur
+                    resultRibattutos[durIndex] = ribattutoAlteration
                 } else {
                     nextDur = durations[durIndex + 1]
                     legato = (nextDur * (legatoAlteration - 1f)).toInt()
                     result[durIndex] =
                         if (legato > maxLegato) thisDur + maxLegato else thisDur + legato
+                    resultRibattutos[durIndex] = ribattutoAlteration
                 }
             }
             durIndex++
@@ -401,6 +410,7 @@ fun alterateArticulation(
         alterationIndex++
     }
     legatoAlteration = legatoAlterations[alterationIndex]
+    ribattutoAlteration = ribattutosAlterations[alterationIndex]
     thisDur = durations[durIndex]
     if (legatoAlteration <= 1.0) {
         newDur = (thisDur * legatoAlteration).toInt()
@@ -408,9 +418,11 @@ fun alterateArticulation(
     } else {
         result[durIndex] = thisDur // last note doesn't need legato
     }
-//        println("Original durations: ${durations.contentToString()}")
-//        result.also{ println("Alterate articulations: ${it.contentToString()}") }
-    return result
+    resultRibattutos[durIndex] = ribattutoAlteration
+        println("Original durations: ${durations.contentToString()}")
+        result.also{ println("Alterate articulations: ${it.contentToString()}") }
+        resultRibattutos.also{ println("Alterate ribattutos: ${it.contentToString()}") }
+    return Pair(result, resultRibattutos)
 }
 
 fun insertNoteCheckingHigh(

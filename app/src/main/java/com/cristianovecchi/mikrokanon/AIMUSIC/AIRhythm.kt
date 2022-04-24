@@ -120,7 +120,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     GRAZIOSO_6_16_R8_16(RhythmType.BALLET,"Grazioso 6/16♪16", listOf(240,30,-90,240,30,-90), Pair(6,16)),
     GRAZIOSO_9_16_R8_16(RhythmType.BALLET,"Grazioso 9/16♪16", listOf(240,30,-90,240,30,-90,240,30,-90), Pair(9,16)),
     GRAZIOSO_12_16_R8_16(RhythmType.BALLET,"Grazioso 12/16♪16", listOf(240,30,-90,240,30,-90,240,30,-90,240,30,-90), Pair(12,16)),
-    GRAZIOSETTO_3_8_R8(RhythmType.BALLET,"Graziosetto 3/8♪",listOf(240,60,-180,60,-180), Pair(6,8)),
+    GRAZIOSETTO_3_8_R8(RhythmType.BALLET,"Graziosetto 3/8♪",listOf(240,60,-180,60,-180), Pair(3,8)),
     GRAZIOSETTO_6_8_R8(RhythmType.BALLET,"Graziosetto 6/8♪",listOf(240,60,-180,60,-180,240,60,-180,60,-180), Pair(6,8)),
     GRAZIOSETTO_2_4_R16(RhythmType.BALLET,"Graziosetto 16",listOf(N4graziosetto, N4graziosetto).flatten(), METRO_2_4),
     GRAZIOSETTO_2_4_R16_8T(RhythmType.BALLET,"Graziosetto 16+♪t",listOf(N4graziosetto, N3graziosetto).flatten(), METRO_2_4),
@@ -134,7 +134,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     DOTTED1_3_4(RhythmType.PUNTATO,"Dotted1 3/4", listOf(360,120,360,120,360,120), METRO_3_4),
     DOTTED2_1_4(RhythmType.PUNTATO,"Dotted2 1/4", listOf(360,60,60), Pair(1,4)),
     DOTTED2_2_4(RhythmType.PUNTATO,"Dotted2 2/4", listOf(360,60,60,360,60,60), METRO_2_4),
-    DOTTED2_3_4(RhythmType.PUNTATO,"Dotted2 3/4", listOf(360,60,60,360,60,60,360,60,60,360,60,60), METRO_3_4),
+    DOTTED2_3_4(RhythmType.PUNTATO,"Dotted2 3/4", listOf(360,60,60,360,60,60,360,60,60), METRO_3_4),
     DOTTED3_1_4(RhythmType.PUNTATO,"Dotted3 1/4", listOf(300,60,60,60), Pair(1,4)),
     DOTTED3_2_4(RhythmType.PUNTATO,"Dotted3 2/4", listOf(300,60,60,60,300,60,60,60), METRO_2_4),
     DOTTED3_3_4(RhythmType.PUNTATO,"Dotted3 3/4", listOf(300,60,60,60,300,60,60,60,300,60,60,60), METRO_3_4),
@@ -154,7 +154,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
         listOf(N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N6rhythmDotted, N5rhythmDotted,N4rhythmDotted,N3rhythmDotted,).flatten()),
     DOTTED_FLUX_1234565432(RhythmType.PUNTATO,"Dotted Flux 1234565432",
         listOf(N1rhythmDotted,N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N6rhythmDotted, N5rhythmDotted,N4rhythmDotted, N3rhythmDotted, N2rhythmDotted).flatten(),Pair(5,4)),
-    SNARE(RhythmType.DANCE,"Snare", listOf(90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,90,-30,30,-30,30,-30,30,-30,30,-30,30,-30,30,-30)),
+    SNARE(RhythmType.DANCE,"Snare", listOf(90,-30, 30,-30,30,-30, 90,-30, 30,-30,30,-30, 90,-30, 30,-30,30,-30, 30,-30,30,-30, 30,-30,30,-30), Pair(2,4)),
     CANCAN(RhythmType.DANCE,"Cancan", listOf(listOf(360,-120),N4graziosetto, N2détaché, N4graziosetto, N2détaché, N4graziosetto, N4staccatissimo, N4staccatissimo).flatten(),Pair(4,8)),
 
     HABANERA(RhythmType.DANCE,"Habanera", listOf(360,120,60,-180,60,-180), Pair(2,4)),
@@ -192,7 +192,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     BULGARIAN1H(RhythmType.BULGARIAN,"Bulgarian1 4+2+3♬",listOf(H1h,N1h,N1dottedH).flatten(),Pair(9,16)),
     BULGARIAN2H(RhythmType.BULGARIAN,"Bulgarian2 2+2+3♬",listOf(N1h,N1h,N1dottedH).flatten(),Pair(7,16)),
     BULGARIAN3H(RhythmType.BULGARIAN,"Bulgarian3 2+3♬",listOf(N1h,N1dottedH).flatten(),Pair(5,16)),
-    BULGARIAN4H(RhythmType.BULGARIAN,"Bulgarian4 3+2+3♬",listOf(N1dotted,N1h,N1dottedH).flatten(),Pair(8,16)),
+    BULGARIAN4H(RhythmType.BULGARIAN,"Bulgarian4 3+2+3♬",listOf(N1dottedH,N1h,N1dottedH).flatten(),Pair(8,16)),
     BULGARIAN5H(RhythmType.BULGARIAN,"Bulgarian5 2+2+2+3♬",listOf(N1h,N1h,N1h,N1dottedH).flatten(),Pair(9,16)),
     BULGARIAN6H(RhythmType.BULGARIAN,"Bulgarian6 3+3+2♬",listOf(N1dottedH,N1dottedH,N1h).flatten(),Pair(8,16)),
     BULGARIAN1GRZH(RhythmType.BULGARIAN,"Bulg.1 grz. 4+2+3♬",listOf(Ox4grzH,Ox2grzH,Ox3grzH).flatten(),Pair(9,16)),
@@ -204,15 +204,15 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
 
     HEMIOLIA32(RhythmType.HEMIOLIA,"Hemiolia 3=2", listOf(120,60,60,120),Pair(3,16)),
     HEMIOLIA43(RhythmType.HEMIOLIA,"Hemiolia 4=3", listOf(180,60,120,120,60,180),Pair(3,8)),
-    HEMIOLIA54(RhythmType.HEMIOLIA,"Hemiolia 5=4", listOf(480,60,180,120,120,180,60,480),Pair(5,8)),
+    HEMIOLIA54(RhythmType.HEMIOLIA,"Hemiolia 5=4", listOf(240,60,180,120,120,180,60,240),Pair(5,8)),
     HEMIOLIA65(RhythmType.HEMIOLIA,"Hemiolia 6=5", listOf(600,120,480,240,360,360, 240,480,120,600),Pair(6,16)),
 
-    FLUX_3454(RhythmType.FLUX,"Flux 3454",listOf(160,160,160,120,120,120,120,96,96,96,96,96,120,120,120,120,160,160,160)),
-    FLUX_345654(RhythmType.FLUX,"Flux 345654",listOf(160,160,160,120,120,120,120,96,96,96,96,96,80,80,80,80,80,80,96,96,96,96,96,120,120,120,120,160,160,160),Pair(3,4)),
-    FLUX_34567654(RhythmType.FLUX,"Flux 34567654",listOf(160,160,160,120,120,120,120,96,96,96,96,96,80,80,80,80,80,80,69,68,69,68,69,68,69,80,80,80,80,80,80,96,96,96,96,96,120,120,120,120,160,160,160)),
-    FLUX_3456787654(RhythmType.FLUX,"Flux 3456787654",listOf(160,160,160,120,120,120,120,96,96,96,96,96,80,80,80,80,80,80,69,68,69,68,69,68,69,60,60,60,60,60,60,60,60, 69,68,69,68,69,68,69,80,80,80,80,80,80,96,96,96,96,96,120,120,120,120,160,160,160),Pair(2,4)),
+    FLUX_3454(RhythmType.FLUX,"Flux 3454",listOf(N3,N4,N5,N4).flatten()),
+    FLUX_345654(RhythmType.FLUX,"Flux 345654",listOf(N3,N4,N5, N6,N5,N4).flatten(),Pair(3,4)),
+    FLUX_34567654(RhythmType.FLUX,"Flux 34567654",listOf(N3,N4,N5,N6,N7,N6,N5,N4).flatten()),
+    FLUX_3456787654(RhythmType.FLUX,"Flux 3456787654",listOf(N3,N4,N5, N6,N7,N8, N7,N6,N5,N4).flatten(),Pair(2,4)),
     FLUX_2H34H56H78H9TH98H76H54H3(RhythmType.FLUX,"Flux 2h34h56h78h9Th 98h76h54h3",
-        listOf(listOf(120),N3,N4h,N5 ,N6h,N7,N8h,N9 ,N10h,N9,N8h,N7 ,N6h,N5,N4h,N3).flatten() ,Pair(3,4)),
+        listOf(listOf(240),N3,N4h,N5 ,N6h,N7,N8h,N9 ,N10h,N9,N8h,N7 ,N6h,N5,N4h,N3).flatten() ,Pair(3,4)),
     FLUX_234_345_456_567_876_765_654_543(RhythmType.FLUX,"Flux 234 345 456 567 876 765 654 543",
         listOf(N2,N3,N4, N3,N4,N5, N4,N5,N6, N5,N6,N7, N8,N7,N6, N7,N6,N5, N6,N5,N4, N5,N4,N3).flatten(),Pair(3,4)),
     ACC_345678(RhythmType.FLUX,"Acc 345678", listOf(N3,N4,N5, N6,N7,N8).flatten(), Pair(3,4)),
@@ -246,6 +246,9 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     fun metroDenominatorMidiValue(): Int {
         return denominatorMidiValue(this.metro.second)
     }
+    fun isIntegrityOk(): Boolean {
+        return this.patternDuration() % this.barDuration() == 0
+    }
 
     // can't have two negative values coupled (ex: -80, -20 ... write -100)
     fun retrogradeValues(): List<Int> {
@@ -267,6 +270,11 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     }
 
     companion object {
+        fun checkIntegrity(){
+            val wrongPatterns = RhythmPatterns.values().filter{ !it.isIntegrityOk()}
+            if(wrongPatterns.isEmpty()) println("Rhythm patterns are OK!!!")
+            else println("WARNING!!! Damages in patterns: $wrongPatterns")
+        }
         fun durationSum(nNotes: Int, values: List<Int>): Int{
             var index = 0;
             var sum = 0
