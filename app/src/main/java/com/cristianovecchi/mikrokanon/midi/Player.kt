@@ -166,7 +166,7 @@ object Player {
                 .repeat(triple.third) else triple.first.values.repeat(triple.third)
         }.mergeNegativeValues()
         val nRhythmSteps = durations.filter { it > -1 }.count()
-        println("durations: $durations")
+        //println("durations: $durations")
         val actualRhythm = {
             val actualRhythm = mutableListOf<Triple<RhythmPatterns, Boolean, Int>>()
             //println("TOTAL NOTES: $nTotalNotes   STEPS: $nRhythmSteps")
@@ -216,7 +216,8 @@ object Player {
                 6 to 1.25f
             )
             val legatos = legatoTypes.map { articulationMap[it.first.absoluteValue]!! * (if (it.first < 0) -1 else 1) }
-            val ribattutos = legatoTypes.map { it.second }
+            val ribattutos = if(legatoTypes.size == 1) listOf(legatoTypes[0].second, legatoTypes[0].second)
+                else legatoTypes.map { it.second }
 
 //            println("Legatos: $legatos")
 //            println("Ribattutos: $ribattutos")
@@ -446,28 +447,26 @@ object Player {
             actualPitch -= 12
         }
         val dur = duration - separator
-        val on = NoteOn(start, channel, actualPitch, velOn)
-        val off = NoteOff(start + dur, channel, actualPitch, velOff)
-        mt.insertEvent(on)
-        mt.insertEvent(off)
+        insertNoteWithRibattuto(mt, start, dur, channel, actualPitch, velOn, velOff, ribattuto)
     }
     fun insertNoteWithRibattuto(
         mt: MidiTrack, start: Long, dur: Long, channel: Int,
         pitch: Int, velOn: Int, velOff: Int, ribattuto: Int = 1
     ){
         when (ribattuto){
-            1 -> insertSimpleNote(mt, start, dur, channel, pitch, velOn, velOff)
+            in Int.MIN_VALUE..1 -> insertSimpleNote(mt, start, dur, channel, pitch, velOn, velOff)
             in 2..Int.MAX_VALUE -> {
                 val ribVelOff = 0
                 if(dur < 24 ) {
                     insertSimpleNote(mt, start, dur, channel, pitch, velOn, ribVelOff)
                 } else {
                     val divDur = dur / ribattuto
-                    if (divDur < 4) {
+                    if (divDur < 3) {
                         insertSimpleNote(mt, start, dur, channel, pitch, velOn, velOff)
                     } else {
+                        val realDur = divDur - separator
                         for( i in 0 until ribattuto){
-                            insertSimpleNote(mt, start + i * divDur, divDur, channel, pitch, velOn, ribVelOff)
+                            insertSimpleNote(mt, start + i * divDur, realDur, channel, pitch, velOn, ribVelOff)
                         }
                     }
                 }
