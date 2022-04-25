@@ -21,6 +21,7 @@ import com.leff.midi.event.meta.TimeSignature
 import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 
 object Player {
@@ -216,9 +217,10 @@ object Player {
             )
             val legatos = legatoTypes.map { articulationMap[it.first.absoluteValue]!! * (if (it.first < 0) -1 else 1) }
             val ribattutos = legatoTypes.map { it.second }
-            println("Legatos: $legatos")
-            println("Ribattutos: $ribattutos")
-            val (legatoAlterations, ribattutoAlterations, legatoDeltas) = alterateLegatosWithDistribution(legatos, ribattutos,0.005f, totalLength)
+
+//            println("Legatos: $legatos")
+//            println("Ribattutos: $ribattutos")
+            val (legatoAlterations, legatoDeltas, pivots) = alterateLegatosWithDistribution(legatos, ribattutos,0.005f, totalLength)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 counterpointTrackData.parallelStream().forEach {
@@ -226,13 +228,14 @@ object Player {
                         it.ticks,
                         it.durations,
                         legatoAlterations,
-                        ribattutoAlterations,
+                        ribattutos,
                         legatoDeltas,
+                        pivots,
                         it.isPreviousRest,
                         maxLegato
                     )
                     it.articulationDurations= pair.first
-                    it.ribattutos= pair.second
+                    it.ribattutos = pair.second.map{ float -> float.roundToInt()}.toIntArray()
                 }
             } else {
                 counterpointTrackData.forEach {
@@ -240,17 +243,18 @@ object Player {
                         it.ticks,
                         it.durations,
                         legatoAlterations,
-                        ribattutoAlterations,
+                        ribattutos,
                         legatoDeltas,
+                        pivots,
                         it.isPreviousRest,
                         maxLegato
                     )
                     it.articulationDurations= pair.first
-                    it.ribattutos= pair.second
+                    it.ribattutos= pair.second.map{ float -> float.roundToInt()}.toIntArray()
                 }
             }
         }
-        println("TrackData 1 = ${counterpointTrackData[0]}")
+//        println("TrackData 1 = ${counterpointTrackData[0]}")
         //if(counterpointTrackData.map{println(it.changes);it.changes.size}.toSet().size != 1) throw Exception("WARNING: SOME CHANGE DATA HAS BEEN SKIPPED!!!")
         // TRANSFORM DATATRACKS IN MIDITRACKS
         val counterpointTracks =
@@ -454,7 +458,7 @@ object Player {
         when (ribattuto){
             1 -> insertSimpleNote(mt, start, dur, channel, pitch, velOn, velOff)
             in 2..Int.MAX_VALUE -> {
-                val ribVelOff = 127
+                val ribVelOff = 0
                 if(dur < 24 ) {
                     insertSimpleNote(mt, start, dur, channel, pitch, velOn, ribVelOff)
                 } else {
