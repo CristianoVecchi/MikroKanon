@@ -372,7 +372,7 @@ data class Lang( // English by default
     val selectZodiac: String = "Use these zodiac symbols:",
     val mbti: String = "MBTI",
     val selectMbti: String = "Select MBTI!",
-    val credits: String = "Credits",
+    val creditsAndLicenses: String = "Credits & Licenses",
     val choose2ndSequence: String = "Choose the second sequence!",
     val chooseAnotherSequence: String = "Choose another sequence!",
 

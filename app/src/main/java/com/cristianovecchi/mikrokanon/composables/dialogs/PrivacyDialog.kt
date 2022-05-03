@@ -48,8 +48,13 @@ fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                     .height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
+                val weights = dimensions.listDialogWeights
                 Column(verticalArrangement = Arrangement.SpaceBetween){
-                    LazyColumn(modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                    val modifierA = Modifier
+                        .weight(weights.first)
+                    val modifierB = Modifier
+                        .weight(weights.second)
+                    LazyColumn(modifier = modifierA.padding(start = 10.dp, end = 10.dp)
 
                     ) {
                         item {
@@ -72,22 +77,32 @@ fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                                     append("Information Collection and Use\n")
                                 }
                                 withStyle(commentStyle){
-                                    append("The MikroKanon app does not collect any user's information of any kind, also does not profile the user in any manner and does not connect to any server or any device.")
+                                    append("The MikroKanon app does not collect any user's information of any kind, also does not profile the user in any manner and does not connect either to any server or to any device.")
                                 }
                             })
                         }
                         item{
                             Text(text = buildAnnotatedString {
                                 withStyle(titleStyle){
-                                    append("Bugs report\n")
+                                    append("Bugs Report\n")
                                 }
                                 withStyle(commentStyle){
                                     append("Please report bugs at cristianovecchi@alice.it")
                                 }
                             })
                         }
+                        item{
+                            Text(text = buildAnnotatedString {
+                                withStyle(titleStyle){
+                                    append("Privacy Policy Modification\n")
+                                }
+                                withStyle(commentStyle){
+                                    append("You will receive a notification each time this Privacy Policy is modified to read it.")
+                                }
+                            })
+                        }
                     }
-                    Column(modifier = Modifier.padding(10.dp)) {
+                    Column(modifier = modifierB.padding(10.dp)) {
                         Spacer(modifier = Modifier.height(10.dp))
                         Button(
                             onClick = {

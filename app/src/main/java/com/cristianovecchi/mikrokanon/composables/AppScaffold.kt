@@ -1017,13 +1017,13 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                             }
                             "Credits" -> {
                                 SelectableCard(
-                                    text = lang.credits,
+                                    text = lang.creditsAndLicenses,
                                     fontSize = fontSize,
                                     colors = colors,
                                     isSelected = true,
                                     onClick = {
                                         creditsDialogData.value = TextDialogData(
-                                            true, "Credits:",
+                                            true, lang.creditsAndLicenses,
                                         ) {
                                             creditsDialogData.value = TextDialogData()
                                         }

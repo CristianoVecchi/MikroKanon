@@ -39,11 +39,15 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
             color = Color.Blue)
         val uriHandler = LocalUriHandler.current
         val youtubeChannelUri = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
-        val youtubeMikroKanonExamplesUri = "https://www.youtube.com/watch?v=zaa3d3FVqA4&list=PLO0dKPP71phouGDmrOQA_yXEp0Z1L1PLV&index=2"
+        val youtubeMikroKanonPiecesUri = "https://www.youtube.com/watch?v=TzZNZy1s1UQ&list=PLO0dKPP71phrCDKvSq1XZPtfSccANQBiC"
+        val youtubeMikroKanonScoresUri = "https://www.youtube.com/watch?v=zaa3d3FVqA4&list=PLO0dKPP71phouGDmrOQA_yXEp0Z1L1PLV&index=2"
         val instagramUri = "https://www.instagram.com/cristiano.vecchi"
         val linkedinUri = "https://www.linkedin.com/in/cristiano-vecchi-ba1a311a"
         val githubUri = "https://github.com/CristianoVecchi"
+        val mitLicenseMKuri = "https://github.com/CristianoVecchi/MikroKanon/blob/master/LICENSE"
         val githubLeffelManiaUri = "https://github.com/LeffelMania"
+        val mitLicenseLeffelUri = "https://github.com/LeffelMania/android-midi-lib/blob/master/LICENSE"
+        val apacheLicense20Uri = "https://www.apache.org/licenses/LICENSE-2.0.txt"
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier
@@ -51,8 +55,13 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                     .height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
+                val weights = dimensions.listDialogWeights
                 Column(verticalArrangement = Arrangement.SpaceBetween){
-                    LazyColumn(modifier = Modifier.padding(10.dp)
+                    val modifierA = Modifier
+                        .weight(weights.first)
+                    val modifierB = Modifier
+                        .weight(weights.second)
+                    LazyColumn(modifier = modifierA.padding(10.dp)
 
                     ) {
                         item {
@@ -62,7 +71,7 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                         item {
                             Text(text = buildAnnotatedString {
                                 withStyle(commentStyle){
-                                    append("the MikroKanon App has been conceived and developed in 2021 by\n")
+                                    append("the MikroKanon App has been conceived and developed in 2021-2022 by\n")
                                 }
                                 withStyle(nameStyle){
                                     append("Cristiano Vecchi")
@@ -77,10 +86,17 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                             })
                             ClickableText(text = buildAnnotatedString {
                                 withStyle(uriStyle){
-                                    append("Youtube MK examples")
+                                    append("Youtube MK pieces")
                                 }
                             },onClick = {
-                                uriHandler.openUri(youtubeMikroKanonExamplesUri)
+                                uriHandler.openUri(youtubeMikroKanonPiecesUri)
+                            })
+                            ClickableText(text = buildAnnotatedString {
+                                withStyle(uriStyle){
+                                    append("Youtube MK scores")
+                                }
+                            },onClick = {
+                                uriHandler.openUri(youtubeMikroKanonScoresUri)
                             })
                             ClickableText(text = buildAnnotatedString {
                                 withStyle(uriStyle){
@@ -103,8 +119,19 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                             },onClick = {
                                 uriHandler.openUri(githubUri)
                             })
+                            ClickableText(text = buildAnnotatedString {
+                                withStyle(commentStyle){
+                                    append("the MikroKanon App is released under ")
+                                }
+                                withStyle(uriStyle){
+                                    append("MIT License")
+                                }
+                            },onClick = {
+                                uriHandler.openUri(mitLicenseMKuri)
+                            })
                             Spacer(modifier = Modifier.height(10.dp))
                         }
+
 
 
                         item{
@@ -123,10 +150,35 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                             },onClick = {
                                 uriHandler.openUri(githubLeffelManiaUri)
                             })
+                            ClickableText(text = buildAnnotatedString {
+                                withStyle(commentStyle){
+                                    append("released under ")
+                                }
+                                withStyle(uriStyle){
+                                    append("MIT License")
+                                }
+                            },onClick = {
+                                uriHandler.openUri(mitLicenseLeffelUri)
+                            })
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
+                        item{
+                            Text(text = buildAnnotatedString {
+                                withStyle(commentStyle){
+                                    append("Icons used in this App are available under the ")
+                                }
 
+                            })
+                            ClickableText(text = buildAnnotatedString {
+                                withStyle(uriStyle){
+                                    append("Apache License Version 2.0")
+                                }
+                            },onClick = {
+                                uriHandler.openUri(apacheLicense20Uri)
+                            })
+                        }
                     }
-                    Column(modifier = Modifier.padding(10.dp)) {
+                    Column(modifier = modifierB.padding(10.dp)) {
                         Spacer(modifier = Modifier.height(10.dp))
                         Button(
                             onClick = {
