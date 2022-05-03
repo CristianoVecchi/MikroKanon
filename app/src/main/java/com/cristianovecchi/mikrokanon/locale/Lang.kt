@@ -385,7 +385,8 @@ data class Lang( // English by default
     val clearSlots: String = "Clear slots",
     val selectSlots: String = "Select slots to clear!",
     val slotNumbers: List<String> = listOf("1","2","3","4","5","6","7","8","9","A","B","C","D","E","F","G"),
-    val addSequencesToMaze: String = "Add other sequences in the maze!"
+    val addSequencesToMaze: String = "Add other sequences in the maze!",
+    val privacyPolicy: String = "Privacy Policy"
     //val convertToDate: (Long) -> String = toDateEn
     ){
 

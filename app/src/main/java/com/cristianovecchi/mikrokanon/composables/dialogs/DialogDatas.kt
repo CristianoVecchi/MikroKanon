@@ -56,5 +56,5 @@ data class ButtonsDialogData(
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
                             val error:String = "",
                             val onSubmitButtonClick: () -> Unit = {})
-data class CreditsDialogData(val dialogState: Boolean = false, val title:String = "",
+data class TextDialogData(val dialogState: Boolean = false, val title:String = "",
                              val onSubmitButtonClick: () -> Unit = {})

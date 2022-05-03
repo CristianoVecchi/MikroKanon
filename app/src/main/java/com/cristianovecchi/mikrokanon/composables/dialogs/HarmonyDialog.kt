@@ -24,12 +24,14 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
+import com.cristianovecchi.mikrokanon.AIMUSIC.ListaStrumenti
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.midi.HarmonizationData
 import com.cristianovecchi.mikrokanon.midi.HarmonizationType
 import com.cristianovecchi.mikrokanon.midi.chordsInstruments
+import com.cristianovecchi.mikrokanon.midi.starredChordsInstruments
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
@@ -43,6 +45,9 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                value = multiNumberDialogData.value.value) }) {
     if (multiNumberDialogData.value.dialogState) {
         val model = multiNumberDialogData.value.model
+        val ratedChordsInstruments = chordsInstruments.mapIndexed{i, ch ->
+            "${ListaStrumenti.getNameByIndex(i)}${if(starredChordsInstruments.contains(i)) " *" else ""}"
+        }
         val lang = Lang.provideLanguage(model.getUserLangDef())
         val harmNames = HarmonizationType.values().map{ it.title }
         val harmTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
@@ -164,7 +169,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             val harmData = harmDatas[cursor]
                             harmTypeDialogData.value = ListDialogData(
                                 true,
-                                multiNumberDialogData.value.names,
+                                ratedChordsInstruments,
                                 chordsInstruments.indexOf(harmData.instrument),
                                 lang.selectHarmonizationInstruments
                             ) { instrumentIndex ->
@@ -184,14 +189,15 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             colors = model.appColors
                         ) {
                             val harmData = harmDatas[cursor]
+                            val volumes = listOf(100,90,80,70,60,50,40,30,26,23,20,16,13,10,6,3)
                             harmTypeDialogData.value = ListDialogData(
                                 true,
-                                listOf("100%","90%","80%","70%","60%","50%","40%","30%","20%","10%"),
-                                10 - (harmData.volume * 10).toInt(),
+                                volumes.map{"$it%"},
+                                volumes.indexOf((harmData.volume * 100).toInt()),
                                 lang.selectHarmonizationVolume
                             ) { volumeIndex ->
                                 val newHarmDatas = harmDatas.toMutableList()
-                                newHarmDatas[cursor] = harmDatas[cursor].copy(volume = (10 - volumeIndex) / 10f)
+                                newHarmDatas[cursor] = harmDatas[cursor].copy(volume = volumes[volumeIndex] / 100f)
                                 harmDatas = newHarmDatas
                                 ListDialogData(itemList = harmTypeDialogData.value.itemList)
                             }

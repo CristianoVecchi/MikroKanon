@@ -321,7 +321,7 @@ object Player {
 //        )
         // CHORD TRACK IF NEEDED
         println(harmonizations)
-        if(harmonizations.isNotEmpty()){
+        if(harmonizations.isNotEmpty() && !harmonizations.all { it.type == HarmonizationType.NONE }){
             val doubledBars = bars.mergeOnesInMetro()
                 .resizeLastBar(totalLength)
                 .splitBarsInTwoParts()

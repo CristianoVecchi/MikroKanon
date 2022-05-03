@@ -67,7 +67,7 @@ fun AppScaffold(model: AppViewModel,
         scaffoldState = scaffoldState,
         drawerContent = { SettingsDrawer(model, dimensionsFlow, userOptionsDataFlow, counterpointsDataFlow)},
         topBar = {
-            val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
+            val creditsDialogData by lazy { mutableStateOf(TextDialogData())}
             CreditsDialog(creditsDialogData, dimensions)
             TopAppBar(Modifier.border(1.dp,colors.selCardBorderColorSelected)) {
                 Row(
@@ -96,9 +96,9 @@ fun AppScaffold(model: AppViewModel,
                             append("by Cristiano Vecchi")
                         }
                     },onClick = {
-                        creditsDialogData.value = CreditsDialogData(true, "Credits:",
+                        creditsDialogData.value = TextDialogData(true, "Credits:",
                         ) {
-                            creditsDialogData.value = CreditsDialogData()
+                            creditsDialogData.value = TextDialogData()
                         }
                     })
                 }
@@ -131,7 +131,8 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
     val harmonyDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val clearSlotsDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
-    val creditsDialogData by lazy { mutableStateOf(CreditsDialogData())}
+    val privacyDialogData by lazy { mutableStateOf(TextDialogData())}
+    val creditsDialogData by lazy { mutableStateOf(TextDialogData())}
     val mbtiDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val detectorDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val detExtensionDialogData by lazy { mutableStateOf(ListDialogData())}
@@ -158,7 +159,8 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         "Spread where possible", "Deep Search in 4 part MK",
          "Detector","Detector Extension",
         //"Colors",
-        "Custom Colors", "Counterpoint View", "Language","Zodiac","MBTI","Spacer","Credits")
+        "Custom Colors", "Counterpoint View", "Language","Zodiac","MBTI",
+        "Spacer", "Privacy Policy", "Credits")
 
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val allCounterpointsData by counterpointsDataFlow.collectAsState(initial = listOf())
@@ -186,6 +188,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         val formsNames = listOf("unrelated", lang.original, lang.inverse, lang.retrograde, lang.invRetrograde)
         RowFormsDialog(rowFormsDialogData, dimensions, formsNames, lang.slotNumbers)
         ExportDialog(exportDialogData, lang.OKbutton)
+        PrivacyDialog(privacyDialogData, dimensions, lang.OKbutton)
         CreditsDialog(creditsDialogData, dimensions, lang.OKbutton)
         MultiListDialog(mbtiDialogData, dimensions, lang.OKbutton)
         MultiListDialog(detectorDialogData, dimensions, lang.OKbutton)
@@ -997,6 +1000,21 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                             "Spacer" -> {
                                 Spacer(modifier = Modifier.height(spacerHeight.dp))
                             }
+                            "Privacy Policy" -> {
+                                SelectableCard(
+                                    text = lang.privacyPolicy,
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = true,
+                                    onClick = {
+                                        privacyDialogData.value = TextDialogData(
+                                            true, "",
+                                        ) {
+                                            privacyDialogData.value = TextDialogData()
+                                        }
+                                    }
+                                )
+                            }
                             "Credits" -> {
                                 SelectableCard(
                                     text = lang.credits,
@@ -1004,10 +1022,10 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                     colors = colors,
                                     isSelected = true,
                                     onClick = {
-                                        creditsDialogData.value = CreditsDialogData(
+                                        creditsDialogData.value = TextDialogData(
                                             true, "Credits:",
                                         ) {
-                                            creditsDialogData.value = CreditsDialogData()
+                                            creditsDialogData.value = TextDialogData()
                                         }
                                     }
                                 )
