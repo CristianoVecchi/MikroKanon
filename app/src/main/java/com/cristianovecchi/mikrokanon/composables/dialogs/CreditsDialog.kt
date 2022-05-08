@@ -165,7 +165,7 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                         item{
                             Text(text = buildAnnotatedString {
                                 withStyle(commentStyle){
-                                    append("Icons used in this App are available under the ")
+                                    append("icons used in this App are available on Android Studio under the ")
                                 }
 
                             })
