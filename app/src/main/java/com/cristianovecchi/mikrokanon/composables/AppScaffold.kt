@@ -1010,6 +1010,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                         privacyDialogData.value = TextDialogData(
                                             true, "",
                                         ) {
+                                            model.updateUserOptions("privacy", 1)
                                             privacyDialogData.value = TextDialogData()
                                         }
                                     }

@@ -59,7 +59,6 @@ fun SequenceSelector(model: AppViewModel,
         if(userOptionsData.isNotEmpty()) model.setAppColors(userOptionsData[0].colors)
         model.appColors // default ALL BLACK
     }
-
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val backgroundColor = appColors.sequencesListBackgroundColor
     val buttonsBackgroundColor = appColors.buttonsDisplayBackgroundColor
@@ -88,9 +87,18 @@ fun SequenceSelector(model: AppViewModel,
             val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
             val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+            val privacyDialogData = remember { mutableStateOf(TextDialogData())}
             val buttonSize = dimensions.selectorButtonSize
             val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
             val filledSlots by model.filledSlots.asFlow().collectAsState(initial = setOf())
+            if(!model.privacyIsAccepted){
+                privacyDialogData.value = TextDialogData(
+                    true, "",
+                ) {
+                    model.updateUserOptions("privacy", 1)
+                    privacyDialogData.value = TextDialogData()
+                }
+            }
             SequencesDialog(dialogState = dialogState, dimensions = dimensions,
                 title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
                 sequencesList = sequencesToString,
@@ -117,6 +125,7 @@ fun SequenceSelector(model: AppViewModel,
                 selected = selected, onSelect = onSelectComposition
             )
             MultiSequenceDialog(multiSequenceDialogData, buttonsDialogData, dimensions, model)
+            PrivacyDialog(privacyDialogData, dimensions, language.OKbutton)
 
             Column(modifier1) {
                 Row(modifier = Modifier.fillMaxSize(),horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {

@@ -274,7 +274,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                         }
                         CustomButton(
                             adaptSizeToIconButton = true,
-                            isActive = sequences.size <=  AppViewModel.MAX_SEQUENCES_IN_MAZE,
+                            isActive = sequences.size <  AppViewModel.MAX_SEQUENCES_IN_MAZE,
                             iconId = model.iconMap["add"]!!,
                             buttonSize = buttonSize.dp,
                             iconColor = model.appColors.iconButtonIconColor,

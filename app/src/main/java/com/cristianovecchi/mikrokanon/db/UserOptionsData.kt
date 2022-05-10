@@ -99,6 +99,9 @@ import androidx.room.PrimaryKey
 
         @ColumnInfo(name = "lastplay_data")
         val lastPlayData: String,
+
+        @ColumnInfo(name = "privacy")
+        val privacy: Int,
     ){
         companion object{
             fun getDefaultUserOptionsData(): UserOptionsData {
@@ -110,7 +113,7 @@ import androidx.room.PrimaryKey
                     0,0,0,1,
                      //"System|0" ,
                      "579|0" , // priority on custom color 579
-                    0,"System", 0, 1 ,"","0|-1")
+                    0,"System", 0, 1 ,"","0|-1", 0)
             }
             fun updateUserOptionsData(
                 optionsDataClone: UserOptionsData,
@@ -210,6 +213,9 @@ import androidx.room.PrimaryKey
                     }
                     "lastPlayData" -> {
                         optionsDataClone.copy(id = id, lastPlayData = value as String)
+                    }
+                    "privacy" -> {
+                        optionsDataClone.copy(id = id, privacy = value as Int)
                     }
                     else -> optionsDataClone.copy()
                 }

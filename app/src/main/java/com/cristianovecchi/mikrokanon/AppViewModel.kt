@@ -85,6 +85,7 @@ class AppViewModel(
         const val MAX_SEQUENCES_IN_MAZE = 10
         val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,24, 16,14)
     }
+    var privacyIsAccepted = true
     val iconMap = Icons.provideIcons()
     var _dimensions: MutableLiveData<Dimensions> = MutableLiveData(Dimensions.default())
     val dimensions: LiveData<Dimensions> = _dimensions
