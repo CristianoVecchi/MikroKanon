@@ -94,6 +94,9 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "nuances")
         val nuances: Int,
 
+        @ColumnInfo(name = "check_and_replace")
+        val checkAndReplace: String,
+
         @ColumnInfo(name = "harmonizations")
         val harmonizations: String,
 
@@ -113,7 +116,8 @@ import androidx.room.PrimaryKey
                     0,0,0,1,
                      //"System|0" ,
                      "579|0" , // priority on custom color 579
-                    0,"System", 0, 1 ,"","0|-1", 0)
+                    0,"System", 0, 1 ,
+                    "","","0|-1", 0)
             }
             fun updateUserOptionsData(
                 optionsDataClone: UserOptionsData,
@@ -207,6 +211,9 @@ import androidx.room.PrimaryKey
                     }
                     "nuances" -> {
                         optionsDataClone.copy(id = id, nuances = value as Int)
+                    }
+                    "checkAndReplace" -> {
+                        optionsDataClone.copy(id = id, checkAndReplace = value as String)
                     }
                     "harmonizations" -> {
                         optionsDataClone.copy(id = id, harmonizations = value as String)

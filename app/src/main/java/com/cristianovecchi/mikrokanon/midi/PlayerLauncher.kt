@@ -146,6 +146,7 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
             glissandoFlags,
             audio8DFlags,
             vibrato,
+            emptyList(),
             harmonizations
         )
     }

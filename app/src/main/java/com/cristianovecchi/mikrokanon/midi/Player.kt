@@ -132,6 +132,7 @@ object Player {
         glissandoFlags: Int = 0,
         audio8DFlags: Int = 0,
         vibrato: Int = 0,
+        checkAndReplace: List<CheckAndReplaceData> = listOf(),
         harmonizations: List<HarmonizationData> = listOf()
     ): String {
         // Triple: Pattern, isRetrograde, nRepetitions
@@ -255,11 +256,21 @@ object Player {
                 }
             }
         }
+        // CHECK AND REPLACE
+        val checkAndReplaceList = listOf(
+            CheckAndReplaceData(CheckType.LONGER, listOf(120), ReplaceType.MORDENTE, listOf(30))
+        )
+        val actualCounterpointTrackData =
+            counterpointTrackData.map{
+                it.checkAndReplace(checkAndReplaceList[0])
+            }
+
+
 //        println("TrackData 1 = ${counterpointTrackData[0]}")
         //if(counterpointTrackData.map{println(it.changes);it.changes.size}.toSet().size != 1) throw Exception("WARNING: SOME CHANGE DATA HAS BEEN SKIPPED!!!")
         // TRANSFORM DATATRACKS IN MIDITRACKS
         val counterpointTracks =
-            counterpointTrackData.map { convertToMidiTrack(it, counterpointTrackData.size) }
+            actualCounterpointTrackData.map { convertToMidiTrack(it, actualCounterpointTrackData.size) }
 
         //val counterpointTracks = listOf(pitchBenderTest(MidiTrack()))
         //val totalLength = counterpointTracks.maxOf{ it.lengthInTicks}//.also{println("Total length: $it")} // Empty tracks have 0 length
@@ -312,20 +323,13 @@ object Player {
         tracks.add(tempoTrack)
         tracks.addAll(counterpointTracks)
 
-        // CHORD TRACK
-//        val harmonizations = listOf<HarmonizationData>(
-//            HarmonizationData(HarmonizationType.JAZZ11, 63, 0.8f),
-//            HarmonizationData(HarmonizationType.JAZZ, 62, 0.6f),
-//            HarmonizationData(HarmonizationType.NONE),
-//            HarmonizationData(HarmonizationType.XWH, 54, 0.9f),
-//        )
         // CHORD TRACK IF NEEDED
-        println(harmonizations)
+        //println(harmonizations)
         if(harmonizations.isNotEmpty() && !harmonizations.all { it.type == HarmonizationType.NONE }){
             val doubledBars = bars.mergeOnesInMetro()
                 .resizeLastBar(totalLength)
                 .splitBarsInTwoParts()
-            assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
+            assignDodecaBytesToBars(doubledBars.toTypedArray(), actualCounterpointTrackData, false)
             val barGroups = if(harmonizations.size == 1) listOf(doubledBars) else doubledBars.splitBarsInGroups(harmonizations.size)
             val chordsTrack = MidiTrack()
             addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations)

@@ -16,15 +16,7 @@ fun findTopNuances(stabilities: List<Float>, minNuance: Float, maxNuance: Float)
 data class ChangeData(val noteIndex: Int, val instrument: Int)
 data class TickChangeData(val tick: Long, val instrument: Int)
 
-data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: IntArray,
-                     val velocities: IntArray,val glissando: IntArray,  val attacks: IntArray,
-                     val isPreviousRest: BooleanArray,
-                     var articulationDurations: IntArray? = null,
-                     var ribattutos: IntArray? = null,
-                     val channel: Int,  val velocityOff: Int = 80,
-                     val vibrato: Int, val doublingFlags: Int = 0,
-                     val audio8D: Boolean = false, val partIndex: Int,
-                     val changes: List<TickChangeData> = listOf()  )// tick + instrument
+
 
 object CounterpointInterpreter {
     fun doTheMagic(counterpoint: Counterpoint,
