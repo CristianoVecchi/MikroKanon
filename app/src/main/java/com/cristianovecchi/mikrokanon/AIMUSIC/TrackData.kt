@@ -28,19 +28,33 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         if(articulationDurations == null) null else articulationDurations!![index],
         if(ribattutos == null) null else ribattutos!![index] )
     }
-    fun checkAndReplace(checkAndReplaceData: CheckAndReplaceData,
-                        start: Int = 0, end: Int = this.pitches.size-1 ): TrackData {
+    fun findSubstitutionNotes(checkAndReplaceData: CheckAndReplaceData,
+                              start: Long, end: Long, trackDataList: List<TrackData>): List<SubstitutionNotes>{
 
         val check = provideCheckFunction(checkAndReplaceData.check, checkAndReplaceData.checkValues)
         val replace = provideReplaceFunction(checkAndReplaceData.replace, checkAndReplaceData.replaceValues)
 
         val substitutions = mutableListOf<SubstitutionNotes>()
-        (start..end).forEach{ index ->
-            if(check(this, index)) substitutions.add(
-                replace(this, index)
+        for(index in pitches.indices){
+            if(ticks[index] > end) break
+            val noteEnd = ticks[index] + durations[index]
+            if(noteEnd < start) continue
+            if(check(this, index, trackDataList)) substitutions.add(
+                replace(this, index, trackDataList)
             )
         }
-        return this.substitueNote(substitutions)
+        return substitutions.toList()
+    }
+    fun checkAndReplace(checkAndReplaceDataList: List<CheckAndReplaceData>,
+                        totalLength: Long, trackDataList: List<TrackData>): TrackData {
+        val substitutions = mutableListOf<SubstitutionNotes>()
+        val slice = totalLength / checkAndReplaceDataList.size
+        checkAndReplaceDataList.forEachIndexed { index, checkAndReplaceData ->
+            val start = slice * index
+            println("totalLength:$totalLength start:$start end:${start+slice}")
+            substitutions.addAll(findSubstitutionNotes(checkAndReplaceData, start, start + slice, trackDataList))
+        }
+        return this.substitueNote(substitutions.distinctBy { it.index }) // to avoid overlapping
     }
     fun substitueNote(substitutionNotes: List<SubstitutionNotes>): TrackData {
         var subsIndex = 0
@@ -93,6 +107,20 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
             if(this.ribattutos == null) null else ribattutosData.toIntArray(),
             channel, 80, vibrato, doublingFlags,
             audio8D, partIndex, changes)
+    }
+    companion object {
+        fun findPitchesInSlice(trackDataList: List<TrackData>, start: Long, end: Long): Set<Int>{
+            val result = mutableSetOf<Int>()
+            for(track in trackDataList){
+                for(index in track.pitches.indices){
+                    if(track.ticks[index] > end) break
+                    val noteEnd = track.ticks[index] + track.durations[index]
+                    if(noteEnd < start) continue
+                    result.add(track.pitches[index])
+                }
+            }
+            return result.toSet()
+        }
     }
 }
 

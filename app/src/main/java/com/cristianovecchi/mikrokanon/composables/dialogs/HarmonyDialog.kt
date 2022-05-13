@@ -160,6 +160,27 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         CustomButton(
                             adaptSizeToIconButton = true,
                             text = "",
+                            iconId = model.iconMap["edit"]!!,
+                            buttonSize = buttonSize.dp,
+                            iconColor = model.appColors.iconButtonIconColor,
+                            colors = model.appColors
+                        ) {
+                            val harmData = harmDatas[cursor]
+                            harmTypeDialogData.value = ListDialogData(
+                                true,
+                                harmNames,
+                                harmData.type.ordinal,
+                                lang.selectHarmonizationType
+                            ) { newHarmonizationType ->
+                                val newHarmDatas = harmDatas.toMutableList()
+                                newHarmDatas[cursor] = harmDatas[cursor].copy(type = HarmonizationType.values()[newHarmonizationType])
+                                harmDatas = newHarmDatas
+                                ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                            }
+                        }
+                        CustomButton(
+                            adaptSizeToIconButton = true,
+                            text = "",
                             isActive = harmDatas[cursor].type != HarmonizationType.NONE,
                             iconId = model.iconMap["sound"]!!,
                             buttonSize = buttonSize.dp,
@@ -189,7 +210,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             colors = model.appColors
                         ) {
                             val harmData = harmDatas[cursor]
-                            val volumes = listOf(100,90,80,70,60,50,40,30,26,23,20,16,13,10,6,3)
+                            val volumes = listOf(100,90,80,70,60,50,45,40,35,30,26,23,20,16,13,10,8,6,4,2)
                             harmTypeDialogData.value = ListDialogData(
                                 true,
                                 volumes.map{"$it%"},
@@ -223,27 +244,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             )
                             onDismissRequest.invoke()
                         }
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            text = "",
-                            iconId = model.iconMap["edit"]!!,
-                            buttonSize = buttonSize.dp,
-                            iconColor = model.appColors.iconButtonIconColor,
-                            colors = model.appColors
-                        ) {
-                            val harmData = harmDatas[cursor]
-                            harmTypeDialogData.value = ListDialogData(
-                                true,
-                                harmNames,
-                                harmData.type.ordinal,
-                                lang.selectHarmonizationType
-                            ) { newHarmonizationType ->
-                                val newHarmDatas = harmDatas.toMutableList()
-                                newHarmDatas[cursor] = harmDatas[cursor].copy(type = HarmonizationType.values()[newHarmonizationType])
-                                harmDatas = newHarmDatas
-                                ListDialogData(itemList = harmTypeDialogData.value.itemList)
-                            }
-                        }
+
                         CustomButton(
                             adaptSizeToIconButton = true,
                             text = "",
