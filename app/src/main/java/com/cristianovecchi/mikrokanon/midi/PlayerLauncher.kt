@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.midi
 
 import android.media.MediaPlayer
+import com.cristianovecchi.mikrokanon.AIMUSIC.CheckAndReplaceData
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
@@ -118,6 +119,9 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
         val vibrato: Int =
             userOptionsData?.let { userOptionsData.vibrato }
                 ?: 0
+    val checkAndReplace: List<CheckAndReplaceData> =
+        userOptionsData?.let {CheckAndReplaceData.createCheckAndReplaceDatasFromCsv(userOptionsData.checkAndReplace)}
+            ?: listOf()
     val harmonizations: List<HarmonizationData> =
         userOptionsData?.let {HarmonizationData.createHarmonizationsFromCsv(userOptionsData.harmonizations)}
             ?: listOf()
@@ -146,7 +150,7 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
             glissandoFlags,
             audio8DFlags,
             vibrato,
-            emptyList(),
+            checkAndReplace,
             harmonizations
         )
     }

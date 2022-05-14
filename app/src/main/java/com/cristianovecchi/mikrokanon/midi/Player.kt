@@ -257,21 +257,16 @@ object Player {
             }
         }
         // CHECK AND REPLACE
-        val checkAndReplaceList = listOf(
-            CheckAndReplaceData(CheckType.LONGER, listOf(0), ReplaceType.TRILLO, listOf(30)),
-//            CheckAndReplaceData(CheckType.LONGER, listOf(0), ReplaceType.GRUPPETTO, listOf(30)),
-//            CheckAndReplaceData(CheckType.LONGER, listOf(0), ReplaceType.MORDENTE_3X, listOf(30)),
-//            CheckAndReplaceData(CheckType.LONGER, listOf(0), ReplaceType.MORDENTE_2X, listOf(30)),
-            //CheckAndReplaceData(CheckType.LONGER, listOf(0), ReplaceType.MORDENTE, listOf(30)),
-          //  CheckAndReplaceData(CheckType.NONE, listOf(120), ReplaceType.MORDENTE, listOf(30)),
-            //CheckAndReplaceData(CheckType.LONGER, listOf(120), ReplaceType.MORDENTE, listOf(30)),
-
-        )
+//        val checkAndReplaceList = listOf(
+//            CheckAndReplaceData(CheckType.EqualOrGreater(limit = 0), ReplaceType.Onda(stress = 30)),
+//            CheckAndReplaceData(CheckType.EqualOrGreater(limit = 0), ReplaceType.Trillo(stress = 30)),
+//
+//        )
         var actualCounterpointTrackData = counterpointTrackData
-        if(checkAndReplaceList.isNotEmpty() && checkAndReplaceList.any{ it.check != CheckType.NONE }) {
+        if(checkAndReplace.isNotEmpty() && checkAndReplace.any{ it.check !is CheckType.None }) {
             actualCounterpointTrackData =
                 counterpointTrackData.map{ trackData ->
-                    trackData.checkAndReplace(checkAndReplaceList, totalLength, counterpointTrackData)
+                    trackData.checkAndReplace(checkAndReplace, totalLength, counterpointTrackData)
                 }
         }
 
@@ -340,6 +335,7 @@ object Player {
             val doubledBars = bars.mergeOnesInMetro()
                 .resizeLastBar(totalLength)
                 .splitBarsInTwoParts()
+            // using trackDatas without replacing for a better chord definition
             assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
             val barGroups = if(harmonizations.size == 1) listOf(doubledBars) else doubledBars.splitBarsInGroups(harmonizations.size)
             val chordsTrack = MidiTrack()

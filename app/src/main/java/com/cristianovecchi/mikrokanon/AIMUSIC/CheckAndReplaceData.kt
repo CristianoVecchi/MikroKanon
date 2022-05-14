@@ -1,31 +1,140 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import com.cristianovecchi.mikrokanon.divideDistributingRest
+import com.cristianovecchi.mikrokanon.midi.HarmonizationData
+import com.cristianovecchi.mikrokanon.midi.HarmonizationType
 
-enum class CheckType(val title: String) {
-    NONE("No action"), LONGER(">=")//, ALONE("].[ >=")
+sealed class CheckType(open val title: String = "") {
+    fun toCsv(): String {
+        return when (this){
+            is CheckType.None -> "0"
+            is CheckType.EqualOrGreater -> "1#$limit"
+        }
+    }
+    fun describe(): String {
+        return when (this){
+            is CheckType.None -> this.title
+            is CheckType.EqualOrGreater -> if(this.limit == 0) "ALL" else "${this.title}${this.limit}"
+        }
+    }
+    data class None(override val title: String = "No action"): CheckType()
+    data class EqualOrGreater(override val title: String = ">=", val limit: Int = 240) : CheckType()
+    //, ALONE("].[ >=")
+    companion object {
+        fun provideCheckType(index: Int, limit: Int = 240): CheckType{
+            return when (index) {
+                0 -> CheckType.None()
+                1 -> CheckType.EqualOrGreater(limit = limit)
+                else -> CheckType.None()
+            }
+        }
+        fun checkList(): List<CheckType>{
+            return listOf( CheckType.None(),
+                CheckType.EqualOrGreater(limit = 0),CheckType.EqualOrGreater(limit = 120),
+                CheckType.EqualOrGreater(limit = 240),CheckType.EqualOrGreater(limit = 480), )
+        }
+        fun getIndex(check: CheckType): Int {
+            return when(check){
+                is CheckType.None -> 0
+                is CheckType.EqualOrGreater -> when(check.limit){
+                    0 -> 1
+                    120 -> 2
+                    240 -> 3
+                    480 -> 4
+                    else -> 0
+                }
+            }
+        }
+    }
 }
-enum class ReplaceType(val title: String) {
-   MORDENTE("Mordente"), MORDENTE_2X("Mordente 2x"),
-    MORDENTE_3X("Mordente 3x"), GRUPPETTO("Gruppetto"), TRILLO("Trillo")
+sealed class ReplaceType(open val title: String = "", open val stress: Int = 0) {
+    fun clone(stress: Int): ReplaceType{
+        return when (this){
+            is Trillo -> this.copy(stress = stress)
+            is Mordente -> this.copy(stress = stress)
+            is Mordente_2x -> this.copy(stress = stress)
+            is Mordente_3x -> this.copy(stress = stress)
+            is Gruppetto -> this.copy(stress = stress)
+            is Onda -> this.copy(stress = stress)
+        }
+    }
+    fun toCsv(): String {
+        return when (this){
+            is Trillo -> "0#$stress"
+            is Mordente -> "1#$stress"
+            is Mordente_2x -> "2#$stress"
+            is Mordente_3x -> "3#$stress"
+            is Gruppetto -> "4#$stress"
+            is Onda -> "5#$stress"
+        }
+    }
+    companion object{
+        val titles: List<String> = listOf( "Trillo", "Mordente", "Mordente 2X",
+        "Mordente 3x", "Gruppetto", "Onda" )
+        fun provideReplaceType(index: Int, stress: Int = 16): ReplaceType{
+            return when (index) {
+                0 -> ReplaceType.Trillo(stress = stress)
+                1 -> ReplaceType.Mordente(stress = stress)
+                2 -> ReplaceType.Mordente_2x(stress = stress)
+                3 -> ReplaceType.Mordente_3x(stress = stress)
+                4 -> ReplaceType.Gruppetto(stress = stress)
+                5 -> ReplaceType.Onda(stress = stress)
+                else -> ReplaceType.Trillo(stress = stress)
+            }
+        }
+    }
+    data class Trillo(override val title: String = "Trillo", override val stress: Int = 16): ReplaceType()
+    data class Mordente(override val title: String = "Mordente", override val stress: Int = 16): ReplaceType()
+    data class Mordente_2x(override val title: String = "Mordente 2x", override val stress: Int = 16): ReplaceType()
+    data class Mordente_3x(override val title: String = "Mordente 3x", override val stress: Int = 16): ReplaceType()
+    data class Gruppetto(override val title: String = "Gruppetto", override val stress: Int = 16): ReplaceType()
+    data class Onda(override val title: String = "Onda", override val stress: Int = 16): ReplaceType()
 }
-data class CheckAndReplaceData(val check: CheckType = CheckType.NONE,
-                               val checkValues: List<Int> = emptyList(),
-                               val replace: ReplaceType = ReplaceType.MORDENTE,
-                               val replaceValues: List<Int> = emptyList())
+data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
+                               val replace: ReplaceType = ReplaceType.Mordente(),){
+    fun describe(): String {
+        return when(check){
+            is CheckType.None -> check.describe()
+            is CheckType.EqualOrGreater -> "${check.describe()} ${replace.title} ^${replace.stress}"
+        }
+    }
+    fun toCsv(): String {
+        return "${this.check.toCsv()}|${this.replace.toCsv()}"
+    }
+    companion object{
+        fun createCheckAndReplaceDatasFromCsv(csv: String): List<CheckAndReplaceData>{
+            if(csv.isBlank()) return listOf()
+            val values = csv.split(",")
+            return values.map{ createCheckAndReplaceDataFromCsv(it) }
+        }
+        fun createCheckAndReplaceDataFromCsv(csv: String): CheckAndReplaceData{
+            if(csv.isBlank()) return CheckAndReplaceData()
+            val (checkCsv, replaceCsv) = csv.split("|")
+            val checkValues = checkCsv.split("#")
+            val replaceValues = replaceCsv.split("#")
+            val limit = if(checkValues.size>1) checkValues[1].toInt() else 0
+            val check = CheckType.provideCheckType(checkValues[0].toInt(), limit)
+            val stress = if(replaceValues.size>1) replaceValues[1].toInt() else 0
+            val replace = ReplaceType.provideReplaceType(replaceValues[0].toInt(), stress)
+            return CheckAndReplaceData(check, replace)
+        }
+    }
+}
 
-fun provideCheckFunction(checkType: CheckType, checkValues: List<Int>): (TrackData, Int, List<TrackData>) -> Boolean {
+
+
+fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>) -> Boolean {
     return when(checkType){
-        CheckType.NONE -> { _, _, _ -> false }
-        CheckType.LONGER -> { trackData, index, trackDataList -> trackData.durations[index] >= checkValues[0] }
+        is CheckType.None -> { _, _, _ -> false }
+        is CheckType.EqualOrGreater -> { trackData, index, trackDataList -> trackData.durations[index] >= checkType.limit }
         //CheckType.ALONE -> TODO()
     }
 }
 
-fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
+fun provideReplaceFunction(replaceType: ReplaceType):
             (TrackData, Int, List<TrackData>) -> SubstitutionNotes {
     return when(replaceType){
-        ReplaceType.TRILLO -> { trackData, index, trackDataList ->
+        is ReplaceType.Trillo -> { trackData, index, trackDataList ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
             = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
@@ -35,7 +144,7 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                 in (120..239) -> 3
                 in (240..359) -> 5 // 34 - 42
                 in (360..479) -> 7 // 32 - 38
-                in (480..Int.MAX_VALUE) -> actualDuration / 50
+                in (480..Int.MAX_VALUE) -> actualDuration / 43
                 else -> -1
             }
             if (div == -1) { // fake substitution
@@ -43,7 +152,7 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                 SubstitutionNotes(-1) // will not be considered
             } else {
                 val durs = actualDuration.toLong().divideDistributingRest(div)
-                val stress = replaceValues[0]
+                val stress = replaceType.stress
                 val stressedVelocity = if (velocity + stress > 127) 127 else velocity + stress
                 val nextPitch = trackData.pitches.getOrElse(index + 1) { pitch }
                 val secondPitch = when {
@@ -70,10 +179,10 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                     if (articulationDuration == null) null else durs.map{it.toInt()},
                     if (ribattuto == null) null else List(div){ribattuto}
                 )
-                    .apply { println("duration: $duration, artDur: $articulationDuration $this") }
+                   // .apply { println("duration: $duration, artDur: $articulationDuration $this") }
             }
         }
-        ReplaceType.MORDENTE -> { trackData, index, trackDataList ->
+        is ReplaceType.Mordente -> { trackData, index, trackDataList ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(
                 index
             )
@@ -85,7 +194,7 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                 println("No Subs: actual duration = $actualDuration")
                 SubstitutionNotes(-1) // will not be considered
             } else {
-                val stress = replaceValues[0]
+                val stress = replaceType.stress
                 val stressedVelocity = if (velocity + stress > 127) 127 else velocity + stress
                 val nextPitch = trackData.pitches.getOrElse(index + 1) { pitch }
                 val secondPitch = when {
@@ -111,10 +220,10 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                     ),
                     if (ribattuto == null) null else listOf(ribattuto, ribattuto, ribattuto)
                 )
-                    .apply { println("duration: $duration, artDur: $articulationDuration $this") }
+                    //.apply { println("duration: $duration, artDur: $articulationDuration $this") }
             }
         }
-            ReplaceType.MORDENTE_3X -> { trackData, index, trackDataList ->
+           is ReplaceType.Mordente_3x -> { trackData, index, trackDataList ->
                 val (pitch, thick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
                 // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
 
@@ -124,7 +233,7 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                     println("No Subs: actual duration = $actualDuration")
                     SubstitutionNotes(-1 ) // will not be considered
                 } else {
-                    val stress = replaceValues[0]
+                    val stress = replaceType.stress
                     val stressedVelocity = if(velocity + stress > 127) 127 else velocity + stress
                     val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
                     val secondPitch = when{
@@ -143,10 +252,10 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                     listOf(isPreviousRest, false, false, false, false, false, false),
                     if(articulationDuration == null) null else listOf(dur,dur, dur,dur, dur,dur, articulationDuration - dur * 4),
                     if(ribattuto == null) null else listOf(ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto) )
-                    .apply { println("duration: $duration, artDur: $articulationDuration $this") }
+                   // .apply { println("duration: $duration, artDur: $articulationDuration $this") }
                 }
             }
-        ReplaceType.MORDENTE_2X -> { trackData, index, trackDataList ->
+       is ReplaceType.Mordente_2x -> { trackData, index, trackDataList ->
             val (pitch, thick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
 
@@ -156,7 +265,7 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                 println("No Subs: actual duration = $actualDuration")
                 SubstitutionNotes(-1 ) // will not be considered
             } else {
-                val stress = replaceValues[0]
+                val stress = replaceType.stress
                 val stressedVelocity = if(velocity + stress > 127) 127 else velocity + stress
                 val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
                 val secondPitch = when{
@@ -175,10 +284,10 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                     listOf(isPreviousRest, false, false, false, false),
                     if(articulationDuration == null) null else listOf(dur,dur, dur,dur, articulationDuration - dur * 4),
                     if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto, ribattuto) )
-                    .apply { println("duration: $duration, artDur: $articulationDuration $this") }
+                    //.apply { println("duration: $duration, artDur: $articulationDuration $this") }
             }
         }
-        ReplaceType.GRUPPETTO -> { trackData, index, trackDataList ->
+        is ReplaceType.Gruppetto -> { trackData, index, trackDataList ->
             val (pitch, thick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
 
@@ -188,7 +297,7 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                 println("No Subs: actual duration = $actualDuration")
                 SubstitutionNotes(-1 ) // will not be considered
             } else {
-                val stress = replaceValues[0]
+                val stress = replaceType.stress
                 val stressedVelocity = if(velocity + stress > 127) 127 else velocity + stress
                 val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
                 val (secondPitch, fourthPitch) = when {
@@ -200,6 +309,37 @@ fun provideReplaceFunction(replaceType: ReplaceType, replaceValues: List<Int>):
                     listOf(thick, thick + dur, thick + dur * 2, thick + dur * 3, thick + dur * 4 ),
                     listOf(dur, dur, dur, dur, duration - dur * 4),
                     listOf(stressedVelocity, velocity, velocity, velocity, velocity),
+                    listOf(glissando, glissando, glissando, glissando, glissando),
+                    listOf(attack, attack, attack, attack, attack),
+                    listOf(isPreviousRest, false, false, false, false),
+                    if(articulationDuration == null) null else listOf(dur,dur, dur,dur, articulationDuration - dur * 4),
+                    if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto, ribattuto) )
+                    //.apply { println("duration: $duration, artDur: $articulationDuration $this") }
+            }
+        }
+        is ReplaceType.Onda -> { trackData, index, trackDataList ->
+            val (pitch, thick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
+            // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
+
+            val actualDuration = articulationDuration ?: duration + 1
+            val dur = if(60 * 8 > actualDuration ) actualDuration / 8 else  60
+            if(dur < 12 || pitch == 108 || pitch == 107 || pitch == 21 || pitch == 22) { // fake substitution
+                println("No Subs: actual duration = $actualDuration")
+                SubstitutionNotes(-1 ) // will not be considered
+            } else {
+                val stress = replaceType.stress
+                val stressedVelocity = if(velocity + stress > 127) 127 else velocity + stress
+                val middleVelocity = (stressedVelocity + velocity) / 2
+                val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
+                val (secondAndFourthPitch, thirdPitch) = when {
+                    pitch <= nextPitch -> Pair(pitch-1, pitch -2)
+                    pitch > nextPitch -> Pair(pitch+1, pitch +2)
+                    else -> Pair(pitch-1, pitch -2)
+                }
+                SubstitutionNotes(index, listOf(pitch, secondAndFourthPitch, thirdPitch, secondAndFourthPitch, pitch),
+                    listOf(thick, thick + dur, thick + dur * 2, thick + dur * 3, thick + dur * 4 ),
+                    listOf(dur, dur, dur, dur, duration - dur * 4),
+                    listOf(velocity, middleVelocity, stressedVelocity, middleVelocity, velocity),
                     listOf(glissando, glissando, glissando, glissando, glissando),
                     listOf(attack, attack, attack, attack, attack),
                     listOf(isPreviousRest, false, false, false, false),

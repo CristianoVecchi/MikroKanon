@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
+import com.cristianovecchi.mikrokanon.AIMUSIC.CheckAndReplaceData
+import com.cristianovecchi.mikrokanon.AIMUSIC.CheckType
 import com.cristianovecchi.mikrokanon.AIMUSIC.ListaStrumenti
 import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
@@ -129,6 +131,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val audio8DDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val harmonyDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val checkAndReplaceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val clearSlotsDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val privacyDialogData by lazy { mutableStateOf(TextDialogData())}
@@ -152,7 +155,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         "Spacer",
         "Ritornello", "Transpose", "Row Forms",
 
-        "Harmony",
+        "Harmony", "Check and Replace",
 
         "Clear Slots", "Spacer", "Export MIDI",
 
@@ -199,6 +202,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         ListDialog(ritornelloDialogData, dimensions, lang.OKbutton, fillPrevious = true)
         ListDialog(vibratoDialogData, dimensions, lang.OKbutton,  fillPrevious = true)
         HarmonyDialog(harmonyDialogData, dimensions)
+        CheckAndReplaceDialog(checkAndReplaceDialogData, dimensions)
 
         SettingTabs(selectedTab = selectedTab, dimensions = dimensions, colors = colors, model = model)
 
@@ -648,7 +652,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                         when (optionName) {
                             "Harmony" -> {
                                 var harmDatas = HarmonizationData.createHarmonizationsFromCsv(userOptions.harmonizations)
-                                harmDatas = if(harmDatas.isEmpty()) listOf(HarmonizationData()) else harmDatas
+                                harmDatas = harmDatas.ifEmpty { listOf(HarmonizationData()) }
                                 val isSelected = !(harmDatas.size == 1 && harmDatas[0].type == HarmonizationType.NONE)
                                 SelectableCard(
                                     text = if(!isSelected) lang.harmony
@@ -668,6 +672,32 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                                 harmonizationsCsv
                                             )
                                             harmonyDialogData.value =
+                                                MultiNumberDialogData(model = model)
+                                        }
+                                    })
+                            }
+                            "Check and Replace" -> {
+                                var cnrDatas = CheckAndReplaceData.createCheckAndReplaceDatasFromCsv(userOptions.checkAndReplace)
+                                cnrDatas = cnrDatas.ifEmpty { listOf(CheckAndReplaceData()) }
+                                val isSelected = !(cnrDatas.size == 1 && cnrDatas[0].check is CheckType.None)
+                                SelectableCard(
+                                    text = if(!isSelected) lang.checkAndReplace
+                                    else "${lang.checkAndReplace}: \n${cnrDatas.mapIndexed{i, cnr ->
+                                        "${i+1}: ${cnr.describe()}"}.joinToString("\n")}",
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isSelected,
+                                    onClick = {
+                                        checkAndReplaceDialogData.value = MultiNumberDialogData(
+                                            true, lang.selectCheckType,
+                                            model = model, names = chordsInstruments.map{ListaStrumenti.getNameByIndex(it)},
+                                            anySequence = cnrDatas,
+                                        ) { cnrCsv ->
+                                            model.updateUserOptions(
+                                                "checkAndReplace",
+                                                cnrCsv
+                                            )
+                                            checkAndReplaceDialogData.value =
                                                 MultiNumberDialogData(model = model)
                                         }
                                     })

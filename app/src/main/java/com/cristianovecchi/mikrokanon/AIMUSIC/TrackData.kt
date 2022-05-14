@@ -31,8 +31,8 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
     fun findSubstitutionNotes(checkAndReplaceData: CheckAndReplaceData,
                               start: Long, end: Long, trackDataList: List<TrackData>): List<SubstitutionNotes>{
 
-        val check = provideCheckFunction(checkAndReplaceData.check, checkAndReplaceData.checkValues)
-        val replace = provideReplaceFunction(checkAndReplaceData.replace, checkAndReplaceData.replaceValues)
+        val check = provideCheckFunction(checkAndReplaceData.check)
+        val replace = provideReplaceFunction(checkAndReplaceData.replace)
 
         val substitutions = mutableListOf<SubstitutionNotes>()
         for(index in pitches.indices){
