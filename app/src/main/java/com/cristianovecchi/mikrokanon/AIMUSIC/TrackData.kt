@@ -30,20 +30,35 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
     }
     fun findSubstitutionNotes(checkAndReplaceData: CheckAndReplaceData,
                               start: Long, end: Long, trackDataList: List<TrackData>): List<SubstitutionNotes>{
-
-        val check = provideCheckFunction(checkAndReplaceData.check)
-        val replace = provideReplaceFunction(checkAndReplaceData.replace)
-
         val substitutions = mutableListOf<SubstitutionNotes>()
-        for(index in pitches.indices){
-            if(ticks[index] >= end) break
-            val noteEnd = ticks[index] + durations[index]
-            if(noteEnd <= start) continue
-            //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
-            if(check(this, index, trackDataList)) substitutions.add(
-                replace(this, index, trackDataList)
-            )
+        if(checkAndReplaceData.replace is ReplaceType.Fantasia){
+            val check = provideCheckFunction(checkAndReplaceData.check)
+
+            for(index in pitches.indices){
+                val available = provideAvailableReplaceFunction((0..checkAndReplaceData.replace.stress).random())
+                val replace = provideReplaceFunction(available.random())
+                if(ticks[index] >= end) break
+                val noteEnd = ticks[index] + durations[index]
+                if(noteEnd <= start) continue
+                //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
+                if(check(this, index, trackDataList)) substitutions.add(
+                    replace(this, index, trackDataList)
+                )
+            }
+        } else {
+            val check = provideCheckFunction(checkAndReplaceData.check)
+            val replace = provideReplaceFunction(checkAndReplaceData.replace)
+            for(index in pitches.indices){
+                if(ticks[index] >= end) break
+                val noteEnd = ticks[index] + durations[index]
+                if(noteEnd <= start) continue
+                //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
+                if(check(this, index, trackDataList)) substitutions.add(
+                    replace(this, index, trackDataList)
+                )
+            }
         }
+
         return substitutions.toList()
     }
     fun checkAndReplace(checkAndReplaceDataList: List<CheckAndReplaceData>,
