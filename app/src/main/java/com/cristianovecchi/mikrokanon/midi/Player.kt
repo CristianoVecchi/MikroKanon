@@ -264,6 +264,7 @@ object Player {
 //        )
         var actualCounterpointTrackData = counterpointTrackData
         if(checkAndReplace.isNotEmpty() && checkAndReplace.any{ it.check !is CheckType.None }) {
+           // println(checkAndReplace)
             actualCounterpointTrackData =
                 counterpointTrackData.map{ trackData ->
                     trackData.checkAndReplace(checkAndReplace, totalLength, counterpointTrackData)

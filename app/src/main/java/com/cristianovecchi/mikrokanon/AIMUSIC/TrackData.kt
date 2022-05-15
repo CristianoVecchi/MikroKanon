@@ -36,9 +36,10 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
 
         val substitutions = mutableListOf<SubstitutionNotes>()
         for(index in pitches.indices){
-            if(ticks[index] > end) break
+            if(ticks[index] >= end) break
             val noteEnd = ticks[index] + durations[index]
-            if(noteEnd < start) continue
+            if(noteEnd <= start) continue
+            //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
             if(check(this, index, trackDataList)) substitutions.add(
                 replace(this, index, trackDataList)
             )
@@ -51,10 +52,10 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         val slice = totalLength / checkAndReplaceDataList.size
         checkAndReplaceDataList.forEachIndexed { index, checkAndReplaceData ->
             val start = slice * index
-            println("totalLength:$totalLength start:$start end:${start+slice}")
-            substitutions.addAll(findSubstitutionNotes(checkAndReplaceData, start, start + slice, trackDataList))
+           // println("totalLength:$totalLength start:$start end:${start+slice-1}")
+            substitutions.addAll(findSubstitutionNotes(checkAndReplaceData, start, start + slice-1, trackDataList))
         }
-        return this.substitueNote(substitutions.distinctBy { it.index }) // to avoid overlapping
+        return this.substitueNote(substitutions.filter{ it.index!=-1 }.distinctBy { it.index }) // to avoid overlapping
     }
     fun substitueNote(substitutionNotes: List<SubstitutionNotes>): TrackData {
         var subsIndex = 0
@@ -66,10 +67,11 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         val previousIsRestData = mutableListOf<Boolean>()
         val artDurData = mutableListOf<Int>()
         val ribattutosData = mutableListOf<Int>()
-
+        substitutionNotes.forEach { println(it) }
         for(noteIndex in pitches.indices){
             if(subsIndex < substitutionNotes.size && noteIndex == substitutionNotes[subsIndex].index){
                 val subs = substitutionNotes[subsIndex]
+                //println("SUBSTITUTION:${subs.index}")
                 pitchesData.addAll(subs.newPitches)
                 ticksData.addAll(subs.newTicks)
                 durationsData.addAll(subs.newDurations)

@@ -68,7 +68,7 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
             val absPitch = it.pitch
             val tick = it.tick
             val duration = it.duration
-            for (octave in 4..7) {
+            for (octave in 4..8) {
                 Player.insertNoteWithGlissando(
                     chordsTrack, tick, duration, chordsChannel,
                     octave * 12 + absPitch, it.velocity - diffChordVelocity, 70, 0
@@ -79,7 +79,7 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
             val absPitch = it.pitch
             val tick = it.tick
             val duration = it.duration
-            for (octave in 1..4) {
+            for (octave in 2..4) {
                 Player.insertNoteWithGlissando(
                     chordsTrack, tick, duration, chordsChannel,
                     octave * 12 + absPitch, it.velocity - diffRootVelocity, 70 + 10, 0
@@ -140,7 +140,7 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
         val absPitch = it.pitch
         val tick = it.tick
         val duration = it.duration
-        for (octave in 4..7) {
+        for (octave in 4..8) {
             Player.insertNoteWithGlissando(
                 chordsTrack, tick, duration, chordsChannel,
                 octave * 12 + absPitch, it.velocity - diffChordVelocity, 70, 0
@@ -153,7 +153,7 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
             val absPitch = it.pitch
             val tick = it.tick
             val duration = it.duration
-            for (octave in 1..4) {
+            for (octave in 2..4) {
                 Player.insertNoteWithGlissando(
                     chordsTrack, tick, duration, chordsChannel,
                     octave * 12 + absPitch, it.velocity - diffRootVelocity, 70 + 10, 0
@@ -166,13 +166,13 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
 fun insertChordNotes(chordsTrack: MidiTrack, channel: Int, root: Int,
                      absPitches: IntArray, tick: Long, duration: Long, velocity: Int, justVoicing: Boolean = false) {
     if(!justVoicing){
-        for(octave in 1..2){
+        for(octave in 2..3){
             Player.insertNoteWithGlissando(chordsTrack, tick, duration, channel,
                 octave * 12 + root, velocity, 70,0)
 
         }
     }
-    for(octave in 3..6){
+    for(octave in 3..8){
         for(absPitch in absPitches){
             Player.insertNoteWithGlissando(chordsTrack, tick, duration, channel,
                 octave * 12 + absPitch, velocity, 70,0)

@@ -103,7 +103,7 @@ fun createFull12HarmonizedTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrum
         val absPitch = it.pitch
         val tick = it.tick
         val duration = it.duration
-        for (octave in 1..7) {
+        for (octave in 2..8) {
             Player.insertNoteWithGlissando(
                 chordsTrack, tick, duration, chordsChannel,
                 octave * 12 + absPitch, it.velocity - diffChordVelocity, 70, 0
