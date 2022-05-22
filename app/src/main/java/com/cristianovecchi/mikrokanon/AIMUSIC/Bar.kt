@@ -58,7 +58,7 @@ fun List<Bar>.resizeLastBar(totalDuration: Long): List<Bar>{
     val result = mutableListOf<Bar>()
     var indexLastBar = 0
 //    this.forEachIndexed{ i, it ->
-//        print("$i:${it.tick}-${it.tick+it.duration}, ")
+//        println("$i:${it.tick}-${it.tick+it.duration}, ")
 //    }
     for(i in this.indices){
         if(this[i].tick  + this[i].duration >= totalDuration) break
@@ -69,8 +69,9 @@ fun List<Bar>.resizeLastBar(totalDuration: Long): List<Bar>{
 //    println("Bar duration = ${realSequence.sumBy { it.duration.toInt() }} Total duration = $totalDuration  Diff = $diff LastBarIndex=$indexLastBar ")
     if(diff == 0L) return realSequence
     result.addAll(realSequence)
-    val lastBar = this[indexLastBar]
-    result.add(lastBar.copy(duration = diff))
+    val lastBar = this[indexLastBar]//.apply{println("old last bar = $this")}
+    result.add(lastBar.copy(duration = diff))//.apply{println("new last bar = $this")})
+//    println("input list size = ${this.size}  output list size = ${result.size}")
     return result.toList()
 }
 fun List<Bar>.mergeOnesInMetro(): List<Bar>{

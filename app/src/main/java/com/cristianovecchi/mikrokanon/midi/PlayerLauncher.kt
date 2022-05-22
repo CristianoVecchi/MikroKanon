@@ -1,15 +1,9 @@
 package com.cristianovecchi.mikrokanon.midi
 
 import android.media.MediaPlayer
-import com.cristianovecchi.mikrokanon.AIMUSIC.CheckAndReplaceData
-import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
-import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
-import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
+import com.cristianovecchi.mikrokanon.*
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
-import com.cristianovecchi.mikrokanon.extractFloatsFromCsv
-import com.cristianovecchi.mikrokanon.extractIntListsFromCsv
-import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
-import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import java.io.File
 import kotlin.math.absoluteValue
 
@@ -125,6 +119,11 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
     val harmonizations: List<HarmonizationData> =
         userOptionsData?.let {HarmonizationData.createHarmonizationsFromCsv(userOptionsData.harmonizations)}
             ?: listOf()
+    val chordsToEnhance: List<ChordToEnhanceData> =
+        userOptionsData?.let {
+            userOptionsData.chordsToEnhance.extractIntPairsFromCsv().map{
+                ChordToEnhanceData(convertFlagsToInts(it.first), it.second)}
+        } ?: listOf()
         //selectedCounterpoint.value!!.display()
         return Player.playCounterpoint(
             mediaPlayer,
@@ -151,6 +150,7 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
             audio8DFlags,
             vibrato,
             checkAndReplace,
-            harmonizations
+            harmonizations,
+            chordsToEnhance
         )
     }

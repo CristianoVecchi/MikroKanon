@@ -100,6 +100,9 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "harmonizations")
         val harmonizations: String,
 
+        @ColumnInfo(name = "chords_to_enhance")
+        val chordsToEnhance: String,
+
         @ColumnInfo(name = "lastplay_data")
         val lastPlayData: String,
 
@@ -117,7 +120,7 @@ import androidx.room.PrimaryKey
                      //"System|0" ,
                      "579|0" , // priority on custom color 579
                     0,"System", 0, 1 ,
-                    "","","0|-1", 0)
+                    "","","0|1","0|-1", 0)
             }
             fun updateUserOptionsData(
                 optionsDataClone: UserOptionsData,
@@ -217,6 +220,9 @@ import androidx.room.PrimaryKey
                     }
                     "harmonizations" -> {
                         optionsDataClone.copy(id = id, harmonizations = value as String)
+                    }
+                    "chordsToEnhance" -> {
+                        optionsDataClone.copy(id = id, chordsToEnhance = value as String)
                     }
                     "lastPlayData" -> {
                         optionsDataClone.copy(id = id, lastPlayData = value as String)

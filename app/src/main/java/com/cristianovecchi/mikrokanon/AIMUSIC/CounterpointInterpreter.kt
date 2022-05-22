@@ -14,7 +14,7 @@ fun findTopNuances(stabilities: List<Float>, minNuance: Float, maxNuance: Float)
     return (0 until n).map{ steps[orderedStabilities.indexOf(stabilities[it])]}
 }
 data class ChangeData(val noteIndex: Int, val instrument: Int)
-data class TickChangeData(val tick: Long, val instrument: Int)
+data class TickChangeData(val tick: Long, val instrument: Int, val noteIndex: Int)
 
 
 
@@ -131,7 +131,7 @@ object CounterpointInterpreter {
             var isPreviousRest = true
             while (index < actualPitches.size) {
                 if(index == changesData[changeIndex].noteIndex){
-                    tickChangesData.add(TickChangeData(tick.toLong(), changesData[changeIndex].instrument))
+                    tickChangesData.add(TickChangeData(tick.toLong(), changesData[changeIndex].instrument, index))
                     changeIndex = ++changeIndex % changesData.size
                 }
                 val pitch = actualPitches[index]
@@ -159,9 +159,9 @@ object CounterpointInterpreter {
                                 dur += nextDur
                                 index++
                                 durIndex++
-                                if(index == changesData[changeIndex].noteIndex){
-                                    tickChangesData.add(TickChangeData(tick.toLong(), changesData[changeIndex].instrument))
-                                    changeIndex = ++changeIndex % changesData.size
+                                if(changeIndex < changesData.size && index == changesData[changeIndex].noteIndex){
+                                    tickChangesData.add(TickChangeData(tick.toLong(), changesData[changeIndex].instrument, index))
+                                    changeIndex++
                                 }
                             }
                         }

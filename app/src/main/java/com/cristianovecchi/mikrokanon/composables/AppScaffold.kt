@@ -26,10 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
-import com.cristianovecchi.mikrokanon.AIMUSIC.CheckAndReplaceData
-import com.cristianovecchi.mikrokanon.AIMUSIC.CheckType
-import com.cristianovecchi.mikrokanon.AIMUSIC.ListaStrumenti
-import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.db.CounterpointData
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
@@ -132,6 +129,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
     val audio8DDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val harmonyDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val checkAndReplaceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val chordsToEnhanceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val clearSlotsDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val privacyDialogData by lazy { mutableStateOf(TextDialogData())}
@@ -155,7 +153,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         "Spacer",
         "Ritornello", "Transpose", "Row Forms",
 
-        "Harmony", "Check and Replace",
+        "Harmony", "Check and Replace", "Chords to Enhance",
 
         "Clear Slots", "Spacer", "Export MIDI",
 
@@ -203,6 +201,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         ListDialog(vibratoDialogData, dimensions, lang.OKbutton,  fillPrevious = true)
         HarmonyDialog(harmonyDialogData, dimensions)
         CheckAndReplaceDialog(checkAndReplaceDialogData, dimensions)
+        ChordsToEnhanceDialog(chordsToEnhanceDialogData, dimensions)
 
         SettingTabs(selectedTab = selectedTab, dimensions = dimensions, colors = colors, model = model)
 
@@ -698,6 +697,36 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                                 cnrCsv
                                             )
                                             checkAndReplaceDialogData.value =
+                                                MultiNumberDialogData(model = model)
+                                        }
+                                    })
+                            }
+                            "Chords to Enhance" -> {
+                                val absPitchNames = (0..11).map{Clip.convertAbsToClipText(it, lang.noteNames)}
+                                var cteDatas = userOptions.chordsToEnhance.extractIntPairsFromCsv()
+                                    .map{ ChordToEnhanceData(convertFlagsToInts(it.first), it.second)}
+                                cteDatas = cteDatas.ifEmpty { listOf(ChordToEnhanceData(setOf(),1)) }
+                                val isSelected = !cteDatas.all{it == ChordToEnhanceData(setOf(),1)}
+                                SelectableCard(
+                                    text = if(!isSelected) lang.chordsToEnhance
+                                    else "${lang.chordsToEnhance}: \n${
+                                        cteDatas.joinToString("\n") {
+                                            it.describe(absPitchNames)
+                                        }}",
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isSelected,
+                                    onClick = {
+                                        chordsToEnhanceDialogData.value = MultiNumberDialogData(
+                                            true, lang.selectChordsToEnhance,
+                                            model = model, names = absPitchNames,
+                                            anySequence = cteDatas,
+                                        ) { cteCsv ->
+                                            model.updateUserOptions(
+                                                "chordsToEnhance",
+                                                cteCsv
+                                            )
+                                            chordsToEnhanceDialogData.value =
                                                 MultiNumberDialogData(model = model)
                                         }
                                     })

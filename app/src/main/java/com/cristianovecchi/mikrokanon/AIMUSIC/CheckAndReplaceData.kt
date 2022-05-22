@@ -2,6 +2,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 
 sealed class CheckType(open val title: String = "") {
@@ -59,6 +60,8 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0) 
             is Cromatica -> this.copy(stress = stress)
             is Diatonica -> this.copy(stress = stress)
             is GruppettoRetr -> this.copy(stress = stress)
+            is Accento -> this.copy(stress = stress)
+            is Tornado -> this.copy(stress = stress)
             is Fantasia -> this.copy(stress = stress)
         }
     }
@@ -73,12 +76,15 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0) 
             is Cromatica -> "6#$stress"
             is Diatonica -> "7#$stress"
             is GruppettoRetr -> "8#$stress"
-            is Fantasia -> "9#$stress"
+            is Accento -> "9#$stress"
+            is Tornado -> "10#$stress"
+            is Fantasia -> "11#$stress"
         }
     }
     companion object{
         val titles: List<String> = listOf( "Trillo", "Mordente", "Mordente 2X",
-        "Mordente 3x", "Gruppetto", "Onda", "Cromatica", "Diatonica", "←Gruppetto", "Fantasia" )
+        "Mordente 3x", "Gruppetto", "Onda", "Cromatica", "Diatonica", "←Gruppetto",
+            "Accento", "Tornado", "Fantasia" )
         fun provideReplaceType(index: Int, stress: Int = 16): ReplaceType{
             return when (index) {
                 0 -> Trillo(stress = stress)
@@ -90,7 +96,9 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0) 
                 6 -> Cromatica(stress = stress)
                 7 -> Diatonica(stress = stress)
                 8 -> GruppettoRetr(stress = stress)
-                9 -> Fantasia(stress = stress)
+                9 -> Accento(stress = stress)
+                10 -> Tornado(stress = stress)
+                11 -> Fantasia(stress = stress)
                 else -> Trillo(stress = stress)
             }
         }
@@ -104,6 +112,8 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0) 
     data class Cromatica(override val title: String = "Cromatica", override val stress: Int = 16): ReplaceType()
     data class Diatonica(override val title: String = "Diatonica", override val stress: Int = 16): ReplaceType()
     data class GruppettoRetr(override val title: String = "←Gruppetto", override val stress: Int = 16): ReplaceType()
+    data class Accento(override val title: String = "Accento", override val stress: Int = 16): ReplaceType()
+    data class Tornado(override val title: String = "Tornado", override val stress: Int = 16): ReplaceType()
     data class Fantasia(override val title: String = "Fantasia", override val stress: Int = 16): ReplaceType()
 }
 data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
@@ -146,20 +156,57 @@ fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>
         //CheckType.ALONE -> TODO()
     }
 }
-fun provideAvailableReplaceFunction(stress: Int): List<ReplaceType>{
+fun provideFantasiaFunctions(stress: Int): List<ReplaceType>{
     return listOf(ReplaceType.Trillo(stress = stress), ReplaceType.Mordente(stress = stress),
         ReplaceType.Mordente2x(stress = stress), ReplaceType.Mordente3x(stress = stress),
         ReplaceType.Gruppetto(stress = stress), ReplaceType.Onda(stress = stress),
         ReplaceType.Cromatica(stress = stress), ReplaceType.Diatonica(stress = stress),
-        ReplaceType.GruppettoRetr(stress = stress)
+        ReplaceType.GruppettoRetr(stress = stress))
+}
+fun provideTornadoFunctions(stress: Int): List<ReplaceType>{
+    val step = stress / 3f
+    return listOf(ReplaceType.Mordente(stress = 0),
+        ReplaceType.Mordente2x(stress = step.roundToInt()),
+        ReplaceType.Mordente3x(stress = (step * 2).roundToInt()),
+        ReplaceType.Trillo(stress = stress),
+        ReplaceType.Mordente3x(stress = (step * 2).roundToInt()),
+        ReplaceType.Mordente2x(stress = step.roundToInt())
     )
 }
 
 fun provideReplaceFunction(replaceType: ReplaceType):
             (TrackData, Int, List<TrackData>) -> SubstitutionNotes {
     return when(replaceType){
+        is ReplaceType.Tornado -> { trackData, index, trackDataList ->
+        SubstitutionNotes(-1)
+        }
         is ReplaceType.Fantasia -> { trackData, index, trackDataList ->
             SubstitutionNotes(-1)
+        }
+        is ReplaceType.Accento -> { trackData, index, trackDataList ->
+            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
+                    = trackData.extractNoteDataAtIndex(index)
+            val actualDuration = articulationDuration ?: duration
+            val accentDur = 6
+            val accentPlusRestDur = accentDur * 10
+            if(actualDuration < accentPlusRestDur * 3 / 2){
+                SubstitutionNotes(-1)
+            } else {
+                val stress = replaceType.stress
+                val stressedVelocity = if (velocity + stress > 127) 127 else velocity + stress
+                SubstitutionNotes(
+                    index, listOf(pitch, pitch),
+                    listOf(tick, tick + accentPlusRestDur),
+                    listOf(accentDur, duration - accentPlusRestDur),
+                    listOf(stressedVelocity, velocity),
+                    listOf(0, glissando),
+                    listOf(0, attack),
+                    listOf(isPreviousRest, true),
+                    if (articulationDuration == null) null else listOf(accentDur, actualDuration - accentPlusRestDur),
+                    if (ribattuto == null) null else listOf(ribattuto, ribattuto)
+                )
+            }
+
         }
         is ReplaceType.Cromatica -> { trackData, index, trackDataList ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
@@ -260,7 +307,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 in (120..239) -> 3
                 in (240..359) -> 5 // 34 - 42
                 in (360..479) -> 7 // 32 - 38
-                in (480..Int.MAX_VALUE) -> actualDuration / 43
+                in (480..Int.MAX_VALUE) -> (480 / 43) * (actualDuration / 480)
                 else -> -1
             }
             if (div == -1) { // fake substitution
@@ -433,7 +480,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
 
-            val actualDuration = articulationDuration ?: duration + 1
+            val actualDuration = articulationDuration ?: duration
             val dur = if(60 * 8 > actualDuration ) actualDuration / 8 else  60
             val isNextRest = trackData.isPreviousRest.getOrElse(index + 1) { true }
             val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }

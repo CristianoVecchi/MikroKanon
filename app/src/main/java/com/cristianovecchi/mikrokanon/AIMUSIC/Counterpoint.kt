@@ -53,6 +53,9 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun getColumnValues(index: Int): List<Int>{
         return parts.filter{index < it.absPitches.size }.map{ it.absPitches[index] }
     }
+    fun getColumnValuesWithoutEmptyValues(index: Int): List<Int>{
+        return parts.filter{index < it.absPitches.size }.map{ it.absPitches[index] }.filter{it != -1 }
+    }
     fun getColumnValuesWithEmptyValues(index: Int): List<Int>{
         return parts.map{  if(index < it.absPitches.size) it.absPitches[index] else -1 }
     }
@@ -333,6 +336,36 @@ data class Counterpoint(val parts: List<AbsPart>,
         result.emptiness = result.findEmptiness()
         return result.cutBlankParts()
     }
+    fun enhanceChords(chordsToEnhance: List<Pair<Set<Int>, Int>>): Counterpoint {
+        println("chords to enhance:$chordsToEnhance")
+        if (chordsToEnhance.isEmpty()) return this
+        val clone = if(isNormalized()) this else this.normalizePartsSize(false)
+        val result = clone.cloneWithEmptyParts()
+        var index = 0
+        val maxSize = clone.maxSize()
+        val chords = chordsToEnhance.map{ it.first.toSortedSet() }
+        val repetitions = chordsToEnhance.map{ it.second }
+        while (index < maxSize){
+            val columnSorted = clone.getColumnValuesWithoutEmptyValues(index).toSortedSet()
+            var found = false
+            chords@for(i in chords.indices){
+                if(chords[i] == columnSorted){
+                    found = true
+                    val repeatedColumn = clone.getColumnValuesWithEmptyValues(index)
+                    println("index: $index  chord: ${chords[i]}  column sorted: $columnSorted  repeated column: $repeatedColumn")
+                    (0 until repetitions[i]).forEach{ _ ->
+                        result.addColumn(repeatedColumn)
+                    }
+                    break@chords
+                }
+            }
+            if(!found) result.addColumn(clone.getColumnValuesWithEmptyValues(index))
+            index++
+        }
+        result.emptiness = result.findEmptiness()
+        return result
+    }
+
     fun addCadenzas(horizontalIntervalSet: List<Int>, values: List<Int> = listOf(0,1,0,1,1)): Counterpoint{
         val clone = this.normalizePartsSize(false)
         val checks = clone.detectIntervalsInColumns(horizontalIntervalSet)

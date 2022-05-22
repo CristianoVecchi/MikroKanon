@@ -31,34 +31,50 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
     fun findSubstitutionNotes(checkAndReplaceData: CheckAndReplaceData,
                               start: Long, end: Long, trackDataList: List<TrackData>): List<SubstitutionNotes>{
         val substitutions = mutableListOf<SubstitutionNotes>()
-        if(checkAndReplaceData.replace is ReplaceType.Fantasia){
-            val check = provideCheckFunction(checkAndReplaceData.check)
-
-            for(index in pitches.indices){
-                val available = provideAvailableReplaceFunction((0..checkAndReplaceData.replace.stress).random())
-                val replace = provideReplaceFunction(available.random())
-                if(ticks[index] >= end) break
-                val noteEnd = ticks[index] + durations[index]
-                if(noteEnd <= start) continue
-                //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
-                if(check(this, index, trackDataList)) substitutions.add(
-                    replace(this, index, trackDataList)
-                )
+        val check = provideCheckFunction(checkAndReplaceData.check)
+        when(checkAndReplaceData.replace){
+            is ReplaceType.Fantasia -> {
+                for(index in pitches.indices){
+                    if(ticks[index] >= end) break
+                    val noteEnd = ticks[index] + durations[index]
+                    if(noteEnd <= start) continue
+                    //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
+                    if(check(this, index, trackDataList)) {
+                        val available = provideFantasiaFunctions((0..checkAndReplaceData.replace.stress).random())
+                        val replace = provideReplaceFunction(available.random())
+                        substitutions.add(replace(this, index, trackDataList))
+                    }
+                }
             }
-        } else {
-            val check = provideCheckFunction(checkAndReplaceData.check)
-            val replace = provideReplaceFunction(checkAndReplaceData.replace)
-            for(index in pitches.indices){
-                if(ticks[index] >= end) break
-                val noteEnd = ticks[index] + durations[index]
-                if(noteEnd <= start) continue
-                //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
-                if(check(this, index, trackDataList)) substitutions.add(
-                    replace(this, index, trackDataList)
-                )
+            is ReplaceType.Tornado -> {
+                val available = provideTornadoFunctions(checkAndReplaceData.replace.stress)
+                val ventoSize = available.size
+                var ventoIndex = 0
+                for(index in pitches.indices){
+                    if(ticks[index] >= end) break
+                    val noteEnd = ticks[index] + durations[index]
+                    if(noteEnd <= start) continue
+                    //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
+                    if(check(this, index, trackDataList)) {
+                        val replace = provideReplaceFunction(available[ventoIndex % ventoSize])
+                        substitutions.add(replace(this, index, trackDataList))
+                        ventoIndex++
+                    }
+                }
+            }
+            else -> {
+                val replace = provideReplaceFunction(checkAndReplaceData.replace)
+                for(index in pitches.indices){
+                    if(ticks[index] >= end) break
+                    val noteEnd = ticks[index] + durations[index]
+                    if(noteEnd <= start) continue
+                    //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
+                    if(check(this, index, trackDataList)) substitutions.add(
+                        replace(this, index, trackDataList)
+                    )
+                }
             }
         }
-
         return substitutions.toList()
     }
     fun checkAndReplace(checkAndReplaceDataList: List<CheckAndReplaceData>,
@@ -82,7 +98,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         val previousIsRestData = mutableListOf<Boolean>()
         val artDurData = mutableListOf<Int>()
         val ribattutosData = mutableListOf<Int>()
-        substitutionNotes.forEach { println(it) }
+        //substitutionNotes.forEach { println(it) }
         for(noteIndex in pitches.indices){
             if(subsIndex < substitutionNotes.size && noteIndex == substitutionNotes[subsIndex].index){
                 val subs = substitutionNotes[subsIndex]

@@ -148,8 +148,8 @@ fun createExtendedWeightedHarmonyTrack(chordsTrack: MidiTrack, bars: List<Bar>, 
     val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento
     chordsTrack.insertEvent(pc)
 
-    println("${bars.map{ convertFlagsToInts(it.dodecaByte1stHalf!!)}}")
-    println("XWH roots: $roots")
+//    println("${bars.map{ convertFlagsToInts(it.dodecaByte1stHalf!!)}}")
+//    println("XWH roots: $roots")
     findExtendedWeightedHarmonyNotes(chordsTrack, chordsChannel, bars, roots, diffChordVelocity, diffChordVelocity / 2)
 }
 fun createPopChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: Int, diffChordVelocity: Int){
@@ -167,7 +167,7 @@ fun createPopChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: In
         it.chord1 = chord
         lastRoot = chordPosition.first
         previousChord = chord.chord
-        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+//        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
     }
     val chordsChannel = 15
     val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento
@@ -192,7 +192,7 @@ fun createJazzChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, with11: Boole
         it.chord1 = chord
         lastRoot = chordPosition.first
         previousChord = chord.chord
-        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+//        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
     }
 
     val chordsChannel = 15

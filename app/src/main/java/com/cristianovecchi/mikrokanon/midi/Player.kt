@@ -10,14 +10,12 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.BebopBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParker
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParkerBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.DEF.MIDDLE_C
-import com.cristianovecchi.mikrokanon.locale.Lang
 
 import com.leff.midi.MidiFile
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.Tempo
 import java.io.IOException
-import com.leff.midi.event.meta.TimeSignature
 import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
@@ -133,7 +131,8 @@ object Player {
         audio8DFlags: Int = 0,
         vibrato: Int = 0,
         checkAndReplace: List<CheckAndReplaceData> = listOf(),
-        harmonizations: List<HarmonizationData> = listOf()
+        harmonizations: List<HarmonizationData> = listOf(),
+        chordsToEnhance: List<ChordToEnhanceData> = listOf()
     ): String {
         // Triple: Pattern, isRetrograde, nRepetitions
         val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
@@ -149,9 +148,10 @@ object Player {
         //var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
         var actualCounterpoint = if (rowForms == listOf(Pair(1, 1))) firstCounterpoint
         else Counterpoint.explodeRowFormsAddingCps(counterpoints, rowForms, nNotesToSkip)
-        actualCounterpoint =
-            if (ritornello > 0) actualCounterpoint.ritornello(ritornello, transpose)
-            else actualCounterpoint.transpose(transpose[0].first, transpose[0].second)
+        actualCounterpoint = if(chordsToEnhance.isEmpty() || chordsToEnhance.all{it == ChordToEnhanceData(setOf(),1)}) actualCounterpoint
+                            else actualCounterpoint.enhanceChords(chordsToEnhance.map{Pair(it.absPitches,it.repetitions)})
+        actualCounterpoint = if (ritornello > 0) actualCounterpoint.ritornello(ritornello, transpose)
+                            else actualCounterpoint.transpose(transpose[0].first, transpose[0].second)
         val glissando: List<Int> =
             if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
         val audio8D: List<Int> =
@@ -234,7 +234,8 @@ object Player {
                         legatoDeltas,
                         pivots,
                         it.isPreviousRest,
-                        maxLegato
+                        maxLegato,
+                        it.changes
                     )
                     it.articulationDurations= pair.first
                     it.ribattutos = pair.second.map{ float -> float.roundToInt()}.toIntArray()
@@ -249,7 +250,8 @@ object Player {
                         legatoDeltas,
                         pivots,
                         it.isPreviousRest,
-                        maxLegato
+                        maxLegato,
+                        it.changes
                     )
                     it.articulationDurations= pair.first
                     it.ribattutos= pair.second.map{ float -> float.roundToInt()}.toIntArray()
@@ -338,7 +340,8 @@ object Player {
                 .splitBarsInTwoParts()
             // using trackDatas without replacing for a better chord definition
             assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
-            val barGroups = if(harmonizations.size == 1) listOf(doubledBars) else doubledBars.splitBarsInGroups(harmonizations.size)
+            val barGroups = if(harmonizations.size == 1) listOf(doubledBars)
+                            else doubledBars.splitBarsInGroups(harmonizations.size)
             val chordsTrack = MidiTrack()
             addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations)
             if(audio8D.isNotEmpty()){
@@ -458,7 +461,7 @@ object Player {
         while (actualPitch > 108) {
             actualPitch -= 12
         }
-        val dur = duration - separator
+        val dur = duration  - separator
         insertNoteWithRibattuto(mt, start, dur, channel, actualPitch, velOn, velOff, ribattuto)
     }
     fun insertNoteWithRibattuto(
@@ -476,7 +479,7 @@ object Player {
                     if (divDur < 3) {
                         insertSimpleNote(mt, start, dur, channel, pitch, velOn, velOff)
                     } else {
-                        val realDur = divDur - separator
+                        val realDur = divDur  - separator
                         for( i in 0 until ribattuto){
                             insertSimpleNote(mt, start + i * divDur, realDur, channel, pitch, velOn, ribVelOff)
                         }

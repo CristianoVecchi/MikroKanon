@@ -1,9 +1,6 @@
 package com.cristianovecchi.mikrokanon.midi
 
-import com.cristianovecchi.mikrokanon.AIMUSIC.Bar
-import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme
-import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmPatterns
-import com.cristianovecchi.mikrokanon.AIMUSIC.TrackData
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.alterateBpmWithDistribution
 import com.cristianovecchi.mikrokanon.convertDodecabyteToInts
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
@@ -14,7 +11,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, roots: MutableList<Int>,
-                                     diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = false) {
+                                     diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
     data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
     val notes = mutableListOf<Note>()
     val rootNotes = mutableListOf<Note>()
@@ -53,7 +50,7 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
             val bar = bars[index]
             val newRoot = roots[index]
             if (newRoot != lastRootNote.pitch) {
-                lastRootNote = Note(newRoot, bar.tick, bar.duration, bar.minVelocity!!-5)
+                lastRootNote = Note(newRoot, bar.tick, bar.duration, bar.minVelocity!!)
                 rootNotes.add(lastRootNote)
             } else {
                 lastRootNote.duration += bar.duration
@@ -62,34 +59,37 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
         }
     }
 
-    if(!justVoicing){
-        rootNotes.sortedBy { it.tick }.forEach {notes.sortedBy { it.tick }.forEach {
+        notes.sortedBy { it.tick }.forEach {
             //print("Chord note: ${it.pitch}, ")
             val absPitch = it.pitch
             val tick = it.tick
             val duration = it.duration
+            val velocity = (it.velocity - diffChordVelocity).coerceIn(0,127)
             for (octave in 4..8) {
                 Player.insertNoteWithGlissando(
                     chordsTrack, tick, duration, chordsChannel,
-                    octave * 12 + absPitch, it.velocity - diffChordVelocity, 70, 0
+                    octave * 12 + absPitch, velocity, 70, 0
                 )
             }
         }
-            //println("Root: $it")
-            val absPitch = it.pitch
-            val tick = it.tick
-            val duration = it.duration
-            for (octave in 2..4) {
-                Player.insertNoteWithGlissando(
-                    chordsTrack, tick, duration, chordsChannel,
-                    octave * 12 + absPitch, it.velocity - diffRootVelocity, 70 + 10, 0
-                )
+            if(!justVoicing){
+            rootNotes.sortedBy { it.tick }.forEach {
+                println("Root: $it")
+                val absPitch = it.pitch
+                val tick = it.tick
+                val duration = it.duration
+                val velocity = (it.velocity - diffRootVelocity).coerceIn(0,127)
+                for (octave in 2..3) {
+                    Player.insertNoteWithGlissando(
+                        chordsTrack, tick, duration, chordsChannel,
+                        octave * 12 + absPitch, velocity, 50, 0
+                    )
+                }
             }
         }
-    }
 }
 fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = false) {
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
     data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
 
     val notes = mutableListOf<Note>()
@@ -128,7 +128,7 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
             val bar = bars[index]
             val newRoot = bar.chord1!!.root
             if (newRoot != lastRoot.pitch) {
-                    lastRoot = Note(newRoot, bar.tick, bar.duration, bar.minVelocity!!-5)
+                    lastRoot = Note(newRoot, bar.tick, bar.duration, bar.minVelocity!!)
                     roots.add(lastRoot)
             } else {
                 lastRoot.duration += bar.duration
@@ -140,23 +140,26 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
         val absPitch = it.pitch
         val tick = it.tick
         val duration = it.duration
+        val velocity = (it.velocity - diffChordVelocity).coerceIn(0,127)
         for (octave in 4..8) {
             Player.insertNoteWithGlissando(
                 chordsTrack, tick, duration, chordsChannel,
-                octave * 12 + absPitch, it.velocity - diffChordVelocity, 70, 0
+                octave * 12 + absPitch, velocity, 70, 0
             )
         }
     }
     if(!justVoicing){
         roots.sortedBy { it.tick }.forEach {
-            //println("Root: $it")
+            println("Root: $it")
             val absPitch = it.pitch
             val tick = it.tick
             val duration = it.duration
-            for (octave in 2..4) {
+            val velocity = (it.velocity - diffRootVelocity).coerceIn(0,127)
+            for (octave in 2..3) {
+                //val pitch = octave * 12 + absPitch
                 Player.insertNoteWithGlissando(
                     chordsTrack, tick, duration, chordsChannel,
-                    octave * 12 + absPitch, it.velocity - diffRootVelocity, 70 + 10, 0
+                    octave * 12 + absPitch, velocity, 50, 0
                 )
             }
         }
@@ -172,7 +175,7 @@ fun insertChordNotes(chordsTrack: MidiTrack, channel: Int, root: Int,
 
         }
     }
-    for(octave in 3..8){
+    for(octave in 4..8){
         for(absPitch in absPitches){
             Player.insertNoteWithGlissando(chordsTrack, tick, duration, channel,
                 octave * 12 + absPitch, velocity, 70,0)
@@ -203,6 +206,12 @@ fun assignDodecaBytesToBars(bars: Array<Bar>, counterpointTrackData: List<TrackD
         }
     }
 }
+fun printNoteLimits(ticks: IntArray, durations: IntArray) {
+    for(i in ticks.indices){
+        print("$i=${ticks[i]}-${ticks[i]+durations[i]} ")
+    }
+    println()
+}
 fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
     val track = MidiTrack()
     val channel = trackData.channel
@@ -216,12 +225,23 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
 //    println()
 //    println("CHANNEL: $channel")
     var lastTick = -1L // avoid overriding
+   // var noteIndex = -1
+    //printNoteLimits(ticks, articulationDurations)
     trackData.changes.forEach{
-        if(it.tick > lastTick){
+       // println("Intrument change: $it")
+        val tick = it.tick
+//        do {
+//            noteIndex++
+//        } while(noteIndex < ticks.size && ticks[noteIndex]+articulationDurations[noteIndex]<= tick)
+//        println("note index: $noteIndex")
+//        println("old tick: $tick")
+//        tick = if(tick <= ticks[noteIndex]) tick else ticks[noteIndex]+articulationDurations[noteIndex]+1.toLong()
+//        println("new tick: $tick")
+        if(tick > lastTick){
 //            println(it)
-            val pc: MidiEvent = ProgramChange(it.tick, channel, it.instrument) // cambia strumento
+            val pc: MidiEvent = ProgramChange(tick, channel, it.instrument) // cambia strumento
             track.insertEvent(pc)
-            lastTick = it.tick
+            lastTick = tick
         }
 
     }
@@ -301,6 +321,7 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
     return track
 }
 
+
 fun setAudio8D(track: MidiTrack, nRevolutions: Int, channel: Int) {
     val aims = mutableListOf<Float>()
     for(i in 0 until nRevolutions){
@@ -363,7 +384,7 @@ fun setTimeSignatures(
 fun alterateArticulation(
     ticks: IntArray, durations: IntArray,
     legatoAlterations: List<Float>, ribattutos: List<Int>, legatoDeltas: List<Long>,
-    pivots: List<Int>, previousIsRest: BooleanArray, maxLegato: Int
+    pivots: List<Int>, previousIsRest: BooleanArray, maxLegato: Int, changes: List<TickChangeData>
 ): Pair<IntArray, FloatArray> {
     if (durations.isEmpty()) return Pair(IntArray(0), FloatArray(0))
     val result = IntArray(durations.size)
@@ -380,6 +401,9 @@ fun alterateArticulation(
     var legato: Int
     val notePivots = mutableListOf<Int>()
     var pivotIndex = 0
+    var changeIndex = 0
+    val changeNotes = if(changes.size == 1) listOf(0)
+                    else changes.map{it.noteIndex}.drop(1)//.apply{println("changeNote: $this")}
     if (durations.isNotEmpty()) {
         while (durIndex < durations.size - 1) {
             while (alterationTick + legatoDeltas[alterationIndex] < ticks[durIndex]) {
@@ -401,6 +425,10 @@ fun alterateArticulation(
                 if (previousIsRest[durIndex + 1]) { // there is a rest between notes, legato is not requested
                     result[durIndex] = thisDur
                    // resultRibattutos[durIndex] = ribattutoAlteration
+                } else if(changeIndex<changeNotes.size && durIndex + 1 == changeNotes[changeIndex]){ // no legato if the next notes has a program change on it
+                    //println("Legato avoided on note $durIndex cause program change on the next one.")
+                    result[durIndex] = thisDur
+                    changeIndex++
                 } else {
                     nextDur = durations[durIndex + 1]
                     legato = (nextDur * (legatoAlteration - 1f)).toInt()

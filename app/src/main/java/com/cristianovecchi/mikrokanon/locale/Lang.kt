@@ -331,6 +331,9 @@ data class Lang( // English by default
     val selectCheckType: String = "Select the check type!",
     val selectReplaceType: String = "Select the replace!",
     val selectStress: String = "Select the replace stress!",
+    val chordsToEnhance: String = "Chords to enhance",
+    val selectChordsToEnhance: String = "Select the chord to enhance!",
+
     val dynamics: String = "Dynamics",
     val selectDynamicAlterations: String ="Select the dynamic alterations!",
     val bpm: String = "BPM",
