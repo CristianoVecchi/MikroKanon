@@ -161,7 +161,7 @@ fun provideFantasiaFunctions(stress: Int): List<ReplaceType>{
         ReplaceType.Mordente2x(stress = stress), ReplaceType.Mordente3x(stress = stress),
         ReplaceType.Gruppetto(stress = stress), ReplaceType.Onda(stress = stress),
         ReplaceType.Cromatica(stress = stress), ReplaceType.Diatonica(stress = stress),
-        ReplaceType.GruppettoRetr(stress = stress))
+        ReplaceType.GruppettoRetr(stress = stress), ReplaceType.Accento(stress = stress))
 }
 fun provideTornadoFunctions(stress: Int): List<ReplaceType>{
     val step = stress / 3f
@@ -177,10 +177,10 @@ fun provideTornadoFunctions(stress: Int): List<ReplaceType>{
 fun provideReplaceFunction(replaceType: ReplaceType):
             (TrackData, Int, List<TrackData>) -> SubstitutionNotes {
     return when(replaceType){
-        is ReplaceType.Tornado -> { trackData, index, trackDataList ->
+        is ReplaceType.Tornado -> { _, _, _ ->
         SubstitutionNotes(-1)
         }
-        is ReplaceType.Fantasia -> { trackData, index, trackDataList ->
+        is ReplaceType.Fantasia -> { _, _, _ ->
             SubstitutionNotes(-1)
         }
         is ReplaceType.Accento -> { trackData, index, trackDataList ->
@@ -219,17 +219,12 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             if(isNextRest || nextPitch == pitch || actualDuration < duration || nNotes == 1){
                 SubstitutionNotes(-1)
             } else {
-
                 val direction = if(pitch < nextPitch) 1 else -1
-                val halfDuration = duration / 2
-                var scaleDurs = halfDuration.toLong().divideDistributingRest(nNotes)
-                if(scaleDurs[0] < 4){
+                val durs = findScaleDurations(duration, nNotes, 60)
+                if(durs.last() < 12){
                     SubstitutionNotes(-1)
                 } else {
-                    scaleDurs = if(scaleDurs[0] > 60) MutableList(scaleDurs.size){60} else scaleDurs
-                    val diffArticolation = actualDuration - duration
-                    val longDur = duration - scaleDurs.sum() + scaleDurs[0]
-                    val durs = listOf(longDur, *scaleDurs.drop(1).dropLast(1).toTypedArray(), scaleDurs.last() + diffArticolation).map{ it.toInt()}
+                    val diffArticulation = actualDuration - duration
                     var lastTick = tick
                     val ticks = (0 until nNotes-1).map{
                         lastTick += durs[it]
@@ -241,12 +236,13 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     SubstitutionNotes(
                         index, pitches,
                         listOf(tick, *ticks.toTypedArray()),
-                        listOf(longDur, *scaleDurs.drop(1).toTypedArray()).map{ it.toInt()},
+                        durs,
                         listOf(stressedVelocity, *List(nNotes-1){velocity}.toTypedArray()),
                         List(nNotes){glissando},
                         List(nNotes){attack},
                         listOf(isPreviousRest, *List(nNotes-1){false}.toTypedArray()),
-                        if (articulationDuration == null) null else durs.map{it},
+                        if (articulationDuration == null) null
+                        else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diffArticulation),
                         if (ribattuto == null) null else List(nNotes){ribattuto}
                     )
                 }
@@ -265,15 +261,11 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             } else {
                 val nNotes = nHalfTones / 2 + nHalfTones % 2
                 val direction = if(pitch < nextPitch) 1 else -1
-                val halfDuration = duration / 2
-                var scaleDurs = halfDuration.toLong().divideDistributingRest(nNotes)
-                if(scaleDurs[0] < 4){
+                val durs = findScaleDurations(duration, nNotes, 60)
+                if(durs.last() < 12){
                     SubstitutionNotes(-1)
                 } else {
-                    scaleDurs = if(scaleDurs[0] > 60) MutableList(scaleDurs.size){60} else scaleDurs
-                    val diffArticolation = actualDuration - duration
-                    val longDur = duration - scaleDurs.sum() + scaleDurs[0]
-                    val durs = listOf(longDur, *scaleDurs.drop(1).dropLast(1).toTypedArray(), scaleDurs.last() + diffArticolation).map{ it.toInt()}
+                    val diffArticulation = actualDuration - duration
                     var lastTick = tick
                     val ticks = (0 until nNotes-1).map{
                         lastTick += durs[it]
@@ -286,12 +278,13 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     SubstitutionNotes(
                         index, pitches,
                         listOf(tick, *ticks.toTypedArray()),
-                        listOf(longDur, *scaleDurs.drop(1).toTypedArray()).map{ it.toInt()},
+                        durs,
                         listOf(stressedVelocity, *List(nNotes-1){velocity}.toTypedArray()),
                         List(nNotes){glissando},
                         List(nNotes){attack},
                         listOf(isPreviousRest, *List(nNotes-1){false}.toTypedArray()),
-                        if (articulationDuration == null) null else durs,
+                        if (articulationDuration == null) null
+                        else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diffArticulation),
                         if (ribattuto == null) null else List(nNotes){ribattuto}
                     )
                 }

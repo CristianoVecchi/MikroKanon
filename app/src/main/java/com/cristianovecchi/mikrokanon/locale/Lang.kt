@@ -333,7 +333,7 @@ data class Lang( // English by default
     val selectStress: String = "Select the replace stress!",
     val chordsToEnhance: String = "Chords to enhance",
     val selectChordsToEnhance: String = "Select the chord to enhance!",
-    val enhanceChordsIntranspositions: String = "Enhance chords in transpositions",
+    val enhanceChordsInTranspositions: String = "Keep enhanced chords in transpositions",
 
     val dynamics: String = "Dynamics",
     val selectDynamicAlterations: String ="Select the dynamic alterations!",

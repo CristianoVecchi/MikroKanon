@@ -1,7 +1,14 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.divideDistributingRest
 import kotlin.math.absoluteValue
 
+fun findScaleDurations(duration: Int, nNotes: Int, maxShortNote: Int): List<Int>{
+    val halfDuration = duration / 2
+    val shortDurs = halfDuration.divideDistributingRest(nNotes)
+    return if (shortDurs[0] > maxShortNote) MutableList(nNotes){60}.apply{ this[0] += duration - maxShortNote * nNotes }
+    else shortDurs.apply { this[0] += halfDuration }
+}
 object AIRhythm {
     @JvmStatic
     fun findOffBeats(nBeats: Int): IntArray {

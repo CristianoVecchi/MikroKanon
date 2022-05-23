@@ -734,7 +734,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                             "Enhance in Transpositions" -> {
                                 var isOn = userOptions.enhanceChordsInTranspositions != 0
                                 SelectableCard(
-                                    text = lang.enhanceChordsIntranspositions,
+                                    text = lang.enhanceChordsInTranspositions,
                                     fontSize = fontSize,
                                     colors = colors,
                                     isSelected = isOn,

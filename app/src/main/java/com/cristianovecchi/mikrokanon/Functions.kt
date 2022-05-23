@@ -305,12 +305,28 @@ fun Long.divideDistributingRest(divisor: Int): MutableList<Long>{
     val halfDivisor = divisor / 2 + (divisor and 1)
     val restDiv = rest / halfDivisor
     val restOfRest = rest - (restDiv * halfDivisor )
-    val addOne = rest % halfDivisor != 0L
+    //val addOne = rest % halfDivisor != 0L
     val list = mutableListOf<Long>()
     val resultPlusRestDiv = result + restDiv
     //println("result=$result rest=$rest restDiv=$restDiv restOfRest=$restOfRest")
     (0 until divisor).forEach{ i -> if(i and 1 == 1) list.add(result) else list.add(resultPlusRestDiv) }
     (0 until restOfRest.toInt()).forEach{ i -> list[i*2+1] = list[i*2+1]+1}
+    //if(addOne) list[0] = list[0] + 1
+    return list
+}
+fun Int.divideDistributingRest(divisor: Int): MutableList<Int>{
+    if(this == 0 || divisor == 0) return mutableListOf(this)
+    val result = this / divisor
+    val rest = this - (result * divisor) // module operation without decimals
+    val halfDivisor = divisor / 2 + (divisor and 1)
+    val restDiv = rest / halfDivisor
+    val restOfRest = rest - (restDiv * halfDivisor )
+    //val addOne = rest % halfDivisor != 0L
+    val list = mutableListOf<Int>()
+    val resultPlusRestDiv = result + restDiv
+    //println("result=$result rest=$rest restDiv=$restDiv restOfRest=$restOfRest")
+    (0 until divisor).forEach{ i -> if(i and 1 == 1) list.add(result) else list.add(resultPlusRestDiv) }
+    (0 until restOfRest).forEach{ i -> list[i*2+1] = list[i*2+1]+1}
     //if(addOne) list[0] = list[0] + 1
     return list
 }

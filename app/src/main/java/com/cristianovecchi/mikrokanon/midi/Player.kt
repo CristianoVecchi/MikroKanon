@@ -274,11 +274,6 @@ object Player {
             }
         }
         // CHECK AND REPLACE
-//        val checkAndReplaceList = listOf(
-//            CheckAndReplaceData(CheckType.EqualOrGreater(limit = 0), ReplaceType.Onda(stress = 30)),
-//            CheckAndReplaceData(CheckType.EqualOrGreater(limit = 0), ReplaceType.Trillo(stress = 30)),
-//
-//        )
         var actualCounterpointTrackData = counterpointTrackData
         if(checkAndReplace.isNotEmpty() && checkAndReplace.any{ it.check !is CheckType.None }) {
            // println(checkAndReplace)
@@ -287,9 +282,6 @@ object Player {
                     trackData.checkAndReplace(checkAndReplace, totalLength, counterpointTrackData)
                 }
         }
-
-
-
 //        println("TrackData 1 = ${counterpointTrackData[0]}")
         //if(counterpointTrackData.map{println(it.changes);it.changes.size}.toSet().size != 1) throw Exception("WARNING: SOME CHANGE DATA HAS BEEN SKIPPED!!!")
         // TRANSFORM DATATRACKS IN MIDITRACKS
