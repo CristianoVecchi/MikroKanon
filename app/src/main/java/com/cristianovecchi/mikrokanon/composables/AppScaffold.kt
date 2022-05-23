@@ -153,7 +153,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         "Spacer",
         "Ritornello", "Transpose", "Row Forms",
 
-        "Harmony", "Check and Replace", "Chords to Enhance",
+        "Harmony", "Check and Replace", "Chords to Enhance", "Enhance in Transpositions",
 
         "Clear Slots", "Spacer", "Export MIDI",
 
@@ -729,6 +729,21 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                             chordsToEnhanceDialogData.value =
                                                 MultiNumberDialogData(model = model)
                                         }
+                                    })
+                            }
+                            "Enhance in Transpositions" -> {
+                                var isOn = userOptions.enhanceChordsInTranspositions != 0
+                                SelectableCard(
+                                    text = lang.enhanceChordsIntranspositions,
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isOn,
+                                    onClick = {
+                                        isOn = !isOn
+                                        model.updateUserOptions(
+                                            "enhanceChordsInTranspositions",
+                                            if (isOn) 1 else 0
+                                        )
                                     })
                             }
                         }

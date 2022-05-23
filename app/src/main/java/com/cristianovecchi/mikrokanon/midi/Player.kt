@@ -132,7 +132,8 @@ object Player {
         vibrato: Int = 0,
         checkAndReplace: List<CheckAndReplaceData> = listOf(),
         harmonizations: List<HarmonizationData> = listOf(),
-        chordsToEnhance: List<ChordToEnhanceData> = listOf()
+        chordsToEnhance: List<ChordToEnhanceData> = listOf(),
+        enhanceChordsInTransposition: Boolean = false
     ): String {
         // Triple: Pattern, isRetrograde, nRepetitions
         val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
@@ -148,10 +149,24 @@ object Player {
         //var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
         var actualCounterpoint = if (rowForms == listOf(Pair(1, 1))) firstCounterpoint
         else Counterpoint.explodeRowFormsAddingCps(counterpoints, rowForms, nNotesToSkip)
-        actualCounterpoint = if(chordsToEnhance.isEmpty() || chordsToEnhance.all{it == ChordToEnhanceData(setOf(),1)}) actualCounterpoint
-                            else actualCounterpoint.enhanceChords(chordsToEnhance.map{Pair(it.absPitches,it.repetitions)})
-        actualCounterpoint = if (ritornello > 0) actualCounterpoint.ritornello(ritornello, transpose)
-                            else actualCounterpoint.transpose(transpose[0].first, transpose[0].second)
+        val handleRitornellos = {
+            actualCounterpoint = when {
+                ritornello > 0 -> actualCounterpoint.ritornello(ritornello, transpose)
+                transpose[0].first != 0 && transpose[0].second != 1 -> actualCounterpoint.transpose(transpose[0].first, transpose[0].second)
+                else -> actualCounterpoint
+            }
+        }
+        val handleChordEnhancement = {
+            actualCounterpoint = if(chordsToEnhance.isEmpty() || chordsToEnhance.all{it == ChordToEnhanceData(setOf(),1)}) actualCounterpoint
+            else actualCounterpoint.enhanceChords(chordsToEnhance.map{Pair(it.absPitches,it.repetitions)})
+        }
+        if(enhanceChordsInTransposition){
+            handleChordEnhancement()
+            handleRitornellos()
+        } else {
+            handleRitornellos()
+            handleChordEnhancement()
+        }
         val glissando: List<Int> =
             if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
         val audio8D: List<Int> =

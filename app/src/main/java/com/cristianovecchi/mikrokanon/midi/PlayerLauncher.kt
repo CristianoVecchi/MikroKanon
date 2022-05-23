@@ -124,6 +124,9 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
             userOptionsData.chordsToEnhance.extractIntPairsFromCsv().map{
                 ChordToEnhanceData(convertFlagsToInts(it.first), it.second)}
         } ?: listOf()
+    val enhanceChordsInTranspositions: Boolean =
+        0 != (userOptionsData?.let { userOptionsData.enhanceChordsInTranspositions }
+            ?: 0)
         //selectedCounterpoint.value!!.display()
         return Player.playCounterpoint(
             mediaPlayer,
@@ -151,6 +154,7 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
             vibrato,
             checkAndReplace,
             harmonizations,
-            chordsToEnhance
+            chordsToEnhance,
+            enhanceChordsInTranspositions
         )
     }
