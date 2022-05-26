@@ -259,7 +259,8 @@ fun ResultDisplay(model: AppViewModel,
                 val filledSlots by model.filledSlots.asFlow().collectAsState(initial = setOf())
                 val sequencesToString by lazy {model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }}
                 SequencesDialog(dialogState = dialogState, dimensions = dimensions,
-                    title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
+                    title = language.choose2ndSequence, repeatText = language.repeatSequence,
+                    okText = language.OKbutton, appColors = colors,
                     sequencesList = sequencesToString,
                     onSubmitButtonClick = { index, repeat ->
                         dialogState.value = false
@@ -268,7 +269,7 @@ fun ResultDisplay(model: AppViewModel,
                         }
                     })
                 ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model, language, filledSlots = filledSlots)
-                MultiListDialog(intervalSetDialogData, dimensions, language.OKbutton)
+                MultiListDialog(intervalSetDialogData, dimensions, language.OKbutton, colors)
                 TransposeDialog(transposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OKbutton, model)
                 SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,

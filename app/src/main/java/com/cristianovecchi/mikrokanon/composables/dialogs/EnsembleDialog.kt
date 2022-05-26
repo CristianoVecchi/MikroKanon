@@ -43,10 +43,13 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
     if (multiNumberDialogData.value.dialogState) {
         val model = multiNumberDialogData.value.model
         val lang = Lang.provideLanguage(model.getUserLangDef())
+        val appColors = model.appColors
+        val fontColor = appColors.dialogFontColor
+        val backgroundColor = appColors.dialogBackgroundColor
         val ensNames = multiNumberDialogData.value.names
         val multiListDialogData by lazy { mutableStateOf(MultiListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            MultiListDialog(multiListDialogData, dimensions, lang.OKbutton)
+            MultiListDialog(multiListDialogData, dimensions, lang.OKbutton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
                 else dimensions.dialogWidth
@@ -55,6 +58,7 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                 modifier = Modifier
                     .width(width)
                     .height(height),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(
@@ -80,7 +84,7 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor)
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors
@@ -112,7 +116,7 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                             val id = index
                                             Card(
                                                 modifier = Modifier
-                                                    .background(Color.White)
+                                                    .background(backgroundColor)
                                                     .clip(RoundedCornerShape(6.dp))
                                                     .padding(intervalPadding)
                                                     .clickable { cursor = id },

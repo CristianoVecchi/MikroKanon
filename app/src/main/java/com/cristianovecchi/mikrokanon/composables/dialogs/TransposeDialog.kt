@@ -41,6 +41,9 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
+            val appColors = model.appColors
+            val fontColor = appColors.dialogFontColor
+            val backgroundColor = appColors.dialogBackgroundColor
             val inverseSymbol = rowFormsMap[2]!!
             val retrogradeSymbol = rowFormsMap[3]!!
             val width = if(dimensions.width <=884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
@@ -50,6 +53,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
 //            else dimensions.dialogHeight
             Surface(
                 modifier = Modifier.width(width).height(height),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -78,7 +82,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor)
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors
@@ -112,7 +116,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                             val id = index
                                             Card(
                                                 modifier = Modifier
-                                                    .background(Color.White)
+                                                    .background(backgroundColor)
                                                     .clip(RoundedCornerShape(6.dp))
                                                     .padding(intervalPadding)
                                                     .clickable { cursor = id },

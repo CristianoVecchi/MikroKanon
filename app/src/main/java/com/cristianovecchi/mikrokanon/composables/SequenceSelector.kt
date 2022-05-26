@@ -100,7 +100,8 @@ fun SequenceSelector(model: AppViewModel,
                 }
             }
             SequencesDialog(dialogState = dialogState, dimensions = dimensions,
-                title = language.choose2ndSequence, repeatText = language.repeatSequence, okText = language.OKbutton,
+                title = language.choose2ndSequence, repeatText = language.repeatSequence,
+                okText = language.OKbutton, appColors = appColors,
                 sequencesList = sequencesToString,
                 onSubmitButtonClick = { index, repeat ->
                     dialogState.value = false

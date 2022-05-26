@@ -39,12 +39,16 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiFloatDialogData.value.model
+            val appColors = model.appColors
+            val fontColor = appColors.dialogFontColor
+            val backgroundColor = appColors.dialogBackgroundColor
             val width = if(dimensions.width <=884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             val height = if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
             else dimensions.dialogHeight
             Surface(
                 modifier = Modifier.width(width).height(height),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -82,7 +86,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                     val dynamicMap: Map<Float,String> =  model.dynamicMap
 
                     Column(modifier = modifierA) {
-                        Text(text = multiFloatDialogData.value.title)
+                        Text(text = multiFloatDialogData.value.title, color = fontColor)
                         Spacer(modifier = Modifier.height(10.dp))
 
                         val colors = model.appColors
@@ -115,7 +119,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                             val id = index
                                             Card(
                                                 modifier = Modifier
-                                                    .background(Color.White)
+                                                    .background(backgroundColor)
                                                     .clip(RoundedCornerShape(6.dp))
                                                     .padding(intervalPadding)
                                                     .clickable { cursor = id },

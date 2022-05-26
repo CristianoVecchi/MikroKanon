@@ -20,35 +20,40 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
+import com.cristianovecchi.mikrokanon.ui.shift
 
 @Composable
 fun ListDialog(listDialogData: MutableState<ListDialogData>, dimensions: Dimensions,
-               okText: String = "OK", fillPrevious: Boolean = false,
+               okText: String = "OK", appColors: AppColors, fillPrevious: Boolean = false,
                parentDialogData: MutableState<out Any>? = null) // is necessary a reference for the parent dialog if this is used as child dialog
 {
     SingleSelectListDialog(
         listDialogData = listDialogData, dimensions = dimensions,
-        okText = okText, fillPrevious,
+        okText = okText, fillPrevious, appColors,
         onDismissRequest = { listDialogData.value = ListDialogData(itemList = listDialogData.value.itemList)  }
     )
 }
 @Composable
 fun SingleSelectListDialog(
     listDialogData: MutableState<ListDialogData>, dimensions: Dimensions,
-    okText: String = "OK", fillPrevious: Boolean = false,
+    okText: String = "OK", fillPrevious: Boolean = false, appColors: AppColors,
     onDismissRequest: () -> Unit
 ) {
     if (listDialogData.value.dialogState) {
+        val fontColor = appColors.dialogFontColor
+        val backgroundColor = appColors.dialogBackgroundColor
         val fontSize = dimensions.dialogFontSize
         var selectedOption by remember{ mutableStateOf(listDialogData.value.selectedListDialogItem) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = listDialogData.value.dialogTitle)
+                    Text(text = listDialogData.value.dialogTitle, color = fontColor)
                     Spacer(modifier = Modifier.height(5.dp))
                     val listState = rememberLazyListState()
                     val weights = dimensions.listDialogWeights
@@ -69,7 +74,7 @@ fun SingleSelectListDialog(
                             Spacer(modifier = Modifier.height(3.dp))
                             val showAsSelected = if (!fillPrevious) false
                             else index <= listDialogData.value.itemList.indexOf(selected)
-                            RadioButton(item, selected, showAsSelected, fontSize.sp) { selectedValue ->
+                            RadioButton(item, selected, showAsSelected, fontSize.sp, appColors) { selectedValue ->
                                 selectedOption = listDialogData.value.itemList.indexOf(selectedValue)
                             }
                         }
@@ -100,7 +105,11 @@ fun SingleSelectListDialog(
     }
 }
 @Composable
-fun RadioButton(text: String, selectedValue: String, showAsSelected: Boolean = false, fontSize: TextUnit, onClickListener: (String) -> Unit) {
+fun RadioButton(text: String, selectedValue: String, showAsSelected: Boolean = false, fontSize: TextUnit,
+                appColors: AppColors, onClickListener: (String) -> Unit) {
+    val fontColor = appColors.dialogFontColor
+    val backgroundColor = appColors.dialogBackgroundColor
+    val backgroundColorLighter = backgroundColor.shift(0.07f)
     Row(
         Modifier
             .fillMaxWidth()
@@ -110,7 +119,7 @@ fun RadioButton(text: String, selectedValue: String, showAsSelected: Boolean = f
                     onClickListener(text)
                 }
             )
-            .background(if (showAsSelected) Color.LightGray else Color.White)
+            .background(if (showAsSelected) backgroundColorLighter else backgroundColor)
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically
     ) {
         // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.
@@ -123,6 +132,7 @@ fun RadioButton(text: String, selectedValue: String, showAsSelected: Boolean = f
         )
         Text(
             text = text,
+            color = fontColor,
             style = MaterialTheme.typography.body1.merge().copy(fontSize = fontSize),
             modifier = Modifier.padding(start = 16.dp)
         )

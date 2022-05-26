@@ -31,16 +31,20 @@ fun SelectCounterpointDialog(
     }
 ) {
     if (buttonsDialogData.value.dialogState) {
+        val appColors = model.appColors
+        val fontColor = appColors.dialogFontColor
+        val backgroundColor = appColors.dialogBackgroundColor
         val buttonSize = dimensions.dialogButtonSize.dp
         val fontSize = dimensions.dialogFontSize
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = buttonsDialogData.value.title)
+                    Text(text = buttonsDialogData.value.title, color = fontColor)
                     Spacer(modifier = Modifier.height(10.dp))
                     val listState = rememberLazyListState()
                     LazyColumn(

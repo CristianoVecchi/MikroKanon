@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.composables.dialogs
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,14 +34,18 @@ fun ButtonsDialog(
     if (buttonsDialogData.value.dialogState) {
         val buttonSize = dimensions.dialogButtonSize.dp
         val fontSize = dimensions.dialogFontSize
+        val fontColor = model.appColors.dialogFontColor
+        val backgroundColor = model.appColors.dialogBackgroundColor
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
-                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
-                shape = RoundedCornerShape(10.dp)
+                modifier = Modifier.width(dimensions.dialogWidth)
+                    .height(dimensions.dialogHeight),
+                color = backgroundColor,
+                shape = RoundedCornerShape(10.dp),
             ) {
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = buttonsDialogData.value.title)
+                Column(modifier = Modifier.padding(10.dp).background(backgroundColor),) {
+                    Text(text = buttonsDialogData.value.title, color = fontColor)
                     Spacer(modifier = Modifier.height(10.dp))
                     val listState = rememberLazyListState()
                     LazyColumn(

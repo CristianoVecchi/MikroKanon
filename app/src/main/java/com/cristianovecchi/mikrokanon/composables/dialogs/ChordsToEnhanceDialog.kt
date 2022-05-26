@@ -45,13 +45,16 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                       value = multiNumberDialogData.value.value) }) {
     if (multiNumberDialogData.value.dialogState) {
         val model = multiNumberDialogData.value.model
+        val appColors = model.appColors
+        val fontColor = appColors.dialogFontColor
+        val backgroundColor = appColors.dialogBackgroundColor
         val lang = Lang.provideLanguage(model.getUserLangDef())
         val absPitchNames = multiNumberDialogData.value.names
         val pitchesDialogData by lazy { mutableStateOf(MultiListDialogData()) }
         val repetitionsDialogData by lazy { mutableStateOf(ListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            MultiListDialog(pitchesDialogData, dimensions, lang.OKbutton)
-            ListDialog(repetitionsDialogData, dimensions, lang.OKbutton, fillPrevious = true)
+            MultiListDialog(pitchesDialogData, dimensions, lang.OKbutton, appColors)
+            ListDialog(repetitionsDialogData, dimensions, lang.OKbutton, appColors, fillPrevious = true)
 
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
@@ -61,6 +64,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                 modifier = Modifier
                     .width(width)
                     .height(height),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(
@@ -84,7 +88,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor)
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors
@@ -115,7 +119,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                             val id = index
                                             Card(
                                                 modifier = Modifier
-                                                    .background(Color.White)
+                                                    .background(backgroundColor)
                                                     .clip(RoundedCornerShape(6.dp))
                                                     .padding(intervalPadding)
                                                     .clickable { cursor = id },

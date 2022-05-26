@@ -24,11 +24,16 @@ fun SimpleTransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
     if (multiNumberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
+            val model = multiNumberDialogData.value.model
+            val appColors = model.appColors
+            val fontColor = appColors.dialogFontColor
+            val backgroundColor = appColors.dialogBackgroundColor
             val height = dimensions.dialogHeight / 3 * 2
             val width = if(dimensions.width <= 884) (dimensions.width / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             Surface(
                 modifier = Modifier.width(width).height(height),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -40,7 +45,7 @@ fun SimpleTransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor)
                         Spacer(modifier = Modifier.height(20.dp))
 
                         Column(modifier = Modifier.height(height / 6 * 5).padding(10.dp), verticalArrangement = Arrangement.Center) {

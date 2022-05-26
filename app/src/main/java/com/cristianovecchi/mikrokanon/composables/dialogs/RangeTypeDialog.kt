@@ -43,9 +43,13 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val model = multiNumberDialogData.value.model
+            val appColors = model.appColors
+            val fontColor = appColors.dialogFontColor
+            val backgroundColor = appColors.dialogBackgroundColor
             val octaves= getOctaveSymbols()
             Surface(
                 modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -74,7 +78,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor)
                         Spacer(modifier = Modifier.height(10.dp))
 
                         val colors = model.appColors
@@ -108,7 +112,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                             val id = index
                                             Card(
                                                 modifier = Modifier
-                                                    .background(Color.White)
+                                                    .background(backgroundColor)
                                                     .clip(RoundedCornerShape(6.dp))
                                                     .padding(intervalPadding)
                                                     .clickable { cursor = id },

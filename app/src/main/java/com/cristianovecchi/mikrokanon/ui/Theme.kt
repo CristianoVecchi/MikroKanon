@@ -52,7 +52,8 @@ fun MikroKanonTheme(model: AppViewModel, darkTheme: Boolean = isSystemInDarkThem
     val overridingColor = appColors.selCardBorderColorSelected
     val colors = lightColors(primary = overridingColor,
                                 primaryVariant = overridingColor,
-                                secondary = overridingColor)
+                                secondary = overridingColor,
+                                onSurface = overridingColor)
     MaterialTheme(
             colors = colors,
             typography = typography,

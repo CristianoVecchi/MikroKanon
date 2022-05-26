@@ -38,6 +38,9 @@ data class AppColors(
     val drawerBackgroundColor: Color = Color(0.2f,0.2f,1.0f,1.0f),
     val inputBackgroundColor: Color = Color(0.3f,0.3f,0.6f,1.0f),
 
+    val dialogBackgroundColor: Color = Color(0.15f,0.15f,0f,0.0f),
+    val dialogFontColor: Color = Color.White
+
     //val alphas: Array<Float> = (0..12).map { 1f - it * 0.03f }.toTypedArray()
 ){
     companion object{
@@ -68,7 +71,10 @@ data class AppColors(
                 sequencesListBackgroundColor = Color.Black,
                 buttonsDisplayBackgroundColor = Color.Black,
                 drawerBackgroundColor = Color.Black,
-                inputBackgroundColor =  Color.Black
+                inputBackgroundColor =  Color.Black,
+
+                dialogBackgroundColor = Color.Black,
+                dialogFontColor = Color.Black
 
             )
         }
@@ -100,8 +106,10 @@ data class AppColors(
                 sequencesListBackgroundColor = backgroundColor2,
                 buttonsDisplayBackgroundColor = backgroundColor2.shift(-0.1f),
                 drawerBackgroundColor = backgroundColor1.shift(-0.4f),
-                inputBackgroundColor =  backgroundColor2.shift(-0.2f)
+                inputBackgroundColor =  backgroundColor2.shift(-0.2f),
 
+                dialogBackgroundColor = backgroundColor2.shift(-0.2f),
+                dialogFontColor = fontColor.shift(0.2f)
             )
         }
         fun provideAppColors(colorTheme: AppColorThemes): AppColors {

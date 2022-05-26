@@ -41,18 +41,23 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
 
     if (multiNumberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
+        val model = multiNumberDialogData.value.model
+        val lang = Lang.provideLanguage(model.getUserLangDef())
+        val appColors = model.appColors
+        val fontColor = appColors.dialogFontColor
+        val backgroundColor = appColors.dialogBackgroundColor
             val patternNames = patterns.map{ it.title }
             val listDialogData by lazy { mutableStateOf(ListDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            val model = multiNumberDialogData.value.model
-            val lang = Lang.provideLanguage(model.getUserLangDef())
-            ListDialog(listDialogData, dimensions, lang.OKbutton)
+
+            ListDialog(listDialogData, dimensions, lang.OKbutton, appColors)
             val width = if(dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             val height = (dimensions.height / dimensions.dpDensity).toInt().dp
 
             Surface(
                 modifier = Modifier.width(width).height(height),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -81,7 +86,7 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor)
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors
@@ -117,7 +122,7 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                             val id = index
                                             Card(
                                                 modifier = Modifier
-                                                    .background(Color.White)
+                                                    .background(backgroundColor)
                                                     .clip(RoundedCornerShape(6.dp))
                                                     .padding(intervalPadding)
                                                     .clickable { cursor = id },

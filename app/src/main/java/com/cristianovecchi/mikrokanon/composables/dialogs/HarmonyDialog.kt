@@ -47,6 +47,9 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                value = multiNumberDialogData.value.value) }) {
     if (multiNumberDialogData.value.dialogState) {
         val model = multiNumberDialogData.value.model
+        val appColors = model.appColors
+        val fontColor = appColors.dialogFontColor
+        val backgroundColor = appColors.dialogBackgroundColor
         val ratedChordsInstruments = chordsInstruments.mapIndexed{i, ch ->
             "${ListaStrumenti.getNameByIndex(i)}${if(starredChordsInstruments.contains(i)) " *" else ""}"
         }
@@ -56,9 +59,9 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         val instrumentDialogData by lazy { mutableStateOf(ListDialogData()) }
         val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            ListDialog(harmTypeDialogData, dimensions, lang.OKbutton)
-            ListDialog(instrumentDialogData, dimensions, lang.OKbutton)
-            ListDialog(volumeDialogData, dimensions, lang.OKbutton)
+            ListDialog(harmTypeDialogData, dimensions, lang.OKbutton, appColors)
+            ListDialog(instrumentDialogData, dimensions, lang.OKbutton, appColors)
+            ListDialog(volumeDialogData, dimensions, lang.OKbutton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
                 else dimensions.dialogWidth
@@ -67,6 +70,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                 modifier = Modifier
                     .width(width)
                     .height(height),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(
@@ -90,7 +94,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor)
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors
@@ -121,7 +125,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                             val id = index
                                             Card(
                                                 modifier = Modifier
-                                                    .background(Color.White)
+                                                    .background(backgroundColor)
                                                     .clip(RoundedCornerShape(6.dp))
                                                     .padding(intervalPadding)
                                                     .clickable { cursor = id },

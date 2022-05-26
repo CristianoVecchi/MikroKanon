@@ -26,6 +26,7 @@ fun NumberDialog(
     if (numberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
+
             Surface(
                 modifier = Modifier.width(300.dp),
                 shape = RoundedCornerShape(10.dp)

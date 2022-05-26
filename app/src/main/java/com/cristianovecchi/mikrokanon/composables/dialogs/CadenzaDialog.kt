@@ -44,11 +44,14 @@ fun CadenzaDialog(
     if (multiNumberDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
+            val fontColor = model.appColors.dialogFontColor
+            val backgroundColor = model.appColors.dialogBackgroundColor
             val model = multiNumberDialogData.value.model
             val width = if(dimensions.width <= 884) (dimensions.width / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             Surface(
                 modifier = Modifier.width(width).height(dimensions.dialogHeight / 2),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
 
@@ -76,7 +79,7 @@ fun CadenzaDialog(
                     val fontWeight = FontWeight.Normal
                     val numberFontWeight = FontWeight.Bold
                     val buttonPadding = 4.dp
-                    Text(text = multiNumberDialogData.value.title)
+                    Text(text = multiNumberDialogData.value.title, color = fontColor)
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Row(modifier = modifierA.fillMaxWidth(),
@@ -100,14 +103,16 @@ fun CadenzaDialog(
                                     style = TextStyle(
                                         fontSize = fontSize,
                                         fontWeight = fontWeight
-                                    )
+                                    ),
+                                    color = fontColor
                                 )
                             }
 
 
                             Text(text = cadenzaValues[0].toString() + restSymbol, style = TextStyle(
                                 fontSize = fontSize,
-                                fontWeight = numberFontWeight
+                                fontWeight = numberFontWeight,
+                                color = fontColor
                             ))
 
 
@@ -119,7 +124,8 @@ fun CadenzaDialog(
                                     style = TextStyle(
                                         fontSize = fontSize,
                                         fontWeight = fontWeight
-                                    )
+                                    ),
+                                    color = fontColor
                                 )
                             }
                         }
@@ -134,10 +140,12 @@ fun CadenzaDialog(
                                     style = TextStyle(
                                         fontSize = fontSize,
                                         fontWeight = fontWeight
-                                    )
+                                    ),
+                                    color = fontColor
                                 )
                             }
-                            Text(text = cadenzaValues[1].toString() + noteSymbol, style = TextStyle(
+                            Text(text = cadenzaValues[1].toString() + noteSymbol, color = fontColor,
+                                style = TextStyle(
                                 fontSize = fontSize,
                                 fontWeight = numberFontWeight))
                             Button(modifier = Modifier// MINUS BUTTON
@@ -148,7 +156,8 @@ fun CadenzaDialog(
                                     style = TextStyle(
                                         fontSize = fontSize,
                                         fontWeight = fontWeight
-                                    )
+                                    ),
+                                    color = fontColor
                                 )
                             }
                         }
@@ -164,9 +173,11 @@ fun CadenzaDialog(
                                         fontSize = fontSize,
                                         fontWeight = fontWeight
                                     )
+                                ,color = fontColor
                                 )
                             }
-                            Text(text = cadenzaValues[2].toString() + restSymbol, style = TextStyle(
+                            Text(text = cadenzaValues[2].toString() + restSymbol, color = fontColor,
+                                style = TextStyle(
                                 fontSize = fontSize,
                                 fontWeight = numberFontWeight))
                             Button(modifier = Modifier// MINUS BUTTON
@@ -177,7 +188,8 @@ fun CadenzaDialog(
                                     style = TextStyle(
                                         fontSize = fontSize,
                                         fontWeight = fontWeight
-                                    )
+                                    ),
+                                    color = fontColor
                                 )
                             }
                         }
@@ -192,10 +204,12 @@ fun CadenzaDialog(
                                     style = TextStyle(
                                         fontSize = fontSize,
                                         fontWeight = fontWeight
-                                    )
+                                    ),
+                                    color = fontColor
                                 )
                             }
-                            Text(text = cadenzaValues[3].toString() + noteSymbol, style = TextStyle(
+                            Text(text = cadenzaValues[3].toString() + noteSymbol, color = fontColor,
+                                style = TextStyle(
                                 fontSize = fontSize,
                                 fontWeight = numberFontWeight))
                             Button(modifier = Modifier// MINUS BUTTON
@@ -206,7 +220,8 @@ fun CadenzaDialog(
                                     style = TextStyle(
                                         fontSize = fontSize,
                                         fontWeight = fontWeight
-                                    )
+                                    ),
+                                    color = fontColor
                                 )
                             }
                         }
@@ -221,10 +236,12 @@ fun CadenzaDialog(
                                     style = TextStyle(
                                         fontSize = fontSize,
                                         fontWeight = fontWeight
-                                    )
+                                    ),
+                                    color = fontColor
                                 )
                             }
-                            Text(text = cadenzaValues[4].toString() + restSymbol, style = TextStyle(
+                            Text(text = cadenzaValues[4].toString() + restSymbol, color = fontColor,
+                                style = TextStyle(
                                 fontSize = fontSize,
                                 fontWeight = numberFontWeight))
                             Button(modifier = Modifier// MINUS BUTTON
@@ -235,7 +252,8 @@ fun CadenzaDialog(
                                     style = TextStyle(
                                         fontSize = fontSize,
                                         fontWeight = fontWeight
-                                    )
+                                    ),
+                                    color = fontColor
                                 )
                             }
                         }

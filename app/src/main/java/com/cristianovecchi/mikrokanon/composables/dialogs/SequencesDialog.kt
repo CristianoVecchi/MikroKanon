@@ -13,18 +13,21 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 
 @Composable
 fun SequencesDialog(dialogState: MutableState<Boolean>, sequencesList: List<String>,
-                    dimensions: Dimensions, title: String, repeatText: String, okText: String = "OK",
+                    dimensions: Dimensions, title: String, repeatText: String,
+                    okText: String = "OK", appColors: AppColors,
                     showRepeatButton: Boolean = true,
                     onSubmitButtonClick: (Int, Boolean) -> Unit) {
     SingleSelectDialog(
         dialogState = dialogState,
         title = title,
         repeatText = repeatText, okText = okText,
+        appColors = appColors,
         sequencesList = sequencesList,
         dimensions = dimensions,
         showRepeatButton = showRepeatButton,
@@ -35,7 +38,7 @@ fun SequencesDialog(dialogState: MutableState<Boolean>, sequencesList: List<Stri
 @Composable
 fun SingleSelectDialog(
     dialogState: MutableState<Boolean>,
-    title: String, repeatText: String, okText: String = "OK",
+    title: String, repeatText: String, okText: String = "OK", appColors: AppColors,
     sequencesList: List<String>,
     defaultSelected: Int = -1,
     dimensions:Dimensions,
@@ -44,6 +47,8 @@ fun SingleSelectDialog(
     onDismissRequest: () -> Unit
 ) {
     if (dialogState.value) {
+        val fontColor = appColors.dialogFontColor
+        val backgroundColor = appColors.dialogBackgroundColor
         var selectedOption by remember{ mutableStateOf(defaultSelected) }
         var repeated by remember{ mutableStateOf(false) }
         val fontSize = dimensions.dialogFontSize
@@ -51,10 +56,11 @@ fun SingleSelectDialog(
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(5.dp)) {
-                    Text(text = title)
+                    Text(text = title, color = fontColor)
                     Spacer(modifier = Modifier.height(5.dp))
                     val listState = rememberLazyListState()
                     val modifierA = Modifier
@@ -71,7 +77,7 @@ fun SingleSelectDialog(
                             //sequencesList[selectedOption.value]
                         }
                         Spacer(modifier = Modifier.height(4.dp))
-                        RadioButton(sequence, selected, fontSize = fontSize.sp) { selectedValue ->
+                        RadioButton(sequence, selected, fontSize = fontSize.sp, appColors = appColors) { selectedValue ->
                             selectedOption = sequencesList.indexOf(selectedValue)
                         }
                     }
@@ -98,7 +104,7 @@ fun SingleSelectDialog(
                                         repeated = !repeated
                                     }
                                 )
-                                Text(text = repeatText)
+                                Text(text = repeatText, color = fontColor)
                             }
 
                         }

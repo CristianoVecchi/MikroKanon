@@ -15,33 +15,38 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
-fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>, dimensions: Dimensions, okText: String = "OK") {
+fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>, dimensions: Dimensions,
+                    okText: String = "OK", appColors: AppColors) {
     MultiSelectListDialog(
         listDialogData = listDialogData,
-        dimensions = dimensions,  okText = okText,
+        dimensions = dimensions,  okText = okText, appColors = appColors,
         onDismissRequest = { listDialogData.value = MultiListDialogData(itemList = listDialogData.value.itemList)  }
     )
 }
 @Composable
 fun MultiSelectListDialog(
     listDialogData: MutableState<MultiListDialogData>,
-    dimensions: Dimensions, okText: String = "OK",
+    dimensions: Dimensions, okText: String = "OK", appColors: AppColors,
     onDismissRequest: () -> Unit
 ) {
     if (listDialogData.value.dialogState) {
+        val fontColor = appColors.dialogFontColor
+        val backgroundColor = appColors.dialogBackgroundColor
         val fontSize = dimensions.dialogFontSize
         var selectedOptions by remember{ mutableStateOf(listDialogData.value.selectedListDialogItems) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
 
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = listDialogData.value.dialogTitle)
+                    Text(text = listDialogData.value.dialogTitle, color = fontColor)
                     Spacer(modifier = Modifier.height(5.dp))
                     val weights = dimensions.listDialogWeights
                     val modifierA = Modifier
@@ -60,7 +65,7 @@ fun MultiSelectListDialog(
                                 //sequencesList[selectedOption.value]
                             }
                             Spacer(modifier = Modifier.height(2.dp))
-                            MultiRadioButton(item, selected, fontSize.sp) { selectedValue ->
+                            MultiRadioButton(item, selected, fontSize.sp, appColors) { selectedValue ->
                                 val index = listDialogData.value.itemList.indexOf(selectedValue)
                                 selectedOptions = if(selectedOptions.contains(index)){
                                     selectedOptions.toMutableSet().also{
@@ -99,7 +104,7 @@ fun MultiSelectListDialog(
     }
 }
 @Composable
-fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextUnit,
+fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextUnit, appColors: AppColors,
                      onClickListener: (String) -> Unit) {
     Row(
         Modifier
@@ -122,6 +127,7 @@ fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextU
         )
         Text(
             text = text,
+            color = appColors.dialogFontColor,
             style = MaterialTheme.typography.body1.merge().copy(fontSize = fontSize),
             modifier = Modifier.padding(start = 16.dp)
         )
