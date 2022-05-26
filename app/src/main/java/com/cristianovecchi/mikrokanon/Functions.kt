@@ -449,6 +449,24 @@ fun List<Int>.sums(start: Int = 0): List<Int>{
     return this.map{ last += it; last }
 }
 
+fun <E> List<E>.addOrInsert(newItem: E, cursor: Int): Pair<List<E>,Int> {
+    val mutableList = this.toMutableList()
+    return when {
+        this.isEmpty() -> {
+            mutableList.add(newItem)
+            Pair(mutableList, 0)
+        }
+        cursor == mutableList.size-1 -> {
+            mutableList.add(newItem)
+            Pair(mutableList, cursor+1)
+        }
+        else -> {
+            mutableList.add(cursor + 1, newItem)
+            Pair(mutableList, cursor + 1)
+        }
+    }
+}
+
 
 
 

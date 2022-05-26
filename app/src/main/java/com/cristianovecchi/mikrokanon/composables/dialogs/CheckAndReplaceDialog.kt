@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
+import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.locale.Lang
@@ -279,10 +280,10 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 CheckType.getIndex(checkAndReplaceData.check),
                                 lang.selectCheckType
                             ) { newCheckTypeIndex ->
-                                val newCnrDatas = checkAndReplaceDatas.toMutableList()
-                                newCnrDatas.add(CheckAndReplaceData(check = checkList[newCheckTypeIndex]))
-                                checkAndReplaceDatas = newCnrDatas
-                                cursor = checkAndReplaceDatas.size -1
+                                val rebuilding = checkAndReplaceDatas.addOrInsert(
+                                CheckAndReplaceData(check = checkList[newCheckTypeIndex]), cursor)
+                                checkAndReplaceDatas = rebuilding.first
+                                cursor = rebuilding.second
                                 ListDialogData(itemList = checkTypeDialogData.value.itemList)
                             }
                         }

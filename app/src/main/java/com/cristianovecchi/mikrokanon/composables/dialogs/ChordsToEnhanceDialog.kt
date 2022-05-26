@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
+import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.convertIntsToFlags
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
@@ -187,7 +188,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                             val chordToEnhanceData = chordsToEnhanceDatas[cursor]
                             repetitionsDialogData.value = ListDialogData(
                                 true,
-                                (0..64).map { it.toString() },
+                                (0..256).map { it.toString() },
                                 chordToEnhanceData.repetitions,
                                 lang.selectRitornello
                             ) { newRepetitions ->
@@ -255,10 +256,10 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                             ) { pitchIndeces ->
                                 val actualPitches = pitchIndeces.map{11 - it}.toSortedSet()
                                 if(chordsToEnhanceDatas.all{it.absPitches != actualPitches}){
-                                    val newCteDatas = chordsToEnhanceDatas.toMutableList()
-                                    newCteDatas.add(ChordToEnhanceData(actualPitches, 1))
-                                    chordsToEnhanceDatas = newCteDatas
-                                    cursor = chordsToEnhanceDatas.size -1
+                                    val rebuilding = chordsToEnhanceDatas.addOrInsert(
+                                        ChordToEnhanceData(actualPitches, 1), cursor)
+                                    chordsToEnhanceDatas = rebuilding.first
+                                    cursor = rebuilding.second
                                 }
                                 ListDialogData(itemList = pitchesDialogData.value.itemList)
                             }

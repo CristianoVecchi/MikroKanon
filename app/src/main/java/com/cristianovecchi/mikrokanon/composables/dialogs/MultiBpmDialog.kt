@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.correctBpms
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
@@ -342,11 +343,12 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = bpmText.extractIntsFromCsv().toMutableList()
-                                val lastValue = values[values.size - 1]
-                                values.add(lastValue)
+                                var values = bpmText.extractIntsFromCsv()
+                                val selectedValue = values[cursor]
+                                val rebuilding = values.addOrInsert(selectedValue, cursor)
+                                values = rebuilding.first
+                                cursor = rebuilding.second
                                 bpmText = values.joinToString(",")
-                                cursor = values.size - 1
                             }
 
                         }

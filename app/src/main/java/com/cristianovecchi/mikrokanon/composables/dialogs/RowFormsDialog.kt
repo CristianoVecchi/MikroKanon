@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.describeSingleRowForm
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
@@ -332,11 +333,12 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val pairs = formsText.extractIntPairsFromCsv().toMutableList()
-                            val lastPair = pairs[pairs.size - 1].copy()
-                            pairs.add(lastPair)
-                            formsText = pairs.toIntPairsString()
-                            cursor = pairs.size - 1
+                            var values = formsText.extractIntPairsFromCsv()
+                            val selectedPair = values[cursor].copy()
+                            val rebuilding = values.addOrInsert(selectedPair, cursor)
+                            values = rebuilding.first
+                            cursor = rebuilding.second
+                            formsText = values.toMutableList().toIntPairsString()
                         }
                         CustomButton(
                             adaptSizeToIconButton = true,

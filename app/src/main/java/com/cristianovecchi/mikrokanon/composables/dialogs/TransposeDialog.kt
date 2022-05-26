@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
@@ -378,11 +379,12 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = transposeText.extractIntPairsFromCsv().toMutableList()
-                                val lastValue = values[values.size -1]
-                                values.add(lastValue)
-                                transposeText = values.toIntPairsString()
-                                cursor = values.size - 1
+                                var values = transposeText.extractIntPairsFromCsv()
+                                val selectedValue = values[cursor]
+                                val rebuilding = values.addOrInsert(selectedValue, cursor)
+                                values = rebuilding.first
+                                cursor = rebuilding.second
+                                transposeText = values.toMutableList().toIntPairsString()
                             }
                     }
                 }

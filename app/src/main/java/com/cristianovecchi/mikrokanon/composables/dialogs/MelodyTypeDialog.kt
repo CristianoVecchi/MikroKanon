@@ -23,9 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.melodyTypeMap
+import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
@@ -246,11 +248,12 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val melodies = melodyText.extractIntsFromCsv().toMutableList()
-                                val lastMelody = melodies[melodies.size - 1]
-                                melodies.add(lastMelody)
+                                var melodies = melodyText.extractIntsFromCsv()
+                                val selectedMelody = melodies[cursor]
+                                val rebuilding = melodies.addOrInsert(selectedMelody, cursor)
+                                melodies = rebuilding.first
+                                cursor = rebuilding.second
                                 melodyText = melodies.joinToString(",")
-                                cursor = melodies.size - 1
                             }
                         }
                     }

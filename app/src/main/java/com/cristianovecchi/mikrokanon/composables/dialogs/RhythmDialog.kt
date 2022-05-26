@@ -27,6 +27,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
+import com.cristianovecchi.mikrokanon.midi.HarmonizationData
+import com.cristianovecchi.mikrokanon.midi.HarmonizationType
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -261,15 +263,16 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
                                 ) {
-                                    val values = patternText.extractIntPairsFromCsv().toMutableList()
-                                    val value = values.last()
-                                    val pattern = value.first.absoluteValue - 1
+                                    var values = patternText.extractIntPairsFromCsv()
+                                    val selectedValue = values[cursor]
+                                    val pattern = selectedValue.first.absoluteValue - 1
                                     listDialogData.value = ListDialogData(
                                         true, patternNames, pattern, lang.selectRhythm
                                     ) { index ->
-                                        values.add(Pair(index+1,1))
-                                        patternText = values.toIntPairsString()
-                                        cursor = values.size - 1
+                                        val rebuilding = values.addOrInsert(Pair(index+1,1), cursor)
+                                        values = rebuilding.first
+                                        cursor = rebuilding.second
+                                        patternText = values.toMutableList().toIntPairsString()
 
                                         listDialogData.value =
                                             ListDialogData(itemList = listDialogData.value.itemList)

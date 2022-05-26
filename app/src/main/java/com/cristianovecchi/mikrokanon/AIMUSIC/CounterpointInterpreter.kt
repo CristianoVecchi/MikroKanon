@@ -130,9 +130,9 @@ object CounterpointInterpreter {
                 Insieme.checkIntervalsInPitches(actualPitches, glissando.toIntArray())
             var isPreviousRest = true
             while (index < actualPitches.size) {
-                if(index == changesData[changeIndex].noteIndex){
+                if(changeIndex < changesData.size && index == changesData[changeIndex].noteIndex){
                     tickChangesData.add(TickChangeData(tick.toLong(), changesData[changeIndex].instrument, index))
-                    changeIndex = ++changeIndex % changesData.size
+                    changeIndex++
                 }
                 val pitch = actualPitches[index]
                 val velocity = velocities[index]

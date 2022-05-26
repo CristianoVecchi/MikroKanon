@@ -388,11 +388,12 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val values = dynamicText.extractFloatsFromCsv().toMutableList()
-                                val lastValue = values[values.size - 1]
-                                values.add(lastValue)
+                                var values = dynamicText.extractFloatsFromCsv()
+                                val selectedValue = values[cursor]
+                                val rebuilding = values.addOrInsert(selectedValue, cursor)
+                                values = rebuilding.first
+                                cursor = rebuilding.second
                                 dynamicText = values.joinToString(",")
-                                cursor = values.size - 1
                             }
 
                         }

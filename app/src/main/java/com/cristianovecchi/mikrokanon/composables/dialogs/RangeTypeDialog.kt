@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
+import com.cristianovecchi.mikrokanon.extractFloatsFromCsv
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
 import com.cristianovecchi.mikrokanon.locale.getOctaveSymbols
 import com.cristianovecchi.mikrokanon.locale.rangeTypeMap
@@ -352,11 +354,12 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val ranges = rangeText.extractIntPairsFromCsv().toMutableList()
-                            val lastRange = ranges[ranges.size - 1]
-                            ranges.add(lastRange)
-                            rangeText = ranges.toIntPairsString()
-                            cursor = ranges.size - 1
+                            var ranges = rangeText.extractIntPairsFromCsv()
+                            val selectedRange = ranges[cursor]
+                            val rebuilding = ranges.addOrInsert(selectedRange, cursor)
+                            ranges = rebuilding.first
+                            cursor = rebuilding.second
+                            rangeText = ranges.toMutableList().toIntPairsString()
                         }
                     }
 

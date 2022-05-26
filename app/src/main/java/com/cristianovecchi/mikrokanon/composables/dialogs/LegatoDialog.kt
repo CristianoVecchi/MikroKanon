@@ -26,6 +26,8 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.*
+import com.cristianovecchi.mikrokanon.midi.HarmonizationData
+import com.cristianovecchi.mikrokanon.midi.HarmonizationType
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -364,11 +366,12 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
-                                val legatos = legatoText.extractIntPairsFromCsv().toMutableList()
-                                val lastRange = legatos[legatos.size - 1]
-                                legatos.add(lastRange)
-                                legatoText = legatos.toIntPairsString()
-                                cursor = legatos.size - 1
+                                var legatos = legatoText.extractIntPairsFromCsv()
+                                val selectedRange = legatos[cursor]
+                                val rebuilding = legatos.addOrInsert(selectedRange, cursor)
+                                legatos = rebuilding.first
+                                cursor = rebuilding.second
+                                legatoText = legatos.toMutableList().toIntPairsString()
                             }
                         }
                     }

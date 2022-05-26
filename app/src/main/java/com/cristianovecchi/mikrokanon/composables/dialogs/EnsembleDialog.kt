@@ -22,8 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.AIMUSIC.ChordToEnhanceData
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
+import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.locale.Lang
@@ -212,12 +214,11 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 ensemble.toSet(),
                                 lang.selectEnsemble
                             ) { newEnsembleMix ->
-                                val newEnsembles = ensembles.toMutableList()
-                                newEnsembles.add(newEnsembleMix)
-                                ensembles = newEnsembles
-                                cursor = ensembles.size - 1
+                                val rebuilding = ensembles.addOrInsert(
+                                    newEnsembleMix, cursor)
+                                ensembles = rebuilding.first
+                                cursor = rebuilding.second
                                 ListDialogData(itemList = multiListDialogData.value.itemList)
-
                             }
                         }
                     }
