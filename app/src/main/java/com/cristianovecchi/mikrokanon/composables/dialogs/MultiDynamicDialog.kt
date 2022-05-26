@@ -170,7 +170,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -184,7 +184,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -198,7 +198,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -212,7 +212,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
 
@@ -230,7 +230,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -243,7 +243,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -256,7 +256,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -269,7 +269,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
 
@@ -287,7 +287,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -300,7 +300,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -313,7 +313,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -326,7 +326,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                             }

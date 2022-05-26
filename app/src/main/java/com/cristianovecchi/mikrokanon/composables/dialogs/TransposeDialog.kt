@@ -160,7 +160,8 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[11],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight),
+                                        color = fontColor
                                     )
                                 }
                                 Button(
@@ -171,7 +172,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[10],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
                                 Button(
@@ -182,7 +183,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[9],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
                                 Button(
@@ -193,7 +194,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[8],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
 
@@ -209,7 +210,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[7],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -219,7 +220,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[6],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -229,7 +230,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[5],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -239,7 +240,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[4],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
                             }
@@ -254,7 +255,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[3],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -264,7 +265,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[2],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -274,7 +275,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[1],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -284,7 +285,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 {
                                     Text(
                                         text = intervals[0],
-                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                        style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                     )
                                 }
 
@@ -313,7 +314,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             {
                                 Text(
                                     text = inverseSymbol,
-                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                 )
                             }
                             Button(modifier = Modifier
@@ -335,7 +336,7 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             {
                                 Text(
                                     text = retrogradeSymbol,
-                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight)
+                                    style = TextStyle(fontSize = fontSize, fontWeight = fontWeight), color = fontColor
                                 )
                             }
                         }

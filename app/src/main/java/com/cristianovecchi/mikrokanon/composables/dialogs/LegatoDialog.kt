@@ -159,7 +159,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -173,7 +173,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -187,7 +187,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -201,7 +201,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -215,7 +215,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -229,7 +229,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
 

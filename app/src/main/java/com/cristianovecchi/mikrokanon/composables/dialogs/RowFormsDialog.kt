@@ -168,7 +168,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize[1].sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -182,7 +182,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize[3].sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -195,7 +195,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize[2].sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -208,7 +208,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize[4].sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
 

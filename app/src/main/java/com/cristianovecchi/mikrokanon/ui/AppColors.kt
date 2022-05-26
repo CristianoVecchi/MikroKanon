@@ -80,12 +80,13 @@ data class AppColors(
         }
         fun createCustomColors(fontColor: Color, backgroundColor1: Color, backgroundColor2: Color,
                                beat: Color, pass1: Color, pass2: Color, radar: Color): AppColors{
+            val actualRadar = if(AIColor.colorDistanceAverage(radar.toArgb(),fontColor.shift(0.3f).toArgb()) <= 0.124f) radar.shift(-0.2f) else radar
             return AppColors(
                 selCardBackColorSelected = pass1,
                 selCardBackColorUnselected = pass2,
                 selCardTextColorSelected = beat.shift(0.2f),
                 selCardTextColorUnselected = beat,
-                selCardBorderColorSelected = radar,
+                selCardBorderColorSelected = actualRadar,
                 selCardBorderColorUnselected = radar.shift(-0.1f),
 
                 cellDarkColorUnselected = backgroundColor1.shift(-0.02f),
@@ -98,7 +99,7 @@ data class AppColors(
 
                 iconButtonBorderColor = fontColor.shift(-0.15f),
                 iconButtonIconColor = fontColor.shift(0.3f),
-                iconButtonBackgroundColor = radar,
+                iconButtonBackgroundColor = actualRadar,
                 iconButtonInactiveBorderColor = fontColor.shift(-0.35f),
                 iconButtonInactiveIconColor = radar.shift(-0.2f),
                 iconButtonInactiveBackgroundColor = fontColor.shift(-0.3f),

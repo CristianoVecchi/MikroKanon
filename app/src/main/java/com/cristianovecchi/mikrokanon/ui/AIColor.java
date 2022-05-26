@@ -112,6 +112,23 @@ public class AIColor {
         int dB = Math.abs(B2-B1);
         return dR + dG + dB;//it's not a color!!!!
     }
+    public static float colorDistanceAverage(int startColor, int aimColor){
+        int R1 = (startColor >> 16) & 0xff;
+        int G1 = (startColor >>  8) & 0xff;
+        int B1 = (startColor      ) & 0xff;
+
+        int R2 = (aimColor >> 16) & 0xff;
+        int G2 = (aimColor >>  8) & 0xff;
+        int B2 = (aimColor      ) & 0xff;
+
+        int dR = Math.abs(R2-R1);
+        int dG = Math.abs(G2-G1);
+        int dB = Math.abs(B2-B1);
+
+        float result = (dR + dG + dB) / 300f;
+        System.out.println("result = " + result);
+        return result;//it's not a color!!!!
+    }
 
     public static boolean isLighterOf(int color, int limitColor){
         int R1 = (color >> 16) & 0xff;

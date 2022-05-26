@@ -165,7 +165,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -179,7 +179,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -193,7 +193,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -207,7 +207,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -221,7 +221,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = textFontSize.sp,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
 

@@ -164,7 +164,8 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ),color = fontColor
+
                                     )
                                 }
                                 Button(
@@ -178,7 +179,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(
@@ -192,7 +193,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
 
@@ -210,7 +211,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -223,7 +224,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -236,7 +237,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
 
@@ -254,7 +255,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -267,7 +268,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                                 Button(modifier = Modifier
@@ -280,7 +281,7 @@ fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         style = TextStyle(
                                             fontSize = fontSize,
                                             fontWeight = fontWeight
-                                        )
+                                        ), color = fontColor
                                     )
                                 }
                             }

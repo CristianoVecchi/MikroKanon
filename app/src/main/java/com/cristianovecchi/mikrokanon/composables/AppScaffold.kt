@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -55,9 +56,10 @@ fun AppScaffold(model: AppViewModel,
     val titleStyle = SpanStyle(
         fontSize = dimensions.titleTextSize.first.sp,
         color = colors.cellTextColorSelected)
+    val creditColor = if(AIColor.colorDistanceAverage(colors.cellTextColorUnselected.toArgb(),colors.selCardBorderColorSelected.toArgb()) <= 0.124) colors.cellTextColorUnselected.shift(-0.4f) else colors.cellTextColorUnselected
     val creditStyle = SpanStyle(
         fontSize = dimensions.titleTextSize.second.sp,
-        color = colors.cellTextColorUnselected)
+        color = creditColor)
 
     Scaffold(
         //modifier = Modifier
