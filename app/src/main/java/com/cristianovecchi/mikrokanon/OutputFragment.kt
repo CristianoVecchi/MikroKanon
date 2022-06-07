@@ -89,6 +89,9 @@ class OutputFragment: Fragment() {
                                 onUpsideDown = {
                                     model.onUpsideDown()
                                 },
+                                onArpeggio = {
+                                    model.onArpeggio()
+                                },
                                 onSavingCounterpoint= { position ->
                                     model.selectedCounterpoint.value?.let{
                                         model.saveCounterpointInDb(position, it.copy())

@@ -302,8 +302,8 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
                 addVibratoToTrack(track, tick, dur, channel, vibrato)
             }
             Player.insertNoteWithGlissando(
-                track, tick, dur, channel, pitches[i],
-                velocities[i], velocityOff, gliss, ribattuto
+                track, tick, dur, channel, pitch,
+                velocity, velocityOff, gliss, ribattuto
             )
             doubling.forEach {
                 Player.insertDoublingNote(

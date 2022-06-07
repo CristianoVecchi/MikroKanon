@@ -341,6 +341,7 @@ object Player {
 
         // CHORD TRACK IF NEEDED
         //println(harmonizations)
+        val justVoicing = true
         if(harmonizations.isNotEmpty() && !harmonizations.all { it.type == HarmonizationType.NONE }){
             val doubledBars = bars.mergeOnesInMetro()
                 .resizeLastBar(totalLength)
@@ -350,7 +351,7 @@ object Player {
             val barGroups = if(harmonizations.size == 1) listOf(doubledBars)
                             else doubledBars.splitBarsInGroups(harmonizations.size)
             val chordsTrack = MidiTrack()
-            addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations)
+            addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations, justVoicing)
             if(audio8D.isNotEmpty()){
                 setAudio8D(chordsTrack, 12, 15)
             }

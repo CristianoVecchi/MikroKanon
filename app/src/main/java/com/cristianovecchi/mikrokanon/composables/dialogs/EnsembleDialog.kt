@@ -219,7 +219,7 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 lang.selectEnsemble
                             ) { newEnsembleMix ->
                                 val rebuilding = ensembles.addOrInsert(
-                                    newEnsembleMix, cursor)
+                                    newEnsembleMix.ifEmpty { listOf(2) }, cursor)
                                 ensembles = rebuilding.first
                                 cursor = rebuilding.second
                                 ListDialogData(itemList = multiListDialogData.value.itemList)

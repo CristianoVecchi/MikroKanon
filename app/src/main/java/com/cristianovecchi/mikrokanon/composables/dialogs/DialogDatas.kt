@@ -50,6 +50,7 @@ data class ButtonsDialogData(
     val onMK5reducted: () -> Unit = {},  val onMK6reducted: () -> Unit = {},
     val onMaze: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
     val onSort: (Int) -> Unit = {}, val onUpsideDown: () -> Unit = {},
+    val onArpeggio: () -> Unit = {},
     val onCounterpointSelected: (Int) -> Unit = {},
     val onSubmitButtonClick: (Any?) -> Unit = {}, )
 

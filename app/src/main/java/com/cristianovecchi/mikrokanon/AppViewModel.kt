@@ -46,6 +46,7 @@ sealed class Computation(open val icon: String = "") {
     data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val values: List<Int>, override val icon: String = "cadenza"): Computation()
     data class Sort(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val sortType: Int, override val icon: String = "sort_up"): Computation()
     data class UpsideDown(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "upside_down"): Computation()
+    data class Arpeggio(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "arpeggio"): Computation()
     data class Scarlatti(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "Scarlatti"): Computation()
     data class Overlap(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "overlap"): Computation()
     data class Crossover(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "crossover"): Computation()
@@ -83,7 +84,7 @@ class AppViewModel(
         const val MAX_NOTES_MK_5RED = 25
         const val MAX_NOTES_MK_6RED = 20
         const val MAX_SEQUENCES_IN_MAZE = 10
-        val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,24, 16,14)
+        val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,18, 12,10)
     }
     var privacyIsAccepted = true
     val iconMap = Icons.provideIcons()
@@ -368,6 +369,12 @@ class AppViewModel(
         computationStack.pushAndDispatch(Computation.UpsideDown(originalCounterpoints, null, index))
         upsideDownAllCounterpoints(originalCounterpoints,index)
     }
+    val onArpeggio = {
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        computationStack.pushAndDispatch(Computation.Arpeggio(originalCounterpoints, null, index))
+        arpeggioAllCounterpoints(originalCounterpoints,index)
+    }
     val onEraseIntervals = {
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
@@ -620,6 +627,7 @@ class AppViewModel(
                     is Computation.Maze -> computationStack.lastElement()
                     is Computation.Sort -> computationStack.lastElement()
                     is Computation.UpsideDown -> computationStack.lastElement()
+                    is Computation.Arpeggio -> computationStack.lastElement()
                     is Computation.EraseIntervals -> computationStack.lastElement()
                     is Computation.Single-> computationStack.lastElement()
                     is Computation.Transposition-> computationStack.lastElement()
@@ -691,6 +699,9 @@ class AppViewModel(
                         sortAllCounterpoints( previousComputation.counterpoints,previousComputation.index, previousComputation.sortType)
                     }
                     is Computation.UpsideDown -> {
+                        upsideDownAllCounterpoints( previousComputation.counterpoints,previousComputation.index)
+                    }
+                    is Computation.Arpeggio -> {
                         upsideDownAllCounterpoints( previousComputation.counterpoints,previousComputation.index)
                     }
                     is Computation.Scarlatti -> {
@@ -1084,6 +1095,19 @@ class AppViewModel(
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = upsideDownCounterpoints(originalCounterpoints)
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                }
+                changeCounterpointsWithLimit(newList, false)
+                changeSelectedCounterpoint(counterpoints.value!![index])
+            }
+        }
+    }
+    private fun arpeggioAllCounterpoints(originalCounterpoints: List<Counterpoint>,index: Int){
+        if(!selectedCounterpoint.value!!.isEmpty()){
+            var newList: List<Counterpoint>
+            viewModelScope.launch(Dispatchers.Main){
+                withContext(Dispatchers.Default){
+                    newList = arpeggioCounterpoints(originalCounterpoints)
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimit(newList, false)

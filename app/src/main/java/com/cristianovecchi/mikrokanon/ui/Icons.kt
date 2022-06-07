@@ -50,6 +50,7 @@ object Icons {
             "accompanist" to R.drawable.ic_baseline_brush_24,
             "volume" to R.drawable.ic_baseline_volume_up_24,
             "check" to R.drawable.ic_baseline_troubleshoot_24,
+            "arpeggio" to R.drawable.ic_baseline_texture_24
         )
     }
 }

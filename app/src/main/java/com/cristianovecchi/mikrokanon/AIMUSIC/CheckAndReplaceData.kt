@@ -15,9 +15,10 @@ sealed class CheckType(open val title: String = "") {
     fun describe(): String {
         return when (this){
             is None -> this.title
-            is EqualOrGreater -> if(this.limit == 0) "ALL" else "${this.title}${this.limit}"
+            is EqualOrGreater -> if(this.limit == 0) "ALL" else "${this.title}${limitInString(this.limit)}"
         }
     }
+
     data class None(override val title: String = "No action"): CheckType()
     data class EqualOrGreater(override val title: String = ">=", val limit: Int = 240) : CheckType()
     //, ALONE("].[ >=")
@@ -32,7 +33,23 @@ sealed class CheckType(open val title: String = "") {
         fun checkList(): List<CheckType>{
             return listOf( None(),
                 EqualOrGreater(limit = 0),EqualOrGreater(limit = 120),
-                EqualOrGreater(limit = 240), EqualOrGreater(limit = 480), )
+                EqualOrGreater(limit = 160),EqualOrGreater(limit = 240),
+                EqualOrGreater(limit = 320), EqualOrGreater(limit = 480),
+                EqualOrGreater(limit = 960), EqualOrGreater(limit = 1440),
+                EqualOrGreater(limit = 1920) )
+        }
+        fun limitInString(limit: Int): String {
+            return when (limit) {
+                120 -> "1/16"
+                160 -> "1/8t"
+                240 -> "1/8"
+                320 -> "1/4t"
+                480 -> "1/4"
+                960 -> "2/4"
+                1440 -> "3/4"
+                1920 -> "4/4"
+                else -> "?"
+            }
         }
         fun getIndex(check: CheckType): Int {
             return when(check){
@@ -40,8 +57,13 @@ sealed class CheckType(open val title: String = "") {
                 is EqualOrGreater -> when(check.limit){
                     0 -> 1
                     120 -> 2
-                    240 -> 3
-                    480 -> 4
+                    160 -> 3
+                    240 -> 4
+                    320 -> 5
+                    480 -> 6
+                    960 -> 7
+                    1440 -> 8
+                    1920 -> 9
                     else -> 0
                 }
             }
@@ -238,7 +260,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(tick, *ticks.toTypedArray()),
                         durs,
                         listOf(stressedVelocity, *List(nNotes-1){velocity}.toTypedArray()),
-                        List(nNotes){glissando},
+                        List(nNotes){ 0 },
                         List(nNotes){attack},
                         listOf(isPreviousRest, *List(nNotes-1){false}.toTypedArray()),
                         if (articulationDuration == null) null
@@ -280,7 +302,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(tick, *ticks.toTypedArray()),
                         durs,
                         listOf(stressedVelocity, *List(nNotes-1){velocity}.toTypedArray()),
-                        List(nNotes){glissando},
+                        List(nNotes){ 0 },
                         List(nNotes){attack},
                         listOf(isPreviousRest, *List(nNotes-1){false}.toTypedArray()),
                         if (articulationDuration == null) null
@@ -329,7 +351,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(tick, *ticks.toTypedArray()),
                     durs.map{ it.toInt()},
                     listOf(stressedVelocity, *List(div-1){velocity}.toTypedArray()),
-                    List(div){glissando},
+                    listOf(*List(div-1){ 0 }.toTypedArray(), glissando),
                     List(div){attack},
                     listOf(isPreviousRest, *List(div-1){false}.toTypedArray()),
                     if (articulationDuration == null) null else durs.map{it.toInt()},
@@ -366,7 +388,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(tick, tick + dur, tick + dur * 2),
                     listOf(dur, dur, duration - dur * 2),
                     listOf(stressedVelocity, velocity, velocity),
-                    listOf(glissando, glissando, glissando),
+                    listOf(0, 0, glissando),
                     listOf(attack, attack, attack),
                     listOf(isPreviousRest, false, false),
                     if (articulationDuration == null) null else listOf(dur, dur, articulationDuration - dur * 2),
@@ -399,7 +421,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(thick, thick + dur, thick + dur * 2, thick + dur * 3, thick + dur * 4, thick + dur * 5, thick + dur * 6 ),
                         listOf(dur, dur, dur, dur, dur, dur, duration - dur * 6),
                         listOf(stressedVelocity, velocity, velocity, velocity, velocity, velocity, velocity),
-                        listOf(glissando, glissando, glissando, glissando, glissando, glissando, glissando),
+                        listOf(0,0,0,0,0,0,glissando),
                     listOf(attack, attack, attack, attack, attack, attack, attack),
                     listOf(isPreviousRest, false, false, false, false, false, false),
                     if(articulationDuration == null) null else listOf(dur,dur, dur,dur, dur,dur, articulationDuration - dur * 6),
@@ -431,7 +453,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(thick, thick + dur, thick + dur * 2, thick + dur * 3, thick + dur * 4 ),
                     listOf(dur, dur, dur, dur, duration - dur * 4),
                     listOf(stressedVelocity, velocity, velocity, velocity, velocity),
-                    listOf(glissando, glissando, glissando, glissando, glissando),
+                    listOf(0,0,0,0, glissando),
                     listOf(attack, attack, attack, attack, attack),
                     listOf(isPreviousRest, false, false, false, false),
                     if(articulationDuration == null) null else listOf(dur,dur, dur,dur, articulationDuration - dur * 4),
@@ -461,7 +483,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(thick, thick + dur, thick + dur * 2, thick + dur * 3, thick + dur * 4 ),
                     listOf(dur, dur, dur, dur, duration - dur * 4),
                     listOf(stressedVelocity, velocity, velocity, velocity, velocity),
-                    listOf(glissando, glissando, glissando, glissando, glissando),
+                    listOf(0,0,0,0, glissando),
                     listOf(attack, attack, attack, attack, attack),
                     listOf(isPreviousRest, false, false, false, false),
                     if(articulationDuration == null) null else listOf(dur,dur, dur,dur, articulationDuration - dur * 4),
@@ -496,7 +518,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(tick, startGruppettoTick, startGruppettoTick + dur, startGruppettoTick + dur * 2, startGruppettoTick + dur * 3 ),
                     listOf(longDuration, dur, dur, dur, dur),
                     listOf(velocity, stressedVelocity, velocity, velocity, velocity),
-                    listOf(glissando, glissando, glissando, glissando, glissando),
+                    listOf(0,0,0,0, glissando),
                     listOf(attack, attack, attack, attack, attack),
                     listOf(isPreviousRest, false, false, false, false),
                     if(articulationDuration == null) null else listOf(longDuration, dur, dur, dur, dur + diffArticulation),
@@ -527,7 +549,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(thick, thick + dur, thick + dur * 2, thick + dur * 3, thick + dur * 4 ),
                     listOf(dur, dur, dur, dur, duration - dur * 4),
                     listOf(velocity, middleVelocity, stressedVelocity, middleVelocity, velocity),
-                    listOf(glissando, glissando, glissando, glissando, glissando),
+                    listOf(0,0,0,0, glissando),
                     listOf(attack, attack, attack, attack, attack),
                     listOf(isPreviousRest, false, false, false, false),
                     if(articulationDuration == null) null else listOf(dur,dur, dur,dur, articulationDuration - dur * 4),

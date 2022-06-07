@@ -467,6 +467,16 @@ fun <E> List<E>.addOrInsert(newItem: E, cursor: Int): Pair<List<E>,Int> {
     }
 }
 
+fun <E> List<E>.shiftCycling(): List<E> {
+    if (this.isEmpty() || this.size == 1) return this
+    val result = mutableListOf<E>()
+    for(i in 1 until this.size){
+        result.add(this[i])
+    }
+    result.add(this[0])
+    return result
+}
+
 
 
 

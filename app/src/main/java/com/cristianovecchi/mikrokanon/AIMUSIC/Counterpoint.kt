@@ -5,6 +5,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.getIntOrEmptyValue
+import com.cristianovecchi.mikrokanon.shiftCycling
 import com.cristianovecchi.mikrokanon.tritoneSubstitutionOnIntervalSet
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.*
@@ -292,8 +293,28 @@ data class Counterpoint(val parts: List<AbsPart>,
         val newParts = parts.map{ absPart -> absPart.insert(index, nColumns, -1)}
         return this.copy(parts = newParts).also{ it.findEmptiness()}
     }
+    fun counterpointIsEmpty(): Boolean {
+        return parts.all{ it.absPitches.isEmpty()}
+    }
+    fun arpeggio(): Counterpoint{
+        if(counterpointIsEmpty()) return this
+        if(this.parts.size == 1) return this
+        val clone = this.normalizePartsSize(false)
+        val maxSize = clone.maxSize()
+        val nParts = clone.parts.size
+        val result = clone.cloneWithEmptyParts()
+        for( i in 0 until maxSize){
+            var column = clone.getColumnValuesWithEmptyValues(i)
+            result.addColumn(column)
+            for( j in 0 until nParts-1){
+                column = column.shiftCycling()
+                result.addColumn(column)
+            }
+        }
+        return result
+    }
     fun sortColumns(sortType: Int): Counterpoint {
-        if(parts[0].absPitches.isEmpty()) return this
+        if(counterpointIsEmpty()) return this
         val clone = this.normalizePartsSize(false)
         val maxSize = clone.maxSize()
         val nParts = clone.parts.size

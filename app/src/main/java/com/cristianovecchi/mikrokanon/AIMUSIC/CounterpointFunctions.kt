@@ -109,6 +109,9 @@ suspend fun sortColumnsOnCounterpoints(originalCounterpoints: List<Counterpoint>
 suspend fun upsideDownCounterpoints(originalCounterpoints: List<Counterpoint>): List<Counterpoint>{
      return originalCounterpoints.map{ it.upsideDown() }
 }
+suspend fun arpeggioCounterpoints(originalCounterpoints: List<Counterpoint>): List<Counterpoint>{
+     return originalCounterpoints.map{ it.arpeggio() }
+}
 suspend fun reduceCounterpointsToSinglePart(originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{ it.reduceToSinglePart() }
 }

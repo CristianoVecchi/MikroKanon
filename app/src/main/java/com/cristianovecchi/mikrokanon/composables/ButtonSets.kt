@@ -188,7 +188,7 @@ fun BoostedMikroKanonsButtons(
 @Composable
 fun NotFromSelectorButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
-    onUpsideDown: () -> Unit, onSort: (Int) -> Unit
+    onUpsideDown: () -> Unit, onSort: (Int) -> Unit, onArpeggio: () -> Unit
 ) {
     Row{
         CustomButton(iconId = model.iconMap["sort_up"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
@@ -199,6 +199,11 @@ fun NotFromSelectorButtons(
         }
         CustomButton(iconId = model.iconMap["upside_down"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
             onUpsideDown()
+        }
+    }
+    Row{
+        CustomButton(iconId = model.iconMap["arpeggio"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+            onArpeggio()
         }
     }
 }
