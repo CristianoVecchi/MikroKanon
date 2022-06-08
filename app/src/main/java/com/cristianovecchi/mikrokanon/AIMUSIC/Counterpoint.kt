@@ -17,11 +17,14 @@ import kotlin.math.max
 import kotlin.math.pow
 import kotlin.system.measureTimeMillis
 
-enum class TREND(val directions: List<Int>){
+enum class TREND(val directions: List<Int>) {
     ASCENDANT_DYNAMIC(Insieme.TREND_ASCENDANT_DYNAMIC.toList()),
     DESCENDANT_DYNAMIC(Insieme.TREND_DESCENDANT_DYNAMIC.toList()),
     ASCENDANT_STATIC(Insieme.TREND_ASCENDANT_STATIC.toList()),
     DESCENDANT_STATIC(Insieme.TREND_DESCENDANT_STATIC.toList())
+}
+enum class ARPEGGIO {
+    ASCENDANT, SINUS, WAVES
 }
 @Parcelize
 data class Counterpoint(val parts: List<AbsPart>,
@@ -296,20 +299,48 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun counterpointIsEmpty(): Boolean {
         return parts.all{ it.absPitches.isEmpty()}
     }
-    fun arpeggio(): Counterpoint{
+    fun arpeggio(arpeggioType: ARPEGGIO): Counterpoint{
         if(counterpointIsEmpty()) return this
         if(this.parts.size == 1) return this
         val clone = this.normalizePartsSize(false)
         val maxSize = clone.maxSize()
         val nParts = clone.parts.size
         val result = clone.cloneWithEmptyParts()
-        for( i in 0 until maxSize){
-            var column = clone.getColumnValuesWithEmptyValues(i)
-            result.addColumn(column)
-            for( j in 0 until nParts-1){
-                column = column.shiftCycling()
+        val computation = when (arpeggioType){
+            ARPEGGIO.ASCENDANT -> { index: Int ->
+                var column = clone.getColumnValuesWithEmptyValues(index)
                 result.addColumn(column)
+                for( j in 0 until nParts-1){
+                    column = column.shiftCycling()
+                    result.addColumn(column)
+                }
             }
+            ARPEGGIO.SINUS -> { index: Int ->
+                var column = clone.getColumnValuesWithEmptyValues(index)
+                result.addColumn(column)
+                for( j in 0 until nParts-1){
+                    column = column.shiftCycling()
+                    result.addColumn(column)
+                }
+                val size = result.getAbsPitches()[0].size
+                for( j in 2..nParts){
+                    result.addColumn(result.getColumnValuesWithEmptyValues(size-j))
+                }
+            }
+            ARPEGGIO.WAVES -> { index: Int ->
+                var column = clone.getColumnValuesWithEmptyValues(index)
+                var nextColumn = column.shiftCycling()
+                for( j in 0 until nParts){
+                    result.addColumn(column)
+                    result.addColumn(nextColumn)
+                    result.addColumn(column)
+                    column = nextColumn
+                    nextColumn = column.shiftCycling()
+                }
+            }
+        }
+        for( i in 0 until maxSize){
+            computation(i)
         }
         return result
     }

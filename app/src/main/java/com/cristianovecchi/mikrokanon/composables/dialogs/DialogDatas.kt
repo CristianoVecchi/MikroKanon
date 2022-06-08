@@ -2,6 +2,7 @@ package com.cristianovecchi.mikrokanon.composables.dialogs
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.cristianovecchi.mikrokanon.AIMUSIC.ARPEGGIO
 import com.cristianovecchi.mikrokanon.AppViewModel
 
 
@@ -47,10 +48,10 @@ data class ButtonsDialogData(
     val onOverlap: () -> Unit = {}, val onCrossover: () -> Unit = {},
     val onGlue: () -> Unit = {}, val onFlourish: () -> Unit = {},
     val onEraseIntervals: () -> Unit = {}, val onSingle: () -> Unit = {},
-    val onMK5reducted: () -> Unit = {},  val onMK6reducted: () -> Unit = {},
+    val onMK5reducted: () -> Unit = {}, val onMK6reducted: () -> Unit = {},
     val onMaze: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
     val onSort: (Int) -> Unit = {}, val onUpsideDown: () -> Unit = {},
-    val onArpeggio: () -> Unit = {},
+    val onArpeggio: (ARPEGGIO) -> Unit = {},
     val onCounterpointSelected: (Int) -> Unit = {},
     val onSubmitButtonClick: (Any?) -> Unit = {}, )
 

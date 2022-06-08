@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cristianovecchi.mikrokanon.AIMUSIC.ARPEGGIO
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.ui.*
 
@@ -188,7 +189,7 @@ fun BoostedMikroKanonsButtons(
 @Composable
 fun NotFromSelectorButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
-    onUpsideDown: () -> Unit, onSort: (Int) -> Unit, onArpeggio: () -> Unit
+    onUpsideDown: () -> Unit, onSort: (Int) -> Unit, onArpeggio: (ARPEGGIO) -> Unit
 ) {
     Row{
         CustomButton(iconId = model.iconMap["sort_up"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
@@ -202,8 +203,14 @@ fun NotFromSelectorButtons(
         }
     }
     Row{
-        CustomButton(iconId = model.iconMap["arpeggio"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-            onArpeggio()
+        CustomButton(iconId = model.iconMap["arpeggio"]!!, text = "➚", isActive = isActive, buttonSize = buttonSize, colors = colors) {
+            onArpeggio(ARPEGGIO.ASCENDANT)
+        }
+        CustomButton(iconId = model.iconMap["arpeggio"]!!, text = "⇅", isActive = isActive, buttonSize = buttonSize, colors = colors) {
+            onArpeggio(ARPEGGIO.SINUS)
+        }
+        CustomButton(iconId = model.iconMap["arpeggio"]!!, text = "≈", isActive = isActive, buttonSize = buttonSize, colors = colors) {
+            onArpeggio(ARPEGGIO.WAVES)
         }
     }
 }

@@ -46,7 +46,7 @@ sealed class Computation(open val icon: String = "") {
     data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val values: List<Int>, override val icon: String = "cadenza"): Computation()
     data class Sort(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val sortType: Int, override val icon: String = "sort_up"): Computation()
     data class UpsideDown(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "upside_down"): Computation()
-    data class Arpeggio(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "arpeggio"): Computation()
+    data class Arpeggio(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val arpeggioType: ARPEGGIO, override val icon: String = "arpeggio"): Computation()
     data class Scarlatti(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "Scarlatti"): Computation()
     data class Overlap(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "overlap"): Computation()
     data class Crossover(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "crossover"): Computation()
@@ -369,11 +369,14 @@ class AppViewModel(
         computationStack.pushAndDispatch(Computation.UpsideDown(originalCounterpoints, null, index))
         upsideDownAllCounterpoints(originalCounterpoints,index)
     }
-    val onArpeggio = {
+    val onArpeggio = { arpeggioType: ARPEGGIO ->
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-        computationStack.pushAndDispatch(Computation.Arpeggio(originalCounterpoints, null, index))
-        arpeggioAllCounterpoints(originalCounterpoints,index)
+        if(originalCounterpoints[0].parts.size > 1){
+            computationStack.pushAndDispatch(Computation.Arpeggio(originalCounterpoints, null, index, arpeggioType))
+            arpeggioAllCounterpoints(originalCounterpoints,index, arpeggioType)
+        }
+
     }
     val onEraseIntervals = {
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
@@ -702,7 +705,7 @@ class AppViewModel(
                         upsideDownAllCounterpoints( previousComputation.counterpoints,previousComputation.index)
                     }
                     is Computation.Arpeggio -> {
-                        upsideDownAllCounterpoints( previousComputation.counterpoints,previousComputation.index)
+                        arpeggioAllCounterpoints( previousComputation.counterpoints,previousComputation.index, previousComputation.arpeggioType)
                     }
                     is Computation.Scarlatti -> {
                         duplicateAllPhrasesInCounterpoint( previousComputation.counterpoints[previousComputation.index],previousComputation.index)
@@ -1102,12 +1105,12 @@ class AppViewModel(
             }
         }
     }
-    private fun arpeggioAllCounterpoints(originalCounterpoints: List<Counterpoint>,index: Int){
+    private fun arpeggioAllCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int, arpeggioType: ARPEGGIO){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
-                    newList = arpeggioCounterpoints(originalCounterpoints)
+                    newList = arpeggioCounterpoints(originalCounterpoints, arpeggioType)
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimit(newList, false)

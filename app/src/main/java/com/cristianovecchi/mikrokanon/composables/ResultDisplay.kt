@@ -20,10 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
-import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
-import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
-import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
-import com.cristianovecchi.mikrokanon.AIMUSIC.toStringAll
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.composables.counterpointviews.*
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
@@ -64,7 +61,7 @@ fun ResultDisplay(model: AppViewModel,
                   onClick: (Counterpoint) -> Unit = {},
                   onSort: (Int) -> Unit = {},
                   onUpsideDown: () -> Unit = {},
-                  onArpeggio: () -> Unit = {},
+                  onArpeggio: (ARPEGGIO) -> Unit = {},
                   onSavingCounterpoint: (Int) -> Unit = {},
                   onBack: () -> Unit = {},
                   onFreePart: (TREND) -> Unit = {},
@@ -435,7 +432,7 @@ fun ResultDisplay(model: AppViewModel,
                                     onSingle = { onSingle(); close() },
                                     onSort = { sortType -> onSort(sortType); close() },
                                     onUpsideDown = { onUpsideDown(); close()},
-                                    onArpeggio = { onArpeggio(); close()},
+                                    onArpeggio = { arpeggioType -> onArpeggio(arpeggioType); close()},
                                     onCounterpointSelected = { position -> onSavingCounterpoint(position)},
                                     onDoppelgänger = { onDoppelgänger(); close()},
                                     onPedal1 = { onPedal(1); close() },
