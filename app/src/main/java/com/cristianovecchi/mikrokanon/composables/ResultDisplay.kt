@@ -3,6 +3,7 @@ package com.cristianovecchi.mikrokanon.composables
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -71,8 +72,9 @@ fun ResultDisplay(model: AppViewModel,
                   onStop: () -> Unit = {}
                   )
 {
-    val coroutineScope = rememberCoroutineScope()
+    //val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+    var listHasDone = false
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val triple by derivedStateOf {
         if(userOptionsData.isNotEmpty()) {
@@ -87,36 +89,39 @@ fun ResultDisplay(model: AppViewModel,
     val (colors, detectorIntervalSet, detectorExtensions) = triple
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val notesNames = language.noteNames
-        val counterpointView = model.counterpointView
-        val counterpoints by counterpointsFlow.collectAsState(initial = emptyList())
-        val counterpointsData: List<Pair<Counterpoint, List<List<Any>>>> by derivedStateOf {
-            when (counterpointView){
-                0 -> counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
-                1 -> counterpoints.map{Pair(it, it.getRibattutos())}
-                else -> counterpoints.map{Pair(it, listOf(listOf()))}
-            }
+    val counterpointView = model.counterpointView
+    val counterpoints by counterpointsFlow.collectAsState(initial = emptyList())
+    val counterpointsData: List<Pair<Counterpoint, List<List<Any>>>> by derivedStateOf {
+        when (counterpointView){
+            0 -> counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
+            1 -> counterpoints.map{Pair(it, it.getRibattutos())}
+            else -> counterpoints.map{Pair(it, listOf(listOf()))}
         }
+    }
+    val elaborating: Boolean by elaboratingFlow.collectAsState(initial = false)
+    val playing by model.playing.asFlow().collectAsState(initial = false)
+    var scrollToTopList by remember{mutableStateOf(false)}
+    var scrollToItem by remember{mutableStateOf(-1)}
+    val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, specialFunctions = true,freeParts = true))
 
-        val elaborating: Boolean by elaboratingFlow.collectAsState(initial = false)
-        val playing by model.playing.asFlow().collectAsState(initial = false)
-        var scrollToTopList by remember{mutableStateOf(false)}
-        val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, specialFunctions = true,freeParts = true))
+    val elaboratingBackgroundColor by animateColorAsState(
+        if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
+    val backgroundColor = colors.sequencesListBackgroundColor
+    val buttonsBackgroundColor = colors.buttonsDisplayBackgroundColor
+    val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
+    val noteTableHeight = if(counterpoints.isNotEmpty()) counterpoints[0].parts.size * 80 else 80
+    val marbleHeight = 360
+    val quantumSquareSide = (dimensions.width / 4 * 3)
 
-        val elaboratingBackgroundColor by animateColorAsState(
-            if(elaborating) Color(0f,0f,0f,0.3f) else Color(0f,0f,0f,0.0f) )
-        val backgroundColor = colors.sequencesListBackgroundColor
-        val buttonsBackgroundColor = colors.buttonsDisplayBackgroundColor
-        val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
+    val dialogState = remember { mutableStateOf(false) }
+    val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
+    val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
+    val transposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+    val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+    val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
+    val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
 
-        val dialogState = remember { mutableStateOf(false) }
-        val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
-        val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
-        val transposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
-        val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
-        val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
-        val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
-
-        val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
+    val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
 
         Column(
             modifier = Modifier
@@ -135,7 +140,7 @@ fun ResultDisplay(model: AppViewModel,
             Box(modifier = modifierAbove) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), state = listState)
                 {
-                    itemsIndexed(counterpointsData) { _, counterpointsData ->
+                    itemsIndexed(counterpointsData) { itemIndex, counterpointsData ->
                         val counterpoint = counterpointsData.first
                         val parts = counterpointsData.second
                         val maxSize = parts.maxOf { it.size }
@@ -148,25 +153,25 @@ fun ResultDisplay(model: AppViewModel,
                             if (redNotes?.flatten()?.count { it } ?: 0 == 0) null else redNotes
                         when (counterpointView) {
                             0 -> {
-                                val _clipsText: MutableList<List<String>> = mutableListOf()
+                                val clipsText: MutableList<List<String>> = mutableListOf()
                                 for (i in 0 until maxSize) {
                                     val col: MutableList<String> = mutableListOf()
                                     for (j in parts.indices) {
                                         val text = if (i < parts[j].size) parts[j][i] as String else ""
                                         col.add(text)
                                     }
-                                    _clipsText.add(col.toList())
+                                    clipsText.add(col.toList())
                                 }
-                                val clipsText = _clipsText.toList()
                                 NoteCounterpointView(
                                     model,
                                     counterpoint,
-                                    clipsText,
+                                    clipsText.toList(),
                                     colors,
                                     dimensions.outputNoteTableFontSize,
                                     dimensions.outputNoteTableCellWidth,
                                     redNotes,
                                     onClick = { onClick(counterpoint) })
+                                listHasDone = itemIndex == counterpoints.size-1
                             }
                             1 -> MarbleCounterpointView(
                                 model = model,
@@ -180,61 +185,32 @@ fun ResultDisplay(model: AppViewModel,
                                 redNotes = redNotes,
                                 onClick = { onClick(counterpoint) })
                             2 -> Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                                val squareSide = (dimensions.width / 4 * 3)
+                                val sideColumnWidth = (dimensions.width / 4 / 2 / dimensions.dpDensity).dp
+                                val sideColumnHeight = (quantumSquareSide / dimensions.dpDensity).dp
                                 Column(Modifier
-                                    .width((dimensions.width / 4 / 2 / dimensions.dpDensity).dp)
-                                    .height((squareSide / dimensions.dpDensity).dp)
-                                    .clickable(onClick = {
-                                        val colorDefs = extractColorDefs(userOptionsData[0].colors)
-                                        val colorIndex = (model.lastIndexCustomColors - 1).coerceIn(
-                                            0,
-                                            G.getArraySize() - 1
-                                        )
-                                        model.updateUserOptions(
-                                            "colors",
-                                            "$colorIndex||${colorDefs.app}"
-                                        )
-                                    }
-                                    )
-                                ){}
+                                    .width(sideColumnWidth)
+                                    .height(sideColumnHeight)
+                                    .clickable(onClick = { model.shiftColors(-1) })) {}
                                 QuantumCounterpointView(
                                     model = model,
                                     counterpoint = counterpoint,
                                     colors = colors,
-                                    totalWidthDp = squareSide,
-                                    totalHeightDp = squareSide,
+                                    totalWidthDp = quantumSquareSide,
+                                    totalHeightDp = quantumSquareSide,
                                     dpDensity = dimensions.dpDensity,
                                     redNotes = redNotes,
                                     padding = 10,
                                     onClick = { onClick(counterpoint) })
                                 Column(Modifier
-                                    .width((dimensions.width / 4 / 2 / dimensions.dpDensity).dp)
-                                    .height((squareSide / dimensions.dpDensity).dp)
-                                    .clickable(onClick = {
-                                        val colorDefs = extractColorDefs(userOptionsData[0].colors)
-                                        val colorIndex = (model.lastIndexCustomColors + 1).coerceIn(
-                                            0,
-                                            G.getArraySize() - 1
-                                        )
-                                        model.updateUserOptions(
-                                            "colors",
-                                            "$colorIndex||${colorDefs.app}"
-                                        )
-                                    }
-                                    )
-                                ){}
+                                    .width(sideColumnWidth)
+                                    .height(sideColumnHeight)
+                                    .clickable(onClick = { model.shiftColors(+1) })) {}
                             }
 
                             else -> Unit
                         }
                     }
-                }
-                if(scrollToTopList && !elaborating) {
-                    coroutineScope.launch {
-                        delay(200)
-                        if(counterpointsData.isNotEmpty()) listState.animateScrollToItem(0)
-                        scrollToTopList = false
-                    }
+
                 }
                 if(elaborating){
                     Column(modifier = Modifier
@@ -278,10 +254,17 @@ fun ResultDisplay(model: AppViewModel,
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 15.dp, bottom = 10.dp)
                     .clickable {
+                        val indexItem = model.indexOfSelectedCounterpoint()
                         model.updateUserOptions(
                             "counterpointView",
                             ++model.counterpointView % 3
                         )
+                        scrollToItem = indexItem
+//                        if(indexItem != -1) {
+//                            coroutineScope.launch {
+//                                listState.scrollToItem(indexItem)
+//                            }
+//                        }
                     },
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
@@ -341,7 +324,6 @@ fun ResultDisplay(model: AppViewModel,
                                     )
                                     intervalSetDialogData.value = MultiListDialogData(itemList = intervalSetDialogData.value.itemList)
                                 }
-
                             }
                         }
 
@@ -499,6 +481,40 @@ fun ResultDisplay(model: AppViewModel,
                     names = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet, colors = colors
                 ) { scrollToTopList = true }
             }
+            LaunchedEffect(scrollToTopList) {
+                //Do something when List end has been reached
+                if (scrollToTopList && !elaborating) {
+                    delay(200)
+                    if (counterpointsData.isNotEmpty()) listState.animateScrollToItem(0)
+                    scrollToTopList = false
+                }
+            }
+            LaunchedEffect(counterpointView){
+                if(scrollToItem != -1 && counterpoints.isNotEmpty()) {
+//                        if (scrollToItem == counterpoints.size-1){
+//                            listState.scrollToItem(scrollToItem, Int.MAX_VALUE)
+//                        } else {
+                    delay(5)
+//                    if(counterpointView == 0) {
+//                       // while(!listHasDone)  {delay(5)}
+//                        listState.animateScrollToItem(scrollToItem)
+//                    } else
+                        if(scrollToItem == 0 || scrollToItem == counterpoints.size-1) {
+                            listState.animateScrollToItem(scrollToItem)
+                    } else {
+                        val offset = when(counterpointView){
+                            0 -> noteTableHeight / 8 * 7
+                            1 -> marbleHeight / 2
+                            else -> quantumSquareSide / 4 * 3
+                        }
+                        listState.animateScrollToItem(scrollToItem - 1, offset)
+                    }
+
+//                        }
+                    scrollToItem = -1
+                }
+            }
         }
+
     }
 

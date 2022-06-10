@@ -1289,6 +1289,14 @@ class AppViewModel(
         val flags = createFlagsFromIntervalSet(intervalSet.value!!)
         updateUserOptions("intSetVertFlags", flags)
     }
+    fun indexOfSelectedCounterpoint() : Int {
+        counterpoints.value?.let{
+            selectedCounterpoint.value?.let{
+                return counterpoints.value!!.indexOf(selectedCounterpoint.value)
+            }
+        }
+        return -1
+    }
 
     // ROOM ---------------------------------------------------------------------
     fun addSequence(sequence: ArrayList<Clip>){
@@ -1406,6 +1414,11 @@ class AppViewModel(
         }
     }
 
+    val shiftColors = { shift: Int ->
+        val colorDefs = extractColorDefs(userOptionsData.value!![0].colors)
+        val colorIndex = (lastIndexCustomColors + shift).coerceIn(0, G.getArraySize() - 1)
+        updateUserOptions("colors", "$colorIndex||${colorDefs.app}")
+    }
     // LANGUAGE --------------------------------------------------------------------------
     fun getSystemAppColorsName(): String{
         return AppColorThemes.GEMINI_BLUE.title

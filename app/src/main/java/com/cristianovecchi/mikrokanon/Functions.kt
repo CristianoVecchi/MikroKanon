@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon
 
 import android.content.res.Resources
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AIMUSIC.ChangeData
@@ -475,6 +476,10 @@ fun <E> List<E>.shiftCycling(): List<E> {
     }
     result.add(this[0])
     return result
+}
+fun LazyListState.isScrolledToTheEnd() : Boolean {
+    val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
+    return lastItem == null || lastItem.size + lastItem.offset <= layoutInfo.viewportEndOffset
 }
 
 
