@@ -15,12 +15,12 @@ sealed class CheckType(open val title: String = "") {
     fun describe(): String {
         return when (this){
             is None -> this.title
-            is EqualOrGreater -> if(this.limit == 0) "ALL" else "${this.title}${limitInString(this.limit)}"
+            is EqualOrGreater -> if(this.limit == 0) " ∞ " else "${this.title}${limitInString(this.limit)}"
         }
     }
 
-    data class None(override val title: String = "No action"): CheckType()
-    data class EqualOrGreater(override val title: String = ">=", val limit: Int = 240) : CheckType()
+    data class None(override val title: String = "   - - -   "): CheckType()
+    data class EqualOrGreater(override val title: String = " \u2265 ", val limit: Int = 240) : CheckType()
     //, ALONE("].[ >=")
     companion object {
         fun provideCheckType(index: Int, limit: Int = 240): CheckType{

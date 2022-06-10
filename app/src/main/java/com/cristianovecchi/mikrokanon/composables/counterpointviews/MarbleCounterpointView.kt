@@ -42,7 +42,7 @@ fun MarbleCounterpointView(model: AppViewModel, counterpoint: Counterpoint, riba
         )
         ) {
         val nParts = counterpoint.parts.size
-        val maxLength = counterpoint.maxSize()
+        val maxLength = counterpoint.maxSize().coerceAtMost(2048)
         val cellWidth = ((100f / maxLength) * ((this.size.width) )/ 100f)
         val cellHeight = ((100f / nParts) * ((this.size.height ) ) / 100f)
         val cellWidthHalf = cellWidth / 2

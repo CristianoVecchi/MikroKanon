@@ -95,7 +95,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
             else -> listOf()
         }
-        return Counterpoint(newParts, intervalSet)//.also{ it.display(); println()}
+        return Counterpoint(newParts, intervalSet).cutExtraNotes()//.also{ it.display(); println()}
     }
     fun inverse(): Counterpoint {
         val newParts = parts.map{ it.inverse() }
@@ -131,7 +131,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
             counterpoint = counterpoint.enqueue(counterpoint.copy(parts = newParts))
         }
-        return counterpoint
+        return counterpoint.cutExtraNotes()
     }
     fun addEmptyPart(): Counterpoint {
         val newParts = listOf(parts, listOf( AbsPart.emptyPart(maxSize()) )).flatten()
@@ -174,7 +174,8 @@ data class Counterpoint(val parts: List<AbsPart>,
                     newParts[j][i+nNotesOfSection] = parts[j].absPitches[i]
                 }
             }
-            result.add(Counterpoint(newParts.map{ AbsPart(it.toMutableList()) }, this.intervalSet))
+            result.add(Counterpoint(newParts.map{ AbsPart(it.toMutableList()) }, this.intervalSet).cutExtraNotes())
+                .also{ this.findAndSetEmptiness()}
         }
         return if(result.isEmpty()) {result.add(Counterpoint.empty(parts.size)); result.toList()
         } else {
@@ -252,7 +253,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                         }
                     }
                 }
-        if(findEmptiness) clone.emptiness = clone.findEmptiness()
+        if(findEmptiness) clone.findAndSetEmptiness()
         //clone.display()
         return clone
     }
@@ -294,7 +295,7 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun addEmptyColumns(index: Int, nColumns: Int): Counterpoint {
         if(nColumns == 0) return this.copy()
         val newParts = parts.map{ absPart -> absPart.insert(index, nColumns, -1)}
-        return this.copy(parts = newParts).also{ it.findEmptiness()}
+        return this.copy(parts = newParts).cutExtraNotes().also{ it.findEmptiness()}
     }
     fun counterpointIsEmpty(): Boolean {
         return parts.all{ it.absPitches.isEmpty()}
@@ -342,7 +343,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         for( i in 0 until maxSize){
             computation(i)
         }
-        return result
+        return result.cutExtraNotes()
     }
     fun sortColumns(sortType: Int): Counterpoint {
         if(counterpointIsEmpty()) return this
@@ -414,8 +415,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             if(!found) result.addColumn(clone.getColumnValuesWithEmptyValues(index))
             index++
         }
-        result.emptiness = result.findEmptiness()
-        return result
+        return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
     }
 
     fun addCadenzas(horizontalIntervalSet: List<Int>, values: List<Int> = listOf(0,1,0,1,1)): Counterpoint{
@@ -444,8 +444,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 index++
             }
         }
-        result.emptiness = result.findEmptiness()
-        return result
+        return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
     }
     fun eraseIntervalsOnBothNotes(horizontalIntervalSet: List<Int>): Counterpoint{
         val clone = this.normalizePartsSize(false)
@@ -458,7 +457,7 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
     fun reduceToSinglePart(): Counterpoint{
         val reducedAbsPitches = (0 until maxSize()).map{ this.getColumnValuesWithEmptyValues(it)}.flatten().toMutableList()
-        return this.copy(parts = listOf(parts[0].copy(absPitches = reducedAbsPitches)))
+        return this.copy(parts = listOf(parts[0].copy(absPitches = reducedAbsPitches))).cutExtraNotes().apply { this.findAndSetEmptiness() }
     }
     fun explodeToDoppelgänger(maxParts: Int): Counterpoint{
         val newParts = mutableListOf<AbsPart>()
@@ -474,7 +473,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 newParts.add(absPart)
             }
         }
-        return this.copy(parts = newParts.filter{!it.isBlank()}).also{ it.findEmptiness()}
+        return this.copy(parts = newParts.filter{!it.isBlank()}).also{ it.findAndSetEmptiness()}
     }
     fun explodeToDoppelgänger2(maxParts: Int, ensembleTypes: List<EnsembleType>, rangeType: Pair<Int, Int>, melodyType: Int): Counterpoint {
         val newParts = mutableListOf<AbsPart>()
@@ -609,7 +608,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 newCounterpoint = newCounterpoint.enqueue(normalized.transpose(transpose, rowForm))
             }
 
-            return newCounterpoint.apply { findAndSetEmptiness() }
+            return newCounterpoint.cutExtraNotes().apply { findAndSetEmptiness() }
         }
     }
     fun convertPartsToCsv(partSeparator: String = "\n"): String{
@@ -642,7 +641,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             result.add(counterpoint1st.enqueue(retrograde).transpose(transpose))
             result.add(counterpoint1st.enqueue(inverseRetrograde).transpose(transpose))
         }
-        result.forEach{ it.findAndSetEmptiness()}
+        result.map{ it.cutExtraNotes().apply { findAndSetEmptiness()}}
         return result.toList()
     }
     suspend fun transposingOverlap(context: CoroutineContext, counterpoint2nd: Counterpoint,
@@ -724,7 +723,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             val fromPart = this@Counterpoint.parts.size
             result.map{ it.compress(fromPart)}
         } else {
-            result.toList()
+            result.toList().map{ it.cutExtraNotes().apply { this.findAndSetEmptiness()}}
         }
     }
     fun compress(fromPart: Int): Counterpoint {
@@ -746,8 +745,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         val newParts = parts.filterIndexed { index, _ -> !deletedParts.contains(index) }
         val result = this.copy(parts = newParts)
-        result.findAndSetEmptiness()
-        return result
+        return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
 //        return copy(parts = newParts).apply {
 //            findEmptiness()
 //        }
@@ -785,8 +783,17 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun getRibattutos(): List<List<Boolean>> {
         return parts.map { it.getRibattutos() }
     }
+    fun cutLastNotesFrom(start: Int): Counterpoint{
+        return this.copy(parts = parts.map{it.copy(absPitches = it.absPitches.subList(0, start))})
+            .apply { this.findAndSetEmptiness() }
+    }
+
+    fun cutExtraNotes(): Counterpoint{
+        return if(this.maxSize()<= MAX_N_NOTES) this else this.cutLastNotesFrom(MAX_N_NOTES)
+    }
 
     companion object {
+        const val MAX_N_NOTES = 32768
         fun createFromCsv(
             doubleLevelCsv: String,
             partSeparator: String = "\n",
@@ -795,17 +802,17 @@ data class Counterpoint(val parts: List<AbsPart>,
             val newParts = doubleLevelCsv.split(partSeparator)
                 .map { csvPart -> csvPart.split(',').map { it.toInt() } }
                 .map { intsPart -> AbsPart(intsPart.toMutableList()) }
-            return Counterpoint(newParts, timestamp = timestamp)
+            return Counterpoint(newParts, timestamp = timestamp).cutExtraNotes().apply { this.findAndSetEmptiness() }
         }
 
         fun createSeparatorCounterpoint(nParts: Int, nNotesToSkip: Int): Counterpoint {
             val absPart = AbsPart((0 until nNotesToSkip).map { -1 }.toMutableList())
             val newParts = (0 until nParts).map { absPart }
-            return Counterpoint(newParts)
+            return Counterpoint(newParts, emptiness = 1f).cutExtraNotes()
         }
 
         fun counterpointFromClipList(clipList: List<Clip>): Counterpoint {
-            return Counterpoint(listOf(AbsPart.absPartfromClipList(clipList)))
+            return Counterpoint(listOf(AbsPart.absPartfromClipList(clipList))).cutExtraNotes().apply { this.findAndSetEmptiness() }
         }
 
         fun empty(): Counterpoint {
@@ -911,7 +918,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                     }
                 }
             }
-            return Counterpoint(newParts, counterpoint.intervalSet)
+            return Counterpoint(newParts, counterpoint.intervalSet).cutExtraNotes().apply { this.findAndSetEmptiness() }
         }
 
         fun expand(counterpoint: Counterpoint, nTimes: Int): Counterpoint {
@@ -926,7 +933,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 }
                 parts.add(AbsPart(pitches, oldPart.rowForm, oldPart.transpose, oldPart.delay))
             }
-            return Counterpoint(parts, counterpoint.intervalSet)
+            return Counterpoint(parts, counterpoint.intervalSet).cutExtraNotes().apply { this.findAndSetEmptiness() }
         }
 
         fun findWave(
@@ -1111,7 +1118,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 resultIndex++
             }
             val resultAbsPart = AbsPart(result, rowForm, transpose, delay)
-            return Counterpoint(listOf(*target.parts.toTypedArray(), resultAbsPart), intervalSet)
+            return Counterpoint(listOf(*target.parts.toTypedArray(), resultAbsPart), intervalSet).cutExtraNotes().apply { this.findAndSetEmptiness() }
         }
 
 
@@ -1175,7 +1182,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 original.inverse().retrograde()
             ) else result
             result = if (separator && addFinal) result.enqueue(separatorCounterpoint!!) else result
-            return result
+            return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
         }
 
         fun explodeRowFormsAddingCps(
@@ -1225,7 +1232,7 @@ data class Counterpoint(val parts: List<AbsPart>,
 
             }
 
-            return result
+            return result.cutExtraNotes()//.apply { this.findAndSetEmptiness() }
         }
 
         fun explodeRowForms(
@@ -1264,7 +1271,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                     }
                 }
             }
-            return result
+            return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
         }
 
         fun addBestPedal(
@@ -1327,19 +1334,17 @@ data class Counterpoint(val parts: List<AbsPart>,
         ): Counterpoint {
             return (0 until nPedals).fold(counterpoint) { accCounterpoint, _ ->
                 accCounterpoint.addBestPedal(intervalSet)
-            }.cutExtraParts(nPartsLimit)
+            }.apply { this.findAndSetEmptiness() }
         }
 
         fun createFromIntList(absPitches: List<Int>): Counterpoint {
-            return Counterpoint(mutableListOf(AbsPart(absPitches.toMutableList()))).apply {
-                emptiness = 0f
+            return Counterpoint(mutableListOf(AbsPart(absPitches.toMutableList()))).cutExtraNotes().apply {
+                findAndSetEmptiness()
             }
         }
         fun createFromIntLists(absPitchesLists: List<List<Int>>): Counterpoint {
             val absParts = absPitchesLists.map{AbsPart(it.toMutableList())}
-            return Counterpoint(absParts).apply {
-                findAndSetEmptiness()
-            }
+            return Counterpoint(absParts)
         }
         suspend fun findMazesWithRowForms(context: CoroutineContext, sequences: List<List<Int>>,
                               intervalSet: List<Int>, msTimeLimit: Long = 30000L): List<Counterpoint> {
