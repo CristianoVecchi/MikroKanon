@@ -1057,4 +1057,14 @@ public class Insieme {
         //System.out.println("glissandoChecks: " + Arrays.toString(result));
         return result;
     }
+
+    // same pitch and tritone return 0
+    public static int checkAbsPitchesDirectionForHalving(int pitch1, int pitch2){
+        if(pitch1 == pitch2) return 0;
+        if(pitch2 < pitch1) pitch2 += 12;
+        int diff = pitch2 - pitch1;
+        if(diff == 6) return 0;
+        if(diff < 6) return 1; //ascendant
+        return -1; //descendant
+    }
 }

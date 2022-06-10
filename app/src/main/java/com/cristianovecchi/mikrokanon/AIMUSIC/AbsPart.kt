@@ -118,6 +118,14 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         }
         return newAbsPart
     }
+    fun indexOfFirstPitchFrom(start: Int): Int{
+        val size = this.absPitches.size
+        if(start >= size ) return -1
+        for(i in start until size ){
+            if(this.absPitches[i] != -1) return i
+        }
+        return -1
+    }
 
     fun divideWithSubSequencer(octave: Int, range: IntRange, melodyType: Int): List<AbsPart> {
         val actualPitches = Insieme.findMelody(octave, absPitches.toIntArray(), range.first, range.last, melodyType)//.also{println(it.toList())}
@@ -278,13 +286,50 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
         result.add(false)
         return result.toList()
     }
+    fun divideAbsPitchesByDirection(): List<AbsPart> {
+        val nNotes = absPitches.count { it != -1 }
+        val size = this.absPitches.size
+        if (nNotes < 2) return listOf(this.copy(), emptyPart(size))
 
+        val ascPart = IntArray(size) { -1 }
+        val descPart = IntArray(size) { -1 }
+        var firstPitchIndex = this.indexOfFirstPitchFrom(0)
+        var secondPitchIndex = this.indexOfFirstPitchFrom(firstPitchIndex +1)
+        var direction: Int// = Insieme.checkAbsPitchesDirectionForHalving(absPitches[firstPitchIndex], absPitches[secondPitchIndex])
+        var isTheVeryFirst = true
+        var isAscendant = true
+        while(firstPitchIndex < size && secondPitchIndex != -1){
+            direction = Insieme.checkAbsPitchesDirectionForHalving(absPitches[firstPitchIndex], absPitches[secondPitchIndex])
+            isAscendant = when(direction){
+                -1 -> false
+                0 -> isAscendant
+                else -> true
+            }
+            if(isAscendant){
+                if(isTheVeryFirst) {
+                    ascPart[firstPitchIndex] = absPitches[firstPitchIndex]
+                    isTheVeryFirst = false
+                }
+                ascPart[secondPitchIndex] = absPitches[secondPitchIndex]
+            } else {
+                if(isTheVeryFirst) {
+                    descPart[firstPitchIndex] = absPitches[firstPitchIndex]
+                    isTheVeryFirst = false
+                }
+                descPart[secondPitchIndex] = absPitches[secondPitchIndex]
+            }
+            firstPitchIndex = secondPitchIndex
+            secondPitchIndex = this.indexOfFirstPitchFrom(firstPitchIndex +1)
+
+        }
+        return listOf(AbsPart(ascPart.toMutableList()),AbsPart(descPart.toMutableList()))
+    }
 
 }
 fun main(args : Array<String>){
-    val part = AbsPart(mutableListOf(-1,-1, 9,0,4,5,1,-1,-1,4,4,5,-1,5,7,8,1,1))
+    val part = AbsPart(mutableListOf(-1,11, 9,0,4,5,1,0,-1,-1,4,4,5,-1,4,3,11,1,1))
     //println(part.getRibattutos())
 //    println(Insieme.findMelody(0, part.absPitches.toIntArray(),
 //        21,108,3).contentToString())
-    println(part.subSequences())
+    part.divideAbsPitchesByDirection().forEach { println(it) }
 }

@@ -460,7 +460,23 @@ data class Counterpoint(val parts: List<AbsPart>,
         val reducedAbsPitches = (0 until maxSize()).map{ this.getColumnValuesWithEmptyValues(it)}.flatten().toMutableList()
         return this.copy(parts = listOf(parts[0].copy(absPitches = reducedAbsPitches)))
     }
-    fun explodeToDoppelgänger(maxParts: Int, ensembleTypes: List<EnsembleType>, rangeType: Pair<Int, Int>, melodyType: Int): Counterpoint {
+    fun explodeToDoppelgänger(maxParts: Int): Counterpoint{
+        val newParts = mutableListOf<AbsPart>()
+        val nPartsToExplode = (maxParts - (parts.size * 2 - maxParts).absoluteValue ) / 2
+        //val nNewParts = nPartsToExplode * 2 + ( parts.size - nPartsToExplode)
+
+        parts.forEachIndexed { index, absPart ->
+            if(index < nPartsToExplode){
+                //val isUpperPart = index < this.parts.size / 2
+                val partTwins: List<AbsPart> = absPart.divideAbsPitchesByDirection()
+                newParts.addAll(partTwins)
+            } else {
+                newParts.add(absPart)
+            }
+        }
+        return this.copy(parts = newParts.filter{!it.isBlank()}).also{ it.findEmptiness()}
+    }
+    fun explodeToDoppelgänger2(maxParts: Int, ensembleTypes: List<EnsembleType>, rangeType: Pair<Int, Int>, melodyType: Int): Counterpoint {
         val newParts = mutableListOf<AbsPart>()
         val nPartsToExplode = (maxParts - (parts.size * 2 - maxParts).absoluteValue ) / 2
         val nNewParts = nPartsToExplode * 2 + ( parts.size - nPartsToExplode)

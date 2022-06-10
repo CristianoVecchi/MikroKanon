@@ -494,20 +494,20 @@ fun ResultDisplay(model: AppViewModel,
 //                        if (scrollToItem == counterpoints.size-1){
 //                            listState.scrollToItem(scrollToItem, Int.MAX_VALUE)
 //                        } else {
-                    delay(5)
+                    delay(10)
 //                    if(counterpointView == 0) {
 //                       // while(!listHasDone)  {delay(5)}
 //                        listState.animateScrollToItem(scrollToItem)
 //                    } else
                         if(scrollToItem == 0 || scrollToItem == counterpoints.size-1) {
-                            listState.animateScrollToItem(scrollToItem)
+                            listState.scrollToItem(scrollToItem)
                     } else {
                         val offset = when(counterpointView){
                             0 -> noteTableHeight / 8 * 7
-                            1 -> marbleHeight / 2
-                            else -> quantumSquareSide / 4 * 3
+                            1 -> marbleHeight / 4 * 3
+                            else -> quantumSquareSide / 5 * 4
                         }
-                        listState.animateScrollToItem(scrollToItem - 1, offset)
+                        listState.scrollToItem(scrollToItem - 1, offset)
                     }
 
 //                        }

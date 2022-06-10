@@ -1135,20 +1135,19 @@ class AppViewModel(
     private fun doppelgängerOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
-            val ensList: List<List<EnsembleType>> =
-                userOptionsData.value?.let { listOf(userOptionsData.value!![0].ensemblesList
-                    .extractIntListsFromCsv()[0].map{EnsembleType.values()[it]})}
-                    ?: listOf(listOf(EnsembleType.STRING_ORCHESTRA))
-            val rangeType: Pair<Int,Int> =
-                userOptionsData.value?.let { userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()[0] }
-                    ?: Pair(2,0)
-            val melodyType: Int =
-                userOptionsData.value?.let { userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()[0] }
-                    ?: 0
+//            val ensList: List<List<EnsembleType>> =
+//                userOptionsData.value?.let { listOf(userOptionsData.value!![0].ensemblesList
+//                    .extractIntListsFromCsv()[0].map{EnsembleType.values()[it]})}
+//                    ?: listOf(listOf(EnsembleType.STRING_ORCHESTRA))
+//            val rangeType: Pair<Int,Int> =
+//                userOptionsData.value?.let { userOptionsData.value!![0].rangeTypes.extractIntPairsFromCsv()[0] }
+//                    ?: Pair(2,0)
+//            val melodyType: Int =
+//                userOptionsData.value?.let { userOptionsData.value!![0].melodyTypes.extractIntsFromCsv()[0] }
+//                    ?: 0
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
-                    newList = explodeCounterpointsToDoppelgänger(originalCounterpoints,
-                        MAX_PARTS, ensList[0], rangeType, melodyType )
+                    newList = explodeCounterpointsToDoppelgänger(originalCounterpoints, MAX_PARTS)
                         .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
@@ -1242,7 +1241,10 @@ class AppViewModel(
     fun changeCounterpointsWithLimit(newCounterpoints: List<Counterpoint>, selectFirst: Boolean,
                                      take: Int = MAX_VISIBLE_COUNTERPOINTS){
         lastIndex = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
-        _counterpoints.value = newCounterpoints.take(take)
+        val timestamp = System.currentTimeMillis()
+        // if new counterpoints are equal to the previous ones 'remember' doesn't refresh them in composables
+        val timestampedCounterpoints = newCounterpoints.take(take).mapIndexed{ index, it -> if(index == 0) it.copy(timestamp = timestamp) else it}
+        _counterpoints.value = timestampedCounterpoints
         if(selectFirst) counterpoints.value?.let{
             if(it.isNotEmpty()) changeSelectedCounterpoint(it[0])
         }
