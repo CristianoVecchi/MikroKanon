@@ -74,7 +74,6 @@ fun ResultDisplay(model: AppViewModel,
 {
     //val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    var listHasDone = false
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val triple by derivedStateOf {
         if(userOptionsData.isNotEmpty()) {
@@ -100,7 +99,7 @@ fun ResultDisplay(model: AppViewModel,
     }
     val elaborating: Boolean by elaboratingFlow.collectAsState(initial = false)
     val playing by model.playing.asFlow().collectAsState(initial = false)
-    var scrollToTopList by remember{mutableStateOf(false)}
+    //var scrollToTopList by remember{mutableStateOf(false)}
     var scrollToItem by remember{mutableStateOf(-1)}
     val activeButtons by model.activeButtons.asFlow().collectAsState(initial = ActiveButtons(counterpoint = true, specialFunctions = true,freeParts = true))
 
@@ -140,7 +139,7 @@ fun ResultDisplay(model: AppViewModel,
             Box(modifier = modifierAbove) {
                 LazyColumn(modifier = Modifier.fillMaxSize(), state = listState)
                 {
-                    itemsIndexed(counterpointsData) { itemIndex, counterpointsData ->
+                    itemsIndexed(counterpointsData) { _, counterpointsData ->
                         val counterpoint = counterpointsData.first
                         val parts = counterpointsData.second
                         val maxSize = parts.maxOf { it.size }
@@ -157,7 +156,8 @@ fun ResultDisplay(model: AppViewModel,
                                 for (i in 0 until maxSize) {
                                     val col: MutableList<String> = mutableListOf()
                                     for (j in parts.indices) {
-                                        val text = if (i < parts[j].size) parts[j][i] as String else ""
+                                        val text =
+                                            if (i < parts[j].size) parts[j][i] as String else ""
                                         col.add(text)
                                     }
                                     clipsText.add(col.toList())
@@ -171,7 +171,6 @@ fun ResultDisplay(model: AppViewModel,
                                     dimensions.outputNoteTableCellWidth,
                                     redNotes,
                                     onClick = { onClick(counterpoint) })
-                                listHasDone = itemIndex == counterpoints.size-1
                             }
                             1 -> MarbleCounterpointView(
                                 model = model,
@@ -184,13 +183,19 @@ fun ResultDisplay(model: AppViewModel,
                                 dpDensity = dimensions.dpDensity,
                                 redNotes = redNotes,
                                 onClick = { onClick(counterpoint) })
-                            2 -> Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                                val sideColumnWidth = (dimensions.width / 4 / 2 / dimensions.dpDensity).dp
+                            2 -> Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                val sideColumnWidth =
+                                    (dimensions.width / 4 / 2 / dimensions.dpDensity).dp
                                 val sideColumnHeight = (quantumSquareSide / dimensions.dpDensity).dp
-                                Column(Modifier
-                                    .width(sideColumnWidth)
-                                    .height(sideColumnHeight)
-                                    .clickable(onClick = { model.shiftColors(-1) })) {}
+                                Column(
+                                    Modifier
+                                        .width(sideColumnWidth)
+                                        .height(sideColumnHeight)
+                                        .clickable(onClick = { model.shiftColors(-1) })
+                                ) {}
                                 QuantumCounterpointView(
                                     model = model,
                                     counterpoint = counterpoint,
@@ -201,16 +206,17 @@ fun ResultDisplay(model: AppViewModel,
                                     redNotes = redNotes,
                                     padding = 10,
                                     onClick = { onClick(counterpoint) })
-                                Column(Modifier
-                                    .width(sideColumnWidth)
-                                    .height(sideColumnHeight)
-                                    .clickable(onClick = { model.shiftColors(+1) })) {}
+                                Column(
+                                    Modifier
+                                        .width(sideColumnWidth)
+                                        .height(sideColumnHeight)
+                                        .clickable(onClick = { model.shiftColors(+1) })
+                                ) {}
                             }
 
                             else -> Unit
                         }
                     }
-
                 }
                 if(elaborating){
                     Column(modifier = Modifier
@@ -239,7 +245,7 @@ fun ResultDisplay(model: AppViewModel,
                     onSubmitButtonClick = { index, repeat ->
                         dialogState.value = false
                         if (index != -1) {
-                            onKP(index, repeat); scrollToTopList = true
+                            onKP(index, repeat);
                         }
                     })
                 ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model, language, filledSlots = filledSlots)
@@ -303,7 +309,7 @@ fun ResultDisplay(model: AppViewModel,
                             isActive = activeButtons.undo,
                             buttonSize = buttonSize, colors = colors
                         ) {
-                            if (!elaborating) onBack(); scrollToTopList = !model.lastComputationIsExpansion()
+                            if (!elaborating) onBack(); model.scrollToTopList = !model.lastComputationIsExpansion()
                         }
                         // HORIZONTAL INTERVAL SET DIALOG BUTTON
                         CustomButton(
@@ -322,6 +328,7 @@ fun ResultDisplay(model: AppViewModel,
                                         "intSetHorFlags",
                                         if(indexes.isEmpty()) 0b1111111 else convertIntsToFlags(indexes.toSortedSet())
                                     )
+                                    //model.dispatchIntervals
                                     intervalSetDialogData.value = MultiListDialogData(itemList = intervalSetDialogData.value.itemList)
                                 }
                             }
@@ -329,7 +336,7 @@ fun ResultDisplay(model: AppViewModel,
 
                     }
                     ExtensionButtons(model = model, isActive = activeButtons.expand, buttonSize = buttonSize, colors = colors,
-                        onExpand = { if (!elaborating) onExpand(); scrollToTopList = false },
+                        onExpand = { if (!elaborating) onExpand() },
                         onTranspose = {  if (!elaborating) {
                             transposeDialogData.value = MultiNumberDialogData(
                                 true, language.selectTranspositions, value = "0|1",
@@ -338,7 +345,6 @@ fun ResultDisplay(model: AppViewModel,
                                 transposeDialogData.value = MultiNumberDialogData(model = model)
 
                             }
-                            scrollToTopList = false
                         }
                         }
                     )
@@ -354,9 +360,9 @@ fun ResultDisplay(model: AppViewModel,
                                 buttonsDialogData.value = ButtonsDialogData(true,
                                     language.selectSpecialFunction,
                                     model, isActiveWaves = activeButtons.waves, isActivePedals = activeButtons.pedals,
-                                    onWave3 = { onWave(3); close(); scrollToTopList = true },
-                                    onWave4 = { onWave(4); close(); scrollToTopList = true },
-                                    onWave6 = { onWave(6); close(); scrollToTopList = true },
+                                    onWave3 = { onWave(3); close() },
+                                    onWave4 = { onWave(4); close() },
+                                    onWave6 = { onWave(6); close() },
                                     onTritoneSubstitution = { onTritoneSubstitution(); close() },
                                     onRound = { onRound(); close() },
                                     onCadenza = {
@@ -409,7 +415,7 @@ fun ResultDisplay(model: AppViewModel,
                                             }
                                         )
                                     },
-                                    onFlourish = {onFlourish(); close(); scrollToTopList = false},
+                                    onFlourish = {onFlourish(); close(); },
                                     onEraseIntervals = { onEraseIntervals(); close() },
                                     onSingle = { onSingle(); close() },
                                     onSort = { sortType -> onSort(sortType); close() },
@@ -430,19 +436,15 @@ fun ResultDisplay(model: AppViewModel,
                         isActive = activeButtons.freeParts,
                         onAscDynamicClick = {
                             if (!elaborating) onFreePart(TREND.ASCENDANT_DYNAMIC)
-                            scrollToTopList = true
                         },
                         onAscStaticClick = {
                             if (!elaborating) onFreePart(TREND.ASCENDANT_STATIC)
-                            scrollToTopList = true
                         },
                         onDescDynamicClick = {
                             if (!elaborating) onFreePart(TREND.DESCENDANT_DYNAMIC)
-                            scrollToTopList = true
                         },
                         onDescStaticClick = {
                             if (!elaborating) onFreePart(TREND.DESCENDANT_STATIC)
-                            scrollToTopList = true
                         }
                     )
                     // PLAY||STOP BUTTON
@@ -453,7 +455,7 @@ fun ResultDisplay(model: AppViewModel,
                             buttonSize = buttonSize, colors = colors
                         ) {
                             if (!elaborating) {
-                                onPlay(); scrollToTopList = false
+                                onPlay();
                             }
                         }
                     } else {
@@ -462,7 +464,7 @@ fun ResultDisplay(model: AppViewModel,
                             isActive = activeButtons.playOrStop,
                             buttonSize = buttonSize, colors = colors
                         ) {
-                            onStop(); scrollToTopList = false
+                            onStop();
                         }
                     }
 
@@ -479,14 +481,16 @@ fun ResultDisplay(model: AppViewModel,
                     model,
                     fontSize = if(model.zodiacPlanetsActive) dimensions.outputIntervalSetFontSize * 2 else dimensions.outputIntervalSetFontSize,
                     names = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet, colors = colors
-                ) { scrollToTopList = true }
+                ) {  }
             }
-            LaunchedEffect(scrollToTopList) {
+            val scope = rememberCoroutineScope()
                 //Do something when List end has been reached
-                if (scrollToTopList && !elaborating) {
-                    delay(200)
-                    if (counterpointsData.isNotEmpty()) listState.animateScrollToItem(0)
-                    scrollToTopList = false
+            scope.launch {
+                if (model.scrollToTopList && !elaborating) {
+                    delay(300)
+                    //if (counterpointsData.isNotEmpty())
+                    listState.scrollToItem(0)
+                    model.scrollToTopList = false
                 }
             }
             LaunchedEffect(counterpointView){

@@ -115,7 +115,7 @@ suspend fun arpeggioCounterpoints(originalCounterpoints: List<Counterpoint>, arp
 suspend fun reduceCounterpointsToSinglePart(originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
      return originalCounterpoints.map{ it.reduceToSinglePart() }
 }
-suspend fun explodeCounterpointsTo(originalCounterpoints: List<Counterpoint>, maxParts: Int): List<Counterpoint>{
+suspend fun explodeCounterpointsToDoppelgänger(originalCounterpoints: List<Counterpoint>, maxParts: Int): List<Counterpoint>{
      return originalCounterpoints.map{ it.explodeToDoppelgänger(maxParts) }
 }
 suspend fun findPedalsOnCounterpoint(nPedals:Int, counterpoint: Counterpoint, intervalSet: List<Int>): Counterpoint{

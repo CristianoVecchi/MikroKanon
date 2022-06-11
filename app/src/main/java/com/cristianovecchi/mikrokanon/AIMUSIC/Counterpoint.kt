@@ -453,7 +453,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             val checks = part.detectIntervalsReportingBothNotes(horizontalIntervalSet)
             newParts.add(part.setAbsPitchesByChecks(checks))
         }
-        return Counterpoint(parts = newParts, this.intervalSet)
+        return Counterpoint(parts = newParts, this.intervalSet).apply { this.findAndSetEmptiness() }
     }
     fun reduceToSinglePart(): Counterpoint{
         val reducedAbsPitches = (0 until maxSize()).map{ this.getColumnValuesWithEmptyValues(it)}.flatten().toMutableList()

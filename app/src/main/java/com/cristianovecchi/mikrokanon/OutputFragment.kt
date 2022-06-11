@@ -105,7 +105,7 @@ class OutputFragment: Fragment() {
                                     model.onSimpleTransposition(transposition)
                                 },
                                 onWave = { nWaves ->
-                                    model.onWaveFurtherSelection(nWaves, null)
+                                    model.onWaveFurtherSelection(nWaves)
                                 },
                                 onTritoneSubstitution = {
                                     model.onTritoneSubstitution()
