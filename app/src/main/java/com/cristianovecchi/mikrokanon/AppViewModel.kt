@@ -41,20 +41,20 @@ sealed class Computation(open val icon: String = "") {
     data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int, override val icon: String = "waves"): Computation()
     data class FirstFromFreePart(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val trend: TREND, override val icon: String = "free_parts"): Computation()
     data class FurtherFromFreePart(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val trend: TREND, override val icon: String = "free_parts"): Computation()
-    data class Fioritura(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "fioritura"): Computation()
+    data class Fioritura(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, override val icon: String = "fioritura"): Computation()
     data class Round(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "round"): Computation()
-    data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val values: List<Int>, override val icon: String = "cadenza"): Computation()
-    data class Sort(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val sortType: Int, override val icon: String = "sort_up"): Computation()
+    data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val values: List<Int>, override val icon: String = "cadenza"): Computation()
+    data class Sort(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val sortType: Int, override val icon: String = "sort_up"): Computation()
     data class UpsideDown(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "upside_down"): Computation()
     data class Arpeggio(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val arpeggioType: ARPEGGIO, override val icon: String = "arpeggio"): Computation()
-    data class Scarlatti(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "Scarlatti"): Computation()
+    data class Scarlatti(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "Scarlatti"): Computation()
     data class Overlap(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "overlap"): Computation()
     data class Crossover(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "crossover"): Computation()
     data class Glue(val counterpoint1st: Counterpoint, val counterpoint2nd: Counterpoint, val firstSequence: ArrayList<Clip>?, override val icon: String = "glue"): Computation()
     data class Maze(val intSequences: List<List<Int>>, override val icon: String = "maze"): Computation()
-    data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "erase"): Computation()
-    data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "single"): Computation()
-    data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "doppelgänger"): Computation()
+    data class EraseIntervals(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, override val icon: String = "erase"): Computation()
+    data class Single(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, override val icon: String = "single"): Computation()
+    data class Doppelgänger(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, override val icon: String = "doppelgänger"): Computation()
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2, override val icon: String = "expand") : Computation()
     data class Transposition(val counterpoints: List<Counterpoint>, val transpositions: List<Pair<Int,Int>>, val index: Int, override val icon: String = "transpose") : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int, override val icon: String = "tritone_substitution") : Computation()
@@ -302,15 +302,15 @@ class AppViewModel(
     val onCadenzaFromSelector = { list: ArrayList<Clip>, values: List<Int> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
-        computationStack.pushAndDispatch(Computation.Cadenza(listOf(selectedCounterpoint.value!!.clone()), list,0, values))
-        cadenzasOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0, values)
+        computationStack.pushAndDispatch(Computation.Cadenza(listOf(selectedCounterpoint.value!!.clone()), list, values))
+        cadenzasOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()),  values)
     }
     val onCadenza = { values: List<Int> ->
         scrollToTopList = true
-        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-        computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, index, values))
-        cadenzasOnCounterpoints(originalCounterpoints, index, values)
+        computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, values))
+        cadenzasOnCounterpoints(originalCounterpoints, values)
     }
     val onOverlapFromSelector = { list: ArrayList<Clip>, position: Int, crossover: Boolean ->
         if(savedCounterpoints[position] != null ){
@@ -351,23 +351,21 @@ class AppViewModel(
     val onScarlattiFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
-        computationStack.pushAndDispatch(Computation.Scarlatti(listOf(selectedCounterpoint.value!!.clone()), list,0))
-        duplicateAllPhrasesInCounterpoint(selectedCounterpoint.value!!.clone(), 0)
+        computationStack.pushAndDispatch(Computation.Scarlatti(selectedCounterpoint.value!!.clone(), list))
+        duplicateAllPhrasesInCounterpoint(selectedCounterpoint.value!!.clone())
     }
     val onScarlatti = {
         scrollToTopList = true
-        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
-        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-        computationStack.pushAndDispatch(Computation.Scarlatti(originalCounterpoints, null, index))
-        duplicateAllPhrasesInCounterpoint(selectedCounterpoint.value!!.clone(), 0)
+        val originalCounterpoint = selectedCounterpoint.value!!.clone()
+        computationStack.pushAndDispatch(Computation.Scarlatti(originalCounterpoint, null))
+        duplicateAllPhrasesInCounterpoint(selectedCounterpoint.value!!.clone())
     }
     val onSortCounterpoints = { sortType: Int ->
         scrollToTopList = true
-        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
         val iconString = if(sortType == 0) "sort_up" else "sort_down"
-        computationStack.pushAndDispatch(Computation.Sort(originalCounterpoints, null, index, sortType, iconString ))
-        sortAllCounterpoints(originalCounterpoints, sortType, index)
+        computationStack.pushAndDispatch(Computation.Sort(originalCounterpoints, null, sortType, iconString ))
+        sortAllCounterpoints(originalCounterpoints, sortType)
     }
     val onUpsideDown = {
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
@@ -383,33 +381,30 @@ class AppViewModel(
             computationStack.pushAndDispatch(Computation.Arpeggio(originalCounterpoints, null, index, arpeggioType))
             arpeggioAllCounterpoints(originalCounterpoints,index, arpeggioType)
         }
-
     }
     val onEraseIntervals = {
         scrollToTopList = true
-        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-        computationStack.pushAndDispatch(Computation.EraseIntervals(originalCounterpoints, null, index))
-        eraseIntervalsOnCounterpoints(originalCounterpoints, 0)
+        computationStack.pushAndDispatch(Computation.EraseIntervals(originalCounterpoints, null))
+        eraseIntervalsOnCounterpoints(originalCounterpoints)
     }
     val onEraseIntervalsFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
-        computationStack.pushAndDispatch(Computation.EraseIntervals(listOf(selectedCounterpoint.value!!.clone()), list,0))
-        eraseIntervalsOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+        computationStack.pushAndDispatch(Computation.EraseIntervals(listOf(selectedCounterpoint.value!!.clone()), list))
+        eraseIntervalsOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()))
     }
     val onSingleFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
-        computationStack.pushAndDispatch(Computation.Single(listOf(selectedCounterpoint.value!!.clone()), list,0))
-        singleOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+        computationStack.pushAndDispatch(Computation.Single(listOf(selectedCounterpoint.value!!.clone()), list))
+        singleOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()))
     }
     val onSingle= {
         scrollToTopList = true
-        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-        computationStack.pushAndDispatch(Computation.Single(originalCounterpoints, null, index))
-        singleOnCounterpoints(originalCounterpoints, index)
+        computationStack.pushAndDispatch(Computation.Single(originalCounterpoints, null))
+        singleOnCounterpoints(originalCounterpoints)
     }
     val onSimpleTransposition = { transpositions: List<Pair<Int,Int>> ->
         if(transpositions != listOf( Pair(0,1) )){
@@ -420,16 +415,15 @@ class AppViewModel(
         }
     }
     val onDoppelgänger= {
-        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-        computationStack.pushAndDispatch(Computation.Doppelgänger(originalCounterpoints, null, index))
-        doppelgängerOnCounterpoints(originalCounterpoints, index)
+        computationStack.pushAndDispatch(Computation.Doppelgänger(originalCounterpoints, null))
+        doppelgängerOnCounterpoints(originalCounterpoints)
     }
     val onDoppelgängerFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
-        computationStack.pushAndDispatch(Computation.Doppelgänger(listOf(selectedCounterpoint.value!!.clone()), list,0))
-        doppelgängerOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+        computationStack.pushAndDispatch(Computation.Doppelgänger(listOf(selectedCounterpoint.value!!.clone()), list))
+        doppelgängerOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()))
     }
     val onRoundFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
@@ -492,15 +486,14 @@ class AppViewModel(
     val onFlourishFromSelector = { list: ArrayList<Clip> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
-        computationStack.pushAndDispatch(Computation.Fioritura(listOf(selectedCounterpoint.value!!.clone()), list,0))
-        flourishCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+        computationStack.pushAndDispatch(Computation.Fioritura(listOf(selectedCounterpoint.value!!.clone()), list))
+        flourishCounterpoints(listOf(selectedCounterpoint.value!!.clone()))
     }
     val onFlourish = {
         scrollToTopList = true
-        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-        computationStack.pushAndDispatch(Computation.Fioritura(originalCounterpoints, null, index))
-        flourishCounterpoints(originalCounterpoints, index)
+        computationStack.pushAndDispatch(Computation.Fioritura(originalCounterpoints, null))
+        flourishCounterpoints(originalCounterpoints)
     }
     val onPedalFromSelector = { nPedals: Int, list: ArrayList<Clip>->
         changeFirstSequence(list)
@@ -680,7 +673,7 @@ class AppViewModel(
                     }
                     is Computation.Fioritura -> {
                         scrollToTopList = true
-                        flourishCounterpoints(previousComputation.counterpoints, previousComputation.index)
+                        flourishCounterpoints(previousComputation.counterpoints)
                     }
                     is Computation.FirstFromKP -> onKPfromFirstSelection(
                         previousComputation.firstSequence,
@@ -713,7 +706,7 @@ class AppViewModel(
                     }
                     is Computation.Doppelgänger -> {
                         if(stepBack){
-                            doppelgängerOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
+                            doppelgängerOnCounterpoints( previousComputation.counterpoints)
                         }
                     }
                     is Computation.Round -> {
@@ -722,11 +715,11 @@ class AppViewModel(
                         }
                     }
                     is Computation.Cadenza -> {
-                            cadenzasOnCounterpoints( previousComputation.counterpoints,previousComputation.index, previousComputation.values)
+                            cadenzasOnCounterpoints( previousComputation.counterpoints, previousComputation.values)
                     }
                     is Computation.Sort -> {
                         if(stepBack){
-                            sortAllCounterpoints( previousComputation.counterpoints,previousComputation.index, previousComputation.sortType)
+                            sortAllCounterpoints( previousComputation.counterpoints,previousComputation.sortType)
                         }
                     }
                     is Computation.UpsideDown -> {
@@ -741,7 +734,7 @@ class AppViewModel(
                     }
                     is Computation.Scarlatti -> {
                         if(stepBack){
-                            duplicateAllPhrasesInCounterpoint( previousComputation.counterpoints[previousComputation.index],previousComputation.index)
+                            duplicateAllPhrasesInCounterpoint( previousComputation.counterpoint)
                         }
                     }
                     is Computation.Overlap -> {
@@ -759,11 +752,11 @@ class AppViewModel(
                     }
                     is Computation.EraseIntervals -> {
 //                        if(stepBack || previousIntervalSet != intervalSetHorizontal.value) {
-                        eraseIntervalsOnCounterpoints(previousComputation.counterpoints,0)
+                        eraseIntervalsOnCounterpoints(previousComputation.counterpoints)
                     }
                     is Computation.Single -> {
                         if(stepBack){
-                            singleOnCounterpoints( previousComputation.counterpoints,previousComputation.index)
+                            singleOnCounterpoints( previousComputation.counterpoints)
                         }
                     }
                     is Computation.Transposition -> {
@@ -1024,15 +1017,16 @@ class AppViewModel(
             changeCounterpointsWithLimit(newList, true)
         }
     }
-    private fun flourishCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+    private fun flourishCounterpoints(originalCounterpoints: List<Counterpoint>){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = flourish(originalCounterpoints, intervalSet.value!!, intervalSetHorizontal.value!!.toList())
+                        .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, false)
-                changeSelectedCounterpoint(counterpoints.value!![index])
+                changeCounterpointsWithLimit(newList, true)
             }
         }
     }
@@ -1048,19 +1042,19 @@ class AppViewModel(
             }
         }
     }
-    private fun cadenzasOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int, values: List<Int>){
+    private fun cadenzasOnCounterpoints(originalCounterpoints: List<Counterpoint>,values: List<Int>){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = addCadenzasOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints, values)
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, false)
-                changeSelectedCounterpoint(counterpoints.value!![index])
+                changeCounterpointsWithLimit(newList, true)
             }
         }
     }
-    private fun duplicateAllPhrasesInCounterpoint(originalCounterpoint: Counterpoint,index: Int){
+    private fun duplicateAllPhrasesInCounterpoint(originalCounterpoint: Counterpoint){
         if(!originalCounterpoint.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
@@ -1070,7 +1064,6 @@ class AppViewModel(
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimit(newList, true)
-                changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
     }
@@ -1106,7 +1099,7 @@ class AppViewModel(
         }
     }
 
-    private fun eraseIntervalsOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+    private fun eraseIntervalsOnCounterpoints(originalCounterpoints: List<Counterpoint>){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
@@ -1115,11 +1108,10 @@ class AppViewModel(
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimit(newList, true)
-                //changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
     }
-    private fun sortAllCounterpoints(originalCounterpoints: List<Counterpoint>, sortType: Int, index: Int){
+    private fun sortAllCounterpoints(originalCounterpoints: List<Counterpoint>, sortType: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
@@ -1128,8 +1120,7 @@ class AppViewModel(
                         .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, spread != 0)
-                changeSelectedCounterpoint(counterpoints.value!![index])
+                changeCounterpointsWithLimit(newList, true)
             }
         }
     }
@@ -1140,7 +1131,6 @@ class AppViewModel(
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = upsideDownCounterpoints(originalCounterpoints)
-                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimit(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
@@ -1153,14 +1143,14 @@ class AppViewModel(
             viewModelScope.launch(Dispatchers.Main){
                 withContext(Dispatchers.Default){
                     newList = arpeggioCounterpoints(originalCounterpoints, arpeggioType)
-                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                        //.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimit(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
     }
-    private fun singleOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+    private fun singleOnCounterpoints(originalCounterpoints: List<Counterpoint>){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
             viewModelScope.launch(Dispatchers.Main){
@@ -1169,12 +1159,11 @@ class AppViewModel(
                         .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, spread != 0)
-                changeSelectedCounterpoint(counterpoints.value!![index])
+                changeCounterpointsWithLimit(newList, true)
             }
         }
     }
-    private fun doppelgängerOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+    private fun doppelgängerOnCounterpoints(originalCounterpoints: List<Counterpoint>){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
 //            val ensList: List<List<EnsembleType>> =
@@ -1194,7 +1183,6 @@ class AppViewModel(
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimit(newList, true)
-                changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
     }
