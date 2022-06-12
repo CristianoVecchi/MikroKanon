@@ -1,6 +1,8 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import android.os.Parcelable
+import com.cristianovecchi.mikrokanon.AIMUSIC.Ensembles.getEnsemble
+import com.cristianovecchi.mikrokanon.AIMUSIC.Ensembles.getEnsembleMix
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
@@ -1334,7 +1336,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         ): Counterpoint {
             return (0 until nPedals).fold(counterpoint) { accCounterpoint, _ ->
                 accCounterpoint.addBestPedal(intervalSet)
-            }.apply { this.findAndSetEmptiness() }
+            }.cutExtraParts(nPartsLimit).apply { this.findAndSetEmptiness() }
         }
 
         fun createFromIntList(absPitches: List<Int>): Counterpoint {
@@ -1490,7 +1492,9 @@ fun main(args : Array<String>){
     val absPitches3 = mutableListOf(4, 5, 6)//, 3, 4, 5, 6, 7, 8, 9, 10,11,0)
     val sequences = listOf(absPitches1, absPitches2, absPitches3)
     val notes = listOf("C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "__")
-    Counterpoint.mazeTest(sequences)
+    //val ens = getEnsemble(12, EnsembleType.STRING_ORCHESTRA).apply { println(this) }
+    //val mix = getEnsembleMix(12, listOf(EnsembleType.STRING_ORCHESTRA, EnsembleType.WOODWINDS)).apply { println(this) }
+   // Counterpoint.mazeTest(sequences)
     //println(Insieme.areAbsPitchesValid(absPitches1.toIntArray(), pentatonicIntervalSet.toIntArray() ))
 //    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8)
 //    val mssq = MelodySubSequencer(pitches.toIntArray())

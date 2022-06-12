@@ -48,8 +48,9 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
 
 object Ensembles {
     fun getEnsembleMix(nParts: Int, types: List<EnsembleType>):  List<EnsemblePart> {
-        //println("Ensemble Types: $types")
+       // println("nParts: $nParts    Ensemble Types: $types")
         val mix = types.map{ getEnsemble(nParts, it)}
+     //   mix.forEachIndexed{ i, it -> println("ensemble #$i: $it")}
         return (0 until nParts).toList().map{
             mix[it % types.size][it]}
     }

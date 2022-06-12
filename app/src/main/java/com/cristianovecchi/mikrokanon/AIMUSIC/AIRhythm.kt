@@ -9,6 +9,65 @@ fun findScaleDurations(duration: Int, nNotes: Int, maxShortNote: Int): List<Int>
     return if (shortDurs[0] > maxShortNote) MutableList(nNotes){60}.apply{ this[0] += duration - maxShortNote * nNotes }
     else shortDurs.apply { this[0] += halfDuration }
 }
+fun findScaleTicks(tick: Int, scaleDurations: List<Int>): List<Int>{
+        var lastTick = tick
+        val ticks = (0 until scaleDurations.size -1).map {
+            lastTick += scaleDurations[it]
+            lastTick
+        }
+        return listOf(tick, *ticks.toTypedArray())
+
+}
+fun find2ShortAndLongDurations(duration: Int, maxShortNote: Int): List<Int>{
+    val dur = if (maxShortNote * 4 > duration) duration / 4 else maxShortNote
+    return listOf(dur, dur, duration - dur * 2)
+}
+fun find2ShortAndLongTicks(tick: Int, duration: Int, shortDur: Int, isRetrograde: Boolean = false): List<Int>{
+    return if(isRetrograde){
+        val longDuration = duration - shortDur * 2
+        val startGruppettoTick = tick + longDuration
+        listOf(tick, startGruppettoTick, startGruppettoTick + shortDur)
+    } else {
+        listOf(tick, tick + shortDur, tick + shortDur * 2)
+    }
+}
+fun find4ShortAndLongDurations(duration: Int, maxShortNote: Int): List<Int>{
+    val dur = if (maxShortNote * 8 > duration) duration / 8 else maxShortNote
+    return listOf(dur, dur, dur, dur, dur, dur, duration - dur * 4)
+}
+fun find4ShortAndLongTicks(tick: Int, duration: Int, shortDur: Int, isRetrograde: Boolean = false): List<Int>{
+    return if(isRetrograde){
+        val longDuration = duration - shortDur * 4
+        val startGruppettoTick = tick + longDuration
+        listOf(tick, startGruppettoTick, startGruppettoTick + shortDur, startGruppettoTick + shortDur * 2, startGruppettoTick + shortDur * 3 )
+    } else {
+        listOf(tick, tick + shortDur, tick + shortDur * 2, tick + shortDur * 3, tick + shortDur * 4 )
+    }
+}
+fun find6ShortAndLongDurations(duration: Int, maxShortNote: Int): List<Int>{
+    val dur = if (maxShortNote * 12 > duration) duration / 12 else maxShortNote
+    return listOf(dur, dur, dur, dur, dur, dur, duration - dur * 6)
+}
+fun find6ShortAndLongTicks(tick: Int, duration: Int, shortDur: Int, isRetrograde: Boolean = false): List<Int>{
+    return if(isRetrograde){
+        val longDuration = duration - shortDur * 6
+        val startGruppettoTick = tick + longDuration
+        listOf(tick, startGruppettoTick, startGruppettoTick + shortDur, startGruppettoTick + shortDur * 2, startGruppettoTick + shortDur * 3, startGruppettoTick + shortDur * 4, startGruppettoTick + shortDur * 5)
+    } else {
+        listOf(tick, tick + shortDur, tick + shortDur * 2, tick + shortDur * 3, tick + shortDur * 4, tick + shortDur * 5, tick + shortDur * 6 )
+    }
+}
+fun findTrillDurations(duration: Int): Pair<List<Int>,Int>{
+    val div = when(duration){
+        in (0..119) -> -1
+        in (120..239) -> 3
+        in (240..359) -> 5 // 34 - 42
+        in (360..479) -> 7 // 32 - 38
+        in (480..Int.MAX_VALUE) -> (480 / 43) * (duration / 480)
+        else -> -1
+    }
+    return if(div == -1) Pair(listOf(duration), div) else Pair(duration.divideDistributingRest(div), div)
+}
 object AIRhythm {
     @JvmStatic
     fun findOffBeats(nBeats: Int): IntArray {

@@ -28,6 +28,20 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         if(articulationDurations == null) null else articulationDurations!![index],
         if(ribattutos == null) null else ribattutos!![index] )
     }
+    fun isConnectedToNextNote(index: Int, isStaccato: Boolean): Boolean{
+        if(index >= pitches.size) return false
+        val next = index + 1
+        if(isStaccato || isPreviousRest[next]) return false
+        return true
+    }
+    fun isConnectedToPreviousNote(index: Int): Boolean{
+        if(index < 1) return false
+        val previous = index - 1
+        val previousDuration = durations[previous]
+        val actualPreviousDuration = articulationDurations?.get(previous) ?: previousDuration
+        if(actualPreviousDuration < previousDuration || isPreviousRest[index]) return false
+        return true
+    }
     fun findSubstitutionNotes(checkAndReplaceData: CheckAndReplaceData,
                               start: Long, end: Long, trackDataList: List<TrackData>): List<SubstitutionNotes>{
         val substitutions = mutableListOf<SubstitutionNotes>()
@@ -40,14 +54,14 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                     if(noteEnd <= start) continue
                     //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
                     if(check(this, index, trackDataList)) {
-                        val available = provideFantasiaFunctions((0..checkAndReplaceData.replace.stress).random())
+                        val available = provideFantasiaFunctions((0..checkAndReplaceData.replace.stress).random(), checkAndReplaceData.replace.isRetrograde)
                         val replace = provideReplaceFunction(available.random())
                         substitutions.add(replace(this, index, trackDataList))
                     }
                 }
             }
             is ReplaceType.Tornado -> {
-                val available = provideTornadoFunctions(checkAndReplaceData.replace.stress)
+                val available = provideTornadoFunctions(checkAndReplaceData.replace.stress, checkAndReplaceData.replace.isRetrograde)
                 val ventoSize = available.size
                 var ventoIndex = 0
                 for(index in pitches.indices){

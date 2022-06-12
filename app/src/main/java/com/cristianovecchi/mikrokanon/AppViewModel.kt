@@ -307,7 +307,6 @@ class AppViewModel(
     }
     val onCadenza = { values: List<Int> ->
         scrollToTopList = true
-
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
         computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, values))
         cadenzasOnCounterpoints(originalCounterpoints, values)
@@ -779,7 +778,6 @@ class AppViewModel(
                 _elaborating.value = false
             }
     }
-
     fun lastComputationIsExpansion(): Boolean{
         if (computationStack.isEmpty()) return true
         return when (computationStack.lastElement()) {
@@ -794,16 +792,12 @@ class AppViewModel(
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = listOf(findPedalsOnCounterpoint(nPedals, counterpoint, intervalSet.value!!))
-
                 //newIntervalSet = pair.second
             }
             //changeIntervalSet(newIntervalSet)
             changeCounterpointsWithLimit(newList, true)
         }
     }
-
-
-
     private fun findWavesFromSequence(nWaves: Int){
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
@@ -813,7 +807,6 @@ class AppViewModel(
             changeCounterpointsWithLimit(newList, true)
         }
     }
-
     fun findWavesOnCounterpoints(originalCounterpoints: List<Counterpoint>, nWaves: Int){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
@@ -842,7 +835,6 @@ class AppViewModel(
             changeCounterpointsWithLimit(newList, true)
         }
     }
-
     private val jobQueue = LinkedList<Job>()
     private fun cancelPreviousMKjobs() {
         if(jobQueue.isNotEmpty()) {
@@ -1003,7 +995,6 @@ class AppViewModel(
             }
         }.also{  jobQueue.add(it)  }
     }
-
     private fun findCounterpointsByMikroKanons2(){
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
@@ -1098,7 +1089,6 @@ class AppViewModel(
             }.also{  jobQueue.add(it)  }
         }
     }
-
     private fun eraseIntervalsOnCounterpoints(originalCounterpoints: List<Counterpoint>){
         if(!selectedCounterpoint.value!!.isEmpty()){
             var newList: List<Counterpoint>
@@ -1462,7 +1452,6 @@ class AppViewModel(
             }
         }
     }
-
     val shiftColors = { shift: Int ->
         val colorDefs = extractColorDefs(userOptionsData.value!![0].colors)
         val colorIndex = (lastIndexCustomColors + shift).coerceIn(0, G.getArraySize() - 1)
