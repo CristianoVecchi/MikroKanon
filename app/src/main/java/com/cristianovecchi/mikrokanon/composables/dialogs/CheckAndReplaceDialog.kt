@@ -26,6 +26,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
+import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.midi.HarmonizationData
 import com.cristianovecchi.mikrokanon.midi.HarmonizationType
@@ -229,6 +230,22 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 checkAndReplaceDatas = newCnrDatas
                                 ListDialogData(itemList = stressDialogData.value.itemList)
                             }
+                        }
+                        CustomButton(
+                            adaptSizeToIconButton = true,
+                            iconId = model.iconMap["back"]!!,
+                            buttonSize = buttonSize.dp,
+                            iconColor = model.appColors.iconButtonIconColor,
+                            colors = model.appColors
+                        ) {
+                            val newCnrDatas = checkAndReplaceDatas.toMutableList()
+                            val oldCnrData = checkAndReplaceDatas[cursor]
+                            val oldReplace = oldCnrData.replace
+
+                            newCnrDatas[cursor] = oldCnrData.copy(
+                                replace = oldReplace.clone(isRetrograde = !oldReplace.isRetrograde))
+                            checkAndReplaceDatas = newCnrDatas
+                            ListDialogData(itemList = stressDialogData.value.itemList)
                         }
                     }
                     Row(

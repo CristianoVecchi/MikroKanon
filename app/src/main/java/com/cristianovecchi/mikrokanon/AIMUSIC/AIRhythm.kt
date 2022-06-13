@@ -2,7 +2,14 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import kotlin.math.absoluteValue
-
+fun findTicksFromDurations(tick:Int, durations: List<Int>): List<Int>{
+    var lastTick = tick
+    val ticks = (0 until durations.size -1).map {
+        lastTick += durations[it]
+        lastTick
+    }
+    return listOf(tick, *ticks.toTypedArray())
+}
 fun findScaleDurations(duration: Int, nNotes: Int, maxShortNote: Int): List<Int>{
     val halfDuration = duration / 2
     val shortDurs = halfDuration.divideDistributingRest(nNotes)
@@ -33,7 +40,7 @@ fun find2ShortAndLongTicks(tick: Int, duration: Int, shortDur: Int, isRetrograde
 }
 fun find4ShortAndLongDurations(duration: Int, maxShortNote: Int): List<Int>{
     val dur = if (maxShortNote * 8 > duration) duration / 8 else maxShortNote
-    return listOf(dur, dur, dur, dur, dur, dur, duration - dur * 4)
+    return listOf(dur, dur, dur, dur, duration - dur * 4)
 }
 fun find4ShortAndLongTicks(tick: Int, duration: Int, shortDur: Int, isRetrograde: Boolean = false): List<Int>{
     return if(isRetrograde){

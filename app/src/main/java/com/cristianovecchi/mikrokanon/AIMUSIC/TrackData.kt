@@ -29,7 +29,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         if(ribattutos == null) null else ribattutos!![index] )
     }
     fun isConnectedToNextNote(index: Int, isStaccato: Boolean): Boolean{
-        if(index >= pitches.size) return false
+        if(index >= pitches.size - 1) return false
         val next = index + 1
         if(isStaccato || isPreviousRest[next]) return false
         return true

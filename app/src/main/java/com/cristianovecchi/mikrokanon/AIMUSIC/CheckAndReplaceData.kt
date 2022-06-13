@@ -72,20 +72,19 @@ sealed class CheckType(open val title: String = "") {
 }
 sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                          open val isRetrograde: Boolean = false) {
-    fun clone(stress: Int): ReplaceType{
+    fun clone(stress: Int = this.stress, isRetrograde: Boolean = this.isRetrograde ): ReplaceType{
         return when (this){
-            is Trillo -> this.copy(stress = stress, )
-            is Mordente -> this.copy(stress = stress)
-            is Mordente2x -> this.copy(stress = stress)
-            is Mordente3x -> this.copy(stress = stress)
-            is Gruppetto -> this.copy(stress = stress)
-            is Onda -> this.copy(stress = stress)
-            is Cromatica -> this.copy(stress = stress)
-            is Diatonica -> this.copy(stress = stress)
-            //is GruppettoRetr -> this.copy(stress = stress)
-            is Accento -> this.copy(stress = stress)
-            is Tornado -> this.copy(stress = stress)
-            is Fantasia -> this.copy(stress = stress)
+            is Trillo -> this.copy(stress = stress, isRetrograde = isRetrograde)
+            is Mordente -> this.copy(stress = stress, isRetrograde = isRetrograde)
+            is Mordente2x -> this.copy(stress = stress, isRetrograde = isRetrograde)
+            is Mordente3x -> this.copy(stress = stress, isRetrograde = isRetrograde)
+            is Gruppetto -> this.copy(stress = stress, isRetrograde = isRetrograde)
+            is Onda -> this.copy(stress = stress, isRetrograde = isRetrograde)
+            is Cromatica -> this.copy(stress = stress, isRetrograde = isRetrograde)
+            is Diatonica -> this.copy(stress = stress, isRetrograde = isRetrograde)
+            is Accento -> this.copy(stress = stress, isRetrograde = isRetrograde)
+            is Tornado -> this.copy(stress = stress, isRetrograde = isRetrograde)
+            is Fantasia -> this.copy(stress = stress, isRetrograde = isRetrograde)
         }
     }
     fun toCsv(): String {
@@ -99,15 +98,14 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
             is Onda -> "5#$stress#$retr"
             is Cromatica -> "6#$stress#$retr"
             is Diatonica -> "7#$stress#$retr"
-            //is GruppettoRetr -> "8#$stress#$retr"
-            is Accento -> "9#$stress#$retr"
-            is Tornado -> "10#$stress#$retr"
-            is Fantasia -> "11#$stress#$retr"
+            is Accento -> "8#$stress#$retr"
+            is Tornado -> "9#$stress#$retr"
+            is Fantasia -> "10#$stress#$retr"
         }
     }
     companion object{
         val titles: List<String> = listOf( "Trillo", "Mordente", "Mordente 2X",
-        "Mordente 3x", "Gruppetto", "Onda", "Cromatica", "Diatonica", "←Gruppetto",
+        "Mordente 3x", "Gruppetto", "Onda", "Cromatica", "Diatonica",
             "Accento", "Tornado", "Fantasia" )
         fun provideReplaceType(index: Int, stress: Int = 16, isRetrograde: Boolean = false): ReplaceType{
             return when (index) {
@@ -119,10 +117,9 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 5 -> Onda(stress = stress, isRetrograde = isRetrograde)
                 6 -> Cromatica(stress = stress, isRetrograde = isRetrograde)
                 7 -> Diatonica(stress = stress, isRetrograde = isRetrograde)
-                //8 -> GruppettoRetr(stress = stress)
-                9 -> Accento(stress = stress, isRetrograde = isRetrograde)
-                10 -> Tornado(stress = stress, isRetrograde = isRetrograde)
-                11 -> Fantasia(stress = stress, isRetrograde = isRetrograde)
+                8 -> Accento(stress = stress, isRetrograde = isRetrograde)
+                9 -> Tornado(stress = stress, isRetrograde = isRetrograde)
+                10 -> Fantasia(stress = stress, isRetrograde = isRetrograde)
                 else -> Trillo(stress = stress, isRetrograde = isRetrograde)
             }
         }
@@ -135,7 +132,6 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
     data class Onda(override val title: String = "Onda", override val stress: Int = 16, override val isRetrograde: Boolean = false): ReplaceType()
     data class Cromatica(override val title: String = "Cromatica", override val stress: Int = 16, override val isRetrograde: Boolean = false): ReplaceType()
     data class Diatonica(override val title: String = "Diatonica", override val stress: Int = 16, override val isRetrograde: Boolean = false): ReplaceType()
-    //data class GruppettoRetr(override val title: String = "←Gruppetto", override val stress: Int = 16, override val isRetrograde: Boolean = false): ReplaceType()
     data class Accento(override val title: String = "Accento", override val stress: Int = 16, override val isRetrograde: Boolean = false): ReplaceType()
     data class Tornado(override val title: String = "Tornado", override val stress: Int = 16, override val isRetrograde: Boolean = false): ReplaceType()
     data class Fantasia(override val title: String = "Fantasia", override val stress: Int = 16, override val isRetrograde: Boolean = false): ReplaceType()
@@ -211,7 +207,6 @@ fun provideTornadoFunctions(stress: Int, isRetrograde: Boolean): List<ReplaceTyp
         ReplaceType.Mordente2x(stress = step.roundToInt(), isRetrograde = isRetrograde)
     )
 }
-
 fun provideReplaceFunction(replaceType: ReplaceType):
             (TrackData, Int, List<TrackData>) -> SubstitutionNotes {
     return when(replaceType){
@@ -232,16 +227,17 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 SubstitutionNotes(-1)
             } else {
                 val stress = replaceType.stress
+
                 val stressedVelocity = if (velocity + stress > 127) 127 else velocity + stress
                 if(isRetrograde){
                     SubstitutionNotes(
                         index, listOf(pitch, pitch),
-                        listOf(tick, tick + actualDuration),
-                        listOf(duration - accentPlusRestDur, accentDur),
-                        listOf(stressedVelocity, velocity),
+                        listOf(tick, tick + actualDuration - accentPlusRestDur),
+                        listOf(actualDuration - accentPlusRestDur, accentDur),
+                        listOf(velocity, stressedVelocity),
                         listOf(0, glissando),
-                        listOf(0, attack),
-                        listOf(isPreviousRest, true),
+                        listOf(attack, 0),
+                        listOf(isPreviousRest, false),
                         if (articulationDuration == null) null else listOf(actualDuration - accentPlusRestDur, accentDur),
                         if (ribattuto == null) null else listOf(ribattuto, ribattuto)
                     )
@@ -249,7 +245,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     SubstitutionNotes(
                         index, listOf(pitch, pitch),
                         listOf(tick, tick + accentPlusRestDur),
-                        listOf(accentDur, duration - accentPlusRestDur),
+                        listOf(accentDur, actualDuration - accentPlusRestDur),
                         listOf(stressedVelocity, velocity),
                         listOf(0, glissando),
                         listOf(0, attack),
@@ -319,7 +315,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             val (startPitch, endPitch) = if(isRetrograde){
                 Pair(trackData.pitches.getOrElse(index - 1) { pitch }, pitch)
             } else {
-                Pair(pitch, trackData.pitches.getOrElse(index - 1) { pitch })
+                Pair(pitch, trackData.pitches.getOrElse(index + 1) { pitch })
             }
             val semitones = (startPitch - endPitch).absoluteValue
             val uselessRange = when(replaceType){
@@ -370,8 +366,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
             val actualDuration = articulationDuration ?: duration
-            val isOverLegato = actualDuration > duration
-            val (durs, div) = findTrillDurations(if (isOverLegato) duration else actualDuration)
+            val isStaccato = actualDuration < duration
+            val (durs, div) = findTrillDurations(if (!isStaccato) duration else actualDuration)
             if (div == -1) { // fake substitution
                 //println("TRILLO:$index No Subs: actual duration = $actualDuration")
                 SubstitutionNotes(-1) // will not be considered
@@ -391,7 +387,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     lastTick += durs[it]
                     lastTick
                 }
-                val diff = if(actualDuration <= duration) 0 else actualDuration - duration
+                val diff = if(isStaccato) 0 else actualDuration - duration
                 SubstitutionNotes(
                     index,
                     if(replaceType.isRetrograde) (0 until div).map { if(it % 2 != 0) secondPitch else pitch }
@@ -443,7 +439,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 SubstitutionNotes(
                     index,
                     listOf(pitch, secondPitch, pitch),
-                    find2ShortAndLongTicks(tick, actualDuration, dur, isRetrograde),
+                    findTicksFromDurations(tick, durs),
                     durs,
                     if(isRetrograde) listOf(velocity, stressedVelocity, velocity)
                         else listOf(stressedVelocity, velocity, velocity),
@@ -489,7 +485,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     }
                     val diff = if(isStaccato) 0 else actualDuration - duration
                     SubstitutionNotes(index, listOf(pitch, secondPitch, pitch, secondPitch, pitch, secondPitch, pitch),
-                        find6ShortAndLongTicks(tick, duration, dur, isRetrograde),
+                        findTicksFromDurations(tick, durs),
                         durs,
                         if(isRetrograde) listOf(velocity, stressedVelocity, velocity, velocity, velocity, velocity, velocity)
                         else listOf(stressedVelocity, velocity, velocity, velocity, velocity, velocity, velocity),
@@ -534,7 +530,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 }
                 val diff = if(isStaccato) 0 else actualDuration - duration
                 SubstitutionNotes(index, listOf(pitch, secondPitch, pitch, secondPitch, pitch),
-                    find4ShortAndLongTicks(tick, duration, dur, isRetrograde),
+                    findTicksFromDurations(tick, durs),
                     durs,
                     if(isRetrograde) listOf(velocity, stressedVelocity, velocity, velocity, velocity)
                         else listOf(stressedVelocity, velocity, velocity, velocity, velocity),
@@ -554,7 +550,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             val isStaccato = actualDuration < duration
             val isRetrograde = replaceType.isRetrograde
             var durs = find4ShortAndLongDurations(
-                if(!isStaccato) duration else actualDuration, 60).reversed()
+                if(!isStaccato) duration else actualDuration, 60)
             durs = if(isRetrograde) durs.reversed() else durs
             val dur = if(isRetrograde) durs.last() else durs.first()
             val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
@@ -581,7 +577,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 }
                 val diff = if(isStaccato) 0 else actualDuration - duration
                 SubstitutionNotes(index, listOf(pitch, secondPitch, pitch, fourthPitch, pitch),
-                    find4ShortAndLongTicks(tick, duration, dur, isRetrograde), durs, velocities,
+                    findTicksFromDurations(tick, durs),
+                    durs, velocities,
                     listOf(0,0,0,0, glissando),
                     listOf(attack, attack, attack, attack, attack),
                     listOf(isPreviousRest, false, false, false, false),
@@ -621,7 +618,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 }
                 val diff = if(isStaccato) 0 else actualDuration - duration
                 SubstitutionNotes(index, listOf(pitch, secondAndFourthPitch, thirdPitch, secondAndFourthPitch, pitch),
-                    find4ShortAndLongTicks(tick, duration, dur, isRetrograde),
+                    findTicksFromDurations(tick, durs),
                     durs,
                     listOf(velocity, middleVelocity, stressedVelocity, middleVelocity, velocity),
                     listOf(0,0,0,0, glissando),
