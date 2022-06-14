@@ -112,7 +112,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         val previousIsRestData = mutableListOf<Boolean>()
         val artDurData = mutableListOf<Int>()
         val ribattutosData = mutableListOf<Int>()
-        //substitutionNotes.forEach { println(it) }
+        substitutionNotes.forEach { println(it) }
         for(noteIndex in pitches.indices){
             if(subsIndex < substitutionNotes.size && noteIndex == substitutionNotes[subsIndex].index){
                 val subs = substitutionNotes[subsIndex]

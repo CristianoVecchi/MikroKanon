@@ -113,8 +113,8 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
         val vibrato: Int =
             userOptionsData?.let { userOptionsData.vibrato }
                 ?: 0
-    val checkAndReplace: List<CheckAndReplaceData> =
-        userOptionsData?.let {CheckAndReplaceData.createCheckAndReplaceDatasFromCsv(userOptionsData.checkAndReplace)}
+    val checkAndReplace: List<List<CheckAndReplaceData>> =
+        userOptionsData?.let {CheckAndReplaceData.createMultiCheckAndReplaceDatasFromCsv(userOptionsData.checkAndReplace)}
             ?: listOf()
     val harmonizations: List<HarmonizationData> =
         userOptionsData?.let {HarmonizationData.createHarmonizationsFromCsv(userOptionsData.harmonizations)}

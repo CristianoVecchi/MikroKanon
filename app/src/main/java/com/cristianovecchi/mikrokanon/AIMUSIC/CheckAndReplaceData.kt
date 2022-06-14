@@ -149,6 +149,17 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
         return "${this.check.toCsv()}|${this.replace.toCsv()}"
     }
     companion object{
+        fun insertInMultiCheckAndReplaceCsv(index: Int, cnrCsv: String, multiCsv: String): String {
+            println("multiCsv = $multiCsv")
+            val multiCnrCsv = multiCsv.split(";").toMutableList()
+            multiCnrCsv[index] = cnrCsv
+            return multiCnrCsv.joinToString(";")
+        }
+        fun createMultiCheckAndReplaceDatasFromCsv(csv: String): List<List<CheckAndReplaceData>>{
+            if(csv.isBlank()) return listOf()
+            val values = csv.split(";")
+            return values.map{ createCheckAndReplaceDatasFromCsv(it) }
+        }
         fun createCheckAndReplaceDatasFromCsv(csv: String): List<CheckAndReplaceData>{
             if(csv.isBlank()) return listOf()
             val values = csv.split(",")

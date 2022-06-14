@@ -116,14 +116,14 @@ import androidx.room.PrimaryKey
             fun getDefaultUserOptionsData(): UserOptionsData {
                 return UserOptionsData(0,"2", "2|0","4|1","0",
                     0,0,
-                    "0.828", "90", "20|1",
+                    "0.828", "90", "0|1",
                     0,0, "1|1",0, "0|1",
                     0,0,0b0011110, 0b1111111,
                     0,0,0,1,
                      //"System|0" ,
                      "579|0" , // priority on custom color 579
                     0,"System", 0, 1 ,
-                    "","","0|1",0,
+                    ";;","","0|1",0,
                     "0|-1", 0)
             }
             fun updateUserOptionsData(

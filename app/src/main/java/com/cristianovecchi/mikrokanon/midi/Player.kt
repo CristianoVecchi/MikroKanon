@@ -130,7 +130,7 @@ object Player {
         glissandoFlags: Int = 0,
         audio8DFlags: Int = 0,
         vibrato: Int = 0,
-        checkAndReplace: List<CheckAndReplaceData> = listOf(),
+        checkAndReplace: List<List<CheckAndReplaceData>> = listOf(),
         harmonizations: List<HarmonizationData> = listOf(),
         chordsToEnhance: List<ChordToEnhanceData> = listOf(),
         enhanceChordsInTransposition: Boolean = false
@@ -204,7 +204,7 @@ object Player {
             if (rhythmShuffle) durations.shuffled().toIntArray() else actualDurations
         }
 
-        val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
+        var counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
             actualCounterpoint, actualDurations(), actualEnsemblePartsList,
             nuances, doublingFlags, rangeTypes, melodyTypes,
             glissando, audio8D, vibratoExtensions[vibrato]
@@ -275,13 +275,17 @@ object Player {
         }
         // CHECK AND REPLACE
         var actualCounterpointTrackData = counterpointTrackData
-        if(checkAndReplace.isNotEmpty() && checkAndReplace.any{ it.check !is CheckType.None }) {
-           // println(checkAndReplace)
-            actualCounterpointTrackData =
-                counterpointTrackData.map{ trackData ->
-                    trackData.checkAndReplace(checkAndReplace, totalLength, counterpointTrackData)
-                }
+        checkAndReplace.forEach { cnr ->
+            if(cnr.isNotEmpty() && cnr.any{ it.check !is CheckType.None }) {
+                // println(checkAndReplace)
+                actualCounterpointTrackData =
+                    counterpointTrackData.map{ trackData ->
+                        trackData.checkAndReplace(cnr, totalLength, counterpointTrackData)
+                    }
+                counterpointTrackData = actualCounterpointTrackData
+            }
         }
+
 //        println("TrackData 1 = ${counterpointTrackData[0]}")
         //if(counterpointTrackData.map{println(it.changes);it.changes.size}.toSet().size != 1) throw Exception("WARNING: SOME CHANGE DATA HAS BEEN SKIPPED!!!")
         // TRANSFORM DATATRACKS IN MIDITRACKS
