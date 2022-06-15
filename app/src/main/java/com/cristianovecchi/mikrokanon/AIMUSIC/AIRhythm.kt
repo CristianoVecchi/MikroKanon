@@ -2,6 +2,26 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import kotlin.math.absoluteValue
+fun multiplyDurations(nTotalNotes: Int, durations: List<Int> ):IntArray {
+    val actualDurations = IntArray(nTotalNotes * 2 + 1)// note + optional rests + optional initial rest
+    (0 until nTotalNotes * 2 + 1).forEach {
+        actualDurations[it] = durations[it % durations.size]
+    }
+    return actualDurations
+}
+fun multiplyRhythmPatternDatas(nTotalNotes:Int, nRhythmSteps: Int,
+        rhythm:List<Triple<RhythmPatterns, Boolean, Int>> ): List<Triple<RhythmPatterns, Boolean, Int>>{
+    val actualRhythm = mutableListOf<Triple<RhythmPatterns, Boolean, Int>>()
+    //println("TOTAL NOTES: $nTotalNotes   STEPS: $nRhythmSteps")
+    if(nTotalNotes>=nRhythmSteps){
+        (0..(nTotalNotes / nRhythmSteps + (if (nTotalNotes % nRhythmSteps == 0) 0 else 1))).forEach { _ ->
+            actualRhythm.addAll(rhythm)
+        }
+    } else {
+        actualRhythm.addAll(rhythm)
+    }
+    return actualRhythm
+}
 fun findTicksFromDurations(tick:Int, durations: List<Int>): List<Int>{
     var lastTick = tick
     val ticks = (0 until durations.size -1).map {

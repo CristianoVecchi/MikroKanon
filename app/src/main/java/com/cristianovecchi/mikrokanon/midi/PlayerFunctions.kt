@@ -3,12 +3,63 @@ package com.cristianovecchi.mikrokanon.midi
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.alterateBpmWithDistribution
 import com.cristianovecchi.mikrokanon.convertDodecabyteToInts
+import com.cristianovecchi.mikrokanon.convertDynamicToBytes
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
+import com.leff.midi.event.meta.Tempo
 import com.leff.midi.event.meta.TimeSignature
 import kotlin.math.abs
 import kotlin.math.roundToInt
+fun buildTempoTrack(bpms: List<Float>, totalLength: Long): MidiTrack {
+    val tempoTrack = MidiTrack()
+    val (bpmAlterations, bpmDeltas) = alterateBpmWithDistribution(bpms, 0.5f, totalLength)
+    var tempoTick = 0L
+
+    (0 until bpmAlterations.size - 1).forEach { index -> // doesn't take the last bpm
+        val newTempo = Tempo(tempoTick, 0L, 500000)
+        newTempo.bpm = bpmAlterations[index]
+        tempoTrack.insertEvent(newTempo)
+        tempoTick += bpmDeltas[index]
+    }
+    return tempoTrack
+}
+fun MidiTrack.addVolumeToTrack(dynamics: List<Float>, totalLength: Long) {
+    //val dynamics = listOf(1f,0f,1f)
+    val (dynamicAlterations, dynamicDeltas) = alterateBpmWithDistribution(dynamics, 0.01f, totalLength)
+    var tempoTick = 0L
+
+    (0 until dynamicAlterations.size - 1).forEach { index -> // doesn't take the last dynamic
+        // 0x7F = universal immediatly message, 0x7F = all devices, 0x04 = device control message, 0x01 = master volume
+        // bytes = first the low 7 bits, second the high 7 bits - volume is from 0x0000 to 0x3FFF
+        val volumeBytes: Pair<Int, Int> = dynamicAlterations[index].convertDynamicToBytes()
+        val data: ByteArray =
+            listOf(0x7F, 0x7F, 0x04, 0x01, volumeBytes.first, volumeBytes.second, 0xF7)
+                .foldIndexed(ByteArray(7)) { i, a, v -> a.apply { set(i, v.toByte()) } }
+        val newGeneralVolume = SystemExclusiveEvent(0xF0, tempoTick, data)
+
+        this.insertEvent(newGeneralVolume)
+        tempoTick += dynamicDeltas[index]
+    }
+}
+fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, bars: List<Bar>,
+                   trackData: List<TrackData>, audio8D: List<Int>, totalLength: Long, justVoicing: Boolean){
+    if(harmonizations.isNotEmpty() && !harmonizations.all { it.type == HarmonizationType.NONE }) {
+        val doubledBars = bars.mergeOnesInMetro()
+            .resizeLastBar(totalLength)
+            .splitBarsInTwoParts()
+        // using trackDatas without replacing for a better chord definition
+        assignDodecaBytesToBars(doubledBars.toTypedArray(), trackData, false)
+        val barGroups = if(harmonizations.size == 1) listOf(doubledBars)
+        else doubledBars.splitBarsInGroups(harmonizations.size)
+        val chordsTrack = MidiTrack()
+        addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations, justVoicing)
+        if(audio8D.isNotEmpty()){
+            setAudio8D(chordsTrack, 12, 15)
+        }
+        this.add(chordsTrack)
+    }
+}
 
 fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, roots: MutableList<Int>,
                                      diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
@@ -264,7 +315,7 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
             val ribattuto = ribattutos[i]
             val overLegato = articulationDuration > duration
 //                val attackDelay = if(lastIsGliss && (articulationDuration == duration || overLegato)) 127 else 0
-            val dur = if(overLegato && (glissando[(i+1) % glissando.size] >0 || gliss >0)  )
+            val dur = if(overLegato && (glissando.getOrElse(i) { 0 } >0 || gliss >0)  )
                 duration.toLong() else articulationDuration.toLong()
             //println("note $i attack: $attackDelay")
             if (trackData.vibrato != 0) {
@@ -294,7 +345,7 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
             val ribattuto = ribattutos[i]
             val overLegato = articulationDuration > duration
 //                val attackDelay = if(lastIsGliss && (articulationDuration == duration || overLegato)) 127 else 0
-            val dur = if(overLegato && (glissando[(i+1) % glissando.size] >0 || gliss >0)  )
+            val dur = if(overLegato && (glissando.getOrElse(i) { 0 } >0 || gliss >0)  )
                 duration.toLong() else articulationDuration.toLong()
             val pitch = pitches[i]
             val velocity = velocities[i]
@@ -320,8 +371,6 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
     }
     return track
 }
-
-
 fun setAudio8D(track: MidiTrack, nRevolutions: Int, channel: Int) {
     val aims = mutableListOf<Float>()
     for(i in 0 until nRevolutions){
@@ -339,11 +388,7 @@ fun setAudio8D(track: MidiTrack, nRevolutions: Int, channel: Int) {
 }
 
 
-fun setTimeSignatures(
-    tempoTrack: MidiTrack,
-    rhythm: List<Triple<RhythmPatterns, Boolean, Int>>,
-    totalLength: Long
-): List<Bar> {
+fun MidiTrack.setTimeSignatures(rhythm: List<Triple<RhythmPatterns, Boolean, Int>>, totalLength: Long): List<Bar> {
     val bars = mutableListOf<Bar>()
     var tick = 0L
     var barTick = 0L
@@ -371,7 +416,7 @@ fun setTimeSignatures(
                 tick, 0L, newSignature.first, newSignature.second,
                 TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION
             )
-            tempoTrack.insertEvent(ts)
+            this.insertEvent(ts)
             // println("SIGNATURE #$index: tick = $tick  metro = ${newSignature.first}/${newSignature.second}")
             lastSignature = newSignature
         }

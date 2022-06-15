@@ -246,8 +246,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(tick, tick + actualDuration - accentPlusRestDur),
                         listOf(actualDuration - accentPlusRestDur, accentDur),
                         listOf(velocity, stressedVelocity),
-                        listOf(0, glissando),
-                        listOf(attack, 0),
+                        listOf(0, 0),
+                        listOf(0, attack),
                         listOf(isPreviousRest, false),
                         if (articulationDuration == null) null else listOf(actualDuration - accentPlusRestDur, accentDur),
                         if (ribattuto == null) null else listOf(ribattuto, ribattuto)
@@ -259,7 +259,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(accentDur, actualDuration - accentPlusRestDur),
                         listOf(stressedVelocity, velocity),
                         listOf(0, glissando),
-                        listOf(0, attack),
+                        listOf(attack, 0),
                         listOf(isPreviousRest, true),
                         if (articulationDuration == null) null else listOf(accentDur, actualDuration - accentPlusRestDur),
                         if (ribattuto == null) null else listOf(ribattuto, ribattuto)
@@ -362,7 +362,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         index, pitches, ticks, durs,
                         if(isRetrograde) listOf(stressedVelocity, *List(nNotes-1){velocity}.toTypedArray())
                         else listOf(velocity, stressedVelocity, *List(nNotes-2){velocity}.toTypedArray()),
-                        listOf(*List(nNotes -1){ 0 }.toTypedArray(), glissando),
+                        List(nNotes) {0},
                         List(nNotes){attack},
                         listOf(isPreviousRest, *List(nNotes-1){false}.toTypedArray()),
                         if(articulationDuration == null) null

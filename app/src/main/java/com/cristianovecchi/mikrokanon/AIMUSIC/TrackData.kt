@@ -1,5 +1,11 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import android.os.Build
+import com.cristianovecchi.mikrokanon.alterateLegatosWithDistribution
+import com.cristianovecchi.mikrokanon.midi.alterateArticulation
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
+
 
 data class SubstitutionNotes(val index: Int, val newPitches: List<Int> = emptyList(),
                              val newTicks: List<Int> = emptyList(),
@@ -112,7 +118,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         val previousIsRestData = mutableListOf<Boolean>()
         val artDurData = mutableListOf<Int>()
         val ribattutosData = mutableListOf<Int>()
-        substitutionNotes.forEach { println(it) }
+        //substitutionNotes.forEach { println(it) }
         for(noteIndex in pitches.indices){
             if(subsIndex < substitutionNotes.size && noteIndex == substitutionNotes[subsIndex].index){
                 val subs = substitutionNotes[subsIndex]
@@ -167,6 +173,67 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                 }
             }
             return result.toSet()
+        }
+    }
+}
+fun List<TrackData>.applyMultiCheckAndReplace(checkAndReplace: List<List<CheckAndReplaceData>>,
+                              totalLength: Long) : List<TrackData>{
+    var result = this
+    var isFirstCheckAndReplace = true
+    checkAndReplace.forEach{ cnr ->
+        val trackDataToTransform = if(isFirstCheckAndReplace) this else result
+        if(cnr.isNotEmpty() && cnr.any{ it.check !is CheckType.None }) {
+            // println(checkAndReplace)
+            result =
+                trackDataToTransform.map{ trackData ->
+                    trackData.checkAndReplace(cnr, totalLength, trackDataToTransform)
+                }
+            isFirstCheckAndReplace = false
+        }
+    }
+    return result
+}
+fun List<TrackData>.addLegatoAndRibattuto(maxLegato: Int, articulations: FloatArray,
+        legatoTypes: List<Pair<Int,Int>>, totalLength: Long){
+    val legatos = legatoTypes.map { articulations[it.first.absoluteValue] * (if (it.first < 0) -1 else 1) }
+    val ribattutos = if(legatoTypes.size == 1) listOf(legatoTypes[0].second, legatoTypes[0].second)
+    else legatoTypes.map { it.second }
+
+//            println("Legatos: $legatos")
+//            println("Ribattutos: $ribattutos")
+    val (legatoAlterations, legatoDeltas, pivots) = alterateLegatosWithDistribution(legatos, ribattutos,0.005f, totalLength)
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        this.parallelStream().forEach {
+            val pair = alterateArticulation(
+                it.ticks,
+                it.durations,
+                legatoAlterations,
+                ribattutos,
+                legatoDeltas,
+                pivots,
+                it.isPreviousRest,
+                maxLegato,
+                it.changes
+            )
+            it.articulationDurations= pair.first
+            it.ribattutos = pair.second.map{ float -> float.roundToInt()}.toIntArray()
+        }
+    } else {
+        this.forEach {
+            val pair = alterateArticulation(
+                it.ticks,
+                it.durations,
+                legatoAlterations,
+                ribattutos,
+                legatoDeltas,
+                pivots,
+                it.isPreviousRest,
+                maxLegato,
+                it.changes
+            )
+            it.articulationDurations= pair.first
+            it.ribattutos= pair.second.map{ float -> float.roundToInt()}.toIntArray()
         }
     }
 }

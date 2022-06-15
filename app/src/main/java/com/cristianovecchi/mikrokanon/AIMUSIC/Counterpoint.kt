@@ -302,6 +302,17 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun counterpointIsEmpty(): Boolean {
         return parts.all{ it.absPitches.isEmpty()}
     }
+    fun handleRitornellos(ritornello: Int, transpose: List<Pair<Int,Int>>): Counterpoint {
+        return when {
+            ritornello > 0 -> this.ritornello(ritornello, transpose)
+            transpose[0].first != 0 && transpose[0].second != 1 -> this.transpose(transpose[0].first, transpose[0].second)
+            else -> this
+        }
+    }
+    fun handleChordEnhancement(chordsToEnhance: List<ChordToEnhanceData>): Counterpoint {
+        return if(chordsToEnhance.isEmpty() || chordsToEnhance.all{it == ChordToEnhanceData(setOf(),1)}) this
+        else this.enhanceChords(chordsToEnhance.map{Pair(it.absPitches,it.repetitions)})
+    }
     fun arpeggio(arpeggioType: ARPEGGIO): Counterpoint{
         if(counterpointIsEmpty()) return this
         if(this.parts.size == 1) return this

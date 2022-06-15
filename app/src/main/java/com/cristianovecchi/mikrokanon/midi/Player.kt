@@ -113,7 +113,7 @@ object Player {
         dynamics: List<Float>,
         bpms: List<Float>,
         shuffle: Float,
-        rhythm: List<Triple<RhythmPatterns, Boolean, Int>>,
+        rhythm: List<Triple<RhythmPatterns, Boolean, Int>>, // Triple: Pattern, isRetrograde, nRepetitions
         ensemblesList: List<List<EnsembleType>>,
         play: Boolean,
         midiFile: File,
@@ -135,83 +135,49 @@ object Player {
         chordsToEnhance: List<ChordToEnhanceData> = listOf(),
         enhanceChordsInTransposition: Boolean = false
     ): String {
-        // Triple: Pattern, isRetrograde, nRepetitions
-        val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
-        val ensemblePartsList: List<List<EnsemblePart>> =
-            if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
-            else Ensembles.getEnsemblesListMix(nParts, ensemblesList)
-        //ensembleParts.display()
-        val actualEnsemblePartsList =
-            if (partsShuffle) ensemblePartsList.map { it.shuffled() } else ensemblePartsList
-        val firstCounterpoint = counterpoints.firstOrNull()
-            ?: return "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
+        // BUILD ACTUAL COUNTERPOINT
+        val firstCounterpoint = counterpoints.firstOrNull() ?: return "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
         val nNotesToSkip = rhythm[0].first.nNotesLeftInThePattern(firstCounterpoint.nNotes())
         //var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
         var actualCounterpoint = if (rowForms == listOf(Pair(1, 1))) firstCounterpoint
         else Counterpoint.explodeRowFormsAddingCps(counterpoints, rowForms, nNotesToSkip)
-        val handleRitornellos = {
-            actualCounterpoint = when {
-                ritornello > 0 -> actualCounterpoint.ritornello(ritornello, transpose)
-                transpose[0].first != 0 && transpose[0].second != 1 -> actualCounterpoint.transpose(transpose[0].first, transpose[0].second)
-                else -> actualCounterpoint
-            }
-        }
-        val handleChordEnhancement = {
-            actualCounterpoint = if(chordsToEnhance.isEmpty() || chordsToEnhance.all{it == ChordToEnhanceData(setOf(),1)}) actualCounterpoint
-            else actualCounterpoint.enhanceChords(chordsToEnhance.map{Pair(it.absPitches,it.repetitions)})
-        }
-        if(enhanceChordsInTransposition){
-            handleChordEnhancement()
-            handleRitornellos()
-        } else {
-            handleRitornellos()
-            handleChordEnhancement()
-        }
-        val glissando: List<Int> =
-            if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
-        val audio8D: List<Int> =
-            if (audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
-        val vibratoExtensions = listOf(0, 360, 240, 160, 120, 80, 60, 30, 15)
 
+        actualCounterpoint = if(enhanceChordsInTransposition){
+            actualCounterpoint.handleChordEnhancement(chordsToEnhance).handleRitornellos(ritornello, transpose)
+        } else {
+            actualCounterpoint.handleRitornellos(ritornello, transpose).handleChordEnhancement(chordsToEnhance)
+        }
         if (actualCounterpoint.isEmpty()) return "Counterpoint to play is empty!!!"
-        if (actualCounterpoint.parts[0].absPitches.size == 0) return "Counterpoint parts are empty!!!"
+        if (actualCounterpoint.parts.any{ it.absPitches.size == 0}) return "Counterpoint parts are empty!!!"
+
+        // COUNTERPOINT FINAL SIZE (NOT CONSIDERING CHECK AND REPLACE!!!)
         val nTotalNotes = actualCounterpoint.nNotes()
 
+        // EXTRACT COUNTERPOINT TRACK DATA
         val durations = rhythm.fold(listOf<Int>()) { acc, triple ->
             acc + if (triple.second) triple.first.retrogradeValues()
                 .repeat(triple.third) else triple.first.values.repeat(triple.third)
         }.mergeNegativeValues()
-        val nRhythmSteps = durations.filter { it > -1 }.count()
         //println("durations: $durations")
-        val actualRhythm = {
-            val actualRhythm = mutableListOf<Triple<RhythmPatterns, Boolean, Int>>()
-            //println("TOTAL NOTES: $nTotalNotes   STEPS: $nRhythmSteps")
-            if(nTotalNotes>=nRhythmSteps){
-                (0..(nTotalNotes / nRhythmSteps + (if (nTotalNotes % nRhythmSteps == 0) 0 else 1))).forEach { _ ->
-                    actualRhythm.addAll(rhythm)
-                }
-            } else {
-                actualRhythm.addAll(rhythm)
-            }
-            actualRhythm.toList()
-        }
-        val actualDurations = {
-            val actualDurations =
-                IntArray(nTotalNotes * 2 + 1)// note + optional rests + optional initial rest
-            (0 until nTotalNotes * 2 + 1).forEach {
-                actualDurations[it] = durations[it % durations.size]
-            }
-            if (rhythmShuffle) durations.shuffled().toIntArray() else actualDurations
-        }
-
-        var counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
-            actualCounterpoint, actualDurations(), actualEnsemblePartsList,
+        val actualDurations = multiplyDurations(nTotalNotes, durations)
+        if (rhythmShuffle) actualDurations.shuffle()
+        val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
+        val ensemblePartsList: List<List<EnsemblePart>> =
+            if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
+            else Ensembles.getEnsemblesListMix(nParts, ensemblesList)
+        val actualEnsemblePartsList = if (partsShuffle) ensemblePartsList.map { it.shuffled() } else ensemblePartsList
+        val glissando: List<Int> = if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
+        val audio8D: List<Int> = if (audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
+        val vibratoExtensions = intArrayOf(0, 360, 240, 160, 120, 80, 60, 30, 15)
+        val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
+            actualCounterpoint, actualDurations, actualEnsemblePartsList,
             nuances, doublingFlags, rangeTypes, melodyTypes,
             glissando, audio8D, vibratoExtensions[vibrato]
         )
         //counterpointTrackData.forEach{ println(it.pitches.contentToString())}
         if (counterpointTrackData.isEmpty()) return "No Tracks in Counterpoint!!!"
 
+        // TOTAL LENGTH OF THE PIECE
         val totalLength = (counterpointTrackData.filter { it.ticks.isNotEmpty() }
             .maxOfOrNull { it.ticks.last() + it.durations.last() }
             ?: 0).toLong()//.also{println("Total length: $it")} // Empty tracks have 0 length
@@ -220,150 +186,37 @@ object Player {
         // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
         //println("legatoTypes: $legatoTypes")
         if (legatoTypes != listOf(Pair(4, 0))) {
-            val maxLegato =
-                rhythm.minByOrNull { it.first.metroDenominatorMidiValue() }!!.first.metroDenominatorMidiValue() / 3
-            val articulationMap = mapOf(
-                0 to 1.0f,
-                1 to 0.125f,
-                2 to 0.25f,
-                3 to 0.75f,
-                4 to 1.0f,
-                5 to 1.125f,
-                6 to 1.25f
-            )
-            val legatos = legatoTypes.map { articulationMap[it.first.absoluteValue]!! * (if (it.first < 0) -1 else 1) }
-            val ribattutos = if(legatoTypes.size == 1) listOf(legatoTypes[0].second, legatoTypes[0].second)
-                else legatoTypes.map { it.second }
-
-//            println("Legatos: $legatos")
-//            println("Ribattutos: $ribattutos")
-            val (legatoAlterations, legatoDeltas, pivots) = alterateLegatosWithDistribution(legatos, ribattutos,0.005f, totalLength)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                counterpointTrackData.parallelStream().forEach {
-                    val pair = alterateArticulation(
-                        it.ticks,
-                        it.durations,
-                        legatoAlterations,
-                        ribattutos,
-                        legatoDeltas,
-                        pivots,
-                        it.isPreviousRest,
-                        maxLegato,
-                        it.changes
-                    )
-                    it.articulationDurations= pair.first
-                    it.ribattutos = pair.second.map{ float -> float.roundToInt()}.toIntArray()
-                }
-            } else {
-                counterpointTrackData.forEach {
-                    val pair = alterateArticulation(
-                        it.ticks,
-                        it.durations,
-                        legatoAlterations,
-                        ribattutos,
-                        legatoDeltas,
-                        pivots,
-                        it.isPreviousRest,
-                        maxLegato,
-                        it.changes
-                    )
-                    it.articulationDurations= pair.first
-                    it.ribattutos= pair.second.map{ float -> float.roundToInt()}.toIntArray()
-                }
-            }
+            val maxLegato = rhythm.minByOrNull { it.first.metroDenominatorMidiValue() }!!.first.metroDenominatorMidiValue() / 3
+            val articulations = floatArrayOf(1f, 0.125f, 0.25f, 0.75f, 1f, 1.125f, 1.25f)
+            counterpointTrackData.addLegatoAndRibattuto(maxLegato, articulations, legatoTypes, totalLength)
         }
         // CHECK AND REPLACE
-        var actualCounterpointTrackData = counterpointTrackData
-        checkAndReplace.forEach { cnr ->
-            if(cnr.isNotEmpty() && cnr.any{ it.check !is CheckType.None }) {
-                // println(checkAndReplace)
-                actualCounterpointTrackData =
-                    counterpointTrackData.map{ trackData ->
-                        trackData.checkAndReplace(cnr, totalLength, counterpointTrackData)
-                    }
-                counterpointTrackData = actualCounterpointTrackData
-            }
-        }
+        val actualCounterpointTrackData = counterpointTrackData.applyMultiCheckAndReplace(checkAndReplace,totalLength)
 
-//        println("TrackData 1 = ${counterpointTrackData[0]}")
-        //if(counterpointTrackData.map{println(it.changes);it.changes.size}.toSet().size != 1) throw Exception("WARNING: SOME CHANGE DATA HAS BEEN SKIPPED!!!")
         // TRANSFORM DATATRACKS IN MIDITRACKS
-        val counterpointTracks =
-            actualCounterpointTrackData.map { convertToMidiTrack(it, actualCounterpointTrackData.size) }
+        val counterpointTracks = actualCounterpointTrackData.map { convertToMidiTrack(it, actualCounterpointTrackData.size) }
 
-        //val counterpointTracks = listOf(pitchBenderTest(MidiTrack()))
-        //val totalLength = counterpointTracks.maxOf{ it.lengthInTicks}//.also{println("Total length: $it")} // Empty tracks have 0 length
-        val tempoTrack = MidiTrack()
-        // from TimeSignature.class
-//        public static final int DEFAULT_METER = 24;
-//        public static final int DEFAULT_DIVISION = 8;
-        //      val ts = TimeSignature()
-//        ts.setTimeSignature(actualRhythm[0].first.metro.first, actualRhythm[0].first.metro.second,
-//                            TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION)
-        //  tempoTrack.insertEvent(ts);
+        // ADD BPM AND VOLUME CHANGES
+        val tempoTrack = buildTempoTrack(bpms, totalLength)
+        tempoTrack.addVolumeToTrack(dynamics, totalLength)
 
-        //val t = Tempo()
-        //t.bpm = bpm
-        //val t2 = Tempo(totalLength/2,0L, 500000)
-        //t2.bpm = bpm * 3
-        //tempoTrack.insertEvent(t)
-        //tempoTrack.insertEvent(t2)
-        //val bpmAlterations = bpm.projectTo(bpm*2, 0.5f).projectTo(bpm, 0.5f).also{println(it)}
-        // INSERT BPM ALTERATIONS
-        val (bpmAlterations, bpmDeltas) = alterateBpmWithDistribution(bpms, 0.5f, totalLength)
-        var tempoTick = 0L
+        // ADD METRO CHANGES
+        val nRhythmSteps = durations.filter { it > -1 }.count()
+        val actualRhythm = multiplyRhythmPatternDatas(nTotalNotes, nRhythmSteps, rhythm)
+        val bars = tempoTrack.setTimeSignatures(actualRhythm, totalLength)
 
-        (0 until bpmAlterations.size - 1).forEach { index -> // doesn't take the last bpm
-            val newTempo = Tempo(tempoTick, 0L, 500000)
-            newTempo.bpm = bpmAlterations[index]
-            tempoTrack.insertEvent(newTempo)
-            tempoTick += bpmDeltas[index]
-        }
-
-        //val dynamics = listOf(1f,0f,1f)
-        val (dynamicAlterations, dynamicDeltas) = alterateBpmWithDistribution(dynamics, 0.01f, totalLength)
-        tempoTick = 0L
-
-        (0 until dynamicAlterations.size - 1).forEach { index -> // doesn't take the last dynamic
-            // 0x7F = universal immediatly message, 0x7F = all devices, 0x04 = device control message, 0x01 = master volume
-            // bytes = first the low 7 bits, second the high 7 bits - volume is from 0x0000 to 0x3FFF
-            val volumeBytes: Pair<Int, Int> = dynamicAlterations[index].convertDynamicToBytes()
-            val data: ByteArray =
-                listOf(0x7F, 0x7F, 0x04, 0x01, volumeBytes.first, volumeBytes.second, 0xF7)
-                    .foldIndexed(ByteArray(7)) { i, a, v -> a.apply { set(i, v.toByte()) } }
-            val newGeneralVolume = SystemExclusiveEvent(0xF0, tempoTick, data)
-
-            tempoTrack.insertEvent(newGeneralVolume)
-            tempoTick += dynamicDeltas[index]
-        }
-
+        //BUILD MIDI FILE
         val tracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
-        val bars = setTimeSignatures(tempoTrack, actualRhythm(), totalLength)
         tracks.add(tempoTrack)
         tracks.addAll(counterpointTracks)
 
-        // CHORD TRACK IF NEEDED
+        // // ADD CHORD TRACK IF NEEDED
         //println(harmonizations)
-        val justVoicing = true
-        if(harmonizations.isNotEmpty() && !harmonizations.all { it.type == HarmonizationType.NONE }){
-            val doubledBars = bars.mergeOnesInMetro()
-                .resizeLastBar(totalLength)
-                .splitBarsInTwoParts()
-            // using trackDatas without replacing for a better chord definition
-            assignDodecaBytesToBars(doubledBars.toTypedArray(), counterpointTrackData, false)
-            val barGroups = if(harmonizations.size == 1) listOf(doubledBars)
-                            else doubledBars.splitBarsInGroups(harmonizations.size)
-            val chordsTrack = MidiTrack()
-            addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations, justVoicing)
-            if(audio8D.isNotEmpty()){
-                setAudio8D(chordsTrack, 12, 15)
-            }
-            tracks.add(chordsTrack)
-        }
-
+        tracks.addChordTrack(harmonizations, bars,
+            counterpointTrackData, audio8D, totalLength, false)
 
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
+        // WARNING: nTotalNotes returned is not considering check and replace modifications!!!
         return saveAndPlayMidiFile(mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
     }
 
