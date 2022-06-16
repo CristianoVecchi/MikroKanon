@@ -77,6 +77,7 @@ class AppViewModel(
         const val MAX_VISIBLE_COUNTERPOINTS = 42
         const val MAX_PITCHES_IN_CACHE = 60000
         const val MAX_PARTS = 12
+        const val MAX_DEPTH_MK_3 = 5
         const val MAX_NOTES_MK_2= 200
         const val MAX_NOTES_MK_3 = 74
         const val MAX_NOTES_MK_4 = 32
@@ -467,7 +468,7 @@ class AppViewModel(
         computationStack.pushAndDispatch(Computation.FirstFromLoading(listOf(retrievedCounterpoint),
             ArrayList(firstSequence.value!!), position))
         changeSelectedCounterpoint(retrievedCounterpoint)
-        changeCounterpointsWithLimit(listOf(retrievedCounterpoint),true)
+        changeCounterpointsWithLimitAndCache(listOf(retrievedCounterpoint),true)
     }
     val onWaveFromFirstSelection = { nWaves: Int, list: ArrayList<Clip> ->
         changeFirstSequence(list)
@@ -518,7 +519,8 @@ class AppViewModel(
         findFreeParts(trend)
     }
     val onMikroKanons2 = {list: ArrayList<Clip> ->
-        computationStack.pushAndDispatch(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),ArrayList(sequenceToMikroKanons.value!!),2))
+        computationStack.pushAndDispatch(Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),
+            ArrayList(sequenceToMikroKanons.value!!),2))
         if(list.isNotEmpty()) changeSequenceToMikroKanons(list)
             findCounterpointsByMikroKanons2()
 
@@ -531,11 +533,8 @@ class AppViewModel(
     }
     val onMikroKanons4 = {list: ArrayList<Clip> ->
             computationStack.pushAndDispatch(
-                Computation.MikroKanonOnly(
-                    selectedCounterpoint.value!!.clone(),
-                    ArrayList(sequenceToMikroKanons.value!!), 4
-                )
-            )
+                Computation.MikroKanonOnly(selectedCounterpoint.value!!.clone(),
+                    ArrayList(sequenceToMikroKanons.value!!), 4))
             if (list.isNotEmpty()) changeSequenceToMikroKanons(list)
             findCounterpointsByMikroKanons4()
     }
@@ -651,7 +650,7 @@ class AppViewModel(
                     is Computation.FirstFromLoading -> {
                         if(stepBack){
                             changeSelectedCounterpoint(previousComputation.counterpoints[0])
-                            changeCounterpointsWithLimit(previousComputation.counterpoints, true)
+                            changeCounterpointsWithLimitAndCache(previousComputation.counterpoints, true)
                         }
                     }
                     is Computation.FirstFromFreePart -> onFreePartFromFirstSelection(
@@ -795,7 +794,7 @@ class AppViewModel(
                 //newIntervalSet = pair.second
             }
             //changeIntervalSet(newIntervalSet)
-            changeCounterpointsWithLimit(newList, true)
+            changeCounterpointsWithLimitAndCache(newList, true)
         }
     }
     private fun findWavesFromSequence(nWaves: Int){
@@ -804,7 +803,7 @@ class AppViewModel(
             withContext(Dispatchers.Default){
                 newList = waves(listOf(Counterpoint.counterpointFromClipList(firstSequence.value!!)), intervalSet.value!! ,intervalSetHorizontal.value!!, nWaves)
             }
-            changeCounterpointsWithLimit(newList, true)
+            changeCounterpointsWithLimitAndCache(newList, true)
         }
     }
     fun findWavesOnCounterpoints(originalCounterpoints: List<Counterpoint>, nWaves: Int){
@@ -817,7 +816,7 @@ class AppViewModel(
                             .mapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                             .sortedBy { it.emptiness }
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimitAndCache(newList, true)
             }
         }
     }
@@ -832,7 +831,7 @@ class AppViewModel(
                     .mapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                     .sortedBy { it.emptiness }
             }
-            changeCounterpointsWithLimit(newList, true)
+            changeCounterpointsWithLimitAndCache(newList, true)
         }
     }
     private val jobQueue = LinkedList<Job>()
@@ -846,6 +845,42 @@ class AppViewModel(
             }
         }
     }
+    private fun findCounterpointsByMikroKanons2(){
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_2)
+                newList = mikroKanons2(sequence,intervalSet.value!!, 7)
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+            }
+            changeCounterpointsWithLimitAndCache(newList, true, MAX_VISIBLE_COUNTERPOINTS * 2)
+        }
+    }
+    private fun findCounterpointsByMikroKanons3(){
+        viewModelScope.launch(Dispatchers.Main){
+            if(sequenceToMikroKanons.value!!.isNotEmpty()) {
+                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_3)
+                val key = CacheKey(sequence, intervalSet.value!!)
+                if(mk3cache.containsKey(key)) {
+                    changeCounterpointsWithLimitAndCache(mk3cache[key]!!.first, true)
+                }else {
+                    val newList: List<Counterpoint>
+                    _elaborating.value = true
+                    withContext(Dispatchers.Default) {
+                        newList = mikroKanons3(sequence,intervalSet.value!!, MAX_DEPTH_MK_3)
+                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
+                            .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                    }
+                    changeCounterpointsWithLimitAndCache(newList, true, MAX_VISIBLE_COUNTERPOINTS * 2,
+                            mk3cache, key)
+                    _elaborating.value = false
+                }
+            }
+        }.also{  jobQueue.add(it)  }
+    }
     private fun findCounterpointsByMikroKanons4(){
         viewModelScope.launch(Dispatchers.Main){
             val deepSearch = userOptionsData.value!![0].deepSearch != 0
@@ -854,9 +889,9 @@ class AppViewModel(
                     .take( if(deepSearch) MAX_NOTES_MK_4DEEP else MAX_NOTES_MK_4 )
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if(mk4cache.containsKey(key) && !deepSearch) {
-                    changeCounterpointsWithLimit(mk4cache[key]!!.first, true)
+                    changeCounterpointsWithLimitAndCache(mk4cache[key]!!.first, true)
                 }else if(mk4deepSearchCache.containsKey(key) && deepSearch) {
-                    changeCounterpointsWithLimit(mk4deepSearchCache[key]!!.first, true)
+                    changeCounterpointsWithLimitAndCache(mk4deepSearchCache[key]!!.first, true)
                 }else {
                    measureTimeMillis{
                     _elaborating.value = true
@@ -873,12 +908,8 @@ class AppViewModel(
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
                     //val newList: List<Counterpoint> = def.await()
-                    if (deepSearch) {
-                        mk4deepSearchCache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
-                    } else {
-                        mk4cache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
-                    }
-                    changeCounterpointsWithLimit(newList, true)
+                    changeCounterpointsWithLimitAndCache(newList, true, MAX_VISIBLE_COUNTERPOINTS,
+                        if(deepSearch) mk4deepSearchCache else mk4cache)
                     _elaborating.value = false
                     }.also { time -> println("MK4 executed in $time ms" )}
                 }
@@ -891,7 +922,7 @@ class AppViewModel(
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_5RED)
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if (mk5reductedCache.containsKey(key) ) {
-                    changeCounterpointsWithLimit(mk5reductedCache[key]!!.first, true)
+                    changeCounterpointsWithLimitAndCache(mk5reductedCache[key]!!.first, true)
                 } else {
                     measureTimeMillis {
                         _elaborating.value = true
@@ -908,8 +939,7 @@ class AppViewModel(
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
                         //val newList: List<Counterpoint> = def.await()
-                        mk5reductedCache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
-                        changeCounterpointsWithLimit(newList, true, )
+                        changeCounterpointsWithLimitAndCache(newList, true, MAX_VISIBLE_COUNTERPOINTS, mk5reductedCache, key)
                         _elaborating.value = false
                     }.also { time -> println("MK5reducted executed in $time ms") }
                 }
@@ -922,7 +952,7 @@ class AppViewModel(
                 val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_6RED)
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if (mk6reductedCache.containsKey(key) ) {
-                    changeCounterpointsWithLimit(mk6reductedCache[key]!!.first, true)
+                    changeCounterpointsWithLimitAndCache(mk6reductedCache[key]!!.first, true)
                 } else {
                     measureTimeMillis {
                         _elaborating.value = true
@@ -939,8 +969,7 @@ class AppViewModel(
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
                         //val newList: List<Counterpoint> = def.await()
-                        mk6reductedCache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
-                        changeCounterpointsWithLimit(newList, true, )
+                        changeCounterpointsWithLimitAndCache(newList, true, MAX_VISIBLE_COUNTERPOINTS, mk6reductedCache, key )
                         _elaborating.value = false
                     }.also { time -> println("MK5reducted executed in $time ms") }
                 }
@@ -952,7 +981,7 @@ class AppViewModel(
                 val sequence = intSequences.reduce{ acc, seq -> acc + seq }
                 val key = CacheKey(sequence, intervalSet.value!!)
                 if (mazeCache.containsKey(key) ) {
-                    changeCounterpointsWithLimit(mazeCache[key]!!.first, true)
+                    changeCounterpointsWithLimitAndCache(mazeCache[key]!!.first, true)
                 } else {
                     measureTimeMillis {
                         _elaborating.value = true
@@ -964,49 +993,12 @@ class AppViewModel(
                                 .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
                                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                         }
-                        mazeCache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
-                        changeCounterpointsWithLimit(newList, true)
+                        changeCounterpointsWithLimitAndCache(newList, true, MAX_VISIBLE_COUNTERPOINTS, mazeCache, key)
                         println("Maze list size = ${newList.size}")
                         _elaborating.value = false
                     }.also { time -> println("Maze executed in $time ms ") }
                 }
             }.also { jobQueue.add(it) }
-    }
-    private fun findCounterpointsByMikroKanons3(){
-         viewModelScope.launch(Dispatchers.Main){
-            if(sequenceToMikroKanons.value!!.isNotEmpty()) {
-                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_3)
-                val key = CacheKey(sequence, intervalSet.value!!)
-                if(mk3cache.containsKey(key)) {
-                    changeCounterpointsWithLimit(mk3cache[key]!!.first, true)
-                }else {
-                    val newList: List<Counterpoint>
-                    _elaborating.value = true
-                    withContext(Dispatchers.Default) {
-                        newList = mikroKanons3(sequence,intervalSet.value!!, 6)
-                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
-                            .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
-                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                    }
-                    mk3cache.insertAndClear(key, newList.take(MAX_VISIBLE_COUNTERPOINTS), System.currentTimeMillis())
-                    _elaborating.value = false
-                    changeCounterpointsWithLimit(newList, true)
-                }
-            }
-        }.also{  jobQueue.add(it)  }
-    }
-    private fun findCounterpointsByMikroKanons2(){
-        var newList: List<Counterpoint>
-        viewModelScope.launch(Dispatchers.Main){
-            withContext(Dispatchers.Default){
-                val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(MAX_NOTES_MK_2)
-                newList = mikroKanons2(sequence,intervalSet.value!!, 7)
-                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
-                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
-                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-            }
-            changeCounterpointsWithLimit(newList, true)
-        }
     }
     private fun flourishCounterpoints(originalCounterpoints: List<Counterpoint>){
         if(!selectedCounterpoint.value!!.isEmpty()){
@@ -1017,7 +1009,7 @@ class AppViewModel(
                         .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimitAndCache(newList, true)
             }
         }
     }
@@ -1028,7 +1020,7 @@ class AppViewModel(
                 withContext(Dispatchers.Default){
                     newList = buildRound(originalCounterpoints)
                 }
-                changeCounterpointsWithLimit(newList, false)
+                changeCounterpointsWithLimitAndCache(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
@@ -1041,7 +1033,7 @@ class AppViewModel(
                     newList = addCadenzasOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints, values)
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimitAndCache(newList, true)
             }
         }
     }
@@ -1054,7 +1046,7 @@ class AppViewModel(
                         .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimitAndCache(newList, true)
             }
         }
     }
@@ -1071,7 +1063,7 @@ class AppViewModel(
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                              else newList
                 }
-                changeCounterpointsWithLimit(newList, true, MAX_VISIBLE_COUNTERPOINTS * 2)
+                changeCounterpointsWithLimitAndCache(newList, true, MAX_VISIBLE_COUNTERPOINTS * 2)
                 _elaborating.value = false
             }.also{  jobQueue.add(it)  }
         }
@@ -1085,7 +1077,7 @@ class AppViewModel(
                         .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimitAndCache(newList, true)
             }.also{  jobQueue.add(it)  }
         }
     }
@@ -1097,7 +1089,7 @@ class AppViewModel(
                     newList = eraseHorizontalIntervalsOnCounterpoints(intervalSetHorizontal.value!!, originalCounterpoints)
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimitAndCache(newList, true)
             }
         }
     }
@@ -1110,7 +1102,7 @@ class AppViewModel(
                         .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimitAndCache(newList, true)
             }
         }
     }
@@ -1122,7 +1114,7 @@ class AppViewModel(
                 withContext(Dispatchers.Default){
                     newList = upsideDownCounterpoints(originalCounterpoints)
                 }
-                changeCounterpointsWithLimit(newList, false)
+                changeCounterpointsWithLimitAndCache(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
@@ -1135,7 +1127,7 @@ class AppViewModel(
                     newList = arpeggioCounterpoints(originalCounterpoints, arpeggioType)
                         //.sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, false)
+                changeCounterpointsWithLimitAndCache(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
@@ -1149,7 +1141,7 @@ class AppViewModel(
                         .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimitAndCache(newList, true)
             }
         }
     }
@@ -1172,7 +1164,7 @@ class AppViewModel(
                         .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimitAndCache(newList, true)
             }
         }
     }
@@ -1183,7 +1175,7 @@ class AppViewModel(
                 withContext(Dispatchers.Default){
                     newList = expand(originalCounterpoints, extension)
                 }
-                changeCounterpointsWithLimit(newList, false)
+                changeCounterpointsWithLimitAndCache(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
@@ -1195,7 +1187,7 @@ class AppViewModel(
                 withContext(Dispatchers.Default){
                     newList = transposeAllCounterpoints(originalCounterpoints, transpositions)
                 }
-                changeCounterpointsWithLimit(newList, false)
+                changeCounterpointsWithLimitAndCache(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
@@ -1208,7 +1200,7 @@ class AppViewModel(
                     newList = originalCounterpoints.map{ it.tritoneSubstitution() }
                 }
                 changeIntervalSet(tritoneSubstitutionOnIntervalSet(intervalSet.value!!))
-                changeCounterpointsWithLimit(newList, false)
+                changeCounterpointsWithLimitAndCache(newList, false)
                 changeSelectedCounterpoint(counterpoints.value!![index])
             }
         }
@@ -1225,7 +1217,7 @@ class AppViewModel(
                         //.map{ it.emptiness = it.findEmptiness(); it}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
-                changeCounterpointsWithLimit(newList, true)
+                changeCounterpointsWithLimitAndCache(newList, true)
             }
         }
     }
@@ -1240,7 +1232,7 @@ class AppViewModel(
         _elaborating.value = false
         onStop()
         computationStack.clearAndDispatch()
-        changeCounterpointsWithLimit(listOf(), false)
+        changeCounterpointsWithLimitAndCache(listOf(), false)
         changeSequenceToMikroKanons(listOf())
         changeFirstSequence(listOf())
         changeSequenceToAdd(listOf())
@@ -1260,14 +1252,20 @@ class AppViewModel(
         val sortedList = newIntervalSet.sorted()
         _intervalSet.value = sortedList
     }
-    fun changeCounterpointsWithLimit(newCounterpoints: List<Counterpoint>, selectFirst: Boolean,
-                                     take: Int = MAX_VISIBLE_COUNTERPOINTS){
+    fun changeCounterpointsWithLimitAndCache(newCounterpoints: List<Counterpoint>, selectFirst: Boolean,
+                                     take: Int = MAX_VISIBLE_COUNTERPOINTS,
+                                             cache: HashMap<CacheKey, Pair<List<Counterpoint>,Long>>? = null,
+                                                key: CacheKey? = null){
+       // println("new counterpoints found:${newCounterpoints.size}")
+        val limitedCounterpoints = newCounterpoints.take(take)
+       // println("new counterpoints accepted:${limitedCounterpoints.size}")
+
         lastIndex = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
-        println("new counterpoints size:${newCounterpoints.size}")
+        cache?.insertAndClear(key!!, limitedCounterpoints, System.currentTimeMillis())
         // if new counterpoints are equal to the previous ones 'remember' doesn't refresh them in composables
 //        val timestamp = System.currentTimeMillis()
 //        val timestampedCounterpoints = newCounterpoints.take(take).mapIndexed{ index, it -> if(index == 0) it.copy(timestamp = timestamp) else it}
-        if(_counterpoints.value == newCounterpoints && computationStack.size > 1){
+        if(_counterpoints.value == limitedCounterpoints && computationStack.size > 1){
 
             if(computationStack.peek() is Computation.Fioritura
                 || computationStack.peek() is Computation.EraseIntervals
@@ -1275,12 +1273,12 @@ class AppViewModel(
                 || computationStack.peek() is Computation.Pedal
                 || computationStack.peek() is Computation.FurtherFromWave){
                 _counterpoints.value = listOf()
-                _counterpoints.value = newCounterpoints
+                _counterpoints.value = limitedCounterpoints
             } else {
                 computationStack.popAndDispatch()
             }
         } else {
-            _counterpoints.value = newCounterpoints
+            _counterpoints.value = limitedCounterpoints
         }
         if(selectFirst) counterpoints.value?.let{
             if(it.isNotEmpty()) changeSelectedCounterpoint(it[0])
@@ -1493,8 +1491,8 @@ class AppViewModel(
     private fun HashMap<CacheKey, Pair<List<Counterpoint>,Long>>.insertAndClear(key: CacheKey, counterpoints: List<Counterpoint>, timestamp: Long){
         val intAmount = this.values.map{it.first}.fold(0){ acc1, list -> acc1 + list.fold(0){acc2, counterpoint -> acc2 + counterpoint.countAbsPitches()} }
         val listAmount = counterpoints.fold(0){acc, counterpoint -> acc + counterpoint.countAbsPitches()}
-        println("key: ${key.sequence} ${key.intervalSet}")
-        println("Cache size: $intAmount, new list size: $listAmount, limit: $MAX_PITCHES_IN_CACHE")
+//        println("key: ${key.sequence} ${key.intervalSet}")
+//        println("Cache size: $intAmount, new list size: $listAmount, limit: $MAX_PITCHES_IN_CACHE")
         if(this.isNotEmpty()){
             if(intAmount + listAmount > MAX_PITCHES_IN_CACHE) {
                 remove(keys.sortedBy { this[it]?.second }[0])

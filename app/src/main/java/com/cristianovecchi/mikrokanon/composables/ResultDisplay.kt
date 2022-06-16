@@ -483,38 +483,30 @@ fun ResultDisplay(model: AppViewModel,
                     names = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet, colors = colors
                 ) {  }
             }
-            val scope = rememberCoroutineScope()
+            //val scope = rememberCoroutineScope()
                 //Do something when List end has been reached
-            scope.launch {
+            LaunchedEffect(key1 = model.scrollToTopList){
                 if (model.scrollToTopList && !elaborating) {
-                    delay(300)
-                    //if (counterpointsData.isNotEmpty())
-                    listState.scrollToItem(0)
-                    model.scrollToTopList = false
-                }
+                    //scope.launch {
+                        delay(250)
+                        //if (counterpointsData.isNotEmpty())
+                        listState.scrollToItem(0)
+                        model.scrollToTopList = false
+                    }
             }
-            LaunchedEffect(counterpointView){
-                if(scrollToItem != -1 && counterpoints.isNotEmpty()) {
-//                        if (scrollToItem == counterpoints.size-1){
-//                            listState.scrollToItem(scrollToItem, Int.MAX_VALUE)
-//                        } else {
-                    delay(10)
-//                    if(counterpointView == 0) {
-//                       // while(!listHasDone)  {delay(5)}
-//                        listState.animateScrollToItem(scrollToItem)
-//                    } else
-                        if(scrollToItem == 0 || scrollToItem == counterpoints.size-1) {
-                            listState.scrollToItem(scrollToItem)
+            LaunchedEffect(key1 = counterpointView) {
+                if(scrollToItem > -1 && counterpoints.isNotEmpty() && counterpoints.size > 1) {
+                    delay(100)
+                    if (scrollToItem == 0 || scrollToItem == counterpoints.size - 1) {
+                        listState.scrollToItem(scrollToItem)
                     } else {
-                        val offset = when(counterpointView){
+                        val offset = when (counterpointView) {
                             0 -> noteTableHeight / 8 * 7
                             1 -> marbleHeight / 4 * 3
                             else -> quantumSquareSide / 5 * 4
                         }
                         listState.scrollToItem(scrollToItem - 1, offset)
                     }
-
-//                        }
                     scrollToItem = -1
                 }
             }

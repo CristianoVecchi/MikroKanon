@@ -183,8 +183,8 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 lang.selectEnsemble
                             ) { newEnsembleMix ->
                                 val newEnsembles = ensembles.toMutableList()
-                                newEnsembles[cursor] = newEnsembleMix
-                                ensembles = newEnsembles
+                                newEnsembles[cursor] = newEnsembleMix.ifEmpty { listOf(2) }
+                                ensembles = newEnsembles.toList()
                                 ListDialogData(itemList = multiListDialogData.value.itemList)
                             }
                         }

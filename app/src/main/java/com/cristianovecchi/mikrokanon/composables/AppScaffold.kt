@@ -684,7 +684,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                 var cteDatas = userOptions.chordsToEnhance.extractIntPairsFromCsv()
                                     .map{ ChordToEnhanceData(convertFlagsToInts(it.first), it.second)}
                                 cteDatas = cteDatas.ifEmpty { listOf(ChordToEnhanceData(setOf(),1)) }
-                                val isSelected = !cteDatas.all{it == ChordToEnhanceData(setOf(),1)}
+                                val isSelected = !cteDatas.all{it == ChordToEnhanceData(setOf(),1) }
                                 SelectableCard(
                                     text = if(!isSelected) lang.chordsToEnhance
                                     else "${lang.chordsToEnhance}: \n${

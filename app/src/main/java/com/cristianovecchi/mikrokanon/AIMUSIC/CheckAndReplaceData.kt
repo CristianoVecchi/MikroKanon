@@ -152,6 +152,10 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
         fun insertInMultiCheckAndReplaceCsv(index: Int, cnrCsv: String, multiCsv: String): String {
             println("multiCsv = $multiCsv")
             val multiCnrCsv = multiCsv.split(";").toMutableList()
+            if(multiCnrCsv.size ==1) {
+                multiCnrCsv.add("")
+                multiCnrCsv.add("")
+            }
             multiCnrCsv[index] = cnrCsv
             return multiCnrCsv.joinToString(";")
         }
@@ -401,8 +405,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 val diff = if(isStaccato) 0 else actualDuration - duration
                 SubstitutionNotes(
                     index,
-                    if(replaceType.isRetrograde) (0 until div).map { if(it % 2 != 0) secondPitch else pitch }
-                        else (0 until div).map { if(it % 2 == 0) secondPitch else pitch },
+                    if(replaceType.isRetrograde) (0 until div).map { if(it % 2 == 0) secondPitch else pitch }
+                        else (0 until div).map { if(it % 2 == 0) pitch else secondPitch },
                     listOf(tick, *ticks.toTypedArray()),
                     durs,
                     listOf(stressedVelocity, *List(div-1){velocity}.toTypedArray()),
