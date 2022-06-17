@@ -9,6 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -51,17 +52,27 @@ fun SelectCounterpointDialog(
                         state = listState,
                         modifier = Modifier.height(dimensions.dialogHeight)
                     ) {
-                        items((0..0).toList()) { item ->
+                        items((0..1).toList()) { item ->
                             when (item) {
-                                0 -> SlotButtons(
-                                    model = buttonsDialogData.value.model,
-                                    buttonSize = buttonSize,
-                                    fontSize = fontSize,
-                                    colors = model.appColors,
-                                    numbers = language.slotNumbers,
-                                    filled = filledSlots,
-                                    onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected
-                                )
+                                0 -> Column(modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally){
+                                    SlotButtons(
+                                        model = buttonsDialogData.value.model,
+                                        buttonSize = buttonSize,
+                                        fontSize = fontSize,
+                                        colors = model.appColors,
+                                        numbers = language.slotNumbers,
+                                        filled = filledSlots,
+                                        onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected
+                                    )
+                                }
+                                1 -> Column(modifier = Modifier.fillMaxWidth(),
+                                            horizontalAlignment = Alignment.CenterHorizontally){
+                                    CustomButton(iconId = model.iconMap["self"]!!, isActive = true, buttonSize = buttonSize,
+                                                fontSize = fontSize,colors = model.appColors) {
+                                        buttonsDialogData.value.onCounterpointSelected(-1)
+                                    }
+                                }
                             }
                         }
                     }

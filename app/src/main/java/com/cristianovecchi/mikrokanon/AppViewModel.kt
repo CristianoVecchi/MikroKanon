@@ -313,18 +313,19 @@ class AppViewModel(
         cadenzasOnCounterpoints(originalCounterpoints, values)
     }
     val onOverlapFromSelector = { list: ArrayList<Clip>, position: Int, crossover: Boolean ->
-        if(savedCounterpoints[position] != null ){
+        if(position == -1 || savedCounterpoints[position] != null){
             changeFirstSequence(list)
             convertFirstSequenceToSelectedCounterpoint()
-            val computation = if(crossover) Computation.Crossover(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone(),list)
-                else Computation.Overlap(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone(),list)
+            val counterpoint2nd = if(position == -1) selectedCounterpoint.value!! else savedCounterpoints[position]
+            val computation = if(crossover) Computation.Crossover(selectedCounterpoint.value!!.clone(), counterpoint2nd!!.clone(),list)
+                else Computation.Overlap(selectedCounterpoint.value!!.clone(), counterpoint2nd!!.clone(),list)
             computationStack.pushAndDispatch(computation)
-            overlapBothCounterpoints(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone(), crossover)
+            overlapBothCounterpoints(selectedCounterpoint.value!!.clone(), counterpoint2nd!!.clone(), crossover)
         }
     }
     val onOverlap = { position: Int , crossover: Boolean->
         scrollToTopList = true
-        val counterpoint2nd = savedCounterpoints[position]
+        val counterpoint2nd = if(position == -1) selectedCounterpoint.value!! else savedCounterpoints[position]
         if (counterpoint2nd != null ) {
             val computation = if(crossover) Computation.Crossover(selectedCounterpoint.value!!.clone(),counterpoint2nd.clone(), null)
                 else Computation.Overlap(selectedCounterpoint.value!!.clone(),counterpoint2nd.clone(), null)
@@ -333,16 +334,17 @@ class AppViewModel(
         }
     }
     val onGlueFromSelector = { list: ArrayList<Clip>, position: Int ->
-        if(savedCounterpoints[position] != null ){
+        if(position == -1 ||  savedCounterpoints[position] != null){
             changeFirstSequence(list)
             convertFirstSequenceToSelectedCounterpoint()
-            computationStack.pushAndDispatch(Computation.Glue(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone(),list))
-            glueBothCounterpoints(selectedCounterpoint.value!!.clone(), savedCounterpoints[position]!!.clone())
+            val counterpoint2nd = if(position == -1) selectedCounterpoint.value!! else savedCounterpoints[position]
+            computationStack.pushAndDispatch(Computation.Glue(selectedCounterpoint.value!!.clone(), counterpoint2nd!!.clone(),list))
+            glueBothCounterpoints(selectedCounterpoint.value!!.clone(), counterpoint2nd.clone())
         }
     }
     val onGlue= { position: Int ->
         scrollToTopList = true
-        val counterpoint2nd = savedCounterpoints[position]
+        val counterpoint2nd = if(position == -1) selectedCounterpoint.value!! else savedCounterpoints[position]
         if (counterpoint2nd != null) {
             computationStack.pushAndDispatch(Computation.Glue(selectedCounterpoint.value!!.clone(),counterpoint2nd.clone(), null))
             glueBothCounterpoints(selectedCounterpoint.value!!.clone(), counterpoint2nd.clone())

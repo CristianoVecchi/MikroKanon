@@ -108,13 +108,13 @@ var start = true
                                         model.onScarlattiFromSelector(list)
                                     },
                                     onOverlap = { list, position, crossover ->
-                                        model.savedCounterpoints[position]?.let{
+                                        if(position == -1 || model.savedCounterpoints[position] != null){
                                             findNavController().navigate(R.id.outputFragment)
                                             model.onOverlapFromSelector(list, position, crossover)
                                         }
                                     },
                                     onGlue = { list, position ->
-                                        model.savedCounterpoints[position]?.let{
+                                        if(position == -1 || model.savedCounterpoints[position] != null){
                                             findNavController().navigate(R.id.outputFragment)
                                             model.onGlueFromSelector(list, position)
                                         }

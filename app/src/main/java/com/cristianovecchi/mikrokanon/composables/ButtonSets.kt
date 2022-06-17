@@ -232,10 +232,9 @@ fun SpecialFunctions1Buttons(
             CustomButton(iconId = model.iconMap["crossover"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onCrossover()
             }
-            CustomButton(iconId = model.iconMap["maze"]!!, isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                onMaze()
+            CustomButton(iconId = model.iconMap["glue"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onGlue()
             }
-
         }
         Row{
             CustomButton(iconId = model.iconMap["single"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
@@ -262,8 +261,8 @@ fun SpecialFunctions1Buttons(
             CustomButton(iconId = model.iconMap["cadenza"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onCadenza()
             }
-            CustomButton(iconId = model.iconMap["glue"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-                onGlue()
+            CustomButton(iconId = model.iconMap["maze"]!!, isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                onMaze()
             }
         }
     }
