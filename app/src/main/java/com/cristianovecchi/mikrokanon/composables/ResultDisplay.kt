@@ -74,6 +74,7 @@ fun ResultDisplay(model: AppViewModel,
 {
     //val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val triple by derivedStateOf {
         if(userOptionsData.isNotEmpty()) {
@@ -119,10 +120,9 @@ fun ResultDisplay(model: AppViewModel,
     val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
-
     val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
 
-        Column(
+    Column(
             modifier = Modifier
                 .fillMaxHeight()
                 .background(backgroundColor)
@@ -199,7 +199,7 @@ fun ResultDisplay(model: AppViewModel,
                                 QuantumCounterpointView(
                                     model = model,
                                     counterpoint = counterpoint,
-                                    colors = colors,
+                                    appColors = colors,
                                     totalWidthDp = quantumSquareSide,
                                     totalHeightDp = quantumSquareSide,
                                     dpDensity = dimensions.dpDensity,
@@ -215,6 +215,12 @@ fun ResultDisplay(model: AppViewModel,
                             }
 
                             else -> Unit
+                        }
+                    }
+                    item {
+                            if (model.scrollToTopList && !elaborating) {
+                                scope.launch { listState.scrollToItem(0) }
+                                model.scrollToTopList = false
                         }
                     }
                 }
@@ -482,17 +488,6 @@ fun ResultDisplay(model: AppViewModel,
                     fontSize = if(model.zodiacPlanetsActive) dimensions.outputIntervalSetFontSize * 2 else dimensions.outputIntervalSetFontSize,
                     names = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet, colors = colors
                 ) {  }
-            }
-            //val scope = rememberCoroutineScope()
-                //Do something when List end has been reached
-            LaunchedEffect(key1 = model.scrollToTopList){
-                if (model.scrollToTopList && !elaborating) {
-                    //scope.launch {
-                        delay(250)
-                        //if (counterpointsData.isNotEmpty())
-                        listState.scrollToItem(0)
-                        model.scrollToTopList = false
-                    }
             }
             LaunchedEffect(key1 = counterpointView) {
                 if(scrollToItem > -1 && counterpoints.isNotEmpty() && counterpoints.size > 1) {
