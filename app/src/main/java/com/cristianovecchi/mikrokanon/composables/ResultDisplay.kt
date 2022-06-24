@@ -402,7 +402,7 @@ fun ResultDisplay(model: AppViewModel,
                                     },
                                     onGlue = {
                                         selectCounterpointDialogData.value = ButtonsDialogData(true,
-                                            language.selectToOverlap, model,
+                                            language.selectToGlue, model,
                                             onCounterpointSelected = { position ->
                                                 close()
                                                 onGlue(position)

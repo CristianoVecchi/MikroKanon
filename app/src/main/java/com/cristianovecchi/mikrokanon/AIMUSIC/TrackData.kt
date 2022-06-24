@@ -194,31 +194,40 @@ fun List<TrackData>.applyMultiCheckAndReplace(checkAndReplace: List<List<CheckAn
     return result
 }
 fun List<TrackData>.addLegatoAndRibattuto(maxLegato: Int, articulations: FloatArray,
-        legatoTypes: List<Pair<Int,Int>>, totalLength: Long){
-    val legatos = legatoTypes.map { articulations[it.first.absoluteValue] * (if (it.first < 0) -1 else 1) }
-    val ribattutos = if(legatoTypes.size == 1) listOf(legatoTypes[0].second, legatoTypes[0].second)
+        legatoTypes: List<Pair<Int,Int>>, totalLength: Long) {
+    val legatos =
+        legatoTypes.map { articulations[it.first.absoluteValue] * (if (it.first < 0) -1 else 1) }
+    val ribattutos = if (legatoTypes.size == 1) listOf(legatoTypes[0].second, legatoTypes[0].second)
     else legatoTypes.map { it.second }
 
 //            println("Legatos: $legatos")
 //            println("Ribattutos: $ribattutos")
-    val (legatoAlterations, legatoDeltas, pivots) = alterateLegatosWithDistribution(legatos, ribattutos,0.005f, totalLength)
+    val (legatoAlterations, legatoDeltas, pivots) = alterateLegatosWithDistribution(
+        legatos,
+        ribattutos,
+        0.005f,
+        totalLength
+    )
 
+    //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        this.parallelStream().forEach {
-            val pair = alterateArticulation(
-                it.ticks,
-                it.durations,
-                legatoAlterations,
-                ribattutos,
-                legatoDeltas,
-                pivots,
-                it.isPreviousRest,
-                maxLegato,
-                it.changes
-            )
-            it.articulationDurations= pair.first
-            it.ribattutos = pair.second.map{ float -> float.roundToInt()}.toIntArray()
-        }
+        this
+            //.parallelStream()
+            .forEach {
+                val pair = alterateArticulation(
+                    it.ticks,
+                    it.durations,
+                    legatoAlterations,
+                    ribattutos,
+                    legatoDeltas,
+                    pivots,
+                    it.isPreviousRest,
+                    maxLegato,
+                    it.changes
+                )
+                it.articulationDurations = pair.first
+                it.ribattutos = pair.second.map { float -> float.roundToInt() }.toIntArray()
+            }
     } else {
         this.forEach {
             val pair = alterateArticulation(
@@ -232,8 +241,8 @@ fun List<TrackData>.addLegatoAndRibattuto(maxLegato: Int, articulations: FloatAr
                 maxLegato,
                 it.changes
             )
-            it.articulationDurations= pair.first
-            it.ribattutos= pair.second.map{ float -> float.roundToInt()}.toIntArray()
+            it.articulationDurations = pair.first
+            it.ribattutos = pair.second.map { float -> float.roundToInt() }.toIntArray()
         }
     }
 }

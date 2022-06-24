@@ -148,7 +148,7 @@ val METRO_2_4 = Pair(2,4)
 val METRO_3_4 = Pair(3,4)
 val METRO_4_4 = Pair(4,4)
 enum class RhythmType{
-     BASIC, PLAIN, BALLET, PUNTATO, DANCE, RAGTIME, QUOTE, BULGARIAN, HEMIOLIA, FLUX
+     BASIC, PLAIN, BALLET, PUNTATO, MIX, DANCE, RAGTIME, QUOTE, BULGARIAN, HEMIOLIA, FLUX
 }
 // WARNING: can't have two negative values coupled (ex: -80, -20 ... write -100)
 enum class RhythmPatterns(val type: RhythmType, val title: String, val values: List<Int>,val metro: Pair<Int,Int> = METRO_4_4) {
@@ -231,6 +231,12 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     DOTTED3_1_4(RhythmType.PUNTATO,"Dotted3 1/4", listOf(300,60,60,60), Pair(1,4)),
     DOTTED3_2_4(RhythmType.PUNTATO,"Dotted3 2/4", listOf(300,60,60,60,300,60,60,60), METRO_2_4),
     DOTTED3_3_4(RhythmType.PUNTATO,"Dotted3 3/4", listOf(300,60,60,60,300,60,60,60,300,60,60,60), METRO_3_4),
+    MIXED_8_8T(RhythmType.MIX, "Mix 3/8 (♪+♪t)", listOf(240, 160,160,160), Pair(3,8)),
+    MIXED_3X8_8T(RhythmType.MIX, "Mix 5/8 (3♪+♪t)", listOf(240,240,240, 160,160,160), Pair(5,8)),
+    MIXED_8T_16(RhythmType.MIX, "Mix 5/16 (♪t+16)", listOf(160,160,160, 120), Pair(5,16)),
+    MIXED_8T_3X16(RhythmType.MIX, "Mix 7/16 (♪t+3X16)", listOf(160,160,160, 120,120,120), Pair(7,16)),
+    MIXED_16_16T(RhythmType.MIX, "Mix 3/16 (16+16t)", listOf(120, 80,80,80), Pair(3,16)),
+    MIXED_3X16_16T(RhythmType.MIX, "Mix 5/16 (3X16+16t)", listOf(120,120,120, 80,80,80), Pair(5,16)),
     DOTTED_FLUX_1232(RhythmType.PUNTATO,"Dotted Flux 1232",
         listOf(N1rhythmDotted, N2rhythmDotted, N3rhythmDotted, N2rhythmDotted).flatten()),
     DOTTED_FLUX_2343(RhythmType.PUNTATO,"Dotted Flux 2343",

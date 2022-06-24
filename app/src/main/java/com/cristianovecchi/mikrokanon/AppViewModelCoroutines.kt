@@ -394,7 +394,7 @@ fun AppViewModel.findPedal(nPedals: Int, list: ArrayList<Clip>?){
             //newIntervalSet = pair.second
         }
         //changeIntervalSet(newIntervalSet)
-        changeCounterpointsWithLimitAndCache(newList, false)
+        changeCounterpointsWithLimitAndCache(newList, true)
     }
 }
 fun AppViewModel.findWavesFromSequence(nWaves: Int){

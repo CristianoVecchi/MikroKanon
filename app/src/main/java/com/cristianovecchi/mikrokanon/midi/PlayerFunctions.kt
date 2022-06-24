@@ -485,11 +485,13 @@ fun alterateArticulation(
             durIndex++
         }
     }
-    while (alterationTick + legatoDeltas[alterationIndex] < ticks[durIndex]) {
+    println("durationSize=${durations.size} legatoDeltasSize=${legatoDeltas.size} lastTick=${ticks[durIndex]}")
+    while (alterationIndex < legatoDeltas.size && alterationTick + legatoDeltas[alterationIndex] <= ticks[durIndex]) {
         alterationTick += legatoDeltas[alterationIndex].toInt()
         alterationIndex++
     }
-    legatoAlteration = legatoAlterations[alterationIndex]
+    legatoAlteration = if (alterationIndex< legatoDeltas.size) legatoAlterations[alterationIndex]//.apply{println("not last $this")}
+                    else legatoAlterations[legatoAlterations.size-1]//.apply{println("last $this")}
    // ribattutoAlteration = ribattutosAlterations[alterationIndex]
     thisDur = durations[durIndex]
     if (legatoAlteration <= 1.0) {

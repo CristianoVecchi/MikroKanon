@@ -6,17 +6,17 @@
 
     <fragment
         android:id="@+id/inputFragment"
-        android:name="com.cristianovecchi.mikrokanon.InputFragment"
+        android:name="com.cristianovecchi.mikrokanon.fragments.InputFragment"
         android:label="InputFragment" />
     <fragment
         android:id="@+id/outputFragment"
-        android:name="com.cristianovecchi.mikrokanon.OutputFragment"
+        android:name="com.cristianovecchi.mikrokanon.fragments.OutputFragment"
         android:label="OutputFragment" >
     </fragment>
 
     <fragment
         android:id="@+id/sequencesFragment"
-        android:name="com.cristianovecchi.mikrokanon.SequencesFragment"
+        android:name="com.cristianovecchi.mikrokanon.fragments.SequencesFragment"
         android:label="SequencesFragment" >
         <action
             android:id="@+id/action_sequencesFragment_to_inputFragment"

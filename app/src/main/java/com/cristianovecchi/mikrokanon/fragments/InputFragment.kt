@@ -1,4 +1,4 @@
-package com.cristianovecchi.mikrokanon
+package com.cristianovecchi.mikrokanon.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +12,7 @@ import androidx.lifecycle.asFlow
 import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.composables.AbstractNoteSequenceEditor
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
+import com.cristianovecchi.mikrokanon.MainActivity
 import com.cristianovecchi.mikrokanon.composables.AppScaffold
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme

@@ -1,4 +1,4 @@
-package com.cristianovecchi.mikrokanon
+package com.cristianovecchi.mikrokanon.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,10 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.MainActivity
 import com.cristianovecchi.mikrokanon.composables.*
+import com.cristianovecchi.mikrokanon.createIntervalSetFromFlags
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 import kotlin.system.measureTimeMillis
