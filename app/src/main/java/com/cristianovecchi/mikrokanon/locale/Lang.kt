@@ -47,7 +47,7 @@ enum class LANGUAGES(val language:String){
     hi("हिन्दी"),id("Bahasa Indonesia"),it("Italiano"),
     ko("한국어") ,ja("日本語"),
      pt("Português"), ru("Русский"),
-    sw("Kiswahili"),zh("中文");
+    sw("Kiswahili"), uk("Українська"), zh("中文");
     companion object {
         fun languageNameFromDef(langDef: String): String {
             return when (langDef) {
@@ -65,6 +65,7 @@ enum class LANGUAGES(val language:String){
                 "pt" -> pt.language
                 "ru" -> ru.language
                 "sw" -> sw.language
+                "uk" -> uk.language
                 "zh" -> zh.language
                 else -> en.language
             }
@@ -84,6 +85,9 @@ enum class NoteNamesFr {
 }
 enum class NoteNamesRu {
     До,Ре,Ми,Фа,Соль,Ля,Си,EMPTY
+}
+enum class NoteNamesUk {
+    До,Ре,Мі,Фа,Соль,Ля,Сі,EMPTY
 }
 enum class NoteNamesEl {
     Ντο, Ρε, Μι, Φα, Σολ, Λα, Σι, EMPTY
@@ -133,6 +137,8 @@ val ensembleNamesRu = listOf("Струнные", "Деревянные духо�
 val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao", "Orchestra ya ala za nyuzi", "Vyombo vya upepo vya chuma",
     "Gamelan", "Saxophones", "Zilizimbi","Mwanzi mara mbili", "Clarinets", "Bassoons", "Cellos", "Piano", "Kinubi",
     "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa","Ya kutisha")
+val ensembleNamesUk = listOf("Смичкові", "Дерев'яні духові", "Струнний оркестр", "Мідні духові", "Гамелан", "Саксофони", "Флейти",
+    "Подвійний очерет", "Кларнети", "Фаготи", "Віолончелі", "фортепіано","арфа", "П'єро","бароко","Пощипані струни","моторошний")
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器","甘美蘭", "薩氏管", "长笛",
     "双簧管", "单簧管", "巴松管", "大提琴", "钢琴","豎琴","皮埃罗","巴洛克","撥弦樂器","幽灵般的")
 
@@ -227,7 +233,7 @@ val doublingRu = listOf("Секунда малая", "Секунда больш�
 "Кварта увеличенная", "Квинта", "Секста малая", "Секста большая", "Септима малая", "Септима большая",
 "Октава", "Нона малая", "Нона большая", "Децима малая", "Децима большая", "Ундецима",
 "Ундецима увеличенная", "Дуодецима", "Терцдецима малая", "Терцдецима большая",
-    "Квартдецима малая", "Квартдецима большая", "Квинтдецима ")
+    "Квартдецима малая", "Квартдецима большая", "Квинтдецима")
 val doublingKo = listOf("단2도","장2도","단3도","장3도","완전4도",
     "트라이톤","완전5도","단6도","장6도","단7도","장7도",
     "완전8도","단9도","장9도","단10도","장10도","완전11도",
@@ -237,6 +243,11 @@ val doublingJa = listOf("短2度","長2度","短3度","長3度","4度",
 "増4度","5度","短6度","長6度","短7度","長7度",
 "8度","短9度","長9度","短10度","長10度","11度",
     "増11度","12度","短13度","長13度","短14度","長14度","15度")
+val doublingUk = listOf("мала Секунда", "велика Секунда", "мала Терція", "велика Терція", "Кварта",
+    "збільшена Кварта", "Квінта", "мала Секста", "велика Секста", "мала Септима", "велика Септима",
+    "Октава", "мала Нона", "велика Нона", "мала Децима", "велика Децима", "Ундецима",
+    "збільшена Ундецима", "Дуодецима", "мала Терцдецима", "велика Терцдецима",
+    "мала Квартдецима", "велика Квартдецима", "Квинтдецима")
 val doublingZh = listOf("小二度","大二度","小三度","大三度","纯四度",
     "增四度","纯五度","小六度","大六度","小七度","大七度",
     "纯八度","小九度","大九度","小十度","大十度","纯十一度",
@@ -256,6 +267,7 @@ val intervalSetIt = listOf("2m\n7M","2M\n7m","3m\n6M","3M\n6m","4\n5","4A\n5d","
 val intervalSetEn = listOf("m2\nM7","M2\nm7","m3\nM6","M3\nm6","4\n5","A4\nd5","U\n8")
 val intervalSetDe = listOf("k2\nG7","G2\nk7","k3\nG6","G3\nk6","4\n5","Ü4\nv5","1\n8")
 val intervalSetRu = listOf("2м\n7В","2В\n7м","3м\n6В","3В\n6м","4\n5","4У\n5у","1\n8")
+val intervalSetUk = listOf("м2\nВ7","В2\nм7","м3\nВ6","В3\nм6","4\n5","З4\nч5","1\n8")
 fun getIntervalsForTranspose(intervalSet: List<String> = intervalSetEn): List<String>{
     val split = intervalSet.map{ it.split("\n")}
     return listOf(split[6][0], split[0][0], split[1][0], split[2][0], split[3][0], split[4][0],
@@ -417,6 +429,7 @@ data class Lang( // English by default
                 "pt" -> portugues()
                 "ru" -> russian()
                 "sw" -> kiswahili()
+                "uk" -> ukranian()
                 "zh" -> chinese()
                 else -> Lang()
             }
@@ -432,6 +445,7 @@ data class Lang( // English by default
                 bpm = "BPM ",
                 enterSomeNotes = "Entrez quelques notes !",
                 choose2ndSequence = "Choisissez la deuxième séquence !",
+                chooseAnotherSequence = "Choisissez une autre séquence !",
                 repeatSequence = "Répéter la séquence",
                 OKbutton = "D'accord",
                 selectEnsemble = "Choisissez un ensemble !",
@@ -511,10 +525,12 @@ data class Lang( // English by default
             return Lang(
                 noteNames = NoteNamesIt.values().map { it.toString() },
                 intervalSet = intervalSetIt,
+                ensemble = "Organico",
                 enterSomeNotes = "Digita delle note!",
                 choose2ndSequence = "Scegli la seconda sequenza!",
+                chooseAnotherSequence = "Scegli un'altra sequenza!",
                 repeatSequence = "Ripeti la sequenza",
-                selectEnsemble = "Scegli un ensemble!",
+                selectEnsemble = "Scegli un organico!",
                 ensembleNames = ensembleNamesIt,
                 range = "Estensione",
                 selectRange = "Scegli un'estensione!",
@@ -593,6 +609,7 @@ data class Lang( // English by default
                 intervalSet = intervalSetIt,
                 enterSomeNotes = "¡Escribe algunas notas!",
                 choose2ndSequence = "¡Elige la segunda secuencia!",
+                chooseAnotherSequence = "¡Elige otra secuencia!",
                 repeatSequence = "Repite la secuencia",
                 selectEnsemble = "¡Elige un ensemble!",
                 ensembleNames = ensembleNamesEs,
@@ -673,6 +690,7 @@ data class Lang( // English by default
                 intervalSet = intervalSetDe,
                 enterSomeNotes = "Tippe ein paar Noten ein!",
                 choose2ndSequence = "Wähle die zweite Sequenz!",
+                chooseAnotherSequence = "Wählen Sie eine andere Sequenz!",
                 repeatSequence = "Wiederhole die Sequenz",
                 OKbutton = "D'accord",
                 selectEnsemble = "Wähle ein Ensemble!",
@@ -748,12 +766,97 @@ data class Lang( // English by default
                 selectSlots = "Wählen Sie Slots zum Löschen aus!",
             )
         }
+        fun ukranian(): Lang {
+            return Lang(
+                noteNames = NoteNamesUk.values().map { it.toString() },
+                intervalSet = intervalSetUk,
+                ensemble = "Ансамбль",
+                OKbutton = "В порядку",
+                enterSomeNotes = "Введіть ноти!",
+                choose2ndSequence = "Виберіть другу послідовність!",
+                chooseAnotherSequence = "Виберіть іншу послідовність!",
+                repeatSequence = "Повторіть послідовність",
+                selectEnsemble = "Виберіть ансамбль!",
+                ensembleNames = ensembleNamesUk,
+                range = "Розширення",
+                selectRange = "Виберіть розширення!",
+                rangeOptions = listOf("Безкоштовне", "Інструменту", "Обмежене", "Майже закрите", "Закрите"),
+                articulation = "Артикуляція",
+                selectArticulation = "Обирайте зміни артикуляції!",
+                selectMelody ="Виберіть тип мелодії!",
+                melody = "Мелодія",
+                selectGlissando = "Виберіть інтервали для гліссандо!",
+                vibrato = "Вібрато",
+                selectVibrato = "Виберіть інтенсивність вібрато!",
+                nuancesOptions = listOf("Без нюансів", "Рельєфні короткі ноти", "Рельєфні довгі ноти"),
+                nuances = "Нюанси",
+                selectNuances = "Вибирайте нюанси для динаміки!",
+                harmony = "Гармонія",
+                selectHarmonizationType = "Виберіть тип гармонізації!",
+                selectHarmonizationInstruments = "Обирайте інструменти гармонізації!",
+                selectHarmonizationVolume = "Обирайте гучність гармонізації!",
+                checkAndReplace = "Знайдіть і замініть",
+                selectCheckType  = "Виберіть тип виявлення!",
+                selectReplaceType  = "Виберіть тип заміни!",
+                selectStress  = "Виберіть напругу заміни!",
+                chordsToEnhance= "Акорди для посилення",
+                selectChordsToEnhance= "Виберіть акорд для покращення!",
+                enhanceChordsInTranspositions= "Зберігайте розширені акорди в транспозиціях",
+                dynamics = "Динаміка",
+                selectDynamicAlterations ="Обирайте зміни динаміки!",
+                bpm = "БПМ",
+                beatsPerMinute = "Пульсації за хвилину",
+                selectRhythm = "Виберіть ритм!",
+                selectDoubling = "Виберіть інтервали для подвоєння!",
+                doublingNames = doublingUk,
+                selectAudio8D = "Виберіть елементи в AUDIO 8D!",
+                rhythm = "Ритм",
+                rhythmShuffle  = "Змішайте ритм",
+                partsShuffle  = "Змішайте частини",
+                rowForms = "Серійні форми",
+                selectRowForms = "Вибирайте серійні форми!",
+                original = "Основна",
+                retrograde  = "Ракохід",
+                inverse  = "Обернення",
+                invRetrograde  = "Обернення ракоходу",
+                selectRitornello = "Виберіть кількість повторів!",
+                transpose = "Транспонувати",
+                selectTranspositions = "Виберіть транспозиції!",
+                doubling  = "Подвійний",
+                spreadWherePossible  = "Розширюйте, де це можливо",
+                deepSearch  = "Глибокий пошук у чотиричастних канонах",
+                horIntervalSet = "Інтервали вільних частин",
+                detector = "Детектор",
+                selectIntervalsToDetect = "Виберіть інтервали для виявлення!",
+                detectorExtension = "Радіус детектора",
+                selectDetectorExtension = "Виберіть радіус детектора!",
+                exportMidi  = "Спортивний файл MIDI",
+                customColors = "Кольори",
+                counterpointView = "Вид",
+                selectCounterpointView = "Виберіть вигляд для контрапунктів!",
+                counterpointViewOptions = listOf("Ноти", "Мармур", "квантовий"),
+                language  = "Мову",
+                zodiac = "Зодіак",
+                zodiacOptions = listOf("Планети", "Знаки зодіак", "Emojis"),
+                selectZodiac = "Використовуйте ці символи зодіаку:" ,
+                selectSpecialFunction = "Виберіть функцію!",
+                selectCadenzaForm = "Виберіть форму каденції!",
+                selectToOverlap = "Виберіть контрапункт для накладання!",
+                selectToCrossOver = "Виберіть контрапункт для наслідування!",
+                selectToGlue = "Виберіть контрапункт для склеювання!",
+                addSequencesToMaze = "Додайте більше послідовностей до лабіринту!",
+                selectHorizontalIntervals = "Виберіть мелодійні інтервали для функцій!",
+                clearSlots = "Спорожніть відсіки",
+                selectSlots = "Виберіть відділення для спорожнення!",
+            )
+        }
         fun russian(): Lang {
             return Lang(
                 noteNames = NoteNamesRu.values().map { it.toString() },
                 intervalSet = intervalSetRu,
                 enterSomeNotes = "Введите ноты!",
                 choose2ndSequence = "Выберите вторую последовательность!",
+                chooseAnotherSequence = "Выберите другую последовательность!",
                 repeatSequence = "Повторите последовательность",
                 ensemble = "Ансамбль",
                 bpm = "БПМ",
@@ -836,6 +939,7 @@ data class Lang( // English by default
                 noteNames = NoteNamesIt.values().map { it.toString() },
                 enterSomeNotes = "음표를 입력하세요!",
                 choose2ndSequence = "두 번째 시퀀스를 선택하십시오!",
+                chooseAnotherSequence = "다른 시퀀스를 선택하십시오!",
                 repeatSequence = "순서를 반복하십시오",
                 OKbutton = "확인",
                 selectEnsemble = "앙상블을 선택하십시오!",
@@ -918,6 +1022,7 @@ data class Lang( // English by default
                 noteNames = NoteNamesIt.values().map { it.toString() },
                 enterSomeNotes = "音符を入力してください！",
                 choose2ndSequence = "2番目のシーケンスを選択してください！",
+                chooseAnotherSequence = "別のシーケンスを選択してください！",
                 repeatSequence = "シーケンスを繰り返します",
                 selectEnsemble = "アンサんブルを選いしてください！",
                 ensembleNames = ensembleNamesJa,
@@ -999,6 +1104,7 @@ data class Lang( // English by default
                 noteNames = NoteNamesIt.values().map { it.toString() },
                 enterSomeNotes = "键入一些音符时间",
                 choose2ndSequence = "选择第二个序列！",
+                chooseAnotherSequence = "选择另一个序列！",
                 repeatSequence = "重复序列",
                 OKbutton = "好的",
                 selectEnsemble = "选择合奏！",
@@ -1082,6 +1188,7 @@ data class Lang( // English by default
                 noteNames = listOf("دو","ري","مي","فا","صول","لا","سي"),
                 enterSomeNotes = "!اكتب بعض النوتات الموسيقية",
                 choose2ndSequence = "!اختر التسلسل الثاني",
+                chooseAnotherSequence = "اختر تسلسل آخر!",
                 repeatSequence = "كرر التسلسل",
                 OKbutton = "موافق",
                 ensemble ="الفرقة",
@@ -1166,6 +1273,7 @@ data class Lang( // English by default
                 intervalSet = intervalSetEn,
                 enterSomeNotes = "Πληκτρολογήστε μερικές νότες!",
                 choose2ndSequence = "Επιλέξτε τη δεύτερη ακολουθία!",
+                chooseAnotherSequence = "Διάλεξε άλλη ακολουθία!",
                 repeatSequence = "Επαναλάβετε την ακολουθία",
                 OKbutton = "Εντάξει",
                 ensemble ="Σύνολο",
@@ -1249,6 +1357,7 @@ data class Lang( // English by default
                 intervalSet = intervalSetIt,
                 enterSomeNotes = "Chapa maelezo kadhaa!",
                 choose2ndSequence = "Chagua mlolongo wa pili!",
+                chooseAnotherSequence = "Chagua mlolongo mwingine!",
                 repeatSequence = "Kurudia mlolongo",
                 OKbutton = "Sawa",
                 selectEnsemble = "Chagua mkusanyiko!",
@@ -1330,6 +1439,7 @@ data class Lang( // English by default
                 intervalSet = intervalSetIt,
                 enterSomeNotes = "Digite algumas notas!",
                 choose2ndSequence = "Escolha a segunda sequência!",
+                chooseAnotherSequence = "Escolha outra sequência!",
                 repeatSequence = "Repita a sequência",
                 ensemble ="Conjunto",
                 selectEnsemble = "Escolha um conjunto!",
@@ -1411,6 +1521,7 @@ data class Lang( // English by default
                 intervalSet = intervalSetEn,
                 enterSomeNotes = "Ketik beberapa not!",
                 choose2ndSequence = "Pilih urutan kedua!",
+                chooseAnotherSequence = "Pilih urutan lain!",
                 repeatSequence = "Ulangi urutannya",
                 OKbutton = "Oke",
                 ensemble = "Ansambel",
@@ -1493,6 +1604,7 @@ data class Lang( // English by default
                 intervalSet = intervalSetEn,
                 enterSomeNotes = "कुछ नोट्स टाइप करें!",
                 choose2ndSequence = "दूसरा क्रम चुनें!",
+                chooseAnotherSequence = "एक और क्रम चुनें!",
                 repeatSequence = "क्रम दोहराएं",
                 OKbutton = "ठीक",
                 selectEnsemble = "एक पहनावा चुनें!",
