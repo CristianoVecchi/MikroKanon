@@ -136,6 +136,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
     val clearSlotsDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val exportDialogData by lazy { mutableStateOf(ExportDialogData())}
     val privacyDialogData by lazy { mutableStateOf(TextDialogData())}
+    val historiaDialogData by lazy { mutableStateOf(TextDialogData())}
     val creditsDialogData by lazy { mutableStateOf(TextDialogData())}
     val mbtiDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val detectorDialogData by lazy { mutableStateOf(MultiListDialogData())}
@@ -164,8 +165,9 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         "Spread where possible", "Deep Search in 4 part MK",
          "Detector","Detector Extension",
         //"Colors",
-        "Custom Colors", "Counterpoint View", "Language","Zodiac","MBTI",
-        "Spacer", "Privacy Policy", "Credits")
+        "Custom Colors", "Counterpoint View", "Language","Zodiac",
+        //"MBTI",
+        "Spacer", "Privacy Policy", "Credits", "Historia")
 
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
     val allCounterpointsData by counterpointsDataFlow.collectAsState(initial = listOf())
@@ -195,6 +197,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         ExportDialog(exportDialogData, lang.OKbutton)
         PrivacyDialog(privacyDialogData, dimensions, lang.OKbutton)
         CreditsDialog(creditsDialogData, dimensions, lang.OKbutton)
+        HistoriaDialog(historiaDialogData, dimensions, lang.OKbutton)
         MultiListDialog(mbtiDialogData, dimensions, lang.OKbutton, colors)
         MultiListDialog(detectorDialogData, dimensions, lang.OKbutton, colors)
         ListDialog(detExtensionDialogData, dimensions, lang.OKbutton, colors, fillPrevious = true)
@@ -1097,42 +1100,42 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                         }
                                     })
                             }
-                            "MBTI" -> {
-                                val verticalIntervals by model.intervalSet.observeAsState(listOf(-1))
-                                val mbtis = MBTI.listFromIntervals(
-                                    if(verticalIntervals.contains(-1)) createIntervalSetFromFlags(userOptions.intSetVertFlags).toSet()
-                                    else verticalIntervals.toSet()
-                                )
-                                val isOn = mbtis.isNotEmpty()
-                                val nl = newLineOrNot(mbtis, 4)
-                                val text = if (!isOn) lang.mbti else "${lang.mbti}: $nl${
-                                    mbtis.joinToString(
-                                        separator = " + "
-                                    ) { it.name }
-                                }"
-                                val intsFromMbtis = MBTI.values().withIndex()
-                                    .filter{mbtis.contains(it.value)}
-                                    .map{ it.index}
-                                SelectableCard(
-                                    text = text,
-                                    fontSize = fontSize,
-                                    colors = colors,
-                                    isSelected = isOn,
-                                    onClick = {
-                                        mbtiDialogData.value = MultiListDialogData(
-                                            true,
-                                            MBTI.values().map{"${it}\n  ${it.character}"},
-                                            intsFromMbtis.toSet(),
-                                            dialogTitle = lang.selectMbti
-                                        ) { indices ->
-                                            model.createVerticalIntervalSet(MBTI.intervalsFromIndices(indices).toList(), "AppScaffold")
-                                            model.saveVerticalIntervalSet("AppScaffold")
-                                            mbtiDialogData.value =
-                                                MultiListDialogData(itemList = detectorDialogData.value.itemList)
-
-                                        }
-                                    })
-                            }
+//                            "MBTI" -> {
+//                                val verticalIntervals by model.intervalSet.observeAsState(listOf(-1))
+//                                val mbtis = MBTI.listFromIntervals(
+//                                    if(verticalIntervals.contains(-1)) createIntervalSetFromFlags(userOptions.intSetVertFlags).toSet()
+//                                    else verticalIntervals.toSet()
+//                                )
+//                                val isOn = mbtis.isNotEmpty()
+//                                val nl = newLineOrNot(mbtis, 4)
+//                                val text = if (!isOn) lang.mbti else "${lang.mbti}: $nl${
+//                                    mbtis.joinToString(
+//                                        separator = " + "
+//                                    ) { it.name }
+//                                }"
+//                                val intsFromMbtis = MBTI.values().withIndex()
+//                                    .filter{mbtis.contains(it.value)}
+//                                    .map{ it.index}
+//                                SelectableCard(
+//                                    text = text,
+//                                    fontSize = fontSize,
+//                                    colors = colors,
+//                                    isSelected = isOn,
+//                                    onClick = {
+//                                        mbtiDialogData.value = MultiListDialogData(
+//                                            true,
+//                                            MBTI.values().map{"${it}\n  ${it.character}"},
+//                                            intsFromMbtis.toSet(),
+//                                            dialogTitle = lang.selectMbti
+//                                        ) { indices ->
+//                                            model.createVerticalIntervalSet(MBTI.intervalsFromIndices(indices).toList(), "AppScaffold")
+//                                            model.saveVerticalIntervalSet("AppScaffold")
+//                                            mbtiDialogData.value =
+//                                                MultiListDialogData(itemList = detectorDialogData.value.itemList)
+//
+//                                        }
+//                                    })
+//                            }
                             "Spacer" -> {
                                 Spacer(modifier = Modifier.height(spacerHeight.dp))
                             }
@@ -1163,6 +1166,21 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                             true, lang.creditsAndLicenses,
                                         ) {
                                             creditsDialogData.value = TextDialogData()
+                                        }
+                                    }
+                                )
+                            }
+                            "Historia" -> {
+                                SelectableCard(
+                                    text = lang.historia,
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = true,
+                                    onClick = {
+                                        historiaDialogData.value = TextDialogData(
+                                            true, "",
+                                        ) {
+                                            historiaDialogData.value = TextDialogData()
                                         }
                                     }
                                 )

@@ -71,7 +71,7 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                         item {
                             Text(text = buildAnnotatedString {
                                 withStyle(commentStyle){
-                                    append("the MikroKanon App has been conceived and developed in 2021-2022 by\n")
+                                    append("the MikroKanon App has been conceived and developed during 2021-2022 by\n")
                                 }
                                 withStyle(nameStyle){
                                     append("Cristiano Vecchi")

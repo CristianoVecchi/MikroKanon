@@ -24,7 +24,7 @@ import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 @Composable
-fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: Dimensions,
+fun HistoriaDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: Dimensions,
                   okText: String = "OK",
                   onDismissRequest: () -> Unit = {creditsDialogData.value = TextDialogData() })
 {
@@ -37,6 +37,10 @@ fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
         val commentStyle = SpanStyle(
             fontSize = (dimensions.dialogFontSize - dimensions.dialogFontSize/20).sp,
             color = Color.DarkGray)
+        val par1 = "Cristiano Vecchi has applied the Quantistic Counterpoint (multiple counterpoint on sets of vertical and horizontal intervals) first time in works like Primo Quartetto - Diurna Venus (1998), Emisfero Opposto (1999), Lettere da Marte (2000), Chi semina vento (2000), Prossima del Centauro (2001), Dromomania (2003) and other works."
+        val par2 = "The Extended Weighted Harmony algorithm has been conceived and coded by Cristiano Vecchi in 2005 and applied in works like Anelli di Saturno (2006), Introversione - Estroversione (2008)."
+        val par3 = "All composition algorithms used in the MikroKanon App have been conceived and coded by Cristiano Vecchi during 1998 - 2022."
+//        val par4 = ""
 //        val uriStyle = SpanStyle(
 //            fontSize = dimensions.dialogFontSize.sp,
 //            color = Color.Blue)
@@ -59,48 +63,51 @@ fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                     ) {
                         item {
                             Text(text = creditsDialogData.value.title)
+                        }
+                        item{
+                            Text(text = buildAnnotatedString {
+                                withStyle(titleStyle){
+                                    append("Quantistic Counterpoint\n")
+                                }
+                                withStyle(commentStyle){
+                                    append(par1)
+                                }
+                            })
+                        }
+                        item {
                             Spacer(modifier = Modifier.height(10.dp))
                         }
                         item{
                             Text(text = buildAnnotatedString {
                                 withStyle(titleStyle){
-                                    append("Privacy Policy\n")
+                                    append("Extended Weighted Harmony\n")
                                 }
                                 withStyle(commentStyle){
-                                    append("Cristiano Vecchi built the MikroKanon app as a Free app, provided at no cost and intended for use as is.")
+                                    append(par2)
                                 }
                             })
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
                         item{
                             Text(text = buildAnnotatedString {
                                 withStyle(titleStyle){
-                                    append("Information Collection and Use\n")
+                                    append("Composition techniques converted into algorithms\n")
                                 }
                                 withStyle(commentStyle){
-                                    append("The MikroKanon app does not collect any user's information of any kind, also does not profile the user in any manner and does not connect to any server or to any device.")
+                                    append(par3)
                                 }
                             })
                         }
-                        item{
-                            Text(text = buildAnnotatedString {
-                                withStyle(titleStyle){
-                                    append("Bugs Report\n")
-                                }
-                                withStyle(commentStyle){
-                                    append("Please report bugs at cristianovecchi@alice.it")
-                                }
-                            })
-                        }
-                        item{
-                            Text(text = buildAnnotatedString {
-                                withStyle(titleStyle){
-                                    append("Privacy Policy Modification\n")
-                                }
-                                withStyle(commentStyle){
-                                    append("You will receive a notification each time this Privacy Policy is modified to read it.")
-                                }
-                            })
-                        }
+//                        item{
+//                            Text(text = buildAnnotatedString {
+//
+//                                withStyle(commentStyle){
+//                                    append(par4)
+//                                }
+//                            })
+//                        }
                     }
                     Column(modifier = modifierB.padding(10.dp)) {
                         Spacer(modifier = Modifier.height(10.dp))
