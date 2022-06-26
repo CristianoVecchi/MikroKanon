@@ -1,8 +1,7 @@
 package com.cristianovecchi.mikrokanon.midi
 
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
-import com.cristianovecchi.mikrokanon.AIMUSIC.JazzChord.priorityFrom2and5
-import com.cristianovecchi.mikrokanon.AIMUSIC.JazzChord.selectChordArea_just_7
+import com.cristianovecchi.mikrokanon.AIMUSIC.JazzChord.*
 import com.cristianovecchi.mikrokanon.convertDodecabyteToInts
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.leff.midi.MidiTrack
@@ -155,7 +154,7 @@ fun createExtendedWeightedHarmonyTrack(chordsTrack: MidiTrack, bars: List<Bar>, 
 }
 fun createPopChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: Int,
                          diffChordVelocity: Int, justVoicing: Boolean){
-    var priority = priorityFrom2and5 // assuming a dominant chord previously
+    var priority = priorityFrom2and5Just7 // assuming a dominant chord previously
     var lastRoot = (Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
     var previousChord = JazzChord.EMPTY
     //println("start root = $lastRoot")
@@ -169,7 +168,7 @@ fun createPopChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: In
         it.chord1 = chord
         lastRoot = chordPosition.first
         previousChord = chord.chord
-//        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+        //println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
     }
     val chordsChannel = 15
     val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento

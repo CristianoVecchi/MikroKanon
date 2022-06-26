@@ -201,7 +201,7 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
     }
     if(!justVoicing){
         roots.sortedBy { it.tick }.forEach {
-            println("Root: $it")
+            //println("Root: $it")
             val absPitch = it.pitch
             val tick = it.tick
             val duration = it.duration

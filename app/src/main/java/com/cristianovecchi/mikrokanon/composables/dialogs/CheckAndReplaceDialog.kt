@@ -233,6 +233,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                         }
                         CustomButton(
                             adaptSizeToIconButton = true,
+                            isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
                             iconId = model.iconMap["back"]!!,
                             buttonSize = buttonSize.dp,
                             iconColor = model.appColors.iconButtonIconColor,

@@ -37,12 +37,15 @@ public enum JazzChord {
     //MAJOR5AUM("5#",   0B101100010101), // acc magg 5# 9M 13M
     EMPTY("[ ]",         0B000000000000); // accordo vuoto
 
+    // JAZZ
     public static int[] priorityFromTonic = {2,8, 9,3, 4,10, 5,11, 6,0, 1,7};
     public static int[] priorityFrom2and5 = {5,11, 10,4, 3,9, 8,2, 1,7, 6,0};
 
-    public static int[] priorityFromTonicJust7 = {2,8, 9,3, 4,10, 5,11, 6,0, 1,7};
-    public static int[] priorityFrom2and5Just7= {5,11, 10,4, 3,9, 8,2, 1,7, 6,0};
-    @NotNull
+    // POP
+    public static int[] priorityFromTonicJust7 = {9, 5, 2, 7, 4, 10, 3, 8, 11, 1, 6, 0}; // from Do -> La, Fa, Re, Sol, Mi, Si, Sib, Mib, Lab, Si, Reb, Solb, Do
+    public static int[] priorityFrom2and5Just7= {5, 10, 2, 9, 7, 3, 1, 8, 11, 4, 6, 0};//from Sol -> Do, Fa, La, Mi, Re, Sib, Lab, Mib, Solb, Si, Reb, Sol
+
+    // JAZZ
     public static int[] findRootMovementPriority(@NotNull JazzChord previousChord) {
         switch (previousChord){
             case MAJOR: case MAJOR11AUM: case MINOR7MAJ:
@@ -51,6 +54,7 @@ public enum JazzChord {
         return priorityFrom2and5;
     }
 
+    // POP
     public static int[] findRootMovementPriorityJust7(@NotNull JazzChord previousChord) {
         switch (previousChord){
             case MAJOR: case MAJOR11AUM: case MINOR7MAJ:
