@@ -6,6 +6,16 @@ public class BebopGrammar {
     private static HashMap<JazzChord,Integer[]> grammar;
     public static void initGrammar(){
         grammar = new HashMap<>();
+        // SIMPLE TRIADS
+        Integer[] valuesMajorTriad= {0b000010010001, 0b000100100100}; // beat notes and passage notes for Major Triad
+        grammar.put(JazzChord.MAJOR_TRIAD, valuesMajorTriad);
+
+        Integer[] valuesMinorTriad = {0b000010010001, 0b010000100100}; // beat notes and passage notes for Minor Triad
+        grammar.put(JazzChord.MINOR_TRIAD, valuesMinorTriad);
+
+        Integer[] valuesDimTriad = {0b000001001001, 0b010000100010}; // beat notes and passage notes for Diminished Triad
+        grammar.put(JazzChord.DIM_TRIAD, valuesDimTriad);
+
         // JUST 7 or 6 CHORDS
         Integer[] valuesMajorJust7M = {0b001010010001,0b100100100100}; // beat notes and passage notes for Major7 just 7
         grammar.put(JazzChord.MAJOR_JUST7MAJ,valuesMajorJust7M);

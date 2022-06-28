@@ -9,7 +9,7 @@ import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.ProgramChange
 
 enum class HarmonizationType(val title: String) {
-    NONE("No Harm."), POP("POP"), JAZZ("JAZZ"), JAZZ11("JAZZ 11"),
+    NONE("No Harm."), POP("POP"), POP7("POP 7"), JAZZ("JAZZ"), JAZZ11("JAZZ 11"),
     XWH("XW HARMONY"), FULL12("FULL 12")
 }
 val starredChordsInstruments = listOf(
@@ -51,7 +51,8 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
             val chordsInstrument = harmonizationData.instrument
             when (harmonizationData.type){
                 HarmonizationType.NONE -> Unit
-                HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, chordsInstrument, diffChordVelocity, justVoicing)
+                HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, false, chordsInstrument, diffChordVelocity, justVoicing)
+                HarmonizationType.POP7 -> createPopChordsTrack(chordsTrack, barGroup, true,chordsInstrument, diffChordVelocity, justVoicing)
                 HarmonizationType.JAZZ -> createJazzChordsTrack(chordsTrack, barGroup, false, chordsInstrument, diffChordVelocity, justVoicing)
                 HarmonizationType.JAZZ11 -> createJazzChordsTrack(chordsTrack, barGroup, true, chordsInstrument, diffChordVelocity, justVoicing)
                 HarmonizationType.XWH -> createExtendedWeightedHarmonyTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity, justVoicing)
@@ -152,14 +153,16 @@ fun createExtendedWeightedHarmonyTrack(chordsTrack: MidiTrack, bars: List<Bar>, 
 //    println("XWH roots: $roots")
     findExtendedWeightedHarmonyNotes(chordsTrack, chordsChannel, bars, roots, diffChordVelocity, diffChordVelocity / 2, justVoicing)
 }
-fun createPopChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: Int,
+fun createPopChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, with7: Boolean = true, instrument: Int,
                          diffChordVelocity: Int, justVoicing: Boolean){
     var priority = priorityFrom2and5Just7 // assuming a dominant chord previously
     var lastRoot = (Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
     var previousChord = JazzChord.EMPTY
+    val selectChordArea = if(with7) { previousChord: JazzChord -> JazzChord.selectChordArea_just_7(previousChord)}
+    else {previousChord:JazzChord -> JazzChord.selectChordArea_no_7(previousChord)}
     //println("start root = $lastRoot")
     bars.forEach {
-        val jazzChords = selectChordArea_just_7(previousChord)
+        val jazzChords = selectChordArea(previousChord)
         val chordFaultsGrid =  it.findChordFaultsGrid(jazzChords)
         priority = JazzChord.findRootMovementPriorityJust7(previousChord)
         val chordPosition = chordFaultsGrid.findBestChordPosition(lastRoot, priority)

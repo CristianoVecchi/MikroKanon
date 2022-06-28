@@ -7,6 +7,10 @@ import org.jetbrains.annotations.NotNull;
  */
 
 public enum JazzChord {
+    MAJOR_TRIAD("M", 0B000010010001), // triade maggiore
+    MINOR_TRIAD("m", 0B000010001001), // triade minore
+    DIM_TRIAD("dim", 0B000001001001), // triade diminuita
+
     MAJOR_JUST7MAJ("M7", 0B100010010001), // accordo maggiore solo 7M
     MAJOR_ADD6("add6",0B001010010001 ), // accordo maggiore + 6M senza 7!!!
     MINOR_JUST7("m7", 0B100010001001), // accordo minore solo 7m
@@ -62,6 +66,28 @@ public enum JazzChord {
         }
         return priorityFrom2and5Just7;
     }
+    public static JazzChord[] selectChordArea_no_7(JazzChord previousChord){
+        switch (previousChord){
+            case MAJOR_TRIAD:
+                return SECOND_GRADE_AREA_NO_7;
+            case MINOR_TRIAD: case DIM_TRIAD:
+                return DOMINANT_AREA_NO_7;
+            case DOM_JUST7:
+                return TONIC_AREA_NO_7;
+        }
+        return TONIC_AREA_NO_7;
+    }
+    public static JazzChord[] selectChordArea_just_7(JazzChord previousChord){
+        switch (previousChord){
+            case MAJOR_ADD6: case MAJOR_JUST7MAJ: case MINOR_ADD6:
+                return SECOND_GRADE_AREA_JUST_7;
+            case HALFDIM_JUST7: case DIM: case MINOR_JUST7:
+                return DOMINANT_AREA_JUST_7;
+            case DOM_JUST7: case SUS4_JUST7: case EMPTY:
+                return TONIC_AREA_JUST_7;
+        }
+        return TONIC_AREA_JUST_7;
+    }
     public static JazzChord[] selectChordArea_11(JazzChord previousChord){
         switch (previousChord){
             case MAJOR: case MAJOR11AUM: case MINOR7MAJ:
@@ -84,17 +110,11 @@ public enum JazzChord {
         }
         return TONIC_AREA_NO_11;
     }
-    public static JazzChord[] selectChordArea_just_7(JazzChord previousChord){
-        switch (previousChord){
-            case MAJOR_ADD6: case MAJOR_JUST7MAJ: case MINOR_ADD6:
-                return SECOND_GRADE_AREA_JUST_7;
-            case HALFDIM_JUST7: case DIM: case MINOR_JUST7:
-                return DOMINANT_AREA_JUST_7;
-            case DOM_JUST7: case SUS4_JUST7: case EMPTY:
-                return TONIC_AREA_JUST_7;
-        }
-        return TONIC_AREA_JUST_7;
-    }
+
+    public static JazzChord[] TONIC_AREA_NO_7= {MAJOR_TRIAD, MINOR_TRIAD, DIM_TRIAD, DOM_JUST7, EMPTY};
+    public static JazzChord[] SECOND_GRADE_AREA_NO_7= {MINOR_TRIAD, DIM_TRIAD, MAJOR_TRIAD, DOM_JUST7, EMPTY};
+    public static JazzChord[] DOMINANT_AREA_NO_7 = {DOM_JUST7, DIM_TRIAD, MAJOR_TRIAD, MINOR_TRIAD, EMPTY};
+
     public static JazzChord[] TONIC_AREA_JUST_7= {MAJOR_ADD6, MINOR_ADD6, MAJOR_JUST7MAJ, MINOR_JUST7,
             DOM_JUST7, SUS4_JUST7, HALFDIM_JUST7, DIM, EMPTY};
     public static JazzChord[] SECOND_GRADE_AREA_JUST_7= {MINOR_JUST7, MINOR_ADD6, HALFDIM_JUST7, DIM,

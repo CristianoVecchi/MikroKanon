@@ -23,7 +23,7 @@ fun Array<IntArray>.findBestChordPosition(
     var maxFaultsNumber = Int.MAX_VALUE
     var result = Pair(0,0)
     val actualPriority = priority.map{ (it + lastRoot) % 12}.toIntArray()
-    println(actualPriority.toList())
+    //println(actualPriority.toList())
     for(i in actualPriority.indices){
         val transposition = actualPriority[i]
         for(j in 0 until this[i].size){

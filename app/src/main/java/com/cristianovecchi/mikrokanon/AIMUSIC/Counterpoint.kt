@@ -403,7 +403,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         return result.cutBlankParts()
     }
     fun enhanceChords(chordsToEnhance: List<Pair<Set<Int>, Int>>): Counterpoint {
-        println("chords to enhance:$chordsToEnhance")
+        //println("chords to enhance:$chordsToEnhance")
         if (chordsToEnhance.isEmpty()) return this
         val clone = if(isNormalized()) this else this.normalizePartsSize(false)
         val result = clone.cloneWithEmptyParts()
