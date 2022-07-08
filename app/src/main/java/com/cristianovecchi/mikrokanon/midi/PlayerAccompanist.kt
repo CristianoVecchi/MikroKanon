@@ -9,7 +9,9 @@ import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.ProgramChange
 
 enum class HarmonizationType(val title: String) {
-    NONE("No Harm."), POP("POP"), POP7("POP 7"), JAZZ("JAZZ"), JAZZ11("JAZZ 11"),
+    NONE("No Harm."),
+    POP("POP"), POP7("POP 7"),
+    JAZZ("JAZZ"), JAZZ11("JAZZ 11"),
     XWH("XW HARMONY"), FULL12("FULL 12")
 }
 val starredChordsInstruments = listOf(

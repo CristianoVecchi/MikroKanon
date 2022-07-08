@@ -246,7 +246,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             val newIndex = newSequencesAll.indexOfFirst {
                                 it.map{it.abstractNote} == sequence }
                             listDialogData.value = ListDialogData(
-                                true, newSequenceTexts, newIndex, lang.selectRhythm
+                                true, newSequenceTexts, newIndex, lang.chooseAnotherSequence
                             ) { index ->
                                 val newSequence = newSequencesAll[index].map{it.abstractNote}
                                 val mutableSequences = sequences.toMutableList()

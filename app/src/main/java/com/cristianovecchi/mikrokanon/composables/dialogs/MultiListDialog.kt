@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.composables.dialogs
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
+import com.cristianovecchi.mikrokanon.ui.shift
 
 @Composable
 fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>, dimensions: Dimensions,
@@ -106,6 +108,10 @@ fun MultiSelectListDialog(
 @Composable
 fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextUnit, appColors: AppColors,
                      onClickListener: (String) -> Unit) {
+    val fontColor = appColors.dialogFontColor
+    val backgroundColor = appColors.dialogBackgroundColor
+    val backgroundColorLighter = backgroundColor.shift(0.15f)
+    val isSelected = selectedValues.contains(text)
     Row(
         Modifier
             .fillMaxWidth()
@@ -115,19 +121,20 @@ fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextU
                     onClickListener(text)
                 }
             )
+            .background(if (isSelected) backgroundColorLighter else backgroundColor)
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically
     ) {
         // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.
         // So have Text Composable to show text.
-        RadioButton(
-            selected = (selectedValues.contains(text)),
+        androidx.compose.material.RadioButton(
+            selected = isSelected,
             onClick = {
                 onClickListener(text)
             }
         )
         Text(
             text = text,
-            color = appColors.dialogFontColor,
+            color = fontColor,
             style = MaterialTheme.typography.body1.merge().copy(fontSize = fontSize),
             modifier = Modifier.padding(start = 16.dp)
         )

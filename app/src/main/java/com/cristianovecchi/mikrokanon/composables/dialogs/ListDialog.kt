@@ -109,17 +109,18 @@ fun RadioButton(text: String, selectedValue: String, showAsSelected: Boolean = f
                 appColors: AppColors, onClickListener: (String) -> Unit) {
     val fontColor = appColors.dialogFontColor
     val backgroundColor = appColors.dialogBackgroundColor
-    val backgroundColorLighter = backgroundColor.shift(0.07f)
+    val backgroundColorLighter = backgroundColor.shift(0.15f)
+    val isSelected = text == selectedValue
     Row(
         Modifier
             .fillMaxWidth()
             .selectable(
-                selected = (text == selectedValue),
+                selected = isSelected,
                 onClick = {
                     onClickListener(text)
                 }
             )
-            .background(if (showAsSelected) backgroundColorLighter else backgroundColor)
+            .background(if (showAsSelected || isSelected) backgroundColorLighter else backgroundColor)
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically
     ) {
         // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.

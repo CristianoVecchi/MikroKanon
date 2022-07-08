@@ -46,6 +46,9 @@ const val KOTO = 107
 
 //"009 - Glockenspiel","010 - Music Box","011 - Vibraphone","012 - Marimba","013 - Xylophone","014 - Tubular Bell","
 const val HARPSICHORD = 6
+const val CELESTA = 8
+const val TIMPANI = 47
+const val WOODBLOCKS = 115
 const val ELECTRIC_PIANO_1 = 4
 const val ELECTRIC_PIANO_2 = 5
 const val HAMMOND_ORGAN = 16
@@ -338,7 +341,9 @@ val FRENCH_HORN_LOW3 = IntRange(35, 51) // B1 - D#3
 val FRENCH_HORN_MIDDLE3 = IntRange(51, G4) // Eb3 - G4
 val FRENCH_HORN_HIGH3 = IntRange(61, 77) // Db4 - F5
 val PART_FRENCH_HORN_MIDDLE_HIGH = EnsemblePart(FRENCH_HORN, 4, FRENCH_HORN_ALL, FRENCH_HORN_MIDDLE3..FRENCH_HORN_HIGH3)
+val PART_FRENCH_HORN_HIGH = EnsemblePart(FRENCH_HORN, 5, FRENCH_HORN_ALL, FRENCH_HORN_HIGH3)
 val PART_FRENCH_HORN_MIDDLE = EnsemblePart(FRENCH_HORN, 3, FRENCH_HORN_ALL, FRENCH_HORN_MIDDLE3)
+val PART_FRENCH_HORN_LOW_MIDDLE = EnsemblePart(FRENCH_HORN, 2, FRENCH_HORN_ALL, FRENCH_HORN_LOW3..FRENCH_HORN_MIDDLE3)
 
 val TRUMPET_ALL = IntRange(54 ,C6) // F#3 - C6
 val TRUMPET_LOW3 = IntRange(54, 70) // F#3 - Bb4

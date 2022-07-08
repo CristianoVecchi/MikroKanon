@@ -6,9 +6,9 @@ import com.cristianovecchi.mikrokanon.rangeTo
 
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, GAMELAN, SAXOPHONES, FLUTES,
-    DOUBLEREEDS,  CLARINETS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
+    DOUBLE_REEDS,  CLARINETS, FRENCH_HORNS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
     BAROQUE, PLUCKED_STRINGS, SPOOKY,
-    HARPSICHORD,
+    RECORDER, HARPSICHORD, XYLOPHONE, MARIMBA, VIBRAPHONE, CELESTA, BELLS, TIMPANI, WOODBLOCKS,
     ELECTRIC_PIANO_1, ELECTRIC_PIANO_2,
     HAMMOND_ORGAN, PERC_ORGAN, BLUES_ORGAN, CHURCH_ORGAN, REED_ORGAN, ACCORDION, TANGO_ACCORDION,
     SYN_SQUARE_WAVE, SYN_SAW_WAVE, SYN_CALLIOPE, SYN_CHIFF,
@@ -17,6 +17,9 @@ enum class EnsembleType {
     BOWED_GLASS, METAL_PAD, HALO_PAD, SWEEP_PAD,
     ICE_RAIN, SOUNDTRACK, CRYSTAL, ATMOSPHERE,
     BRIGHTNESS, GOBLINS, ECHO_DROPS, SCI_FI
+}
+enum class RANGES {
+    PIANO, HALF, HALF_PLUS_1, CELESTA, BELLS, TIMPANI, WOODBLOCKS
 }
 fun  List<EnsemblePart>.display() {
     this.forEach {  println(it) }
@@ -68,8 +71,9 @@ object Ensembles {
             EnsembleType.GAMELAN -> getGamelan(nParts)
             EnsembleType.SAXOPHONES -> getSaxophones(nParts)
             EnsembleType.FLUTES -> getFlutes(nParts)
-            EnsembleType.DOUBLEREEDS -> getDoubleReeds(nParts)
+            EnsembleType.DOUBLE_REEDS -> getDoubleReeds(nParts)
             EnsembleType.CLARINETS -> getClarinets(nParts)
+            EnsembleType.FRENCH_HORNS -> getFrenchHorns(nParts)
             EnsembleType.BASSOONS -> getBassoons(nParts)
             EnsembleType.CELLOS -> getCellos(nParts)
             EnsembleType.PIANO -> getPiano(nParts)
@@ -78,7 +82,15 @@ object Ensembles {
             EnsembleType.BAROQUE -> getBaroque(nParts)
             EnsembleType.PLUCKED_STRINGS -> getPluckedStrings(nParts)
             EnsembleType.SPOOKY -> getSpooky(nParts)
+            EnsembleType.RECORDER -> getKeyboardInstrument(RECORDER, nParts)
             EnsembleType.HARPSICHORD -> getKeyboardInstrument(HARPSICHORD, nParts)
+            EnsembleType.XYLOPHONE -> getKeyboardInstrument(XYLOPHONE, nParts, RANGES.HALF)
+            EnsembleType.MARIMBA -> getKeyboardInstrument(MARIMBA, nParts, RANGES.HALF_PLUS_1)
+            EnsembleType.VIBRAPHONE -> getKeyboardInstrument(VIBRAPHONE, nParts, RANGES.HALF_PLUS_1)
+            EnsembleType.CELESTA -> getKeyboardInstrument(CELESTA, nParts, RANGES.CELESTA)
+            EnsembleType.BELLS -> getKeyboardInstrument(TUBULAR_BELLS, nParts, RANGES.BELLS)
+            EnsembleType.TIMPANI -> getKeyboardInstrument(TIMPANI, nParts, RANGES.TIMPANI)
+            EnsembleType.WOODBLOCKS -> getKeyboardInstrument(WOODBLOCKS, nParts, RANGES.WOODBLOCKS)
             EnsembleType.ELECTRIC_PIANO_1 -> getKeyboardInstrument(ELECTRIC_PIANO_1, nParts)
             EnsembleType.ELECTRIC_PIANO_2-> getKeyboardInstrument(ELECTRIC_PIANO_2, nParts)
             EnsembleType.HAMMOND_ORGAN -> getKeyboardInstrument(HAMMOND_ORGAN, nParts)
@@ -785,6 +797,57 @@ object Ensembles {
             else -> listOf()
         }
     }
+    fun getFrenchHorns(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            1, 2, 3 -> listOf(
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE
+            )
+            4, 5 -> listOf(
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE
+            )
+            6, 7 -> listOf(
+                PART_FRENCH_HORN_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_LOW_MIDDLE,
+                PART_FRENCH_HORN_LOW_MIDDLE
+            )
+            8, 9 -> listOf(
+                PART_FRENCH_HORN_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_LOW_MIDDLE,
+                PART_FRENCH_HORN_LOW_MIDDLE
+            )
+            in 10..12 -> listOf(
+                PART_FRENCH_HORN_HIGH,
+                PART_FRENCH_HORN_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE_HIGH,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_MIDDLE,
+                PART_FRENCH_HORN_LOW_MIDDLE,
+                PART_FRENCH_HORN_LOW_MIDDLE,
+                PART_TUBA_LOW,
+                PART_TUBA_LOW
+            )
+            else -> listOf()
+        }
+    }
     fun getBassoons(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2, 3 -> listOf(
@@ -1330,65 +1393,74 @@ object Ensembles {
             else -> listOf()
         }
     }
-    fun getKeyboardInstrument(keyboardInstrument: Int, nParts: Int): List<EnsemblePart> {
+    fun getKeyboardInstrument(keyboardInstrument: Int, nParts: Int, range: RANGES = RANGES.PIANO): List<EnsemblePart> {
         val instrument = createKeyboardInstrumentParts(keyboardInstrument)
+        val oct = when(range){
+            RANGES.PIANO -> (0..7).toList().toIntArray()
+            RANGES.HALF -> intArrayOf(0, 4,4,5,5,5,6,6)
+            RANGES.HALF_PLUS_1 -> intArrayOf(0, 3,3,3,4,4,5,6) // Marimba, Vibraphone
+            RANGES.CELESTA -> intArrayOf(0, 5,5,6,6,6,7,7)
+            RANGES.BELLS -> intArrayOf(0, 3,3,3,3,4,4,4)
+            RANGES.TIMPANI -> intArrayOf(0, 2,2,2,3,3,3,3)
+            RANGES.WOODBLOCKS -> intArrayOf(0, 2,2,2,3,3,3,4)
+        }
         return when (nParts) {
             1, 2, 3 -> listOf(
-                instrument[5],
-                instrument[4],
-                instrument[2],
+                instrument[oct[5]],
+                instrument[oct[4]],
+                instrument[oct[2]],
             )
             in (4..6) -> listOf(
-                instrument[5],
-                instrument[4],
-                instrument[4],
-                instrument[3],
-                instrument[3],
-                instrument[2]
+                instrument[oct[5]],
+                instrument[oct[4]],
+                instrument[oct[4]],
+                instrument[oct[3]],
+                instrument[oct[3]],
+                instrument[oct[2]]
             )
             7 -> listOf(
-                instrument[5],
-                instrument[4],
-                instrument[4],
-                instrument[3],
-                instrument[3],
-                instrument[2],
-                instrument[1]
+                instrument[oct[5]],
+                instrument[oct[4]],
+                instrument[oct[4]],
+                instrument[oct[3]],
+                instrument[oct[3]],
+                instrument[oct[2]],
+                instrument[oct[1]]
             )
             8 -> listOf(
-                instrument[6],
-                instrument[5],
-                instrument[4],
-                instrument[4],
-                instrument[3],
-                instrument[3],
-                instrument[2],
-                instrument[1]
+                instrument[oct[6]],
+                instrument[oct[5]],
+                instrument[oct[4]],
+                instrument[oct[4]],
+                instrument[oct[3]],
+                instrument[oct[3]],
+                instrument[oct[2]],
+                instrument[oct[1]]
             )
             9 -> listOf(
-                instrument[6],
-                instrument[5],
-                instrument[5],
-                instrument[4],
-                instrument[4],
-                instrument[3],
-                instrument[3],
-                instrument[2],
-                instrument[1]
+                instrument[oct[6]],
+                instrument[oct[5]],
+                instrument[oct[5]],
+                instrument[oct[4]],
+                instrument[oct[4]],
+                instrument[oct[3]],
+                instrument[oct[3]],
+                instrument[oct[2]],
+                instrument[oct[1]]
             )
             in 10..12 -> listOf(
-                instrument[7],
-                instrument[6],
-                instrument[6],
-                instrument[5],
-                instrument[5],
-                instrument[4],
-                instrument[4],
-                instrument[3],
-                instrument[3],
-                instrument[2],
-                instrument[2],
-                instrument[1]
+                instrument[oct[7]],
+                instrument[oct[6]],
+                instrument[oct[6]],
+                instrument[oct[5]],
+                instrument[oct[5]],
+                instrument[oct[4]],
+                instrument[oct[4]],
+                instrument[oct[3]],
+                instrument[oct[3]],
+                instrument[oct[2]],
+                instrument[oct[2]],
+                instrument[oct[1]]
             )
             else -> listOf()
         }
