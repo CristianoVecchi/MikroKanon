@@ -43,6 +43,7 @@ const val SITAR = 104
 const val BANJO = 105
 const val SHAMISEN = 106
 const val KOTO = 107
+const val BAG_PIPE = 109
 
 //"009 - Glockenspiel","010 - Music Box","011 - Vibraphone","012 - Marimba","013 - Xylophone","014 - Tubular Bell","
 const val HARPSICHORD = 6

@@ -266,8 +266,9 @@ class AppViewModel(
         } else {
             val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
             val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+            val previousIntervalSet = intervalSet.value!!
             computationStack.pushAndDispatch(Computation.TritoneSubstitution(originalCounterpoints, intervalSet.value!!.toList(),index))
-            tritoneSubstitutionOnCounterpoints(originalCounterpoints, index)
+            tritoneSubstitutionOnCounterpoints(originalCounterpoints, index, previousIntervalSet)
         }
     }
     val onCadenzaFromSelector = { list: ArrayList<Clip>, values: List<Int> ->
@@ -653,7 +654,7 @@ class AppViewModel(
                     }
                     is Computation.TritoneSubstitution -> {
                         if(stepBack){
-                            tritoneSubstitutionOnCounterpoints(previousComputation.counterpoints, previousComputation.index)
+                            tritoneSubstitutionOnCounterpoints(previousComputation.counterpoints, previousComputation.index, previousComputation.intervalSet)
                         }
                     }
                     is Computation.Doppelgänger -> {

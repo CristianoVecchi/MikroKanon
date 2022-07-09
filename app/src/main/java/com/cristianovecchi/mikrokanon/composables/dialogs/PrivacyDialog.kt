@@ -30,6 +30,11 @@ fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
 {
     if (creditsDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
+        val privacyPolicyUri = ""
+        val uriHandler = LocalUriHandler.current
+        val uriStyle = SpanStyle(
+            fontSize = dimensions.dialogFontSize.sp,
+            color = Color.Blue)
         val titleStyle = SpanStyle(
             fontWeight = FontWeight.Bold,
             fontSize = (dimensions.dialogFontSize + dimensions.dialogFontSize/20).sp,
@@ -99,6 +104,15 @@ fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                                 withStyle(commentStyle){
                                     append("You will receive a notification each time this Privacy Policy is modified to read it.")
                                 }
+                            })
+                        }
+                        item{
+                            ClickableText(text = buildAnnotatedString {
+                                withStyle(uriStyle){
+                                    append("Link to this Privacy Policy")
+                                }
+                            },onClick = {
+                                uriHandler.openUri(privacyPolicyUri)
                             })
                         }
                     }

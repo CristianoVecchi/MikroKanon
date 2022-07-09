@@ -359,14 +359,15 @@ fun AppViewModel.singleOnCounterpoints(originalCounterpoints: List<Counterpoint>
         }
     }
 }
-fun AppViewModel.tritoneSubstitutionOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+fun AppViewModel.tritoneSubstitutionOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int,
+        verticalIntervalSet: List<Int>){
     if(!selectedCounterpoint.value!!.isEmpty()){
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = originalCounterpoints.map{ it.tritoneSubstitution() }
             }
-            changeIntervalSet(tritoneSubstitutionOnIntervalSet(intervalSet.value!!))
+            changeIntervalSet(tritoneSubstitutionOnIntervalSet(verticalIntervalSet))
             changeCounterpointsWithLimitAndCache(newList, false)
             changeSelectedCounterpoint(counterpoints.value!![index])
         }

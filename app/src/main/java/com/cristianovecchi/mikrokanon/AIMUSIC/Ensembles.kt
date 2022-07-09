@@ -8,6 +8,7 @@ enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, GAMELAN, SAXOPHONES, FLUTES,
     DOUBLE_REEDS,  CLARINETS, FRENCH_HORNS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
     BAROQUE, PLUCKED_STRINGS, SPOOKY,
+    TREMOLO_STRINGS, PIZZICATO, MUTED_BRASS, BAG_PIPES,
     RECORDER, HARPSICHORD, XYLOPHONE, MARIMBA, VIBRAPHONE, CELESTA, BELLS, TIMPANI, WOODBLOCKS,
     ELECTRIC_PIANO_1, ELECTRIC_PIANO_2,
     HAMMOND_ORGAN, PERC_ORGAN, BLUES_ORGAN, CHURCH_ORGAN, REED_ORGAN, ACCORDION, TANGO_ACCORDION,
@@ -19,7 +20,7 @@ enum class EnsembleType {
     BRIGHTNESS, GOBLINS, ECHO_DROPS, SCI_FI
 }
 enum class RANGES {
-    PIANO, HALF, HALF_PLUS_1, CELESTA, BELLS, TIMPANI, WOODBLOCKS
+    PIANO, HALF, HALF_PLUS_1, CELESTA, BELLS, TIMPANI, WOODBLOCKS, BAG_PIPES
 }
 fun  List<EnsemblePart>.display() {
     this.forEach {  println(it) }
@@ -82,6 +83,10 @@ object Ensembles {
             EnsembleType.BAROQUE -> getBaroque(nParts)
             EnsembleType.PLUCKED_STRINGS -> getPluckedStrings(nParts)
             EnsembleType.SPOOKY -> getSpooky(nParts)
+            EnsembleType.TREMOLO_STRINGS -> getKeyboardInstrument(TREMOLO_STRINGS, nParts)
+            EnsembleType.PIZZICATO -> getKeyboardInstrument(PIZZICATO, nParts)
+            EnsembleType.MUTED_BRASS -> getKeyboardInstrument(MUTED_TRUMPET, nParts)
+            EnsembleType.BAG_PIPES -> getKeyboardInstrument(BAG_PIPE, nParts, RANGES.BAG_PIPES)
             EnsembleType.RECORDER -> getKeyboardInstrument(RECORDER, nParts)
             EnsembleType.HARPSICHORD -> getKeyboardInstrument(HARPSICHORD, nParts)
             EnsembleType.XYLOPHONE -> getKeyboardInstrument(XYLOPHONE, nParts, RANGES.HALF)
@@ -1403,6 +1408,7 @@ object Ensembles {
             RANGES.BELLS -> intArrayOf(0, 3,3,3,3,4,4,4)
             RANGES.TIMPANI -> intArrayOf(0, 2,2,2,3,3,3,3)
             RANGES.WOODBLOCKS -> intArrayOf(0, 2,2,2,3,3,3,4)
+            RANGES.BAG_PIPES -> intArrayOf(0, 1,2,2,3,3,4,4)
         }
         return when (nParts) {
             1, 2, 3 -> listOf(

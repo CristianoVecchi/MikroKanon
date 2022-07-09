@@ -97,6 +97,7 @@ enum class NoteNamesEl {
 //}
 
 val synthsNames = listOf(
+    "Tremolo strings", "Pizzicato", "Muted brass", "Bag pipes",
     "Recorders", "Harpsichord", "Xylophone", "Marimba", "Vibraphone", "Celesta", "Bells", "Timpani", "Woodblocks",
     "Electric Piano 1", "Electric Piano 2",
     "Hammond Organ","Perc. Organ","Blues Organ","Church Organ","Reed Organ","Accordion","Tango Accordion",
