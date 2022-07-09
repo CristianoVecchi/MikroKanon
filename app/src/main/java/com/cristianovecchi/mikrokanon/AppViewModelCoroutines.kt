@@ -450,3 +450,15 @@ fun AppViewModel.addSequenceToCounterpoint(repeat: Boolean){
         }
     }
 }
+fun AppViewModel.extendedWeightedHarmonyOnCounterpoints(originalCounterpoints: List<Counterpoint>){
+    if(!selectedCounterpoint.value!!.isEmpty()){
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                newList = extendedWeightedHarmony(originalCounterpoints)
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+            }
+            changeCounterpointsWithLimitAndCache(newList, true)
+        }
+    }
+}

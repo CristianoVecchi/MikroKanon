@@ -174,6 +174,10 @@ var start = true
                                     onMaze = { intSequences ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onMaze(intSequences)
+                                    },
+                                    onEWH = { list ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onEWH(list)
                                     }
                                 )
                             }

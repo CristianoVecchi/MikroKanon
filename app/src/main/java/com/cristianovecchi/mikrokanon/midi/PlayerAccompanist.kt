@@ -115,7 +115,7 @@ fun createFull12HarmonizedTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrum
 }
 fun createExtendedWeightedHarmonyTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: Int,
                                        diffChordVelocity: Int, justVoicing: Boolean){
-    val priority = listOf(5, 8, 2, 10, 6, 4, 1, 11, 9, 7, 3, 0).toIntArray()
+    val priority = intArrayOf(5, 8, 2, 10, 6, 4, 1, 11, 9, 7, 3, 0)
     var lastRoot = (Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
     val roots = mutableListOf<Int>()
     bars.forEachIndexed { i, bar ->
@@ -123,6 +123,7 @@ fun createExtendedWeightedHarmonyTrack(chordsTrack: MidiTrack, bars: List<Bar>, 
         //println("Bar $i: ${bar.dodecaByte1stHalf!!.toString(2)}")
         val bools = HarmonyEye.selNotesFrom12Byte(bar.dodecaByte1stHalf!!)//.apply {
             //println(this.contentToString()) }
+
         val harmonyResults = (0..11).map{
             val boolsWithRoot = bools.reversedArray()
             boolsWithRoot[it] = true

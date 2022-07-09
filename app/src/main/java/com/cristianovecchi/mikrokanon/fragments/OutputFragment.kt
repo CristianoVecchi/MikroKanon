@@ -29,8 +29,8 @@ class OutputFragment: Fragment() {
         model.selectedCounterpoint.observe(viewLifecycleOwner){
             if(model.selectedCounterpoint.value!!.parts.isNotEmpty()) {
                 model.changeActiveButtons( if(model.selectedCounterpoint.value!!.parts.size >= 12)
-                    model.activeButtons.value!!.copy(counterpoint = false, freeParts = false, waves = false, pedals = false)
-                else model.activeButtons.value!!.copy(counterpoint = true, freeParts = true, waves = true, pedals = true)
+                    model.activeButtons.value!!.copy(counterpoint = false, freeParts = false, waves = false, pedals = false, specialFunctions1 = false)
+                else model.activeButtons.value!!.copy(counterpoint = true, freeParts = true, waves = true, pedals = true, specialFunctions1 = true)
                 )
             }
         }
@@ -149,6 +149,7 @@ class OutputFragment: Fragment() {
                                 },
                                 onExpand = { model.onExpand() },
                                 onFlourish = { model.onFlourish() },
+                                onEWH = { model.onEWH(arrayListOf())},
                                 onPlay = {
                                     val executionTime = measureTimeMillis {
                                     model.onPlay(true, false) // play the entire structure

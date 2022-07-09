@@ -30,7 +30,7 @@ fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
 {
     if (creditsDialogData.value.dialogState) {
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
-        val privacyPolicyUri = ""
+        val privacyPolicyRawUri = "https://raw.githubusercontent.com/CristianoVecchi/MikroKanon/master/PRIVACY_POLICY"
         val uriHandler = LocalUriHandler.current
         val uriStyle = SpanStyle(
             fontSize = dimensions.dialogFontSize.sp,
@@ -112,7 +112,7 @@ fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                                     append("Link to this Privacy Policy")
                                 }
                             },onClick = {
-                                uriHandler.openUri(privacyPolicyUri)
+                                uriHandler.openUri(privacyPolicyRawUri)
                             })
                         }
                     }

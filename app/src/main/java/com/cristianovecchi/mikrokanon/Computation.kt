@@ -32,4 +32,5 @@ sealed class Computation(open val icon: String = "") {
     data class Expand(val counterpoints: List<Counterpoint>, val index: Int, val extension: Int = 2, override val icon: String = "expand") : Computation()
     data class Transposition(val counterpoints: List<Counterpoint>, val transpositions: List<Pair<Int,Int>>, val index: Int, override val icon: String = "transpose") : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int, override val icon: String = "tritone_substitution") : Computation()
+    data class ExtendedWeightedHarmony(val counterpoints: List<Counterpoint>, override val icon: String = "accompanist") : Computation()
 }

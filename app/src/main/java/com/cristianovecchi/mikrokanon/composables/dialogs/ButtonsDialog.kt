@@ -79,6 +79,7 @@ fun ButtonsDialog(
                                     buttonSize = buttonSize,
                                     fontSize = fontSize,
                                     colors = model.appColors,
+                                    isActive = buttonsDialogData.value.isActiveSpecialFunctions1,
                                     onRound = buttonsDialogData.value.onRound,
                                     onCadenza = buttonsDialogData.value.onCadenza,
                                     onScarlatti = buttonsDialogData.value.onScarlatti,
@@ -91,6 +92,7 @@ fun ButtonsDialog(
                                     onSingle = buttonsDialogData.value.onSingle,
                                     onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution,
                                     onDoppelgänger = buttonsDialogData.value.onDoppelgänger,
+                                    onEWH = buttonsDialogData.value.onEWH,
                                 )
                                 2 -> WavesButtons(
                                     model = buttonsDialogData.value.model,

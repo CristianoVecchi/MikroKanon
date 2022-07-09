@@ -25,6 +25,20 @@ public class Insieme {
     static String[] arrayNote;
     public static final int[] Armoniche = {2048,8,128,4,512,2,64,1024,32,1,256,16,2048,8,128,4,512,2,64,1024,32,1,256,16};
     public static final int[] ArmonicheRetr = {16,256,1,32,1024,64,2,512,4,128,8,2048,16,256,1,32,1024,64,2,512,4,128,8,2048};
+    public static final int[][] absPitchesEWH ={
+            {0,7,4,10, 2,6,8,11, 1,3,5,9},
+            {1,8,5,11, 3,7,9,0,  2,4,6,10},
+            {2,9,6,0,  4,8,10,1, 3,5,7,11},
+            {3,10,7,1, 5,9,11,2, 4,6,8,0},
+            {4,11,8,2, 6,10,0,3, 5,7,9,1},
+            {5,0, 9,3, 7,11,1,4, 6,8,10,2},
+            {6,1,10,4, 8,0,2,5,  7,9,11,3},
+            {7,2,11,5, 9,1,3,6,  8,10,0,4},
+            {8,3,0,6, 10,2,4,7,  9,11,1,5},
+            {9,4,1,7, 11,3,5,8,  10,0,2,6},
+            {10,5,2,8, 0,4,6,9,  11,1,3,7},
+            {11,6,3,9, 1,5,7,10,  0,2,4,8}
+    };
     //Costruttori
     public Insieme() {  //crea un insieme vuoto
         insieme = 0;
@@ -111,6 +125,15 @@ public class Insieme {
         return listaNote;
     }
 
+    public static int dodecaByteFromAbsPitches(int[] absPitches){
+        int dByte = 0;
+        for(int i : absPitches){
+            if(i == -1) continue;
+            //bar.dodecaByte1stHalf = bar.dodecaByte1stHalf?.or((1 shl (pitch % 12)))
+            dByte |= (1 << i);
+        }
+        return dByte;
+    }
     public static Vector listaNote(int numero) {
         Vector listaNote = new Vector();
         int j = 1;
@@ -1066,5 +1089,12 @@ public class Insieme {
         if(diff == 6) return 0;
         if(diff < 6) return 1; //ascendant
         return -1; //descendant
+    }
+    public static int getNewAbsPitchesInEWH(int root, Set<Integer> absPitches){
+        int[] harmonics = absPitchesEWH[root];
+        for(int hrm : harmonics){
+            if(!absPitches.contains(hrm)) return hrm;
+        }
+        return -1;
     }
 }

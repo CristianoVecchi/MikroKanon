@@ -33,7 +33,8 @@ import kotlin.system.measureTimeMillis
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
                          val undo: Boolean = false, val expand: Boolean = true,
                          val waves: Boolean = false, val pedals: Boolean = true,
-                         val counterpoint: Boolean = false, val specialFunctions: Boolean = false,
+                         val counterpoint: Boolean = false,
+                         val specialFunctions: Boolean = false, val specialFunctions1: Boolean = false,
                          val freeParts: Boolean = false, val playOrStop: Boolean = true)
 enum class ScaffoldTabs { SOUND, BUILDING, ACCOMPANIST, IO, SETTINGS }
 
@@ -252,6 +253,17 @@ class AppViewModel(
     val dispatchIntervals = {
         if(computationStack.isNotEmpty())
             refreshComputation(false)
+    }
+    val onEWH = { list: ArrayList<Clip> ->
+        val originalCounterpoints = if(list.isNotEmpty()) {
+            changeFirstSequence(list)
+            convertFirstSequenceToSelectedCounterpoint()
+            listOf( selectedCounterpoint.value!!.clone())
+        } else {
+            counterpoints.value!!.map{ it.clone() }
+        }
+        computationStack.pushAndDispatch(Computation.ExtendedWeightedHarmony(originalCounterpoints))
+        extendedWeightedHarmonyOnCounterpoints(originalCounterpoints)
     }
     val onTritoneSubstitutionFromSelector = { index: Int ->
         changeSequenceSelection(-1)
@@ -603,6 +615,7 @@ class AppViewModel(
                     is Computation.Transposition-> computationStack.lastElement()
                     is Computation.Pedal -> computationStack.lastElement()
                     is Computation.TritoneSubstitution -> computationStack.lastElement()
+                    is Computation.ExtendedWeightedHarmony -> computationStack.lastElement()
                     else -> { stackIcons.removeLast(); computationStack.pop() } // do not Dispatch!!!
                 }
                 previousIntervalSet?.let { changeIntervalSet(previousIntervalSet)}
@@ -688,6 +701,11 @@ class AppViewModel(
                     is Computation.Scarlatti -> {
                         if(stepBack){
                             duplicateAllPhrasesInCounterpoint( previousComputation.counterpoint)
+                        }
+                    }
+                    is Computation.ExtendedWeightedHarmony -> {
+                        if(stepBack){
+                            extendedWeightedHarmonyOnCounterpoints( previousComputation.counterpoints)
                         }
                     }
                     is Computation.Overlap -> {

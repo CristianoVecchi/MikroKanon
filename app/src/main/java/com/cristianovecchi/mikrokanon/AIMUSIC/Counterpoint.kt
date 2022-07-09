@@ -117,6 +117,49 @@ data class Counterpoint(val parts: List<AbsPart>,
         if (parts.isEmpty()) return 0
         return parts.maxOf { it.absPitches.size }
     }
+    fun applyExtendedWeightedHarmony(duplicateRoot: Boolean = false): Counterpoint {
+        var clone = this.normalizePartsSize(false)
+        val size = clone.maxSize()
+        if(clone.isEmpty() || size < 1) return this
+        val priority = intArrayOf(0, 5, 8, 2, 10, 6, 4, 1, 11, 9, 7, 3)
+        val columns = (0 until size).map{ clone.getColumnValuesWithEmptyValues(it)}.toMutableList()
+        var lastRoot = (Insieme.trovaFond(Insieme.dodecaByteFromAbsPitches(columns[0].toIntArray()))[0] - priority[0] + 12) % 12
+        val roots = mutableListOf<Int>()
+        //val plusPitches = IntArray(size)
+        columns.forEachIndexed { i, column ->
+            val dodecaByte = Insieme.dodecaByteFromAbsPitches(column.toIntArray())
+            val bools = HarmonyEye.selNotesFrom12Byte(dodecaByte)//.apply {
+            //println(this.contentToString()) }
+            val harmonyResults = (0..11).map{
+                val boolsWithRoot = bools.reversedArray()
+                boolsWithRoot[it] = true
+                HarmonyEye.findHarmonyResult(boolsWithRoot)
+                    .apply {
+                        this.dodecaByte = dodecaByte or (1 shl it)}
+            }
+            val sortedHarmonyResults = harmonyResults.sortedBy { it.weight }
+            val priorityTransposed = priority.map{ (it + lastRoot) % 12}
+            rootSearch@ for( priorityTr in priorityTransposed){
+                for(result in sortedHarmonyResults){
+                    if (result.roots.contains(priorityTr)){
+                        if(column.contains(priorityTr)){
+                                if(duplicateRoot) roots.add(priorityTr)
+                                else roots.add(Insieme.getNewAbsPitchesInEWH(priorityTr, column.toSet()))
+                        }
+                        else {
+                            roots.add(priorityTr)
+                        }
+                        lastRoot = priorityTr
+                        //dodecaBytes[i] = result.dodecaByte
+                        break@rootSearch
+                    }
+                }
+            }
+        }
+        if (roots.all{ it == -1}) return clone
+        val newParts = this.parts + AbsPart(roots)
+        return clone.copy(parts = newParts).apply { this.findAndSetEmptiness() }
+    }
     fun buildRound(): Counterpoint {
         val nParts = parts.size
         val normalizedCounterpoint = this.normalizePartsSize(false)

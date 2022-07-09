@@ -40,7 +40,7 @@ data class CustomColorsDialogData(val dialogState: Boolean = false, val title:St
 data class ButtonsDialogData(
     val dialogState: Boolean = false, val title:String = "",
     val model: AppViewModel, val buttonSize: Dp = 60.dp, val fontSize: Int = 18,
-    val isActiveWaves: Boolean = false, val isActivePedals: Boolean = false,
+    val isActiveWaves: Boolean = false, val isActivePedals: Boolean = false, val isActiveSpecialFunctions1: Boolean = true,
     val onWave3: () -> Unit = {}, val onWave4: () -> Unit = {}, val onWave6: () -> Unit = {},
     val onPedal1: () -> Unit = {}, val onPedal3: () -> Unit = {}, val onPedal5: () -> Unit = {},
     val onTritoneSubstitution: () -> Unit = {}, val onRound: () -> Unit = {},
@@ -52,7 +52,7 @@ data class ButtonsDialogData(
     val onMaze: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
     val onSort: (Int) -> Unit = {}, val onUpsideDown: () -> Unit = {},
     val onArpeggio: (ARPEGGIO) -> Unit = {},
-    val onCounterpointSelected: (Int) -> Unit = {},
+    val onCounterpointSelected: (Int) -> Unit = {}, val onEWH: () -> Unit = {},
     val onSubmitButtonClick: (Any?) -> Unit = {}, )
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",
