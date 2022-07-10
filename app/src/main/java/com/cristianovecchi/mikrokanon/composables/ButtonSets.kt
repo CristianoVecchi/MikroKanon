@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.AIMUSIC.ARPEGGIO
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.Computation
 import com.cristianovecchi.mikrokanon.ui.*
 
 @Composable
@@ -129,6 +130,27 @@ fun SequenceEditingButtons(
     }
 }
 @Composable
+fun ExtendedWeightedHarmonyButtons(
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
+    colors: AppColors,
+    onEWH: (Int) -> Unit
+) {
+    Row {
+        CustomButton(iconId = model.iconMap["accompanist"]!!, text = "1" , isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+            onEWH(1)
+        }
+        CustomButton(iconId = model.iconMap["accompanist"]!!, text = "2" , isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+            onEWH(2)
+        }
+        CustomButton(iconId = model.iconMap["accompanist"]!!, text = "3" , isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+            onEWH(3)
+        }
+        CustomButton(iconId = model.iconMap["accompanist"]!!, text = "4" , isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+            onEWH(4)
+        }
+    }
+}
+@Composable
 fun SlotButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
     colors: AppColors, numbers: List<String>, filled: Set<Int>,
@@ -220,14 +242,8 @@ fun SpecialFunctions1Buttons(
     onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
     onOverlap: () -> Unit, onCrossover: () -> Unit, onGlue: () -> Unit, onMaze: () -> Unit,
     onScarlatti: () -> Unit, onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit,
-    onEWH: () -> Unit
 ) {
     Column {
-        Row{
-            CustomButton(iconId = model.iconMap["accompanist"]!!, text = "H", isActive = isActive, buttonSize = buttonSize, colors = colors) {
-                onEWH()
-            }
-        }
         Row {
             CustomButton(iconId = model.iconMap["doppelgänger"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onDoppelgänger()

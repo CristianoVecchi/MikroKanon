@@ -52,7 +52,7 @@ data class ButtonsDialogData(
     val onMaze: () -> Unit = {}, val onDoppelgänger: () -> Unit = {},
     val onSort: (Int) -> Unit = {}, val onUpsideDown: () -> Unit = {},
     val onArpeggio: (ARPEGGIO) -> Unit = {},
-    val onCounterpointSelected: (Int) -> Unit = {}, val onEWH: () -> Unit = {},
+    val onCounterpointSelected: (Int) -> Unit = {}, val onEWH: (Int) -> Unit = {},
     val onSubmitButtonClick: (Any?) -> Unit = {}, )
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",

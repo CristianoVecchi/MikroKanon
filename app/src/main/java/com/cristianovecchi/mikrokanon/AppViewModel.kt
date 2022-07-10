@@ -254,7 +254,7 @@ class AppViewModel(
         if(computationStack.isNotEmpty())
             refreshComputation(false)
     }
-    val onEWH = { list: ArrayList<Clip> ->
+    val onEWH = { list: ArrayList<Clip>, nParts: Int ->
         val originalCounterpoints = if(list.isNotEmpty()) {
             changeFirstSequence(list)
             convertFirstSequenceToSelectedCounterpoint()
@@ -262,8 +262,8 @@ class AppViewModel(
         } else {
             counterpoints.value!!.map{ it.clone() }
         }
-        computationStack.pushAndDispatch(Computation.ExtendedWeightedHarmony(originalCounterpoints))
-        extendedWeightedHarmonyOnCounterpoints(originalCounterpoints)
+        computationStack.pushAndDispatch(Computation.ExtendedWeightedHarmony(originalCounterpoints, nParts))
+        extendedWeightedHarmonyOnCounterpoints(originalCounterpoints, nParts)
     }
     val onTritoneSubstitutionFromSelector = { index: Int ->
         changeSequenceSelection(-1)
@@ -705,7 +705,7 @@ class AppViewModel(
                     }
                     is Computation.ExtendedWeightedHarmony -> {
                         if(stepBack){
-                            extendedWeightedHarmonyOnCounterpoints( previousComputation.counterpoints)
+                            extendedWeightedHarmonyOnCounterpoints( previousComputation.counterpoints, previousComputation.nParts)
                         }
                     }
                     is Computation.Overlap -> {

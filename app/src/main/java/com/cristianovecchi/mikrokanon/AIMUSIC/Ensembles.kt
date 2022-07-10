@@ -19,9 +19,6 @@ enum class EnsembleType {
     ICE_RAIN, SOUNDTRACK, CRYSTAL, ATMOSPHERE,
     BRIGHTNESS, GOBLINS, ECHO_DROPS, SCI_FI
 }
-enum class RANGES {
-    PIANO, HALF, HALF_PLUS_1, CELESTA, BELLS, TIMPANI, WOODBLOCKS, BAG_PIPES
-}
 fun  List<EnsemblePart>.display() {
     this.forEach {  println(it) }
     println()
@@ -83,9 +80,9 @@ object Ensembles {
             EnsembleType.BAROQUE -> getBaroque(nParts)
             EnsembleType.PLUCKED_STRINGS -> getPluckedStrings(nParts)
             EnsembleType.SPOOKY -> getSpooky(nParts)
-            EnsembleType.TREMOLO_STRINGS -> getKeyboardInstrument(TREMOLO_STRINGS, nParts)
-            EnsembleType.PIZZICATO -> getKeyboardInstrument(PIZZICATO, nParts)
-            EnsembleType.MUTED_BRASS -> getKeyboardInstrument(MUTED_TRUMPET, nParts)
+            EnsembleType.TREMOLO_STRINGS -> getKeyboardInstrument(TREMOLO_STRINGS, nParts, RANGES.TREMOLO_STRINGS)
+            EnsembleType.PIZZICATO -> getKeyboardInstrument(PIZZICATO, nParts, RANGES.PIZZICATO)
+            EnsembleType.MUTED_BRASS -> getKeyboardInstrument(MUTED_TRUMPET, nParts, RANGES.MUTED_BRASS)
             EnsembleType.BAG_PIPES -> getKeyboardInstrument(BAG_PIPE, nParts, RANGES.BAG_PIPES)
             EnsembleType.RECORDER -> getKeyboardInstrument(RECORDER, nParts)
             EnsembleType.HARPSICHORD -> getKeyboardInstrument(HARPSICHORD, nParts)
@@ -1400,16 +1397,7 @@ object Ensembles {
     }
     fun getKeyboardInstrument(keyboardInstrument: Int, nParts: Int, range: RANGES = RANGES.PIANO): List<EnsemblePart> {
         val instrument = createKeyboardInstrumentParts(keyboardInstrument)
-        val oct = when(range){
-            RANGES.PIANO -> (0..7).toList().toIntArray()
-            RANGES.HALF -> intArrayOf(0, 4,4,5,5,5,6,6)
-            RANGES.HALF_PLUS_1 -> intArrayOf(0, 3,3,3,4,4,5,6) // Marimba, Vibraphone
-            RANGES.CELESTA -> intArrayOf(0, 5,5,6,6,6,7,7)
-            RANGES.BELLS -> intArrayOf(0, 3,3,3,3,4,4,4)
-            RANGES.TIMPANI -> intArrayOf(0, 2,2,2,3,3,3,3)
-            RANGES.WOODBLOCKS -> intArrayOf(0, 2,2,2,3,3,3,4)
-            RANGES.BAG_PIPES -> intArrayOf(0, 1,2,2,3,3,4,4)
-        }
+        val oct = range.octaves
         return when (nParts) {
             1, 2, 3 -> listOf(
                 instrument[oct[5]],

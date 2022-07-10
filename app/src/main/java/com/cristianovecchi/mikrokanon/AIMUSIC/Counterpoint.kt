@@ -117,6 +117,17 @@ data class Counterpoint(val parts: List<AbsPart>,
         if (parts.isEmpty()) return 0
         return parts.maxOf { it.absPitches.size }
     }
+    fun addPartsOfExtendedWeightedHarmony(nParts: Int, maxParts: Int): Counterpoint {
+        val thisParts = this.parts.size
+        val diff = thisParts + nParts - maxParts
+        if(diff >= nParts) return this
+        var result = this
+        val nTimes = if(diff<=0) nParts else nParts - diff
+        repeat(nTimes){
+            result = result.applyExtendedWeightedHarmony()
+        }
+        return result
+    }
     fun applyExtendedWeightedHarmony(duplicateRoot: Boolean = false): Counterpoint {
         var clone = this.normalizePartsSize(false)
         val size = clone.maxSize()

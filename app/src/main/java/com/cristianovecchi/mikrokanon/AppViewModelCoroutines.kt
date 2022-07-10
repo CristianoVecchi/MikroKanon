@@ -325,9 +325,7 @@ fun AppViewModel.singleOnCounterpoints(originalCounterpoints: List<Counterpoint>
 //                    ?: 0
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = explodeCounterpointsToDoppelgänger(originalCounterpoints,
-                    AppViewModel.MAX_PARTS
-                )
+                newList = explodeCounterpointsToDoppelgänger(originalCounterpoints, AppViewModel.MAX_PARTS)
                     .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
@@ -450,12 +448,12 @@ fun AppViewModel.addSequenceToCounterpoint(repeat: Boolean){
         }
     }
 }
-fun AppViewModel.extendedWeightedHarmonyOnCounterpoints(originalCounterpoints: List<Counterpoint>){
+fun AppViewModel.extendedWeightedHarmonyOnCounterpoints(originalCounterpoints: List<Counterpoint>, nParts: Int){
     if(!selectedCounterpoint.value!!.isEmpty()){
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = extendedWeightedHarmony(originalCounterpoints)
+                newList = extendedWeightedHarmony(originalCounterpoints, nParts, AppViewModel.MAX_PARTS)
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimitAndCache(newList, true)

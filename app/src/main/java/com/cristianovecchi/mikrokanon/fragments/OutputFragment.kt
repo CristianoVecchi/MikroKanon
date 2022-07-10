@@ -149,7 +149,7 @@ class OutputFragment: Fragment() {
                                 },
                                 onExpand = { model.onExpand() },
                                 onFlourish = { model.onFlourish() },
-                                onEWH = { model.onEWH(arrayListOf())},
+                                onEWH = { nParts -> model.onEWH(arrayListOf(), nParts)},
                                 onPlay = {
                                     val executionTime = measureTimeMillis {
                                     model.onPlay(true, false) // play the entire structure

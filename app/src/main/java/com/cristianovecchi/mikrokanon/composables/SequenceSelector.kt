@@ -50,7 +50,7 @@ fun SequenceSelector(model: AppViewModel,
                      onMikroKanons5reducted: (ArrayList<Clip>) -> Unit,
                      onMikroKanons6reducted: (ArrayList<Clip>) -> Unit,
                      onMaze: (List<List<Int>>) -> Unit,
-                     onEWH: (ArrayList<Clip>) -> Unit
+                     onEWH: (ArrayList<Clip>, Int) -> Unit
                     )
 {
 
@@ -211,7 +211,7 @@ fun SequenceSelector(model: AppViewModel,
                                 onPedal5 = { onPedal(5, sequences[selected]) },
                                 onMK5reducted = { onMikroKanons5reducted(sequences[selected]) },
                                 onMK6reducted = { onMikroKanons6reducted(sequences[selected]) },
-                                onEWH = { onEWH(sequences[selected])},
+                                onEWH = { nParts -> onEWH(sequences[selected], nParts)},
                                 onMaze = {
                                          //onMaze(listOf(1,2,3,4))//,6,7,8,9,10, 11))
                                     val intSequences = listOf(sequences[selected].map{ it.abstractNote })

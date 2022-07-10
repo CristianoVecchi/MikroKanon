@@ -52,7 +52,7 @@ fun ButtonsDialog(
                         state = listState,
                         modifier = Modifier.height(dimensions.dialogHeight)
                     ) {
-                        items((0..5).toList()) { item ->
+                        items((0..6).toList()) { item ->
                             when (item) {
                                 0 -> if(!workingOnSequences) {
                                     NotFromSelectorButtons(
@@ -74,7 +74,15 @@ fun ButtonsDialog(
                                             onMK6reductedClick = buttonsDialogData.value.onMK6reducted,
                                         )
                                     }
-                                1 -> SpecialFunctions1Buttons(
+                                1 -> ExtendedWeightedHarmonyButtons(
+                                    model = buttonsDialogData.value.model,
+                                    isActive = buttonsDialogData.value.isActiveWaves,
+                                    buttonSize = buttonSize,
+                                    fontSize = fontSize,
+                                    colors = model.appColors,
+                                    onEWH = buttonsDialogData.value.onEWH
+                                )
+                                2 -> SpecialFunctions1Buttons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonSize,
                                     fontSize = fontSize,
@@ -92,9 +100,8 @@ fun ButtonsDialog(
                                     onSingle = buttonsDialogData.value.onSingle,
                                     onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution,
                                     onDoppelgänger = buttonsDialogData.value.onDoppelgänger,
-                                    onEWH = buttonsDialogData.value.onEWH,
                                 )
-                                2 -> WavesButtons(
+                                3 -> WavesButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActiveWaves,
                                     buttonSize = buttonSize,
@@ -104,7 +111,7 @@ fun ButtonsDialog(
                                     onWave4Click = buttonsDialogData.value.onWave4,
                                     onWave6Click = buttonsDialogData.value.onWave6
                                 )
-                                3 -> PedalsButtons(
+                                4 -> PedalsButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActivePedals,
                                     buttonSize = buttonSize,
@@ -114,8 +121,8 @@ fun ButtonsDialog(
                                     onPedal3Click = buttonsDialogData.value.onPedal3,
                                     onPedal5Click = buttonsDialogData.value.onPedal5
                                 )
-                                4 -> Spacer(modifier = Modifier.height(6.dp))
-                                5 -> SlotButtons(
+                                5 -> Spacer(modifier = Modifier.height(6.dp))
+                                6 -> SlotButtons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonSize,
                                     fontSize = fontSize,
