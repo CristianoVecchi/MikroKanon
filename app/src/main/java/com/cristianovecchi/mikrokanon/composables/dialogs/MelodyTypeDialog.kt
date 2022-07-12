@@ -142,67 +142,98 @@ fun MelodyTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         val textFontSize = (dimensions.dialogFontSize).sp
                         val textButtonPadding = 1.dp
                         Spacer(modifier = Modifier.height(6.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            // ROW FORM BUTTONS
-                            Column(
-                                modifier = Modifier.width(IntrinsicSize.Max),
-                                verticalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                Button(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(textButtonPadding), onClick = { setMelody(cursor, 0) })
-                                {
-                                    Text(
-                                        text = types[0],
-                                        style = TextStyle(
-                                            fontSize = textFontSize,
-                                            fontWeight = fontWeight
-                                        ), color = fontColor
-                                    )
-                                }
-                                Button(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(textButtonPadding),
-                                    onClick = { setMelody(cursor, 1) })
-                                {
-                                    Text(
-                                        text = types[1],
-                                        style = TextStyle(
-                                            fontSize = textFontSize,
-                                            fontWeight = fontWeight
-                                        ), color = fontColor
-                                    )
-                                }
-                                Button(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(textButtonPadding), onClick = { setMelody(cursor, 2) })
-                                {
-                                    Text(
-                                        text = types[2],
-                                        style = TextStyle(
-                                            fontSize = textFontSize,
-                                            fontWeight = fontWeight
-                                        ), color = fontColor
-                                    )
-                                }
-                                Button(modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(textButtonPadding), onClick = { setMelody(cursor, 3) })
-                                {
-                                    Text(
-                                        text = types[3],
-                                        style = TextStyle(
-                                            fontSize = textFontSize,
-                                            fontWeight = fontWeight
-                                        ), color = fontColor
-                                    )
-                                }
 
-                            }
+                                Row(
+                                    modifier = modifierC.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Button(modifier = Modifier
+                                        .padding(textButtonPadding),
+                                        onClick = { setMelody(cursor, 0) })
+                                    {
+                                        Text(
+                                            text = types[0],
+                                            style = TextStyle(
+                                                fontSize = textFontSize,
+                                                fontWeight = fontWeight
+                                            ), color = fontColor
+                                        )
+                                    }
+                                    Button(
+                                        modifier = Modifier
+                                            .padding(textButtonPadding),
+                                        onClick = { setMelody(cursor, 1) })
+                                    {
+                                        Text(
+                                            text = types[1],
+                                            style = TextStyle(
+                                                fontSize = textFontSize,
+                                                fontWeight = fontWeight
+                                            ), color = fontColor
+                                        )
+                                    }
+                                }
+                                Row(
+                                    modifier = modifierC.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Button(modifier = Modifier
+                                        .padding(textButtonPadding),
+                                        onClick = { setMelody(cursor, 2) })
+                                    {
+                                        Text(
+                                            text = types[2],
+                                            style = TextStyle(
+                                                fontSize = textFontSize,
+                                                fontWeight = fontWeight
+                                            ), color = fontColor
+                                        )
+                                    }
+                                    Button(modifier = Modifier
+                                        .padding(textButtonPadding),
+                                        onClick = { setMelody(cursor, 3) })
+                                    {
+                                        Text(
+                                            text = types[3],
+                                            style = TextStyle(
+                                                fontSize = textFontSize,
+                                                fontWeight = fontWeight
+                                            ), color = fontColor
+                                        )
+                                    }
+                                }
+                                Row(
+                                    modifier = modifierC.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Button(modifier = Modifier
+                                        .padding(textButtonPadding),
+                                        onClick = { setMelody(cursor, 4) })
+                                    {
+                                        Text(
+                                            text = types[4],
+                                            style = TextStyle(
+                                                fontSize = textFontSize,
+                                                fontWeight = fontWeight
+                                            ), color = fontColor
+                                        )
+                                    }
+                                    Button(modifier = Modifier
+                                        .padding(textButtonPadding),
+                                        onClick = { setMelody(cursor, 5) })
+                                    {
+                                        Text(
+                                            text = types[5],
+                                            style = TextStyle(
+                                                fontSize = textFontSize,
+                                                fontWeight = fontWeight
+                                            ), color = fontColor
+                                        )
+                                    }
+
                         }
                         val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                         val buttonSize = dimensions.dialogButtonSize

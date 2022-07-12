@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -433,6 +434,14 @@ public class Insieme {
         }
         return 0;
     }
+    public static List<Integer> pitchesOnOctaves(int absPitch, int downLimit, int upLimit ){
+        List<Integer> pitches = new LinkedList();
+        for(int i = 2; i < 9; i++){
+            int pitch = i * 12 + absPitch;
+            if(downLimit<=pitch && pitch <=upLimit) pitches.add(pitch);
+        }
+        return pitches;
+    }
     public static int findAscendantNoteCycling(int absPitch1, int absPitch2, int octave, int downLimit, int upLimit ){
         int first = absPitch1 + octave * 12;
         int second = absPitch2 + octave * 12;
@@ -523,9 +532,40 @@ public class Insieme {
                         lastNote = checkNote;
                     }
                 }
+        } else if(melodyType == 4) { //UP AND DOWN
+            lastNote = absPitches[index];
+            boolean goingUp = false;
+            for (int i = index; i < length - 1; i++) {
+                int checkNote = absPitches[i + 1];
+                if (checkNote == -1) {
+                    melody[i + 1] = -1;
+                } else {
+                    int newNote;
+                    if(goingUp){
+                        newNote = findAscendantNoteCycling(lastNote, checkNote, octave, lowerLimit, upperLimit);
+                        goingUp = false;
+                    } else {
+                        newNote = findDescendantNoteCycling(lastNote, checkNote, octave, lowerLimit, upperLimit);
+                        goingUp = true;
+                    }
+                    melody[i + 1] = newNote;
+                    octave = newNote/12;
+                    lastNote = checkNote;
+                }
             }
-
-
+        } else if(melodyType == 5) { //RANDOM OCTAVES
+            Random rand = new Random();
+            for (int i = index; i < length - 1; i++) {
+                int checkNote = absPitches[i + 1];
+                if (checkNote == -1) {
+                    melody[i + 1] = -1;
+                } else {
+                    List<Integer> pitches = pitchesOnOctaves(checkNote, lowerLimit, upperLimit);
+                    int newNote = pitches.get(rand.nextInt(pitches.size()));
+                    melody[i + 1] = newNote;
+                }
+            }
+        }
         return melody;
     }
     public static int[] sequenzaLineare(int ottavaIniz, int[] valoriNote, int min, int max){

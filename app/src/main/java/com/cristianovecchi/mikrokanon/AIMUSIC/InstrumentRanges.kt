@@ -239,7 +239,7 @@ val PART_TUBULAR_BELLS_ALL = EnsemblePart(TUBULAR_BELLS, 5, TUBULAR_BELLS_ALL, T
 
 enum class RANGES(val octaves: IntArray) {
     PIANO((0..7).toList().toIntArray()), HALF(intArrayOf(0, 4,4,5,5,5,6,6)),
-    HALF_PLUS_1(intArrayOf(0, 3,3,3,4,4,5,6)), CELESTA(intArrayOf(0, 5,5,6,6,6,7,7)),
+    HALF_PLUS_1(intArrayOf(0, 3,3,3,4,4,5,6)), CELESTA(intArrayOf(0, 4,5,5,5,6,6,6)),
     BELLS(intArrayOf(0, 3,3,3,3,4,4,4)), TIMPANI(intArrayOf(0, 2,2,2,3,3,3,3)),
     WOODBLOCKS(intArrayOf(0, 2,2,2,3,3,3,4)), BAG_PIPES(intArrayOf(0, 1,2,2,3,3,4,4)),
     TREMOLO_STRINGS(intArrayOf(0, 2,3,3,4,4,5,6)), PIZZICATO(intArrayOf(0, 2,3,3,4,4,5,6)),

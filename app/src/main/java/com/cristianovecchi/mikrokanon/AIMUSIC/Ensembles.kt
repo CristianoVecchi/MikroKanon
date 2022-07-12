@@ -89,7 +89,7 @@ object Ensembles {
             EnsembleType.XYLOPHONE -> getKeyboardInstrument(XYLOPHONE, nParts, RANGES.HALF)
             EnsembleType.MARIMBA -> getKeyboardInstrument(MARIMBA, nParts, RANGES.HALF_PLUS_1)
             EnsembleType.VIBRAPHONE -> getKeyboardInstrument(VIBRAPHONE, nParts, RANGES.HALF_PLUS_1)
-            EnsembleType.CELESTA -> getKeyboardInstrument(CELESTA, nParts, RANGES.CELESTA)
+            EnsembleType.CELESTA -> getKeyboardInstrument(CELESTA, nParts, RANGES.CELESTA, IntRange(C4, C8))
             EnsembleType.BELLS -> getKeyboardInstrument(TUBULAR_BELLS, nParts, RANGES.BELLS)
             EnsembleType.TIMPANI -> getKeyboardInstrument(TIMPANI, nParts, RANGES.TIMPANI)
             EnsembleType.WOODBLOCKS -> getKeyboardInstrument(WOODBLOCKS, nParts, RANGES.WOODBLOCKS)
@@ -1395,8 +1395,8 @@ object Ensembles {
             else -> listOf()
         }
     }
-    fun getKeyboardInstrument(keyboardInstrument: Int, nParts: Int, range: RANGES = RANGES.PIANO): List<EnsemblePart> {
-        val instrument = createKeyboardInstrumentParts(keyboardInstrument)
+    fun getKeyboardInstrument(keyboardInstrument: Int, nParts: Int, range: RANGES = RANGES.PIANO, rangeAll: IntRange = IntRange(A0, C8), ): List<EnsemblePart> {
+        val instrument = createKeyboardInstrumentParts(keyboardInstrument, rangeAll)
         val oct = range.octaves
         return when (nParts) {
             1, 2, 3 -> listOf(

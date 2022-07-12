@@ -1,12 +1,7 @@
 package com.cristianovecchi.mikrokanon.locale
 
-import android.annotation.SuppressLint
-import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
-import com.google.android.material.timepicker.TimeFormat
 import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 //enum class MBTI(val character: String, val intervals: Set<Int>){
@@ -278,7 +273,7 @@ val rowFormsMap = mapOf(
 )
 //"≈≈≈≈≈", "√√√√√", "➚➚➚➚➚", "➘➘➘➘➘")
 val melodyTypeMap = mapOf(
-    0 to "≈", 1 to "√", 2 to "➚", 3 to "➘"
+    0 to "≈", 1 to "√", 2 to "➚", 3 to "➘", 4 to "⇅", 5 to "R"
 )
 val rangeTypeMap = mapOf(
     0 to "∞", 1 to "I", 2 to "[--]", 3 to "[-]", 4 to "[ ]"
@@ -325,7 +320,7 @@ data class Lang( // English by default
     val articulationOptions: List<String> = listOf("Staccatissimo", "Staccato", "Portato", "Articolato", "Legato", "Legatissimo"),
     val selectMelody: String = "Select a melody type!",
     val melody: String = "Melody",
-    val melodyOptions: List<String> = listOf("≈≈≈≈≈", "√√√√√", "➚➚➚➚➚", "➘➘➘➘➘"),
+    val melodyOptions: List<String> = listOf("≈≈≈", "√√√", "➚➚➚", "➘➘➘", "⇅⇅⇅", "RND"),
     val glissando: String = if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
         "\uD834\uDDB1\uD834\uDDB2\uD834\uDDB1"
     else "Glissando",
