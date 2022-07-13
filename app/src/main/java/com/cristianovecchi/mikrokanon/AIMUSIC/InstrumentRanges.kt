@@ -95,6 +95,7 @@ const val C6 = 84
 const val C7 = 96
 const val C8 = 108 //last piano key
 const val A0 = 21 //first piano key
+const val E1 = 28 // doublebass low limit
 const val G2 = 43
 const val G3 = 55 // violin and alto flute low limit
 const val G4 = 67
@@ -239,17 +240,20 @@ val PART_TUBULAR_BELLS_ALL = EnsemblePart(TUBULAR_BELLS, 5, TUBULAR_BELLS_ALL, T
 
 enum class RANGES(val octaves: IntArray) {
     PIANO((0..7).toList().toIntArray()), HALF(intArrayOf(0, 4,4,5,5,5,6,6)),
-    HALF_PLUS_1(intArrayOf(0, 3,3,3,4,4,5,6)), CELESTA(intArrayOf(0, 4,5,5,5,6,6,6)),
-    BELLS(intArrayOf(0, 3,3,3,3,4,4,4)), TIMPANI(intArrayOf(0, 2,2,2,3,3,3,3)),
-    WOODBLOCKS(intArrayOf(0, 2,2,2,3,3,3,4)), BAG_PIPES(intArrayOf(0, 1,2,2,3,3,4,4)),
+    HALF_PLUS_1(intArrayOf(0, 3,3,3,4,4,5,6)), NO_LOWER_OCTAVE(intArrayOf(0, 2,3,4,4,5,6,7)),
+    CELESTA(intArrayOf(0, 4,5,5,5,6,6,6)),
+    BELLS(intArrayOf(0, 3,4,4,4,4,5,5)), TIMPANI(intArrayOf(0, 2,2,2,3,3,3,3)),
+    WOODBLOCKS(intArrayOf(0, 2,2,2,3,3,3,4)), BAG_PIPES(intArrayOf(0, 2,2,3,3,4,4,5)),
     TREMOLO_STRINGS(intArrayOf(0, 2,3,3,4,4,5,6)), PIZZICATO(intArrayOf(0, 2,3,3,4,4,5,6)),
-    MUTED_BRASS(intArrayOf(0, 2,3,3,4,4,5,5))
+    MUTED_BRASS(intArrayOf(0, 2,3,3,4,4,5,5)), RECORDERS(intArrayOf(0, 3,3,4,4,5,5,6)),
+    ORGAN(intArrayOf(0, 2,3,3,4,4,5,6)), SYN_SAW(intArrayOf(0, 3,3,4,4,4,5,5))
+
 }
 fun createKeyboardInstrumentParts(instrument: Int, rangeAll: IntRange = IntRange(A0, C8)): List<EnsemblePart>{
     return listOf(
         EnsemblePart(instrument, 0, rangeAll), //useless
-        EnsemblePart(instrument, 1, rangeAll, IntRange(A0, 40)), // A0 - E2
-        *(2..6).map{ val start = (it+1)*12; EnsemblePart(instrument, it, rangeAll, IntRange(start, start + 19))}.toTypedArray(),
+        EnsemblePart(instrument, 1, rangeAll, IntRange(A0, if(40 > rangeAll.last) A0+11 else 40)), // A0 - E2
+        *(2..6).map{ val start = (it+1)*12; EnsemblePart(instrument, it, rangeAll, IntRange(start, if(start+19 > rangeAll.last) start+11 else start + 19))}.toTypedArray(),
         EnsemblePart(instrument, 8, rangeAll, IntRange(89, C8)) // F6 - C8
     )
 }
@@ -408,8 +412,8 @@ val PART_CELLO_HIGH_HIGHEST = EnsemblePart(CELLO, 4, CELLO_ALL, CELLO_HIGH3..CEL
 val PART_CELLO_HIGH = EnsemblePart(CELLO, 4, CELLO_ALL, CELLO_HIGH3)
 val PART_CELLO_HIGHEST = EnsemblePart(CELLO, 5, CELLO_ALL, CELLO_HIGHEST)
 
-val DOUBLE_BASS_ALL = IntRange(28, G4) // E1 - G4
-val DOUBLE_BASS_LOW3 = IntRange(28, 44) // E1 - G#2 (E string)
+val DOUBLE_BASS_ALL = IntRange(E1, G4) // E1 - G4
+val DOUBLE_BASS_LOW3 = IntRange(E1, 44) // E1 - G#2 (E string)
 val DOUBLE_BASS_MIDDLE3 = IntRange(33, 49) // A1 - C#3 (A string)
 val DOUBLE_BASS_HIGH3 = IntRange(38, 54) // D2 - F#3 (D string)
 val DOUBLE_BASS_HIGHEST = IntRange(G2, 64) // G2 - E4 (G string)

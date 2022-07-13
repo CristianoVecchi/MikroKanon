@@ -555,14 +555,13 @@ public class Insieme {
             }
         } else if(melodyType == 5) { //RANDOM OCTAVES
             Random rand = new Random();
-            for (int i = index; i < length - 1; i++) {
-                int checkNote = absPitches[i + 1];
+            for (int i = index; i < length; i++) {
+                int checkNote = absPitches[i];
                 if (checkNote == -1) {
-                    melody[i + 1] = -1;
+                    melody[i] = -1;
                 } else {
                     List<Integer> pitches = pitchesOnOctaves(checkNote, lowerLimit, upperLimit);
-                    int newNote = pitches.get(rand.nextInt(pitches.size()));
-                    melody[i + 1] = newNote;
+                    melody[i] = pitches.get(rand.nextInt(pitches.size()));
                 }
             }
         }
