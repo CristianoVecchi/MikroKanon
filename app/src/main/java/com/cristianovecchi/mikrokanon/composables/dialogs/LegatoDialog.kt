@@ -152,7 +152,9 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             ) {
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(textButtonPadding), onClick = { setLegato(cursor, 1) })
+                                    .padding(textButtonPadding), onClick = {
+                                    val sign = legatoText.extractIntPairsFromCsv()[cursor].first.sign()
+                                    setLegato(cursor, 1 * sign) })
                                 {
                                     Text(
                                         text = types[0],
@@ -166,7 +168,9 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(textButtonPadding),
-                                    onClick = { setLegato(cursor, 2) })
+                                    onClick = {
+                                        val sign = legatoText.extractIntPairsFromCsv()[cursor].first.sign()
+                                        setLegato(cursor, 2 * sign) })
                                 {
                                     Text(
                                         text = types[1],
@@ -180,7 +184,9 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(textButtonPadding),
-                                    onClick = { setLegato(cursor, 3) })
+                                    onClick = {
+                                        val sign = legatoText.extractIntPairsFromCsv()[cursor].first.sign()
+                                        setLegato(cursor, 3 * sign) })
                                 {
                                     Text(
                                         text = types[2],
@@ -194,7 +200,9 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(textButtonPadding),
-                                    onClick = { setLegato(cursor, 4) })
+                                    onClick = {
+                                        val sign = legatoText.extractIntPairsFromCsv()[cursor].first.sign()
+                                        setLegato(cursor, 4 * sign) })
                                 {
                                     Text(
                                         text = types[3],
@@ -208,7 +216,9 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(textButtonPadding),
-                                    onClick = { setLegato(cursor, 5) })
+                                    onClick = {
+                                        val sign = legatoText.extractIntPairsFromCsv()[cursor].first.sign()
+                                        setLegato(cursor, 5 * sign) })
                                 {
                                     Text(
                                         text = types[4],
@@ -222,7 +232,9 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(textButtonPadding),
-                                    onClick = { setLegato(cursor, 6) })
+                                    onClick = {
+                                        val sign = legatoText.extractIntPairsFromCsv()[cursor].first.sign()
+                                        setLegato(cursor, 6 * sign) })
                                 {
                                     Text(
                                         text = types[5],

@@ -482,6 +482,13 @@ fun LazyListState.isScrolledToTheEnd() : Boolean {
     return lastItem == null || lastItem.size + lastItem.offset <= layoutInfo.viewportEndOffset
 }
 
+fun Int.sign(): Int {
+    return if(this<0) -1 else 1
+}
+fun Float.sign(): Float {
+    return if(this<0f) -1f else 1f
+}
+
 
 
 

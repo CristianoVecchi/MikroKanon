@@ -241,13 +241,11 @@ val PART_TUBULAR_BELLS_ALL = EnsemblePart(TUBULAR_BELLS, 5, TUBULAR_BELLS_ALL, T
 enum class RANGES(val octaves: IntArray) {
     PIANO((0..7).toList().toIntArray()), HALF(intArrayOf(0, 4,4,5,5,5,6,6)),
     HALF_PLUS_1(intArrayOf(0, 3,3,3,4,4,5,6)), NO_LOWER_OCTAVE(intArrayOf(0, 2,3,4,4,5,6,7)),
-    CELESTA(intArrayOf(0, 4,5,5,5,6,6,6)),
-    BELLS(intArrayOf(0, 3,4,4,4,4,5,5)), TIMPANI(intArrayOf(0, 2,2,2,3,3,3,3)),
-    WOODBLOCKS(intArrayOf(0, 2,2,2,3,3,3,4)), BAG_PIPES(intArrayOf(0, 2,2,3,3,4,4,5)),
-    TREMOLO_STRINGS(intArrayOf(0, 2,3,3,4,4,5,6)), PIZZICATO(intArrayOf(0, 2,3,3,4,4,5,6)),
-    MUTED_BRASS(intArrayOf(0, 2,3,3,4,4,5,5)), RECORDERS(intArrayOf(0, 3,3,4,4,5,5,6)),
-    ORGAN(intArrayOf(0, 2,3,3,4,4,5,6)), SYN_SAW(intArrayOf(0, 3,3,4,4,4,5,5))
-
+    NO_EXTREME_OCTAVES(intArrayOf(0, 2,3,3,4,4,5,6)), OCTAVES_2334455(intArrayOf(0, 2,3,3,4,4,5,5)),
+    CELESTA(intArrayOf(0, 4,5,5,5,6,6,6)),BELLS(intArrayOf(0, 3,4,4,4,4,5,5)),
+    TIMPANI(intArrayOf(0, 2,2,2,3,3,3,3)),WOODBLOCKS(intArrayOf(0, 2,2,2,3,3,3,4)),
+    BAG_PIPES(intArrayOf(0, 2,2,3,3,4,4,5)),RECORDERS(intArrayOf(0, 3,3,4,4,5,5,6)),
+    SYN_SAW(intArrayOf(0, 3,3,4,4,4,5,5))
 }
 fun createKeyboardInstrumentParts(instrument: Int, rangeAll: IntRange = IntRange(A0, C8)): List<EnsemblePart>{
     return listOf(

@@ -69,12 +69,13 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                     var dynamicText by remember { mutableStateOf(multiFloatDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setDynamic = { index: Int, dynamicToCheck: Float ->
-                        val newDynamic = dynamicToCheck.coerceIn(
+                        val sign = dynamicToCheck.sign()
+                        val newDynamic = dynamicToCheck.absoluteValue.coerceIn(
                             multiFloatDialogData.value.min,
                             multiFloatDialogData.value.max
                         )
                         val dynamicValues = dynamicText.extractFloatsFromCsv().toMutableList()
-                        dynamicValues[index] = newDynamic
+                        dynamicValues[index] = newDynamic * sign
                         dynamicText = dynamicValues.joinToString(",")
                     }
                     val fontSize = dimensions.dialogFontSize
@@ -163,7 +164,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                             ) {
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(buttonPadding), onClick = { setDynamic(cursor, steps[0]) })
+                                    .padding(buttonPadding), onClick = {
+                                    val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                    setDynamic(cursor, steps[0] * sign) })
                                 {
                                     Text(
                                         text = symbols[0],
@@ -177,7 +180,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(buttonPadding),
-                                    onClick = { setDynamic(cursor, steps[1]) })
+                                    onClick = {
+                                        val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                        setDynamic(cursor, steps[1] * sign) })
                                 {
                                     Text(
                                         text = symbols[1],
@@ -191,7 +196,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(buttonPadding),
-                                    onClick = { setDynamic(cursor, steps[2]) })
+                                    onClick = {
+                                        val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                        setDynamic(cursor, steps[2] * sign) })
                                 {
                                     Text(
                                         text = symbols[2],
@@ -205,7 +212,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(buttonPadding),
-                                    onClick = { setDynamic(cursor, steps[3]) })
+                                    onClick = {
+                                        val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                        setDynamic(cursor, steps[3] * sign) })
                                 {
                                     Text(
                                         text = symbols[3],
@@ -223,7 +232,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                             ) {
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(buttonPadding), onClick = { setDynamic(cursor, steps[4]) })
+                                    .padding(buttonPadding), onClick = {
+                                    val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                    setDynamic(cursor, steps[4] * sign) })
                                 {
                                     Text(
                                         text = symbols[4],
@@ -236,7 +247,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setDynamic(cursor, steps[5])})
+                                    onClick = {
+                                        val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                        setDynamic(cursor, steps[5] * sign) })
                                 {
                                     Text(
                                         text = symbols[5],
@@ -249,7 +262,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setDynamic(cursor, steps[6]) })
+                                    onClick = {
+                                        val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                        setDynamic(cursor, steps[6] * sign) })
                                 {
                                     Text(
                                         text = symbols[6],
@@ -262,7 +277,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setDynamic(cursor, steps[7]) })
+                                    onClick = {
+                                        val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                        setDynamic(cursor, steps[7] * sign) })
                                 {
                                     Text(
                                         text = symbols[7],
@@ -280,7 +297,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                             ) {
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(buttonPadding), onClick = { setDynamic(cursor, steps[8]) })
+                                    .padding(buttonPadding), onClick = {
+                                    val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                    setDynamic(cursor, steps[8] * sign) })
                                 {
                                     Text(
                                         text = symbols[8],
@@ -293,7 +312,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setDynamic(cursor, steps[9]) })
+                                    onClick = {
+                                        val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                        setDynamic(cursor, steps[9] * sign) })
                                 {
                                     Text(
                                         text = symbols[9],
@@ -306,7 +327,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setDynamic(cursor, steps[10]) })
+                                    onClick = {
+                                        val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                        setDynamic(cursor, steps[10] * sign) })
                                 {
                                     Text(
                                         text = symbols[10],
@@ -319,7 +342,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(buttonPadding),
-                                    onClick = { setDynamic(cursor, steps[11]) })
+                                    onClick = {
+                                        val sign = dynamicText.extractFloatsFromCsv()[cursor].sign()
+                                        setDynamic(cursor, steps[11] * sign) })
                                 {
                                     Text(
                                         text = symbols[11],
