@@ -158,7 +158,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         "Ritornello", "Transpose", "Row Forms",
 
         "Harmony", "Chords to Enhance", "Enhance in Transpositions",
-        "Check and Replace I", "Check and Replace II", "Check and Replace III",
+        "Check and Replace I", "Check and Replace II", "Check and Replace III", "Check and Replace IV",
 
         "Clear Slots", "Spacer", "Export MIDI",
 
@@ -805,6 +805,34 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                             model.updateUserOptions(
                                                 "checkAndReplace",
                                                 insertInMultiCheckAndReplaceCsv(2, cnrCsv, optCnrMultiDatas)
+                                            )
+                                            checkAndReplaceDialogData.value =
+                                                MultiNumberDialogData(model = model)
+                                        }
+                                    })
+                            }
+                            "Check and Replace IV" -> {
+                                val optCnrMultiDatas = userOptions.checkAndReplace
+                                val cnrMultiDatas = CheckAndReplaceData.createMultiCheckAndReplaceDatasFromCsv(optCnrMultiDatas).toMutableList()
+                                var cnrDatas = cnrMultiDatas.getOrElse(3) {listOf()}
+                                cnrDatas = cnrDatas.ifEmpty { listOf(CheckAndReplaceData()) }
+                                val isSelected = !(cnrDatas.size == 1 && cnrDatas[0].check is CheckType.None)
+                                SelectableCard(
+                                    text = if(!isSelected) lang.checkAndReplace + " IV"
+                                    else "${lang.checkAndReplace} IV: \n${cnrDatas.mapIndexed{i, cnr ->
+                                        "${i+1}: ${cnr.describe()}"}.joinToString("\n")}",
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isSelected,
+                                    onClick = {
+                                        checkAndReplaceDialogData.value = MultiNumberDialogData(
+                                            true, lang.selectCheckType,
+                                            model = model, names = chordsInstruments.map{ListaStrumenti.getNameByIndex(it)},
+                                            anySequence = cnrDatas,
+                                        ) { cnrCsv ->
+                                            model.updateUserOptions(
+                                                "checkAndReplace",
+                                                insertInMultiCheckAndReplaceCsv(3, cnrCsv, optCnrMultiDatas)
                                             )
                                             checkAndReplaceDialogData.value =
                                                 MultiNumberDialogData(model = model)
