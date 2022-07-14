@@ -6,9 +6,17 @@ import com.cristianovecchi.mikrokanon.rangeTo
 const val PIANO = 0
 const val NYLON_GUITAR = 24
 const val STEEL_GUITAR = 25
+const val JAZZ_GUITAR = 26
 const val CLEAN_GUITAR = 27
+const val MUTED_GUITAR = 28
+const val OVERDRIVE_GUITAR = 29
+const val DISTORTION_GUITAR = 30
 const val GUITAR_HARMONICS= 31
 const val ACOUSTIC_BASS= 32
+const val FRETLESS_BASS= 35
+const val SLAP_BASS_1= 36
+const val SYN_BASS_1= 38
+
 const val VIOLIN = 40
 const val VIOLA = 41
 const val CELLO = 42
@@ -176,7 +184,7 @@ val PARTS_SYN_BRASS_AND_LEAD: List<EnsemblePart> by lazy { listOf( // the array 
     EnsemblePart(SYN_BRASS_AND_LEAD, 8, SYN_BRASS_AND_LEAD_ALL, IntRange(89, C8)) // F6 - C8
 )}
 
-val PARTS_HARP by lazy{ createKeyboardInstrumentParts(HARP, IntRange(23, 104)) } // Cflat0 to Gsharp7
+val PARTS_HARP by lazy{ createKeyboardInstrumentParts(HARP, IntRange(24, 104)) } // Cflat0 to Gsharp7
 
 val PARTS_SYN_FANTASIA by lazy{ createKeyboardInstrumentParts(SYN_FANTASIA) }
 val PARTS_WARM_PAD by lazy{ createKeyboardInstrumentParts(WARM_PAD) }
@@ -242,15 +250,17 @@ enum class RANGES(val octaves: IntArray) {
     PIANO((0..7).toList().toIntArray()), HALF(intArrayOf(0, 4,4,5,5,5,6,6)),
     HALF_PLUS_1(intArrayOf(0, 3,3,3,4,4,5,6)), NO_LOWER_OCTAVE(intArrayOf(0, 2,3,4,4,5,6,7)),
     NO_EXTREME_OCTAVES(intArrayOf(0, 2,3,3,4,4,5,6)), OCTAVES_2334455(intArrayOf(0, 2,3,3,4,4,5,5)),
+    GUITAR(intArrayOf(0, 2,2,3,3,4,4,5)), BASS_GUITAR(intArrayOf(0, 1,1,1,1,2,2,3)),
     CELESTA(intArrayOf(0, 4,5,5,5,6,6,6)),BELLS(intArrayOf(0, 3,4,4,4,4,5,5)),
     TIMPANI(intArrayOf(0, 2,2,2,3,3,3,3)),WOODBLOCKS(intArrayOf(0, 2,2,2,3,3,3,4)),
     BAG_PIPES(intArrayOf(0, 2,2,3,3,4,4,5)),RECORDERS(intArrayOf(0, 3,3,4,4,5,5,6)),
     SYN_SAW(intArrayOf(0, 3,3,4,4,4,5,5))
 }
 fun createKeyboardInstrumentParts(instrument: Int, rangeAll: IntRange = IntRange(A0, C8)): List<EnsemblePart>{
+    val lowerPitch = if(rangeAll.first > A0) rangeAll.first else A0
     return listOf(
         EnsemblePart(instrument, 0, rangeAll), //useless
-        EnsemblePart(instrument, 1, rangeAll, IntRange(A0, if(40 > rangeAll.last) A0+11 else 40)), // A0 - E2
+        EnsemblePart(instrument, 1, rangeAll, IntRange(lowerPitch, if(lowerPitch + 19 > rangeAll.last) lowerPitch + 11 else lowerPitch +19)), // A0 - E2
         *(2..6).map{ val start = (it+1)*12; EnsemblePart(instrument, it, rangeAll, IntRange(start, if(start+19 > rangeAll.last) start+11 else start + 19))}.toTypedArray(),
         EnsemblePart(instrument, 8, rangeAll, IntRange(89, C8)) // F6 - C8
     )

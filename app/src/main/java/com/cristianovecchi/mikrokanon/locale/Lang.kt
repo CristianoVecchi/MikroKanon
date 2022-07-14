@@ -92,6 +92,8 @@ enum class NoteNamesEl {
 //}
 
 val synthsNames = listOf(
+    "Nylon Guitar", "Steel Guitar", "Jazz Guitar", "Clean Guitar", "Muted Guitar", "Overdrive Guitar", "Distortion Guitar",
+    "Acoustic Bass", "Fretless Bass", "Slap Bass", "Syn Bass",
     "Tremolo strings", "Pizzicato", "Muted brass", "Bag pipes",
     "Recorders", "Harpsichord", "Xylophone", "Marimba", "Vibraphone", "Celesta", "Bells", "Timpani", "Woodblocks",
     "Electric Piano 1", "Electric Piano 2",

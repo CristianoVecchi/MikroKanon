@@ -23,14 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
-import com.cristianovecchi.mikrokanon.addOrInsert
+import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.describeSingleRowForm
-import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
-import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 @Composable
 fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
@@ -161,7 +159,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             ) {
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(textButtonPadding), onClick = { setForms(cursor, 1) })
+                                    .padding(textButtonPadding), onClick = {
+                                    val pair = formsText.extractIntPairsFromCsv()[cursor]
+                                    val barSign = pair.second.sign()
+                                    setForms(cursor, 1 * barSign) })
                                 {
                                     Text(
                                         text = forms[1],
@@ -175,7 +176,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(textButtonPadding),
-                                    onClick = { setForms(cursor, 3) })
+                                    onClick = {
+                                        val pair = formsText.extractIntPairsFromCsv()[cursor]
+                                        val barSign = pair.second.sign()
+                                        setForms(cursor, 3 * barSign) })
                                 {
                                     Text(
                                         text = forms[3],
@@ -188,7 +192,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(textButtonPadding),
-                                    onClick = { setForms(cursor, 2) })
+                                    onClick = {
+                                        val pair = formsText.extractIntPairsFromCsv()[cursor]
+                                        val barSign = pair.second.sign()
+                                        setForms(cursor, 2 * barSign) })
                                 {
                                     Text(
                                         text = forms[2],
@@ -201,7 +208,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(textButtonPadding),
-                                    onClick = { setForms(cursor, 4) })
+                                    onClick = {
+                                        val pair = formsText.extractIntPairsFromCsv()[cursor]
+                                        val barSign = pair.second.sign()
+                                        setForms(cursor, 4 * barSign) })
                                 {
                                     Text(
                                         text = forms[4],
@@ -234,7 +244,8 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     ) {
                                         val pairs = formsText.extractIntPairsFromCsv().toMutableList()
                                         val (counterpoint, form) = pairs[cursor]
-                                        pairs[cursor] = Pair( if(counterpoint == step+2) 1 else step+2,form)
+                                        val tritoneSign = counterpoint.sign()
+                                        pairs[cursor] = Pair( if(counterpoint.absoluteValue == step+2) 1 * tritoneSign else (step+2) * tritoneSign, form)
                                         formsText = pairs.toIntPairsString()
                                     }
                                     CustomButton(
@@ -247,7 +258,8 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     ) {
                                         val pairs = formsText.extractIntPairsFromCsv().toMutableList()
                                         val (counterpoint, form) = pairs[cursor]
-                                        pairs[cursor] = Pair( if(counterpoint == step+3) 1 else step+3,form)
+                                        val tritoneSign = counterpoint.sign()
+                                        pairs[cursor] = Pair( if(counterpoint.absoluteValue == step+3) 1 * tritoneSign else (step+3) * tritoneSign, form)
                                         formsText = pairs.toIntPairsString()
                                     }
                                     CustomButton(
@@ -260,7 +272,8 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     ) {
                                         val pairs = formsText.extractIntPairsFromCsv().toMutableList()
                                         val (counterpoint, form) = pairs[cursor]
-                                        pairs[cursor] = Pair( if(counterpoint == step+4) 1 else step+4,form)
+                                        val tritoneSign = counterpoint.sign()
+                                        pairs[cursor] = Pair( if(counterpoint.absoluteValue == step+4) 1 * tritoneSign else (step+4) * tritoneSign, form)
                                         formsText = pairs.toIntPairsString()
                                     }
                                     CustomButton(
@@ -273,7 +286,8 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     ) {
                                         val pairs = formsText.extractIntPairsFromCsv().toMutableList()
                                         val (counterpoint, form) = pairs[cursor]
-                                        pairs[cursor] = Pair( if(counterpoint == step+5) 1 else step+5,form)
+                                        val tritoneSign = counterpoint.sign()
+                                        pairs[cursor] = Pair( if(counterpoint.absoluteValue == step+5) 1 * tritoneSign else (step+5) * tritoneSign, form)
                                         formsText = pairs.toIntPairsString()
                                     }
 

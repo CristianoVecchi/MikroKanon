@@ -7,6 +7,8 @@ enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, GAMELAN, SAXOPHONES, FLUTES,
     DOUBLE_REEDS,  CLARINETS, FRENCH_HORNS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
     BAROQUE, PLUCKED_STRINGS, SPOOKY,
+    NYLON_GUITAR, STEEL_GUITAR, JAZZ_GUITAR, CLEAN_GUITAR, MUTED_GUITAR, OVERDRIVE_GUITAR, DISTORTION_GUITAR,
+    ACOUSTIC_BASS, FRETLESS_BASS, SLAP_BASS_1, SYN_BASS_1,
     TREMOLO_STRINGS, PIZZICATO, MUTED_BRASS, BAG_PIPES,
     RECORDER, HARPSICHORD, XYLOPHONE, MARIMBA, VIBRAPHONE, CELESTA, BELLS, TIMPANI, WOODBLOCKS,
     ELECTRIC_PIANO_1, ELECTRIC_PIANO_2,
@@ -79,6 +81,17 @@ object Ensembles {
             EnsembleType.BAROQUE -> getBaroque(nParts)
             EnsembleType.PLUCKED_STRINGS -> getPluckedStrings(nParts)
             EnsembleType.SPOOKY -> getSpooky(nParts)
+            EnsembleType.NYLON_GUITAR -> getKeyboardInstrument(NYLON_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83)) // 40 - B5
+            EnsembleType.STEEL_GUITAR -> getKeyboardInstrument(STEEL_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
+            EnsembleType.JAZZ_GUITAR -> getKeyboardInstrument(JAZZ_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
+            EnsembleType.CLEAN_GUITAR -> getKeyboardInstrument(CLEAN_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
+            EnsembleType.MUTED_GUITAR -> getKeyboardInstrument(MUTED_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
+            EnsembleType.OVERDRIVE_GUITAR -> getKeyboardInstrument(OVERDRIVE_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
+            EnsembleType.DISTORTION_GUITAR -> getKeyboardInstrument(DISTORTION_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
+            EnsembleType.ACOUSTIC_BASS -> getKeyboardInstrument(ACOUSTIC_BASS, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
+            EnsembleType.FRETLESS_BASS -> getKeyboardInstrument(FRETLESS_BASS, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
+            EnsembleType.SLAP_BASS_1 -> getKeyboardInstrument(SLAP_BASS_1, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
+            EnsembleType.SYN_BASS_1 -> getKeyboardInstrument(SYN_BASS_1, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
             EnsembleType.TREMOLO_STRINGS -> getKeyboardInstrument(TREMOLO_STRINGS, nParts, RANGES.NO_EXTREME_OCTAVES, IntRange(E1, C8))
             EnsembleType.PIZZICATO -> getKeyboardInstrument(PIZZICATO, nParts, RANGES.NO_EXTREME_OCTAVES, IntRange(E1, C8))
             EnsembleType.MUTED_BRASS -> getKeyboardInstrument(MUTED_TRUMPET, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C7))
