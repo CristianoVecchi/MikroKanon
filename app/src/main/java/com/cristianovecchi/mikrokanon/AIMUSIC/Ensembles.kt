@@ -6,7 +6,7 @@ import com.cristianovecchi.mikrokanon.rangeTo
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, GAMELAN, SAXOPHONES, FLUTES,
     DOUBLE_REEDS,  CLARINETS, FRENCH_HORNS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
-    BAROQUE, PLUCKED_STRINGS, SPOOKY,
+    BAROQUE, PLUCKED_STRINGS, CHOIR, SPOOKY,
     NYLON_GUITAR, STEEL_GUITAR, JAZZ_GUITAR, CLEAN_GUITAR, MUTED_GUITAR, OVERDRIVE_GUITAR, DISTORTION_GUITAR,
     ACOUSTIC_BASS, FRETLESS_BASS, SLAP_BASS_1, SYN_BASS_1,
     TREMOLO_STRINGS, PIZZICATO, MUTED_BRASS, BAG_PIPES,
@@ -80,6 +80,7 @@ object Ensembles {
             EnsembleType.PIERROT -> getPierrot(nParts)
             EnsembleType.BAROQUE -> getBaroque(nParts)
             EnsembleType.PLUCKED_STRINGS -> getPluckedStrings(nParts)
+            EnsembleType.CHOIR -> getKeyboardInstrument(CHOIR_AAHS, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C6))
             EnsembleType.SPOOKY -> getSpooky(nParts)
             EnsembleType.NYLON_GUITAR -> getKeyboardInstrument(NYLON_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83)) // 40 - B5
             EnsembleType.STEEL_GUITAR -> getKeyboardInstrument(STEEL_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))

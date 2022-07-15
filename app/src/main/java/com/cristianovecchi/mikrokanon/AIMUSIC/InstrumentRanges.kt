@@ -27,6 +27,7 @@ const val HARP = 46
 const val STRING_ORCHESTRA = 48
 const val SLOW_STRINGS = 49
 const val SYNTH_STRINGS_1 = 50
+const val CHOIR_AAHS = 52
 const val VOICE_OOHS = 53
 const val TRUMPET = 56
 const val TROMBONE = 57
