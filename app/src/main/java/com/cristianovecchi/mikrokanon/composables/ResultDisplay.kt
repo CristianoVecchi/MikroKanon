@@ -3,7 +3,6 @@ package com.cristianovecchi.mikrokanon.composables
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -31,7 +30,6 @@ import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
 import com.cristianovecchi.mikrokanon.ui.Dimensions
-import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import com.cristianovecchi.mikrokanon.ui.shift
 
 import kotlinx.coroutines.delay
@@ -247,7 +245,7 @@ fun ResultDisplay(model: AppViewModel,
                 val sequencesToString by lazy {model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }}
                 SequencesDialog(dialogState = dialogState, dimensions = dimensions,
                     title = language.choose2ndSequence, repeatText = language.repeatSequence,
-                    okText = language.OKbutton, appColors = colors,
+                    okText = language.OkButton, appColors = colors,
                     sequencesList = sequencesToString,
                     onSubmitButtonClick = { index, repeat ->
                         dialogState.value = false
@@ -255,10 +253,10 @@ fun ResultDisplay(model: AppViewModel,
                             onKP(index, repeat);
                         }
                     })
-                ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, model, language, filledSlots = filledSlots)
-                MultiListDialog(intervalSetDialogData, dimensions, language.OKbutton, colors)
+                ButtonsDialog(buttonsDialogData, dimensions, language.OkButton, model, language, filledSlots = filledSlots)
+                MultiListDialog(intervalSetDialogData, dimensions, language.OkButton, colors)
                 TransposeDialog(transposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
-                CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OKbutton, model)
+                CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
                 SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                     dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
                 MultiSequenceDialog(multiSequenceDialogData, buttonsDialogData, dimensions, model)

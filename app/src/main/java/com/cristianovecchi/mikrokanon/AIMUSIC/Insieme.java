@@ -436,7 +436,7 @@ public class Insieme {
     }
     public static List<Integer> pitchesOnOctaves(int absPitch, int downLimit, int upLimit ){
         List<Integer> pitches = new LinkedList();
-        for(int i = 2; i < 9; i++){
+        for(int i = 1; i < 9; i++){
             int pitch = i * 12 + absPitch;
             if(downLimit<=pitch && pitch <=upLimit) pitches.add(pitch);
         }
@@ -561,7 +561,15 @@ public class Insieme {
                     melody[i] = -1;
                 } else {
                     List<Integer> pitches = pitchesOnOctaves(checkNote, lowerLimit, upperLimit);
-                    melody[i] = pitches.get(rand.nextInt(pitches.size()));
+//                    if(pitches.size()>0){
+                        melody[i] = pitches.get(rand.nextInt(pitches.size()));
+//                    } else {
+//                        System.out.println("WARNING: NO PITCHES IN RANDOM OCTAVE!!!");
+//                        System.out.println("checkNote:"+checkNote+" lowerLimit:"+lowerLimit+" upperLimit:"+ upperLimit);
+//                        System.out.println("octave:"+octave+" absPitches:"+ Arrays.toString(absPitches));
+//                        melody[i] = -1;
+//                    }
+
                 }
             }
         }

@@ -22,13 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
-import com.cristianovecchi.mikrokanon.AIMUSIC.ChordToEnhanceData
-import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
-import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
 import com.cristianovecchi.mikrokanon.AIMUSIC.ListaStrumenti
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.midi.HarmonizationData
 import com.cristianovecchi.mikrokanon.midi.HarmonizationType
@@ -59,9 +55,9 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         val instrumentDialogData by lazy { mutableStateOf(ListDialogData()) }
         val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            ListDialog(harmTypeDialogData, dimensions, lang.OKbutton, appColors)
-            ListDialog(instrumentDialogData, dimensions, lang.OKbutton, appColors)
-            ListDialog(volumeDialogData, dimensions, lang.OKbutton, appColors)
+            ListDialog(harmTypeDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(instrumentDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
                 else dimensions.dialogWidth

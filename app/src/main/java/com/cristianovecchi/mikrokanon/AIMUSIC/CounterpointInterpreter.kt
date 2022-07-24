@@ -190,7 +190,11 @@ object CounterpointInterpreter {
             )
         }
         // CREATION OF TRACKS
+//        return counterpoint.parts.map { part ->
+//            computation(part)
+//        }.sortedBy { it.channel }
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            println(counterpoint.parts)
             counterpoint.parts.parallelStream().map { part ->
                 computation(part)
             }.collect(Collectors.toList()).sortedBy { it.channel }

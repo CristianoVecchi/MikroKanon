@@ -25,13 +25,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
-import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.midi.HarmonizationData
-import com.cristianovecchi.mikrokanon.midi.HarmonizationType
-import com.cristianovecchi.mikrokanon.midi.chordsInstruments
-import com.cristianovecchi.mikrokanon.midi.starredChordsInstruments
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
@@ -56,9 +50,9 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
         val replaceTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val stressDialogData by lazy { mutableStateOf(ListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            ListDialog(checkTypeDialogData, dimensions, lang.OKbutton, appColors)
-            ListDialog(replaceTypeDialogData, dimensions, lang.OKbutton, appColors)
-            ListDialog(stressDialogData, dimensions, lang.OKbutton, appColors)
+            ListDialog(checkTypeDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(replaceTypeDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(stressDialogData, dimensions, lang.OkButton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
                 else dimensions.dialogWidth

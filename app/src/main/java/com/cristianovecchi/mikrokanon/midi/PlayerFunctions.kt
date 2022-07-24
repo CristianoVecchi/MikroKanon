@@ -485,7 +485,7 @@ fun alterateArticulation(
             durIndex++
         }
     }
-    println("durationSize=${durations.size} legatoDeltasSize=${legatoDeltas.size} lastTick=${ticks[durIndex]}")
+    //println("durationSize=${durations.size} legatoDeltasSize=${legatoDeltas.size} lastTick=${ticks[durIndex]}")
     while (alterationIndex < legatoDeltas.size && alterationTick + legatoDeltas[alterationIndex] <= ticks[durIndex]) {
         alterationTick += legatoDeltas[alterationIndex].toInt()
         alterationIndex++

@@ -25,13 +25,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.convertIntsToFlags
-import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.midi.HarmonizationData
-import com.cristianovecchi.mikrokanon.midi.HarmonizationType
-import com.cristianovecchi.mikrokanon.midi.chordsInstruments
-import com.cristianovecchi.mikrokanon.midi.starredChordsInstruments
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
@@ -53,8 +47,8 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
         val pitchesDialogData by lazy { mutableStateOf(MultiListDialogData()) }
         val repetitionsDialogData by lazy { mutableStateOf(ListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            MultiListDialog(pitchesDialogData, dimensions, lang.OKbutton, appColors)
-            ListDialog(repetitionsDialogData, dimensions, lang.OKbutton, appColors, fillPrevious = true)
+            MultiListDialog(pitchesDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(repetitionsDialogData, dimensions, lang.OkButton, appColors, fillPrevious = true)
 
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp

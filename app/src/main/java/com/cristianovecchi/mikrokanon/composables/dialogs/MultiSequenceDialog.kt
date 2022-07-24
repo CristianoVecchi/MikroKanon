@@ -50,7 +50,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
         val backgroundColor = appColors.dialogBackgroundColor
         val listDialogData = remember { mutableStateOf(ListDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            ListDialog(listDialogData, dimensions, lang.OKbutton, appColors,false, multiNumberDialogData)
+            ListDialog(listDialogData, dimensions, lang.OkButton, appColors,false, multiNumberDialogData)
             val width = if(dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             val height = (dimensions.height / dimensions.dpDensity).toInt().dp

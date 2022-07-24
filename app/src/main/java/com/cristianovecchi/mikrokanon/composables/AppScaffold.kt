@@ -2,27 +2,22 @@ package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
@@ -180,32 +175,32 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         val selectedTab by model.lastScaffoldTab.asFlow().collectAsState(initial = ScaffoldTabs.SETTINGS)
 
         EnsembleDialog(ensemblesDialogData, dimensions)
-        ListDialog(listDialogData, dimensions, lang.OKbutton, colors)
+        ListDialog(listDialogData, dimensions, lang.OkButton, colors)
         RhythmDialog(rhythmDialogData, dimensions, patterns = RhythmPatterns.values().toList() )
-        MultiListDialog(doublingDialogData, dimensions, lang.OKbutton, colors)
-        MultiListDialog(audio8DDialogData, dimensions, lang.OKbutton, colors)
-        MultiListDialog(clearSlotsDialogData, dimensions, lang.OKbutton, colors)
+        MultiListDialog(doublingDialogData, dimensions, lang.OkButton, colors)
+        MultiListDialog(audio8DDialogData, dimensions, lang.OkButton, colors)
+        MultiListDialog(clearSlotsDialogData, dimensions, lang.OkButton, colors)
         MelodyTypeDialog(melodyTypesDialogData,dimensions, lang.melodyOptions)
         RangeTypeDialog(rangeTypesDialogData, dimensions, lang.rangeOptions)
         LegatoTypeDialog(legatoTypesDialogData, dimensions, lang.articulationOptions)
-        MultiBpmDialog(multiBpmDialogData, dimensions, lang.OKbutton)
-        MultiDynamicDialog(multiFloatDialogData, dimensions, lang.OKbutton)
+        MultiBpmDialog(multiBpmDialogData, dimensions, lang.OkButton)
+        MultiDynamicDialog(multiFloatDialogData, dimensions, lang.OkButton)
         val intervalsForTranspose = getIntervalsForTranspose(lang.intervalSet)
-        TransposeDialog(transposeDialogData, dimensions, intervalsForTranspose, lang.OKbutton)
+        TransposeDialog(transposeDialogData, dimensions, intervalsForTranspose, lang.OkButton)
         val formsNames = listOf("unrelated", lang.original, lang.inverse, lang.retrograde, lang.invRetrograde)
         RowFormsDialog(rowFormsDialogData, dimensions, formsNames, lang.slotNumbers)
-        ExportDialog(exportDialogData, lang.OKbutton)
-        PrivacyDialog(privacyDialogData, dimensions, lang.OKbutton)
-        CreditsDialog(creditsDialogData, dimensions, lang.OKbutton)
-        HistoriaDialog(historiaDialogData, dimensions, lang.OKbutton)
-        MultiListDialog(mbtiDialogData, dimensions, lang.OKbutton, colors)
-        MultiListDialog(detectorDialogData, dimensions, lang.OKbutton, colors)
-        ListDialog(detExtensionDialogData, dimensions, lang.OKbutton, colors, fillPrevious = true)
-        ListDialog(colorsDialogData, dimensions, lang.OKbutton, colors)
-        MultiListDialog(zodiacDialogData, dimensions, lang.OKbutton, colors)
-        CustomColorsDialog(customColorsDialogData, dimensions, lang.OKbutton)
-        ListDialog(ritornelloDialogData, dimensions, lang.OKbutton, colors, fillPrevious = true)
-        ListDialog(vibratoDialogData, dimensions, lang.OKbutton, colors, fillPrevious = true)
+        ExportDialog(exportDialogData, lang.OkButton)
+        PrivacyDialog(privacyDialogData, dimensions, lang.OkButton)
+        CreditsDialog(creditsDialogData, dimensions, lang.OkButton)
+        HistoriaDialog(historiaDialogData, dimensions, lang.OkButton)
+        MultiListDialog(mbtiDialogData, dimensions, lang.OkButton, colors)
+        MultiListDialog(detectorDialogData, dimensions, lang.OkButton, colors)
+        ListDialog(detExtensionDialogData, dimensions, lang.OkButton, colors, fillPrevious = true)
+        ListDialog(colorsDialogData, dimensions, lang.OkButton, colors)
+        MultiListDialog(zodiacDialogData, dimensions, lang.OkButton, colors)
+        CustomColorsDialog(customColorsDialogData, dimensions, lang.OkButton)
+        ListDialog(ritornelloDialogData, dimensions, lang.OkButton, colors, fillPrevious = true)
+        ListDialog(vibratoDialogData, dimensions, lang.OkButton, colors, fillPrevious = true)
         HarmonyDialog(harmonyDialogData, dimensions)
         CheckAndReplaceDialog(checkAndReplaceDialogData, dimensions)
         ChordsToEnhanceDialog(chordsToEnhanceDialogData, dimensions)

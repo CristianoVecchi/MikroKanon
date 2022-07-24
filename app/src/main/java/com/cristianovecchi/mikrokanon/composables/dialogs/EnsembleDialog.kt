@@ -22,9 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
-import com.cristianovecchi.mikrokanon.AIMUSIC.ChordToEnhanceData
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
-import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
@@ -49,7 +47,7 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         val ensNames = multiNumberDialogData.value.names
         val multiListDialogData by lazy { mutableStateOf(MultiListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            MultiListDialog(multiListDialogData, dimensions, lang.OKbutton, appColors)
+            MultiListDialog(multiListDialogData, dimensions, lang.OkButton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
                 else dimensions.dialogWidth

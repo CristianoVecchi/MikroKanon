@@ -437,7 +437,7 @@ fun findMelodyWithStructure(
         lastTick2 += nNotes
         sequence
     }
-    sequences.forEach{println("subSequence: ${it.contentToString()}")}
+//    sequences.forEach{println("subSequence: ${it.contentToString()}")}
     return Pair(sequences.reduce{ acc, arr -> acc + arr}, changes.toList())//.also{println("Result sequence: ${it}")}
 }
 

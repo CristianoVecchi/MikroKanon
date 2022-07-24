@@ -24,13 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.midi.HarmonizationData
-import com.cristianovecchi.mikrokanon.midi.HarmonizationType
 import com.cristianovecchi.mikrokanon.ui.Dimensions
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -50,7 +46,7 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
             val listDialogData by lazy { mutableStateOf(ListDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
 
-            ListDialog(listDialogData, dimensions, lang.OKbutton, appColors)
+            ListDialog(listDialogData, dimensions, lang.OkButton, appColors)
             val width = if(dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             val height = (dimensions.height / dimensions.dpDensity).toInt().dp

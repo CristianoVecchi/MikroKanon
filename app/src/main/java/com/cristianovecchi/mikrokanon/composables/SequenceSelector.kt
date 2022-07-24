@@ -102,7 +102,7 @@ fun SequenceSelector(model: AppViewModel,
             }
             SequencesDialog(dialogState = dialogState, dimensions = dimensions,
                 title = language.choose2ndSequence, repeatText = language.repeatSequence,
-                okText = language.OKbutton, appColors = appColors,
+                okText = language.OkButton, appColors = appColors,
                 sequencesList = sequencesToString,
                 onSubmitButtonClick = { index, repeat ->
                     dialogState.value = false
@@ -111,14 +111,14 @@ fun SequenceSelector(model: AppViewModel,
                     }
                 }
             )
-            ButtonsDialog(buttonsDialogData, dimensions, language.OKbutton, workingOnSequences = true,
+            ButtonsDialog(buttonsDialogData, dimensions, language.OkButton, workingOnSequences = true,
                 model = model, language = language, filledSlots = filledSlots )
             val onSelectComposition = { index: Int ->
                 onSelect(index)
             }
             SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                 dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
-            CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OKbutton, model)
+            CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
             SequenceScrollableColumn( listState = listState, colors = appColors,
                 modifier = modifier3, fontSize = dimensions.selectorClipFontSize,
                 notesNames = notesNames,
@@ -127,7 +127,7 @@ fun SequenceSelector(model: AppViewModel,
                 selected = selected, onSelect = onSelectComposition
             )
             MultiSequenceDialog(multiSequenceDialogData, buttonsDialogData, dimensions, model)
-            PrivacyDialog(privacyDialogData, dimensions, language.OKbutton)
+            PrivacyDialog(privacyDialogData, dimensions, language.OkButton)
 
             Column(modifier1) {
                 Row(modifier = Modifier.fillMaxSize(),horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {

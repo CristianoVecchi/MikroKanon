@@ -251,7 +251,7 @@ fun SpecialFunctions1Buttons(
             CustomButton(iconId = model.iconMap["overlap"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onOverlap()
             }
-            CustomButton(iconId = model.iconMap["crossover"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+            CustomButton(iconId = model.iconMap["crossover"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
                 onCrossover()
             }
             CustomButton(iconId = model.iconMap["glue"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {

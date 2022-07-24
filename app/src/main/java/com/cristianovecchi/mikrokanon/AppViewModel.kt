@@ -56,7 +56,7 @@ class AppViewModel(
         const val MAX_NOTES_MK_4DEEP = 18
         const val MAX_NOTES_MK_5RED = 25
         const val MAX_NOTES_MK_6RED = 20
-        const val MAX_SEQUENCES_IN_MAZE = 10
+        const val MAX_SEQUENCES_IN_MAZE = 9
         val MAX_NOTES_IN_MAZE = listOf(0, 99,99,99,99,99,99, 24,18, 12,10)
     }
     var privacyIsAccepted = true
