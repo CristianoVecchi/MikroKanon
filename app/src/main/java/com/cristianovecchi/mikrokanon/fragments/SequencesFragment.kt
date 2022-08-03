@@ -178,6 +178,10 @@ var start = true
                                     onEWH = { list, nParts->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onEWH(list, nParts)
+                                    },
+                                    onResolutio = { list, resolutioData ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onResolutio(list, resolutioData)
                                     }
                                 )
                             }

@@ -9,8 +9,10 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asFlow
+import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.MainActivity
+import com.cristianovecchi.mikrokanon.R
 import com.cristianovecchi.mikrokanon.composables.*
 import com.cristianovecchi.mikrokanon.createIntervalSetFromFlags
 import com.cristianovecchi.mikrokanon.locale.Lang
@@ -150,6 +152,9 @@ class OutputFragment: Fragment() {
                                 onExpand = { model.onExpand() },
                                 onFlourish = { model.onFlourish() },
                                 onEWH = { nParts -> model.onEWH(arrayListOf(), nParts)},
+                                onResolutio = { resolutioData ->
+                                    model.onResolutio(null, resolutioData)
+                                },
                                 onPlay = {
                                     val executionTime = measureTimeMillis {
                                     model.onPlay(true, false) // play the entire structure

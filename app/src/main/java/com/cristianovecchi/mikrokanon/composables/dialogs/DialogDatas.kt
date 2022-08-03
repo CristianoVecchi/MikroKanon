@@ -27,6 +27,7 @@ data class MultiNumberDialogData(val dialogState: Boolean = false, val title:Str
                                  val anySequence: List<Any> = listOf(),
                                  val dispatchIntLists: (List<List<Int>>) -> Unit = {},
                                  val dispatchCsv: (String) -> Unit = {},
+                                 val dispatchResolutio: (Pair<Set<Int>,String>) -> Unit = {},
                                  val onSubmitButtonClick: (String) -> Unit = {})
 
 data class MultiFloatDialogData(val dialogState: Boolean = false, val title:String = "", val value:String="1.0",
@@ -53,6 +54,7 @@ data class ButtonsDialogData(
     val onSort: (Int) -> Unit = {}, val onUpsideDown: () -> Unit = {},
     val onArpeggio: (ARPEGGIO) -> Unit = {},
     val onCounterpointSelected: (Int) -> Unit = {}, val onEWH: (Int) -> Unit = {},
+    val onResolutio: () -> Unit = {},
     val onSubmitButtonClick: (Any?) -> Unit = {}, )
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",

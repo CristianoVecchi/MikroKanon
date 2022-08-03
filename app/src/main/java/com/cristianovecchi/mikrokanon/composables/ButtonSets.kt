@@ -242,8 +242,17 @@ fun SpecialFunctions1Buttons(
     onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
     onOverlap: () -> Unit, onCrossover: () -> Unit, onGlue: () -> Unit, onMaze: () -> Unit,
     onScarlatti: () -> Unit, onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit,
+    onResolutio: () -> Unit, onDoubling: () -> Unit
 ) {
     Column {
+        Row {
+            CustomButton(iconId = model.iconMap["resolutio"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onResolutio()
+            }
+            CustomButton(iconId = model.iconMap["doubling"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onDoubling()
+            }
+        }
         Row {
             CustomButton(iconId = model.iconMap["doppelgänger"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onDoppelgänger()

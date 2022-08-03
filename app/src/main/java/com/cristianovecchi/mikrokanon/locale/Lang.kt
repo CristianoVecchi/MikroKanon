@@ -395,6 +395,7 @@ data class Lang( // English by default
 
     val selectSpecialFunction: String = "Select a function!",
     val selectCadenzaForm: String = "Select a cadenza form!",
+    val selectResolutioForm: String = "Select a resolutio form!",
     val selectToOverlap: String = "Select a counterpoint to overlap!",
     val selectToCrossOver: String = "Select a counterpoint to cross over!",
     val selectToGlue: String = "Select a counterpoint to glue!",

@@ -46,7 +46,7 @@ class AppViewModel(
 ) : AndroidViewModel(application), LifecycleObserver {
 
     companion object{
-        const val MAX_VISIBLE_COUNTERPOINTS = 42
+        const val MAX_VISIBLE_COUNTERPOINTS = 48
         const val MAX_PITCHES_IN_CACHE = 60000
         const val MAX_PARTS = 12
         const val MAX_DEPTH_MK_3 = 5
@@ -70,6 +70,7 @@ class AppViewModel(
     // + 0.86f
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
     var cadenzaValues = "0,1,0,1,1"
+    var resolutioValues = Pair((0..11).toSet(),"0,1,0,1,0")
     val dynamicMap: Map<Float,String> =  dynamicSteps.zip(getDynamicSymbols()).toMap()
 
     val stackIcons = mutableListOf<String>()
@@ -264,6 +265,9 @@ class AppViewModel(
         }
         computationStack.pushAndDispatch(Computation.ExtendedWeightedHarmony(originalCounterpoints, nParts))
         extendedWeightedHarmonyOnCounterpoints(originalCounterpoints, nParts)
+    }
+    val onResolutio = { list: ArrayList<Clip>?, resolutioData: Pair<Set<Int>,String> ->
+        println("on Resolutio: ${resolutioData.first} ${resolutioData.second}")
     }
     val onTritoneSubstitutionFromSelector = { index: Int ->
         changeSequenceSelection(-1)

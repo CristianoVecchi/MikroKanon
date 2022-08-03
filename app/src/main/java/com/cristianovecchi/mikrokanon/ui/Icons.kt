@@ -52,6 +52,8 @@ object Icons {
             "check" to R.drawable.ic_baseline_troubleshoot_24,
             "arpeggio" to R.drawable.ic_baseline_texture_24,
             "self" to R.drawable.ic_baseline_self_improvement_24,
+            "resolutio" to R.drawable.ic_baseline_theater_comedy_24,
+            "doubling" to R.drawable.ic_baseline_stacked_line_chart_24
         )
     }
 }

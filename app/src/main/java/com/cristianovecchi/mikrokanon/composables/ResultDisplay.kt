@@ -67,6 +67,7 @@ fun ResultDisplay(model: AppViewModel,
                   onExpand: () -> Unit = {},
                   onFlourish: () -> Unit = {},
                   onEWH: (Int) -> Unit = {},
+                  onResolutio: (Pair<Set<Int>,String>) -> Unit,
                   onPlay: () -> Unit = {},
                   onStop: () -> Unit = {}
                   )
@@ -117,6 +118,7 @@ fun ResultDisplay(model: AppViewModel,
     val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
     val transposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+    val resolutioDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
@@ -257,6 +259,7 @@ fun ResultDisplay(model: AppViewModel,
                 MultiListDialog(intervalSetDialogData, dimensions, language.OkButton, colors)
                 TransposeDialog(transposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
+                ResolutioDialog(resolutioDialogData, buttonsDialogData, dimensions, language.OkButton, model)
                 SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                     dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
                 MultiSequenceDialog(multiSequenceDialogData, buttonsDialogData, dimensions, model)
@@ -382,6 +385,13 @@ fun ResultDisplay(model: AppViewModel,
                                             }
                                         )
                                     },
+                                    onResolutio = {
+                                        resolutioDialogData.value = MultiNumberDialogData(true,
+                                            language.selectResolutioForm, model.cadenzaValues, 0, 16, model = model,
+                                            dispatchResolutio = { resolutioData ->
+                                                model.resolutioValues = resolutioData
+                                                onResolutio(resolutioData)
+                                            }) },
                                     onScarlatti = { onScarlatti(); close() },
                                     onOverlap = {
                                         selectCounterpointDialogData.value = ButtonsDialogData(true,

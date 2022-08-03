@@ -50,7 +50,8 @@ fun SequenceSelector(model: AppViewModel,
                      onMikroKanons5reducted: (ArrayList<Clip>) -> Unit,
                      onMikroKanons6reducted: (ArrayList<Clip>) -> Unit,
                      onMaze: (List<List<Int>>) -> Unit,
-                     onEWH: (ArrayList<Clip>, Int) -> Unit
+                     onEWH: (ArrayList<Clip>, Int) -> Unit,
+                     onResolutio: (ArrayList<Clip>, Pair<Set<Int>,String>) -> Unit
                     )
 {
 
@@ -86,6 +87,7 @@ fun SequenceSelector(model: AppViewModel,
             val dialogState = remember { mutableStateOf(false) }
             val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
             val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+            val resolutioDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
             val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val privacyDialogData = remember { mutableStateOf(TextDialogData())}
@@ -119,6 +121,7 @@ fun SequenceSelector(model: AppViewModel,
             SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                 dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
             CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
+            ResolutioDialog(resolutioDialogData, buttonsDialogData, dimensions, language.OkButton, model)
             SequenceScrollableColumn( listState = listState, colors = appColors,
                 modifier = modifier3, fontSize = dimensions.selectorClipFontSize,
                 notesNames = notesNames,
@@ -176,7 +179,14 @@ fun SequenceSelector(model: AppViewModel,
                                         dispatchCsv= { newValues ->
                                             model.cadenzaValues = newValues
                                             onCadenza( sequences[selected], newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
-                                        }) },
+                                }) },
+                                onResolutio = {
+                                     resolutioDialogData.value = MultiNumberDialogData(true,
+                                         language.selectResolutioForm, model.cadenzaValues, 0, 16, model = model,
+                                    dispatchResolutio = { resolutioData ->
+                                        model.resolutioValues = resolutioData
+                                        onResolutio(sequences[selected], resolutioData)
+                                }) },
                                 onScarlatti = { onScarlatti(sequences[selected]) },
                                 onOverlap = {
                                     selectCounterpointDialogData.value = ButtonsDialogData(true,
