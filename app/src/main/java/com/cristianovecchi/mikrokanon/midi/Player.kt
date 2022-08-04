@@ -15,9 +15,13 @@ import com.leff.midi.MidiFile
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.Tempo
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.job
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.File
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -76,7 +80,7 @@ object Player {
         tracks.add(tempoTrack)
         tracks.add(noteTrack)
         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
-        saveAndPlayMidiFile(player, midi, looping, true, null)
+        //saveAndPlayMidiFile(player, midi, looping, true, null)
     }
 
     fun playScheme(
@@ -101,13 +105,15 @@ object Player {
             shuffle
         ) ?: return
         //System.out.println("Midifile creato");
-        saveAndPlayMidiFile(mediaPlayer, midi, looping, true, null)
+        //saveAndPlayMidiFile(mediaPlayer, midi, looping, true, null)
 
 
     }
 
-    fun playCounterpoint(
-        mediaPlayer: MediaPlayer,
+    suspend fun playCounterpoint(
+        context: CoroutineContext,
+        dispatch: (String) -> Unit,
+        mediaPlayer: MediaPlayer?,
         looping: Boolean,
         counterpoints: List<Counterpoint?>,
         dynamics: List<Float>,
@@ -134,140 +140,179 @@ object Player {
         harmonizations: List<HarmonizationData> = listOf(),
         chordsToEnhance: List<ChordToEnhanceData> = listOf(),
         enhanceChordsInTransposition: Boolean = false
-    ): String {
+    ): String = withContext(context){
         // BUILD ACTUAL COUNTERPOINT
-        val firstCounterpoint = counterpoints.firstOrNull() ?: return "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
-        val nNotesToSkip = rhythm[0].first.nNotesLeftInThePattern(firstCounterpoint.nNotes())
-        //var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
-        var actualCounterpoint = if (rowForms == listOf(Pair(1, 1))) firstCounterpoint
-        else Counterpoint.explodeRowFormsAddingCps(counterpoints, rowForms, nNotesToSkip)
+        val job = context.job
+        //job.cancelAndJoin()
+        val firstCounterpoint = counterpoints.firstOrNull()
+        if(firstCounterpoint != null){
+            val nNotesToSkip = rhythm[0].first.nNotesLeftInThePattern(firstCounterpoint.nNotes())
+            //var actualCounterpoint = if (rowForms == listOf(1)) counterpoint else Counterpoint.explodeRowForms(counterpoint, rowForms, nNotesToSkip)
+            var actualCounterpoint = if (rowForms == listOf(Pair(1, 1))) firstCounterpoint
+            else Counterpoint.explodeRowFormsAddingCps(counterpoints, rowForms, nNotesToSkip)
+            actualCounterpoint = if(enhanceChordsInTransposition){
+                actualCounterpoint.handleChordEnhancement(chordsToEnhance).handleRitornellos(ritornello, transpose)
+            } else {
+                actualCounterpoint.handleRitornellos(ritornello, transpose).handleChordEnhancement(chordsToEnhance)
+            }
+            if (actualCounterpoint.isEmpty()) {
+                "Counterpoint to play is empty!!!"
+            } else {
+                if (actualCounterpoint.parts.any{ it.absPitches.size == 0}){
+                    "Counterpoint parts are empty!!!"
+                } else {
+                    // COUNTERPOINT FINAL SIZE (NOT CONSIDERING CHECK AND REPLACE!!!)
+                    val nTotalNotes = actualCounterpoint.nNotes()
+                    // EXTRACT COUNTERPOINT TRACK DATA
+                    val durations = rhythm.fold(listOf<Int>()) { acc, triple ->
+                        acc + if (triple.second) triple.first.retrogradeValues()
+                            .repeat(triple.third) else triple.first.values.repeat(triple.third)
+                    }.mergeNegativeValues()
+                    //println("durations: $durations")
+                    val actualDurations = multiplyDurations(nTotalNotes, durations)
+                    if (rhythmShuffle) actualDurations.shuffle()
+                    val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
+                    val ensemblePartsList: List<List<EnsemblePart>> =
+                        if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
+                        else Ensembles.getEnsemblesListMix(nParts, ensemblesList)
+                    val actualEnsemblePartsList = if (partsShuffle) ensemblePartsList.map { it.shuffled() } else ensemblePartsList
+                    val glissando: List<Int> = if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
+                    val audio8D: List<Int> = if (audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
+                    val vibratoExtensions = intArrayOf(0, 360, 240, 160, 120, 80, 60, 30, 15)
+                    val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
+                        job, dispatch,
+                        actualCounterpoint, actualDurations, actualEnsemblePartsList,
+                        nuances, doublingFlags, rangeTypes, melodyTypes,
+                        glissando, audio8D, vibratoExtensions[vibrato]
+                    )
+                    if (counterpointTrackData.isEmpty()) {
+                        "No Tracks in Counterpoint!!!"
+                    } else {
+                        //counterpointTrackData.forEach{ println(it.pitches.contentToString())}
+                        if (!job.isActive) {
+                            dispatch("Cancelled during DataTracks building!")
+                            "Cancelled during DataTracks building!"
+                        } else {
+                            // TOTAL LENGTH OF THE PIECE
+                            val totalLength = (counterpointTrackData.filter { it.ticks.isNotEmpty() }
+                                .maxOfOrNull { it.ticks.last() + it.durations.last() }
+                                ?: 0).toLong()//.also{println("Total length: $it")} // Empty tracks have 0 length
+                            //LEGATO AND RIBATTUTO DURATION ZONE
+                            // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
+                            //println("legatoTypes: $legatoTypes")
+                            if (legatoTypes != listOf(Pair(4, 0))) {
+                                val maxLegato = rhythm.minByOrNull { it.first.metroDenominatorMidiValue() }!!.first.metroDenominatorMidiValue() / 3
+                                val articulations = floatArrayOf(1f, 0.125f, 0.25f, 0.75f, 1f, 1.125f, 1.25f)
+                                counterpointTrackData.addLegatoAndRibattuto(maxLegato, articulations, legatoTypes, totalLength)
+                            }
+                            // CHECK AND REPLACE
+                            val actualCounterpointTrackData = counterpointTrackData.applyMultiCheckAndReplace(job, dispatch, checkAndReplace,totalLength)
+                            if (!job.isActive) {
+                                dispatch("Cancelled during Check'n'replace building!")
+                                "Cancelled during Check'n'replace building!"
+                            } else {
+                                // TRANSFORM DATATRACKS IN MIDITRACKS
+                                val counterpointTracks = actualCounterpointTrackData.map {
+                                    if(job.isActive) {
+                                        dispatch("Building MidiTrack Channel: ${it.channel}")
+                                        convertToMidiTrack(it, actualCounterpointTrackData.size)
+                                    } else MidiTrack()
+                                }
+                                if (!job.isActive) {
+                                    dispatch("Cancelled during MidiTracks building!")
+                                    "Cancelled during MidiTracks building!"
+                                } else {
+                                    // ADD BPM AND VOLUME CHANGES
+                                    val tempoTrack = buildTempoTrack(bpms, totalLength)
+                                    tempoTrack.addVolumeToTrack(dynamics, totalLength)
 
-        actualCounterpoint = if(enhanceChordsInTransposition){
-            actualCounterpoint.handleChordEnhancement(chordsToEnhance).handleRitornellos(ritornello, transpose)
-        } else {
-            actualCounterpoint.handleRitornellos(ritornello, transpose).handleChordEnhancement(chordsToEnhance)
-        }
-        if (actualCounterpoint.isEmpty()) return "Counterpoint to play is empty!!!"
-        if (actualCounterpoint.parts.any{ it.absPitches.size == 0}) return "Counterpoint parts are empty!!!"
+                                    // ADD METRO CHANGES
+                                    val nRhythmSteps = durations.filter { it > -1 }.count()
+                                    val actualRhythm = multiplyRhythmPatternDatas(nTotalNotes, nRhythmSteps, rhythm)
+                                    val bars = tempoTrack.setTimeSignatures(actualRhythm, totalLength)
 
-        // COUNTERPOINT FINAL SIZE (NOT CONSIDERING CHECK AND REPLACE!!!)
-        val nTotalNotes = actualCounterpoint.nNotes()
+                                    //BUILD MIDI FILE
+                                    val tracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
+                                    tracks.add(tempoTrack)
+                                    tracks.addAll(counterpointTracks)
+                                    // // ADD CHORD TRACK IF NEEDED
+                                    //println(harmonizations)
+                                    tracks.addChordTrack(harmonizations, bars,
+                                        counterpointTrackData, audio8D, totalLength, false)
 
-        // EXTRACT COUNTERPOINT TRACK DATA
-        val durations = rhythm.fold(listOf<Int>()) { acc, triple ->
-            acc + if (triple.second) triple.first.retrogradeValues()
-                .repeat(triple.third) else triple.first.values.repeat(triple.third)
-        }.mergeNegativeValues()
-        //println("durations: $durations")
-        val actualDurations = multiplyDurations(nTotalNotes, durations)
-        if (rhythmShuffle) actualDurations.shuffle()
-        val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
-        val ensemblePartsList: List<List<EnsemblePart>> =
-            if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
-            else Ensembles.getEnsemblesListMix(nParts, ensemblesList)
-        val actualEnsemblePartsList = if (partsShuffle) ensemblePartsList.map { it.shuffled() } else ensemblePartsList
-        val glissando: List<Int> = if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
-        val audio8D: List<Int> = if (audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
-        val vibratoExtensions = intArrayOf(0, 360, 240, 160, 120, 80, 60, 30, 15)
-        val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
-            actualCounterpoint, actualDurations, actualEnsemblePartsList,
-            nuances, doublingFlags, rangeTypes, melodyTypes,
-            glissando, audio8D, vibratoExtensions[vibrato]
-        )
-        //counterpointTrackData.forEach{ println(it.pitches.contentToString())}
-        if (counterpointTrackData.isEmpty()) return "No Tracks in Counterpoint!!!"
-
-        // TOTAL LENGTH OF THE PIECE
-        val totalLength = (counterpointTrackData.filter { it.ticks.isNotEmpty() }
-            .maxOfOrNull { it.ticks.last() + it.durations.last() }
-            ?: 0).toLong()//.also{println("Total length: $it")} // Empty tracks have 0 length
-
-        //LEGATO AND RIBATTUTO DURATION ZONE
-        // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
-        //println("legatoTypes: $legatoTypes")
-        if (legatoTypes != listOf(Pair(4, 0))) {
-            val maxLegato = rhythm.minByOrNull { it.first.metroDenominatorMidiValue() }!!.first.metroDenominatorMidiValue() / 3
-            val articulations = floatArrayOf(1f, 0.125f, 0.25f, 0.75f, 1f, 1.125f, 1.25f)
-            counterpointTrackData.addLegatoAndRibattuto(maxLegato, articulations, legatoTypes, totalLength)
-        }
-        // CHECK AND REPLACE
-        val actualCounterpointTrackData = counterpointTrackData.applyMultiCheckAndReplace(checkAndReplace,totalLength)
-
-        // TRANSFORM DATATRACKS IN MIDITRACKS
-        val counterpointTracks = actualCounterpointTrackData.map { convertToMidiTrack(it, actualCounterpointTrackData.size) }
-
-        // ADD BPM AND VOLUME CHANGES
-        val tempoTrack = buildTempoTrack(bpms, totalLength)
-        tempoTrack.addVolumeToTrack(dynamics, totalLength)
-
-        // ADD METRO CHANGES
-        val nRhythmSteps = durations.filter { it > -1 }.count()
-        val actualRhythm = multiplyRhythmPatternDatas(nTotalNotes, nRhythmSteps, rhythm)
-        val bars = tempoTrack.setTimeSignatures(actualRhythm, totalLength)
-
-        //BUILD MIDI FILE
-        val tracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
-        tracks.add(tempoTrack)
-        tracks.addAll(counterpointTracks)
-
-        // // ADD CHORD TRACK IF NEEDED
-        //println(harmonizations)
-        tracks.addChordTrack(harmonizations, bars,
-            counterpointTrackData, audio8D, totalLength, false)
-
-        val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
-        // WARNING: nTotalNotes returned is not considering check and replace modifications!!!
-        return saveAndPlayMidiFile(mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
+                                    val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
+                                    println("JOB ACTIVE: ${job.isActive}")
+                                    // WARNING: nTotalNotes returned is not considering check and replace modifications!!!
+                                    if(job.isActive) {
+                                        saveAndPlayMidiFile(job, mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
+                                    }
+                                    else {
+                                        "Canceled before playing Midi File!"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
     }
 
 
 
-    fun saveAndPlayMidiFile(
-        mediaPlayer: MediaPlayer,
+    suspend fun saveAndPlayMidiFile(
+        context: CoroutineContext,
+        mediaPlayer: MediaPlayer?,
         midi: MidiFile,
         looping: Boolean,
         play: Boolean,
         midiFile: File?,
         nNotesCounterpoint: Int = 0
-    ): String {
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.stop()
-        }
-        mediaPlayer.reset()
-        // 4. Write the MIDI data to a file
-        //File output = new File(getExternalFilesDir(null), "example.mid");
-        //File output = new File("/sdcard/example.mid");
+    ): String = withContext(context){
+        if(mediaPlayer!=null){
+            if (mediaPlayer.isPlaying) {
+                mediaPlayer.stop()
+            }
+            mediaPlayer.reset()
 
-        // ------------- WARNING!!!! -------------
-        //DOESN'T WORK FOR LATEST ANDROID VERSIONS
-        output = midiFile
-        var error = nNotesCounterpoint.toString()
-        //createDialog(output.toString());
-        //mediaPlayer2 = new MediaPlayer();
-        try {
-            midi.writeToFile(output)
-        } catch (e: IOException) {
-            Log.e(Player::class.java.toString(), e.message, e)
-            error = e.message.toString()
-            return error
-        }
-        if (play) {
+
+            // 4. Write the MIDI data to a file
+            //File output = new File(getExternalFilesDir(null), "example.mid");
+            //File output = new File("/sdcard/example.mid");
+
+            // ------------- WARNING!!!! -------------
+            //DOESN'T WORK FOR LATEST ANDROID VERSIONS
+            output = midiFile
+            var error = "Try to play."
+            //createDialog(output.toString());
+            //mediaPlayer2 = new MediaPlayer();
             try {
-                mediaPlayer.setDataSource(output!!.getAbsolutePath())
-                mediaPlayer.prepare()
-
-                //player.create(Harmony12.this, output.);
-            } catch (e: java.lang.Exception) {
+                midi.writeToFile(output)
+            } catch (e: IOException) {
                 Log.e(Player::class.java.toString(), e.message, e)
                 error = e.message.toString()
-                return error
             }
-            //mediaPlayer.setAuxEffectSendLevel()
-            //System.out.println("Midifile salvato");
-            mediaPlayer.start()
-            //mediaPlayer.setLooping(looping);
-        }
-        return error
+            println("JOB ACTIVE IN SAVING MIDI: ${context.job.isActive}")
+            if (play && context.job.isActive) {
+                try {
+                    mediaPlayer.setDataSource(output!!.getAbsolutePath())
+                    mediaPlayer.prepare()
+                    mediaPlayer.start()
+                    error = nNotesCounterpoint.toString()
+                    //player.create(Harmony12.this, output.);
+                } catch (e: java.lang.Exception) {
+                    Log.e(Player::class.java.toString(), e.message, e)
+                    error = e.message.toString()
+                }
+                //mediaPlayer.setAuxEffectSendLevel()
+                //System.out.println("Midifile salvato");
+
+
+
+                //mediaPlayer.setLooping(looping);
+            }
+            error
+        } else "MediaPlayer is null!!!"
     }
 
     private var output: java.io.File? = null

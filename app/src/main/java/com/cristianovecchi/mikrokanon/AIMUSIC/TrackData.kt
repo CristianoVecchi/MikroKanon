@@ -3,6 +3,8 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 import android.os.Build
 import com.cristianovecchi.mikrokanon.alterateLegatosWithDistribution
 import com.cristianovecchi.mikrokanon.midi.alterateArticulation
+import kotlinx.coroutines.job
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -97,16 +99,20 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         }
         return substitutions.toList()
     }
-    fun checkAndReplace(checkAndReplaceDataList: List<CheckAndReplaceData>,
+    fun checkAndReplace(context: CoroutineContext, checkAndReplaceDataList: List<CheckAndReplaceData>,
                         totalLength: Long, trackDataList: List<TrackData>): TrackData {
         val substitutions = mutableListOf<SubstitutionNotes>()
         val slice = totalLength / checkAndReplaceDataList.size
+        val job = context.job
         checkAndReplaceDataList.forEachIndexed { index, checkAndReplaceData ->
-            val start = slice * index
-           // println("totalLength:$totalLength start:$start end:${start+slice-1}")
-            substitutions.addAll(findSubstitutionNotes(checkAndReplaceData, start, start + slice-1, trackDataList))
+            if(job.isActive){
+                val start = slice * index
+                // println("totalLength:$totalLength start:$start end:${start+slice-1}")
+                substitutions.addAll(findSubstitutionNotes(checkAndReplaceData, start, start + slice-1, trackDataList))
+            }
         }
-        return this.substitueNote(substitutions.filter{ it.index!=-1 }.distinctBy { it.index }) // to avoid overlapping
+        return if(job.isActive) this.substitueNote(substitutions.filter{ it.index!=-1 }.distinctBy { it.index }) // to avoid overlapping
+        else TrackData.emptyTrack()
     }
     fun substitueNote(substitutionNotes: List<SubstitutionNotes>): TrackData {
         var subsIndex = 0
@@ -162,6 +168,11 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
             audio8D, partIndex, changes)
     }
     companion object {
+        fun emptyTrack(): TrackData{
+            return TrackData(intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(),
+                intArrayOf(), booleanArrayOf(),null,null,
+                0,80,0,0,false,0)
+        }
         fun findPitchesInSlice(trackDataList: List<TrackData>, start: Long, end: Long): Set<Int>{
             val result = mutableSetOf<Int>()
             for(track in trackDataList){
@@ -176,8 +187,9 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         }
     }
 }
-fun List<TrackData>.applyMultiCheckAndReplace(checkAndReplace: List<List<CheckAndReplaceData>>,
-                              totalLength: Long) : List<TrackData>{
+fun List<TrackData>.applyMultiCheckAndReplace(context:CoroutineContext, dispatch: (String) -> Unit,
+                                              checkAndReplace: List<List<CheckAndReplaceData>>,
+                                                totalLength: Long) : List<TrackData>{
     var result = this
     var isFirstCheckAndReplace = true
     checkAndReplace.forEach{ cnr ->
@@ -186,7 +198,8 @@ fun List<TrackData>.applyMultiCheckAndReplace(checkAndReplace: List<List<CheckAn
             // println(checkAndReplace)
             result =
                 trackDataToTransform.map{ trackData ->
-                    trackData.checkAndReplace(cnr, totalLength, trackDataToTransform)
+                    dispatch("Check'n'replace applied to trackData:${trackData.channel}")
+                    trackData.checkAndReplace(context, cnr, totalLength, trackDataToTransform)
                 }
             isFirstCheckAndReplace = false
         }

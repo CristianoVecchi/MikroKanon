@@ -6,8 +6,6 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Point
 import androidx.lifecycle.*
-import com.cristianovecchi.mikrokanon.composables.*
-import com.cristianovecchi.mikrokanon.midi.Player
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -26,9 +24,7 @@ import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.midi.launchPlayer
 import com.cristianovecchi.mikrokanon.ui.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import kotlin.math.absoluteValue
-import kotlin.system.measureTimeMillis
 
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
                          val undo: Boolean = false, val expand: Boolean = true,
@@ -199,6 +195,11 @@ class AppViewModel(
 
     // macro Functions called by fragments -----------------------------------------------------
     val onStop = {
+        viewModelScope.launch(Dispatchers.Main) {
+            jobPlay?.cancel("jobPlay canceled by onStop()")
+           // jobPlay?.join()
+        }
+        //cancelPreviousMKjobs()
         mediaPlayer?.let{ if (it.isPlaying) it.stop() }
         mediaPlayer?.let{ if (!it.isPlaying) _playing.value = false}
         mediaPlayer?.release()
@@ -228,28 +229,53 @@ class AppViewModel(
         }
     }
     val onPlay = { createAndPlay: Boolean, simplify: Boolean  ->
-        var error = "ERROR: NO FILE"
+        //var error = "ERROR: NO FILE"
         if (userOptionsData.value!!.isEmpty()) {
             insertUserOptionData(UserOptionsData.getDefaultUserOptionsData())
         }
         if (!selectedCounterpoint.value!!.isEmpty()) {
-            if (mediaPlayer == null) {
-                mediaPlayer = MediaPlayer()
-                mediaPlayer?.setOnCompletionListener { onStop() }
-            }
+//            if(jobPlay!= null || jobPlay!!.isActive){
+//                viewModelScope.launch(Dispatchers.Main){
+//                    jobPlay!!.cancelAndJoin()
+//                    jobPlay = null
+//                }
+//            }
             val counterpoints = listOf(selectedCounterpoint.value!!) + savedCounterpoints.toList()
             userOptionsData.value?.let{
-                error = launchPlayer(
-                    userOptionsData.value!![0], createAndPlay, simplify,
-                    mediaPlayer!!, midiPath, counterpoints)
+                _playing.value = true
+                if (mediaPlayer == null) {
+                    mediaPlayer = MediaPlayer()
+                    mediaPlayer?.setOnCompletionListener { onStop() }
+                }
+                val dispatch =  {msg: String ->dispatchBuilding(msg)}
+                viewModelScope.launch(Dispatchers.Main){
+                    var error = "Start"
+                    val mainContext = this.coroutineContext
+                    withContext(Dispatchers.Default) {
+                        //val context = this.coroutineContext
+                        jobPlay = this.coroutineContext.job
+                        error = launchPlayer(
+                            userOptionsData.value!![0], createAndPlay, simplify,
+                            mediaPlayer, midiPath, counterpoints, jobPlay!!, dispatch
+                        )
+                        dispatchError(error)
+                        error.toIntOrNull()?.let{
+                            val timestamp = System.currentTimeMillis()
+                            updateUserOptions("lastPlayData", "$it|$timestamp")
+                        }
+                    }
+                    dispatchError(error)
+                }//.also{  jobQueue.add(it)  }
+
             }
         }
-        mediaPlayer?.let { if (it.isPlaying) _playing.value = true }
-        error.also { println("MIDI building ends with: $it") }
-        error.toIntOrNull()?.let{
-            val timestamp = System.currentTimeMillis()
-            updateUserOptions("lastPlayData", "$it|$timestamp")
-        }
+        //mediaPlayer?.let { if (it.isPlaying) _playing.value = true }
+    }
+    fun dispatchError(error:String){
+        println("MIDI building ends with: $error")
+    }
+    fun dispatchBuilding(message: String){
+        println("building phase: $message")
     }
     val dispatchIntervals = {
         if(computationStack.isNotEmpty())
@@ -794,6 +820,7 @@ class AppViewModel(
         }
     }
     val jobQueue = LinkedList<Job>()
+    var jobPlay: Job? = null
     private fun cancelPreviousMKjobs() {
         if(jobQueue.isNotEmpty()) {
             viewModelScope.launch(Dispatchers.Main) {

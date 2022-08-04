@@ -4,11 +4,16 @@ import android.media.MediaPlayer
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
+import kotlinx.coroutines.withContext
 import java.io.File
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.absoluteValue
 
-fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simplify: Boolean,
-                 mediaPlayer: MediaPlayer, midiPath: File, counterpoints: List<Counterpoint?>): String{
+suspend fun launchPlayer(
+    userOptionsData: UserOptionsData?, createAndPlay: Boolean, simplify: Boolean,
+    mediaPlayer: MediaPlayer?, midiPath: File,
+    counterpoints: List<Counterpoint?>, context: CoroutineContext, dispatch: (String) -> Unit
+): String = withContext(context){
         val ensList: List<List<EnsembleType>> =
             userOptionsData?.let {
                 userOptionsData.ensemblesList
@@ -128,7 +133,9 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
         0 != (userOptionsData?.let { userOptionsData.enhanceChordsInTranspositions }
             ?: 0)
         //selectedCounterpoint.value!!.display()
-        return Player.playCounterpoint(
+        Player.playCounterpoint(
+            context,
+            dispatch,
             mediaPlayer,
             false,
             counterpoints,
@@ -158,3 +165,4 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
             enhanceChordsInTranspositions
         )
     }
+

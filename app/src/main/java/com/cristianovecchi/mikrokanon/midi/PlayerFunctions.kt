@@ -9,6 +9,7 @@ import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.Tempo
 import com.leff.midi.event.meta.TimeSignature
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 import kotlin.math.roundToInt
 fun buildTempoTrack(bpms: List<Float>, totalLength: Long): MidiTrack {
@@ -43,7 +44,8 @@ fun MidiTrack.addVolumeToTrack(dynamics: List<Float>, totalLength: Long) {
     }
 }
 fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, bars: List<Bar>,
-                   trackData: List<TrackData>, audio8D: List<Int>, totalLength: Long, justVoicing: Boolean){
+                                        trackData: List<TrackData>, audio8D: List<Int>,
+                                       totalLength: Long, justVoicing: Boolean){
     if(harmonizations.isNotEmpty() && !harmonizations.all { it.type == HarmonizationType.NONE }) {
         val doubledBars = bars.mergeOnesInMetro()
             .resizeLastBar(totalLength)
