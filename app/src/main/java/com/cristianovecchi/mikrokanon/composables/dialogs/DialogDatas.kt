@@ -54,7 +54,7 @@ data class ButtonsDialogData(
     val onSort: (Int) -> Unit = {}, val onUpsideDown: () -> Unit = {},
     val onArpeggio: (ARPEGGIO) -> Unit = {},
     val onCounterpointSelected: (Int) -> Unit = {}, val onEWH: (Int) -> Unit = {},
-    val onResolutio: () -> Unit = {},
+    val onResolutio: () -> Unit = {}, val onDoubling: () -> Unit = {},
     val onSubmitButtonClick: (Any?) -> Unit = {}, )
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",

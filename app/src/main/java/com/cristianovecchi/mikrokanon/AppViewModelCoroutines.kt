@@ -2,6 +2,7 @@ package com.cristianovecchi.mikrokanon
 
 import androidx.lifecycle.viewModelScope
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
+import com.cristianovecchi.mikrokanon.AppViewModel.Companion.MAX_PARTS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
@@ -207,6 +208,18 @@ fun AppViewModel.resolutioOnCounterpoints(originalCounterpoints: List<Counterpoi
             var newList: List<Counterpoint>
             withContext(Dispatchers.Default){
                 newList = addResolutioOnCounterpoints(originalCounterpoints, absPitchesSet, resolutioForm)
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+            }
+            changeCounterpointsWithLimitAndCache(newList, true)
+        }
+    }
+}
+fun AppViewModel.doublingOnCounterpoints(originalCounterpoints: List<Counterpoint>, doublingList: List<Pair<Int,Int>>){
+    if(!selectedCounterpoint.value!!.isEmpty()){
+        viewModelScope.launch(Dispatchers.Main){
+            var newList: List<Counterpoint>
+            withContext(Dispatchers.Default){
+                newList = addDoublingOnCounterpoints(originalCounterpoints, doublingList, MAX_PARTS)
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimitAndCache(newList, true)

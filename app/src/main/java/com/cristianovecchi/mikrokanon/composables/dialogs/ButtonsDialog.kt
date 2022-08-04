@@ -101,7 +101,7 @@ fun ButtonsDialog(
                                     onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution,
                                     onDoppelgänger = buttonsDialogData.value.onDoppelgänger,
                                     onResolutio = buttonsDialogData.value.onResolutio,
-                                    onDoubling = {}
+                                    onDoubling = buttonsDialogData.value.onDoubling
                                 )
                                 3 -> WavesButtons(
                                     model = buttonsDialogData.value.model,

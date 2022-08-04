@@ -182,6 +182,10 @@ var start = true
                                     onResolutio = { list, resolutioData ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onResolutio(list, resolutioData)
+                                    },
+                                    onDoubling = { list, doublingList ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onDoubling(list, doublingList)
                                     }
                                 )
                             }

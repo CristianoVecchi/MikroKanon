@@ -155,6 +155,9 @@ class OutputFragment: Fragment() {
                                 onResolutio = { resolutioData ->
                                     model.onResolutio(null, resolutioData)
                                 },
+                                onDoubling = { transposition ->
+                                    model.onDoubling(null, transposition)
+                                },
                                 onPlay = {
                                     val executionTime = measureTimeMillis {
                                     model.onPlay(true, false) // play the entire structure

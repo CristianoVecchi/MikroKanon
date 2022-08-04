@@ -484,9 +484,25 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
     }
+    fun addMultipleDoublingParts(doublingList: List<Pair<Int,Int>>, maxParts: Int): Counterpoint {
+        val clone = this.normalizePartsSize(false)
+        if(doublingList.isEmpty()) return clone
+        var result = clone.cloneWithEmptyParts()
+        for((interval, rowForm) in doublingList){
+            val newParts = this.parts.map{ it.transpose(interval, rowForm)}.sortedBy { it.findEmptiness() }
+            val cloneWithDoubling = clone.addParts(newParts, maxParts)
+            result = result.enqueue(cloneWithDoubling)
+        }
+        return result
+    }
+    fun addParts(newParts: List<AbsPart>, maxParts: Int): Counterpoint {
+        return this.copy(parts = this.parts + newParts).cutExtraParts(maxParts).apply {
+            this.findAndSetEmptiness()
+        }
+    }
     fun addResolutiones(absPitchesSet: Set<Int>, resolutioForm: List<Int> = listOf(0,1,0,1,0)): Counterpoint {
         val clone = this.normalizePartsSize(false)
-        if(absPitchesSet.isEmpty()) return clone()
+        //if(absPitchesSet.isEmpty()) return clone() // if absPitchesSet is empty resolutioColumn == column
         val result = clone.cloneWithEmptyParts()
         val checks = clone.areColumnsInSet(absPitchesSet)
         var index = 0

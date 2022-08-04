@@ -17,6 +17,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.ui.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -51,7 +52,8 @@ fun SequenceSelector(model: AppViewModel,
                      onMikroKanons6reducted: (ArrayList<Clip>) -> Unit,
                      onMaze: (List<List<Int>>) -> Unit,
                      onEWH: (ArrayList<Clip>, Int) -> Unit,
-                     onResolutio: (ArrayList<Clip>, Pair<Set<Int>,String>) -> Unit
+                     onResolutio: (ArrayList<Clip>, Pair<Set<Int>,String>) -> Unit,
+                     onDoubling: (ArrayList<Clip>, List<Pair<Int,Int>>) -> Unit
                     )
 {
 
@@ -88,6 +90,7 @@ fun SequenceSelector(model: AppViewModel,
             val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
             val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val resolutioDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+            val doublingDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
             val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val privacyDialogData = remember { mutableStateOf(TextDialogData())}
@@ -122,6 +125,7 @@ fun SequenceSelector(model: AppViewModel,
                 dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
             CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
             ResolutioDialog(resolutioDialogData, buttonsDialogData, dimensions, language.OkButton, model)
+            TransposeDialog(doublingDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
             SequenceScrollableColumn( listState = listState, colors = appColors,
                 modifier = modifier3, fontSize = dimensions.selectorClipFontSize,
                 notesNames = notesNames,
@@ -187,6 +191,13 @@ fun SequenceSelector(model: AppViewModel,
                                         model.resolutioValues = resolutioData
                                         onResolutio(sequences[selected], resolutioData)
                                 }) },
+                                onDoubling = {
+                                    doublingDialogData.value = MultiNumberDialogData(
+                                        true, language.selectDoubling, value = "0|1",
+                                        model = model) { transpositions ->
+                                        onDoubling(sequences[selected], transpositions.extractIntPairsFromCsv())
+                                    }
+                                },
                                 onScarlatti = { onScarlatti(sequences[selected]) },
                                 onOverlap = {
                                     selectCounterpointDialogData.value = ButtonsDialogData(true,

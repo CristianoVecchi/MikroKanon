@@ -278,6 +278,18 @@ class AppViewModel(
         computationStack.pushAndDispatch(Computation.Resolutio(originalCounterpoints,resolutioData))
         resolutioOnCounterpoints(originalCounterpoints, resolutioData.first, resolutioData.second.extractIntsFromCsv())
     }
+    val onDoubling = { list: ArrayList<Clip>?, doublingData: List<Pair<Int,Int>> ->
+        println("on Doubling: ${doublingData}")
+        val originalCounterpoints = if(list != null) {
+            changeFirstSequence(list)
+            convertFirstSequenceToSelectedCounterpoint()
+            listOf( selectedCounterpoint.value!!.clone())
+        } else {
+            counterpoints.value!!.map{ it.clone() }
+        }
+        computationStack.pushAndDispatch(Computation.Doubling(originalCounterpoints,doublingData))
+        doublingOnCounterpoints(originalCounterpoints, doublingData)
+    }
 
     val onTritoneSubstitutionFromSelector = { index: Int ->
         changeSequenceSelection(-1)
@@ -617,6 +629,7 @@ class AppViewModel(
                     is Computation.Doppelgänger -> computationStack.lastElement()
                     is Computation.Cadenza -> computationStack.lastElement()
                     is Computation.Resolutio -> computationStack.lastElement()
+                    is Computation.Doubling -> computationStack.lastElement()
                     is Computation.Scarlatti -> computationStack.lastElement()
                     is Computation.Overlap -> computationStack.lastElement()
                     is Computation.Crossover -> computationStack.lastElement()
@@ -702,6 +715,11 @@ class AppViewModel(
                         if (stepBack) {
                             resolutioOnCounterpoints( previousComputation.counterpoints,
                                 previousComputation.resolutioData.first, previousComputation.resolutioData.second.extractIntsFromCsv())
+                        }
+                    }
+                    is Computation.Doubling -> {
+                        if (stepBack) {
+                            doublingOnCounterpoints( previousComputation.counterpoints, previousComputation.doublingData)
                         }
                     }
                     is Computation.Sort -> {

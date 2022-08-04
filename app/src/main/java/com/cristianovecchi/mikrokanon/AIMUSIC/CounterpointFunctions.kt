@@ -89,6 +89,9 @@ suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounte
 suspend fun addResolutioOnCounterpoints(originalCounterpoints: List<Counterpoint>, absPitchesSet: Set<Int>, resolutioForm: List<Int>): List<Counterpoint>{
      return originalCounterpoints.map{it.addResolutiones(absPitchesSet, resolutioForm)}
 }
+suspend fun addDoublingOnCounterpoints(originalCounterpoints: List<Counterpoint>,  doublingList: List<Pair<Int,Int>>, maxParts: Int): List<Counterpoint>{
+     return originalCounterpoints.map{it.addMultipleDoublingParts(doublingList, maxParts)}
+}
 suspend fun duplicateAllInCounterpoint(counterpoint: Counterpoint ): List<Counterpoint>{
      return counterpoint.duplicateAllPhrases()
 }

@@ -68,6 +68,7 @@ fun ResultDisplay(model: AppViewModel,
                   onFlourish: () -> Unit = {},
                   onEWH: (Int) -> Unit = {},
                   onResolutio: (Pair<Set<Int>,String>) -> Unit,
+                  onDoubling: (List<Pair<Int,Int>>) -> Unit,
                   onPlay: () -> Unit = {},
                   onStop: () -> Unit = {}
                   )
@@ -117,6 +118,7 @@ fun ResultDisplay(model: AppViewModel,
     val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val intervalSetDialogData = remember { mutableStateOf(MultiListDialogData())}
     val transposeDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+    val doublingDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val resolutioDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
@@ -258,6 +260,7 @@ fun ResultDisplay(model: AppViewModel,
                 ButtonsDialog(buttonsDialogData, dimensions, language.OkButton, model, language, filledSlots = filledSlots)
                 MultiListDialog(intervalSetDialogData, dimensions, language.OkButton, colors)
                 TransposeDialog(transposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
+                TransposeDialog(doublingDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
                 ResolutioDialog(resolutioDialogData, buttonsDialogData, dimensions, language.OkButton, model)
                 SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
@@ -351,7 +354,6 @@ fun ResultDisplay(model: AppViewModel,
                                 model = model) { transpositions ->
                                 onTranspose(transpositions.extractIntPairsFromCsv())
                                 transposeDialogData.value = MultiNumberDialogData(model = model)
-
                             }
                         }
                         }
@@ -391,7 +393,17 @@ fun ResultDisplay(model: AppViewModel,
                                             dispatchResolutio = { resolutioData ->
                                                 model.resolutioValues = resolutioData
                                                 onResolutio(resolutioData)
+                                                resolutioDialogData.value = MultiNumberDialogData(model = model)
                                             }) },
+                                    onDoubling = {
+                                        doublingDialogData.value = MultiNumberDialogData(
+                                            true, language.selectDoubling, value = "0|1",
+                                            model = model) { transpositions ->
+                                            close()
+                                            onDoubling(transpositions.extractIntPairsFromCsv())
+                                            doublingDialogData.value = MultiNumberDialogData(model = model)
+                                        }
+                                    },
                                     onScarlatti = { onScarlatti(); close() },
                                     onOverlap = {
                                         selectCounterpointDialogData.value = ButtonsDialogData(true,
