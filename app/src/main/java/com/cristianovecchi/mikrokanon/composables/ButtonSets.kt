@@ -246,7 +246,7 @@ fun SpecialFunctions1Buttons(
 ) {
     Column {
         Row {
-            CustomButton(iconId = model.iconMap["resolutio"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+            CustomButton(iconId = model.iconMap["resolutio"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
                 onResolutio()
             }
             CustomButton(iconId = model.iconMap["doubling"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {

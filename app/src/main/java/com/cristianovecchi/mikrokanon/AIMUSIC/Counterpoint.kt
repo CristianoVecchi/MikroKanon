@@ -484,6 +484,32 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
     }
+    fun addResolutiones(absPitchesSet: Set<Int>, resolutioForm: List<Int> = listOf(0,1,0,1,0)): Counterpoint {
+        val clone = this.normalizePartsSize(false)
+        if(absPitchesSet.isEmpty()) return clone()
+        val result = clone.cloneWithEmptyParts()
+        val checks = clone.areColumnsInSet(absPitchesSet)
+        var index = 0
+        val maxSize = clone.maxSize()
+        val (nBeforeRests, nFirstNotes, nMiddleRests, nSecondNotes, nAfterRests ) = resolutioForm
+        while (index < maxSize){
+            val column = clone.getColumnValuesWithEmptyValues(index)
+            if(checks[index]){
+                result.addColumn(column)
+            } else {
+                val resolutioColumn = column.map{Insieme.resolveOnAbsPitch(it, absPitchesSet)}
+
+                (0 until nBeforeRests).forEach{ _ -> result.addEmptyColumn() }
+                (0 until nFirstNotes).forEach{ _ -> result.addColumn(column) }
+                (0 until nMiddleRests).forEach{ _ -> result.addEmptyColumn() }
+                (0 until nSecondNotes).forEach{ _ -> result.addColumn(resolutioColumn) }
+                (0 until nAfterRests).forEach{ _ -> result.addEmptyColumn() }
+
+            }
+            index++
+        }
+        return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
+    }
 
     fun addCadenzas(horizontalIntervalSet: List<Int>, values: List<Int> = listOf(0,1,0,1,1)): Counterpoint{
         val clone = this.normalizePartsSize(false)
@@ -562,6 +588,15 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         return Counterpoint(newParts.toList(), this.intervalSet)
     }
+    fun areColumnsInSet(absPitchesSet: Set<Int>): List<Boolean> {
+        val result = mutableListOf<Boolean>()
+        val maxSize = maxSize()
+        for( i in 0 until maxSize){
+            val column = this.getColumnValuesWithoutEmptyValues(i)
+            if(absPitchesSet.containsAll(column)) result.add(true) else result.add(false)
+        }
+        return result
+    }
     fun detectIntervalsInColumns(detectorIntervalSet: List<Int>): List<Boolean> {
         val result = mutableListOf<Boolean>()
         val maxSize = maxSize()
@@ -578,7 +613,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
             result.add(check)
         }
-        return result.toList()
+        return result
     }
     data class Match(val row1: Int, val row2: Int, val pitch1: Int, val pitch2: Int)
     fun detectParallelIntervals(detectorIntervalSet: List<Int>, delays: List<Int> = listOf(1)): List<List<Boolean>> {

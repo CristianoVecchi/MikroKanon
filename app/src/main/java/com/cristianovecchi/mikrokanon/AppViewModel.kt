@@ -268,7 +268,17 @@ class AppViewModel(
     }
     val onResolutio = { list: ArrayList<Clip>?, resolutioData: Pair<Set<Int>,String> ->
         println("on Resolutio: ${resolutioData.first} ${resolutioData.second}")
+        val originalCounterpoints = if(list != null) {
+            changeFirstSequence(list)
+            convertFirstSequenceToSelectedCounterpoint()
+            listOf( selectedCounterpoint.value!!.clone())
+        } else {
+            counterpoints.value!!.map{ it.clone() }
+        }
+        computationStack.pushAndDispatch(Computation.Resolutio(originalCounterpoints,resolutioData))
+        resolutioOnCounterpoints(originalCounterpoints, resolutioData.first, resolutioData.second.extractIntsFromCsv())
     }
+
     val onTritoneSubstitutionFromSelector = { index: Int ->
         changeSequenceSelection(-1)
         updateSequence(index, ArrayList(sequences.value!![index].map{ it.tritoneSubstitution() }) )
@@ -606,6 +616,7 @@ class AppViewModel(
                     is Computation.Round -> computationStack.lastElement()
                     is Computation.Doppelgänger -> computationStack.lastElement()
                     is Computation.Cadenza -> computationStack.lastElement()
+                    is Computation.Resolutio -> computationStack.lastElement()
                     is Computation.Scarlatti -> computationStack.lastElement()
                     is Computation.Overlap -> computationStack.lastElement()
                     is Computation.Crossover -> computationStack.lastElement()
@@ -686,6 +697,12 @@ class AppViewModel(
                     }
                     is Computation.Cadenza -> {
                             cadenzasOnCounterpoints( previousComputation.counterpoints, previousComputation.values)
+                    }
+                    is Computation.Resolutio -> {
+                        if (stepBack) {
+                            resolutioOnCounterpoints( previousComputation.counterpoints,
+                                previousComputation.resolutioData.first, previousComputation.resolutioData.second.extractIntsFromCsv())
+                        }
                     }
                     is Computation.Sort -> {
                         if(stepBack){

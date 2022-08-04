@@ -86,6 +86,9 @@ suspend fun buildRound(originalCounterpoints: List<Counterpoint> ): List<Counter
 suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint>, values: List<Int>): List<Counterpoint>{
      return originalCounterpoints.map{it.addCadenzas(horIntervalSet, values)}
 }
+suspend fun addResolutioOnCounterpoints(originalCounterpoints: List<Counterpoint>, absPitchesSet: Set<Int>, resolutioForm: List<Int>): List<Counterpoint>{
+     return originalCounterpoints.map{it.addResolutiones(absPitchesSet, resolutioForm)}
+}
 suspend fun duplicateAllInCounterpoint(counterpoint: Counterpoint ): List<Counterpoint>{
      return counterpoint.duplicateAllPhrases()
 }

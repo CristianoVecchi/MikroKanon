@@ -246,6 +246,7 @@ public class Insieme {
     public static Integer[] TREND_DESCENDANT_DYNAMIC = {11,10,1,2,9,3,8,4,7,5,6,0};
     public static Integer[] TREND_ASCENDANT_STATIC = {0,1,2,11,10,3,9,4,8,5,7,6};
     public static Integer[] TREND_DESCENDANT_STATIC = {0,11,10,1,2,9,3,8,4,7,5,6};
+    public static Integer[] TREND_ASCENDANT_STATIC_RESOLUTIO = {0,1,11,2,10,3,9,4,8,5,7,6};
     public static Integer[] extractDirectionsFromIntervalSet(Integer[] intervalSet, Integer[] trend){
         Vector list = new Vector();
         Integer[] dirs = trend;
@@ -1143,5 +1144,16 @@ public class Insieme {
             if(!absPitches.contains(hrm)) return hrm;
         }
         return -1;
+    }
+
+    public static int resolveOnAbsPitch(int absPitch, Set<Integer> absPitchesSet) {
+        if(absPitch == -1) return -1;
+        if(absPitchesSet.contains(absPitch)) return absPitch;
+        for(int i : TREND_ASCENDANT_STATIC_RESOLUTIO){
+            int newPitch = absPitch + i;
+            if(newPitch > 11) newPitch = newPitch - 12;
+            if(absPitchesSet.contains(newPitch)) return newPitch;
+        }
+        return absPitch;
     }
 }

@@ -201,6 +201,18 @@ fun AppViewModel.cadenzasOnCounterpoints(originalCounterpoints: List<Counterpoin
         }
     }
 }
+fun AppViewModel.resolutioOnCounterpoints(originalCounterpoints: List<Counterpoint>, absPitchesSet: Set<Int>, resolutioForm: List<Int>){
+    if(!selectedCounterpoint.value!!.isEmpty()){
+        viewModelScope.launch(Dispatchers.Main){
+            var newList: List<Counterpoint>
+            withContext(Dispatchers.Default){
+                newList = addResolutioOnCounterpoints(originalCounterpoints, absPitchesSet, resolutioForm)
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+            }
+            changeCounterpointsWithLimitAndCache(newList, true)
+        }
+    }
+}
 fun AppViewModel.duplicateAllPhrasesInCounterpoint(originalCounterpoint: Counterpoint){
     if(!originalCounterpoint.isEmpty()){
         var newList: List<Counterpoint>
