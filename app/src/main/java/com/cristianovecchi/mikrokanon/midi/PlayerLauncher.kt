@@ -41,7 +41,7 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
 //                            listOf(Triple(patterns[pair.first.absoluteValue-1], pair.first<0, pair.second))
 //                        } else {
                 val pairs = userOptionsData.rhythm.extractIntPairsFromCsv()
-                pairs.map{Triple(patterns[it.first.absoluteValue-1], it.first<0, it.second) }
+                pairs.map{Triple(patterns[it.first], it.second<0, it.second.absoluteValue) }
 //                        }
             } ?: listOf(Triple(RhythmPatterns.PLAIN_4_4_R16,false,1)) )
         val rhythmShuffle: Boolean =
@@ -59,14 +59,14 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
                 }
             } ?: listOf(Pair(1, 1)) // ORIGINAL by default || 0 is unused
         val doublingFlags: Int =
-            userOptionsData?.let { userOptionsData.doublingFlags }
+            userOptionsData?.let { userOptionsData.doublingFlags.toInt() }
                 ?: 0
         val audio8DFlags: Int =
             userOptionsData?.let {
                 if (simplify) {
                     0
                 } else {
-                    userOptionsData.audio8DFlags
+                    userOptionsData.audio8DFlags.toInt()
                 }
             } ?: 0
         val ritornello: Int =
@@ -81,7 +81,7 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
             userOptionsData?.let { userOptionsData.transpose.extractIntPairsFromCsv() }
                 ?: listOf(Pair(0,1))
         val nuances: Int =
-            userOptionsData?.let { userOptionsData.nuances }
+            userOptionsData?.let { userOptionsData.nuances.toInt() }
                 ?: 1
         val rangeTypes: List<Pair<Int, Int>> =
             userOptionsData?.let {
@@ -108,10 +108,10 @@ fun launchPlayer(userOptionsData: UserOptionsData?, createAndPlay: Boolean, simp
                 }
             } ?: listOf(0)
         val glissandoFlags: Int =
-            userOptionsData?.let { userOptionsData.glissandoFlags }
+            userOptionsData?.let { userOptionsData.glissandoFlags.toInt() }
                 ?: 0
         val vibrato: Int =
-            userOptionsData?.let { userOptionsData.vibrato }
+            userOptionsData?.let { userOptionsData.vibrato.toInt() }
                 ?: 0
     val checkAndReplace: List<List<CheckAndReplaceData>> =
         userOptionsData?.let {CheckAndReplaceData.createMultiCheckAndReplaceDatasFromCsv(userOptionsData.checkAndReplace)}

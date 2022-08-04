@@ -144,8 +144,10 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
 
     val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
     val colors = model.appColors
-    val optionNames= listOf("Ensemble", "Glissando","Vibrato","Nuances",
-        "Rhythm",  "Rhythm Shuffle", "Parts Shuffle","Doubling","8D AUDIO",
+    val optionNames= listOf(
+        "Ensemble", "Glissando","Vibrato","Nuances",
+        "Rhythm", "Rhythm Shuffle", "Parts Shuffle",
+        "Doubling","8D AUDIO",
 
         "BPM", "Dynamics",
         "Range","Melody","Articulation",
@@ -244,7 +246,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                         }
                         "Glissando" -> {
                             val intervalsForGlissando = createGlissandoIntervals(lang.doublingNames)
-                            val flags = userOptions.glissandoFlags
+                            val flags = userOptions.glissandoFlags.toInt()
                             val intsFromFlags = convertFlagsToInts(flags).map { it - 1 }
                             val isOn = flags > 0
                             val nl = newLineOrNot(intsFromFlags, 2)
@@ -262,7 +264,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                     ) { indexes ->
                                         model.updateUserOptions(
                                             "glissandoFlags",
-                                            convertIntsToFlags(indexes.map { it + 1 }.toSortedSet())
+                                            convertIntsToFlags(indexes.map { it + 1 }.toSortedSet()).toString()
                                         )
                                         doublingDialogData.value =
                                             MultiListDialogData(itemList = doublingDialogData.value.itemList)
@@ -270,7 +272,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                 })
                         }
                         "Vibrato" -> {
-                            val intensity = userOptions.vibrato
+                            val intensity = userOptions.vibrato.toInt()
                             val sym = getVibratoSymbol()
                             val timeIndices: List<String> = (0 until 9).map { if(it == 0) "-" else sym.repeat(it) }
                             val isOn = intensity != 0
@@ -286,7 +288,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                     ) { index ->
                                         model.updateUserOptions(
                                             "vibrato",
-                                            index
+                                            index.toString()
                                         )
                                         ritornelloDialogData.value =
                                             ListDialogData(itemList = vibratoDialogData.value.itemList)
@@ -295,7 +297,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                         }
                         "Nuances" -> {
                             val nuancesOptions: List<String> = lang.nuancesOptions
-                            val nuancesIndex = userOptions.nuances
+                            val nuancesIndex = userOptions.nuances.toInt()
                             val isOn = nuancesIndex != 0
                             SelectableCard(
                                 text = if(isOn) "${lang.nuances}: ${nuancesOptions[nuancesIndex]}" else lang.nuances,
@@ -308,7 +310,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                     ) { index ->
                                         model.updateUserOptions(
                                             "nuances",
-                                            index
+                                            index.toString()
                                         )
                                         listDialogData.value =
                                             ListDialogData(itemList = listDialogData.value.itemList)
@@ -319,9 +321,9 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                             val rhythmNames = RhythmPatterns.getTitles()
                             val rhythmPatterns = userOptions.rhythm.extractIntPairsFromCsv()
                             val rhythmTexts = rhythmPatterns.map{
-                                val arrow = if(it.first<0) "←" else ""
-                                val feature = if(it.second>1 ) " (${it.second}x)" else ""
-                                arrow + rhythmNames[it.first.absoluteValue - 1] + feature
+                                val arrow = if(it.second<0) "←" else ""
+                                val feature = if(it.second.absoluteValue>1 ) " (${it.second.absoluteValue}x)" else ""
+                                arrow + rhythmNames[it.first] + feature
                             }
                             val nl = newLineOrNot(rhythmTexts, 2)
                             SelectableCard(
@@ -374,7 +376,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                         }
 
                         "Doubling" -> {
-                            val flags = userOptions.doublingFlags
+                            val flags = userOptions.doublingFlags.toInt()
                             val intsFromFlags = convertFlagsToInts(flags).map { it - 1 }
                             val isOn = flags > 0
                             val nl = newLineOrNot(intsFromFlags, 2)
@@ -394,7 +396,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                     ) { indexes ->
                                         model.updateUserOptions(
                                             "doublingFlags",
-                                            convertIntsToFlags(indexes.map { it + 1 }.toSortedSet())
+                                            convertIntsToFlags(indexes.map { it + 1 }.toSortedSet()).toString()
                                         )
                                         doublingDialogData.value =
                                             MultiListDialogData(itemList = doublingDialogData.value.itemList)
@@ -402,7 +404,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                 })
                         }
                         "8D AUDIO" -> {
-                            val flags = userOptions.audio8DFlags
+                            val flags = userOptions.audio8DFlags.toInt()
                             val intsFromFlags = convertFlagsToInts(flags)
                             val isOn = flags > 0
                             val nl = newLineOrNot(intsFromFlags, 7)
@@ -422,7 +424,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                     ) { indexes ->
                                         model.updateUserOptions(
                                             "audio8DFlags",
-                                            convertIntsToFlags(indexes.toSortedSet())
+                                            convertIntsToFlags(indexes.toSortedSet()).toString()
                                         )
                                         doublingDialogData.value =
                                             MultiListDialogData(itemList = doublingDialogData.value.itemList)

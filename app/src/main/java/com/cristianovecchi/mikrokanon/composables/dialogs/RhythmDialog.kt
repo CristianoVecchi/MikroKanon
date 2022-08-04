@@ -112,9 +112,9 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                     for (j in 0 until nCols) {
                                         if (index != pairs.size) {
                                             val pattern = pairs[index].first
-                                            val repetitions = pairs[index].second
+                                            val repetitions = pairs[index].second.absoluteValue
                                             val feature = if(repetitions >1 ) " (${repetitions}x)" else ""
-                                            val text = patternNames[pattern.absoluteValue-1] + feature
+                                            val text = patternNames[pattern] + feature
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -132,7 +132,7 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                             )
                                             {
                                                 Text(
-                                                    text = if (pattern < 0) "←$text" else text,
+                                                    text = if (pairs[index].second < 0) "←$text" else text,
                                                     modifier = Modifier.padding(innerPadding),
                                                     style = TextStyle(fontSize = fontSize),
                                                     fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal
@@ -166,7 +166,7 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                             val value = values[cursor]
                             val pattern = value.first
                             val repetitions = value.second
-                            setPattern(cursor, pattern * -1, repetitions)
+                            setPattern(cursor, pattern, repetitions * -1)
                         }
                         CustomButton(
                             adaptSizeToIconButton = true,
@@ -178,9 +178,10 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                             val values = patternText.extractIntPairsFromCsv().toMutableList()
                             val value = values[cursor]
                             val pattern = value.first
-                            var repetitions = value.second - 1
+                            val back = if(value.second < 0) -1 else 1
+                            var repetitions = value.second.absoluteValue - 1
                             repetitions = if(repetitions < 1) 1 else repetitions
-                            setPattern(cursor, pattern, repetitions)
+                            setPattern(cursor, pattern, repetitions * back)
                         }
                         CustomButton(
                             adaptSizeToIconButton = true,
@@ -192,8 +193,9 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                             val values = patternText.extractIntPairsFromCsv().toMutableList()
                             val value = values[cursor]
                             val pattern = value.first
-                            val repetitions = value.second + 1
-                            setPattern(cursor, pattern, repetitions)
+                            val back = if(value.second < 0) -1 else 1
+                            val repetitions = value.second.absoluteValue + 1
+                            setPattern(cursor, pattern, repetitions * back)
                         }
 
                     }
@@ -227,12 +229,13 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                 ) {
                                     val values = patternText.extractIntPairsFromCsv().toMutableList()
                                     val value = values[cursor]
-                                    val pattern = value.first.absoluteValue - 1
-                                    val repetitions = value.second
+                                    val pattern = value.first
+                                    val repetitions = value.second.absoluteValue
+                                    val back = if(value.second < 0) -1 else 1
                                     listDialogData.value = ListDialogData(
                                         true, patternNames, pattern, lang.selectRhythm
                                     ) { index ->
-                                        values[cursor] = Pair(index+1, repetitions)
+                                        values[cursor] = Pair(index, repetitions * back)
                                         patternText = values.toIntPairsString()
 
                                         listDialogData.value =

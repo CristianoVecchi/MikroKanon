@@ -41,6 +41,7 @@ var start = true
         model.userOptionsData.observe(viewLifecycleOwner){
             model.userOptionsData.value.let {
                 if(it!!.isNotEmpty()) {
+                    println(it[0])
                     model.privacyIsAccepted = it[0].privacy != 0
                     model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                     model.refreshZodiacFlags()

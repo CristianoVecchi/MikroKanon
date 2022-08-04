@@ -24,10 +24,10 @@ import androidx.room.PrimaryKey
         val melodyTypes: String,
 
         @ColumnInfo(name = "glissando_flags")
-        val glissandoFlags: Int,
+        val glissandoFlags: String,
 
         @ColumnInfo(name = "vibrato")
-        val vibrato: Int,
+        val vibrato: String,
 
         @ColumnInfo(name = "dynamics")
         val dynamics: String,
@@ -56,10 +56,10 @@ import androidx.room.PrimaryKey
         val transpose: String,
 
         @ColumnInfo(name = "doubling_flags")
-        val doublingFlags: Int,
+        val doublingFlags: String,
 
         @ColumnInfo(name = "(audio8D_flags")
-        val audio8DFlags: Int,
+        val audio8DFlags: String,
 
         @ColumnInfo(name = "intSetVert_flags")
         val intSetVertFlags: Int,
@@ -92,7 +92,7 @@ import androidx.room.PrimaryKey
         val zodiacFlags: Int,
 
         @ColumnInfo(name = "nuances")
-        val nuances: Int,
+        val nuances: String,
 
         @ColumnInfo(name = "check_and_replace")
         val checkAndReplace: String,
@@ -106,6 +106,9 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "enhance_chords_in_transpositions")
         val enhanceChordsInTranspositions: Int,
 
+        @ColumnInfo(name = "drums")
+        val drums: String,
+
         @ColumnInfo(name = "lastplay_data")
         val lastPlayData: String,
 
@@ -115,16 +118,16 @@ import androidx.room.PrimaryKey
         companion object{
             fun getDefaultUserOptionsData(): UserOptionsData {
                 return UserOptionsData(0,"2", "2|0","4|1","0",
-                    0,0,
+                    "0","0",
                     "0.828", "90", "0|1",
                     0,0, "1|1",0, "0|1",
-                    0,0,0b0011110, 0b1111111,
+                    "0","0",0b0011110, 0b1111111,
                     0,0,0,1,
                      //"System|0" ,
                      "579|0" , // priority on custom color 579
-                    0,"System", 0, 1 ,
+                    0,"System", 0, "1" ,
                     ";;;","","0|1",0,
-                    "0|-1", 0)
+                    "0","0|-1", 0)
             }
             fun updateUserOptionsData(
                 optionsDataClone: UserOptionsData,
@@ -146,10 +149,10 @@ import androidx.room.PrimaryKey
                         optionsDataClone.copy(id = id, melodyTypes = value as String)
                     }
                     "glissandoFlags" -> {
-                        optionsDataClone.copy(id = id, glissandoFlags = value as Int)
+                        optionsDataClone.copy(id = id, glissandoFlags = value as String)
                     }
                     "vibrato" -> {
-                        optionsDataClone.copy(id = id, vibrato = value as Int)
+                        optionsDataClone.copy(id = id, vibrato = value as String)
                     }
                     "dynamics" -> {
                         optionsDataClone.copy(id = id, dynamics = value as String)
@@ -181,10 +184,10 @@ import androidx.room.PrimaryKey
                         optionsDataClone.copy(id = id, transpose = value as String)
                     }
                     "doublingFlags" -> {
-                        optionsDataClone.copy(id = id, doublingFlags = value as Int)
+                        optionsDataClone.copy(id = id, doublingFlags = value as String)
                     }
                     "audio8DFlags" -> {
-                        optionsDataClone.copy(id = id, audio8DFlags = value as Int)
+                        optionsDataClone.copy(id = id, audio8DFlags = value as String)
                     }
                     "intSetVertFlags" -> {
                         optionsDataClone.copy(id = id, intSetVertFlags = value as Int)
@@ -217,7 +220,7 @@ import androidx.room.PrimaryKey
                         optionsDataClone.copy(id = id, zodiacFlags = value as Int)
                     }
                     "nuances" -> {
-                        optionsDataClone.copy(id = id, nuances = value as Int)
+                        optionsDataClone.copy(id = id, nuances = value as String)
                     }
                     "checkAndReplace" -> {
                         optionsDataClone.copy(id = id, checkAndReplace = value as String)
@@ -230,6 +233,9 @@ import androidx.room.PrimaryKey
                     }
                     "enhanceChordsInTranspositions" -> {
                         optionsDataClone.copy(id = id, enhanceChordsInTranspositions = value as Int)
+                    }
+                    "drums" -> {
+                        optionsDataClone.copy(id = id, drums = value as String)
                     }
                     "lastPlayData" -> {
                         optionsDataClone.copy(id = id, lastPlayData = value as String)

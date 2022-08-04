@@ -39,12 +39,15 @@ fun ButtonsDialog(
         // var selectedValue by remember{ mutableStateOf(numberDialogData.value.value)}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
-                modifier = Modifier.width(dimensions.dialogWidth)
+                modifier = Modifier
+                    .width(dimensions.dialogWidth)
                     .height(dimensions.dialogHeight),
                 color = backgroundColor,
                 shape = RoundedCornerShape(10.dp),
             ) {
-                Column(modifier = Modifier.padding(10.dp).background(backgroundColor),) {
+                Column(modifier = Modifier
+                    .padding(10.dp)
+                    .background(backgroundColor),) {
                     Text(text = buttonsDialogData.value.title, color = fontColor)
                     Spacer(modifier = Modifier.height(10.dp))
                     val listState = rememberLazyListState()
@@ -52,7 +55,7 @@ fun ButtonsDialog(
                         state = listState,
                         modifier = Modifier.height(dimensions.dialogHeight)
                     ) {
-                        items((0..6).toList()) { item ->
+                        items((0..10).toList()) { item ->
                             when (item) {
                                 0 -> if(!workingOnSequences) {
                                     NotFromSelectorButtons(
@@ -82,7 +85,19 @@ fun ButtonsDialog(
                                     colors = model.appColors,
                                     onEWH = buttonsDialogData.value.onEWH
                                 )
-                                2 -> SpecialFunctions1Buttons(
+                                2 -> BuildingButtons(
+                                    model = buttonsDialogData.value.model,
+                                    buttonSize = buttonSize,
+                                    fontSize = fontSize,
+                                    colors = model.appColors,
+                                    isActive = buttonsDialogData.value.isActiveSpecialFunctions1,
+                                    onScarlatti = buttonsDialogData.value.onScarlatti,
+                                    onOverlap = buttonsDialogData.value.onOverlap,
+                                    onCrossover = buttonsDialogData.value.onCrossover,
+                                    onGlue = buttonsDialogData.value.onGlue,
+
+                                    )
+                                3 -> SpecialFunctions1Buttons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonSize,
                                     fontSize = fontSize,
@@ -90,10 +105,6 @@ fun ButtonsDialog(
                                     isActive = buttonsDialogData.value.isActiveSpecialFunctions1,
                                     onRound = buttonsDialogData.value.onRound,
                                     onCadenza = buttonsDialogData.value.onCadenza,
-                                    onScarlatti = buttonsDialogData.value.onScarlatti,
-                                    onOverlap = buttonsDialogData.value.onOverlap,
-                                    onCrossover = buttonsDialogData.value.onCrossover,
-                                    onGlue = buttonsDialogData.value.onGlue,
                                     onMaze = buttonsDialogData.value.onMaze,
                                     onFlourish = buttonsDialogData.value.onFlourish,
                                     onEraseIntervals = buttonsDialogData.value.onEraseIntervals,
@@ -103,7 +114,7 @@ fun ButtonsDialog(
                                     onResolutio = buttonsDialogData.value.onResolutio,
                                     onDoubling = buttonsDialogData.value.onDoubling
                                 )
-                                3 -> WavesButtons(
+                                4 -> WavesButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActiveWaves,
                                     buttonSize = buttonSize,
@@ -113,7 +124,7 @@ fun ButtonsDialog(
                                     onWave4Click = buttonsDialogData.value.onWave4,
                                     onWave6Click = buttonsDialogData.value.onWave6
                                 )
-                                4 -> PedalsButtons(
+                                5 -> PedalsButtons(
                                     model = buttonsDialogData.value.model,
                                     isActive = buttonsDialogData.value.isActivePedals,
                                     buttonSize = buttonSize,
@@ -123,16 +134,43 @@ fun ButtonsDialog(
                                     onPedal3Click = buttonsDialogData.value.onPedal3,
                                     onPedal5Click = buttonsDialogData.value.onPedal5
                                 )
-                                5 -> Spacer(modifier = Modifier.height(6.dp))
-                                6 -> SlotButtons(
+                                6 -> Spacer(modifier = Modifier.height(6.dp))
+                                7 -> SlotButtons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonSize,
                                     fontSize = fontSize,
                                     colors = model.appColors,
+                                    start = 0,
                                     numbers = language.slotNumbers,
                                     filled = filledSlots,
                                     onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected)
-
+                                8 -> SlotButtons(
+                                    model = buttonsDialogData.value.model,
+                                    buttonSize = buttonSize,
+                                    fontSize = fontSize,
+                                    colors = model.appColors,
+                                    start = 4,
+                                    numbers = language.slotNumbers,
+                                    filled = filledSlots,
+                                    onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected)
+                                9 -> SlotButtons(
+                                    model = buttonsDialogData.value.model,
+                                    buttonSize = buttonSize,
+                                    fontSize = fontSize,
+                                    colors = model.appColors,
+                                    start = 8,
+                                    numbers = language.slotNumbers,
+                                    filled = filledSlots,
+                                    onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected)
+                                10 -> SlotButtons(
+                                    model = buttonsDialogData.value.model,
+                                    buttonSize = buttonSize,
+                                    fontSize = fontSize,
+                                    colors = model.appColors,
+                                    start = 12,
+                                    numbers = language.slotNumbers,
+                                    filled = filledSlots,
+                                    onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected)
                             }
 
                         }

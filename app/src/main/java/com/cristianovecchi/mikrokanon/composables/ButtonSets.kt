@@ -153,30 +153,27 @@ fun ExtendedWeightedHarmonyButtons(
 @Composable
 fun SlotButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int,
-    colors: AppColors, numbers: List<String>, filled: Set<Int>,
+    colors: AppColors, start: Int, numbers: List<String>, filled: Set<Int>,
     onCounterpointSelected: (Int) -> Unit
 ) {
-    Column{
-        (0 until 4).forEach{
-            val step = it * 4
             Row {
-                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(step+0)) numbers[step+0] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                    onCounterpointSelected(step+0)
+                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(start+0)) numbers[start+0] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                    onCounterpointSelected(start+0)
                 }
-                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(step+1)) numbers[step+1] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                    onCounterpointSelected(step+1)
+                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(start+1)) numbers[start+1] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                    onCounterpointSelected(start+1)
                 }
-                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(step+2)) numbers[step+2] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                    onCounterpointSelected(step+2)
+                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(start+2)) numbers[start+2] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                    onCounterpointSelected(start+2)
                 }
-                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(step+3)) numbers[step+3] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
-                    onCounterpointSelected(step+3)
+                CustomButton(iconId = model.iconMap["save"]!!, text = if(filled.contains(start+3)) numbers[start+3] else " ", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
+                    onCounterpointSelected(start+3)
                 }
             }
-        }
+
     }
 
-}
+
 @Composable
 fun MikroKanonsButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
@@ -237,25 +234,14 @@ fun NotFromSelectorButtons(
     }
 }
 @Composable
-fun SpecialFunctions1Buttons(
+fun BuildingButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
-    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
-    onOverlap: () -> Unit, onCrossover: () -> Unit, onGlue: () -> Unit, onMaze: () -> Unit,
-    onScarlatti: () -> Unit, onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit,
-    onResolutio: () -> Unit, onDoubling: () -> Unit
+    onOverlap: () -> Unit, onCrossover: () -> Unit, onGlue: () -> Unit, onScarlatti: () -> Unit
 ) {
-    Column {
+
         Row {
-            CustomButton(iconId = model.iconMap["resolutio"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
-                onResolutio()
-            }
-            CustomButton(iconId = model.iconMap["doubling"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-                onDoubling()
-            }
-        }
-        Row {
-            CustomButton(iconId = model.iconMap["doppelgänger"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
-                onDoppelgänger()
+            CustomButton(iconId = model.iconMap["Scarlatti"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
+                onScarlatti()
             }
             CustomButton(iconId = model.iconMap["overlap"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onOverlap()
@@ -267,6 +253,29 @@ fun SpecialFunctions1Buttons(
                 onGlue()
             }
         }
+    }
+@Composable
+fun SpecialFunctions1Buttons(
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
+    onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
+    onMaze: () -> Unit, onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit,
+    onResolutio: () -> Unit, onDoubling: () -> Unit
+) {
+    Column {
+        Row {
+            CustomButton(iconId = model.iconMap["cadenza"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
+                onCadenza()
+            }
+            CustomButton(iconId = model.iconMap["resolutio"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
+                onResolutio()
+            }
+            CustomButton(iconId = model.iconMap["doubling"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onDoubling()
+            }
+            CustomButton(iconId = model.iconMap["erase"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
+                onEraseIntervals()
+            }
+        }
         Row{
             CustomButton(iconId = model.iconMap["single"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
                 onSingle()
@@ -274,13 +283,9 @@ fun SpecialFunctions1Buttons(
             CustomButton(iconId = model.iconMap["fioritura"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
                 onFlourish()
             }
-            CustomButton(iconId = model.iconMap["erase"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
-                onEraseIntervals()
+            CustomButton(iconId = model.iconMap["doppelgänger"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
+                onDoppelgänger()
             }
-            CustomButton(iconId = model.iconMap["Scarlatti"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
-                onScarlatti()
-            }
-
         }
         Row {
             CustomButton(iconId = model.iconMap["tritone_substitution"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
@@ -288,9 +293,6 @@ fun SpecialFunctions1Buttons(
             }
             CustomButton(iconId = model.iconMap["round"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
                 onRound()
-            }
-            CustomButton(iconId = model.iconMap["cadenza"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
-                onCadenza()
             }
             CustomButton(iconId = model.iconMap["maze"]!!, isActive = true, buttonSize = buttonSize, fontSize = fontSize,colors = colors) {
                 onMaze()

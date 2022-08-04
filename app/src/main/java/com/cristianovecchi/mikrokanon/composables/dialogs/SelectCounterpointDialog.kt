@@ -61,6 +61,37 @@ fun SelectCounterpointDialog(
                                         buttonSize = buttonSize,
                                         fontSize = fontSize,
                                         colors = model.appColors,
+                                        start = 0,
+                                        numbers = language.slotNumbers,
+                                        filled = filledSlots,
+                                        onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected
+                                    )
+                                    SlotButtons(
+                                        model = buttonsDialogData.value.model,
+                                        buttonSize = buttonSize,
+                                        fontSize = fontSize,
+                                        colors = model.appColors,
+                                        start = 4,
+                                        numbers = language.slotNumbers,
+                                        filled = filledSlots,
+                                        onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected
+                                    )
+                                    SlotButtons(
+                                        model = buttonsDialogData.value.model,
+                                        buttonSize = buttonSize,
+                                        fontSize = fontSize,
+                                        colors = model.appColors,
+                                        start = 8,
+                                        numbers = language.slotNumbers,
+                                        filled = filledSlots,
+                                        onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected
+                                    )
+                                    SlotButtons(
+                                        model = buttonsDialogData.value.model,
+                                        buttonSize = buttonSize,
+                                        fontSize = fontSize,
+                                        colors = model.appColors,
+                                        start = 12,
                                         numbers = language.slotNumbers,
                                         filled = filledSlots,
                                         onCounterpointSelected = buttonsDialogData.value.onCounterpointSelected
