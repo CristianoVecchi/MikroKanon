@@ -1,7 +1,6 @@
 package com.cristianovecchi.mikrokanon.composables
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,7 +13,13 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -56,7 +61,11 @@ fun AppScaffold(model: AppViewModel,
     val creditStyle = SpanStyle(
         fontSize = dimensions.titleTextSize.second.sp,
         color = creditColor)
-
+    val buildingState by model.buildingState.asFlow().collectAsState(initial = Triple(AppViewModel.Building.NONE, listOf(),0))
+    val percWidth by derivedStateOf{
+        if(buildingState.first == AppViewModel.Building.WRITE_FILE) 6f/7 else
+        buildingState.second.toSet().size.toFloat() / buildingState.third
+    }
     Scaffold(
         //modifier = Modifier
             //.background(colors.selCardBorderColorSelected),
@@ -64,42 +73,82 @@ fun AppScaffold(model: AppViewModel,
         scaffoldState = scaffoldState,
         drawerContent = { SettingsDrawer(model, dimensionsFlow, userOptionsDataFlow, counterpointsDataFlow)},
         topBar = {
-            val creditsDialogData by lazy { mutableStateOf(TextDialogData())}
-            CreditsDialog(creditsDialogData, dimensions)
-            TopAppBar(Modifier.border(1.dp,colors.selCardBorderColorSelected)) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(colors.selCardBorderColorSelected), //color of the top app bar
+                val creditsDialogData by lazy { mutableStateOf(TextDialogData())}
+                CreditsDialog(creditsDialogData, dimensions)
+                TopAppBar(Modifier.border(1.dp,colors.selCardBorderColorSelected)) {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .background(colors.selCardBorderColorSelected), //color of the top app bar
                         //.border(1.dp, Color.Transparent),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                )
-                {
-                    IconButton(
-                        modifier = Modifier.size(dimensions.selectorButtonSize),
-                        onClick = {scope.launch { scaffoldState.drawerState.open() }  }
-                    ) {
-                        Icon(
-                            Icons.Filled.Menu, "",
-                            modifier = Modifier.size(dimensions.selectorButtonSize/2),
-                            tint = colors.cellTextColorSelected)
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    )
+                    {
+                        if(buildingState.first == AppViewModel.Building.NONE) {
+                            IconButton(
+                                modifier = Modifier.size(dimensions.selectorButtonSize),
+                                onClick = {scope.launch { scaffoldState.drawerState.open() }  }
+                            ) {
+                                Icon(
+                                    Icons.Filled.Menu, "",
+                                    modifier = Modifier.size(dimensions.selectorButtonSize/2),
+                                    tint = colors.cellTextColorSelected)
+                            }
+                            ClickableText(text = buildAnnotatedString {
+                                withStyle(titleStyle){
+                                    append("MikroKanon\n")
+                                }
+                                withStyle(creditStyle) {
+                                    append("by Cristiano Vecchi")
+                                }
+                            },onClick = {
+                                creditsDialogData.value = TextDialogData(true, "Credits:",
+                                ) {
+                                    creditsDialogData.value = TextDialogData()
+                                }
+                            })
+                        } else {
+                            val iconId = when(buildingState.first){
+                                AppViewModel.Building.DATATRACKS -> model.iconMap["building"]
+                                AppViewModel.Building.NONE -> model.iconMap["building"]
+                                AppViewModel.Building.CHECK_N_REPLACE -> model.iconMap["accompanist"]
+                                AppViewModel.Building.MIDITRACKS -> model.iconMap["sound"]
+                                AppViewModel.Building.WRITE_FILE -> model.iconMap["save"]
+                            }
+                            Box(
+                                Modifier
+                                    .width(dimensions.width.dp)
+                                    .fillMaxHeight()
+                                ){
+                                Canvas(modifier = Modifier
+                                    .fillMaxSize()
+                                ) {
+                                    val allX = this.size.width
+                                    val allY = this.size.height
+                                    drawRect(colors.selCardBorderColorSelected, Offset(0f,0f ),
+                                        Size(allX,allY))
+                                    drawRect(creditColor, Offset(0f,0f ),
+                                        Size(allX * percWidth,allY))
+                                }
+
+                                Row(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Transparent),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        painterResource(id = iconId!!), "",
+                                        modifier = Modifier.size(dimensions.selectorButtonSize/2),
+                                        tint = colors.cellTextColorSelected)
+                                }
+                            }
+
+                        }
                     }
-                    ClickableText(text = buildAnnotatedString {
-                        withStyle(titleStyle){
-                            append("MikroKanon\n")
-                        }
-                        withStyle(creditStyle) {
-                            append("by Cristiano Vecchi")
-                        }
-                    },onClick = {
-                        creditsDialogData.value = TextDialogData(true, "Credits:",
-                        ) {
-                            creditsDialogData.value = TextDialogData()
-                        }
-                    })
                 }
-            }
         },
         content = {
             content()

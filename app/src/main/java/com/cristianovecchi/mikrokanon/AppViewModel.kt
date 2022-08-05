@@ -204,6 +204,7 @@ class AppViewModel(
         mediaPlayer?.let{ if (!it.isPlaying) _playing.value = false}
         mediaPlayer?.release()
         mediaPlayer = null
+        _buildingState.value = Triple(Building.NONE,listOf(),0)
     }
     val onPlaySequence = { clips: List<Clip> ->
         _selectedCounterpoint.value = Counterpoint.counterpointFromClipList(clips)
@@ -247,7 +248,8 @@ class AppViewModel(
                     mediaPlayer = MediaPlayer()
                     mediaPlayer?.setOnCompletionListener { onStop() }
                 }
-                val dispatch =  {msg: String ->dispatchBuilding(msg)}
+                val dispatch =  if(simplify) {msg: Triple<Building, Int, Int> -> Unit} else
+                                                {msg: Triple<Building, Int, Int> ->dispatchBuilding(msg)}
                 viewModelScope.launch(Dispatchers.Main){
                     var error = "Start"
                     val mainContext = this.coroutineContext
@@ -274,8 +276,23 @@ class AppViewModel(
     fun dispatchError(error:String){
         println("MIDI building ends with: $error")
     }
-    fun dispatchBuilding(message: String){
-        println("building phase: $message")
+    enum class Building {
+        NONE, DATATRACKS, CHECK_N_REPLACE, MIDITRACKS, WRITE_FILE
+    }
+    var _buildingState: MutableLiveData<Triple<Building,List<Int>,Int>> =
+                MutableLiveData(Triple(Building.NONE, listOf(),0))
+    val buildingState: LiveData<Triple<Building,List<Int>,Int>> = _buildingState
+    fun dispatchBuilding(message: Triple<Building, Int, Int>){
+        val list = if(message.first == buildingState.value!!.first) buildingState.value!!.second else listOf()
+        val newValue = when (message.first){
+            Building.NONE -> Triple(Building.NONE, listOf(),0)
+            Building.DATATRACKS -> Triple(Building.DATATRACKS,list + message.second ,message.third)
+            Building.CHECK_N_REPLACE -> Triple(Building.CHECK_N_REPLACE,list + message.second ,message.third)
+            Building.MIDITRACKS -> Triple(Building.MIDITRACKS,list + message.second ,message.third)
+            Building.WRITE_FILE -> Triple(Building.WRITE_FILE,list + message.second ,message.third)
+        }
+        _buildingState.postValue(newValue)
+        //println("Building phase: ${buildingState.value}")
     }
     val dispatchIntervals = {
         if(computationStack.isNotEmpty())
@@ -839,8 +856,10 @@ class AppViewModel(
     }
     fun setInitialBlankState() {
         cancelPreviousMKjobs()
+
         _elaborating.value = false
         onStop()
+        //_buildingState.value = Triple(Building.NONE,listOf(),0)
         computationStack.clearAndDispatch()
         changeCounterpointsWithLimitAndCache(listOf(), false)
         changeSequenceToMikroKanons(listOf())

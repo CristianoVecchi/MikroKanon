@@ -40,6 +40,9 @@ class OutputFragment: Fragment() {
             model.retrieveCounterpointsFromDB()
             model.refreshFilledSlots()
         }
+        model.buildingState.observe(viewLifecycleOwner){
+            println("Building phase: $it")
+        }
         if(model.userOptionsData.value != null && model.userOptionsData.value!!.isNotEmpty()){
             val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
             model.createVerticalIntervalSet(verticalIntervalSetFlag, "OutputFragment")

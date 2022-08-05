@@ -12,7 +12,7 @@ import kotlin.math.absoluteValue
 suspend fun launchPlayer(
     userOptionsData: UserOptionsData?, createAndPlay: Boolean, simplify: Boolean,
     mediaPlayer: MediaPlayer?, midiPath: File,
-    counterpoints: List<Counterpoint?>, context: CoroutineContext, dispatch: (String) -> Unit
+    counterpoints: List<Counterpoint?>, context: CoroutineContext, dispatch: (Triple<AppViewModel.Building, Int, Int>) -> Unit
 ): String = withContext(context){
         val ensList: List<List<EnsembleType>> =
             userOptionsData?.let {

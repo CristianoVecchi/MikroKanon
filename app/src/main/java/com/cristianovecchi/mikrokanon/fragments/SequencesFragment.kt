@@ -55,6 +55,9 @@ var start = true
                 }
             }
         }
+        model.buildingState.observe(viewLifecycleOwner){
+            println("Building phase: $it")
+        }
 
         model.selectedSequence.observe(viewLifecycleOwner){
             model.changeActiveButtons( if(model.selectedSequence.value!! != -1 )

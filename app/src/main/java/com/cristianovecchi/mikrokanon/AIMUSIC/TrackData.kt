@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import android.os.Build
+import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.alterateLegatosWithDistribution
 import com.cristianovecchi.mikrokanon.midi.alterateArticulation
 import kotlinx.coroutines.job
@@ -187,7 +188,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         }
     }
 }
-fun List<TrackData>.applyMultiCheckAndReplace(context:CoroutineContext, dispatch: (String) -> Unit,
+fun List<TrackData>.applyMultiCheckAndReplace(context:CoroutineContext, dispatch: (Triple<AppViewModel.Building, Int, Int>) -> Unit,
                                               checkAndReplace: List<List<CheckAndReplaceData>>,
                                                 totalLength: Long) : List<TrackData>{
     var result = this
@@ -198,7 +199,8 @@ fun List<TrackData>.applyMultiCheckAndReplace(context:CoroutineContext, dispatch
             // println(checkAndReplace)
             result =
                 trackDataToTransform.map{ trackData ->
-                    dispatch("Check'n'replace applied to trackData:${trackData.channel}")
+                    //dispatch("Check'n'replace applied to trackData:${trackData.channel}")
+                    dispatch(Triple(AppViewModel.Building.CHECK_N_REPLACE, trackData.channel,this.size * checkAndReplace.size))
                     trackData.checkAndReplace(context, cnr, totalLength, trackDataToTransform)
                 }
             isFirstCheckAndReplace = false

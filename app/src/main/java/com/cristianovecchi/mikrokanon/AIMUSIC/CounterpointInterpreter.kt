@@ -2,6 +2,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 
 import android.os.Build
+import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.combineRangesAndEnsembleParts
 import com.cristianovecchi.mikrokanon.findMelodyWithStructure
 import kotlinx.coroutines.job
@@ -23,7 +24,7 @@ data class TickChangeData(val tick: Long, val instrument: Int, val noteIndex: In
 
 object CounterpointInterpreter {
     suspend fun doTheMagic(context: CoroutineContext,
-                           dispatch: (String) -> Unit,
+                           dispatch: (Triple<AppViewModel.Building, Int, Int>) -> Unit,
                            counterpoint: Counterpoint,
                            durations: IntArray = intArrayOf(240), // 1/8
                            ensemblePartList: List<List<EnsemblePart>>,
@@ -210,7 +211,8 @@ object CounterpointInterpreter {
                     }
                 }
                 //println("Do the magic: Channel: $channel $tickChangesData")
-                dispatch("Do the magic: Channel: $channel $pitchesData")
+                //dispatch("Do the magic: Channel: $channel $pitchesData")
+                dispatch(Triple(AppViewModel.Building.DATATRACKS, channel, counterpoint.parts.size))
                 TrackData(
                     pitchesData.toIntArray(),
                     ticksData.toIntArray(),
@@ -230,7 +232,7 @@ object CounterpointInterpreter {
                     tickChangesData
                 )
             } else {
-                dispatch("Do the magic: empty track created.")
+                //dispatch("Do the magic: empty track created.")
                 TrackData.emptyTrack()
             }
 

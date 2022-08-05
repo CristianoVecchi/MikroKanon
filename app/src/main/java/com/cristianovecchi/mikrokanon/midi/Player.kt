@@ -112,7 +112,7 @@ object Player {
 
     suspend fun playCounterpoint(
         context: CoroutineContext,
-        dispatch: (String) -> Unit,
+        dispatch: (Triple<AppViewModel.Building, Int, Int>) -> Unit,
         mediaPlayer: MediaPlayer?,
         looping: Boolean,
         counterpoints: List<Counterpoint?>,
@@ -179,6 +179,7 @@ object Player {
                     val glissando: List<Int> = if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
                     val audio8D: List<Int> = if (audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
                     val vibratoExtensions = intArrayOf(0, 360, 240, 160, 120, 80, 60, 30, 15)
+                    //dispatch(AppViewModel.Building.DATATRACKS to nParts)
                     val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
                         job, dispatch,
                         actualCounterpoint, actualDurations, actualEnsemblePartsList,
@@ -190,7 +191,7 @@ object Player {
                     } else {
                         //counterpointTrackData.forEach{ println(it.pitches.contentToString())}
                         if (!job.isActive) {
-                            dispatch("Cancelled during DataTracks building!")
+                            //dispatch("Cancelled during DataTracks building!")
                             "Cancelled during DataTracks building!"
                         } else {
                             // TOTAL LENGTH OF THE PIECE
@@ -208,18 +209,19 @@ object Player {
                             // CHECK AND REPLACE
                             val actualCounterpointTrackData = counterpointTrackData.applyMultiCheckAndReplace(job, dispatch, checkAndReplace,totalLength)
                             if (!job.isActive) {
-                                dispatch("Cancelled during Check'n'replace building!")
+                                //dispatch("Cancelled during Check'n'replace building!")
                                 "Cancelled during Check'n'replace building!"
                             } else {
                                 // TRANSFORM DATATRACKS IN MIDITRACKS
                                 val counterpointTracks = actualCounterpointTrackData.map {
                                     if(job.isActive) {
-                                        dispatch("Building MidiTrack Channel: ${it.channel}")
+                                        //dispatch("Building MidiTrack Channel: ${it.channel}")
+                                        dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
                                         convertToMidiTrack(it, actualCounterpointTrackData.size)
                                     } else MidiTrack()
                                 }
                                 if (!job.isActive) {
-                                    dispatch("Cancelled during MidiTracks building!")
+                                    //dispatch("Cancelled during MidiTracks building!")
                                     "Cancelled during MidiTracks building!"
                                 } else {
                                     // ADD BPM AND VOLUME CHANGES
@@ -243,8 +245,9 @@ object Player {
                                     val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
                                     println("JOB ACTIVE: ${job.isActive}")
                                     // WARNING: nTotalNotes returned is not considering check and replace modifications!!!
+                                    //dispatch(Triple(AppViewModel.Building.NONE, 0,0))
                                     if(job.isActive) {
-                                        saveAndPlayMidiFile(job, mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
+                                        saveAndPlayMidiFile(job, dispatch, mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
                                     }
                                     else {
                                         "Canceled before playing Midi File!"
@@ -262,6 +265,7 @@ object Player {
 
     suspend fun saveAndPlayMidiFile(
         context: CoroutineContext,
+        dispatch: (Triple<AppViewModel.Building, Int, Int>) -> Unit,
         mediaPlayer: MediaPlayer?,
         midi: MidiFile,
         looping: Boolean,
@@ -286,6 +290,7 @@ object Player {
             var error = "Try to play."
             //createDialog(output.toString());
             //mediaPlayer2 = new MediaPlayer();
+            dispatch(Triple(AppViewModel.Building.WRITE_FILE, 1, 2))
             try {
                 midi.writeToFile(output)
             } catch (e: IOException) {
@@ -293,6 +298,7 @@ object Player {
                 error = e.message.toString()
             }
             println("JOB ACTIVE IN SAVING MIDI: ${context.job.isActive}")
+            dispatch(Triple(AppViewModel.Building.NONE, 0, 0))
             if (play && context.job.isActive) {
                 try {
                     mediaPlayer.setDataSource(output!!.getAbsolutePath())
