@@ -197,13 +197,13 @@ class AppViewModel(
     val onStop = {
         viewModelScope.launch(Dispatchers.Main) {
             jobPlay?.cancel("jobPlay canceled by onStop()")
-           // jobPlay?.join()
+            jobPlay?.join()
         }
         //cancelPreviousMKjobs()
         mediaPlayer?.let{ if (it.isPlaying) it.stop() }
         mediaPlayer?.let{ if (!it.isPlaying) _playing.value = false}
-        mediaPlayer?.release()
-        mediaPlayer = null
+        //mediaPlayer?.release()
+        //mediaPlayer = null
         _buildingState.value = Triple(Building.NONE,listOf(),0)
     }
     val onPlaySequence = { clips: List<Clip> ->
@@ -244,12 +244,20 @@ class AppViewModel(
             val counterpoints = listOf(selectedCounterpoint.value!!) + savedCounterpoints.toList()
             userOptionsData.value?.let{
                 _playing.value = true
+                viewModelScope.launch(Dispatchers.Main) {
+                    jobPlay?.cancel("jobPlay canceled by onStop()")
+                    jobPlay?.join()
+                }
                 if (mediaPlayer == null) {
                     mediaPlayer = MediaPlayer()
                     mediaPlayer?.setOnCompletionListener { onStop() }
                 }
                 val dispatch =  if(simplify) {msg: Triple<Building, Int, Int> -> Unit} else
-                                                {msg: Triple<Building, Int, Int> ->dispatchBuilding(msg)}
+                                                { msg: Triple<Building, Int, Int> ->
+                                                    jobPlay?.let{
+                                                        if(it.isActive) {dispatchBuilding(msg)}
+                                                    } ?: dispatchBuilding(Triple(Building.NONE,0,0))}
+                if(!simplify) _buildingState.value = Triple(Building.START, listOf(),0)
                 viewModelScope.launch(Dispatchers.Main){
                     var error = "Start"
                     val mainContext = this.coroutineContext
@@ -277,21 +285,30 @@ class AppViewModel(
         println("MIDI building ends with: $error")
     }
     enum class Building {
-        NONE, DATATRACKS, CHECK_N_REPLACE, MIDITRACKS, WRITE_FILE
+        NONE, START, DATATRACKS, CHECK_N_REPLACE, MIDITRACKS, WRITE_FILE
     }
     var _buildingState: MutableLiveData<Triple<Building,List<Int>,Int>> =
                 MutableLiveData(Triple(Building.NONE, listOf(),0))
     val buildingState: LiveData<Triple<Building,List<Int>,Int>> = _buildingState
+    var lastBinding = Building.NONE
     fun dispatchBuilding(message: Triple<Building, Int, Int>){
         val list = if(message.first == buildingState.value!!.first) buildingState.value!!.second else listOf()
         val newValue = when (message.first){
             Building.NONE -> Triple(Building.NONE, listOf(),0)
+            Building.START -> Triple(Building.START, listOf(),0)
             Building.DATATRACKS -> Triple(Building.DATATRACKS,list + message.second ,message.third)
             Building.CHECK_N_REPLACE -> Triple(Building.CHECK_N_REPLACE,list + message.second ,message.third)
             Building.MIDITRACKS -> Triple(Building.MIDITRACKS,list + message.second ,message.third)
             Building.WRITE_FILE -> Triple(Building.WRITE_FILE,list + message.second ,message.third)
         }
-        _buildingState.postValue(newValue)
+                //&& jobPlay != null && jobPlay!!.isActive)
+        if(lastBinding != Building.NONE  ) {
+            lastBinding = newValue.first
+            _buildingState.postValue(newValue)
+        } else {
+            lastBinding = newValue.first
+            _buildingState.postValue(Triple(Building.NONE,listOf(),0))
+        }
         //println("Building phase: ${buildingState.value}")
     }
     val dispatchIntervals = {

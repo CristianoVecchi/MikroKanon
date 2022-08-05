@@ -5,6 +5,7 @@ import android.os.Build
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.combineRangesAndEnsembleParts
 import com.cristianovecchi.mikrokanon.findMelodyWithStructure
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import java.util.stream.Collectors
@@ -38,6 +39,7 @@ object CounterpointInterpreter {
         ): List<TrackData> = withContext(context) {
 //        counterpoint.display()
 //        durations.also{println("Durations: $it")}
+        delay(1)
         val durSize = durations.size
         val actualDurations =
             IntArray(counterpoint.nNotes() * 2 + 1)// note + optional rests + optional initial rest
@@ -212,7 +214,7 @@ object CounterpointInterpreter {
                 }
                 //println("Do the magic: Channel: $channel $tickChangesData")
                 //dispatch("Do the magic: Channel: $channel $pitchesData")
-                dispatch(Triple(AppViewModel.Building.DATATRACKS, channel, counterpoint.parts.size))
+                if(context.job.isActive) dispatch(Triple(AppViewModel.Building.DATATRACKS, channel, counterpoint.parts.size))
                 TrackData(
                     pitchesData.toIntArray(),
                     ticksData.toIntArray(),

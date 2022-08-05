@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.composables
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -62,9 +63,13 @@ fun AppScaffold(model: AppViewModel,
         fontSize = dimensions.titleTextSize.second.sp,
         color = creditColor)
     val buildingState by model.buildingState.asFlow().collectAsState(initial = Triple(AppViewModel.Building.NONE, listOf(),0))
-    val percWidth by derivedStateOf{
-        if(buildingState.first == AppViewModel.Building.WRITE_FILE) 6f/7 else
-        buildingState.second.toSet().size.toFloat() / buildingState.third
+    var buildingHasStarted by remember {
+        mutableStateOf(false)
+    }
+    buildingHasStarted = when (buildingState.first) {
+        AppViewModel.Building.START -> true
+        AppViewModel.Building.NONE -> false
+        else -> buildingHasStarted
     }
     Scaffold(
         //modifier = Modifier
@@ -85,7 +90,8 @@ fun AppScaffold(model: AppViewModel,
                         verticalAlignment = Alignment.CenterVertically,
                     )
                     {
-                        if(buildingState.first == AppViewModel.Building.NONE) {
+                        val jobIsActive = model.jobPlay?.isActive ?: false
+                        if(!jobIsActive || !buildingHasStarted || buildingState.first == AppViewModel.Building.NONE) {
                             IconButton(
                                 modifier = Modifier.size(dimensions.selectorButtonSize),
                                 onClick = {scope.launch { scaffoldState.drawerState.open() }  }
@@ -112,6 +118,7 @@ fun AppScaffold(model: AppViewModel,
                             val iconId = when(buildingState.first){
                                 AppViewModel.Building.DATATRACKS -> model.iconMap["building"]
                                 AppViewModel.Building.NONE -> model.iconMap["building"]
+                                AppViewModel.Building.START -> model.iconMap["building"]
                                 AppViewModel.Building.CHECK_N_REPLACE -> model.iconMap["accompanist"]
                                 AppViewModel.Building.MIDITRACKS -> model.iconMap["sound"]
                                 AppViewModel.Building.WRITE_FILE -> model.iconMap["save"]
@@ -121,23 +128,33 @@ fun AppScaffold(model: AppViewModel,
                                     .width(dimensions.width.dp)
                                     .fillMaxHeight()
                                 ){
+                                val percentage by derivedStateOf{
+                                    when (buildingState.first) {
+                                        AppViewModel.Building.WRITE_FILE -> 15f/16
+                                        AppViewModel.Building.START -> 1f/16
+                                        else -> buildingState.second.toSet().size.toFloat() / buildingState.third
+                                    }
+                                }
+                                val percWidth by animateFloatAsState(targetValue = percentage)
                                 Canvas(modifier = Modifier
                                     .fillMaxSize()
+                                    .padding(0.dp, 4.dp)
                                 ) {
                                     val allX = this.size.width
                                     val allY = this.size.height
-                                    drawRect(colors.selCardBorderColorSelected, Offset(0f,0f ),
-                                        Size(allX,allY))
                                     drawRect(creditColor, Offset(0f,0f ),
+                                        Size(allX,allY))
+                                    drawRect(colors.selCardBorderColorSelected, Offset(0f,0f ),
                                         Size(allX * percWidth,allY))
                                 }
 
                                 Row(
                                     Modifier
                                         .fillMaxSize()
-                                        .background(Color.Transparent),
+                                        .background(Color.Transparent)
+                                        .clickable{scope.launch { scaffoldState.drawerState.open()} },
                                     horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Icon(
                                         painterResource(id = iconId!!), "",

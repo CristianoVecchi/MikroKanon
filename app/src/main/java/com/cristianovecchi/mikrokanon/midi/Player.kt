@@ -16,6 +16,7 @@ import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.Tempo
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -181,7 +182,7 @@ object Player {
                     val vibratoExtensions = intArrayOf(0, 360, 240, 160, 120, 80, 60, 30, 15)
                     //dispatch(AppViewModel.Building.DATATRACKS to nParts)
                     val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
-                        job, dispatch,
+                        context, dispatch,
                         actualCounterpoint, actualDurations, actualEnsemblePartsList,
                         nuances, doublingFlags, rangeTypes, melodyTypes,
                         glissando, audio8D, vibratoExtensions[vibrato]
@@ -213,7 +214,9 @@ object Player {
                                 "Cancelled during Check'n'replace building!"
                             } else {
                                 // TRANSFORM DATATRACKS IN MIDITRACKS
+
                                 val counterpointTracks = actualCounterpointTrackData.map {
+                                    delay(1)
                                     if(job.isActive) {
                                         //dispatch("Building MidiTrack Channel: ${it.channel}")
                                         dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
@@ -246,6 +249,7 @@ object Player {
                                     println("JOB ACTIVE: ${job.isActive}")
                                     // WARNING: nTotalNotes returned is not considering check and replace modifications!!!
                                     //dispatch(Triple(AppViewModel.Building.NONE, 0,0))
+                                    delay(1)
                                     if(job.isActive) {
                                         saveAndPlayMidiFile(job, dispatch, mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
                                     }
@@ -273,52 +277,55 @@ object Player {
         midiFile: File?,
         nNotesCounterpoint: Int = 0
     ): String = withContext(context){
-        if(mediaPlayer!=null){
-            if (mediaPlayer.isPlaying) {
-                mediaPlayer.stop()
-            }
-            mediaPlayer.reset()
+        delay(5)
+        if(context.job.isActive) {
+            if(mediaPlayer!=null){
+                if (mediaPlayer.isPlaying) {
+                    mediaPlayer.stop()
+                }
+                mediaPlayer.reset()
+                // 4. Write the MIDI data to a file
+                //File output = new File(getExternalFilesDir(null), "example.mid");
+                //File output = new File("/sdcard/example.mid");
 
-
-            // 4. Write the MIDI data to a file
-            //File output = new File(getExternalFilesDir(null), "example.mid");
-            //File output = new File("/sdcard/example.mid");
-
-            // ------------- WARNING!!!! -------------
-            //DOESN'T WORK FOR LATEST ANDROID VERSIONS
-            output = midiFile
-            var error = "Try to play."
-            //createDialog(output.toString());
-            //mediaPlayer2 = new MediaPlayer();
-            dispatch(Triple(AppViewModel.Building.WRITE_FILE, 1, 2))
-            try {
-                midi.writeToFile(output)
-            } catch (e: IOException) {
-                Log.e(Player::class.java.toString(), e.message, e)
-                error = e.message.toString()
-            }
-            println("JOB ACTIVE IN SAVING MIDI: ${context.job.isActive}")
-            dispatch(Triple(AppViewModel.Building.NONE, 0, 0))
-            if (play && context.job.isActive) {
+                // ------------- WARNING!!!! -------------
+                //DOESN'T WORK FOR LATEST ANDROID VERSIONS
+                output = midiFile
+                var error = "Try to play."
+                //createDialog(output.toString());
+                //mediaPlayer2 = new MediaPlayer();
+                dispatch(Triple(AppViewModel.Building.WRITE_FILE, 1, 2))
                 try {
-                    mediaPlayer.setDataSource(output!!.getAbsolutePath())
-                    mediaPlayer.prepare()
-                    mediaPlayer.start()
-                    error = nNotesCounterpoint.toString()
-                    //player.create(Harmony12.this, output.);
-                } catch (e: java.lang.Exception) {
+                    midi.writeToFile(output)
+                } catch (e: IOException) {
                     Log.e(Player::class.java.toString(), e.message, e)
                     error = e.message.toString()
                 }
-                //mediaPlayer.setAuxEffectSendLevel()
-                //System.out.println("Midifile salvato");
+                println("JOB ACTIVE IN SAVING MIDI: ${context.job.isActive}")
+                dispatch(Triple(AppViewModel.Building.NONE, 0, 0))
+                if (play && context.job.isActive) {
+                    try {
+                        mediaPlayer.setDataSource(output!!.getAbsolutePath())
+                        mediaPlayer.prepare()
+                        mediaPlayer.start()
+                        error = nNotesCounterpoint.toString()
+                        //player.create(Harmony12.this, output.);
+                    } catch (e: java.lang.Exception) {
+                        Log.e(Player::class.java.toString(), e.message, e)
+                        error = e.message.toString()
+                    }
+                    //mediaPlayer.setAuxEffectSendLevel()
+                    //System.out.println("Midifile salvato");
 
 
 
-                //mediaPlayer.setLooping(looping);
-            }
-            error
-        } else "MediaPlayer is null!!!"
+                    //mediaPlayer.setLooping(looping);
+                }
+                error
+            } else "MediaPlayer is null!!!"
+
+        } else "Job cancelled starting save MIDI"
+
     }
 
     private var output: java.io.File? = null
