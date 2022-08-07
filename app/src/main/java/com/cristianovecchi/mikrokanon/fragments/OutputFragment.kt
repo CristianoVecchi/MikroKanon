@@ -161,6 +161,9 @@ class OutputFragment: Fragment() {
                                 onDoubling = { transposition ->
                                     model.onDoubling(null, transposition)
                                 },
+                                onParade = {
+                                    model.onParade()
+                                },
                                 onPlay = {
                                     val executionTime = measureTimeMillis {
                                     model.onPlay(true, false) // play the entire structure

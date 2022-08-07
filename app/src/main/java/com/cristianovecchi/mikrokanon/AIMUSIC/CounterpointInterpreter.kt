@@ -8,6 +8,7 @@ import com.cristianovecchi.mikrokanon.findMelodyWithStructure
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import java.util.stream.Collectors
 import kotlin.coroutines.CoroutineContext
 
@@ -39,7 +40,8 @@ object CounterpointInterpreter {
         ): List<TrackData> = withContext(context) {
 //        counterpoint.display()
 //        durations.also{println("Durations: $it")}
-        delay(1)
+        //delay(1)
+        yield()
         val durSize = durations.size
         val actualDurations =
             IntArray(counterpoint.nNotes() * 2 + 1)// note + optional rests + optional initial rest

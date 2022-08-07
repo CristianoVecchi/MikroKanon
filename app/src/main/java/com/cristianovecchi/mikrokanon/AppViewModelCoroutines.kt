@@ -239,6 +239,23 @@ fun AppViewModel.duplicateAllPhrasesInCounterpoint(originalCounterpoint: Counter
         }
     }
 }
+fun AppViewModel.paradeOnCounterpoint(originalCounterpoint: Counterpoint){
+    if(!originalCounterpoint.isEmpty()){
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                newList = paradeAllOnCounterpoint(originalCounterpoint, 3, MAX_PARTS,
+                                            intervalSet.value!!, intervalSetHorizontal.value!!,
+                                            cadenzaValues.extractIntsFromCsv(),
+                                            resolutioValues.first.toSet(), resolutioValues.second.extractIntsFromCsv())
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                    .sortedByDescending { it.parts.size }
+            }
+            changeCounterpointsWithLimitAndCache(newList, true)
+        }
+    }
+}
 fun AppViewModel.overlapBothCounterpoints(counterpoint1st: Counterpoint, counterpoint2nd: Counterpoint, crossover: Boolean){
     if(!counterpoint1st.isEmpty() && !counterpoint2nd.isEmpty()){
         var newList: List<Counterpoint>

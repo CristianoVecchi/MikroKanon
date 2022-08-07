@@ -65,7 +65,8 @@ fun ButtonsDialog(
                                         colors = model.appColors,
                                         onSort = buttonsDialogData.value.onSort,
                                         onUpsideDown = buttonsDialogData.value.onUpsideDown,
-                                        onArpeggio = buttonsDialogData.value.onArpeggio
+                                        onArpeggio = buttonsDialogData.value.onArpeggio,
+                                        onParade = buttonsDialogData.value.onParade,
                                     ) }
                                     else {
                                         BoostedMikroKanonsButtons(

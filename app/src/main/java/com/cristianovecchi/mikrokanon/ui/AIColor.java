@@ -126,7 +126,7 @@ public class AIColor {
         int dB = Math.abs(B2-B1);
 
         float result = (dR + dG + dB) / 300f;
-        System.out.println("result = " + result);
+        //System.out.println("result = " + result);
         return result;//it's not a color!!!!
     }
 

@@ -116,11 +116,11 @@ fun AppScaffold(model: AppViewModel,
                             })
                         } else {
                             val iconId = when(buildingState.first){
+                                AppViewModel.Building.NONE -> model.iconMap["building"] //unused
+                                AppViewModel.Building.START -> model.iconMap["sound"]
                                 AppViewModel.Building.DATATRACKS -> model.iconMap["building"]
-                                AppViewModel.Building.NONE -> model.iconMap["building"]
-                                AppViewModel.Building.START -> model.iconMap["building"]
                                 AppViewModel.Building.CHECK_N_REPLACE -> model.iconMap["accompanist"]
-                                AppViewModel.Building.MIDITRACKS -> model.iconMap["sound"]
+                                AppViewModel.Building.MIDITRACKS -> model.iconMap["construction"]
                                 AppViewModel.Building.WRITE_FILE -> model.iconMap["save"]
                             }
                             Box(

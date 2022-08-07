@@ -143,3 +143,44 @@ suspend fun addSequence(counterpoint: Counterpoint,sequence: List<Clip>, interva
           Counterpoint.findAllCounterpoints(counterpoint, sequence.map { it.abstractNote }, intervalSet, depth)
      }
 }
+suspend fun paradeAllOnCounterpoint(
+     counterpoint: Counterpoint,
+     howMany: Int,
+     maxParts: Int,
+     vertIntervalSet: List<Int>,
+     horIntervalSet: List<Int>,
+     cadenzaForm: List<Int>, resolutioAbsPitches: Set<Int>,
+     resolutioForm: List<Int>,): List<Counterpoint>{
+     val partResult = mutableListOf<Counterpoint>()
+     val list = listOf(counterpoint)
+
+     partResult += freeParts(counterpoint, vertIntervalSet, TREND.ASCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}).sortedBy { it.emptiness }.take(howMany)
+     partResult += freeParts(counterpoint, vertIntervalSet, TREND.DESCENDANT_DYNAMIC.directions.filter{ horIntervalSet.contains(it)}).sortedBy { it.emptiness }.take(howMany)
+     partResult += freeParts(counterpoint, vertIntervalSet, TREND.ASCENDANT_STATIC.directions.filter{ horIntervalSet.contains(it)}).sortedBy { it.emptiness }.take(howMany)
+     partResult += freeParts(counterpoint, vertIntervalSet, TREND.DESCENDANT_STATIC.directions.filter{ horIntervalSet.contains(it)}).sortedBy { it.emptiness }.take(howMany)
+     // different trends could have the same result
+     val result = partResult.distinctBy { it.getAbsPitches() }.toMutableList()
+     result += sortColumnsOnCounterpoints(list, 0).sortedBy { it.emptiness }.take(howMany)
+     result += sortColumnsOnCounterpoints(list, 1).sortedBy { it.emptiness }.take(howMany)
+     result += arpeggioCounterpoints(list, ARPEGGIO.ASCENDANT).sortedBy { it.emptiness }.take(howMany)
+     result += extendedWeightedHarmony(list, 1, maxParts).sortedBy { it.emptiness }.take(howMany)
+     result += extendedWeightedHarmony(list, 2, maxParts).sortedBy { it.emptiness }.take(howMany)
+     result += extendedWeightedHarmony(list, 3, maxParts).sortedBy { it.emptiness }.take(howMany)
+     result += extendedWeightedHarmony(list, 4, maxParts).sortedBy { it.emptiness }.take(howMany)
+     result += duplicateAllInCounterpoint(counterpoint).sortedBy { it.emptiness }.take(howMany)
+     result += addCadenzasOnCounterpoints(horIntervalSet, list, cadenzaForm).sortedBy { it.emptiness }.take(howMany)
+     result += addResolutioOnCounterpoints(list, resolutioAbsPitches, resolutioForm).sortedBy { it.emptiness }.take(howMany)
+     result += eraseHorizontalIntervalsOnCounterpoints(horIntervalSet, list).sortedBy { it.emptiness }.take(howMany)
+     result += reduceCounterpointsToSinglePart(list).sortedBy { it.emptiness }.take(howMany)
+     result += flourish(list, vertIntervalSet, horIntervalSet).sortedBy { it.emptiness }.take(howMany)
+     result += explodeCounterpointsToDoppelgänger(list, maxParts).sortedBy { it.emptiness }.take(howMany)
+     result += buildRound(list).sortedBy { it.emptiness }.take(howMany)
+     result += waves(list, vertIntervalSet, horIntervalSet, 3).sortedBy { it.emptiness }.take(howMany)
+     result += waves(list, vertIntervalSet, horIntervalSet, 4).sortedBy { it.emptiness }.take(howMany)
+     result += waves(list, vertIntervalSet, horIntervalSet, 6).sortedBy { it.emptiness }.take(howMany)
+     result += findPedalsOnCounterpoint(1, counterpoint, vertIntervalSet)
+     result += findPedalsOnCounterpoint(3, counterpoint, vertIntervalSet)
+     result += findPedalsOnCounterpoint(5, counterpoint, vertIntervalSet)
+
+     return result
+}

@@ -15,10 +15,7 @@ import com.leff.midi.MidiFile
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.Tempo
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.job
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.IOException
 import java.io.File
 import java.util.*
@@ -216,7 +213,7 @@ object Player {
                                 // TRANSFORM DATATRACKS IN MIDITRACKS
 
                                 val counterpointTracks = actualCounterpointTrackData.map {
-                                    delay(1)
+                                    yield() //delay(1)
                                     if(job.isActive) {
                                         //dispatch("Building MidiTrack Channel: ${it.channel}")
                                         dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
@@ -246,10 +243,11 @@ object Player {
                                         counterpointTrackData, audio8D, totalLength, false)
 
                                     val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
-                                    println("JOB ACTIVE: ${job.isActive}")
+                                    //println("JOB ACTIVE: ${job.isActive}")
                                     // WARNING: nTotalNotes returned is not considering check and replace modifications!!!
                                     //dispatch(Triple(AppViewModel.Building.NONE, 0,0))
-                                    delay(1)
+                                    //delay(1)
+                                    yield()
                                     if(job.isActive) {
                                         saveAndPlayMidiFile(job, dispatch, mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
                                     }
@@ -277,7 +275,8 @@ object Player {
         midiFile: File?,
         nNotesCounterpoint: Int = 0
     ): String = withContext(context){
-        delay(5)
+        //delay(5)
+        yield()
         if(context.job.isActive) {
             if(mediaPlayer!=null){
                 if (mediaPlayer.isPlaying) {
@@ -301,7 +300,7 @@ object Player {
                     Log.e(Player::class.java.toString(), e.message, e)
                     error = e.message.toString()
                 }
-                println("JOB ACTIVE IN SAVING MIDI: ${context.job.isActive}")
+                //println("JOB ACTIVE IN SAVING MIDI: ${context.job.isActive}")
                 dispatch(Triple(AppViewModel.Building.NONE, 0, 0))
                 if (play && context.job.isActive) {
                     try {

@@ -69,6 +69,7 @@ fun ResultDisplay(model: AppViewModel,
                   onEWH: (Int) -> Unit = {},
                   onResolutio: (Pair<Set<Int>,String>) -> Unit,
                   onDoubling: (List<Pair<Int,Int>>) -> Unit,
+                  onParade: () -> Unit = {},
                   onPlay: () -> Unit = {},
                   onStop: () -> Unit = {}
                   )
@@ -444,6 +445,7 @@ fun ResultDisplay(model: AppViewModel,
                                             }
                                         )
                                     },
+                                    onParade = {onParade(); close()},
                                     onFlourish = {onFlourish(); close(); },
                                     onEraseIntervals = { onEraseIntervals(); close() },
                                     onSingle = { onSingle(); close() },

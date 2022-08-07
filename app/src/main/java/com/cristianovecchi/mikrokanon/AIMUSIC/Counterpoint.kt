@@ -53,8 +53,10 @@ data class Counterpoint(val parts: List<AbsPart>,
         return if(this.parts.size <= nPartsLimit) this
         else this.copy(parts = this.parts.take(nPartsLimit))
     }
-    fun cutBlankParts(): Counterpoint {
-        return this.copy(parts = parts.filter{ !it.isBlank()} )
+    fun cutBlankParts(oneLeft: Boolean = true): Counterpoint {
+        var newParts = parts.filter{ !it.isBlank()}
+        newParts = if(newParts.isEmpty() && oneLeft) listOf(AbsPart.emptyPart(this.nNotes())) else newParts
+        return this.copy(parts = newParts )
     }
     fun getColumnValues(index: Int): List<Int>{
         return parts.filter{index < it.absPitches.size }.map{ it.absPitches[index] }
@@ -208,6 +210,7 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun duplicateAllPhrases(): List<Counterpoint>{
         val result = mutableListOf<Counterpoint>()
         val clone = this.normalizePartsSize(false)
+        if(clone.isEmpty() || clone.isBlank()) return listOf(clone)
         val parts = clone.parts
         val nNotes = this.nNotes().also { print(it) }
         val sectionsToDuplicate = parts.map { part ->
@@ -315,6 +318,9 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
     fun isEmpty() : Boolean {
         return parts.isEmpty()
+    }
+    fun isBlank() : Boolean {
+        return parts.all{ it.isBlank()}
     }
     fun display() {
         parts.forEachIndexed { index, absPart ->
@@ -454,7 +460,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
 
         result.emptiness = result.findEmptiness()
-        return result.cutBlankParts()
+        return result.cutBlankParts(true)
     }
     fun enhanceChords(chordsToEnhance: List<Pair<Set<Int>, Int>>): Counterpoint {
         //println("chords to enhance:$chordsToEnhance")
@@ -569,6 +575,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         return this.copy(parts = listOf(parts[0].copy(absPitches = reducedAbsPitches))).cutExtraNotes().apply { this.findAndSetEmptiness() }
     }
     fun explodeToDoppelgänger(maxParts: Int): Counterpoint{
+        if(isEmpty() || isBlank()) return this.copy()
         val newParts = mutableListOf<AbsPart>()
         val nPartsToExplode = (maxParts - (parts.size * 2 - maxParts).absoluteValue ) / 2
         //val nNewParts = nPartsToExplode * 2 + ( parts.size - nPartsToExplode)
@@ -1467,6 +1474,9 @@ data class Counterpoint(val parts: List<AbsPart>,
         suspend fun findMazesWithRowForms(context: CoroutineContext, sequences: List<List<Int>>,
                               intervalSet: List<Int>, msTimeLimit: Long = 30000L): List<Counterpoint> {
             val nParts = sequences.size
+            println("SEQUENCES FOR MAZE: $sequences")
+            if (sequences.all{it.isEmpty()}) return listOf(Counterpoint.empty(sequences.size, 1))
+            if (sequences.all{it.isEmpty() || it.all{ absPitch -> absPitch == -1}}) return listOf(Counterpoint.empty(sequences.size, sequences.maxOf{it.size}))
             if (nParts == 0) return listOf()
             if (nParts == 1) return listOf(Counterpoint.createFromIntList(sequences[0]))
             val result = mutableListOf<Counterpoint>()

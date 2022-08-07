@@ -327,7 +327,7 @@ class AppViewModel(
         extendedWeightedHarmonyOnCounterpoints(originalCounterpoints, nParts)
     }
     val onResolutio = { list: ArrayList<Clip>?, resolutioData: Pair<Set<Int>,String> ->
-        println("on Resolutio: ${resolutioData.first} ${resolutioData.second}")
+        //println("on Resolutio: ${resolutioData.first} ${resolutioData.second}")
         val originalCounterpoints = if(list != null) {
             changeFirstSequence(list)
             convertFirstSequenceToSelectedCounterpoint()
@@ -339,7 +339,7 @@ class AppViewModel(
         resolutioOnCounterpoints(originalCounterpoints, resolutioData.first, resolutioData.second.extractIntsFromCsv())
     }
     val onDoubling = { list: ArrayList<Clip>?, doublingData: List<Pair<Int,Int>> ->
-        println("on Doubling: ${doublingData}")
+        //println("on Doubling: ${doublingData}")
         val originalCounterpoints = if(list != null) {
             changeFirstSequence(list)
             convertFirstSequenceToSelectedCounterpoint()
@@ -349,6 +349,11 @@ class AppViewModel(
         }
         computationStack.pushAndDispatch(Computation.Doubling(originalCounterpoints,doublingData))
         doublingOnCounterpoints(originalCounterpoints, doublingData)
+    }
+    val onParade = {
+        val originalCounterpoint = selectedCounterpoint.value!!.clone()
+        computationStack.pushAndDispatch(Computation.Parade(originalCounterpoint))
+        paradeOnCounterpoint(originalCounterpoint)
     }
 
     val onTritoneSubstitutionFromSelector = { index: Int ->
@@ -690,6 +695,7 @@ class AppViewModel(
                     is Computation.Cadenza -> computationStack.lastElement()
                     is Computation.Resolutio -> computationStack.lastElement()
                     is Computation.Doubling -> computationStack.lastElement()
+                    is Computation.Parade -> computationStack.lastElement()
                     is Computation.Scarlatti -> computationStack.lastElement()
                     is Computation.Overlap -> computationStack.lastElement()
                     is Computation.Crossover -> computationStack.lastElement()
@@ -781,6 +787,9 @@ class AppViewModel(
                         if (stepBack) {
                             doublingOnCounterpoints( previousComputation.counterpoints, previousComputation.doublingData)
                         }
+                    }
+                    is Computation.Parade -> {
+                        paradeOnCounterpoint( previousComputation.counterpoint)
                     }
                     is Computation.Sort -> {
                         if(stepBack){
