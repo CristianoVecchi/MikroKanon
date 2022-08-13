@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.divideDistributingRest
 import kotlin.math.absoluteValue
 
 fun findWholeToneScale(startPitch: Int, endPitch: Int, isRetrograde: Boolean = false): List<Int> {
@@ -126,6 +127,16 @@ fun findGlissandoForScales(pitches: List<Int>, nextPitch:Int, glissandoLimit: In
     val lastGliss = nextPitch - pitches[pitches.size-1]
     result += if(lastGliss > glissandoLimit) 0 else lastGliss
     return result
+}
+fun accumulateVelocities(nNotes: Int, start: Int, diff: Int): List<Int>{
+    val result = mutableListOf<Int>()
+    val increments = diff.divideDistributingRest(nNotes-1)
+    var step = start
+    increments.forEach {
+        result += step
+        step += it
+    }
+    return result.apply{ this += step}
 }
 
 fun main(){
