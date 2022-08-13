@@ -799,7 +799,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                 SelectableCard(
                                     text = if(!isSelected) lang.checkAndReplace + " I"
                                     else "${lang.checkAndReplace} I: \n${cnrDatas.mapIndexed{i, cnr ->
-                                        "${i+1}: ${cnr.describe()}"}.joinToString("\n")}",
+                                        "${i+1}: ${cnr.describe(getGlissandoSymbols().first)}"}.joinToString("\n")}",
                                     fontSize = fontSize,
                                     colors = colors,
                                     isSelected = isSelected,
@@ -827,7 +827,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                 SelectableCard(
                                     text = if(!isSelected) lang.checkAndReplace + " II"
                                     else "${lang.checkAndReplace} II: \n${cnrDatas.mapIndexed{i, cnr ->
-                                        "${i+1}: ${cnr.describe()}"}.joinToString("\n")}",
+                                        "${i+1}: ${cnr.describe(getGlissandoSymbols().first)}"}.joinToString("\n")}",
                                     fontSize = fontSize,
                                     colors = colors,
                                     isSelected = isSelected,
@@ -855,7 +855,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                 SelectableCard(
                                     text = if(!isSelected) lang.checkAndReplace + " III"
                                     else "${lang.checkAndReplace} III: \n${cnrDatas.mapIndexed{i, cnr ->
-                                        "${i+1}: ${cnr.describe()}"}.joinToString("\n")}",
+                                        "${i+1}: ${cnr.describe(getGlissandoSymbols().first)}"}.joinToString("\n")}",
                                     fontSize = fontSize,
                                     colors = colors,
                                     isSelected = isSelected,
@@ -883,7 +883,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                 SelectableCard(
                                     text = if(!isSelected) lang.checkAndReplace + " IV"
                                     else "${lang.checkAndReplace} IV: \n${cnrDatas.mapIndexed{i, cnr ->
-                                        "${i+1}: ${cnr.describe()}"}.joinToString("\n")}",
+                                        "${i+1}: ${cnr.describe(getGlissandoSymbols().first)}"}.joinToString("\n")}",
                                     fontSize = fontSize,
                                     colors = colors,
                                     isSelected = isSelected,

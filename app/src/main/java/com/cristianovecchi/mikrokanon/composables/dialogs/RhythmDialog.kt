@@ -269,11 +269,11 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                 ) {
                                     var values = patternText.extractIntPairsFromCsv()
                                     val selectedValue = values[cursor]
-                                    val pattern = selectedValue.first.absoluteValue - 1
+                                    val pattern = selectedValue.first
                                     listDialogData.value = ListDialogData(
                                         true, patternNames, pattern, lang.selectRhythm
                                     ) { index ->
-                                        val rebuilding = values.addOrInsert(Pair(index+1,1), cursor)
+                                        val rebuilding = values.addOrInsert(Pair(index,1), cursor)
                                         values = rebuilding.first
                                         cursor = rebuilding.second
                                         patternText = values.toMutableList().toIntPairsString()

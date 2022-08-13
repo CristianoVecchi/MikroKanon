@@ -76,22 +76,45 @@ fun findChromaticScaleDiCambio(startPitch: Int, endPitch: Int, isRetrograde: Boo
     return result
 }
 
-fun findGruppettoPitches(pitch: Int, nextPitch: Int): List<Int>{
-    val (secondPitch, fourthPitch) = when {
-        pitch <= nextPitch -> Pair(pitch+1, pitch -1)
-        pitch > nextPitch -> Pair(pitch-1, pitch +1)
-        else -> Pair(pitch+1, pitch -1)
+fun findGruppettoPitches(pitch: Int, nextPitch: Int, addGliss: Boolean = false, finalGlissando:Int ): Pair<List<Int>,List<Int>>{
+    val isAscendant = pitch <= nextPitch
+    val (secondPitch, fourthPitch) = if(isAscendant) Pair(pitch+1, pitch -1) else Pair(pitch-1, pitch +1)
+    val glissList = if(addGliss) {
+        if(isAscendant) listOf(1,-1,-1,1,finalGlissando) else listOf(-1,1,1,-1,finalGlissando)
+    } else {
+        listOf(0,0,0,0, finalGlissando)
     }
-    return listOf(pitch, secondPitch, pitch, fourthPitch, pitch)
+    return Pair(listOf(pitch, secondPitch, pitch, fourthPitch, pitch), glissList)
 }
 
-fun findCambioPitches(pitch: Int, nextPitch: Int): List<Int>{
-    val (secondPitch, fourthPitch) = when {
-        pitch <= nextPitch -> Pair(pitch+1, pitch -1)
-        pitch > nextPitch -> Pair(pitch-1, pitch +1)
-        else -> Pair(pitch+1, pitch -1)
+fun findCambioPitches(pitch: Int, nextPitch: Int, addGliss: Boolean = false, finalGlissando:Int ): Pair<List<Int>,List<Int>>{
+    val isAscendant = pitch <= nextPitch
+    val (secondPitch, thirdPitch) = if(isAscendant) Pair(pitch+1, pitch -1) else Pair(pitch-1, pitch +1)
+    val glissList = if(addGliss) {
+        if(isAscendant) listOf(1,-2,1,finalGlissando) else listOf(-1,2,-1,finalGlissando)
+    } else {
+        listOf(0,0,0, finalGlissando)
     }
-    return listOf(pitch, secondPitch, fourthPitch, pitch)
+    return Pair(listOf(pitch, secondPitch, thirdPitch, pitch), glissList)
+}
+fun findGlissandoForRetrogradeScales(pitches: List<Int>, finalGlissando: Int = 0, glissandoLimit: Int = 12): List<Int>{
+    val result = mutableListOf<Int>()
+    for(i in 0 until pitches.size-1){
+        val gliss = pitches[i+1] - pitches[i]
+        result += if(gliss > glissandoLimit) 0 else gliss
+    }
+    result.add(finalGlissando)
+    return result
+}
+fun findGlissandoForScales(pitches: List<Int>, nextPitch:Int, glissandoLimit: Int = 12): List<Int>{
+    val result = mutableListOf<Int>()
+    for(i in 0 until pitches.size-1){
+        val gliss = pitches[i+1] - pitches[i]
+        result += if(gliss > glissandoLimit) 0 else gliss
+    }
+    val lastGliss = nextPitch - pitches[pitches.size-1]
+    result += if(lastGliss > glissandoLimit) 0 else lastGliss
+    return result
 }
 
 fun main(){

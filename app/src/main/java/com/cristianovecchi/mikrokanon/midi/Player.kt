@@ -484,7 +484,7 @@ object Player {
                     pitchBendOn5.bendAmount = 13312
                     pitchBendOn6.bendAmount = 14336
                     pitchBendOn7.bendAmount = 15360
-                    pitchBendOn8.bendAmount = 16384
+                    pitchBendOn8.bendAmount = 16383
                     pitchBendOff.bendAmount = 8192
                     val on = NoteOn(start, channel, pitch, velOn)
                     val off = NoteOff(start + dur, channel, pitch, velOff)
@@ -923,6 +923,7 @@ object Player {
                     mt.insertEvent(pitchBendOn5)
                     mt.insertEvent(pitchBendOn6)
                     mt.insertEvent(pitchBendOn7)
+                    mt.insertEvent(pitchBendOn8)
                     mt.insertEvent(off)
                 }
                 -3 -> {

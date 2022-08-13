@@ -26,6 +26,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.locale.getGlissandoSymbols
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
@@ -46,6 +47,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
         val checkList = CheckType.checkList()
         val checkNames = checkList.map{ it.describe() }
         val replaceNames = ReplaceType.titles
+        val glissSymbol = getGlissandoSymbols().first
         val checkTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val replaceTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val stressDialogData by lazy { mutableStateOf(ListDialogData()) }
@@ -72,9 +74,9 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                     val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         .padding(8.dp)
-                        .weight(weights.first + weights.second / 6 * 5)
+                        .weight(weights.first + weights.second / 3 * 2)
                     val modifierB = Modifier
-                        .weight(weights.second / 6)
+                        .weight(weights.second / 3)
                     val modifierC = Modifier
                         .padding(8.dp)
                         .weight(weights.third)
@@ -112,7 +114,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 ) {
                                     for (j in 0 until nCols) {
                                         if (index != checkAndReplaceDatas.size) {
-                                            val text = checkAndReplaceDatas[index].describe()
+                                            val text = checkAndReplaceDatas[index].describe(glissSymbol)
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -147,102 +149,133 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                             }
                         }
                     }
-                    Row(
+                    Column(
                         modifier = modifierB.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    ){
                         val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                         val buttonSize = dimensions.dialogButtonSize
-                        CustomButton( // Check edit
-                            adaptSizeToIconButton = true,
-                            text = "",
-                            iconId = model.iconMap["check"]!!,
-                            buttonSize = buttonSize.dp,
-                            iconColor = model.appColors.iconButtonIconColor,
-                            colors = model.appColors
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            val checkAndReplaceData = checkAndReplaceDatas[cursor]
-                            checkTypeDialogData.value = ListDialogData(
-                                true,
-                                checkNames,
-                                CheckType.getIndex(checkAndReplaceData.check),
-                                lang.selectCheckType
-                            ) { newCheckTypeIndex ->
-                                val newCnrDatas = checkAndReplaceDatas.toMutableList()
-                                newCnrDatas[cursor] = checkAndReplaceDatas[cursor].copy(check = checkList[newCheckTypeIndex])
-                                checkAndReplaceDatas = newCnrDatas
-                                ListDialogData(itemList = checkTypeDialogData.value.itemList)
-                            }
-                        }
-                        CustomButton( // Replace edit
-                            adaptSizeToIconButton = true,
-                            text = "",
-                            isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
-                            iconId = model.iconMap["edit"]!!,
-                            buttonSize = buttonSize.dp,
-                            iconColor = model.appColors.iconButtonIconColor,
-                            colors = model.appColors
-                        ) {
-                            val checkAndReplaceData = checkAndReplaceDatas[cursor]
-                            checkTypeDialogData.value = ListDialogData(
-                                true,
-                                replaceNames,
-                                replaceNames.indexOf(checkAndReplaceData.replace.title),
-                                lang.selectReplaceType
-                            ) { newReplaceTypeIndex ->
-                                val newCnrDatas = checkAndReplaceDatas.toMutableList()
-                                val oldCnrData = checkAndReplaceDatas[cursor]
-                                val oldStress = oldCnrData.replace.stress
-                                newCnrDatas[cursor] = oldCnrData.copy(replace = ReplaceType.provideReplaceType(newReplaceTypeIndex, oldStress))
-                                checkAndReplaceDatas = newCnrDatas
-                                ListDialogData(itemList = replaceTypeDialogData.value.itemList)
-                            }
-                        }
 
-                        CustomButton( // stress edit
-                            adaptSizeToIconButton = true,
-                            text = "",
-                            isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
-                            iconId = model.iconMap["volume"]!!,
-                            buttonSize = buttonSize.dp,
-                            iconColor = model.appColors.iconButtonIconColor,
-                            colors = model.appColors
+                            CustomButton( // Check edit
+                                adaptSizeToIconButton = true,
+                                text = "",
+                                iconId = model.iconMap["check"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val checkAndReplaceData = checkAndReplaceDatas[cursor]
+                                checkTypeDialogData.value = ListDialogData(
+                                    true,
+                                    checkNames,
+                                    CheckType.getIndex(checkAndReplaceData.check),
+                                    lang.selectCheckType
+                                ) { newCheckTypeIndex ->
+                                    val newCnrDatas = checkAndReplaceDatas.toMutableList()
+                                    newCnrDatas[cursor] = checkAndReplaceDatas[cursor].copy(check = checkList[newCheckTypeIndex])
+                                    checkAndReplaceDatas = newCnrDatas
+                                    ListDialogData(itemList = checkTypeDialogData.value.itemList)
+                                }
+                            }
+                            CustomButton( // Replace edit
+                                adaptSizeToIconButton = true,
+                                text = "",
+                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
+                                iconId = model.iconMap["edit"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val checkAndReplaceData = checkAndReplaceDatas[cursor]
+                                checkTypeDialogData.value = ListDialogData(
+                                    true,
+                                    replaceNames,
+                                    replaceNames.indexOf(checkAndReplaceData.replace.title),
+                                    lang.selectReplaceType
+                                ) { newReplaceTypeIndex ->
+                                    val newCnrDatas = checkAndReplaceDatas.toMutableList()
+                                    val oldCnrData = checkAndReplaceDatas[cursor]
+                                    val oldStress = oldCnrData.replace.stress
+                                    newCnrDatas[cursor] = oldCnrData.copy(replace = ReplaceType.provideReplaceType(newReplaceTypeIndex, oldStress))
+                                    checkAndReplaceDatas = newCnrDatas
+                                    ListDialogData(itemList = replaceTypeDialogData.value.itemList)
+                                }
+                            }
+
+                            CustomButton( // stress edit
+                                adaptSizeToIconButton = true,
+                                text = "",
+                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
+                                iconId = model.iconMap["volume"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val cnrDatas = checkAndReplaceDatas[cursor]
+                                val stresses = listOf(60, 50, 45, 40, 35, 30, 25, 20, 16, 13, 10, 8, 6, 4, 2, 0)
+                                stressDialogData.value = ListDialogData(
+                                    true,
+                                    stresses.map{"$it"},
+                                    stresses.indexOf(cnrDatas.replace.stress),
+                                    lang.selectStress
+                                ) { stressIndex ->
+                                    val newCnrDatas = checkAndReplaceDatas.toMutableList()
+                                    val oldCnrData = checkAndReplaceDatas[cursor]
+                                    val oldReplace = oldCnrData.replace
+                                    newCnrDatas[cursor] = oldCnrData.copy(replace = oldReplace.clone(stresses[stressIndex]))
+                                    checkAndReplaceDatas = newCnrDatas
+                                    ListDialogData(itemList = stressDialogData.value.itemList)
+                                }
+                            }
+                        }
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            val cnrDatas = checkAndReplaceDatas[cursor]
-                            val stresses = listOf(60, 50, 45, 40, 35, 30, 25, 20, 16, 13, 10, 8, 6, 4, 2, 0)
-                            stressDialogData.value = ListDialogData(
-                                true,
-                                stresses.map{"$it"},
-                                stresses.indexOf(cnrDatas.replace.stress),
-                                lang.selectStress
-                            ) { stressIndex ->
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
+                                iconId = model.iconMap["back"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
                                 val newCnrDatas = checkAndReplaceDatas.toMutableList()
                                 val oldCnrData = checkAndReplaceDatas[cursor]
                                 val oldReplace = oldCnrData.replace
-                                newCnrDatas[cursor] = oldCnrData.copy(replace = oldReplace.clone(stresses[stressIndex]))
+
+                                newCnrDatas[cursor] = oldCnrData.copy(
+                                    replace = oldReplace.clone(isRetrograde = !oldReplace.isRetrograde))
+                                checkAndReplaceDatas = newCnrDatas
+                                ListDialogData(itemList = stressDialogData.value.itemList)
+                            }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
+                                text = glissSymbol,
+//                                iconId = model.iconMap["back"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val newCnrDatas = checkAndReplaceDatas.toMutableList()
+                                val oldCnrData = checkAndReplaceDatas[cursor]
+                                val oldReplace = oldCnrData.replace
+
+                                newCnrDatas[cursor] = oldCnrData.copy(
+                                    replace = oldReplace.clone(addGliss = !oldReplace.addGliss))
                                 checkAndReplaceDatas = newCnrDatas
                                 ListDialogData(itemList = stressDialogData.value.itemList)
                             }
                         }
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
-                            iconId = model.iconMap["back"]!!,
-                            buttonSize = buttonSize.dp,
-                            iconColor = model.appColors.iconButtonIconColor,
-                            colors = model.appColors
-                        ) {
-                            val newCnrDatas = checkAndReplaceDatas.toMutableList()
-                            val oldCnrData = checkAndReplaceDatas[cursor]
-                            val oldReplace = oldCnrData.replace
-
-                            newCnrDatas[cursor] = oldCnrData.copy(
-                                replace = oldReplace.clone(isRetrograde = !oldReplace.isRetrograde))
-                            checkAndReplaceDatas = newCnrDatas
-                            ListDialogData(itemList = stressDialogData.value.itemList)
-                        }
                     }
+
+
                     Row(
                         modifier = modifierC.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
