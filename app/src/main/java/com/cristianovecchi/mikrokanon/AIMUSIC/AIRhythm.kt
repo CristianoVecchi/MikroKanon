@@ -95,6 +95,21 @@ fun findTrillDurations(duration: Int): Pair<List<Int>,Int>{
     }
     return if(div == -1) Pair(listOf(duration), div) else Pair(duration.divideDistributingRest(div), div)
 }
+fun findOscillationDurations(duration: Int): Pair<List<Int>,Int> {
+    val div = when (duration) {
+        in (0..59) -> -1
+        in (60..119) -> duration / 60 * 4 + 1
+        in (120..239) -> duration / 120 * 4 + 1
+        in (240..359) -> duration / 240 * 4 + 1
+        in (360..479) -> duration / 360 * 4 + 1
+        in (480..719) -> duration / 480 * 4 + 1
+        in (720..959) -> duration / 720 * 4 + 1
+        in (960..1439) -> duration / 960 * 4 + 1
+        else -> duration / 1440 * 4 + 1
+    }
+    return if (div == -1) Pair(listOf(duration), div)
+            else Pair(duration.divideDistributingRest(div), div)
+}
 object AIRhythm {
     @JvmStatic
     fun findOffBeats(nBeats: Int): IntArray {

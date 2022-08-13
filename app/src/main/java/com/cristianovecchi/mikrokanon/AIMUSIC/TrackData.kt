@@ -63,14 +63,16 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                     if(noteEnd <= start) continue
                     //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
                     if(check(this, index, trackDataList)) {
-                        val available = provideFantasiaFunctions((0..checkAndReplaceData.replace.stress).random(), checkAndReplaceData.replace.isRetrograde)
+                        val available = provideFantasiaFunctions((0..checkAndReplaceData.replace.stress).random(),
+                            checkAndReplaceData.replace.isRetrograde, checkAndReplaceData.replace.addGliss)
                         val replace = provideReplaceFunction(available.random())
                         substitutions.add(replace(this, index, trackDataList))
                     }
                 }
             }
             is ReplaceType.Tornado -> {
-                val available = provideTornadoFunctions(checkAndReplaceData.replace.stress, checkAndReplaceData.replace.isRetrograde)
+                val available = provideTornadoFunctions(checkAndReplaceData.replace.stress,
+                    checkAndReplaceData.replace.isRetrograde, checkAndReplaceData.replace.addGliss)
                 val ventoSize = available.size
                 var ventoIndex = 0
                 for(index in pitches.indices){

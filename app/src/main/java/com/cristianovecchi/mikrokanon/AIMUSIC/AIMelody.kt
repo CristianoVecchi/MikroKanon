@@ -97,6 +97,17 @@ fun findCambioPitches(pitch: Int, nextPitch: Int, addGliss: Boolean = false, fin
     }
     return Pair(listOf(pitch, secondPitch, thirdPitch, pitch), glissList)
 }
+fun findOscillationPitches(div: Int, pitch: Int, nextPitch: Int, radius:Int): List<Int>{
+    val isAscendant = pitch <= nextPitch
+    val (secondPitch, fourthPitch) = if(isAscendant) Pair(pitch+radius, pitch-radius) else Pair(pitch-radius, pitch+radius)
+    val module = listOf(pitch, secondPitch, pitch, fourthPitch)
+    val result = mutableListOf<Int>()
+    for(i in 0 until div/4){
+        result += module
+    }
+    result += pitch
+    return result
+}
 fun findGlissandoForRetrogradeScales(pitches: List<Int>, finalGlissando: Int = 0, glissandoLimit: Int = 12): List<Int>{
     val result = mutableListOf<Int>()
     for(i in 0 until pitches.size-1){
