@@ -138,6 +138,24 @@ fun accumulateVelocities(nNotes: Int, start: Int, diff: Int): List<Int>{
     }
     return result.apply{ this += step}
 }
+fun accumulateVelocitiesCrescDim(nNotes: Int, start: Int, diff: Int, isDimCresc: Boolean = false): List<Int>{
+    val result = mutableListOf<Int>()
+    val nNotesFirst = nNotes / 2 + nNotes % 2
+    val firstArch = accumulateVelocities(nNotesFirst, start, diff)
+
+    if(isDimCresc){
+        val secondArch = if(nNotes % 2 == 0) firstArch else firstArch.drop(1)
+        result += firstArch.reversed()
+        result += secondArch
+
+    } else {
+        val secondArch = if(nNotes % 2 == 0) firstArch.reversed() else firstArch.reversed().drop(1)
+        result += firstArch
+        result += secondArch
+    }
+
+    return result.apply{ println(this)}
+}
 
 fun main(){
     println( findWholeToneScale(10,12) )

@@ -291,12 +291,13 @@ fun provideReplaceFunction(replaceType: ReplaceType):
         is ReplaceType.Fantasia -> { _, _, _ ->
             SubstitutionNotes(-1)
         }
-        is ReplaceType.TremoloCrescendo -> { trackData, index, trackDataList ->
+        is ReplaceType.TremoloCrescendo, is ReplaceType.TremoloCrescDim -> { trackData, index, trackDataList ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
                     = trackData.extractNoteDataAtIndex(index)
             val actualDuration = articulationDuration ?: duration
-
-            if(actualDuration < 10){
+            val grain = 12
+            val minDur = if(replaceType is ReplaceType.TremoloCrescendo) grain * 2 else grain * 3
+            if(actualDuration < minDur){
                 SubstitutionNotes(-1)
             } else {
                 val isStaccato = actualDuration < duration
@@ -304,14 +305,20 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 val stressedVelocity = if (velocity + stress > 127) 127 else velocity + stress
                 val velDiff = stressedVelocity - velocity
                 val (nNotes, durs) = if(isStaccato){
-                    if(velDiff * 5 <= actualDuration) Pair(velDiff, actualDuration.divideDistributingRest(velDiff)) else
-                    Pair(actualDuration / 5, actualDuration.divideDistributingRest(actualDuration/5).toList())
+                    if(velDiff * grain <= actualDuration) Pair(velDiff, actualDuration.divideDistributingRest(velDiff)) else
+                    Pair(actualDuration / grain, actualDuration.divideDistributingRest(actualDuration/grain).toList())
                 } else {
-                    if(velDiff * 5 <= duration) Pair(velDiff, duration.divideDistributingRest(velDiff)) else
-                    Pair(duration / 5, duration.divideDistributingRest(duration/5).toList())
+                    if(velDiff * grain <= duration) Pair(velDiff, duration.divideDistributingRest(velDiff)) else
+                    Pair(duration / grain, duration.divideDistributingRest(duration/grain).toList())
                 }
-                var velocities = accumulateVelocities(nNotes, velocity, velDiff)
-                velocities = if(replaceType.isRetrograde) velocities.reversed() else velocities
+                val velocities = if(replaceType is ReplaceType.TremoloCrescendo){
+                    var vels = accumulateVelocities(nNotes, velocity, velDiff)
+                    vels = if(replaceType.isRetrograde) vels.reversed() else vels
+                    vels
+                } else {
+                    accumulateVelocitiesCrescDim(nNotes, velocity, velDiff, replaceType.isRetrograde)
+                }
+
                 val diff = if(isStaccato || glissando != 0) 0 else actualDuration - duration
                 SubstitutionNotes(
                     index, List(nNotes){pitch},
@@ -324,41 +331,6 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     if (articulationDuration == null) null else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
                     if (ribattuto == null) null else List(nNotes){ribattuto}
                 )//.apply{ println("nNotes:$nNotes start:$velocity end:$stressedVelocity $this") }
-            }
-        }
-        is ReplaceType.TremoloCrescDim -> { trackData, index, trackDataList ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
-                    = trackData.extractNoteDataAtIndex(index)
-            val actualDuration = articulationDuration ?: duration
-
-            if(actualDuration < 10){
-                SubstitutionNotes(-1)
-            } else {
-                val isStaccato = actualDuration < duration
-                val stress = replaceType.stress
-                val stressedVelocity = if (velocity + stress > 127) 127 else velocity + stress
-                val velDiff = stressedVelocity - velocity
-                val (nNotes, durs) = if(isStaccato){
-                    if(velDiff * 5 <= actualDuration) Pair(velDiff, actualDuration.divideDistributingRest(velDiff)) else
-                        Pair(actualDuration / 5, actualDuration.divideDistributingRest(actualDuration/5).toList())
-                } else {
-                    if(velDiff * 5 <= duration) Pair(velDiff, duration.divideDistributingRest(velDiff)) else
-                        Pair(duration / 5, duration.divideDistributingRest(duration/5).toList())
-                }
-                var velocities = accumulateVelocities(nNotes, velocity, velDiff)
-                velocities = if(replaceType.isRetrograde) velocities.reversed() else velocities
-                val diff = if(isStaccato || glissando != 0) 0 else actualDuration - duration
-                SubstitutionNotes(
-                    index, List(nNotes){pitch},
-                    findTicksFromDurations(tick, durs),
-                    durs,
-                    velocities,
-                    listOf(*List(nNotes-1){0}.toTypedArray(), glissando),
-                    List(nNotes){attack},
-                    listOf(isPreviousRest, *List(nNotes-1){false}.toTypedArray()),
-                    if (articulationDuration == null) null else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
-                    if (ribattuto == null) null else List(nNotes){ribattuto}
-                ).apply{ println("nNotes:$nNotes start:$velocity end:$stressedVelocity $this") }
             }
         }
         is ReplaceType.Accento -> { trackData, index, trackDataList ->
