@@ -49,8 +49,11 @@ suspend fun launchPlayer(
                 pairs.map{Triple(patterns[it.first], it.second<0, it.second.absoluteValue) }
 //                        }
             } ?: listOf(Triple(RhythmPatterns.PLAIN_4_4_R16,false,1)) )
+        val swingShuffle: Float =
+            (userOptionsData?.let { userOptionsData.swingShuffle.toFloat() }
+            ?: 0.5f)
         val rhythmShuffle: Boolean =
-            0 != (userOptionsData?.let { userOptionsData.rhythmShuffle }
+            0 != (userOptionsData?.let { userOptionsData.rhythmShuffle.toInt() }
                 ?: 0)
         val partsShuffle: Boolean =
             0 != (userOptionsData?.let { userOptionsData.partsShuffle }
@@ -141,7 +144,7 @@ suspend fun launchPlayer(
             counterpoints,
             dynamics,
             bpms,
-            0f,
+            swingShuffle,
             rhythm,
             ensList,
             createAndPlay,

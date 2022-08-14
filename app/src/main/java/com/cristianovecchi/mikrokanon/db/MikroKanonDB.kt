@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import java.util.concurrent.Executors
 
-@Database(entities = [SequenceData::class, UserOptionsData::class, CounterpointData::class], version = 3, exportSchema = false)
+@Database(entities = [SequenceData::class, UserOptionsData::class, CounterpointData::class], version = 4, exportSchema = false)
 @TypeConverters(ClipConverters::class)
 public abstract class MikroKanonDB : RoomDatabase() {
 

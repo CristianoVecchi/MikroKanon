@@ -352,6 +352,8 @@ data class Lang( // English by default
 //    val alterationOptions: List<String> = listOf("BPM", "BPM *2", "BPM /2",
 //        "BPM *2 BPM", "BPM /2 BPM", "BPM *2 BPM /2", "BPM /2 BPM *2"),
     val rhythm: String = "Rhythm",
+    val shuffle: String = "Shuffle",
+    val selectShuffle: String = "Select the shuffle!",
     val rhythmShuffle: String = "Rhythm shuffle",
     val partsShuffle: String = "Parts shuffle",
     val rowForms: String = "Row forms",

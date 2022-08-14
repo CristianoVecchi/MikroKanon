@@ -38,8 +38,11 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "rhythm")
         val rhythm: String,
 
+        @ColumnInfo(name = "swing_shuffle")
+        val swingShuffle: String,
+
         @ColumnInfo(name = "rhythm_shuffle")
-        val rhythmShuffle: Int,
+        val rhythmShuffle: String,
 
         @ColumnInfo(name = "parts_shuffle")
         val partsShuffle: Int,
@@ -119,8 +122,7 @@ import androidx.room.PrimaryKey
             fun getDefaultUserOptionsData(): UserOptionsData {
                 return UserOptionsData(0,"2", "2|0","4|1","0",
                     "0","0",
-                    "0.828", "90", "0|1",
-                    0,0, "1|1",0, "0|1",
+                    "0.828", "90", "0|1", "0.5", "0",0, "1|1",0, "0|1",
                     "0","0",0b0011110, 0b1111111,
                     0,0,0,1,
                      //"System|0" ,
@@ -163,8 +165,11 @@ import androidx.room.PrimaryKey
                     "rhythm" -> {
                         optionsDataClone.copy(id = id, rhythm = value as String)
                     }
+                    "swingShuffle" -> {
+                        optionsDataClone.copy(id = id, swingShuffle = value as String)
+                    }
                     "rhythmShuffle" -> {
-                        optionsDataClone.copy(id = id, rhythmShuffle = value as Int)
+                        optionsDataClone.copy(id = id, rhythmShuffle = value as String)
                     }
                     "partsShuffle" -> {
                         optionsDataClone.copy(id = id, partsShuffle = value as Int)

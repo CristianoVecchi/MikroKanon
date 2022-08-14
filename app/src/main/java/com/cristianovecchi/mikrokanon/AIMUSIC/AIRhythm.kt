@@ -2,6 +2,8 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
+
 fun multiplyDurations(nTotalNotes: Int, durations: List<Int> ):IntArray {
     val actualDurations = IntArray(nTotalNotes * 2 + 1)// note + optional rests + optional initial rest
     (0 until nTotalNotes * 2 + 1).forEach {
@@ -109,6 +111,35 @@ fun findOscillationDurations(duration: Int): Pair<List<Int>,Int> {
     }
     return if (div == -1) Pair(listOf(duration), div)
             else Pair(duration.divideDistributingRest(div), div)
+}
+fun IntArray.applySwing(shuffle: Float): IntArray {
+    val result = mutableListOf<Int>()
+    var index = 0
+    while(index < this.size -1){
+        val first = this[index]
+        if(first > 0){
+            val second = this[index+1]
+            if(second > 0){
+                if(first == second){
+                    result += (first * shuffle).roundToInt()
+                    result += (second * (1f - shuffle)).roundToInt()
+                    index += 2
+                    println("Swinging: $first $second -> ${(first * shuffle).roundToInt()} ${(second * (1f - shuffle)).roundToInt()}")
+                } else {
+                    result += first
+                    index++
+                }
+            } else{
+                result += first
+                index++
+            }
+        } else {
+            result += first
+            index++
+        }
+
+    }
+    return result.toIntArray()
 }
 object AIRhythm {
     @JvmStatic

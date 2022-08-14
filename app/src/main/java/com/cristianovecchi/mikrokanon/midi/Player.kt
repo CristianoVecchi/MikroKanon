@@ -116,7 +116,7 @@ object Player {
         counterpoints: List<Counterpoint?>,
         dynamics: List<Float>,
         bpms: List<Float>,
-        shuffle: Float,
+        swingShuffle: Float = 0.5f,
         rhythm: List<Triple<RhythmPatterns, Boolean, Int>>, // Triple: Pattern, isRetrograde, nRepetitions
         ensemblesList: List<List<EnsembleType>>,
         play: Boolean,
@@ -167,8 +167,9 @@ object Player {
                             .repeat(triple.third) else triple.first.values.repeat(triple.third)
                     }.mergeNegativeValues()
                     //println("durations: $durations")
-                    val actualDurations = multiplyDurations(nTotalNotes, durations)
+                    var actualDurations = multiplyDurations(nTotalNotes, durations)
                     if (rhythmShuffle) actualDurations.shuffle()
+                    actualDurations = if (swingShuffle != 0.5f) actualDurations.applySwing(swingShuffle) else actualDurations
                     val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
                     val ensemblePartsList: List<List<EnsemblePart>> =
                         if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
@@ -1311,6 +1312,7 @@ object Player {
 
 
 }
+
 
 //fun main(args : Array<String>){
 //    val tr1 = Triple(RhythmPatterns.PLAIN_4_4_R16, false, 3)

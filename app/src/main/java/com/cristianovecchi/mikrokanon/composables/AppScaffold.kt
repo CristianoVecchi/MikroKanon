@@ -212,7 +212,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
     val colors = model.appColors
     val optionNames= listOf(
         "Ensemble", "Glissando","Vibrato","Nuances",
-        "Rhythm", "Rhythm Shuffle", "Parts Shuffle",
+        "Rhythm", "Swing Shuffle", "Rhythm Shuffle", "Parts Shuffle",
         "Doubling","8D AUDIO",
 
         "BPM", "Dynamics",
@@ -410,8 +410,31 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                     }
                                 })
                         }
+                        "Swing Shuffle" -> {
+                            val shuffle = userOptions.swingShuffle.toFloat()
+                            val isOn = shuffle != 0.5f
+                            val shuffles = listOf(90,80,70,60,50,40,30,20,10)
+                            SelectableCard(
+                                text = if(isOn) "${lang.shuffle}: ${(shuffle * 100).toInt()}%" else lang.shuffle,
+                                fontSize = fontSize,
+                                colors = colors,
+                                isSelected = isOn,
+                                onClick = {
+                                    listDialogData.value = ListDialogData(
+                                        true,
+                                        shuffles.map{"$it%"},
+                                        shuffles.indexOf((shuffle * 100).toInt()),
+                                        lang.selectShuffle
+                                    ) { shuffleIndex ->
+                                        model.updateUserOptions(
+                                            "swingShuffle",
+                                            (shuffles[shuffleIndex] / 100f).toString()
+                                        )
+                                    }
+                                })
+                        }
                         "Rhythm Shuffle" -> {
-                            var isOn = userOptions.rhythmShuffle != 0
+                            var isOn = userOptions.rhythmShuffle.toInt() != 0
                             SelectableCard(
                                 text = lang.rhythmShuffle,
                                 fontSize = fontSize,
@@ -421,7 +444,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                     isOn = !isOn
                                     model.updateUserOptions(
                                         "rhythmShuffle",
-                                        if (isOn) 1 else 0
+                                        if (isOn) 1.toString() else 0.toString()
                                     )
                                 })
                         }
