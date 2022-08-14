@@ -10,23 +10,32 @@ sealed class CheckType(open val title: String = "") {
         return when (this){
             is None -> "0"
             is EqualOrGreater -> "1#$limit"
+            is StartPhrase -> "2"
+            is EndPhrase -> "3"
+
         }
     }
     fun describe(): String {
         return when (this){
             is None -> this.title
             is EqualOrGreater -> if(this.limit == 0) " ∞ " else "${this.title}${limitInString(this.limit)}"
+            is StartPhrase -> this.title
+            is EndPhrase -> this.title
         }
     }
 
     data class None(override val title: String = "   - - -   "): CheckType()
     data class EqualOrGreater(override val title: String = " \u2265 ", val limit: Int = 240) : CheckType()
+    data class StartPhrase(override val title: String = " |- ") : CheckType()
+    data class EndPhrase(override val title: String = " -| ") : CheckType()
     //, ALONE("].[ >=")
     companion object {
         fun provideCheckType(index: Int, limit: Int = 240): CheckType{
             return when (index) {
                 0 -> None()
                 1 -> EqualOrGreater(limit = limit)
+                2 -> StartPhrase()
+                3 -> EndPhrase()
                 else -> None()
             }
         }
@@ -40,6 +49,7 @@ sealed class CheckType(open val title: String = "") {
                 EqualOrGreater(limit = 1920), EqualOrGreater(limit = 2400),
                 EqualOrGreater(limit = 2880), EqualOrGreater(limit = 3360),
                 EqualOrGreater(limit = 3840), EqualOrGreater(limit = 4320),
+                StartPhrase(), EndPhrase()
             )
         }
         fun limitInString(limit: Int): String {
@@ -82,6 +92,8 @@ sealed class CheckType(open val title: String = "") {
                     4320 -> 15
                     else -> 0
                 }
+                is StartPhrase -> 16
+                is EndPhrase -> 17
             }
         }
     }
@@ -190,6 +202,8 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
         return when(check){
             is CheckType.None -> check.describe()
             is CheckType.EqualOrGreater -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
+            is CheckType.StartPhrase -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
+            is CheckType.EndPhrase -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
         }
     }
     fun toCsv(): String {
@@ -241,6 +255,12 @@ fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>
         is CheckType.None -> { _, _, _ -> false }
         is CheckType.EqualOrGreater -> { trackData, index, trackDataList -> trackData.durations[index] >= checkType.limit }
         //CheckType.ALONE -> TODO()
+        is CheckType.StartPhrase -> { trackData, index, trackDataList ->
+            trackData.isPreviousRest[index]
+        }
+        is CheckType.EndPhrase -> { trackData, index, trackDataList ->
+            trackData.isPreviousRest.getOrElse(index + 1) {true}
+        }
     }
 }
 fun provideFantasiaFunctions(stress: Int, isRetrograde: Boolean, addGliss: Boolean): List<ReplaceType>{
