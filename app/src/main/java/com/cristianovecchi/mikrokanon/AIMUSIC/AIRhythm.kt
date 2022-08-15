@@ -112,32 +112,21 @@ fun findOscillationDurations(duration: Int): Pair<List<Int>,Int> {
     return if (div == -1) Pair(listOf(duration), div)
             else Pair(duration.divideDistributingRest(div), div)
 }
-fun IntArray.applySwing(shuffle: Float): IntArray {
+fun IntArray.applySwing(shuffle: Float, maxDur: Int = 240): IntArray {
     val result = mutableListOf<Int>()
     var index = 0
     while(index < this.size -1){
         val first = this[index]
-        if(first > 0){
-            val second = this[index+1]
-            if(second > 0){
-                if(first == second){
+        val second = this[index+1]
+        if( first in 1..maxDur && second > 0 && first == second ){
                     result += (first * shuffle).roundToInt()
                     result += (second * (1f - shuffle)).roundToInt()
                     index += 2
                     println("Swinging: $first $second -> ${(first * shuffle).roundToInt()} ${(second * (1f - shuffle)).roundToInt()}")
-                } else {
-                    result += first
-                    index++
-                }
-            } else{
-                result += first
-                index++
-            }
         } else {
             result += first
             index++
         }
-
     }
     return result.toIntArray()
 }
