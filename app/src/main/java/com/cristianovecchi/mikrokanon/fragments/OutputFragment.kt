@@ -155,6 +155,7 @@ class OutputFragment: Fragment() {
                                 onExpand = { model.onExpand() },
                                 onFlourish = { model.onFlourish() },
                                 onEWH = { nParts -> model.onEWH(arrayListOf(), nParts)},
+                                progressiveEWH = { model.progressiveEWH() },
                                 onResolutio = { resolutioData ->
                                     model.onResolutio(null, resolutioData)
                                 },

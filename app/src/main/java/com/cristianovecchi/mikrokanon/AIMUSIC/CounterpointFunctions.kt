@@ -136,6 +136,9 @@ suspend fun expand(originalCounterpoints: List<Counterpoint>, extension: Int): L
 suspend fun extendedWeightedHarmony(originalCounterpoints: List<Counterpoint>, nParts: Int, maxParts: Int): List<Counterpoint>{
      return originalCounterpoints.map{ it.addPartsOfExtendedWeightedHarmony(nParts, maxParts) }
 }
+suspend fun progressiveWeightedHarmony(originalCounterpoints: List<Counterpoint>): List<Counterpoint>{
+     return originalCounterpoints.map{ it.sortColumnsByProgressiveEWH() }
+}
 suspend fun addSequence(counterpoint: Counterpoint,sequence: List<Clip>, intervalSet: List<Int>, repeat: Boolean,depth: Int = 6): List<Counterpoint> {
      return if(repeat){
           Counterpoint.findAllCounterpointsWithRepeatedSequence(counterpoint, sequence.map { it.abstractNote }, intervalSet, depth)

@@ -33,6 +33,7 @@ sealed class Computation(open val icon: String = "") {
     data class Transposition(val counterpoints: List<Counterpoint>, val transpositions: List<Pair<Int,Int>>, val index: Int, override val icon: String = "transpose") : Computation()
     data class TritoneSubstitution(val counterpoints: List<Counterpoint>, val intervalSet: List<Int>, val index: Int, override val icon: String = "tritone_substitution") : Computation()
     data class ExtendedWeightedHarmony(val counterpoints: List<Counterpoint>, val nParts: Int, override val icon: String = "accompanist") : Computation()
+    data class ProgressiveEWH(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "accompanist") : Computation()
     data class Resolutio(val counterpoints: List<Counterpoint>, val resolutioData: Pair<Set<Int>,String>, override val icon: String = "resolutio") : Computation()
     data class Doubling(val counterpoints: List<Counterpoint>, val doublingData: List<Pair<Int,Int>>, override val icon: String = "doubling") : Computation()
     data class Parade(val counterpoint: Counterpoint, override val icon: String = "parade") : Computation()

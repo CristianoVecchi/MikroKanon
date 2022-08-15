@@ -67,6 +67,7 @@ fun ButtonsDialog(
                                         onUpsideDown = buttonsDialogData.value.onUpsideDown,
                                         onArpeggio = buttonsDialogData.value.onArpeggio,
                                         onParade = buttonsDialogData.value.onParade,
+                                        progressiveEWH = buttonsDialogData.value.progressiveEWH
                                     ) }
                                     else {
                                         BoostedMikroKanonsButtons(

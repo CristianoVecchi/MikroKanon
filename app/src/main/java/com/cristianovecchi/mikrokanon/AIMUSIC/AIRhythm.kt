@@ -118,7 +118,7 @@ fun IntArray.applySwing(shuffle: Float, maxDur: Int = 240): IntArray {
     while(index < this.size -1){
         val first = this[index]
         val second = this[index+1]
-        if( first in 1..maxDur && second > 0 && first == second ){
+        if( first <= maxDur && first > 0 && second > 0 && first == second){
                     result += (first * shuffle).roundToInt()
                     result += (second * (1f - shuffle)).roundToInt()
                     index += 2
@@ -128,7 +128,7 @@ fun IntArray.applySwing(shuffle: Float, maxDur: Int = 240): IntArray {
             index++
         }
     }
-    return result.toIntArray()
+    return result.toIntArray()//.apply{ println("nNotes: ${this.size}")}
 }
 object AIRhythm {
     @JvmStatic

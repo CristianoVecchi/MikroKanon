@@ -502,3 +502,16 @@ fun AppViewModel.extendedWeightedHarmonyOnCounterpoints(originalCounterpoints: L
         }
     }
 }
+fun AppViewModel.progressiveEWHonCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+    if(!selectedCounterpoint.value!!.isEmpty()){
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                newList = progressiveWeightedHarmony(originalCounterpoints)
+                    .distinctBy { it.getAbsPitches() }
+            }
+            changeCounterpointsWithLimitAndCache(newList, false)
+            changeSelectedCounterpoint(counterpoints.value!![index])
+        }
+    }
+}

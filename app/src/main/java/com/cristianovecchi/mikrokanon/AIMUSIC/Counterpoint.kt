@@ -753,6 +753,26 @@ data class Counterpoint(val parts: List<AbsPart>,
             counterpoint2nd.shiftDown((nParts - nParts2nd) shr 1)
         )
     }
+
+    fun sortColumnsByProgressiveEWH(): Counterpoint{
+        val nParts = this.parts.size
+        val columns = (0 until this.maxSize()).map{this.getColumnValuesWithEmptyValues(it)}.toMutableList()
+        val result = Counterpoint.empty(nParts)
+        (1..nParts).forEach{ step ->
+            val stepColumns = columns.filter{
+                it.count{ pitch -> pitch == -1} == nParts - step
+                        || it.filter{pitch -> pitch != -1}.toSet().size == step
+            }
+            val weightedColumns = stepColumns.map{
+                val harmonyResult = HarmonyEye.findHarmonyResult(Insieme.dodecaByteFromAbsPitches(it.toIntArray()))
+                //println("Column:$it Harmony Result: ${harmonyResult.weight} ${harmonyResult.roots.contentToString()}")
+                Pair(it, harmonyResult.weight)
+            }.sortedByDescending { it.second }
+            weightedColumns.forEach { result.addColumn(it.first) }
+        }
+        result.findAndSetEmptiness()
+        return result
+    }
     fun transposingGlueWithRowFormsOf2nd(counterpoint2nd: Counterpoint, centerVertically: Boolean): List<Counterpoint>{
         val (counterpoint1st, original2nd) = this.normalizePartsSize(false)
                                                 .centerVertically(counterpoint2nd.normalizePartsSize(false))

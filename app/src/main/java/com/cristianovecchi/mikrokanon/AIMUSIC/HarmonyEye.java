@@ -1,5 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC;
 
+import static java.util.Collections.reverse;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -59,6 +61,15 @@ public class HarmonyEye {
         }
         return intervals;
     }
+    public static HarmonyResult findHarmonyResult(int dodecaByte){
+        boolean[] bools = HarmonyEye.selNotesFrom12Byte(dodecaByte);
+        System.out.println("bools: " + Arrays.toString(bools));
+        boolean[] revBools = new boolean[12];
+        for(int i=0; i<12; i++){
+            revBools[i] = bools[11-i];
+        }
+        return findHarmonyResult(revBools);
+    }
     public static HarmonyResult findHarmonyResult(boolean[] notes){
         boolean[] notes2 = new boolean[24];
         for(int i=0; i<12; i++){
@@ -95,6 +106,7 @@ public class HarmonyEye {
         hr = new HarmonyResult(fundIndeces, max);
         return hr;
     }
+
     public static int countNotes(boolean[] notes){
         int c = 0;
         for(int i=0; i<notes.length; i++){

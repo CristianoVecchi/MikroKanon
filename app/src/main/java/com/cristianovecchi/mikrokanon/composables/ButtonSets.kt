@@ -208,7 +208,8 @@ fun BoostedMikroKanonsButtons(
 @Composable
 fun NotFromSelectorButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
-    onUpsideDown: () -> Unit, onSort: (Int) -> Unit, onArpeggio: (ARPEGGIO) -> Unit, onParade: () -> Unit
+    onUpsideDown: () -> Unit, onSort: (Int) -> Unit, onArpeggio: (ARPEGGIO) -> Unit, onParade: () -> Unit,
+    progressiveEWH: () -> Unit,
 ) {
     Row{
         CustomButton(iconId = model.iconMap["sort_up"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
@@ -233,6 +234,9 @@ fun NotFromSelectorButtons(
         }
         CustomButton(iconId = model.iconMap["arpeggio"]!!, text = "≈", isActive = isActive, buttonSize = buttonSize, colors = colors) {
             onArpeggio(ARPEGGIO.WAVES)
+        }
+        CustomButton(iconId = model.iconMap["accompanist"]!!, text = "<", isActive = isActive, buttonSize = buttonSize, colors = colors) {
+            progressiveEWH()
         }
     }
 }

@@ -170,6 +170,7 @@ object Player {
                     var actualDurations = multiplyDurations(nTotalNotes, durations)
                     if (rhythmShuffle) actualDurations.shuffle()
                     actualDurations = if (swingShuffle != 0.5f) actualDurations.applySwing(swingShuffle) else actualDurations
+                    println(actualDurations.contentToString())
                     val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
                     val ensemblePartsList: List<List<EnsemblePart>> =
                         if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
@@ -238,7 +239,8 @@ object Player {
                                     val tracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
                                     tracks.add(tempoTrack)
                                     tracks.addAll(counterpointTracks)
-                                    // // ADD CHORD TRACK IF NEEDED
+
+                                    //ADD CHORD TRACK IF NEEDED
                                     //println(harmonizations)
                                     tracks.addChordTrack(harmonizations, bars,
                                         counterpointTrackData, audio8D, totalLength, false)

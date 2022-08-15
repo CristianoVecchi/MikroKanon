@@ -326,6 +326,12 @@ class AppViewModel(
         computationStack.pushAndDispatch(Computation.ExtendedWeightedHarmony(originalCounterpoints, nParts))
         extendedWeightedHarmonyOnCounterpoints(originalCounterpoints, nParts)
     }
+    val progressiveEWH = {
+        val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
+        val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
+        computationStack.pushAndDispatch(Computation.ProgressiveEWH(originalCounterpoints, index))
+        progressiveEWHonCounterpoints(originalCounterpoints, index)
+    }
     val onResolutio = { list: ArrayList<Clip>?, resolutioData: Pair<Set<Int>,String> ->
         //println("on Resolutio: ${resolutioData.first} ${resolutioData.second}")
         val originalCounterpoints = if(list != null) {
@@ -710,6 +716,7 @@ class AppViewModel(
                     is Computation.Pedal -> computationStack.lastElement()
                     is Computation.TritoneSubstitution -> computationStack.lastElement()
                     is Computation.ExtendedWeightedHarmony -> computationStack.lastElement()
+                    is Computation.ProgressiveEWH -> computationStack.lastElement()
                     else -> { stackIcons.removeLast(); computationStack.pop() } // do not Dispatch!!!
                 }
                 previousIntervalSet?.let { changeIntervalSet(previousIntervalSet)}
@@ -814,6 +821,11 @@ class AppViewModel(
                     is Computation.ExtendedWeightedHarmony -> {
                         if(stepBack){
                             extendedWeightedHarmonyOnCounterpoints( previousComputation.counterpoints, previousComputation.nParts)
+                        }
+                    }
+                    is Computation.ProgressiveEWH -> {
+                        if(stepBack){
+                            progressiveEWHonCounterpoints( previousComputation.counterpoints,previousComputation.index)
                         }
                     }
                     is Computation.Overlap -> {
