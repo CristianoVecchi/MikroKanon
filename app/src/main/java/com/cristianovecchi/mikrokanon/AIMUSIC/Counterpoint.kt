@@ -760,8 +760,8 @@ data class Counterpoint(val parts: List<AbsPart>,
         val result = Counterpoint.empty(nParts)
         (1..nParts).forEach{ step ->
             val stepColumns = columns.filter{
-                it.count{ pitch -> pitch == -1} == nParts - step
-                        || it.filter{pitch -> pitch != -1}.toSet().size == step
+                //it.count{ pitch -> pitch == -1} == nParts - step
+                        it.filter{pitch -> pitch != -1}.toSet().size == step
             }
             val weightedColumns = stepColumns.map{
                 val harmonyResult = HarmonyEye.findHarmonyResult(Insieme.dodecaByteFromAbsPitches(it.toIntArray()))
@@ -769,6 +769,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 Pair(it, harmonyResult.weight)
             }.sortedByDescending { it.second }
             weightedColumns.forEach { result.addColumn(it.first) }
+            columns.removeAll(stepColumns)
         }
         result.findAndSetEmptiness()
         return result

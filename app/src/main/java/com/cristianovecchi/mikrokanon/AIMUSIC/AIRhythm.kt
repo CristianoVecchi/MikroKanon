@@ -4,6 +4,49 @@ import com.cristianovecchi.mikrokanon.divideDistributingRest
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
+fun List<Int>.resizePatternByDuration(duration: Int, startTick: Int = 0): Pair<List<Int>, List<Int>>{
+    val durs = mutableListOf<Int>()
+    val ticks = mutableListOf<Int>()
+    val thisDuration = this.sumOf { it.absoluteValue }
+    val ratio = duration.toFloat() / thisDuration
+    var tick = startTick
+    var rest = 0f
+    val areNegative = this.map{ it < 0 }
+    val positivePattern = this.map{
+        val floatValue = it.absoluteValue * ratio
+        val intValue = floatValue.roundToInt()
+        val decimal = floatValue - intValue
+        rest += decimal
+        val add: Int
+        if(rest >=1f) {
+            add = 1
+            rest -= 1f
+        } else {
+            add = 0
+        }
+        intValue + add
+    }.toMutableList()
+    val diff = duration - positivePattern.sum()
+    if (diff != 0){
+        positivePattern[positivePattern.size-1] = positivePattern.last() + diff
+    }
+    val newPattern = positivePattern.mapIndexed { index, i -> if(areNegative[index]) i * -1 else i  }
+    newPattern.forEach {
+        if(it < 0){
+            tick += it.absoluteValue
+        } else {
+            ticks += tick
+            durs += it
+            tick += it
+        }
+    }
+//    println("durs: $durs")
+//    println("ticks: $ticks")
+//    println("ratio: $ratio")
+//    println("pattern: $this  newPattern: $newPattern ")
+//    println("duration requested: $duration  duration achieved: ${newPattern.map{it.absoluteValue}.sum()}")
+    return durs to ticks
+}
 fun multiplyDurations(nTotalNotes: Int, durations: List<Int> ):IntArray {
     val actualDurations = IntArray(nTotalNotes * 2 + 1)// note + optional rests + optional initial rest
     (0 until nTotalNotes * 2 + 1).forEach {
@@ -311,6 +354,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
         120,-120,180,-60 ,120,-120,180,-60 ,30,-210,30,-210,30,-210),Pair(7,8)),
     HAPPY_BIRTHDAY_1(RhythmType.QUOTE,"Birthday 1",listOf(320,160,480,480,480,480,-480), Pair(3,4)),
     HAPPY_BIRTHDAY_2(RhythmType.QUOTE,"Birthday 2",listOf(320,160,480,480,480,480,480), Pair(3,4)),
+    SOS(RhythmType.QUOTE,"SOS",listOf(90, -30,90, -30,90, -30,-120, 180,-60,180,-60,180,-300, 90, -30,90, -30,90, -630), Pair(5,4)),
     BULGARIAN1(RhythmType.BULGARIAN,"Bulgarian1 4+2+3♫",listOf(H1,N1,N1dotted).flatten(),Pair(9,8)),
     BULGARIAN2(RhythmType.BULGARIAN,"Bulgarian2 2+2+3♫",listOf(N1,N1,N1dotted).flatten(),Pair(7,8)),
     BULGARIAN3(RhythmType.BULGARIAN,"Bulgarian3 2+3♫",listOf(N1,N1dotted).flatten(),Pair(5,8)),

@@ -63,7 +63,6 @@ public class HarmonyEye {
     }
     public static HarmonyResult findHarmonyResult(int dodecaByte){
         boolean[] bools = HarmonyEye.selNotesFrom12Byte(dodecaByte);
-        System.out.println("bools: " + Arrays.toString(bools));
         boolean[] revBools = new boolean[12];
         for(int i=0; i<12; i++){
             revBools[i] = bools[11-i];
