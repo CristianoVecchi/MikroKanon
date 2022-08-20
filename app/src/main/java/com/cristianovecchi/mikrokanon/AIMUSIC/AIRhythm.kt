@@ -171,6 +171,12 @@ fun IntArray.applySwing(shuffle: Float, maxDur: Int = 240): IntArray {
             index++
         }
     }
+    if(this.size != result.size) result += this.last()
+//    println(this.contentToString())
+//    println(result)
+    if(this.size != result.size) {
+        throw Exception("Shuffle is incorrect: size=${this.size} result size:${result.size}")
+    }
     return result.toIntArray()//.apply{ println("nNotes: ${this.size}")}
 }
 object AIRhythm {

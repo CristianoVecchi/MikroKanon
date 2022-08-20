@@ -265,7 +265,7 @@ fun printNoteLimits(ticks: IntArray, durations: IntArray) {
     }
     println()
 }
-fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
+fun convertToMidiTrack(trackData: TrackData, nParts: Int, addAttack: Boolean = false): MidiTrack {
     val track = MidiTrack()
     val channel = trackData.channel
     val vibrato = trackData.vibrato
@@ -280,6 +280,8 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
     var lastTick = -1L // avoid overriding
    // var noteIndex = -1
     //printNoteLimits(ticks, articulationDurations)
+    if(addAttack) trackData.addAttackToMidiTrack(track)
+
     trackData.changes.forEach{
        // println("Intrument change: $it")
         val tick = it.tick
@@ -372,6 +374,21 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int): MidiTrack {
         setAudio8D(track, nRevolutions, channel)
     }
     return track
+}
+fun TrackData.addAttackToMidiTrack(midiTrack: MidiTrack) {
+    //println("attacks: ${this.attacks.contentToString()}")
+    val attacks = this.attacks
+    val ticks = this.ticks
+    var lastAttack = 0
+    ticks.forEachIndexed { i, tick ->
+        val newAttack = attacks[i]
+        //if(newAttack != lastAttack) {
+            val setAttack = Controller(tick.toLong(), this.channel,73, attacks[i])
+                //println( "Attack: ${setAttack.value}  tick: $tick")
+            midiTrack.insertEvent(setAttack)
+            lastAttack = newAttack
+       // }
+    }
 }
 fun setAudio8D(track: MidiTrack, nRevolutions: Int, channel: Int) {
     val length = track.lengthInTicks

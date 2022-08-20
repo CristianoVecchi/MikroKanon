@@ -221,7 +221,8 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
         "Ritornello", "Transpose", "Row Forms",
 
         "Harmony", "Chords to Enhance", "Enhance in Transpositions",
-        "Check and Replace I", "Check and Replace II", "Check and Replace III", "Check and Replace IV",
+        "Check and Replace I", "Check and Replace II", "Check and Replace III",
+        "Check and Replace IV", "Check and Replace V",
 
         "Clear Slots", "Spacer", "Export MIDI",
 
@@ -919,6 +920,34 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                             model.updateUserOptions(
                                                 "checkAndReplace",
                                                 insertInMultiCheckAndReplaceCsv(3, cnrCsv, optCnrMultiDatas)
+                                            )
+                                            checkAndReplaceDialogData.value =
+                                                MultiNumberDialogData(model = model)
+                                        }
+                                    })
+                            }
+                            "Check and Replace V" -> {
+                                val optCnrMultiDatas = userOptions.checkAndReplace
+                                val cnrMultiDatas = CheckAndReplaceData.createMultiCheckAndReplaceDatasFromCsv(optCnrMultiDatas).toMutableList()
+                                var cnrDatas = cnrMultiDatas.getOrElse(4) {listOf()}
+                                cnrDatas = cnrDatas.ifEmpty { listOf(CheckAndReplaceData()) }
+                                val isSelected = !(cnrDatas.size == 1 && cnrDatas[0].check is CheckType.None)
+                                SelectableCard(
+                                    text = if(!isSelected) lang.checkAndReplace + " V"
+                                    else "${lang.checkAndReplace} V: \n${cnrDatas.mapIndexed{i, cnr ->
+                                        "${i+1}: ${cnr.describe(getGlissandoSymbols().first)}"}.joinToString("\n")}",
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isSelected,
+                                    onClick = {
+                                        checkAndReplaceDialogData.value = MultiNumberDialogData(
+                                            true, lang.selectCheckType,
+                                            model = model, names = chordsInstruments.map{ListaStrumenti.getNameByIndex(it)},
+                                            anySequence = cnrDatas,
+                                        ) { cnrCsv ->
+                                            model.updateUserOptions(
+                                                "checkAndReplace",
+                                                insertInMultiCheckAndReplaceCsv(4, cnrCsv, optCnrMultiDatas)
                                             )
                                             checkAndReplaceDialogData.value =
                                                 MultiNumberDialogData(model = model)

@@ -22,7 +22,7 @@ data class NoteData(val pitch: Int, val tick: Int, val duration: Int, val veloci
 val attack:Int, val isPreviousRest: Boolean, val articulationDuration: Int?, val ribattuto: Int?)
 
 data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: IntArray,
-                     val velocities: IntArray,val glissando: IntArray,  val attacks: IntArray,
+                     val velocities: IntArray, val glissando: IntArray, val attacks: IntArray,
                      val isPreviousRest: BooleanArray,
                      var articulationDurations: IntArray? = null,
                      var ribattutos: IntArray? = null,
@@ -124,6 +124,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         val durationsData = mutableListOf<Int>()
         val velocitiesData = mutableListOf<Int>()
         val glissandoData = mutableListOf<Int>()
+        val attackData = mutableListOf<Int>()
         val previousIsRestData = mutableListOf<Boolean>()
         val artDurData = mutableListOf<Int>()
         val ribattutosData = mutableListOf<Int>()
@@ -137,6 +138,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                 durationsData.addAll(subs.newDurations)
                 velocitiesData.addAll(subs.newVelocities)
                 glissandoData.addAll(subs.newGlissando)
+                attackData.addAll(subs.newAttacks)
                 previousIsRestData.addAll(subs.newIsPreviousRest)
                 articulationDurations?.let{
                     artDurData.addAll(subs.newArticulationDurations!!)
@@ -151,6 +153,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                 durationsData.add(durations[noteIndex])
                 velocitiesData.add(velocities[noteIndex])
                 glissandoData.add(glissando[noteIndex])
+                attackData.add(attacks[noteIndex])
                 previousIsRestData.add(isPreviousRest[noteIndex])
                 articulationDurations?.let{
                     artDurData.add(articulationDurations!![noteIndex])
@@ -163,7 +166,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
 
 
         return TrackData(pitchesData.toIntArray(), ticksData.toIntArray(), durationsData.toIntArray(),
-            velocitiesData.toIntArray(), glissandoData.toIntArray(), IntArray(pitchesData.size),
+            velocitiesData.toIntArray(), glissandoData.toIntArray(), attackData.toIntArray(),
             previousIsRestData.toBooleanArray(),
             if(this.articulationDurations == null) null else artDurData.toIntArray(),
             if(this.ribattutos == null) null else ribattutosData.toIntArray(),
@@ -176,6 +179,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                 intArrayOf(), booleanArrayOf(),null,null,
                 0,80,0,0,false,0)
         }
+        // TO CORRECT
         fun findPitchesInSlice(trackDataList: List<TrackData>, start: Long, end: Long): Set<Int>{
             val result = mutableSetOf<Int>()
             for(track in trackDataList){

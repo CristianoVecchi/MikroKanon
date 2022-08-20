@@ -170,7 +170,7 @@ object Player {
                     var actualDurations = multiplyDurations(nTotalNotes, durations)
                     if (rhythmShuffle) actualDurations.shuffle()
                     actualDurations = if (swingShuffle != 0.5f) actualDurations.applySwing(swingShuffle) else actualDurations
-                    println(actualDurations.contentToString())
+                    //println(actualDurations.contentToString())
                     val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
                     val ensemblePartsList: List<List<EnsemblePart>> =
                         if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
@@ -213,19 +213,25 @@ object Player {
                                 "Cancelled during Check'n'replace building!"
                             } else {
                                 // TRANSFORM DATATRACKS IN MIDITRACKS
-
                                 val counterpointTracks = actualCounterpointTrackData.map {
                                     yield() //delay(1)
                                     if(job.isActive) {
                                         //dispatch("Building MidiTrack Channel: ${it.channel}")
                                         dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
-                                        convertToMidiTrack(it, actualCounterpointTrackData.size)
+                                        convertToMidiTrack(it, actualCounterpointTrackData.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} })
                                     } else MidiTrack()
                                 }
                                 if (!job.isActive) {
                                     //dispatch("Cancelled during MidiTracks building!")
                                     "Cancelled during MidiTracks building!"
                                 } else {
+                                    // ADD ATTACK TO MIDITRACKS
+//                                    if(checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} }){
+//                                        actualCounterpointTrackData.forEachIndexed { i, trackData ->
+//                                            println(trackData)
+//                                            trackData.addAttackToMidiTrack(counterpointTracks[i])
+//                                        }
+//                                    }
                                     // ADD BPM AND VOLUME CHANGES
                                     val tempoTrack = buildTempoTrack(bpms, totalLength)
                                     tempoTrack.addVolumeToTrack(dynamics, totalLength)
@@ -440,7 +446,10 @@ object Player {
             insertNoteWithRibattuto(mt, start, dur, channel, pitch, velOn, velOff, ribattuto)
         } else {
             lastIsGliss = true
-            when (gliss) {
+            val actualGliss = if(duration < 24) {
+                if(gliss > 0) 2 else -2
+            } else gliss
+            when (actualGliss) {
                 1 -> {
 
                     val durationQuarter = duration / 4

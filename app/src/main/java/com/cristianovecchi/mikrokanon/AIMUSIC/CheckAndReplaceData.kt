@@ -326,7 +326,6 @@ fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>
     return when(checkType){
         is CheckType.None -> { _, _, _ -> false }
         is CheckType.EqualOrGreater -> { trackData, index, trackDataList -> trackData.durations[index] >= checkType.limit }
-        //CheckType.ALONE -> TODO()
         is CheckType.StartPhrase -> { trackData, index, trackDataList ->
             trackData.isPreviousRest[index]
         }
@@ -399,7 +398,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             (TrackData, Int, List<TrackData>) -> SubstitutionNotes {
     return when(replaceType){
         is ReplaceType.Tornado -> { _, _, _ ->
-        SubstitutionNotes(-1)
+            SubstitutionNotes(-1)
         }
         is ReplaceType.Fantasia -> { _, _, _ ->
             SubstitutionNotes(-1)
@@ -436,34 +435,38 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     if(velDiff * grain <= duration) Pair(velDiff, duration.divideDistributingRest(velDiff))
                     else Pair(nNotesProv, duration.divideDistributingRest(nNotesProv).toList())
                 }
-                var ticks = findTicksFromDurations(tick, durs)
                 nNotes = if(isDrammaticoOrRibattuto) nNotes / 2 else nNotes
-                durs = if(isDrammaticoOrRibattuto) durs.drop(durs.size - nNotes) else durs
-                ticks = if(isDrammaticoOrRibattuto) {
-                    ticks.filterIndexed{ i, _ ->
-                        i % 2 != 0}
-                } else { ticks }
-                val velocities = if(replaceType is ReplaceType.TremoloCrescendo
-                                || replaceType is ReplaceType.RibattutoCrescendo
-                                || replaceType is ReplaceType.DrammaticoCrescendo) {
-                    var vels = accumulateVelocities(nNotes, velocity, velDiff)
-                    vels = if(replaceType.isRetrograde) vels.reversed() else vels
-                    vels
+                if(nNotes < 2) {
+                    SubstitutionNotes(-1)
                 } else {
-                    accumulateVelocitiesCrescDim(nNotes, velocity, velDiff, replaceType.isRetrograde)
+                    var ticks = findTicksFromDurations(tick, durs)
+                    durs = if(isDrammaticoOrRibattuto) durs.drop(durs.size - nNotes) else durs
+                    ticks = if(isDrammaticoOrRibattuto) {
+                        ticks.filterIndexed{ i, _ ->
+                            i % 2 != 0}
+                    } else { ticks }
+                    val velocities = if(replaceType is ReplaceType.TremoloCrescendo
+                        || replaceType is ReplaceType.RibattutoCrescendo
+                        || replaceType is ReplaceType.DrammaticoCrescendo) {
+                        var vels = accumulateVelocities(nNotes, velocity, velDiff)
+                        vels = if(replaceType.isRetrograde) vels.reversed() else vels
+                        vels
+                    } else {
+                        accumulateVelocitiesCrescDim(nNotes, velocity, velDiff, replaceType.isRetrograde)
+                    }
+                    val diff = if(isStaccato || glissando != 0) 0 else actualDuration - duration
+                    SubstitutionNotes(
+                        index, List(nNotes){pitch},
+                        ticks,
+                        durs,
+                        velocities,
+                        listOf(*List(nNotes-1){0}.toTypedArray(), glissando),
+                        List(nNotes){attack},
+                        listOf(isPreviousRest, *List(nNotes-1){false}.toTypedArray()),
+                        if (articulationDuration == null) null else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
+                        if (ribattuto == null) null else List(nNotes){ribattuto}
+                    )//.apply{ println("nNotes:$nNotes start:$velocity end:$stressedVelocity $this") }
                 }
-                val diff = if(isStaccato || glissando != 0) 0 else actualDuration - duration
-                SubstitutionNotes(
-                    index, List(nNotes){pitch},
-                    ticks,
-                    durs,
-                    velocities,
-                    listOf(*List(nNotes-1){0}.toTypedArray(), glissando),
-                    List(nNotes){attack},
-                    listOf(isPreviousRest, *List(nNotes-1){false}.toTypedArray()),
-                    if (articulationDuration == null) null else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
-                    if (ribattuto == null) null else List(nNotes){ribattuto}
-                )//.apply{ println("nNotes:$nNotes start:$velocity end:$stressedVelocity $this") }
             }
         }
         is ReplaceType.SOS -> { trackData, index, trackDataList ->
@@ -533,53 +536,6 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 }
             }
         }
-//        is ReplaceType.Cromatica, is ReplaceType.Diatonica -> { trackData, index, trackDataList ->
-//            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
-//                    = trackData.extractNoteDataAtIndex(index)
-//            // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
-//            val actualDuration = articulationDuration ?: duration
-//            val isStaccato = actualDuration < duration
-//            val isRetrograde = replaceType.isRetrograde
-//            val (startPitch, endPitch) = if(isRetrograde){
-//                Pair(trackData.pitches.getOrElse(index - 1) { pitch }, pitch)
-//            } else {
-//                Pair(pitch, trackData.pitches.getOrElse(index - 1) { pitch })
-//            }
-//            val nSemitones = (startPitch - endPitch).absoluteValue
-//            val notPossible = if(isRetrograde){
-//               !trackData.isConnectedToPreviousNoteAndDifferentPitch(index) || nSemitones == 1
-//            } else {
-//                !trackData.isConnectedToNextNoteAndDifferentPitch(index, isStaccato) || nSemitones == 1
-//            }
-//            if(notPossible){
-//                SubstitutionNotes(-1)
-//            } else {
-//                val durs = findScaleDurations(if(isRetrograde) actualDuration else duration, nSemitones, 60)
-//                if(durs.last() < 12){
-//                    SubstitutionNotes(-1)
-//                } else {
-//                    val ticks = findScaleTicks(tick, durs)
-//                    val pitches = findChromaticScale(startPitch, endPitch, isRetrograde)
-//                    val stress = replaceType.stress
-//                    val stressedVelocity = if (velocity + stress > 127) 127 else velocity + stress
-//                    val diff = if(actualDuration <= duration) 0 else actualDuration - duration
-//                    SubstitutionNotes(
-//                        index, pitches, ticks, durs,
-//                        if(isRetrograde) listOf(stressedVelocity, *List(nSemitones-1){velocity}.toTypedArray())
-//                        else listOf(velocity, stressedVelocity, *List(nSemitones-2){velocity}.toTypedArray()),
-//                        List(nSemitones){ 0 },
-//                        List(nSemitones){attack},
-//                        listOf(isPreviousRest, *List(nSemitones-1){false}.toTypedArray()),
-//                        when {
-//                            articulationDuration == null -> null
-//                            isRetrograde -> durs
-//                            else -> listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff)
-//                        },
-//                        if (ribattuto == null) null else List(nSemitones){ribattuto}
-//                    )
-//                }
-//            }
-//        }
         is ReplaceType.Cromatica, is ReplaceType.Diatonica,
         is ReplaceType.CromaticaDiCambio, is ReplaceType.DiatonicaDiCambio -> { trackData, index, trackDataList ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
@@ -1013,6 +969,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
         is ReplaceType.Velocity, is ReplaceType.Glissando, is ReplaceType.Attack   -> { trackData, index, trackDataList ->
                 var (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
                 val stress = replaceType.stress
+                var actualDuration = articulationDuration ?: duration
                 when (replaceType) {
                     is ReplaceType.Velocity -> {
                         val negativity = if(replaceType.isRetrograde) -1 else 1
@@ -1020,29 +977,30 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         velocity = velocity.coerceIn(0,127)
                     }
                     is ReplaceType.Glissando -> {
-                        val actualDuration = articulationDuration ?: duration
-                        val isStaccato = actualDuration < duration
-                        articulationDuration = if(isStaccato) articulationDuration else duration // avoid Legato with Glissando
-                        val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
-                        glissando = (nextPitch - pitch).coerceIn(-12, +12)
+                        if(glissando == 0){
+                            val isStaccato = actualDuration < duration
+                            actualDuration = if(isStaccato) actualDuration else duration // avoid Legato with Glissando
+                            val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
+                            glissando = (nextPitch - pitch).coerceIn(-12, +12)
+                        }
                     }
                     is ReplaceType.Attack ->{
                         attack += stress
-                        attack += attack.coerceIn(0, 127)
+                        attack = attack.coerceIn(0, 127)
                     }
                     else -> {}
                 }
             SubstitutionNotes(index, listOf(pitch),
                 listOf(tick),
-                listOf(duration),
+                listOf(actualDuration),
                 listOf(velocity),
                 listOf(glissando),
                 listOf(attack),
                 listOf(isPreviousRest),
                 if(articulationDuration == null) null
-                else listOf(articulationDuration),
+                else listOf(actualDuration),
                 if(ribattuto == null) null else listOf(ribattuto) )
-            //  .apply { println("ONDA:$index duration: $duration, artDur: $articulationDuration $this") }
+            //.apply { println("SUBSTITUTION NOTE: $this") }
             }
     }
 }
