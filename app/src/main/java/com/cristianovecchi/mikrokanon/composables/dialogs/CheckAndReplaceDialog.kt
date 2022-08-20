@@ -216,7 +216,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 colors = model.appColors
                             ) {
                                 val cnrDatas = checkAndReplaceDatas[cursor]
-                                val stresses = listOf(100,90,80,70,60, 50, 45, 40, 35, 30, 25, 20, 16, 13, 10, 8, 6, 4, 2, 0)
+                                val stresses = listOf(100,90,80,75,70,66, 60, 50, 45, 40, 35, 33,30, 25, 20, 16, 13, 10, 8, 6, 4, 2, 0)
                                 stressDialogData.value = ListDialogData(
                                     true,
                                     stresses.map{"$it"},

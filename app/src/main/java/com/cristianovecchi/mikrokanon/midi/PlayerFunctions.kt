@@ -373,21 +373,40 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int, addAttack: Boolean = f
         val nRevolutions = (12 - trackData.partIndex) * 2
         setAudio8D(track, nRevolutions, channel)
     }
-    return track
+    return track//.apply { this.dumpEvents() }
 }
 fun TrackData.addAttackToMidiTrack(midiTrack: MidiTrack) {
     //println("attacks: ${this.attacks.contentToString()}")
-    val attacks = this.attacks
-    val ticks = this.ticks
-    var lastAttack = 0
-    ticks.forEachIndexed { i, tick ->
+    ticks.forEachIndexed { i, intTick ->
         val newAttack = attacks[i]
-        //if(newAttack != lastAttack) {
-            val setAttack = Controller(tick.toLong(), this.channel,73, attacks[i])
+        if(newAttack > 0){
+            var tick = intTick.toLong()
+            val attackDur = (durations[i] * (newAttack.toFloat() / 100)).toInt()
+            var values = (29..127).filter{it % 2 != 0 }
+            val size = values.size
+            if(attackDur < size) {
+                values = values.subList(size - attackDur, size).filter {it % 2 != 0 }
+            }
+            val step = attackDur / values.size // possibly reducted size
+            //println("tick: $tick dur: $dur  attackDur: $attackDur  step: $step  ${values.size} $values")
+            values.forEach{
+                val setAttack = Controller(tick, this.channel,11, it)
+                midiTrack.insertEvent(setAttack)
                 //println( "Attack: ${setAttack.value}  tick: $tick")
-            midiTrack.insertEvent(setAttack)
-            lastAttack = newAttack
-       // }
+                tick += step
+            }
+            //println("last tick: $tick")
+        }
+        // 70 = Sound Variation
+        // 71 = Sound Timbre
+        // 72 = Release Time
+        // 73 = Attack Time
+        // 74 = Sound Brightness
+        // 91 = Effects Level
+        // 92 = Tremulo Level
+        // 93 = Chorus Level
+        // 94 = Celeste Level
+        // 95 = Phaser Level
     }
 }
 fun setAudio8D(track: MidiTrack, nRevolutions: Int, channel: Int) {
