@@ -13,6 +13,8 @@ sealed class CheckType(open val title: String = "") {
             is StartPhrase -> "2"
             is EndPhrase -> "3"
             is SingleNote -> "4"
+            is AtTheExtremes -> "5"
+            is NotAtTheExtremes -> "6"
         }
     }
     fun describe(): String {
@@ -22,6 +24,8 @@ sealed class CheckType(open val title: String = "") {
             is StartPhrase -> this.title
             is EndPhrase -> this.title
             is SingleNote -> this.title
+            is AtTheExtremes -> this.title
+            is NotAtTheExtremes -> this.title
         }
     }
 
@@ -30,6 +34,8 @@ sealed class CheckType(open val title: String = "") {
     data class StartPhrase(override val title: String = " |- ") : CheckType()
     data class EndPhrase(override val title: String = " -| ") : CheckType()
     data class SingleNote(override val title: String = " |-| ") : CheckType()
+    data class AtTheExtremes(override val title: String = " |- ... -| ") : CheckType()
+    data class NotAtTheExtremes(override val title: String = " ∞ != |- -| ") : CheckType()
     //, ALONE("].[ >=")
     companion object {
         fun provideCheckType(index: Int, limit: Int = 240): CheckType{
@@ -39,6 +45,8 @@ sealed class CheckType(open val title: String = "") {
                 2 -> StartPhrase()
                 3 -> EndPhrase()
                 4 -> SingleNote()
+                5 -> AtTheExtremes()
+                6 -> NotAtTheExtremes()
                 else -> None()
             }
         }
@@ -52,7 +60,8 @@ sealed class CheckType(open val title: String = "") {
                 EqualOrGreater(limit = 1920), EqualOrGreater(limit = 2400),
                 EqualOrGreater(limit = 2880), EqualOrGreater(limit = 3360),
                 EqualOrGreater(limit = 3840), EqualOrGreater(limit = 4320),
-                StartPhrase(), EndPhrase(), SingleNote()
+                StartPhrase(), EndPhrase(), SingleNote(),
+                AtTheExtremes(), NotAtTheExtremes()
             )
         }
         fun limitInString(limit: Int): String {
@@ -98,6 +107,8 @@ sealed class CheckType(open val title: String = "") {
                 is StartPhrase -> 16
                 is EndPhrase -> 17
                 is SingleNote -> 18
+                is AtTheExtremes -> 19
+                is NotAtTheExtremes -> 20
             }
         }
     }
@@ -276,6 +287,8 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
             is CheckType.StartPhrase -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
             is CheckType.EndPhrase -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
             is CheckType.SingleNote -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
+            is CheckType.AtTheExtremes -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
+            is CheckType.NotAtTheExtremes -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
         }
     }
     fun toCsv(): String {
@@ -334,6 +347,12 @@ fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>
         }
         is CheckType.SingleNote -> { trackData, index, trackDataList ->
             trackData.isPreviousRest[index] && trackData.isPreviousRest.getOrElse(index + 1) {true}
+        }
+        is CheckType.AtTheExtremes -> { trackData, index, trackDataList ->
+            trackData.isPreviousRest[index] || trackData.isPreviousRest.getOrElse(index + 1) {true}
+        }
+        is CheckType.NotAtTheExtremes -> { trackData, index, trackDataList ->
+            !trackData.isPreviousRest[index] && !trackData.isPreviousRest.getOrElse(index + 1) {true}
         }
     }
 }
