@@ -11,6 +11,7 @@ import com.leff.midi.event.meta.Tempo
 import com.leff.midi.event.meta.TimeSignature
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 fun buildTempoTrack(bpms: List<Float>, totalLength: Long): MidiTrack {
     val tempoTrack = MidiTrack()
@@ -396,6 +397,32 @@ fun TrackData.addAttackToMidiTrack(midiTrack: MidiTrack) {
                 tick += step
             }
             //println("last tick: $tick")
+        } else if(newAttack < 0) {
+            var tick = intTick.toLong()
+            val attackDur = (durations[i] * (newAttack.absoluteValue.toFloat() / 100)).toInt()
+            var values = (125 downTo 29).filter{it % 2 != 0 }
+            val size = values.size
+            if(attackDur < size) {
+                values = values.subList(0, attackDur).filter {it % 2 != 0 }
+            }
+            val step = attackDur / values.size // possibly reducted size
+            //println("tick: $tick dur: $dur  attackDur: $attackDur  step: $step  ${values.size} $values")
+            val firstAttack = Controller(tick, this.channel,11, 127)
+            midiTrack.insertEvent(firstAttack)
+            tick = tick + durations[i] - attackDur
+            values.forEach{
+                val setAttack = Controller(tick, this.channel,11, it)
+                midiTrack.insertEvent(setAttack)
+                //println( "Attack: ${setAttack.value}  tick: $tick")
+                tick += step
+            }
+            val nextAttack = attacks.getOrNull(i + 1)
+            nextAttack?.let{
+                if(nextAttack == 0){
+                    val setAttack = Controller(ticks[i+1].toLong(), this.channel,11, 127)
+                    midiTrack.insertEvent(setAttack)
+                }
+            }
         }
         // 70 = Sound Variation
         // 71 = Sound Timbre

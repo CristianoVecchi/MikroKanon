@@ -985,8 +985,10 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         }
                     }
                     is ReplaceType.Attack ->{
-                        attack += stress
-                        attack = attack.coerceIn(0, 127)
+                        val originalNegativity = if(attack < 0) -1 else 1
+                        val negativity = if(replaceType.isRetrograde) -1 else 1
+                        attack = attack.absoluteValue + stress
+                        attack = attack.coerceIn(0, 127) * negativity * originalNegativity
                     }
                     else -> {}
                 }
