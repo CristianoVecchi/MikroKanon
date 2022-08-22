@@ -44,9 +44,10 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
         val backgroundColor = appColors.dialogBackgroundColor
             val patternNames = patterns.map{ it.title }
             val listDialogData by lazy { mutableStateOf(ListDialogData())}
+            val repetitionsDialogData by lazy { mutableStateOf(ListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-
             ListDialog(listDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(repetitionsDialogData, dimensions, lang.OkButton, appColors, fillPrevious = true)
             val width = if(dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             val height = (dimensions.height / dimensions.dpDensity).toInt().dp
@@ -168,34 +169,56 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                             val repetitions = value.second
                             setPattern(cursor, pattern, repetitions * -1)
                         }
-                        CustomButton(
+//                        CustomButton(
+//                            adaptSizeToIconButton = true,
+//                            iconId = model.iconMap["minus_one"]!!, // [+1] Icon
+//                            buttonSize = buttonSize.dp,
+//                            iconColor = model.appColors.iconButtonIconColor,
+//                            colors = model.appColors
+//                        ) {
+//                            val values = patternText.extractIntPairsFromCsv().toMutableList()
+//                            val value = values[cursor]
+//                            val pattern = value.first
+//                            val back = if(value.second < 0) -1 else 1
+//                            var repetitions = value.second.absoluteValue - 1
+//                            repetitions = if(repetitions < 1) 1 else repetitions
+//                            setPattern(cursor, pattern, repetitions * back)
+//                        }
+//                        CustomButton(
+//                            adaptSizeToIconButton = true,
+//                            iconId = model.iconMap["Scarlatti"]!!, // [+1] Icon
+//                            buttonSize = buttonSize.dp,
+//                            iconColor = model.appColors.iconButtonIconColor,
+//                            colors = model.appColors
+//                        ) {
+//                            val values = patternText.extractIntPairsFromCsv().toMutableList()
+//                            val value = values[cursor]
+//                            val pattern = value.first
+//                            val back = if(value.second < 0) -1 else 1
+//                            val repetitions = value.second.absoluteValue + 1
+//                            setPattern(cursor, pattern, repetitions * back)
+//                        }
+                        CustomButton( // Replace edit
                             adaptSizeToIconButton = true,
-                            iconId = model.iconMap["minus_one"]!!, // [+1] Icon
+                            text = "",
+                            iconId = model.iconMap["glue"]!!,
                             buttonSize = buttonSize.dp,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
                             val values = patternText.extractIntPairsFromCsv().toMutableList()
                             val value = values[cursor]
-                            val pattern = value.first
-                            val back = if(value.second < 0) -1 else 1
-                            var repetitions = value.second.absoluteValue - 1
-                            repetitions = if(repetitions < 1) 1 else repetitions
-                            setPattern(cursor, pattern, repetitions * back)
-                        }
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            iconId = model.iconMap["Scarlatti"]!!, // [+1] Icon
-                            buttonSize = buttonSize.dp,
-                            iconColor = model.appColors.iconButtonIconColor,
-                            colors = model.appColors
-                        ) {
-                            val values = patternText.extractIntPairsFromCsv().toMutableList()
-                            val value = values[cursor]
-                            val pattern = value.first
-                            val back = if(value.second < 0) -1 else 1
-                            val repetitions = value.second.absoluteValue + 1
-                            setPattern(cursor, pattern, repetitions * back)
+                            val (pattern, repetitions) = value
+                            val back = if(repetitions < 0) -1 else 1
+                            repetitionsDialogData.value = ListDialogData(
+                                true,
+                                (1..128).map { it.toString() },
+                                repetitions.absoluteValue - 1,
+                                lang.selectRitornello
+                            ) { newRepetitions ->
+                                setPattern(cursor, pattern, (newRepetitions + 1) * back)
+                                ListDialogData(itemList = repetitionsDialogData.value.itemList)
+                            }
                         }
 
                     }

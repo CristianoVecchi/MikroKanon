@@ -518,8 +518,13 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             val isStaccato = actualDuration < duration
 
             val isRetrograde = replaceType.isRetrograde
-            val accentDur = 6
-            val accentPlusRestDur = accentDur * 10
+            val (accentDur, accentPlusRestDur) = if(duration <= 120) {
+                val acc = 6
+                acc to acc * 10
+            } else {
+                val acc = 12
+                acc to acc * 5
+            }
             if(actualDuration < accentPlusRestDur * 3 / 2){
                 SubstitutionNotes(-1)
             } else {
@@ -1004,10 +1009,12 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         }
                     }
                     is ReplaceType.Attack ->{
-                        val originalNegativity = if(attack < 0) -1 else 1
-                        val negativity = if(replaceType.isRetrograde) -1 else 1
-                        attack = attack.absoluteValue + stress
-                        attack = attack.coerceIn(0, 127) * negativity * originalNegativity
+                        if (attack == 0) {
+                            val originalNegativity = if(attack < 0) -1 else 1
+                            val negativity = if(replaceType.isRetrograde) -1 else 1
+                            attack = attack.absoluteValue + stress
+                            attack = attack.coerceIn(0, 127) * negativity * originalNegativity
+                        }
                     }
                     else -> {}
                 }
