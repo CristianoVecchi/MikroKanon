@@ -68,6 +68,7 @@ fun ResultDisplay(model: AppViewModel,
                   onFlourish: () -> Unit = {},
                   onEWH: (Int) -> Unit = {},
                   progressiveEWH: () -> Unit = {},
+                  onChess: (Int) -> Unit,
                   onResolutio: (Pair<Set<Int>,String>) -> Unit,
                   onDoubling: (List<Pair<Int,Int>>) -> Unit,
                   onParade: () -> Unit = {},
@@ -123,6 +124,7 @@ fun ResultDisplay(model: AppViewModel,
     val doublingDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val resolutioDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+    val chessDialogData = remember { mutableStateOf(ListDialogData())}
     val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
@@ -265,6 +267,7 @@ fun ResultDisplay(model: AppViewModel,
                 TransposeDialog(doublingDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
                 ResolutioDialog(resolutioDialogData, buttonsDialogData, dimensions, language.OkButton, model)
+                ListDialog(listDialogData = chessDialogData, dimensions = dimensions, appColors = colors, fillPrevious = true )
                 SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                     dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
                 MultiSequenceDialog(multiSequenceDialogData, buttonsDialogData, dimensions, model)
@@ -407,6 +410,17 @@ fun ResultDisplay(model: AppViewModel,
                                         }
                                     },
                                     onScarlatti = { onScarlatti(); close() },
+                                    onChess = {
+                                        val maxSize = counterpoints.maxByOrNull{ it.maxSize() }?.maxSize() ?: 0
+                                        if( maxSize > 0) {
+                                            chessDialogData.value = ListDialogData(true,
+                                                (1..maxSize * 2).map{ it.toString()}, 0,
+                                                language.selectChessRange) {
+                                                close()
+                                                onChess(it + 1)
+                                            }
+                                        }
+                                    },
                                     onOverlap = {
                                         selectCounterpointDialogData.value = ButtonsDialogData(true,
                                             language.selectToOverlap, model,

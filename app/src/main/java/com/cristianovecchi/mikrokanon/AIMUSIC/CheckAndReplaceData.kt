@@ -459,7 +459,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     SubstitutionNotes(-1)
                 } else {
                     var ticks = findTicksFromDurations(tick, durs)
-                    durs = if(isDrammaticoOrRibattuto) durs.drop(durs.size - nNotes) else durs
+                    durs = if(isDrammaticoOrRibattuto) durs.take(nNotes) else durs
                     ticks = if(isDrammaticoOrRibattuto) {
                         ticks.filterIndexed{ i, _ ->
                             i % 2 != 0}
@@ -631,7 +631,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             val actualDuration = articulationDuration ?: duration
             val isStaccato = actualDuration < duration
             val (durs, div) = findOscillationDurations(if (!isStaccato) duration else actualDuration)
-            if (div == -1 || pitch > 106 || pitch < 23) { // fake substitution
+            if (div == -1 || div < 3 || pitch > 106 || pitch < 23) { // fake substitution
                 //println("TRILLO:$index No Subs: actual duration = $actualDuration")
                 SubstitutionNotes(-1) // will not be considered
             } else {
@@ -672,7 +672,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             val actualDuration = articulationDuration ?: duration
             val isStaccato = actualDuration < duration
             val (durs, div) = findTrillDurations(if (!isStaccato) duration else actualDuration)
-            if (div == -1) { // fake substitution
+            if (div == -1 || div < 3) { // fake substitution
                 //println("TRILLO:$index No Subs: actual duration = $actualDuration")
                 SubstitutionNotes(-1) // will not be considered
             } else {

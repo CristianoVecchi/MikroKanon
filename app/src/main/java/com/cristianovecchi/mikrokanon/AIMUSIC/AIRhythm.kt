@@ -131,8 +131,8 @@ fun find6ShortAndLongTicks(tick: Int, duration: Int, shortDur: Int, isRetrograde
 }
 fun findTrillDurations(duration: Int): Pair<List<Int>,Int>{
     val div = when(duration){
-        in (0..119) -> -1
-        in (120..239) -> 3
+        in (0..59) -> -1
+        in (60..239) -> 3
         in (240..359) -> 5 // 34 - 42
         in (360..479) -> 7 // 32 - 38
         in (480..Int.MAX_VALUE) -> (480 / 43) * (duration / 480)

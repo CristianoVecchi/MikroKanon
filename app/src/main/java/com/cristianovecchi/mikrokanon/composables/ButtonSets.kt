@@ -266,7 +266,7 @@ fun SpecialFunctions1Buttons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
     onTritoneSubstitution: () -> Unit, onRound: () -> Unit, onCadenza: () -> Unit, onFlourish: () -> Unit,
     onMaze: () -> Unit, onSingle: () -> Unit, onDoppelgänger: () -> Unit, onEraseIntervals: () -> Unit,
-    onResolutio: () -> Unit, onDoubling: () -> Unit
+    onResolutio: () -> Unit, onDoubling: () -> Unit, onChess: () -> Unit
 ) {
     Column {
         Row {
@@ -292,6 +292,9 @@ fun SpecialFunctions1Buttons(
             }
             CustomButton(iconId = model.iconMap["doppelgänger"]!!, isActive = isActive, buttonSize = buttonSize, colors = colors) {
                 onDoppelgänger()
+            }
+            CustomButton(iconId = model.iconMap["chess"]!!, isActive = true, buttonSize = buttonSize, colors = colors) {
+                onChess()
             }
         }
         Row {

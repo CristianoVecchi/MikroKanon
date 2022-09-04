@@ -383,44 +383,50 @@ fun TrackData.addAttackToMidiTrack(midiTrack: MidiTrack) {
         if(newAttack > 0){
             var tick = intTick.toLong()
             val attackDur = (durations[i] * (newAttack.toFloat() / 100)).toInt()
-            var values = (29..127).filter{it % 2 != 0 }
-            val size = values.size
-            if(attackDur < size) {
-                values = values.subList(size - attackDur, size).filter {it % 2 != 0 }
+            if(attackDur >= 12){
+                var values = (29..127).filter{it % 2 != 0 }
+                val size = values.size
+                if(attackDur < size) {
+                    values = values.subList(size - attackDur, size).filter {it % 2 != 0 }
+                }
+                val step = attackDur / values.size // possibly reducted size
+                //println("tick: $tick dur: $dur  attackDur: $attackDur  step: $step  ${values.size} $values")
+                values.forEach{
+                    val setAttack = Controller(tick, this.channel,11, it)
+                    midiTrack.insertEvent(setAttack)
+                    //println( "Attack: ${setAttack.value}  tick: $tick")
+                    tick += step
+                }
+                //println("last tick: $tick")
             }
-            val step = attackDur / values.size // possibly reducted size
-            //println("tick: $tick dur: $dur  attackDur: $attackDur  step: $step  ${values.size} $values")
-            values.forEach{
-                val setAttack = Controller(tick, this.channel,11, it)
-                midiTrack.insertEvent(setAttack)
-                //println( "Attack: ${setAttack.value}  tick: $tick")
-                tick += step
-            }
-            //println("last tick: $tick")
+
         } else if(newAttack < 0) {
             var tick = intTick.toLong()
             val attackDur = (durations[i] * (newAttack.absoluteValue.toFloat() / 100)).toInt()
-            var values = (125 downTo 29).filter{it % 2 != 0 }
-            val size = values.size
-            if(attackDur < size) {
-                values = values.subList(0, attackDur).filter {it % 2 != 0 }
-            }
-            val step = attackDur / values.size // possibly reducted size
-            //println("tick: $tick dur: $dur  attackDur: $attackDur  step: $step  ${values.size} $values")
-            val firstAttack = Controller(tick, this.channel,11, 127)
-            midiTrack.insertEvent(firstAttack)
-            tick = tick + durations[i] - attackDur
-            values.forEach{
-                val setAttack = Controller(tick, this.channel,11, it)
-                midiTrack.insertEvent(setAttack)
-                //println( "Attack: ${setAttack.value}  tick: $tick")
-                tick += step
-            }
-            val nextAttack = attacks.getOrNull(i + 1)
-            nextAttack?.let{
-                if(nextAttack == 0){
-                    val setAttack = Controller(ticks[i+1].toLong(), this.channel,11, 127)
+            if(attackDur >= 12){
+                var values = (125 downTo 29).filter{it % 2 != 0 }
+                val size = values.size
+                //println("newAttack:$newAttack attackDur:$attackDur values:$values")
+                if(attackDur < size) {
+                    values = values.subList(0, attackDur).filter{it % 2 != 0 }
+                }
+                val step = attackDur / values.size // possibly reducted size
+                //println("tick: $tick dur: $dur  attackDur: $attackDur  step: $step  ${values.size} $values")
+                val firstAttack = Controller(tick, this.channel,11, 127)
+                midiTrack.insertEvent(firstAttack)
+                tick = tick + durations[i] - attackDur
+                values.forEach{
+                    val setAttack = Controller(tick, this.channel,11, it)
                     midiTrack.insertEvent(setAttack)
+                    //println( "Attack: ${setAttack.value}  tick: $tick")
+                    tick += step
+                }
+                val nextAttack = attacks.getOrNull(i + 1)
+                nextAttack?.let{
+                    if(nextAttack == 0){
+                        val setAttack = Controller(ticks[i+1].toLong(), this.channel,11, 127)
+                        midiTrack.insertEvent(setAttack)
+                    }
                 }
             }
         }

@@ -446,9 +446,11 @@ object Player {
             insertNoteWithRibattuto(mt, start, dur, channel, pitch, velOn, velOff, ribattuto)
         } else {
             lastIsGliss = true
-            val actualGliss = if(duration < 24) {
-                if(gliss > 0) 2 else -2
-            } else gliss
+            val actualGliss = when(duration) {
+                in 0..11 -> 0
+                in 12..24 -> if(gliss > 0) 1 else -1
+                else -> gliss
+            }
             when (actualGliss) {
                 1 -> {
 

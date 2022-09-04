@@ -53,7 +53,8 @@ fun SequenceSelector(model: AppViewModel,
                      onMaze: (List<List<Int>>) -> Unit,
                      onEWH: (ArrayList<Clip>, Int) -> Unit,
                      onResolutio: (ArrayList<Clip>, Pair<Set<Int>,String>) -> Unit,
-                     onDoubling: (ArrayList<Clip>, List<Pair<Int,Int>>) -> Unit
+                     onDoubling: (ArrayList<Clip>, List<Pair<Int,Int>>) -> Unit,
+                     onChess: (ArrayList<Clip>, Int) -> Unit
                     )
 {
 
@@ -92,6 +93,7 @@ fun SequenceSelector(model: AppViewModel,
             val resolutioDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val doublingDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
+            val chessDialogData = remember { mutableStateOf(ListDialogData())}
             val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val privacyDialogData = remember { mutableStateOf(TextDialogData())}
             val buttonSize = dimensions.selectorButtonSize
@@ -134,6 +136,7 @@ fun SequenceSelector(model: AppViewModel,
                 selected = selected, onSelect = onSelectComposition
             )
             MultiSequenceDialog(multiSequenceDialogData, buttonsDialogData, dimensions, model)
+            ListDialog(listDialogData = chessDialogData, dimensions = dimensions, appColors = appColors, fillPrevious = true )
             PrivacyDialog(privacyDialogData, dimensions, language.OkButton)
 
             Column(modifier1) {
@@ -166,7 +169,7 @@ fun SequenceSelector(model: AppViewModel,
                         buttonSize = buttonSize,
                         onAdd = { dialogState.value = true },
                         onSpecialFunctions = {
-                            val close = { buttonsDialogData.value = ButtonsDialogData(model = model) }
+                            //val close = { buttonsDialogData.value = ButtonsDialogData(model = model) }
                             buttonsDialogData.value = ButtonsDialogData(true,
                                 language.selectSpecialFunction,
                                 model, isActiveWaves = activeButtons.waves,
@@ -199,6 +202,13 @@ fun SequenceSelector(model: AppViewModel,
                                     }
                                 },
                                 onScarlatti = { onScarlatti(sequences[selected]) },
+                                onChess = {
+                                    chessDialogData.value = ListDialogData(true,
+                                        (1..sequences[selected].size * 2).map{ it.toString()}, 0,
+                                        language.selectChessRange) {
+                                            onChess(sequences[selected], it + 1)
+                                         }
+                                },
                                 onOverlap = {
                                     selectCounterpointDialogData.value = ButtonsDialogData(true,
                                     language.selectToOverlap, model,

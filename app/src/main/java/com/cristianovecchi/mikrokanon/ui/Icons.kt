@@ -55,7 +55,8 @@ object Icons {
             "resolutio" to R.drawable.ic_baseline_theater_comedy_24,
             "doubling" to R.drawable.ic_baseline_stacked_line_chart_24,
             "construction" to R.drawable.ic_baseline_construction_24,
-            "parade" to R.drawable.ic_baseline_star_rate_24
+            "parade" to R.drawable.ic_baseline_star_rate_24,
+            "chess" to R.drawable.ic_baseline_sports_score_24
         )
     }
 }

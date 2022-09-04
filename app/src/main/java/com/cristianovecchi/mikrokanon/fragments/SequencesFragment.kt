@@ -190,6 +190,10 @@ var start = true
                                     onDoubling = { list, doublingList ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onDoubling(list, doublingList)
+                                    },
+                                    onChess = {list, range ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onChess(list, range)
                                     }
                                 )
                             }

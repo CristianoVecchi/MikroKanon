@@ -142,44 +142,23 @@ fun findGlissandoForScales(pitches: List<Int>, nextPitch:Int, glissandoLimit: In
     result += if(lastGliss > glissandoLimit) 0 else lastGliss
     return result
 }
-fun accumulateVelocities(nNotes: Int, start: Int, diff: Int): List<Int>{
-    val result = mutableListOf<Int>()
-    val increments = diff.divideDistributingRest(nNotes-1)
-    var step = start
-    increments.forEach {
-        result += step
-        step += it
-    }
-    return result.apply{ this += step}
-}
-fun accumulateVelocitiesCrescDim(nNotes: Int, start: Int, diff: Int, isDimCresc: Boolean = false): List<Int>{
-    val result = mutableListOf<Int>()
-    val nNotesFirst = nNotes / 2 + nNotes % 2
-    val firstArch = accumulateVelocities(nNotesFirst, start, diff)
 
-    if(isDimCresc){
-        val secondArch = if(nNotes % 2 == 0) firstArch else firstArch.drop(1)
-        result += firstArch.reversed()
-        result += secondArch
-
-    } else {
-        val secondArch = if(nNotes % 2 == 0) firstArch.reversed() else firstArch.reversed().drop(1)
-        result += firstArch
-        result += secondArch
-    }
-
-    return result.apply{ println(this)}
-}
 
 fun main(){
-    println( findWholeToneScale(10,12) )
-    println( findWholeToneScale(12,10) )
-    println( findWholeToneScaleDiCambio(10,12) )
-    println( findWholeToneScaleDiCambio(12,10) )
-    println( findWholeToneScale(10,12, true) )
-    println( findWholeToneScale(12,10, true) )
-    println( findWholeToneScaleDiCambio(10,12, true) )
-    println( findWholeToneScaleDiCambio(12,10, true) )
+//    println(accumulateVelocities(10, 64, 30))
+//    println(accumulateVelocitiesCrescDim(10, 64, 30))
+//    println(accumulateVelocities(1, 64, 30))
+//    println(accumulateVelocitiesCrescDim(1, 64, 30))
+//    println(accumulateVelocities(0, 64, 30))
+//    println(accumulateVelocitiesCrescDim(0, 64, 30))
+//    println( findWholeToneScale(10,12) )
+//    println( findWholeToneScale(12,10) )
+//    println( findWholeToneScaleDiCambio(10,12) )
+//    println( findWholeToneScaleDiCambio(12,10) )
+//    println( findWholeToneScale(10,12, true) )
+//    println( findWholeToneScale(12,10, true) )
+//    println( findWholeToneScaleDiCambio(10,12, true) )
+//    println( findWholeToneScaleDiCambio(12,10, true) )
 //    println( findWholeToneScale(10,21) )
 //    println( findWholeToneScale(21,10) )
 //    println( findWholeToneScaleDiCambio(10,21) )

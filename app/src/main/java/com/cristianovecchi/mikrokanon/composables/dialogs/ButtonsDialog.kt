@@ -114,7 +114,8 @@ fun ButtonsDialog(
                                     onTritoneSubstitution = buttonsDialogData.value.onTritoneSubstitution,
                                     onDoppelgänger = buttonsDialogData.value.onDoppelgänger,
                                     onResolutio = buttonsDialogData.value.onResolutio,
-                                    onDoubling = buttonsDialogData.value.onDoubling
+                                    onDoubling = buttonsDialogData.value.onDoubling,
+                                    onChess = buttonsDialogData.value.onChess
                                 )
                                 4 -> WavesButtons(
                                     model = buttonsDialogData.value.model,

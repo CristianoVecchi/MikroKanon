@@ -16,7 +16,11 @@ data class SubstitutionNotes(val index: Int, val newPitches: List<Int> = emptyLi
                              val newGlissando: List<Int> = emptyList(), val newAttacks: List<Int> = emptyList(),
                              val newIsPreviousRest: List<Boolean> = emptyList(),
                              val newArticulationDurations: List<Int>? = null,
-                             val newRibattutos: List<Int>? = null)
+                             val newRibattutos: List<Int>? = null) {
+    fun check(replace: ReplaceType) {
+        if(newPitches.size != newVelocities.size) println("WARNING: SubstitutionNote from ${replace.title } is malformed $this")
+    }
+}
 
 data class NoteData(val pitch: Int, val tick: Int, val duration: Int, val velocity:Int, val glissando: Int,
 val attack:Int, val isPreviousRest: Boolean, val articulationDuration: Int?, val ribattuto: Int?)
@@ -65,8 +69,11 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                     if(check(this, index, trackDataList)) {
                         val available = provideFantasiaFunctions((0..checkAndReplaceData.replace.stress).random(),
                             checkAndReplaceData.replace.isRetrograde, checkAndReplaceData.replace.addGliss)
-                        val replace = provideReplaceFunction(available.random())
-                        substitutions.add(replace(this, index, trackDataList))
+                        val replaceType = available.random()
+                        val replace = provideReplaceFunction(replaceType)
+                        substitutions.add(
+                            replace(this, index, trackDataList)//.apply{ this.check(replaceType)}
+                        )
                     }
                 }
             }
@@ -81,8 +88,11 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                     if(noteEnd <= start) continue
                     //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
                     if(check(this, index, trackDataList)) {
-                        val replace = provideReplaceFunction(available[ventoIndex % ventoSize])
-                        substitutions.add(replace(this, index, trackDataList))
+                        val replaceType = available[ventoIndex % ventoSize]
+                        val replace = provideReplaceFunction(replaceType)
+                        substitutions.add(
+                            replace(this, index, trackDataList) //.apply{ this.check(replaceType)}
+                        )
                         ventoIndex++
                     }
                 }
@@ -95,7 +105,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                     if(noteEnd <= start) continue
                     //println("CHOSEN FOR SUBS: note=${ticks[index]}-$noteEnd slice=$start-$end ")
                     if(check(this, index, trackDataList)) substitutions.add(
-                        replace(this, index, trackDataList)
+                        replace(this, index, trackDataList)//.apply{ this.check(checkAndReplaceData.replace)}
                     )
                 }
             }

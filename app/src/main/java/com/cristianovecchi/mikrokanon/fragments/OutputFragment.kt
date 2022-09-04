@@ -162,6 +162,9 @@ class OutputFragment: Fragment() {
                                 onDoubling = { transposition ->
                                     model.onDoubling(null, transposition)
                                 },
+                                onChess = { range ->
+                                    model.onChess(null, range)
+                                },
                                 onParade = {
                                     model.onParade()
                                 },

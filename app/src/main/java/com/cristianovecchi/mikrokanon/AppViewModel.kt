@@ -315,6 +315,17 @@ class AppViewModel(
         if(computationStack.isNotEmpty())
             refreshComputation(false)
     }
+    val onChess = { list: ArrayList<Clip>?, range: Int ->
+        val originalCounterpoints = if(list != null) {
+            changeFirstSequence(list)
+            convertFirstSequenceToSelectedCounterpoint()
+            listOf( selectedCounterpoint.value!!.clone())
+        } else {
+            counterpoints.value!!.map{ it.clone() }
+        }
+        computationStack.pushAndDispatch(Computation.Chess(originalCounterpoints, range))
+        //chessOnCounterpoints(originalCounterpoints, range)
+    }
     val onEWH = { list: ArrayList<Clip>, nParts: Int ->
         val originalCounterpoints = if(list.isNotEmpty()) {
             changeFirstSequence(list)

@@ -401,6 +401,7 @@ data class Lang( // English by default
     val selectToOverlap: String = "Select a counterpoint to overlap!",
     val selectToCrossOver: String = "Select a counterpoint to cross over!",
     val selectToGlue: String = "Select a counterpoint to glue!",
+    val selectChessRange: String = "Select a range for chess!",
     val addSequencesToMaze: String = "Add other sequences in the maze!",
     val selectHorizontalIntervals: String = "Select the melodic intervals for the functions!",
     val clearSlots: String = "Clear slots",
