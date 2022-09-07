@@ -324,7 +324,7 @@ class AppViewModel(
             counterpoints.value!!.map{ it.clone() }
         }
         computationStack.pushAndDispatch(Computation.Chess(originalCounterpoints, range))
-        //chessOnCounterpoints(originalCounterpoints, range)
+        chessAllCounterpoints(originalCounterpoints, range)
     }
     val onEWH = { list: ArrayList<Clip>, nParts: Int ->
         val originalCounterpoints = if(list.isNotEmpty()) {
@@ -728,6 +728,7 @@ class AppViewModel(
                     is Computation.TritoneSubstitution -> computationStack.lastElement()
                     is Computation.ExtendedWeightedHarmony -> computationStack.lastElement()
                     is Computation.ProgressiveEWH -> computationStack.lastElement()
+                    is Computation.Chess -> computationStack.lastElement()
                     else -> { stackIcons.removeLast(); computationStack.pop() } // do not Dispatch!!!
                 }
                 previousIntervalSet?.let { changeIntervalSet(previousIntervalSet)}
@@ -804,6 +805,11 @@ class AppViewModel(
                     is Computation.Doubling -> {
                         if (stepBack) {
                             doublingOnCounterpoints( previousComputation.counterpoints, previousComputation.doublingData)
+                        }
+                    }
+                    is Computation.Chess -> {
+                        if (stepBack) {
+                            chessAllCounterpoints( previousComputation.counterpoints, previousComputation.range)
                         }
                     }
                     is Computation.Parade -> {

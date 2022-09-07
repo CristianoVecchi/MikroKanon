@@ -112,6 +112,9 @@ suspend fun eraseHorizontalIntervalsOnCounterpoints(horIntervalSet: List<Int>, o
 suspend fun sortColumnsOnCounterpoints(originalCounterpoints: List<Counterpoint>, sortType: Int ): List<Counterpoint>{
      return originalCounterpoints.map{ it.sortColumns(sortType) }
 }
+suspend fun chessOnCounterpoints(originalCounterpoints: List<Counterpoint>, range: Int ): List<Counterpoint>{
+     return originalCounterpoints.map{ it.chessboard(range) }
+}
 suspend fun upsideDownCounterpoints(originalCounterpoints: List<Counterpoint>): List<Counterpoint>{
      return originalCounterpoints.map{ it.upsideDown() }
 }

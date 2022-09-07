@@ -506,6 +506,31 @@ data class Counterpoint(val parts: List<AbsPart>,
             this.findAndSetEmptiness()
         }
     }
+    fun chessboard(range: Int = 1): Counterpoint {
+        val clone = this.normalizePartsSize(false)
+        val size = clone.maxSize()
+        if(size == 0 || clone.parts.isEmpty()) return clone
+        val newParts = mutableListOf<AbsPart>()
+        clone.parts.forEachIndexed { index, absPart ->
+            val newPitches = mutableListOf<Int>()
+            val chunks = if(range < size){
+                absPart.absPitches.chunked(range)
+            } else {
+                listOf(absPart.absPitches + MutableList(range-size){-1})
+            }
+            chunks.forEach{
+                if(index % 2 == 0){
+                    newPitches += it
+                    newPitches += MutableList(it.size){ -1 }
+                } else {
+                    newPitches += MutableList(it.size){ -1 }
+                    newPitches += it
+                }
+            }
+            newParts += absPart.copy(absPitches = newPitches)
+        }
+        return clone.copy(parts = newParts).cutExtraNotes().apply { this.findAndSetEmptiness() }
+    }
     fun addResolutiones(absPitchesSet: Set<Int>, resolutioForm: List<Int> = listOf(0,1,0,1,0)): Counterpoint {
         val clone = this.normalizePartsSize(false)
         //if(absPitchesSet.isEmpty()) return clone() // if absPitchesSet is empty resolutioColumn == column

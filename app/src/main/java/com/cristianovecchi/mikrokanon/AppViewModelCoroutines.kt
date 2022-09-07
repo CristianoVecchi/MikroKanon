@@ -313,6 +313,19 @@ fun AppViewModel.eraseIntervalsOnCounterpoints(originalCounterpoints: List<Count
         }
     }
 }
+fun AppViewModel.chessAllCounterpoints(originalCounterpoints: List<Counterpoint>, range: Int){
+    if(!selectedCounterpoint.value!!.isEmpty()){
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                newList = chessOnCounterpoints(originalCounterpoints, range)
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+            }
+            changeCounterpointsWithLimitAndCache(newList, true)
+        }
+    }
+}
  fun AppViewModel.upsideDownAllCounterpoints(originalCounterpoints: List<Counterpoint>,index: Int){
     if(!selectedCounterpoint.value!!.isEmpty()){
         var newList: List<Counterpoint>
