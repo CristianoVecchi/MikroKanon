@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.text.isDigitsOnly
-import com.cristianovecchi.mikrokanon.G
 
 enum class AppColorThemes(val title :String){
     GEMINI_BLUE("Gemini Blue")

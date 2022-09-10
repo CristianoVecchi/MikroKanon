@@ -1,6 +1,6 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC;
 
-import com.cristianovecchi.mikrokanon.G;
+import com.cristianovecchi.mikrokanon.ui.G;
 
 import java.util.LinkedList;
 import java.util.List;

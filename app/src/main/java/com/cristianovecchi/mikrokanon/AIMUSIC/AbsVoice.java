@@ -231,43 +231,43 @@ public class AbsVoice {
         return real;
     }
 
-    public static void main(String[] args){
-        int[] priority = {0,1,-1,2,-2,3,-3,4,-4,5,-5,6,-6,7,-7,8,-8,9,-9,10,-10,11,-11};
-       // int[][] absChords = { {1,4,8,11}, {0,4,9,11}, {0,2,9,10}, {0,2,8,9}};
-        //int[][] absChords = { {11}, {11}, {3,10,4}, {10,5}};
-       // int[][] absChords = {{4,6,7},{5,11},{8,10,4},{2,5,9,10},{0,1,7,9,10}};
-       // int[][] absChords = {{0,6,7},{5,11},{8,10,4,0},{2,5,9,10},{0,1,7,9,10}};
-        int[][] absChords = {{8,6,6,7},{5,11,0},{8,10,4,11},{2,5,5,9,10},{0,1,4,9,11}};
-        int[][] voices = sortPolyphonicChords(absChords,priority);
-        for (int i = 0; i < voices.length ; i++) {
-            System.out.println(Arrays.toString(voices[i]));
-        }
-        AbsVoice[] absVoices = voicesFromChords(voices,priority,false);
-        for (int i = 0; i <absVoices.length ; i++) {
-            System.out.println(Arrays.toString(absVoices[i].absNotes));
-        }
-        int[][] reals = new int[absVoices.length][];
-        for (int i = 0; i <reals.length ; i++) {
-            reals[i] = absVoices[i].getRealVoiceLinear(4);
-            System.out.println(Arrays.toString(reals[i]));
-        }
-      /*  AbsVoice[] voices = extractAbsVoicesFromAbsChords(maxCountInArray(absChords),
-                                                            priority,absChords);
-        for (int i = 0; i <voices.length ; i++) {
-            System.out.println(Arrays.toString(voices[i].absNotes));
-        } */
-      /* int[] chord = {3,7,9,10,10};
-       int [][] perms = permute(chord);
-        for (int i = 0; i < perms.length; i++) {
-            System.out.print(Arrays.toString(perms[i]));
-        }*/
-
-      /*  System.out.println(extractFromChordList(1, priority, absChords).toString());
-        System.out.println(extractFromChordList(4, priority, absChords).toString());
-        System.out.println(extractFromChordList(8, priority, absChords).toString());
-        System.out.println(extractFromChordList(11, priority, absChords).toString());*/
-
-    }
+//    public static void main(String[] args){
+//        int[] priority = {0,1,-1,2,-2,3,-3,4,-4,5,-5,6,-6,7,-7,8,-8,9,-9,10,-10,11,-11};
+//       // int[][] absChords = { {1,4,8,11}, {0,4,9,11}, {0,2,9,10}, {0,2,8,9}};
+//        //int[][] absChords = { {11}, {11}, {3,10,4}, {10,5}};
+//       // int[][] absChords = {{4,6,7},{5,11},{8,10,4},{2,5,9,10},{0,1,7,9,10}};
+//       // int[][] absChords = {{0,6,7},{5,11},{8,10,4,0},{2,5,9,10},{0,1,7,9,10}};
+//        int[][] absChords = {{8,6,6,7},{5,11,0},{8,10,4,11},{2,5,5,9,10},{0,1,4,9,11}};
+//        int[][] voices = sortPolyphonicChords(absChords,priority);
+//        for (int i = 0; i < voices.length ; i++) {
+//            System.out.println(Arrays.toString(voices[i]));
+//        }
+//        AbsVoice[] absVoices = voicesFromChords(voices,priority,false);
+//        for (int i = 0; i <absVoices.length ; i++) {
+//            System.out.println(Arrays.toString(absVoices[i].absNotes));
+//        }
+//        int[][] reals = new int[absVoices.length][];
+//        for (int i = 0; i <reals.length ; i++) {
+//            reals[i] = absVoices[i].getRealVoiceLinear(4);
+//            System.out.println(Arrays.toString(reals[i]));
+//        }
+//      /*  AbsVoice[] voices = extractAbsVoicesFromAbsChords(maxCountInArray(absChords),
+//                                                            priority,absChords);
+//        for (int i = 0; i <voices.length ; i++) {
+//            System.out.println(Arrays.toString(voices[i].absNotes));
+//        } */
+//      /* int[] chord = {3,7,9,10,10};
+//       int [][] perms = permute(chord);
+//        for (int i = 0; i < perms.length; i++) {
+//            System.out.print(Arrays.toString(perms[i]));
+//        }*/
+//
+//      /*  System.out.println(extractFromChordList(1, priority, absChords).toString());
+//        System.out.println(extractFromChordList(4, priority, absChords).toString());
+//        System.out.println(extractFromChordList(8, priority, absChords).toString());
+//        System.out.println(extractFromChordList(11, priority, absChords).toString());*/
+//
+//    }
 
 
 }

@@ -326,10 +326,10 @@ data class AbsPart(val absPitches: MutableList<Int>, val rowForm: RowForm = RowF
     }
 
 }
-fun main(args : Array<String>){
-    val part = AbsPart(mutableListOf(-1,11, 9,0,4,5,1,0,-1,-1,4,4,5,-1,4,3,11,1,1))
-    //println(part.getRibattutos())
-//    println(Insieme.findMelody(0, part.absPitches.toIntArray(),
-//        21,108,3).contentToString())
-    part.divideAbsPitchesByDirection().forEach { println(it) }
-}
+//fun main(args : Array<String>){
+//    val part = AbsPart(mutableListOf(-1,11, 9,0,4,5,1,0,-1,-1,4,4,5,-1,4,3,11,1,1))
+//    //println(part.getRibattutos())
+////    println(Insieme.findMelody(0, part.absPitches.toIntArray(),
+////        21,108,3).contentToString())
+//    part.divideAbsPitchesByDirection().forEach { println(it) }
+//}

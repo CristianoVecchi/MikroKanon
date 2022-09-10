@@ -3,7 +3,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC;
 import android.util.Log;
 
 
-import com.cristianovecchi.mikrokanon.G;
+import com.cristianovecchi.mikrokanon.ui.G;
 
 import java.util.Arrays;
 import java.util.LinkedList;

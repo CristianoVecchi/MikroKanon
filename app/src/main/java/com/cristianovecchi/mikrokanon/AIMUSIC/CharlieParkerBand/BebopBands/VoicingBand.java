@@ -3,8 +3,6 @@ package com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.BebopBands;
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.BebopBand;
 import com.cristianovecchi.mikrokanon.AIMUSIC.Chord;
 import com.cristianovecchi.mikrokanon.AIMUSIC.ChordSequence;
-import com.cristianovecchi.mikrokanon.G;
-import com.cristianovecchi.mikrokanon.AIMUSIC.ChordSequence;
 import com.leff.midi.MidiTrack;
 import com.leff.midi.event.MidiEvent;
 import com.leff.midi.event.ProgramChange;

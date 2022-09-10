@@ -244,7 +244,7 @@ fun AppViewModel.paradeOnCounterpoint(originalCounterpoint: Counterpoint){
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = paradeAllOnCounterpoint(originalCounterpoint, 3, MAX_PARTS,
+                newList = paradeAllOnCounterpoint(originalCounterpoint, 1, MAX_PARTS,
                                             intervalSet.value!!, intervalSetHorizontal.value!!,
                                             cadenzaValues.extractIntsFromCsv(),
                                             resolutioValues.first.toSet(), resolutioValues.second.extractIntsFromCsv())

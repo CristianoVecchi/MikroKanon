@@ -7,8 +7,6 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.ChordSequence;
 import com.cristianovecchi.mikrokanon.AIMUSIC.DEF;
 import com.cristianovecchi.mikrokanon.AIMUSIC.Interval;
 import com.cristianovecchi.mikrokanon.AIMUSIC.JazzInterpreter;
-import com.cristianovecchi.mikrokanon.G;
-import com.cristianovecchi.mikrokanon.AIMUSIC.ChordSequence;
 import com.leff.midi.MidiTrack;
 import com.leff.midi.event.MidiEvent;
 import com.leff.midi.event.ProgramChange;

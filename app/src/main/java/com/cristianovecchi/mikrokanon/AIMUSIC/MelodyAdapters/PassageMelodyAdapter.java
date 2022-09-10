@@ -8,8 +8,6 @@ import com.cristianovecchi.mikrokanon
         .AIMUSIC.ChordSequence;
 import com.cristianovecchi.mikrokanon
         .AIMUSIC.Insieme;
-import com.cristianovecchi.mikrokanon
-        .G;
 
 public class PassageMelodyAdapter extends MelodyAdapter {
     public int getRealNote(int desiredNote, int noteSelected, BebopMelody bebopMelody, ChordSequence chordSequence, int soloRangeLowerNote, int soloRangeUpperNote) {

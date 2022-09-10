@@ -517,14 +517,14 @@ fun List<Int>.mergeNegativeValues(): List<Int> {
     }
     return result.toList()
 }
-fun main(args : Array<String>){
-    println("${listOf(-20,100,-40,-30,-5,60,-80,-10,90,-90).mergeNegativeValues()}")
-    println("${listOf(-20,-40,200, 100,-40,-30,-5,60,-80,-10,90,5,-90,-40).mergeNegativeValues()}")
-    println("${listOf(-20,-40,200, 100,-40,-30,-5,60,-80,-10,-7,90,5,-15,80,-90,-40).mergeNegativeValues()}")
-    println("${RhythmPatterns.STACCATO_2_8_R8.values}  +  ${RhythmPatterns.MAPLE_LEAF_1.values}")
-    println("${(RhythmPatterns.STACCATO_2_8_R8.values 
-            + RhythmPatterns.MAPLE_LEAF_1.values).mergeNegativeValues()}")
-//    println("${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.values}  ->  ${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.retrogradeValues()}")
-//    println("${RhythmPatterns.DOTTED3_2_4.values}  ->  ${RhythmPatterns.DOTTED3_2_4.retrogradeValues()}")
-//    println("${RhythmPatterns.BULGARIAN3GRZ.retrogradeValues() + RhythmPatterns.BULGARIAN3GRZ.values}")
-}
+//fun main(args : Array<String>){
+//    println("${listOf(-20,100,-40,-30,-5,60,-80,-10,90,-90).mergeNegativeValues()}")
+//    println("${listOf(-20,-40,200, 100,-40,-30,-5,60,-80,-10,90,5,-90,-40).mergeNegativeValues()}")
+//    println("${listOf(-20,-40,200, 100,-40,-30,-5,60,-80,-10,-7,90,5,-15,80,-90,-40).mergeNegativeValues()}")
+//    println("${RhythmPatterns.STACCATO_2_8_R8.values}  +  ${RhythmPatterns.MAPLE_LEAF_1.values}")
+//    println("${(RhythmPatterns.STACCATO_2_8_R8.values
+//            + RhythmPatterns.MAPLE_LEAF_1.values).mergeNegativeValues()}")
+////    println("${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.values}  ->  ${RhythmPatterns.GRAZIOSETTO_2_4_R16_8T.retrogradeValues()}")
+////    println("${RhythmPatterns.DOTTED3_2_4.values}  ->  ${RhythmPatterns.DOTTED3_2_4.retrogradeValues()}")
+////    println("${RhythmPatterns.BULGARIAN3GRZ.retrogradeValues() + RhythmPatterns.BULGARIAN3GRZ.values}")
+//}

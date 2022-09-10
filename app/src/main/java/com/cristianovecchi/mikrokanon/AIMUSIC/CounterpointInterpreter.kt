@@ -95,7 +95,8 @@ object CounterpointInterpreter {
                     it.second.getOctavedRangeByType(
                         it.first.first,
                         it.first.second,
-                        isUpperPart
+                        isUpperPart,
+                        it.second.familyRange
                     )
                 }
                 //println("rangeAndEnsembleParts: " + rangesAndEnsembleParts)

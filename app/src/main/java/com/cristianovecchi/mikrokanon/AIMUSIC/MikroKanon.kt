@@ -542,7 +542,7 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                 listOf(delay1,delay2,delay3,delay4,delay5), transpositions, forms, absPitches.size)
         }
 
-        fun findAll2AbsPartMikroKanons(
+        suspend fun findAll2AbsPartMikroKanons(
             absPitches: List<Int>,
             intervalSet: List<Int>,
             depth: Int
@@ -1225,19 +1225,19 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
 
 }
 
-fun main(args : Array<String>){
-    val absPitches = listOf(1,0,6,11,5,7,8,3,6,9)
-    val intervalSet = listOf(1,11,2,10,3,9,6)
-
-    val mikroKanons = MikroKanon.findAll4AbsPartMikroKanons(absPitches,intervalSet, 3)
-    mikroKanons.forEach{it.display(); println()}
-
-//    val mikroKanons = MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet, 4)
+//fun main(args : Array<String>){
+//    val absPitches = listOf(1,0,6,11,5,7,8,3,6,9)
+//    val intervalSet = listOf(1,11,2,10,3,9,6)
+//
+//    val mikroKanons = MikroKanon.findAll4AbsPartMikroKanons(absPitches,intervalSet, 3)
 //    mikroKanons.forEach{it.display(); println()}
-
-//    val delay = 3
-//    val transpose = 0
-//    val rowForm = 3
-//    val mikroKanon = MikroKanon.find2AbsPartMikroKanon(absPitches, intervalSet, delay, transpose, rowForm)
-//    mikroKanon.display()
-}
+//
+////    val mikroKanons = MikroKanon.findAll2AbsPartMikroKanons(absPitches,intervalSet, 4)
+////    mikroKanons.forEach{it.display(); println()}
+//
+////    val delay = 3
+////    val transpose = 0
+////    val rowForm = 3
+////    val mikroKanon = MikroKanon.find2AbsPartMikroKanon(absPitches, intervalSet, delay, transpose, rowForm)
+////    mikroKanon.display()
+//}

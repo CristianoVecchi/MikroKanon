@@ -1,11 +1,8 @@
-package com.cristianovecchi.mikrokanon
+package com.cristianovecchi.mikrokanon.ui
 
 import android.content.res.TypedArray
 
-import android.R
-import android.R.array
 import android.content.Context
-import com.cristianovecchi.mikrokanon.ui.AIColor
 import java.lang.Exception
 import java.lang.reflect.Field
 import kotlin.math.absoluteValue

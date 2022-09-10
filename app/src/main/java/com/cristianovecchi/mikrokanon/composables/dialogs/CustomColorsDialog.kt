@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.cristianovecchi.mikrokanon.G
+import com.cristianovecchi.mikrokanon.ui.G
 import com.cristianovecchi.mikrokanon.composables.ColorSelector
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.ui.Dimensions
@@ -35,7 +35,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                        onSetArrayIndexAndRefresh: (Int) -> Unit =
                            {customColorsDialogData.value = customColorsDialogData.value.copy(arrayColorIndex = it, firstRendering = true)},
                        onDismissRequest: () -> Unit =
-                           {G.deleteColorArrays(); customColorsDialogData.value = CustomColorsDialogData(model = customColorsDialogData.value.model) })
+                           { G.deleteColorArrays(); customColorsDialogData.value = CustomColorsDialogData(model = customColorsDialogData.value.model) })
 {
 
     var indexColors = customColorsDialogData.value.arrayColorIndex

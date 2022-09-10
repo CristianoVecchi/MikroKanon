@@ -12,7 +12,7 @@ suspend fun waves(counterpoints: List<Counterpoint>, intervalSet: List<Int>, hor
 suspend fun freeParts(counterpoint: Counterpoint, intervalSet: List<Int>, directions: List<Int>) : List<Counterpoint>{
     return Counterpoint.findAllFreeParts(counterpoint, intervalSet, directions)
 }
-inline fun isIntervalInSet(intervalSet: IntArray, pitch1: Int, pitch2: Int): Boolean {
+fun isIntervalInSet(intervalSet: IntArray, pitch1: Int, pitch2: Int): Boolean {
      val interval = abs(pitch2 - pitch1)
      return intervalSet.contains(interval)
 }
@@ -173,6 +173,8 @@ suspend fun paradeAllOnCounterpoint(
      result += extendedWeightedHarmony(list, 2, maxParts).sortedBy { it.emptiness }.take(howMany)
      result += extendedWeightedHarmony(list, 3, maxParts).sortedBy { it.emptiness }.take(howMany)
      result += extendedWeightedHarmony(list, 4, maxParts).sortedBy { it.emptiness }.take(howMany)
+     result += progressiveWeightedHarmony(list).sortedBy { it.emptiness }.take(howMany)
+     result += chessOnCounterpoints(list,1).sortedBy { it.emptiness }.take(howMany)
      result += duplicateAllInCounterpoint(counterpoint).sortedBy { it.emptiness }.take(howMany)
      result += addCadenzasOnCounterpoints(horIntervalSet, list, cadenzaForm).sortedBy { it.emptiness }.take(howMany)
      result += addResolutioOnCounterpoints(list, resolutioAbsPitches, resolutioForm).sortedBy { it.emptiness }.take(howMany)

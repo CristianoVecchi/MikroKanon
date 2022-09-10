@@ -2,6 +2,12 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import kotlin.math.absoluteValue
+enum class TREND(val directions: List<Int>) {
+    ASCENDANT_DYNAMIC(Insieme.TREND_ASCENDANT_DYNAMIC.toList()),
+    DESCENDANT_DYNAMIC(Insieme.TREND_DESCENDANT_DYNAMIC.toList()),
+    ASCENDANT_STATIC(Insieme.TREND_ASCENDANT_STATIC.toList()),
+    DESCENDANT_STATIC(Insieme.TREND_DESCENDANT_STATIC.toList())
+}
 
 fun findWholeToneScale(startPitch: Int, endPitch: Int, isRetrograde: Boolean = false): List<Int> {
     val nSemitones = (startPitch - endPitch).absoluteValue
@@ -144,7 +150,7 @@ fun findGlissandoForScales(pitches: List<Int>, nextPitch:Int, glissandoLimit: In
 }
 
 
-fun main(){
+//fun main(){
 //    println(accumulateVelocities(10, 64, 30))
 //    println(accumulateVelocitiesCrescDim(10, 64, 30))
 //    println(accumulateVelocities(1, 64, 30))
@@ -180,4 +186,4 @@ fun main(){
 //    println( findChromaticScaleDiCambio(21,10) )
 //    println( findChromaticScaleDiCambio(10,21, true) )
 //    println( findChromaticScaleDiCambio(21,10, true) )
-}
+//}

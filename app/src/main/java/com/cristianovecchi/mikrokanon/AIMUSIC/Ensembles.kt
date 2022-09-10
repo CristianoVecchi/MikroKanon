@@ -26,7 +26,8 @@ fun  List<EnsemblePart>.display() {
 }
 data class EnsemblePart( val instrument: Int, val octave: Int,
                          val allRange: IntRange = PIANO_ALL,
-                         val colorRange: IntRange = allRange){ // if colorRange is not specified, allRange will be taken
+                         val colorRange: IntRange = allRange,
+                         val familyRange: IntRange = allRange,){ // if colorRange is not specified, allRange will be taken
 
     fun getRangeByType(rangeType: Int): IntRange {
         return when(rangeType) {
@@ -38,12 +39,12 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
         }
     }
 
-    fun getOctavedRangeByType(rangeType: Int, octaveTranspose: Int, upperPart: Boolean): IntRange {
+    fun getOctavedRangeByType(rangeType: Int, octaveTranspose: Int, upperPart: Boolean, familyRange: IntRange): IntRange {
         val range = getRangeByType(rangeType)
         return when (octaveTranspose) {
-            3 -> if(upperPart) range.octaveTranspose(1) else range.octaveTranspose(-1)
-            4 -> if(upperPart) range.octaveTranspose(2) else range.octaveTranspose(-2)
-            else -> range.octaveTranspose(octaveTranspose)
+            3 -> if(upperPart) range.octaveTranspose(1, familyRange) else range.octaveTranspose(-1, familyRange)
+            4 -> if(upperPart) range.octaveTranspose(2, familyRange) else range.octaveTranspose(-2, familyRange)
+            else -> range.octaveTranspose(octaveTranspose, familyRange)
         }//.also{println("range: $it rangeType:$rangeType octaveTranspose:$octaveTranspose upperPart:$upperPart")}
     }
 }
@@ -731,7 +732,7 @@ object Ensembles {
                 PART_BASSOON_MIDDLE_HIGH,
                 PART_BASSOON_MIDDLE,
                 PART_BASSOON_LOW_MIDDLE,
-                PART_BASSOON_LOW
+                PART_CONTRABASSOON_LOW_MIDDLE,
             )
             9 -> listOf(
                 PART_OBOE_HIGH,
@@ -742,7 +743,7 @@ object Ensembles {
                 PART_BASSOON_MIDDLE_HIGH,
                 PART_BASSOON_MIDDLE,
                 PART_BASSOON_LOW_MIDDLE,
-                PART_BASSOON_LOW
+                PART_CONTRABASSOON_LOW
             )
             in 10..12 -> listOf(
                 PART_OBOE_HIGH,
@@ -755,8 +756,8 @@ object Ensembles {
                 PART_ENGLISH_HORN_LOW,
                 PART_BASSOON_MIDDLE_HIGH,
                 PART_BASSOON_MIDDLE,
-                PART_BASSOON_LOW_MIDDLE,
-                PART_BASSOON_LOW
+                PART_CONTRABASSOON_LOW_MIDDLE,
+                PART_CONTRABASSOON_LOW
             )
             else -> listOf()
         }
@@ -887,7 +888,7 @@ object Ensembles {
                 PART_BASSOON_LOW_MIDDLE,
                 PART_BASSOON_LOW_MIDDLE,
                 PART_BASSOON_LOW,
-                PART_BASSOON_LOW,
+                PART_CONTRABASSOON_LOW,
 
             )
             in (10..12) -> listOf(
@@ -901,8 +902,8 @@ object Ensembles {
                 PART_BASSOON_MIDDLE,
                 PART_BASSOON_LOW_MIDDLE,
                 PART_BASSOON_LOW_MIDDLE,
-                PART_BASSOON_LOW,
-                PART_BASSOON_LOW,
+                PART_CONTRABASSOON_LOW_MIDDLE,
+                PART_CONTRABASSOON_LOW,
             )
             else -> listOf()
         }

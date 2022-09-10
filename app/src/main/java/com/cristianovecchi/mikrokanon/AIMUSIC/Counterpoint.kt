@@ -18,13 +18,6 @@ import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.pow
 import kotlin.system.measureTimeMillis
-
-enum class TREND(val directions: List<Int>) {
-    ASCENDANT_DYNAMIC(Insieme.TREND_ASCENDANT_DYNAMIC.toList()),
-    DESCENDANT_DYNAMIC(Insieme.TREND_DESCENDANT_DYNAMIC.toList()),
-    ASCENDANT_STATIC(Insieme.TREND_ASCENDANT_STATIC.toList()),
-    DESCENDANT_STATIC(Insieme.TREND_DESCENDANT_STATIC.toList())
-}
 enum class ARPEGGIO {
     ASCENDANT, SINUS, WAVES
 }
@@ -617,26 +610,26 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         return this.copy(parts = newParts.filter{!it.isBlank()}).also{ it.findAndSetEmptiness()}
     }
-    fun explodeToDoppelgänger2(maxParts: Int, ensembleTypes: List<EnsembleType>, rangeType: Pair<Int, Int>, melodyType: Int): Counterpoint {
-        val newParts = mutableListOf<AbsPart>()
-        val nPartsToExplode = (maxParts - (parts.size * 2 - maxParts).absoluteValue ) / 2
-        val nNewParts = nPartsToExplode * 2 + ( parts.size - nPartsToExplode)
-        val ensembles = if(ensembleTypes.size ==1) Ensembles.getEnsemble(nNewParts, ensembleTypes[0])
-                        else Ensembles.getEnsembleMix(nNewParts, ensembleTypes)
-        parts.forEachIndexed { index, absPart ->
-            if(index < nPartsToExplode){
-                val ensemble = ensembles[index]
-                val isUpperPart = index < this.parts.size / 2
-                val partTwins: List<AbsPart> =
-                    absPart.divideWithSubSequencer(ensemble.octave,
-                        ensemble.getOctavedRangeByType(rangeType.first, rangeType.second, isUpperPart), melodyType )
-                newParts.addAll(partTwins)
-            } else {
-                newParts.add(absPart)
-            }
-        }
-        return Counterpoint(newParts.toList(), this.intervalSet)
-    }
+//    fun explodeToDoppelgänger2(maxParts: Int, ensembleTypes: List<EnsembleType>, rangeType: Pair<Int, Int>, melodyType: Int): Counterpoint {
+//        val newParts = mutableListOf<AbsPart>()
+//        val nPartsToExplode = (maxParts - (parts.size * 2 - maxParts).absoluteValue ) / 2
+//        val nNewParts = nPartsToExplode * 2 + ( parts.size - nPartsToExplode)
+//        val ensembles = if(ensembleTypes.size ==1) Ensembles.getEnsemble(nNewParts, ensembleTypes[0])
+//                        else Ensembles.getEnsembleMix(nNewParts, ensembleTypes)
+//        parts.forEachIndexed { index, absPart ->
+//            if(index < nPartsToExplode){
+//                val ensemble = ensembles[index]
+//                val isUpperPart = index < this.parts.size / 2
+//                val partTwins: List<AbsPart> =
+//                    absPart.divideWithSubSequencer(ensemble.octave,
+//                        ensemble.getOctavedRangeByType(rangeType.first, rangeType.second, isUpperPart), melodyType )
+//                newParts.addAll(partTwins)
+//            } else {
+//                newParts.add(absPart)
+//            }
+//        }
+//        return Counterpoint(newParts.toList(), this.intervalSet)
+//    }
     fun areColumnsInSet(absPitchesSet: Set<Int>): List<Boolean> {
         val result = mutableListOf<Boolean>()
         val maxSize = maxSize()
@@ -1658,13 +1651,13 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
 }
 
-fun main(args : Array<String>){
-    val pentatonicIntervalSet = listOf(2, 10, 3, 9, 4, 8, 5, 7)
-    val absPitches1 = mutableListOf(0, 1, 2, 11, 2, 6, 9)
-    val absPitches2 = mutableListOf(2, 3, 4, 4)//5, 6, 7, 8, 9, 10,11,0,1)
-    val absPitches3 = mutableListOf(4, 5, 6)//, 3, 4, 5, 6, 7, 8, 9, 10,11,0)
-    val sequences = listOf(absPitches1, absPitches2, absPitches3)
-    val notes = listOf("C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "__")
+//fun main(args : Array<String>){
+//    val pentatonicIntervalSet = listOf(2, 10, 3, 9, 4, 8, 5, 7)
+//    val absPitches1 = mutableListOf(0, 1, 2, 11, 2, 6, 9)
+//    val absPitches2 = mutableListOf(2, 3, 4, 4)//5, 6, 7, 8, 9, 10,11,0,1)
+//    val absPitches3 = mutableListOf(4, 5, 6)//, 3, 4, 5, 6, 7, 8, 9, 10,11,0)
+//    val sequences = listOf(absPitches1, absPitches2, absPitches3)
+//    val notes = listOf("C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "__")
     //val ens = getEnsemble(12, EnsembleType.STRING_ORCHESTRA).apply { println(this) }
     //val mix = getEnsembleMix(12, listOf(EnsembleType.STRING_ORCHESTRA, EnsembleType.WOODWINDS)).apply { println(this) }
    // Counterpoint.mazeTest(sequences)
@@ -1707,6 +1700,6 @@ fun main(args : Array<String>){
 //    println(repeatedSequence)
 //    val list = listOf(-1,-1,0,10,5,6,11,2,-1,-1,3,-1,10)
 //    println(Insieme.linearMelody(4,list.toIntArray(),21,108).asList())
-}
+//}
 
 

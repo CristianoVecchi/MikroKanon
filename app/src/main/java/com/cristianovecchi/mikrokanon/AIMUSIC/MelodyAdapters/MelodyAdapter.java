@@ -3,9 +3,6 @@ package com.cristianovecchi.mikrokanon.AIMUSIC.MelodyAdapters;
 import com.cristianovecchi.mikrokanon.AIMUSIC.BebopMelody;
 import com.cristianovecchi.mikrokanon.AIMUSIC.ChordSequence;
 import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme;
-import com.cristianovecchi.mikrokanon.G;
-import com.cristianovecchi.mikrokanon.AIMUSIC.BebopMelody;
-import com.cristianovecchi.mikrokanon.AIMUSIC.ChordSequence;
 
 public class MelodyAdapter {
     public int getRealNote(int desiredNote, int noteSelected, BebopMelody bebopMelody,
