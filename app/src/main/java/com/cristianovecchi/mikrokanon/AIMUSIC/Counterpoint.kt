@@ -244,6 +244,7 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
 
     fun normalizePartsSize(refreshEmptiness: Boolean): Counterpoint{
+        if(parts.isEmpty()) return this.copy(parts = listOf(AbsPart(mutableListOf())))
         val maxSize: Int = parts.maxOf { it.absPitches.size }
         //if(this.parts.isEmpty()) return this
         val newParts = mutableListOf<AbsPart>()
@@ -509,7 +510,7 @@ data class Counterpoint(val parts: List<AbsPart>,
     fun chessboard(range: Int = 1): Counterpoint {
         val clone = this.normalizePartsSize(false)
         val size = clone.maxSize()
-        if(size == 0 || clone.parts.isEmpty()) return clone
+        if(range < 1 || clone.parts.isEmpty() || size == 0) return clone
         val newParts = mutableListOf<AbsPart>()
         clone.parts.forEachIndexed { index, absPart ->
             val newPitches = mutableListOf<Int>()
