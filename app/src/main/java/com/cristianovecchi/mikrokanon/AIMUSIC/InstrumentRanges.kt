@@ -128,13 +128,7 @@ val PARTS_HARPSICHORD: List<EnsemblePart> = listOf( // the array index indicates
     *(2..6).map{ val start = (it+1)*12; EnsemblePart(HARPSICHORD, it, HARPSICHORD_ALL, IntRange(start, start + 19))}.toTypedArray(),
     EnsemblePart(HARPSICHORD, 8, HARPSICHORD_ALL, IntRange(89, C8)) // F6 - C8
 )
-val SYN_SQUARE_WAVE_ALL = IntRange(A0, C8)
-val SYN_SAW_WAVE_ALL = IntRange(A0, C8)
 
-val SYN_CALLIOPE_ALL = IntRange(A0, C8)
-val SYN_CHIFF_ALL = IntRange(A0, C8)
-
-val SYN_CHARANG_ALL = IntRange(A0, C8)
 
 val SYN_VOICE_ALL = IntRange(A0, C8)
 val PARTS_SYN_VOICE: List<EnsemblePart> by lazy { listOf( // the array index indicates the requested octave + 5M
@@ -143,10 +137,13 @@ val PARTS_SYN_VOICE: List<EnsemblePart> by lazy { listOf( // the array index ind
     *(2..6).map{ val start = (it+1)*12; EnsemblePart(SYN_VOICE, it, SYN_VOICE_ALL, IntRange(start, start + 19))}.toTypedArray(),
     EnsemblePart(SYN_VOICE, 8, SYN_VOICE_ALL, IntRange(89, C8)) // F6 - C8
 )}
-val SYN_FIFTHS_SAW_ALL = IntRange(A0, C8)
-
-val SYN_BRASS_AND_LEAD_ALL = IntRange(A0, C8)
-
+//val SYN_SQUARE_WAVE_ALL = IntRange(A0, C8)
+//val SYN_SAW_WAVE_ALL = IntRange(A0, C8)
+//val SYN_CALLIOPE_ALL = IntRange(A0, C8)
+//val SYN_CHIFF_ALL = IntRange(A0, C8)
+//val SYN_CHARANG_ALL = IntRange(A0, C8)
+//val SYN_FIFTHS_SAW_ALL = IntRange(A0, C8)
+//val SYN_BRASS_AND_LEAD_ALL = IntRange(A0, C8)
 
 val PARTS_HARP by lazy{ createKeyboardInstrumentParts(HARP, IntRange(24, 104)) } // Cflat0 to Gsharp7
 
@@ -222,14 +219,34 @@ fun createKeyboardInstrumentParts(instrument: Int, rangeAll: IntRange = IntRange
     )
 }
 fun IntRange.octaveTranspose(octaveTranspose: Int, familyRange: IntRange): IntRange {
+
     return when{
         octaveTranspose == 0 -> this
         octaveTranspose > 0 -> (octaveTranspose downTo 0).first{
             this.last + it * 12 <= familyRange.last}.let{ IntRange(this.first + it * 12, this.last + it * 12)}
+            //?: IntRange(10,1000)
         octaveTranspose < 0 -> (octaveTranspose..0).first{
             this.first + it * 12 >= familyRange.first}.let{ IntRange(this.first + it * 12, this.last + it * 12)}
+            //?: IntRange(10,1000)
         else -> this
     }
+//        .apply {
+//        if(this == IntRange(10,1000)){
+//            println("IntRange:${this@octaveTranspose} Octave Transpose: $octaveTranspose  familyRange: $familyRange")
+//            println("Return from octaveTranspose:$this") }
+//        }
+}
+fun main(){
+    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(0, FAMILY_RANGE_CLARINETS)
+    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(-1, FAMILY_RANGE_CLARINETS)
+    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(-2, FAMILY_RANGE_CLARINETS)
+    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(1, FAMILY_RANGE_CLARINETS)
+    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(2, FAMILY_RANGE_CLARINETS)
+    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(0, FAMILY_RANGE_CLARINETS)
+    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(-1, FAMILY_RANGE_CLARINETS)
+    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(-2, FAMILY_RANGE_CLARINETS)
+    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(1, FAMILY_RANGE_CLARINETS)
+    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(2, FAMILY_RANGE_CLARINETS)
 }
 val GUITAR_ALL = IntRange(40, C6) // E2 - C6
 val GUITAR_LOW5 = IntRange(40, 59) // E2 - B3
@@ -315,13 +332,13 @@ val PART_BASSOON_HIGH = EnsemblePart(BASSOON, 5, BASSOON_ALL, BASSOON_HIGH5, FAM
 val PART_BASSOON_MIDDLE = EnsemblePart(BASSOON, 3, BASSOON_ALL, BASSOON_MIDDLE3, FAMILY_RANGE_BASSOONS)
 val PART_BASSOON_LOW = EnsemblePart(BASSOON, 2, BASSOON_ALL, BASSOON_LOW3, FAMILY_RANGE_BASSOONS)
 val CONTRABASSOON_ALL = IntRange(22, 65) // Bb0 - F4
-val CONTRABASSOON_LOW3 = IntRange(22, 32) // Bb0 - D2
+val CONTRABASSOON_LOW3 = IntRange(22, 38) // Bb0 - D2
 val CONTRABASSOON_MIDDLE3 = IntRange(30, 46) // F#1 - Bb2
 val CONTRABASSOON_HIGH5 = IntRange(46, 65) // Bb2 - F4 (added a fifth at the start to cover the whole range)
 val PART_CONTRABASSOON_LOW_MIDDLE = EnsemblePart(BASSOON, 2, CONTRABASSOON_ALL, CONTRABASSOON_LOW3..CONTRABASSOON_MIDDLE3, FAMILY_RANGE_BASSOONS)
-val PART_CONTRABASSOON_MIDDLE_HIGH = EnsemblePart(BASSOON, 3, CONTRABASSOON_ALL, CONTRABASSOON_MIDDLE3..CONTRABASSOON_HIGH5, FAMILY_RANGE_BASSOONS)
-val PART_CONTRABASSOON_HIGH = EnsemblePart(BASSOON, 4, CONTRABASSOON_ALL, CONTRABASSOON_HIGH5, FAMILY_RANGE_BASSOONS)
-val PART_CONTRABASSOON_MIDDLE = EnsemblePart(BASSOON, 2, CONTRABASSOON_ALL, CONTRABASSOON_MIDDLE3, FAMILY_RANGE_BASSOONS)
+//val PART_CONTRABASSOON_MIDDLE_HIGH = EnsemblePart(BASSOON, 3, CONTRABASSOON_ALL, CONTRABASSOON_MIDDLE3..CONTRABASSOON_HIGH5, FAMILY_RANGE_BASSOONS)
+//val PART_CONTRABASSOON_HIGH = EnsemblePart(BASSOON, 4, CONTRABASSOON_ALL, CONTRABASSOON_HIGH5, FAMILY_RANGE_BASSOONS)
+//val PART_CONTRABASSOON_MIDDLE = EnsemblePart(BASSOON, 2, CONTRABASSOON_ALL, CONTRABASSOON_MIDDLE3, FAMILY_RANGE_BASSOONS)
 val PART_CONTRABASSOON_LOW = EnsemblePart(BASSOON, 1, CONTRABASSOON_ALL, CONTRABASSOON_LOW3, FAMILY_RANGE_BASSOONS)
 
 val FRENCH_HORN_ALL = IntRange(35, 77) // B1 - F5

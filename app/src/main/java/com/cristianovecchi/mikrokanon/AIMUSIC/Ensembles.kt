@@ -29,23 +29,25 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
                          val colorRange: IntRange = allRange,
                          val familyRange: IntRange = allRange,){ // if colorRange is not specified, allRange will be taken
 
-    fun getRangeByType(rangeType: Int): IntRange {
+    fun getRangeByType(rangeType: Int, familyRange: IntRange): IntRange {
         return when(rangeType) {
             1 -> allRange
             2 -> colorRange
             3 -> colorRange.extractFromMiddle(8)
             4 -> colorRange.extractFromMiddle(6)
-            else -> PIANO_ALL
+            else -> familyRange
         }
     }
 
     fun getOctavedRangeByType(rangeType: Int, octaveTranspose: Int, upperPart: Boolean, familyRange: IntRange): IntRange {
-        val range = getRangeByType(rangeType)
+        val range = getRangeByType(rangeType, familyRange)
+        //println("rangeType:$rangeType octaveTranspose:$octaveTranspose upperPart:$upperPart familyRange:$familyRange range:$range")
         return when (octaveTranspose) {
             3 -> if(upperPart) range.octaveTranspose(1, familyRange) else range.octaveTranspose(-1, familyRange)
             4 -> if(upperPart) range.octaveTranspose(2, familyRange) else range.octaveTranspose(-2, familyRange)
             else -> range.octaveTranspose(octaveTranspose, familyRange)
-        }//.also{println("range: $it rangeType:$rangeType octaveTranspose:$octaveTranspose upperPart:$upperPart")}
+        }//.apply{println("Return from OctavedRangeByType:$this")}
+    //.also{println("range: $it rangeType:$rangeType octaveTranspose:$octaveTranspose upperPart:$upperPart")}
     }
 }
 
@@ -1409,7 +1411,7 @@ object Ensembles {
             else -> listOf()
         }
     }
-    fun getKeyboardInstrument(keyboardInstrument: Int, nParts: Int, range: RANGES = RANGES.PIANO, rangeAll: IntRange = IntRange(A0, C8), ): List<EnsemblePart> {
+    fun getKeyboardInstrument(keyboardInstrument: Int, nParts: Int, range: RANGES = RANGES.PIANO, rangeAll: IntRange = IntRange(A0, C8) ): List<EnsemblePart> {
         val instrument = createKeyboardInstrumentParts(keyboardInstrument, rangeAll)
         val oct = range.octaves
         return when (nParts) {

@@ -259,6 +259,10 @@ object Player {
                                     yield()
                                     if(job.isActive) {
                                         saveAndPlayMidiFile(job, dispatch, mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
+//                                        val testTracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
+//                                        testTracks.add(octaveTest(MidiTrack()))
+//                                        val testMidi = MidiFile(MidiFile.DEFAULT_RESOLUTION, testTracks)
+//                                            saveAndPlayMidiFile(job, dispatch, mediaPlayer,  testMidi, looping, play, midiFile, nTotalNotes)
                                     }
                                     else {
                                         "Canceled before playing Midi File!"

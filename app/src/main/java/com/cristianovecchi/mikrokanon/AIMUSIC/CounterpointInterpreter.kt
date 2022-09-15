@@ -91,7 +91,9 @@ object CounterpointInterpreter {
 
                 // RANGES EXTENSION
                 //val ranges = rangeTypes.map { ensemblePart.getOctavedRangeByType(it.first, it.second, isUpperPart) }
+                //println(rangesAndEnsembleParts)
                 val ranges = rangesAndEnsembleParts.map {
+                    //println(it)
                     it.second.getOctavedRangeByType(
                         it.first.first,
                         it.first.second,

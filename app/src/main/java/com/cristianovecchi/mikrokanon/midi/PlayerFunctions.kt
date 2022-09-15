@@ -44,25 +44,7 @@ fun MidiTrack.addVolumeToTrack(dynamics: List<Float>, totalLength: Long) {
         tempoTick += dynamicDeltas[index]
     }
 }
-fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, bars: List<Bar>,
-                                        trackData: List<TrackData>, audio8D: List<Int>,
-                                       totalLength: Long, justVoicing: Boolean){
-    if(harmonizations.isNotEmpty() && !harmonizations.all { it.type == HarmonizationType.NONE }) {
-        val doubledBars = bars.mergeOnesInMetro()
-            .resizeLastBar(totalLength)
-            .splitBarsInTwoParts()
-        // using trackDatas without replacing for a better chord definition
-        assignDodecaBytesToBars(doubledBars.toTypedArray(), trackData, false)
-        val barGroups = if(harmonizations.size == 1) listOf(doubledBars)
-        else doubledBars.splitBarsInGroups(harmonizations.size)
-        val chordsTrack = MidiTrack()
-        addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations, justVoicing)
-        if(audio8D.isNotEmpty()){
-            setAudio8D(chordsTrack, 12, 15)
-        }
-        this.add(chordsTrack)
-    }
-}
+
 
 fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, roots: MutableList<Int>,
                                      diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
@@ -128,7 +110,7 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
         }
             if(!justVoicing){
             rootNotes.sortedBy { it.tick }.forEach {
-                println("Root: $it")
+                //println("Root: $it")
                 val absPitch = it.pitch
                 val tick = it.tick
                 val duration = it.duration
@@ -658,53 +640,67 @@ fun addVibratoToTrack(mt: MidiTrack, start: Long, duration: Long, channel: Int, 
         }
     }
 }
-fun pitchBenderTest(mt: MidiTrack): MidiTrack {
-    val pitches2m = listOf(61, 60, 59, 61, 60, 59)
-    val noBend = 8192
-    val ht = 4096
-    val halfToneUp = noBend + ht
-    val halfToneDown = noBend - ht
-    val toneUp = noBend + ht * 2 - 1
-    val toneDown = noBend + ht * 2
-    val durs = listOf(480, 480, 480, 480, 480, 480)
-    val glissAmounts = listOf(noBend, noBend, noBend, toneDown, toneDown, noBend)
-    // var lastGliss = false
-    val pitches = pitches2m
-    var tick = 0L
-    (0 until 3).forEach {
-        val on = NoteOn(tick, 0, pitches[it], 100)
-        val off = NoteOff(tick + durs[it] - 1, 0, pitches[it], 80)
-        mt.insertEvent(on)
-        mt.insertEvent(off)
-        tick += durs[it]
-    }
-    (3 until 6).forEach {
-        val pitchBendOff = PitchBend(tick, 0, 0, 0)
-        pitchBendOff.bendAmount = noBend
-        mt.insertEvent(pitchBendOff)
-
-        if (it != 5) {
-            //7168 6144 5120 4096
-            val pitchBendOn1 = PitchBend(tick + 120, 0, 0, 0)
-            pitchBendOn1.bendAmount = 7168
-            val pitchBendOn2 = PitchBend(tick + 240, 0, 0, 0)
-            pitchBendOn2.bendAmount = 6144
-            val pitchBendOn3 = PitchBend(tick + 360, 0, 0, 0)
-            pitchBendOn3.bendAmount = 5120
-            val pitchBendOn4 = PitchBend(tick + 480 - 1, 0, 0, 0)
-            pitchBendOn4.bendAmount = 4096
-            mt.insertEvent(pitchBendOn1)
-            mt.insertEvent(pitchBendOn2)
-            mt.insertEvent(pitchBendOn3)
-            mt.insertEvent(pitchBendOn4)
-        }
-
-
-        val on = NoteOn(tick, 0, pitches[it], 100)
-        val off = NoteOff(tick + durs[it] - 1, 0, pitches[it], 80)
-        mt.insertEvent(on)
-        mt.insertEvent(off)
-        tick += durs[it]
-    }
-    return mt
-}
+//fun octaveTest(mt: MidiTrack): MidiTrack {
+//    val pitches = listOf(60, 24, 36, 48, 60, 72, 84, 96, 108)
+//    var tick = 0L
+//    pitches.forEach {
+//        val pc: MidiEvent = ProgramChange(tick, 0, STRING_ORCHESTRA) // cambia strumento
+//        mt.insertEvent(pc)
+//        val on = NoteOn(tick, 0, it, 100)
+//        val off = NoteOff(tick + 480 - 1, 0, it, 80)
+//        mt.insertEvent(on)
+//        mt.insertEvent(off)
+//        tick += 480
+//    }
+//    return mt
+//}
+//fun pitchBenderTest(mt: MidiTrack): MidiTrack {
+//    val pitches2m = listOf(61, 60, 59, 61, 60, 59)
+//    val noBend = 8192
+//    val ht = 4096
+//    val halfToneUp = noBend + ht
+//    val halfToneDown = noBend - ht
+//    val toneUp = noBend + ht * 2 - 1
+//    val toneDown = noBend + ht * 2
+//    val durs = listOf(480, 480, 480, 480, 480, 480)
+//    val glissAmounts = listOf(noBend, noBend, noBend, toneDown, toneDown, noBend)
+//    // var lastGliss = false
+//    val pitches = pitches2m
+//    var tick = 0L
+//    (0 until 3).forEach {
+//        val on = NoteOn(tick, 0, pitches[it], 100)
+//        val off = NoteOff(tick + durs[it] - 1, 0, pitches[it], 80)
+//        mt.insertEvent(on)
+//        mt.insertEvent(off)
+//        tick += durs[it]
+//    }
+//    (3 until 6).forEach {
+//        val pitchBendOff = PitchBend(tick, 0, 0, 0)
+//        pitchBendOff.bendAmount = noBend
+//        mt.insertEvent(pitchBendOff)
+//
+//        if (it != 5) {
+//            //7168 6144 5120 4096
+//            val pitchBendOn1 = PitchBend(tick + 120, 0, 0, 0)
+//            pitchBendOn1.bendAmount = 7168
+//            val pitchBendOn2 = PitchBend(tick + 240, 0, 0, 0)
+//            pitchBendOn2.bendAmount = 6144
+//            val pitchBendOn3 = PitchBend(tick + 360, 0, 0, 0)
+//            pitchBendOn3.bendAmount = 5120
+//            val pitchBendOn4 = PitchBend(tick + 480 - 1, 0, 0, 0)
+//            pitchBendOn4.bendAmount = 4096
+//            mt.insertEvent(pitchBendOn1)
+//            mt.insertEvent(pitchBendOn2)
+//            mt.insertEvent(pitchBendOn3)
+//            mt.insertEvent(pitchBendOn4)
+//        }
+//
+//
+//        val on = NoteOn(tick, 0, pitches[it], 100)
+//        val off = NoteOff(tick + durs[it] - 1, 0, pitches[it], 80)
+//        mt.insertEvent(on)
+//        mt.insertEvent(off)
+//        tick += durs[it]
+//    }
+//    return mt
+//}

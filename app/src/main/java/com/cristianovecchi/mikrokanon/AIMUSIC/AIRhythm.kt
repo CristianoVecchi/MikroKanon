@@ -165,7 +165,7 @@ fun IntArray.applySwing(shuffle: Float, maxDur: Int = 240): IntArray {
                     result += (first * shuffle).roundToInt()
                     result += (second * (1f - shuffle)).roundToInt()
                     index += 2
-                    println("Swinging: $first $second -> ${(first * shuffle).roundToInt()} ${(second * (1f - shuffle)).roundToInt()}")
+                    //println("Swinging: $first $second -> ${(first * shuffle).roundToInt()} ${(second * (1f - shuffle)).roundToInt()}")
         } else {
             result += first
             index++

@@ -68,7 +68,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         val nParts = this.parts.size
         val nPartsToAdd = counterpoint.parts.size
         val diff = nParts - counterpoint.parts.size
-        println("diff: $diff")
+        //println("diff: $diff")
         val newParts = when {
             diff == 0 -> parts.mapIndexed { index, absPart ->
                 absPart.enqueue( counterpoint.parts[index]) }
@@ -205,7 +205,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         val clone = this.normalizePartsSize(false)
         if(clone.isEmpty() || clone.isBlank()) return listOf(clone)
         val parts = clone.parts
-        val nNotes = this.nNotes().also { print(it) }
+        val nNotes = this.nNotes()//.also { print(it) }
         val sectionsToDuplicate = parts.map { part ->
             part.subSequencesLastRepetition()}.flatten().distinct()
         sectionsToDuplicate.forEach{ sectionToDuplicate ->
@@ -472,7 +472,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 if(chords[i] == columnSorted){
                     found = true
                     val repeatedColumn = clone.getColumnValuesWithEmptyValues(index)
-                    println("index: $index  chord: ${chords[i]}  column sorted: $columnSorted  repeated column: $repeatedColumn")
+                    //println("index: $index  chord: ${chords[i]}  column sorted: $columnSorted  repeated column: $repeatedColumn")
                     (0 until repetitions[i]).forEach{ _ ->
                         result.addColumn(repeatedColumn)
                     }
@@ -1073,7 +1073,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                         }
                     //println("part:$bestFiorituraIndex start:$originNote end:$targetNote diff:$diff dirs:$actualDirections note:$bestFioritura fioritura:$fiorituraNotes")
                     if (fiorituraNotes.isNotEmpty()) {
-                        fiorituraNotes.forEach { it ->
+                        fiorituraNotes.forEach {
                             newParts.mapIndexed { i, absPart ->
                                 if (i == bestFiorituraIndex)
                                     absPart.absPitches.add(it)
@@ -1514,7 +1514,7 @@ data class Counterpoint(val parts: List<AbsPart>,
         suspend fun findMazesWithRowForms(context: CoroutineContext, sequences: List<List<Int>>,
                               intervalSet: List<Int>, msTimeLimit: Long = 30000L): List<Counterpoint> {
             val nParts = sequences.size
-            println("SEQUENCES FOR MAZE: $sequences")
+            //println("SEQUENCES FOR MAZE: $sequences")
             if (sequences.all{it.isEmpty()}) return listOf(Counterpoint.empty(sequences.size, 1))
             if (sequences.all{it.isEmpty() || it.all{ absPitch -> absPitch == -1}}) return listOf(Counterpoint.empty(sequences.size, sequences.maxOf{it.size}))
             if (nParts == 0) return listOf()
@@ -1643,7 +1643,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                             mazes = Counterpoint.findMazes(this.coroutineContext, sequences, pentatonicIntervalSet, maxLimit = 3).sortedBy { it.emptiness }
                             mazes.take(12).forEach { it.displayInNotes(); println() }
                         }
-                        println("maze in $ms ms, nResults: ${mazes.size}")
+                        //println("maze in $ms ms, nResults: ${mazes.size}")
                     }
                 }
             }

@@ -725,7 +725,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
                     if (ribattuto == null) null else List(div){ribattuto}
                 )
-                  .apply { println("TRILLO:$index duration: $duration, artDur: $articulationDuration $this") }
+                  //.apply { println("TRILLO:$index duration: $duration, artDur: $articulationDuration $this") }
             }
         }
         is ReplaceType.Mordente -> { trackData, index, trackDataList ->
@@ -918,7 +918,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto) )
                     //  .apply { println("GRUPPETTO:$index duration: $duration, artDur: $articulationDuration $this") }
                 } else {
-                    val (pitches, glissList) =  findGruppettoPitches(pitch, nextPitch, replaceType.addGliss, glissando).apply { println(this) }
+                    val (pitches, glissList) =  findGruppettoPitches(pitch, nextPitch, replaceType.addGliss, glissando)//.apply { println(this) }
                     SubstitutionNotes(index, pitches,
                         findTicksFromDurations(tick, durs),
                         durs, velocities,

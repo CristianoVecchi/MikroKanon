@@ -63,6 +63,25 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
         }
     }
 }
+fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, bars: List<Bar>,
+                                       trackData: List<TrackData>, audio8D: List<Int>,
+                                       totalLength: Long, justVoicing: Boolean){
+    if(harmonizations.isNotEmpty() && !harmonizations.all { it.type == HarmonizationType.NONE }) {
+        val doubledBars = bars.mergeOnesInMetro()
+            .resizeLastBar(totalLength)
+            .splitBarsInTwoParts()
+        // using trackDatas without replacing for a better chord definition
+        assignDodecaBytesToBars(doubledBars.toTypedArray(), trackData, false)
+        val barGroups = if(harmonizations.size == 1) listOf(doubledBars)
+        else doubledBars.splitBarsInGroups(harmonizations.size)
+        val chordsTrack = MidiTrack()
+        addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations, justVoicing)
+        if(audio8D.isNotEmpty()){
+            setAudio8D(chordsTrack, 12, 15)
+        }
+        this.add(chordsTrack)
+    }
+}
 fun createFull12HarmonizedTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: Int, diffChordVelocity: Int){
     data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
     val notes = mutableListOf<Note>()
