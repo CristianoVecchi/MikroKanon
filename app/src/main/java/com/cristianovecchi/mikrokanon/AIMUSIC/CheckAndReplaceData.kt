@@ -545,7 +545,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     )
                 } else {
                     val diff = if(isStaccato || glissando != 0) 0 else actualDuration - duration
-                    println("pitch:$pitch gliss:$glissando diff:$diff longDur:$longDur")
+                    //println("pitch:$pitch gliss:$glissando diff:$diff longDur:$longDur")
                     SubstitutionNotes(
                         index, listOf(pitch, pitch),
                         listOf(tick, tick + accentPlusRestDur),

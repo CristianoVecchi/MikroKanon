@@ -53,7 +53,7 @@ fun SingleSelectListDialog(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = listDialogData.value.dialogTitle, color = fontColor)
+                    Text(text = listDialogData.value.dialogTitle, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
                     Spacer(modifier = Modifier.height(5.dp))
                     val listState = rememberLazyListState()
                     val weights = dimensions.listDialogWeights

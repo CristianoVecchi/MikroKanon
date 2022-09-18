@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -118,7 +119,7 @@ fun HistoriaDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: 
                             },
                             shape = MaterialTheme.shapes.large
                         ) {
-                            Text(text = okText)
+                            Text(text = okText, style = TextStyle(fontSize = dimensions.dialogFontSize.sp))
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                     }

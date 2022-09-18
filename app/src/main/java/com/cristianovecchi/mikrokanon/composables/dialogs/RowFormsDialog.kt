@@ -80,7 +80,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title, color = fontColor)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
                         Spacer(modifier = Modifier.height(5.dp))
 
                         val colors = model.appColors
@@ -225,7 +225,7 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             }
                         }
                         Spacer(modifier = Modifier.height(5.dp))
-                        val buttonSize = dimensions.dialogButtonSize
+                        val buttonSize = dimensions.dialogButtonSize / 4 * 5
                         val numberFontSize = dimensions.dialogFontSize
                         LazyColumn{
                             items((0..3).toList()) { row ->

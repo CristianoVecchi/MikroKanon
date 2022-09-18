@@ -18,7 +18,7 @@ import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 import java.util.ArrayList
 
-class InputFragment(): Fragment() {
+class InputFragment: Fragment() {
     private var list: ArrayList<Clip> = ArrayList()
     private var editing: Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -34,14 +34,14 @@ fun SelectableCard(text: String, fontSize: Int, colors:AppColors, isSelected: Bo
     val backColor by animateColorAsState( if(isSelected) colors.selCardBackColorSelected.shift(-0.1f) else colors.selCardBackColorUnselected.shift(-0.2f) )
     val textColor  by animateColorAsState( if(isSelected) colors.selCardTextColorSelected.shift(0.1f) else colors.selCardTextColorUnselected )
     val borderColor by animateColorAsState( if(isSelected) colors.selCardBorderColorSelected else colors.selCardBorderColorUnselected )
-    val padding by animateDpAsState( if(isSelected) 3.dp else 2.dp )
+    val padding by animateDpAsState( if(isSelected) 2.dp else 1.dp )
     Card(backgroundColor = backColor,
         contentColor = textColor,
         border = BorderStroke(2.dp, borderColor),modifier = Modifier
         .animateContentSize(animationSpec = tween(25,  easing = LinearEasing))
         //.aspectRatio( if (portraitMode) 3/4f else 16/9f)
         .padding(padding)
-        .clip(RoundedCornerShape(6.dp))
+        .clip(RoundedCornerShape(4.dp))
         .clickable { if (isSelected) onClick(1) else onClick(-1) }
 
     ) {

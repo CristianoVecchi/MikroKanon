@@ -27,9 +27,9 @@ fun  List<EnsemblePart>.display() {
 data class EnsemblePart( val instrument: Int, val octave: Int,
                          val allRange: IntRange = PIANO_ALL,
                          val colorRange: IntRange = allRange,
-                         val familyRange: IntRange = allRange,){ // if colorRange is not specified, allRange will be taken
+                         val familyRange: IntRange = allRange,){
 
-    fun getRangeByType(rangeType: Int, familyRange: IntRange): IntRange {
+    fun getRangeByType(rangeType: Int): IntRange {
         return when(rangeType) {
             1 -> allRange
             2 -> colorRange
@@ -40,7 +40,7 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
     }
 
     fun getOctavedRangeByType(rangeType: Int, octaveTranspose: Int, upperPart: Boolean, familyRange: IntRange): IntRange {
-        val range = getRangeByType(rangeType, familyRange)
+        val range = getRangeByType(rangeType)
         //println("rangeType:$rangeType octaveTranspose:$octaveTranspose upperPart:$upperPart familyRange:$familyRange range:$range")
         return when (octaveTranspose) {
             3 -> if(upperPart) range.octaveTranspose(1, familyRange) else range.octaveTranspose(-1, familyRange)

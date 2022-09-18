@@ -48,11 +48,11 @@ object CounterpointInterpreter {
         (0 until counterpoint.nNotes() * 2 + 1).forEach {
             actualDurations[it] = durations[it % durSize]
         }
-        if (counterpoint.parts.size > 15) {
+        if (counterpoint.parts.size > 12) {
             println("WARNING: Counterpoint n. parts: ${counterpoint.parts.size}")
         }
 
-        counterpoint.parts.forEachIndexed() { i, part ->
+        counterpoint.parts.forEachIndexed { i, part ->
             part.index = i
         }
         val job = context.job
@@ -250,7 +250,7 @@ object CounterpointInterpreter {
 //            computation(part)
 //        }.sortedBy { it.channel }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            println(counterpoint.parts)
+            //println(counterpoint.parts)
             counterpoint.parts.parallelStream().map { part ->
                 computation(part)
             }.collect(Collectors.toList()).sortedBy { it.channel }

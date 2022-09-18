@@ -41,7 +41,7 @@ class OutputFragment: Fragment() {
             model.refreshFilledSlots()
         }
         model.buildingState.observe(viewLifecycleOwner){
-            println("Building phase: $it")
+            //println("Building phase: $it")
         }
         if(model.userOptionsData.value != null && model.userOptionsData.value!!.isNotEmpty()){
             val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
@@ -169,9 +169,9 @@ class OutputFragment: Fragment() {
                                     model.onParade()
                                 },
                                 onPlay = {
-                                    val executionTime = measureTimeMillis {
+                                    //val executionTime = measureTimeMillis {
                                     model.onPlay(true, false) // play the entire structure
-                                    }.also{ println("MIDI file build in $it ms") }
+                                    //}.also{ println("MIDI file build in $it ms") }
                                 },
                                 onStop = { model.onStop() }
                             )

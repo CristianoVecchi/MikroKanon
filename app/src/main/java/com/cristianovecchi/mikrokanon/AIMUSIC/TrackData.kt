@@ -243,7 +243,7 @@ fun List<TrackData>.addLegatoAndRibattuto(maxLegato: Int, articulations: FloatAr
     //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         this
-            //.parallelStream()
+            .parallelStream()
             .forEach {
                 val pair = alterateArticulation(
                     it.ticks,

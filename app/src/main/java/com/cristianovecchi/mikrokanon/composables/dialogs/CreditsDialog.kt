@@ -14,7 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,7 +67,7 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
 
                     ) {
                         item {
-                            Text(text = creditsDialogData.value.title)
+                            Text(text = creditsDialogData.value.title, color = Color.Black, fontWeight = FontWeight.Bold,  style = TextStyle(fontSize = dimensions.dialogFontSize.sp))
                             Spacer(modifier = Modifier.height(10.dp))
                         }
                         item {
@@ -187,7 +189,7 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                             },
                             shape = MaterialTheme.shapes.large
                         ) {
-                            Text(text = okText)
+                            Text(text = okText, style = TextStyle(fontSize = dimensions.dialogFontSize.sp))
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                     }

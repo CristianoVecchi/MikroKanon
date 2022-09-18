@@ -48,7 +48,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
             val backgroundColor = appColors.dialogBackgroundColor
             val octaves= getOctaveSymbols()
             Surface(
-                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
+                modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.height.dp),
                 color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
@@ -78,7 +78,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title, color = fontColor)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
                         Spacer(modifier = Modifier.height(10.dp))
 
                         val colors = model.appColors
@@ -231,8 +231,8 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
                                 val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
-                                val buttonSize = dimensions.dialogButtonSize / 3 * 2
-                                val fontSizeOctave = dimensions.dialogFontSize
+                                val buttonSize = dimensions.dialogButtonSize / 4 * 3
+                                val fontSizeOctave = dimensions.dialogFontSize / 3 * 2
                                 CustomButton(
                                     adaptSizeToIconButton = false,
                                     text = octaves[4], // +15

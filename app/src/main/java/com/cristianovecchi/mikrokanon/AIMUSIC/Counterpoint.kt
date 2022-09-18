@@ -284,7 +284,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                     }
                 }
             }
-            clone.parts.forEachIndexed() { partIndex, part ->
+            clone.parts.forEachIndexed { partIndex, part ->
                 for(pitchIndex in part.absPitches.indices)
                     if(part.absPitches[pitchIndex] == -1) {
                         val next = if(pitchIndex < part.absPitches.size -1) {part.absPitches[pitchIndex+1]} else {null }
@@ -1234,7 +1234,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             trend: List<Int>
         ): List<Counterpoint> {
             val result = mutableListOf<Counterpoint>()
-            (0..11).forEach() {
+            (0..11).forEach{
                 result.add(findFreePart(counterpoint, intervalSet, it, trend))
             }
             return result.distinctBy { it.parts } // several counterpoints could be equal

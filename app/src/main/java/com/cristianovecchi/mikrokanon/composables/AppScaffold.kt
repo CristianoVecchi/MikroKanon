@@ -80,7 +80,7 @@ fun AppScaffold(model: AppViewModel,
         topBar = {
                 val creditsDialogData by lazy { mutableStateOf(TextDialogData())}
                 CreditsDialog(creditsDialogData, dimensions)
-                TopAppBar(Modifier.border(1.dp,colors.selCardBorderColorSelected)) {
+                TopAppBar(Modifier.height(dimensions.selectorButtonSize).border(1.dp,colors.selCardBorderColorSelected)) {
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -412,7 +412,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                         "Swing Shuffle" -> {
                             val shuffle = userOptions.swingShuffle.toFloat()
                             val isOn = shuffle != 0.5f
-                            val shuffles = listOf(90,80,70,60,50,40,30,20,10)
+                            val shuffles = listOf(90,80,75,70,66,60,50,40,33, 30,25,20,10)
                             SelectableCard(
                                 text = if(isOn) "${lang.shuffle}: ${(shuffle * 100).toInt()}%" else lang.shuffle,
                                 fontSize = fontSize,

@@ -282,7 +282,7 @@ class AppViewModel(
         //mediaPlayer?.let { if (it.isPlaying) _playing.value = true }
     }
     fun dispatchError(error:String){
-        println("MIDI building ends with: $error")
+        //println("MIDI building ends with: $error")
     }
     enum class Building {
         NONE, START, DATATRACKS, CHECK_N_REPLACE, MIDITRACKS, WRITE_FILE
@@ -1001,15 +1001,15 @@ class AppViewModel(
         _intervalSetHorizontal.value = createIntervalSetFromFlags(horizontalIntervalSetFlag)
     }
     fun createVerticalIntervalSet(verticalIntervalSetFlag: Int, from: String) {
-        println("Creating Vert Interval Set: ${intervalSet.value!!} from $from")
+        //println("Creating Vert Interval Set: ${intervalSet.value!!} from $from")
         _intervalSet.value = createIntervalSetFromFlags(verticalIntervalSetFlag)
     }
     fun createVerticalIntervalSet(intervalSet: List<Int>, from: String) {
-        println("Creating Vert Interval Set: $intervalSet from $from")
+        //println("Creating Vert Interval Set: $intervalSet from $from")
         _intervalSet.value = intervalSet.sorted()
     }
     fun saveVerticalIntervalSet(from: String) {
-        println("Saving Vert Interval Set: ${intervalSet.value!!} from $from")
+        //println("Saving Vert Interval Set: ${intervalSet.value!!} from $from")
         val flags = createFlagsFromIntervalSet(intervalSet.value!!)
         updateUserOptions("intSetVertFlags", flags)
     }
@@ -1096,7 +1096,7 @@ class AppViewModel(
         }
     }
     fun updateUserOptions(key: String, value: Any){
-        println("$key: $value")
+        //println("$key: $value")
         val optionsDataClone = if(userOptionsData.value!!.isEmpty())
                                 UserOptionsData.getDefaultUserOptionsData()
                                 else userOptionsData.value!![0].copy()
@@ -1121,7 +1121,7 @@ class AppViewModel(
     var lastIndexCustomColors = -1
     var lastAppColors = ""
     fun setAppColors(defs: String){
-        println("COLORS: $defs")
+        //println("COLORS: $defs")
         val colorDefs = extractColorDefs(defs)
         if(colorDefs.isCustom){
             if(lastIndexCustomColors != colorDefs.custom) {
@@ -1186,7 +1186,7 @@ class AppViewModel(
             }
         }
         this[key] = Pair(counterpoints, timestamp)
-        println()
+        //println()
     }
     fun clearMKcaches() {
         mk3cache.clear()

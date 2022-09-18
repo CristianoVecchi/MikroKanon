@@ -19,7 +19,7 @@ import com.cristianovecchi.mikrokanon.composables.SequenceSelector
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.ui.MikroKanonTheme
 
-class SequencesFragment(): Fragment() {
+class SequencesFragment: Fragment() {
 var start = true
     lateinit var model: AppViewModel
     override fun onCreateView(
@@ -41,7 +41,7 @@ var start = true
         model.userOptionsData.observe(viewLifecycleOwner){
             model.userOptionsData.value.let {
                 if(it!!.isNotEmpty()) {
-                    println(it[0])
+                    //println(it[0])
                     model.privacyIsAccepted = it[0].privacy != 0
                     model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                     model.refreshZodiacFlags()
@@ -56,7 +56,7 @@ var start = true
             }
         }
         model.buildingState.observe(viewLifecycleOwner){
-            println("Building phase: $it")
+           // println("Building phase: $it")
         }
 
         model.selectedSequence.observe(viewLifecycleOwner){

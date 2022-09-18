@@ -74,9 +74,9 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                     val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         .padding(8.dp)
-                        .weight(weights.first + weights.second / 3 * 2)
+                        .weight(weights.first + weights.second / 5 * 3)
                     val modifierB = Modifier
-                        .weight(weights.second / 3)
+                        .weight(weights.second / 5 * 2)
                     val modifierC = Modifier
                         .padding(8.dp)
                         .weight(weights.third)
@@ -87,7 +87,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title, color = fontColor)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize))
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors

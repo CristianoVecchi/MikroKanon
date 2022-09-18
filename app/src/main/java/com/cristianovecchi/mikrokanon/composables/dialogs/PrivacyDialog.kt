@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.ui.Dimensions
+import com.cristianovecchi.mikrokanon.ui.pxToDp
 
 @Composable
 fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: Dimensions,
@@ -125,7 +127,7 @@ fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                             },
                             shape = MaterialTheme.shapes.large
                         ) {
-                            Text(text = okText)
+                            Text(text = okText, style = TextStyle(fontSize = dimensions.dialogFontSize.sp))
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                     }

@@ -67,12 +67,12 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         .padding(8.dp)
-                        .weight(weights.first + weights.second / 7 * 6 + weights.third / 3)
-                    val modifierB = Modifier
-                        .weight(weights.second / 7)
+                        .weight(weights.first + weights.second)
+//                    val modifierB = Modifier
+//                        .weight(weights.second / 7)
                     val modifierC = Modifier
                         .padding(8.dp)
-                        .weight(weights.third / 3 * 2)
+                        .weight(weights.third)
                     val allSequences = model.sequences.value!!
                         .map { it.map { it.abstractNote }.cutAdjacentRepetitions() }
                         .map { Clip.convertAbsPitchesToClips(it) }
@@ -82,7 +82,7 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title, color = fontColor)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize))
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors

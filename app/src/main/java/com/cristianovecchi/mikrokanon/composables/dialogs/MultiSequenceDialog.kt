@@ -67,12 +67,12 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                     val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         .padding(8.dp)
-                        .weight(weights.first + weights.second / 7 * 6 + weights.third / 3)
+                        .weight(weights.first + weights.second / 6 * 5)
                     val modifierB = Modifier
-                        .weight(weights.second / 7)
+                        .weight(weights.second / 6)
                     val modifierC = Modifier
                         .padding(8.dp)
-                        .weight(weights.third / 3 * 2)
+                        .weight(weights.third)
                     val allSequences = model.sequences.value!!
                                         .map{ it.map{it.abstractNote}.cutAdjacentRepetitions()}
                                         .map{ Clip.convertAbsPitchesToClips(it)}
@@ -85,7 +85,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title, color = fontColor)
+                        Text(text = multiNumberDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize))
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors
@@ -156,10 +156,12 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                     ) {
                         val dimensions by model.dimensions.asFlow().collectAsState(initial = Dimensions.default())
                         val buttonSize = dimensions.dialogButtonSize
+                        val buttonFontSize = dimensions.dialogFontSize
                         CustomButton(
                             adaptSizeToIconButton = true,
                             text = "➚",
                             buttonSize = buttonSize.dp,
+                            fontSize = buttonFontSize,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
@@ -173,6 +175,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             adaptSizeToIconButton = true,
                             text = "➘",
                             buttonSize = buttonSize.dp,
+                            fontSize = buttonFontSize,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
@@ -186,6 +189,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             adaptSizeToIconButton = true,
                             text = "↑",
                             buttonSize = buttonSize.dp,
+                            fontSize = buttonFontSize,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
@@ -198,6 +202,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             adaptSizeToIconButton = true,
                             text = "↓",
                             buttonSize = buttonSize.dp,
+                            fontSize = buttonFontSize,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {

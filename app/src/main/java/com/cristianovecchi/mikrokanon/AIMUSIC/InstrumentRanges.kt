@@ -147,6 +147,12 @@ val PARTS_SYN_VOICE: List<EnsemblePart> by lazy { listOf( // the array index ind
 
 val PARTS_HARP by lazy{ createKeyboardInstrumentParts(HARP, IntRange(24, 104)) } // Cflat0 to Gsharp7
 
+val GUITAR_ALL = IntRange(40, C6) // E2 - C6
+val GUITAR_LOW5 = IntRange(40, 59) // E2 - B3
+val GUITAR_MIDDLE5 = IntRange(50, 69) // D3 - A4
+val GUITAR_HIGH5 = IntRange(59, 78) // B3 - F#5
+val GUITAR_HIGHEST5 = IntRange(65, C6) // F4 - C6
+
 // USED FOR SPOOKY
 val PARTS_BOWED_GLASS by lazy{ createKeyboardInstrumentParts(BOWED_GLASS) }
 val PARTS_WARM_PAD by lazy{ createKeyboardInstrumentParts(WARM_PAD) }
@@ -209,14 +215,27 @@ enum class RANGES(val octaves: IntArray) {
     BAG_PIPES(intArrayOf(0, 2,2,3,3,4,4,5)),RECORDERS(intArrayOf(0, 3,3,4,4,5,5,6)),
     SYN_SAW(intArrayOf(0, 3,3,4,4,4,5,5))
 }
+fun IntRange.getOctave(): Int {
+    return (((this.last + this.first) / 2) / 12) - 1
+}
 fun createKeyboardInstrumentParts(instrument: Int, rangeAll: IntRange = IntRange(A0, C8)): List<EnsemblePart>{
     val lowerPitch = if(rangeAll.first > A0) rangeAll.first else A0
-    return listOf(
-        EnsemblePart(instrument, 0, rangeAll), //useless
-        EnsemblePart(instrument, 1, rangeAll, IntRange(lowerPitch, if(lowerPitch + 19 > rangeAll.last) lowerPitch + 11 else lowerPitch +19)), // A0 - E2
-        *(2..6).map{ val start = (it+1)*12; EnsemblePart(instrument, it, rangeAll, IntRange(start, if(start+19 > rangeAll.last) start+11 else start + 19))}.toTypedArray(),
-        EnsemblePart(instrument, 8, rangeAll, IntRange(89, C8)) // F6 - C8
+    val ranges = listOf(
+        rangeAll,
+        IntRange(lowerPitch, if(lowerPitch + 19 > rangeAll.last) lowerPitch + 11 else lowerPitch +19),
+        *(2..6).map{
+            val start = (it+1)*12
+            val partStart = if(start<rangeAll.first) rangeAll.first else start
+        IntRange(partStart, if(partStart+19 > rangeAll.last) partStart+11 else partStart + 19)
+        }.toTypedArray(),
+        IntRange(rangeAll.last-19, rangeAll.last) // F6 - C8 if PIANO
     )
+    return listOf(
+        EnsemblePart(instrument, 0, ranges[0]), //useless
+        *(1..7).map{
+            EnsemblePart(instrument, ranges[it].getOctave(), rangeAll, ranges[it])
+        }.toTypedArray()
+    ).also{ println("keyboardParts: $it")}
 }
 fun IntRange.octaveTranspose(octaveTranspose: Int, familyRange: IntRange): IntRange {
 
@@ -248,11 +267,7 @@ fun main(){
     PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(1, FAMILY_RANGE_CLARINETS)
     PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(2, FAMILY_RANGE_CLARINETS)
 }
-val GUITAR_ALL = IntRange(40, C6) // E2 - C6
-val GUITAR_LOW5 = IntRange(40, 59) // E2 - B3
-val GUITAR_MIDDLE5 = IntRange(50, 69) // D3 - A4
-val GUITAR_HIGH5 = IntRange(59, 78) // B3 - F#5
-val GUITAR_HIGHEST5 = IntRange(65, C6) // F4 - C6
+
 
 val FAMILY_RANGE_FLUTES = IntRange(C3, C8)
 

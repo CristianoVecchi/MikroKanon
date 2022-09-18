@@ -521,7 +521,7 @@ fun ResultDisplay(model: AppViewModel,
             Column(
                 modifier = Modifier
                     .background(colors.buttonsDisplayBackgroundColor)
-                    .padding(start = 10.dp, top = 8.dp, end = 15.dp, bottom = 15.dp),
+                    .padding(start = 4.dp, top = 8.dp, end = 4.dp, bottom = 15.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

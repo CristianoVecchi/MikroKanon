@@ -44,8 +44,9 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
             val backgroundColor = appColors.dialogBackgroundColor
             val width = if(dimensions.width <=884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
-            val height = if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
-            else dimensions.dialogHeight
+            val height = dimensions.height.dp
+//                if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
+//            else dimensions.dialogHeight
             Surface(
                 modifier = Modifier.width(width).height(height),
                 color = backgroundColor,
@@ -87,7 +88,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                     val dynamicMap: Map<Float,String> =  model.dynamicMap
 
                     Column(modifier = modifierA) {
-                        Text(text = multiFloatDialogData.value.title, color = fontColor)
+                        Text(text = multiFloatDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
                         Spacer(modifier = Modifier.height(10.dp))
 
                         val colors = model.appColors

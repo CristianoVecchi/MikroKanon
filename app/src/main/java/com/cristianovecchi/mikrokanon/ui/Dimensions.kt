@@ -44,7 +44,7 @@ data class Dimensions( // 1600px width and over
     val outputWeights: Pair<Float, Float> = Pair(16f, 7f),
 
     val optionsFontSize: Int = (width/25).pxToSp,
-    val dialogWidth: Dp = ((width/3*2)/dpDensity).toInt().dp,
+    val dialogWidth: Dp = ((width/4*3)/dpDensity).toInt().dp,
     val dialogHeight: Dp = ((height/6*5)/dpDensity).toInt().dp,
     val dialogFontSize: Int = (width/25).pxToSp,
     val dialogButtonSize: Int = (width/9).pxToDp, //60.dp in Maxi
@@ -76,6 +76,8 @@ data class Dimensions( // 1600px width and over
             println("Dimensions provided: MAXI")
             val selectorButtonSizePx = width/8
             return Dimensions(width, height, dpDensity,
+                dialogFontSize = (width/23).pxToSp,
+                dialogButtonSize = (width/8).pxToDp,
                 selectorButtonSize = (selectorButtonSizePx / dpDensity).toInt().dp,//50.dp,
                 selectorMKbuttonFontSize =(selectorButtonSizePx /4).pxToSp,
                 selectorFPbuttonFontSize= (selectorButtonSizePx /3).pxToSp,
@@ -84,7 +86,7 @@ data class Dimensions( // 1600px width and over
         }
         fun medium(width: Int, height: Int, dpDensity: Float) : Dimensions {
             println("Dimensions provided: MEDIUM")
-            val selectorButtonSizePx = width/7
+            val selectorButtonSizePx = width / 7
             return Dimensions(
                 width = width,
                 height = height,
@@ -130,7 +132,7 @@ data class Dimensions( // 1600px width and over
                 outputNoteTableCellWidth = (width/7).pxToDp,
                 outputButtonSize = (outputButtonSizePx/ dpDensity).toInt().dp,
                 outputFPbuttonFontSize = (outputButtonSizePx /3).pxToSp,
-                outputIntervalSetFontSize= (outputButtonSizePx /4).pxToSp,
+                outputIntervalSetFontSize= (outputButtonSizePx /5).pxToSp,
                 outputWeights= if(height >= 2400) Pair(16f,5f) else Pair(15f, 7f),
 
 
@@ -235,7 +237,7 @@ data class Dimensions( // 1600px width and over
                 outputFPbuttonFontSize = (outputButtonSizePx /3).pxToSp,
                 outputIntervalSetFontSize= (outputButtonSizePx /5).pxToSp,
                 outputWeights= Pair(16f,6f)
-            )
+            )//.also{ println("Dialog width: ${it.dialogWidth}")}
         }
         fun default(): Dimensions {
             return Dimensions.default
