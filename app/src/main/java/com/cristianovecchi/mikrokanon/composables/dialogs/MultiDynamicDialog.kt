@@ -88,7 +88,7 @@ fun MultiDynamicDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                     val dynamicMap: Map<Float,String> =  model.dynamicMap
 
                     Column(modifier = modifierA) {
-                        Text(text = multiFloatDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
+                        Text(text = multiFloatDialogData.value.title, fontWeight = FontWeight.Bold, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
                         Spacer(modifier = Modifier.height(10.dp))
 
                         val colors = model.appColors

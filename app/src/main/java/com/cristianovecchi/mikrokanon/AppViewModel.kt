@@ -1,30 +1,34 @@
 package com.cristianovecchi.mikrokanon
 
+import android.Manifest
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Point
-import androidx.lifecycle.*
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import android.media.MediaPlayer
 import android.os.Build
-import com.cristianovecchi.mikrokanon.AIMUSIC.*
-import androidx.core.content.FileProvider
-import java.io.File
-import androidx.lifecycle.Lifecycle
-
-import androidx.lifecycle.OnLifecycleEvent
 import android.view.WindowManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
+import androidx.lifecycle.*
+import com.cristianovecchi.mikrokanon.AIMUSIC.ARPEGGIO
+import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
+import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
+import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.db.*
+import com.cristianovecchi.mikrokanon.io.writeMidi
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.midi.launchPlayer
 import com.cristianovecchi.mikrokanon.ui.*
 import kotlinx.coroutines.*
+import java.io.File
+import java.util.*
 import kotlin.math.absoluteValue
+
 
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
                          val undo: Boolean = false, val expand: Boolean = true,
@@ -157,9 +161,6 @@ class AppViewModel(
         userOptionsData = userRepository.userOptions.asLiveData()
     }
 
-    fun getContext(): Context {
-        return getApplication<MikroKanonApplication>().applicationContext
-    }
     private fun getDeviceResolution(): Point {
         val windowManager: WindowManager = getApplication<MikroKanonApplication>()
             .applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -649,48 +650,19 @@ class AppViewModel(
         }
     }
     //-------------end macro functions--------------------
-
-    fun shareMidi(file: File){
-        try {
-            if(file.exists()) {
-                val uri = FileProvider.getUriForFile(getApplication<MikroKanonApplication>().applicationContext,
-                    BuildConfig.APPLICATION_ID + ".fileprovider",
-                    file)
-                val intent = Intent(Intent.ACTION_SEND)
-                //println(Intent.FLAG_ACTIVITY_NEW_TASK)
-                //var flags = Intent.FLAG_GRANT_READ_URI_PERMISSION //or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                //val flags = Intent.FLAG_ACTIVITY_NEW_TASK + 1
-                //println("FLAGS: ${flags.toByte()}")
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                intent.setType("audio/midi")
-                intent.putExtra(Intent.EXTRA_STREAM, uri)
-                val chooserIntent = Intent.createChooser(intent,"Share MIDI to...")
-                chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                //println("FLAGS: ${intent.flags}")
-                try{
-                    getApplication<MikroKanonApplication>()
-                        .applicationContext
-                        //.startActivity(intent)
-                        .startActivity(chooserIntent)
-                } catch (ex: Exception){
-                    println("Exception in Share Midi: ${ex.message}")
-                    getApplication<MikroKanonApplication>()
-                        .applicationContext
-                        .startActivity(intent)
-                }
-            }
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
-//        val shareIntent: Intent = Intent().apply {
-//            action = Intent.ACTION_SEND
-//            putExtra(Intent.EXTRA_STREAM, file.toURI() as Parcelable)
-//            type = "audio/midi"
-//        }
-//        getApplication<MikroKanonApplication>().applicationContext
-//
+    fun getContext(): Context {
+        return getApplication<MikroKanonApplication>().applicationContext
     }
+    var activity: Activity? = null
+    fun exportMidi(file: File){
+        activity?.let{
+            var timestamp = userOptionsData.value!![0].lastPlayData.split("|").last().toLong()
+            timestamp = if(timestamp < 0L) System.currentTimeMillis() else timestamp
+            writeMidi(file, activity!!, timestamp, getUserLangDef())
+            //writeMidi(file, activity!!, getContext())
+        }
+    }
+
     var scrollToTopList = true
     fun refreshComputation(stepBack: Boolean){
             if (!elaborating.value!! && computationStack.isNotEmpty()) {

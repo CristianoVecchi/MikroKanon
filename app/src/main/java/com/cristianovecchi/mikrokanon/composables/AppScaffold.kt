@@ -897,7 +897,7 @@ fun SettingsDrawer(model: AppViewModel, dimensionsFlow: Flow<Dimensions>,
                                     colors = colors,
                                     isSelected = isOn,
                                     onClick = {
-                                        model.shareMidi(model.midiPath)
+                                        model.exportMidi(model.midiPath)
                                     })
                             }
                         }

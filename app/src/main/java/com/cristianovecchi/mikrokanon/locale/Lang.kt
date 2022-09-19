@@ -298,6 +298,12 @@ val convertToLocaleDate = { timestamps:List<String>, langDef:String ->
         }
     }
 }
+val convertToFileDate = { timestamp:Long, langDef:String ->
+    val locale = Locale(langDef)
+    val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, 3, locale) // timeFormat: 0,1,3
+    val netDate = Date(timestamp)
+    dateFormat.format(netDate).replace("[^A-Za-z0-9_]".toRegex(), "_")// like  /[^A-Za-z0-9_]/
+}
 
 data class Lang( // English by default
     val noteNames: List<String> = NoteNamesEn.values().map { it.toString() },

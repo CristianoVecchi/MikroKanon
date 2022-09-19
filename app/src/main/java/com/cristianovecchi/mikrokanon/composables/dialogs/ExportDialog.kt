@@ -28,7 +28,7 @@ fun ExportDialog(exportDialogData: MutableState<ExportDialogData>, okText: Strin
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = exportDialogData.value.title)
+                    Text(text = exportDialogData.value.title, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(10.dp))
 
                     // var error by remember { mutableStateOf(exportDialogData.value.error) }

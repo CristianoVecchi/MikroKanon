@@ -30,7 +30,7 @@ fun BpmDialog(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = numberDialogData.value.title)
+                    Text(text = numberDialogData.value.title, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(10.dp))
 
                     var bpm by remember { mutableStateOf(numberDialogData.value.value) }

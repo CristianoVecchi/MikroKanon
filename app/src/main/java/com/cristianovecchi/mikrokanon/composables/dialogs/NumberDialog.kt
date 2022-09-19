@@ -9,6 +9,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -32,7 +33,7 @@ fun NumberDialog(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = numberDialogData.value.title)
+                    Text(text = numberDialogData.value.title, fontWeight = FontWeight.Bold )
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val textState =

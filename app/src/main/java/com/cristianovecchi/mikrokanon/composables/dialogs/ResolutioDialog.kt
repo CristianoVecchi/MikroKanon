@@ -90,7 +90,7 @@ fun ResolutioDialog(
                     val buttonPadding = 4.dp
                     val itemList = (0..11).map{ Clip.convertAbsToClipText(it, model.language.value!!.noteNames)}.reversed()
                     val listState = rememberLazyListState()
-                    Text(text = multiNumberDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize))
+                    Text(text = multiNumberDialogData.value.title, fontWeight = FontWeight.Bold, color = fontColor, style = TextStyle(fontSize = fontSize))
                     Spacer(modifier = Modifier.height(20.dp))
                     LazyColumn( state = listState,
                         modifier = modifierA

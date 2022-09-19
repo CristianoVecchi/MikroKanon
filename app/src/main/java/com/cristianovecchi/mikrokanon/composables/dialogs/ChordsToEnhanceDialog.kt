@@ -82,7 +82,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize))
+                        Text(text = multiNumberDialogData.value.title, fontWeight = FontWeight.Bold, color = fontColor, style = TextStyle(fontSize = fontSize))
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors

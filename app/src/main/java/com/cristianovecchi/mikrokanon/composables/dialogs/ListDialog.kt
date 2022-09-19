@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,7 +54,7 @@ fun SingleSelectListDialog(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = listDialogData.value.dialogTitle, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
+                    Text(text = listDialogData.value.dialogTitle, fontWeight = FontWeight.Bold, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
                     Spacer(modifier = Modifier.height(5.dp))
                     val listState = rememberLazyListState()
                     val weights = dimensions.listDialogWeights

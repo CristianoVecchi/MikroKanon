@@ -79,7 +79,7 @@ fun CadenzaDialog(
                     val fontWeight = FontWeight.Normal
                     val numberFontWeight = FontWeight.Bold
                     val buttonPadding = 4.dp
-                    Text(text = multiNumberDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize))
+                    Text(text = multiNumberDialogData.value.title, fontWeight = FontWeight.Bold, color = fontColor, style = TextStyle(fontSize = fontSize))
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Row(modifier = modifierA.fillMaxWidth(),

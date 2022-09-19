@@ -12,6 +12,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -47,7 +48,7 @@ fun SelectCounterpointDialog(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Column(modifier = Modifier.padding(10.dp)) {
-                    Text(text = buttonsDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
+                    Text(text = buttonsDialogData.value.title, fontWeight = FontWeight.Bold, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
                     Spacer(modifier = Modifier.height(10.dp))
                     val listState = rememberLazyListState()
                     LazyColumn(

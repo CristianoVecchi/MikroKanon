@@ -82,7 +82,7 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
-                        Text(text = multiNumberDialogData.value.title, color = fontColor, style = TextStyle(fontSize = fontSize))
+                        Text(text = multiNumberDialogData.value.title, color = fontColor, fontWeight = FontWeight.Bold, style = TextStyle(fontSize = fontSize))
                         Spacer(modifier = Modifier.height(20.dp))
 
                         val colors = model.appColors
