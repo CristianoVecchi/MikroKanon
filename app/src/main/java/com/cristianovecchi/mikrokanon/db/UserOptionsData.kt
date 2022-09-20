@@ -126,7 +126,7 @@ import androidx.room.PrimaryKey
                     "0","0",0b0011110, 0b1111111,
                     0,0,0,1,
                      //"System|0" ,
-                     "579|0" , // priority on custom color 579
+                     "515|0" , // priority on custom color 515
                     0,"System", 0, "1" ,
                     ";;;;;;","","0|1",0,
                     "0","0|-1", 0)

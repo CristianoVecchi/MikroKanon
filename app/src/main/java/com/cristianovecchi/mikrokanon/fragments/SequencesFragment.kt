@@ -79,7 +79,9 @@ var start = true
                         // A surface container using the 'background' color from the theme
                         Surface(color = MaterialTheme.colors.background) {
 
-                            AppScaffold(model = model, model.dimensions.asFlow(), model.userOptionsData.asFlow(), model.allCounterpointsData.asFlow()) {
+                            AppScaffold(model = model, model.dimensions.asFlow(),
+                                model.userOptionsData.asFlow(),
+                                model.allCounterpointsData.asFlow()) {
                                 SequenceSelector(
                                     model = model,
                                     model.dimensions.asFlow(),
