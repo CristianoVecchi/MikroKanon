@@ -53,7 +53,7 @@ fun AppViewModel.findCounterpointsByMikroKanons3(){
 }
 fun AppViewModel.findCounterpointsByMikroKanons4(){
     viewModelScope.launch(Dispatchers.Main){
-        val deepSearch = userOptionsData.value!![0].deepSearch != 0
+        val deepSearch = userOptionsData.value!![0].deepSearch.toInt() != 0
         if(sequenceToMikroKanons.value!!.isNotEmpty()) {
             val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
                 .take( if(deepSearch) AppViewModel.MAX_NOTES_MK_4DEEP else AppViewModel.MAX_NOTES_MK_4)

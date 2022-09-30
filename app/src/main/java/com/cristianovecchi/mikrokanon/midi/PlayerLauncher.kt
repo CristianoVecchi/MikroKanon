@@ -56,7 +56,7 @@ suspend fun launchPlayer(
             0 != (userOptionsData?.let { userOptionsData.rhythmShuffle.toInt() }
                 ?: 0)
         val partsShuffle: Boolean =
-            0 != (userOptionsData?.let { userOptionsData.partsShuffle }
+            0 != (userOptionsData?.let { userOptionsData.partsShuffle.toInt() }
                 ?: 0)
         val rowForms: List<Pair<Int, Int>> =
             userOptionsData?.let {
@@ -82,7 +82,7 @@ suspend fun launchPlayer(
                 if (simplify) {
                     0
                 } else {
-                    userOptionsData.ritornello
+                    userOptionsData.ritornello.toInt()
                 }
             } ?: 0
         val transpose: List<Pair<Int,Int>> =
@@ -133,7 +133,7 @@ suspend fun launchPlayer(
                 ChordToEnhanceData(convertFlagsToInts(it.first), it.second)}
         } ?: listOf()
     val enhanceChordsInTranspositions: Boolean =
-        0 != (userOptionsData?.let { userOptionsData.enhanceChordsInTranspositions }
+        0 != (userOptionsData?.let { userOptionsData.enhanceChordsInTranspositions.toInt() }
             ?: 0)
         //selectedCounterpoint.value!!.display()
         Player.playCounterpoint(

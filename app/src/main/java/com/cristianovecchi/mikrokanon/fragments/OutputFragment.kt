@@ -58,7 +58,7 @@ class OutputFragment: Fragment() {
                     model.counterpointView = it[0].counterpointView
                     model.refreshZodiacFlags()
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())
-                    model.spread = it[0].spread
+                    model.spread = it[0].spread.toInt()
                 }
             }
         }

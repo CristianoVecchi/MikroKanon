@@ -41,7 +41,7 @@ class InputFragment: Fragment() {
                 if(it!!.isNotEmpty()) {
                     model.refreshZodiacFlags()
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())
-                    model.spread = it[0].spread
+                    model.spread = it[0].spread.toInt()
                 }
             }
         }

@@ -1,31 +1,19 @@
 package com.cristianovecchi.mikrokanon.composables
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import kotlinx.coroutines.launch
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
@@ -37,8 +25,12 @@ import com.cristianovecchi.mikrokanon.locale.*
 import com.cristianovecchi.mikrokanon.midi.HarmonizationData
 import com.cristianovecchi.mikrokanon.midi.HarmonizationType
 import com.cristianovecchi.mikrokanon.midi.chordsInstruments
-import com.cristianovecchi.mikrokanon.ui.*
+import com.cristianovecchi.mikrokanon.ui.AppColorThemes
+import com.cristianovecchi.mikrokanon.ui.AppColors
+import com.cristianovecchi.mikrokanon.ui.Dimensions
+import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @Composable
@@ -358,7 +350,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                 })
                         }
                         "Parts Shuffle" -> {
-                            var isOn = userOptions.partsShuffle != 0
+                            var isOn = userOptions.partsShuffle.toInt() != 0
                             SelectableCard(
                                 text = lang.partsShuffle,
                                 fontSize = fontSize,
@@ -368,7 +360,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                     isOn = !isOn
                                     model.updateUserOptions(
                                         "partsShuffle",
-                                        if (isOn) 1 else 0
+                                        if (isOn) 1.toString() else 0.toString()
                                     )
                                 })
                         }
@@ -619,7 +611,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                             }
                             "Ritornello" -> {
                                 val timeIndices: List<String> = (1..128).map { it.toString() }
-                                val nTimes = userOptions.ritornello
+                                val nTimes = userOptions.ritornello.toInt()
                                 val isOn = nTimes != 0
                                 val text = if (nTimes == 0) lang.ritornello else "${lang.ritornello} x ${nTimes+1}"
                                 SelectableCard(
@@ -633,7 +625,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                         ) { index ->
                                             model.updateUserOptions(
                                                 "ritornello",
-                                                index
+                                                index.toString()
                                             )
                                             ritornelloDialogData.value =
                                                 ListDialogData(itemList = ritornelloDialogData.value.itemList)
@@ -708,7 +700,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                     })
                             }
                             "Enhance in Transpositions" -> {
-                                var isOn = userOptions.enhanceChordsInTranspositions != 0
+                                var isOn = userOptions.enhanceChordsInTranspositions.toInt() != 0
                                 SelectableCard(
                                     text = lang.enhanceChordsInTranspositions,
                                     fontSize = fontSize,
@@ -718,7 +710,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                         isOn = !isOn
                                         model.updateUserOptions(
                                             "enhanceChordsInTranspositions",
-                                            if (isOn) 1 else 0
+                                            if (isOn) 1.toString() else 0.toString()
                                         )
                                     })
                             }
@@ -821,7 +813,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                         val fontSize = dimensions.optionsFontSize
                         when (optionName) {
                             "Spread where possible" -> {
-                                var isOn = userOptions.spread != 0
+                                var isOn = userOptions.spread.toInt() != 0
                                 SelectableCard(
                                     text = lang.spreadWherePossible,
                                     colors = colors,
@@ -833,13 +825,13 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                         model.spread = newSpread
                                         model.updateUserOptions(
                                             "spread",
-                                            newSpread
+                                            newSpread.toString()
                                         )
                                         model.refreshComputation(false)
                                     })
                             }
                             "Deep Search in 4 part MK" -> {
-                                var isOn = userOptions.deepSearch != 0
+                                var isOn = userOptions.deepSearch.toInt() != 0
                                 SelectableCard(
                                     text = lang.deepSearch,
                                     fontSize = fontSize,
@@ -849,7 +841,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                         isOn = !isOn
                                         model.updateUserOptions(
                                             "deepSearch",
-                                            if (isOn) 1 else 0
+                                            if (isOn) "1" else "0"
                                         )
                                     })
                             }

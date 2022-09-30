@@ -45,7 +45,7 @@ var start = true
                     model.privacyIsAccepted = it[0].privacy != 0
                     model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                     model.refreshZodiacFlags()
-                    model.spread = it[0].spread
+                    model.spread = it[0].spread.toInt()
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())
                     if(start){
                         val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags

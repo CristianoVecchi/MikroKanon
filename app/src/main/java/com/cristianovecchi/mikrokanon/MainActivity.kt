@@ -1,10 +1,7 @@
 package com.cristianovecchi.mikrokanon
 
-import android.R.attr.bitmap
-import android.R.attr.data
 import android.app.Application
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -15,13 +12,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.cristianovecchi.mikrokanon.db.CounterpointDataRepository
 import com.cristianovecchi.mikrokanon.db.SequenceDataRepository
 import com.cristianovecchi.mikrokanon.db.UserOptionsDataRepository
-import com.cristianovecchi.mikrokanon.io.REQUEST_CODE_MIDI
+import com.cristianovecchi.mikrokanon.locale.convertToFileDate
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
 
 class MainActivity : AppCompatActivity() {
+    private val REQUEST_CODE_MIDI = 42
 
     val model: AppViewModel by viewModels {
        AppViewModelFactory(
@@ -38,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
-    var midiFile: File? = null
+
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -69,6 +67,17 @@ class MainActivity : AppCompatActivity() {
                 outputStream.close()
             }
         }
+    }
+
+    private var midiFile: File? = null
+    fun writeMidi(file: File, timestamp: Long, langDef: String){
+        this.midiFile = file
+        val fileName = file.name.substringBefore('.') + "_" + convertToFileDate(timestamp, langDef) + ".mid"
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "audio/midi"
+        intent.putExtra(Intent.EXTRA_TITLE, fileName)
+        startActivityForResult(intent, REQUEST_CODE_MIDI)
     }
 }
 

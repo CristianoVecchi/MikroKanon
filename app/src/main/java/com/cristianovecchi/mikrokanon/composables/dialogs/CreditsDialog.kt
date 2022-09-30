@@ -40,7 +40,7 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
             fontSize = dimensions.dialogFontSize.sp,
             color = Color.Blue)
         val uriHandler = LocalUriHandler.current
-        val youtubeChannelUri = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
+        //val youtubeChannelUri = "https://www.youtube.com/channel/UCe9Kd87V90fbPsUBU5gaXKw/playlists?view=1&sort=dd&shelf_id=0"
         val youtubeMikroKanonPiecesUri = "https://www.youtube.com/watch?v=TzZNZy1s1UQ&list=PLO0dKPP71phrCDKvSq1XZPtfSccANQBiC"
         val youtubeMikroKanonScoresUri = "https://www.youtube.com/watch?v=zaa3d3FVqA4&list=PLO0dKPP71phouGDmrOQA_yXEp0Z1L1PLV&index=2"
         val instagramUri = "https://www.instagram.com/cristiano.vecchi"
@@ -79,13 +79,13 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                                     append("Cristiano Vecchi")
                                 }
                             })
-                            ClickableText(text = buildAnnotatedString {
-                                withStyle(uriStyle){
-                                    append("Youtube Channel")
-                                }
-                            },onClick = {
-                                uriHandler.openUri(youtubeChannelUri)
-                            })
+//                            ClickableText(text = buildAnnotatedString {
+//                                withStyle(uriStyle){
+//                                    append("Youtube Channel")
+//                                }
+//                            },onClick = {
+//                                uriHandler.openUri(youtubeChannelUri)
+//                            })
                             ClickableText(text = buildAnnotatedString {
                                 withStyle(uriStyle){
                                     append("Youtube MK pieces")
@@ -116,7 +116,7 @@ fun CreditsDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: D
                             })
                             ClickableText(text = buildAnnotatedString {
                                 withStyle(uriStyle){
-                                    append("GitHub")
+                                    append("GitHub (Help)")
                                 }
                             },onClick = {
                                 uriHandler.openUri(githubUri)

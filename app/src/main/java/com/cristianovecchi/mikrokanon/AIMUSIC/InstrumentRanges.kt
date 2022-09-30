@@ -235,18 +235,18 @@ fun createKeyboardInstrumentParts(instrument: Int, rangeAll: IntRange = IntRange
         *(1..7).map{
             EnsemblePart(instrument, ranges[it].getOctave(), rangeAll, ranges[it])
         }.toTypedArray()
-    ).also{ println("keyboardParts: $it")}
+    )//.also{ println("keyboardParts: $it")}
 }
 fun IntRange.octaveTranspose(octaveTranspose: Int, familyRange: IntRange): IntRange {
 
     return when{
         octaveTranspose == 0 -> this
-        octaveTranspose > 0 -> (octaveTranspose downTo 0).first{
-            this.last + it * 12 <= familyRange.last}.let{ IntRange(this.first + it * 12, this.last + it * 12)}
-            //?: IntRange(10,1000)
-        octaveTranspose < 0 -> (octaveTranspose..0).first{
-            this.first + it * 12 >= familyRange.first}.let{ IntRange(this.first + it * 12, this.last + it * 12)}
-            //?: IntRange(10,1000)
+        octaveTranspose > 0 -> (octaveTranspose downTo 0).firstOrNull{
+            this.last + it * 12 <= familyRange.last}?.let{ IntRange(this.first + it * 12, this.last + it * 12)}
+            ?: IntRange(familyRange.last - 12, familyRange.last)
+        octaveTranspose < 0 -> (octaveTranspose..0).firstOrNull{
+            this.first + it * 12 >= familyRange.first}?.let{ IntRange(this.first + it * 12, this.last + it * 12)}
+            ?: IntRange(familyRange.last - 12, familyRange.last)
         else -> this
     }
 //        .apply {
@@ -255,18 +255,24 @@ fun IntRange.octaveTranspose(octaveTranspose: Int, familyRange: IntRange): IntRa
 //            println("Return from octaveTranspose:$this") }
 //        }
 }
-fun main(){
-    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(0, FAMILY_RANGE_CLARINETS)
-    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(-1, FAMILY_RANGE_CLARINETS)
-    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(-2, FAMILY_RANGE_CLARINETS)
-    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(1, FAMILY_RANGE_CLARINETS)
-    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(2, FAMILY_RANGE_CLARINETS)
-    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(0, FAMILY_RANGE_CLARINETS)
-    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(-1, FAMILY_RANGE_CLARINETS)
-    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(-2, FAMILY_RANGE_CLARINETS)
-    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(1, FAMILY_RANGE_CLARINETS)
-    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(2, FAMILY_RANGE_CLARINETS)
-}
+//fun main(){
+////    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(0, FAMILY_RANGE_CLARINETS)
+////    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(-1, FAMILY_RANGE_CLARINETS)
+////    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(-2, FAMILY_RANGE_CLARINETS)
+////    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(1, FAMILY_RANGE_CLARINETS)
+////    PART_BASS_CLARINET_LOW.allRange.octaveTranspose(2, FAMILY_RANGE_CLARINETS)
+////    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(0, FAMILY_RANGE_CLARINETS)
+////    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(-1, FAMILY_RANGE_CLARINETS)
+////    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(-2, FAMILY_RANGE_CLARINETS)
+////    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(1, FAMILY_RANGE_CLARINETS)
+////    PART_BASS_CLARINET_LOW.colorRange.octaveTranspose(2, FAMILY_RANGE_CLARINETS)
+////    Ensembles.getKeyboardInstrument(CHOIR_AAHS, 12, RANGES.OCTAVES_2334455, IntRange(C2, C6)).also{
+////        it.forEach{ part->
+////            println("$part -> ${part.colorRange.octaveTranspose(-2, part.familyRange)}")
+////        }
+////    }
+//    IntRange(69, 85).octaveTranspose(2, IntRange(36,84)).also{println(it)}
+//}
 
 
 val FAMILY_RANGE_FLUTES = IntRange(C3, C8)

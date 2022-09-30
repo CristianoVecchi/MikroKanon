@@ -1,25 +1,18 @@
 package com.cristianovecchi.mikrokanon
 
-import android.Manifest
-import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Point
 import android.media.MediaPlayer
 import android.os.Build
 import android.view.WindowManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.FileProvider
 import androidx.lifecycle.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.ARPEGGIO
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 import com.cristianovecchi.mikrokanon.db.*
-import com.cristianovecchi.mikrokanon.io.writeMidi
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.midi.launchPlayer
@@ -28,7 +21,6 @@ import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
-
 
 data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean = false,
                          val undo: Boolean = false, val expand: Boolean = true,
@@ -653,12 +645,14 @@ class AppViewModel(
     fun getContext(): Context {
         return getApplication<MikroKanonApplication>().applicationContext
     }
-    var activity: Activity? = null
+
+    var activity: MainActivity? = null
+
     fun exportMidi(file: File){
         activity?.let{
             var timestamp = userOptionsData.value!![0].lastPlayData.split("|").last().toLong()
             timestamp = if(timestamp < 0L) System.currentTimeMillis() else timestamp
-            writeMidi(file, activity!!, timestamp, getUserLangDef())
+            activity!!.writeMidi(file, timestamp, getUserLangDef())
             //writeMidi(file, activity!!, getContext())
         }
     }

@@ -641,10 +641,10 @@ fun addVibratoToTrack(mt: MidiTrack, start: Long, duration: Long, channel: Int, 
     }
 }
 //fun octaveTest(mt: MidiTrack): MidiTrack {
-//    val pitches = listOf(60, 24, 36, 48, 60, 72, 84, 96, 108)
+//    val pitches = listOf(60,72,83, 84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,96,84,72,60,48,36,24)
 //    var tick = 0L
 //    pitches.forEach {
-//        val pc: MidiEvent = ProgramChange(tick, 0, STRING_ORCHESTRA) // cambia strumento
+//        val pc: MidiEvent = ProgramChange(tick, 0, RECORDER) // cambia strumento
 //        mt.insertEvent(pc)
 //        val on = NoteOn(tick, 0, it, 100)
 //        val off = NoteOff(tick + 480 - 1, 0, it, 80)

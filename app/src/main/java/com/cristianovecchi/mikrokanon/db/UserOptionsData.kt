@@ -11,6 +11,12 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "id")
         val id: Long,
 
+        @ColumnInfo(name = "project_title")
+        val projectTitle: String,
+
+        @ColumnInfo(name = "last_change")
+        val lastChange: Long,
+
         @ColumnInfo(name = "ensembles_list")
         val ensemblesList: String,
 
@@ -45,7 +51,7 @@ import androidx.room.PrimaryKey
         val rhythmShuffle: String,
 
         @ColumnInfo(name = "parts_shuffle")
-        val partsShuffle: Int,
+        val partsShuffle: String,
 
         @ColumnInfo(name = "rowForms")
         val rowForms: String,
@@ -53,7 +59,7 @@ import androidx.room.PrimaryKey
 //        val rowFormsFlags: Int,
 
         @ColumnInfo(name = "ritornello")
-        val ritornello: Int,
+        val ritornello: String,
 
         @ColumnInfo(name = "transpose")
         val transpose: String,
@@ -64,6 +70,9 @@ import androidx.room.PrimaryKey
         @ColumnInfo(name = "(audio8D_flags")
         val audio8DFlags: String,
 
+        @ColumnInfo(name = "(various_flags")
+        val variousFlags: String,
+
         @ColumnInfo(name = "intSetVert_flags")
         val intSetVertFlags: Int,
 
@@ -71,10 +80,10 @@ import androidx.room.PrimaryKey
         val intSetHorFlags: Int,
 
         @ColumnInfo(name = "spread")
-        val spread: Int,
+        val spread: String,
 
         @ColumnInfo(name = "deep_search")
-        val deepSearch: Int,
+        val deepSearch: String,
 
         @ColumnInfo(name = "detector_flags")
         val detectorFlags: Int,
@@ -107,7 +116,7 @@ import androidx.room.PrimaryKey
         val chordsToEnhance: String,
 
         @ColumnInfo(name = "enhance_chords_in_transpositions")
-        val enhanceChordsInTranspositions: Int,
+        val enhanceChordsInTranspositions: String,
 
         @ColumnInfo(name = "drums")
         val drums: String,
@@ -120,15 +129,17 @@ import androidx.room.PrimaryKey
     ){
         companion object{
             fun getDefaultUserOptionsData(): UserOptionsData {
-                return UserOptionsData(0,"2", "2|0","4|1","0",
-                    "0","0",
-                    "0.828", "90", "0|1", "0.5", "0",0, "1|1",0, "0|1",
-                    "0","0",0b0011110, 0b1111111,
-                    0,0,0,1,
+                return UserOptionsData(0,"untitled", -1L,
+                    "2", "2|0","4|1","0",
+                    "0","0", "0.828", "90",
+                    "0|1", "0.5", "0","0",
+                    "1|1","0", "0|1",
+                    "0","0", "0",0b0011110, 0b1111111,
+                    "0","0",0,1,
                      //"System|0" ,
                      "515|0" , // priority on custom color 515
                     0,"System", 0, "1" ,
-                    ";;;;;;","","0|1",0,
+                    ";;;;;;","","0|1","0",
                     "0","0|-1", 0)
             }
             fun updateUserOptionsData(
@@ -172,7 +183,7 @@ import androidx.room.PrimaryKey
                         optionsDataClone.copy(id = id, rhythmShuffle = value as String)
                     }
                     "partsShuffle" -> {
-                        optionsDataClone.copy(id = id, partsShuffle = value as Int)
+                        optionsDataClone.copy(id = id, partsShuffle = value as String)
                     }
                     "rowForms" -> {
                         optionsDataClone.copy(id = id, rowForms = value as String)
@@ -183,7 +194,7 @@ import androidx.room.PrimaryKey
 //                newUserOptionsData  = optionsDataClone.copy(rowFormsFlags = flags)
 //            }
                     "ritornello" -> {
-                        optionsDataClone.copy(id = id, ritornello = value as Int)
+                        optionsDataClone.copy(id = id, ritornello = value as String)
                     }
                     "transpose" -> {
                         optionsDataClone.copy(id = id, transpose = value as String)
@@ -194,6 +205,9 @@ import androidx.room.PrimaryKey
                     "audio8DFlags" -> {
                         optionsDataClone.copy(id = id, audio8DFlags = value as String)
                     }
+                    "variousFlags" -> {
+                        optionsDataClone.copy(id = id, variousFlags = value as String)
+                    }
                     "intSetVertFlags" -> {
                         optionsDataClone.copy(id = id, intSetVertFlags = value as Int)
                     }
@@ -201,10 +215,10 @@ import androidx.room.PrimaryKey
                         optionsDataClone.copy(id = id, intSetHorFlags = value as Int)
                     }
                     "spread" -> {
-                        optionsDataClone.copy(id = id, spread = value as Int)
+                        optionsDataClone.copy(id = id, spread = value as String)
                     }
                     "deepSearch" -> {
-                        optionsDataClone.copy(id = id, deepSearch = value as Int)
+                        optionsDataClone.copy(id = id, deepSearch = value as String)
                     }
                     "detectorFlags" -> {
                         optionsDataClone.copy(id = id, detectorFlags = value as Int)
@@ -237,7 +251,7 @@ import androidx.room.PrimaryKey
                         optionsDataClone.copy(id = id, chordsToEnhance = value as String)
                     }
                     "enhanceChordsInTranspositions" -> {
-                        optionsDataClone.copy(id = id, enhanceChordsInTranspositions = value as Int)
+                        optionsDataClone.copy(id = id, enhanceChordsInTranspositions = value as String)
                     }
                     "drums" -> {
                         optionsDataClone.copy(id = id, drums = value as String)
@@ -247,6 +261,12 @@ import androidx.room.PrimaryKey
                     }
                     "privacy" -> {
                         optionsDataClone.copy(id = id, privacy = value as Int)
+                    }
+                    "projectTitle" -> {
+                        optionsDataClone.copy(id = id, projectTitle = value as String)
+                    }
+                    "lastChange" -> {
+                        optionsDataClone.copy(id = id, lastChange = value as Long)
                     }
                     else -> optionsDataClone.copy()
                 }
