@@ -25,7 +25,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.extractFloatsFromCsv
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
 import com.cristianovecchi.mikrokanon.locale.getOctaveSymbols
 import com.cristianovecchi.mikrokanon.locale.rangeTypeMap

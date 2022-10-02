@@ -5,7 +5,6 @@ import android.os.Build
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.combineRangesAndEnsembleParts
 import com.cristianovecchi.mikrokanon.findMelodyWithStructure
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield

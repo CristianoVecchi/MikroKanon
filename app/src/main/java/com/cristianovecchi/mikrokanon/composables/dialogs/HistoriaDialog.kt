@@ -3,7 +3,6 @@ package com.cristianovecchi.mikrokanon.composables.dialogs
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -12,11 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -38,7 +35,7 @@ fun HistoriaDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: 
         val commentStyle = SpanStyle(
             fontSize = (dimensions.dialogFontSize - dimensions.dialogFontSize/20).sp,
             color = Color.DarkGray)
-        val par1 = "Cristiano Vecchi has applied the Quantistic Counterpoint (multiple counterpoint on sets of vertical and horizontal intervals) first time in works like Primo Quartetto - Diurna Venus (1998), Emisfero Opposto (1999), Lettere da Marte (2000), Chi semina vento (2000), Prossima del Centauro (2001), Dromomania (2003) and other works."
+        val par1 = "Cristiano Vecchi has applied the Quantistic Counterpoint (multiple counterpoint on sets of vertical and horizontal intervals) first time in works like Primo Quartetto - Diurna Venus (1998), Emisfero Opposto (1999), and then in Lettere da Marte (2000), Chi semina vento (2000), Prossima del Centauro (2001), Dromomania (2003) and other works."
         val par2 = "The Extended Weighted Harmony algorithm has been conceived and coded by Cristiano Vecchi in 2005 and applied in works like Anelli di Saturno (2006), Introversione - Estroversione (2008)."
         val par3 = "All composition algorithms used in the MikroKanon App have been conceived and coded by Cristiano Vecchi during 1998 - 2022."
 //        val par4 = ""

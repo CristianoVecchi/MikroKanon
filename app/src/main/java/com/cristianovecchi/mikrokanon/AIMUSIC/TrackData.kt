@@ -17,9 +17,9 @@ data class SubstitutionNotes(val index: Int, val newPitches: List<Int> = emptyLi
                              val newIsPreviousRest: List<Boolean> = emptyList(),
                              val newArticulationDurations: List<Int>? = null,
                              val newRibattutos: List<Int>? = null) {
-    fun check(replace: ReplaceType) {
-        if(newPitches.size != newVelocities.size) println("WARNING: SubstitutionNote from ${replace.title } is malformed $this")
-    }
+//    fun check(replace: ReplaceType) {
+//        if(newPitches.size != newVelocities.size) println("WARNING: SubstitutionNote from ${replace.title } is malformed $this")
+//    }
 }
 
 data class NoteData(val pitch: Int, val tick: Int, val duration: Int, val velocity:Int, val glissando: Int,

@@ -28,7 +28,6 @@ import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
-import kotlin.math.sign
 
 @Composable
 fun MultiBpmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,

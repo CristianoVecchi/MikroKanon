@@ -27,7 +27,6 @@ import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.melodyTypeMap
-import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 

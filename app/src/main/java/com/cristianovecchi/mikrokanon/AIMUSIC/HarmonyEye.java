@@ -1,14 +1,9 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC;
 
-import static java.util.Collections.reverse;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import android.util.Log;
-import android.webkit.WebStorage.Origin;
 
 public class HarmonyEye {
     public static final int I7M = 11;

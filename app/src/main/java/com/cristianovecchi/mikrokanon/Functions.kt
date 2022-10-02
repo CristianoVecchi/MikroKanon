@@ -3,19 +3,16 @@ package com.cristianovecchi.mikrokanon
 import android.content.res.Resources
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import androidx.compose.ui.graphics.Color
 import com.cristianovecchi.mikrokanon.AIMUSIC.ChangeData
 import com.cristianovecchi.mikrokanon.AIMUSIC.EnsemblePart
-import com.cristianovecchi.mikrokanon.AIMUSIC.EnsembleType
 import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme
-import com.cristianovecchi.mikrokanon.locale.getRibattutoSymbols
-import com.cristianovecchi.mikrokanon.locale.rowFormsMap
-import kotlinx.coroutines.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
 import kotlin.math.absoluteValue
 
 fun tritoneSubstitution(absPitch: Int): Int {
@@ -153,7 +150,7 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
 
     //TODO: implement in CounterpointInterpreter
     suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
-        map { async() { f(it) } }.awaitAll()
+        map { async { f(it) } }.awaitAll()
     }
 
     @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")

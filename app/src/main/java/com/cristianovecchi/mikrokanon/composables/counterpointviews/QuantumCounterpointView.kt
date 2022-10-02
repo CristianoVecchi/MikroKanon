@@ -2,11 +2,16 @@ package com.cristianovecchi.mikrokanon.composables.counterpointviews
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -18,14 +23,9 @@ import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.unit.dp
 import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
 import com.cristianovecchi.mikrokanon.AppViewModel
-import com.cristianovecchi.mikrokanon.ui.AIColor
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.shift
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlin.math.cos
-import kotlin.math.roundToInt
 import kotlin.math.sin
 
 data class DrawingInfo(val counterpoint: Counterpoint, val totalWidthDp: Int, val totalHeightDp: Int, val dpDensity: Float, val padding: Int, val redNotes: List<List<Boolean>>? = null,

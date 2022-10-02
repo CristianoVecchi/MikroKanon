@@ -967,7 +967,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(velocity, stressedVelocity, velocity),
                         if(isAscendantDescendant) listOf(2,-2,glissando) else listOf(-2,2,glissando),
                         listOf(attack, attack, attack),
-                        listOf(isPreviousRest, false, false,),
+                        listOf(isPreviousRest, false, false),
                         if(articulationDuration == null) null
                         else listOf(*newDurs.dropLast(1).toTypedArray(), newDurs.last() + diff),
                         if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto) )

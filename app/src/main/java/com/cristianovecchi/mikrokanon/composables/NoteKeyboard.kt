@@ -1,34 +1,20 @@
 package com.cristianovecchi.mikrokanon.composables
 
 
-import android.icu.lang.UCharacter
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AppViewModel
-import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getZodiacSigns
 import com.cristianovecchi.mikrokanon.ui.AppColors
-import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.ui.shift
 
 enum class NoteNamesEn(val abs:Int) {

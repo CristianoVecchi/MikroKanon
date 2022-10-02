@@ -3,7 +3,6 @@ package com.cristianovecchi.mikrokanon.midi
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.JazzChord.*
 import com.cristianovecchi.mikrokanon.convertDodecabyteToInts
-import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.ProgramChange

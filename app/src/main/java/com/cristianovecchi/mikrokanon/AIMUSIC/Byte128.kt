@@ -1,7 +1,5 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
-
-
 data class Byte128(var lowByte: Int = 0, var byte2nd: Int = 0, var byte3rd: Int = 0,var byte4th: Int = 0){
     fun bitOn(pos: Int){
         when (pos){

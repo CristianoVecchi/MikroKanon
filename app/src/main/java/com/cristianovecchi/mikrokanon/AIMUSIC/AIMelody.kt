@@ -1,7 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
-import com.cristianovecchi.mikrokanon.divideDistributingRest
 import kotlin.math.absoluteValue
+
 enum class TREND(val directions: List<Int>) {
     ASCENDANT_DYNAMIC(Insieme.TREND_ASCENDANT_DYNAMIC.toList()),
     DESCENDANT_DYNAMIC(Insieme.TREND_DESCENDANT_DYNAMIC.toList()),

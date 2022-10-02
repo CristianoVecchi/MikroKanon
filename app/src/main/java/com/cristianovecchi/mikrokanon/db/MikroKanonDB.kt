@@ -10,7 +10,7 @@ import java.util.concurrent.Executors
 
 @Database(entities = [SequenceData::class, UserOptionsData::class, CounterpointData::class], version = 5, exportSchema = false)
 @TypeConverters(ClipConverters::class)
-public abstract class MikroKanonDB : RoomDatabase() {
+abstract class MikroKanonDB : RoomDatabase() {
 
     abstract fun sequenceDataDao(): SequenceDataDao
     abstract fun userOptionsDataDao(): UserOptionsDataDao

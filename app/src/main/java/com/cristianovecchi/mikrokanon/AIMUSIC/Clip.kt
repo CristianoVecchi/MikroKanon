@@ -6,7 +6,6 @@ import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.db.ClipData
 import com.cristianovecchi.mikrokanon.locale.getZodiacSigns
 import kotlinx.android.parcel.Parcelize
-import kotlin.math.abs
 import kotlin.random.Random
 
 fun ArrayList<Clip>.transpose(transpose: Int): List<Int>{

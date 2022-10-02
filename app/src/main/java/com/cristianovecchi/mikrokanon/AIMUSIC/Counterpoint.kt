@@ -1,8 +1,6 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import android.os.Parcelable
-import com.cristianovecchi.mikrokanon.AIMUSIC.Ensembles.getEnsemble
-import com.cristianovecchi.mikrokanon.AIMUSIC.Ensembles.getEnsembleMix
 import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
@@ -18,9 +16,11 @@ import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.pow
 import kotlin.system.measureTimeMillis
+
 enum class ARPEGGIO {
     ASCENDANT, SINUS, WAVES
 }
+
 @Parcelize
 data class Counterpoint(val parts: List<AbsPart>,
                         val intervalSet: List<Int> = (0..11).toList(),

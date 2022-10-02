@@ -5,22 +5,18 @@ package com.cristianovecchi.mikrokanon.AIMUSIC;
  */
 // Altro approccio: Oggetto Insieme ( set di note ), e tutte le azioni che si possono fare su un set di note
 
-import androidx.compose.ui.text.android.animation.SegmentType;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
+
 public class Insieme {
     int insieme;
     static String[] arrayNote;

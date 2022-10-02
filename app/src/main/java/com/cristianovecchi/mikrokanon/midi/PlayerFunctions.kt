@@ -9,10 +9,8 @@ import com.leff.midi.MidiTrack
 import com.leff.midi.event.*
 import com.leff.midi.event.meta.Tempo
 import com.leff.midi.event.meta.TimeSignature
-import kotlin.coroutines.CoroutineContext
-import kotlin.math.abs
 import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
+
 fun buildTempoTrack(bpms: List<Float>, totalLength: Long): MidiTrack {
     val tempoTrack = MidiTrack()
     val (bpmAlterations, bpmDeltas) = alterateBpmWithDistribution(bpms, 0.5f, totalLength)

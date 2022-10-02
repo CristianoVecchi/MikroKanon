@@ -13,10 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.AIMUSIC.AbsPart
-import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.shift
-import java.time.format.TextStyle
 
 @Composable
 fun SequenceAnalyzer(modifier: Modifier, absPitches: List<Int>, fontSize: Int, colors: AppColors, intervalNames: List<String> ) {

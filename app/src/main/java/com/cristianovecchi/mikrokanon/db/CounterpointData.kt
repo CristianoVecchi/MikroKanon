@@ -4,8 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-
-
 @Entity(tableName = "counterpoints_data")
 data class CounterpointData(
     @PrimaryKey(autoGenerate = true)

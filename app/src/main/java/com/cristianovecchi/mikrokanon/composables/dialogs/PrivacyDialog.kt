@@ -16,14 +16,12 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.ui.Dimensions
-import com.cristianovecchi.mikrokanon.ui.pxToDp
 
 @Composable
 fun PrivacyDialog(creditsDialogData: MutableState<TextDialogData>, dimensions: Dimensions,

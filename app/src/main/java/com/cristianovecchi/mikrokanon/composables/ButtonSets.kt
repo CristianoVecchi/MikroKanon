@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.AIMUSIC.ARPEGGIO
 import com.cristianovecchi.mikrokanon.AppViewModel
-import com.cristianovecchi.mikrokanon.Computation
 import com.cristianovecchi.mikrokanon.ui.*
 
 @Composable

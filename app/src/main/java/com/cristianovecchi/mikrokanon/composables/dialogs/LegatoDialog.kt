@@ -26,8 +26,6 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.*
-import com.cristianovecchi.mikrokanon.midi.HarmonizationData
-import com.cristianovecchi.mikrokanon.midi.HarmonizationType
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue

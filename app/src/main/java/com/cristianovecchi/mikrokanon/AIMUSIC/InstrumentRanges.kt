@@ -1,6 +1,5 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
-import android.util.Range
 import com.cristianovecchi.mikrokanon.rangeTo
 
 const val PIANO = 0

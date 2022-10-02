@@ -2,20 +2,16 @@ package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.ui.Modifier
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
-import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.flow.Flow
-import kotlin.collections.HashMap
 
 @Composable
 fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppViewModel,

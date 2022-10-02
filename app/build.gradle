@@ -12,11 +12,12 @@ android {
     buildToolsVersion '30.0.3'
 
     defaultConfig {
-        applicationId "com.example.mikrokanon"
+        applicationId "com.cristianovecchi.mikrokanon"
         minSdk 22
         targetSdk 30
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

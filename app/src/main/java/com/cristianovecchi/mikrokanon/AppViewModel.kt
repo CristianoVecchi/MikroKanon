@@ -253,7 +253,7 @@ class AppViewModel(
                 if(!simplify) _buildingState.value = Triple(Building.START, listOf(),0)
                 viewModelScope.launch(Dispatchers.Main){
                     var error = "Start"
-                    val mainContext = this.coroutineContext
+                   // val mainContext = this.coroutineContext
                     withContext(Dispatchers.Default) {
                         //val context = this.coroutineContext
                         jobPlay = this.coroutineContext.job

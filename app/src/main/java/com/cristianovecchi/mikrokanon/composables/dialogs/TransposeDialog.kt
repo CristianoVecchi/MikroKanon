@@ -25,7 +25,6 @@ import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
-import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.ui.Dimensions

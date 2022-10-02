@@ -1,7 +1,6 @@
 package com.cristianovecchi.mikrokanon.midi
 
 import android.media.MediaPlayer
-import android.os.Build
 import android.os.Environment
 import android.util.Log
 import com.cristianovecchi.mikrokanon.*
@@ -20,8 +19,6 @@ import java.io.IOException
 import java.io.File
 import java.util.*
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
 
 
 object Player {

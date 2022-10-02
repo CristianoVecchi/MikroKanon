@@ -3,9 +3,6 @@ package com.cristianovecchi.mikrokanon.AIMUSIC;
 
 import com.cristianovecchi.mikrokanon.locale.Lang;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 public class ChordData implements Comparable<ChordData>{
     public String noteList;
     public boolean[] selNotes;

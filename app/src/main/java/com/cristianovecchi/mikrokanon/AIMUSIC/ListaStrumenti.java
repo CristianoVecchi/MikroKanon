@@ -1,4 +1,5 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC;
+
 public class ListaStrumenti {
 	public static final String[] str = {
 		"000 - Piano","001 - Bright Piano","002 - Electric Grand","003 - Honky Tonk Piano","004 - Electric Piano 1","005 - Electric Piano 2","006 - Harpsichord",
