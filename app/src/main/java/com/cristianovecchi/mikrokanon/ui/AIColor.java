@@ -7,6 +7,7 @@ import com.cristianovecchi.mikrokanon.R;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class AIColor {
@@ -59,6 +60,11 @@ public class AIColor {
                     result.add(intArray2);
                 }
             }
+            if (array.isEmpty()) {
+                Integer[] defaultArray = {0xffffff, 0x658a97, 0x557a87, 0x4babc6, 0x2b8ba6, 0x0b6b86, 0x2ca6da}; // default values colors_515
+                result.add(defaultArray);
+            }
+            //System.out.println("TypedArraySize: " + array.size() + " resultSize: " + result.size());
             return result;
         }
     }

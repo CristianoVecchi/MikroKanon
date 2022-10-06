@@ -143,8 +143,11 @@ class AppViewModel(
 //     else {
 //        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
 //    }
+
     init{
         //RhythmPatterns.checkIntegrity()
+        //readFileLineByLineUsingForEachLine()
+        //createArrayColorsFile()
         val size = getDeviceResolution()
         val displayMetricsDensity = Resources.getSystem().displayMetrics.density
         _dimensions.value = Dimensions.provideDimensions(size.x, size.y, displayMetricsDensity)
@@ -160,14 +163,14 @@ class AppViewModel(
             val windowMetrics = windowManager.currentWindowMetrics
             val w = windowMetrics.bounds.width()
             val h = windowMetrics.bounds.height()
-            println("BOUNDS: WIDTH = $w HEIGHT = $h")
+            //println("BOUNDS: WIDTH = $w HEIGHT = $h")
             Point(w,h)
         } else {
             val size = Point()
             windowManager.defaultDisplay.getRealSize(size)
             val w = size.x
             val h = size.y
-            println("SIZE X = $w   SIZE Y = $h")
+            //println("SIZE X = $w   SIZE Y = $h")
             size
         }
     }
@@ -1093,7 +1096,8 @@ class AppViewModel(
             if(lastIndexCustomColors != colorDefs.custom) {
                 lastAppColors = ""
                 lastIndexCustomColors = colorDefs.custom
-                appColors = AppColors.getCustomColorsFromIndex(getContext(),colorDefs.custom)
+                //appColors = AppColors.getCustomColorsFromIndex(getContext(),colorDefs.custom)
+                appColors = AppColors.getCustomColorsByColorArrays(colorDefs.custom)
             }
         } else {
             if(lastAppColors != colorDefs.app){

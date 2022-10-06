@@ -50,33 +50,35 @@ class G {
      var colorPassageNotes1 = 0
      var colorPassageNotes2 = 0
      var colorRadar = 0
-     var indexColorArray = 559
+     var indexColorArray = 515
      private var radarColorEditor = false
-     private var colorArrays: List<IntArray>? = null
+     //private var colorArrays: List<IntArray>? = null
      fun getArraySize(): Int{
-         return colorArrays!!.size * 3
+         return getColorArraysSize() * 3
+         //return colorArrays!!.size * 3
      }
      fun isRadarColorEditor(): Boolean {
          return radarColorEditor
      }
 
-     fun setRadarColorEditor(isActive: Boolean, context: Context) {
-         if (isActive) {
-             //colorArrays = getMultiTypedArray(context, "colors")
-             radarColorEditor = isActive
-         } else {
-             colorArrays = null
-             radarColorEditor = isActive
-         }
-     }
-     fun loadColorArrays(context: Context): Boolean{
-         colorArrays = AIColor.getMultiTypedArray(context, "colors", -0.12f).map { it.toIntArray() }
-         //println("ArraYColors = ${colorArrays?.size}")
-         return colorArrays?.isNotEmpty() ?: false
-     }
-     fun deleteColorArrays(){
-         colorArrays = null
-     }
+//     fun setRadarColorEditor(isActive: Boolean, context: Context) {
+//         if (isActive) {
+//             //colorArrays = getMultiTypedArray(context, "colors")
+//             radarColorEditor = isActive
+//         } else {
+//             colorArrays = null
+//             radarColorEditor = isActive
+//         }
+//     }
+//     fun loadColorArrays(context: Context): Boolean{
+//         colorArrays = AIColor.getMultiTypedArray(context, "colors", -0.12f).map { it.toIntArray() }
+//         //colorArrays!!.forEach{ println(it.contentToString())}
+//         //println("ArraYColors = ${colorArrays?.size}")
+//         return colorArrays?.isNotEmpty() ?: false
+//     }
+//     fun deleteColorArrays(){
+//         colorArrays = null
+//     }
 
      fun setColorArrayBySearch(context: Context, desiredColor: Int) {
          var max = Int.MAX_VALUE
@@ -100,16 +102,16 @@ class G {
          val background1index = 1
 
          var choice = indexColorArray
-         for (i in colorArrays!!.indices) {
-             val aimColor = colorArrays!![i][background1index]
+         for (i in colorArrays.indices) {
+             val aimColor = colorArrays[i][background1index]
              val diff: Int = AIColor.colorDistance(desiredColor, aimColor)
              if (diff < max) {
                  max = diff
              }
          }
          val choices = mutableListOf<Int>()
-         for (i in colorArrays!!.indices) {
-             val aimColor = colorArrays!![i][background1index]
+         for (i in colorArrays.indices) {
+             val aimColor = colorArrays[i][background1index]
              if(AIColor.colorDistance(desiredColor, aimColor) == max){
                  choices.add(i)
              }
@@ -124,7 +126,8 @@ class G {
          }
          indexColorArray = choice
          //println("Color Array = $choice")
-         setColorArray(context, choice)
+         //setColorArray(context, choice)
+         setColorArray(getColorList(choice).toIntArray(), choice)
      }
      fun setColorArray(context: Context, index: Int) {
          var index = index
@@ -132,8 +135,10 @@ class G {
          var i = 0
          if (index < 0) index = 0
          //val arrays = AIColor.getMultiTypedArray(context, "colors")
-         val arrays = colorArrays!!
-         val array = arrays[index % arrays.size]
+         val arrays = colorArrays
+         val array = if(arrays.size == 1) arrays[0] else arrays[index % arrays.size]
+         //println("Array[0]= ${array.contentToString()}")
+         //val array = arrays[index % arrays.size]
          colorFont = array[i++]
          colorBackground1 = array[i++]
          colorBackground2 = array[i++]
@@ -144,6 +149,17 @@ class G {
          //((MainActivity)context).savePreferences();
          //G.radarMessage = "C.A.: " + index % arrays.size
      }
+     fun setColorArray(colors: IntArray, index: Int) {
+         indexColorArray = index
+         var i = 0
+         colorFont = colors[i++]
+         colorBackground1 = colors[i++]
+         colorBackground2 = colors[i++]
+         colorBeatNotes = colors[i++]
+         colorPassageNotes1 = colors[i++]
+         colorPassageNotes2 = colors[i++]
+         colorRadar = colors[i]
+     }
 
      fun selectRandomColors(context: Context) {
          val arrays = getMultiTypedArray(context, "colors")
@@ -151,6 +167,7 @@ class G {
          val random = (Math.random() * (size + 1)).toInt()
          setColorArray(context, random)
      }
+
 
  }
 }

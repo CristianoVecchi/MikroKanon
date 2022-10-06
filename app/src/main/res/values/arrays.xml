@@ -2,32 +2,31 @@
 <resources>
     <array name="colors_0">
 
-        <item>#FFFFFFFF</item>
-        <item>#FF280AC8</item>
-        <item>#FF280ABE</item>
-        <item>#FF787FFF</item>
+        <item>#FFFFFF</item>
+        <item>#280AC8</item>
+        <item>#280ABE</item>
+        <item>#787FFF</item>
         <item>#A0A0A0</item>
         <item>#606060</item>
-        <item>#FF282840</item>
+        <item>#282840</item>
 
     </array>
- <!-- Font, back1, back2, beat, pass1, pass2, RADAR -->
+
     <array name="colors_1">
 
-        <item>#FFFFFFFF</item>
+        <item>#FFFFFF</item>
 
 
-       <item>#FF67DF67</item>
+       <item>#67DF67</item>
 
-        <item>#FF57cf57</item>
-        <item>#FFA5FFA5</item>
-        <item>#FFAAAAAA</item>
-        <item>#FF888888</item>
-        <item>#FF525252</item>
+        <item>#57cf57</item>
+        <item>#A5FFA5</item>
+        <item>#AAAAAA</item>
+        <item>#888888</item>
+        <item>#525252</item>
 
     </array>
 
-    <!-- Font, back1, back2, beat, pass1, pass2, RADAR -->
     <array name="colors_2">
 
         <item>#d6e8ee</item>
@@ -41,7 +40,6 @@
 
     </array>
 
-    <!-- Font, back1, back2, beat, pass1, pass2, RADAR -->
     <array name="colors_3">
 
         <item>#d9ecf2</item>
@@ -55,7 +53,6 @@
 
     </array>
 
-    <!-- Font, back1, back2, beat, pass1, pass2, RADAR -->
     <array name="colors_4">
 
         <item>#f5cec7</item>
@@ -118,7 +115,7 @@
         <item>#c5bec4</item>
 
     </array>
-    <!-- Font, back1, back2, beat, pass1, pass2, RADAR -->
+
     <array name="colors_9">
 
         <item>#d6e8ec</item>
@@ -131,7 +128,7 @@
         <item>#001238</item>
 
     </array>
-    <!-- Font, back1, back2, beat, pass1, pass2, RADAR -->
+
     <array name="colors_10">
 
         <item>#ffffff</item>
@@ -144,7 +141,7 @@
         <item>#42564f</item>
 
     </array>
-    <!-- Font, back1, back2, beat, pass1, pass2, RADAR -->
+
     <array name="colors_11">
 
         <item>#ffffff</item>
@@ -157,7 +154,7 @@
         <item>#604d4c</item>
 
     </array>
-    <!-- Font, back1, back2, beat, pass1, pass2, RADAR -->
+
     <array name="colors_12">
 
         <item>#ffffff</item>

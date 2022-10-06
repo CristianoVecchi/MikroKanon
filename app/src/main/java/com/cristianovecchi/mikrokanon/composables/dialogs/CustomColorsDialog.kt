@@ -24,6 +24,8 @@ import com.cristianovecchi.mikrokanon.ui.G
 import com.cristianovecchi.mikrokanon.composables.ColorSelector
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.ui.Dimensions
+import com.cristianovecchi.mikrokanon.ui.getColorList
+import com.cristianovecchi.mikrokanon.ui.shift
 
 @Composable
 fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogData>,
@@ -35,7 +37,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                        onSetArrayIndexAndRefresh: (Int) -> Unit =
                            {customColorsDialogData.value = customColorsDialogData.value.copy(arrayColorIndex = it, firstRendering = true)},
                        onDismissRequest: () -> Unit =
-                           { G.deleteColorArrays(); customColorsDialogData.value = CustomColorsDialogData(model = customColorsDialogData.value.model) })
+                           { customColorsDialogData.value = CustomColorsDialogData(model = customColorsDialogData.value.model) })
 {
 
     var indexColors = customColorsDialogData.value.arrayColorIndex
@@ -61,27 +63,28 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                     var customColor by remember{ mutableStateOf(Color.Black) }
                     val context = customColorsDialogData.value.model.getContext()
                     if(customColorsDialogData.value.firstRendering){
-                        if(G.loadColorArrays(context)) G.setColorArray(context,indexColors)
-                        fontColor = Color(G.colorFont)
-                        back1Color = Color(G.colorBackground1)
-                        back2Color = Color(G.colorBackground2)
-                        beatColor = Color(G.colorBeatNotes)
-                        pass1Color = Color(G.colorPassageNotes1)
-                        pass2Color = Color(G.colorPassageNotes2)
-                        radarColor = Color(G.colorRadar)
+                        //if(G.loadColorArrays(context)) G.setColorArray(context,indexColors)
+                        G.setColorArray(getColorList(indexColors).toIntArray(), indexColors)
+                        fontColor = Color(G.colorFont).shift(0f)
+                        back1Color = Color(G.colorBackground1).shift(0f)
+                        back2Color = Color(G.colorBackground2).shift(0f)
+                        beatColor = Color(G.colorBeatNotes).shift(0f)
+                        pass1Color = Color(G.colorPassageNotes1).shift(0f)
+                        pass2Color = Color(G.colorPassageNotes2).shift(0f)
+                        radarColor = Color(G.colorRadar).shift(0f)
                         arraySize = G.getArraySize()
                         indexColors = G.indexColorArray
                         onRefreshRendering.invoke(false)
                     } else {
-                        if(G.loadColorArrays(context))
-                            G.setColorArrayBySearchFromIndex(context, customColor.toArgb(), indexColors)
-                        fontColor = Color(G.colorFont)
-                        back1Color = Color(G.colorBackground1)
-                        back2Color = Color(G.colorBackground2)
-                        beatColor = Color(G.colorBeatNotes)
-                        pass1Color = Color(G.colorPassageNotes1)
-                        pass2Color = Color(G.colorPassageNotes2)
-                        radarColor = Color(G.colorRadar)
+
+                        G.setColorArrayBySearchFromIndex(context, customColor.toArgb(), indexColors)
+                        fontColor = Color(G.colorFont).shift(0f)
+                        back1Color = Color(G.colorBackground1).shift(0f)
+                        back2Color = Color(G.colorBackground2).shift(0f)
+                        beatColor = Color(G.colorBeatNotes).shift(0f)
+                        pass1Color = Color(G.colorPassageNotes1).shift(0f)
+                        pass2Color = Color(G.colorPassageNotes2).shift(0f)
+                        radarColor = Color(G.colorRadar).shift(0f)
                         arraySize = G.getArraySize()
                         indexColors = G.indexColorArray
                     }
@@ -138,7 +141,10 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                                 .height(h),
                             horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
                             Text( text = "$indexColors",
-                                style = TextStyle(fontSize = (dimensions.selectorClipFontSize * 2).sp, fontWeight = FontWeight.ExtraBold, color = fontColor) )
+                                style = TextStyle(fontSize = (dimensions.selectorClipFontSize * 2).sp, fontWeight = FontWeight.ExtraBold,
+                                    color = fontColor
+
+                                ) )
                         }
 
 

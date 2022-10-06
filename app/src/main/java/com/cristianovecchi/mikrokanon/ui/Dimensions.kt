@@ -57,7 +57,7 @@ data class Dimensions( // 1600px width and over
     companion object {
         val default = provideDimensions(720, 1280, 2.0f)
         fun provideDimensions(width: Int, height: Int, dpDensity: Float) : Dimensions {
-            println("DISPLAY [ X=$width Y=$height dpDensity=$dpDensity ]")
+           // println("DISPLAY [ X=$width Y=$height dpDensity=$dpDensity ]")
             return if (width == 1080 && height in 1920..2159){
                 // with short height
                 res1080x1920(width, height, dpDensity) // 1080x1920 xxh |

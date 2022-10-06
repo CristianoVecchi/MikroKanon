@@ -79,48 +79,63 @@ data class AppColors(
         }
         fun createCustomColors(fontColor: Color, backgroundColor1: Color, backgroundColor2: Color,
                                beat: Color, pass1: Color, pass2: Color, radar: Color): AppColors{
-            val actualRadar = if(AIColor.colorDistanceAverage(radar.toArgb(),fontColor.shift(0.3f).toArgb()) <= 0.124f) radar.shift(-0.2f) else radar
+            val actualRadar = if(AIColor.colorDistanceAverage(radar.toArgb(),fontColor.shift(0.3f).toArgb()) <= 0.124f) radar.shift(-0.2f)
+                                else radar.shift(0f)
             return AppColors(
-                selCardBackColorSelected = pass1,
-                selCardBackColorUnselected = pass2,
+                selCardBackColorSelected = pass1.shift(0f),
+                selCardBackColorUnselected = pass2.shift(0f),
                 selCardTextColorSelected = beat.shift(0.2f),
-                selCardTextColorUnselected = beat,
-                selCardBorderColorSelected = actualRadar,
+                selCardTextColorUnselected = beat.shift(0f),
+                selCardBorderColorSelected = actualRadar.shift(0f),
                 selCardBorderColorUnselected = radar.shift(-0.1f),
 
                 cellDarkColorUnselected = backgroundColor1.shift(-0.02f),
-                cellLightColorUnselected = backgroundColor1,
+                cellLightColorUnselected = backgroundColor1.shift(0f),
                 cellDarkColorSelected = backgroundColor1.shift(0.08f),
                 cellLightColorSelected = backgroundColor1.shift(0.1f),
                 selectionBorderColor = fontColor.shift(-0.1f),
-                cellTextColorSelected = fontColor,
+                cellTextColorSelected = fontColor.shift(0f),
                 cellTextColorUnselected = fontColor.shift(-0.2f),
 
                 iconButtonBorderColor = fontColor.shift(-0.15f),
                 iconButtonIconColor = fontColor.shift(0.3f),
-                iconButtonBackgroundColor = actualRadar,
+                iconButtonBackgroundColor = actualRadar.shift(0f),
                 iconButtonInactiveBorderColor = fontColor.shift(-0.35f),
                 iconButtonInactiveIconColor = radar.shift(-0.2f),
                 iconButtonInactiveBackgroundColor = fontColor.shift(-0.3f),
 
-                sequencesListBackgroundColor = backgroundColor2,
+                sequencesListBackgroundColor = backgroundColor2.shift(0f),
                 buttonsDisplayBackgroundColor = backgroundColor2.shift(-0.1f),
                 drawerBackgroundColor = backgroundColor1.shift(-0.4f),
                 inputBackgroundColor =  backgroundColor2.shift(-0.2f),
 
                 dialogBackgroundColor = backgroundColor2.shift(-0.2f),
                 dialogFontColor = fontColor.shift(0.2f)
-            )
+            )//.also{
+//                print("createCustomColors: $it")
+//            }
         }
         fun provideAppColors(colorTheme: AppColorThemes): AppColors {
             return when (colorTheme) {
                 AppColorThemes.GEMINI_BLUE -> AppColors() // DEFAULT
             }
         }
-
+        fun getCustomColorsByColorArrays(index: Int):AppColors{
+            val colors = getColorList(index).toIntArray()
+            G.setColorArray(colors, index)
+            val fontColor = Color(G.colorFont)
+            val back1Color = Color(G.colorBackground1)
+            val back2Color = Color(G.colorBackground2)
+            val beatColor = Color(G.colorBeatNotes)
+            val pass1Color = Color(G.colorPassageNotes1)
+            val pass2Color = Color(G.colorPassageNotes2)
+            val radarColor = Color(G.colorRadar)
+            return createCustomColors(fontColor,back1Color,back2Color,beatColor,pass1Color,pass2Color,radarColor)
+        }
         fun getCustomColorsFromIndex(context: Context, index: Int): AppColors{
-            if(G.loadColorArrays(context))
-                G.setColorArray(context, index)
+            G.setColorArray(context, index)
+
+
             val fontColor = Color(G.colorFont)
             val back1Color = Color(G.colorBackground1)
             val back2Color = Color(G.colorBackground2)
@@ -138,7 +153,7 @@ fun Color.shift(diff: Float): Color {
   val r = (this.red + diff).coerceIn(0f,1f)
   val g = (this.green + diff).coerceIn(0f,1f)
   val b = (this.blue + diff).coerceIn(0f,1f)
-    return Color(r,g,b,this.alpha)
+    return Color(r,g,b, 1f)//.also{ println(it)}
 }
 
 data class ColorDefs(val app:String = "System", val custom: Int = 0, val isCustom: Boolean = false)

@@ -7,8 +7,10 @@ import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.getIntOrEmptyValue
 import com.cristianovecchi.mikrokanon.shiftCycling
 import com.cristianovecchi.mikrokanon.tritoneSubstitutionOnIntervalSet
+import com.cristianovecchi.mikrokanon.ui.readFileLineByLineUsingForEachLine
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.*
+import java.io.File
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
@@ -321,6 +323,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             println("Part #$index(${absPart.absPitches.size}): ${absPart.absPitches.toIntArray().contentToString()}")
         }
     }
+
     fun displayInNotes(noteNames: List<String> = NoteNamesEn.values().map{it.toString()}) {
         parts.forEachIndexed { index, absPart ->
             val notes = Clip.convertAbsPitchesToClipText(absPart.absPitches, noteNames)
@@ -1650,18 +1653,23 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
     }
 }
-
 //fun main(args : Array<String>){
+//    fun readFileLineByLineUsingForEachLine(fileName: String = "/AndroidStudioProjects/MikroKanon/app/src/main/res/values")
+//            = File(fileName).forEachLine { println(it) }
+//}
+//fun main(args : Array<String>) {
 //    val pentatonicIntervalSet = listOf(2, 10, 3, 9, 4, 8, 5, 7)
 //    val absPitches1 = mutableListOf(0, 1, 2, 11, 2, 6, 9)
 //    val absPitches2 = mutableListOf(2, 3, 4, 4)//5, 6, 7, 8, 9, 10,11,0,1)
 //    val absPitches3 = mutableListOf(4, 5, 6)//, 3, 4, 5, 6, 7, 8, 9, 10,11,0)
 //    val sequences = listOf(absPitches1, absPitches2, absPitches3)
+//    println("DONE")
+//}
 //    val notes = listOf("C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#", "A", "Bb", "B", "__")
-    //val ens = getEnsemble(12, EnsembleType.STRING_ORCHESTRA).apply { println(this) }
-    //val mix = getEnsembleMix(12, listOf(EnsembleType.STRING_ORCHESTRA, EnsembleType.WOODWINDS)).apply { println(this) }
-   // Counterpoint.mazeTest(sequences)
-    //println(Insieme.areAbsPitchesValid(absPitches1.toIntArray(), pentatonicIntervalSet.toIntArray() ))
+//    val ens = getEnsemble(12, EnsembleType.STRING_ORCHESTRA).apply { println(this) }
+//    val mix = getEnsembleMix(12, listOf(EnsembleType.STRING_ORCHESTRA, EnsembleType.WOODWINDS)).apply { println(this) }
+//    Counterpoint.mazeTest(sequences)
+//    println(Insieme.areAbsPitchesValid(absPitches1.toIntArray(), pentatonicIntervalSet.toIntArray() ))
 //    val pitches = listOf(-1,-1,2,3,8,-1,-1,-1,10,12,46,67,32,64,43,0,1,9,8,-1,-1,8)
 //    val mssq = MelodySubSequencer(pitches.toIntArray())
 //    mssq.assignVelocities(0.90f, 0.50f)
@@ -1686,15 +1694,15 @@ data class Counterpoint(val parts: List<AbsPart>,
 //        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions)
 //    val counterpoint3 = Counterpoint.findWave(counterpoint2,pentatonicIntervalSet,6,
 //        listOf(0,1,2),TREND.ASCENDANT_STATIC.directions).displayInNotes()
-    //val normCounterpoint = counterpoint.normalizePartsSize(true)
-    //normCounterpoint.displayInNotes()
-    //normCounterpoint.addCadenzas(listOf(1,11))//.displayInNotes()
+//    val normCounterpoint = counterpoint.normalizePartsSize(true)
+//    normCounterpoint.displayInNotes()
+//    normCounterpoint.addCadenzas(listOf(1,11))//.displayInNotes()
 //    println("emptiness: ${counterpoint.emptiness}")
 //    val counterpointRound = counterpoint.normalizePartsSize(true).buildRound()
 //    counterpointRound.display()
 //    println("emptiness: ${counterpointRound.emptiness}")
 //    println("emptiness: ${counterpointRound.findEmptiness()}")
-
+//
 //    Counterpoint.expand(counterpoint, 2).display()
 //    val repeatedSequence = Collections.nCopies(3, absPitches1).flatten()
 //    println(repeatedSequence)
