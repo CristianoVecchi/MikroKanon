@@ -45,7 +45,7 @@ class AppViewModel(
         const val MAX_NOTES_MK_2= 200
         const val MAX_NOTES_MK_3 = 74
         const val MAX_NOTES_MK_4 = 32
-        const val MAX_NOTES_MK_4DEEP = 18
+        const val MAX_NOTES_MK_4DEEP = 16
         const val MAX_NOTES_MK_5RED = 25
         const val MAX_NOTES_MK_6RED = 20
         const val MAX_SEQUENCES_IN_MAZE = 9

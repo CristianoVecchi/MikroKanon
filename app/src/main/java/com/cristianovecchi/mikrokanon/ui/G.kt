@@ -54,7 +54,7 @@ class G {
      private var radarColorEditor = false
      //private var colorArrays: List<IntArray>? = null
      fun getArraySize(): Int{
-         return getColorArraysSize() * 3
+         return getColorArraysSize()
          //return colorArrays!!.size * 3
      }
      fun isRadarColorEditor(): Boolean {

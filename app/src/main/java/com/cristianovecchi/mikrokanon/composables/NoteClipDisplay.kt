@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
@@ -46,9 +47,10 @@ fun NoteClipDisplay(
     val innerPadding = 10.dp
 
     if (clips.isEmpty() or notesNames.isEmpty()) {
-        Text(text = hintText, modifier = Modifier.padding(40.dp),
-        style = TextStyle(fontSize = 33.sp, fontWeight = FontWeight.Bold,
-                            fontStyle = FontStyle.Italic, color = colors.selCardTextColorUnselected))
+        Text(text = hintText, modifier = Modifier.padding(20.dp),
+        style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Italic, color = colors.selCardTextColorUnselected),
+                            overflow = TextOverflow.Ellipsis)
 
     } else {
         Column(modifier = modifier.background(colors.inputBackgroundColor)) {

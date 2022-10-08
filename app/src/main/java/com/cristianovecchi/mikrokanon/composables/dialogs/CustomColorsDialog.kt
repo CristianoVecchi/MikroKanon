@@ -195,7 +195,7 @@ fun CustomColorsDialog(customColorsDialogData: MutableState<CustomColorsDialogDa
                             }
                             Button(
                                 onClick = {
-                                    if (indexColors < arraySize ) onSetArrayIndexAndRefresh.invoke(indexColors+1)
+                                    if (indexColors < arraySize - 1 ) onSetArrayIndexAndRefresh.invoke(indexColors+1)
                                 },
                                 shape = MaterialTheme.shapes.large
                             ) {

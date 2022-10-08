@@ -57,7 +57,7 @@ data class Dimensions( // 1600px width and over
     companion object {
         val default = provideDimensions(720, 1280, 2.0f)
         fun provideDimensions(width: Int, height: Int, dpDensity: Float) : Dimensions {
-           // println("DISPLAY [ X=$width Y=$height dpDensity=$dpDensity ]")
+            println("DISPLAY [ X=$width Y=$height dpDensity=$dpDensity ]")
             return if (width == 1080 && height in 1920..2159){
                 // with short height
                 res1080x1920(width, height, dpDensity) // 1080x1920 xxh |
@@ -124,7 +124,7 @@ data class Dimensions( // 1600px width and over
                 optionsFontSize = (width/22).pxToSp,
 
                 inputButtonSize = (width/7).pxToDp.dp,
-                inputButtonFontSize = (width/24).pxToSp, // 14
+                inputButtonFontSize = (width/28).pxToSp, // 14
                 inputWeights = Pair(4f, 8f),
                 inputNclipColumns = 6,
 
