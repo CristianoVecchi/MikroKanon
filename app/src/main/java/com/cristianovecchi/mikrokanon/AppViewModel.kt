@@ -219,7 +219,7 @@ class AppViewModel(
                Counterpoint.explodeRowForms(counterpointExample.tritoneSubstitution(), listOf(rowForm.absoluteValue))
            }
            _selectedCounterpoint.value = counterpointToPlay
-               onPlay(true, true)
+           onPlay(true, true)
         }
         if (selCpSaved != null) {
             _selectedCounterpoint.value = selCpSaved.clone()

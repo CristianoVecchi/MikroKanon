@@ -180,7 +180,7 @@ fun convertRYBtoRGB(red: Float, yellow: Float, blue: Float): Triple<Float, Float
         1.0f + B * (-0.4f + Y * 0.6f) - Y + R * ( -1.0f + B * (0.9f + Y * -1.1f) + Y )
     )
 }
-fun main(args : Array<String>){
+fun main(){
     val colorsRYB = listOf(
         Triple(1f,0.333f,0.333f),
         Triple(0.833f, 0.5f,0.166f),
