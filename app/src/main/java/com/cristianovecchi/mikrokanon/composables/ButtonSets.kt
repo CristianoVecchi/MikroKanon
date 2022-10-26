@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -23,9 +25,48 @@ import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.ui.*
 
 @Composable
+fun SimpleIconButton(
+    iconId: Int,
+    buttonSize: Dp,
+    borderWidth: Dp,
+    iconColor: Color,
+    colors: AppColors,
+    isActive: Boolean = true,
+    onClick: () -> Unit,
+) {
+    val borderColor: Color = colors.iconButtonBorderColor
+    val backgroundColor: Color = colors.iconButtonBackgroundColor
+    val inactiveIconColor: Color = colors.iconButtonInactiveIconColor
+    val inactiveBackgroundColor: Color = colors.iconButtonInactiveBackgroundColor
+    val inactiveBorderColor: Color = colors.iconButtonInactiveBorderColor
+    val actualBackgroundColor by animateColorAsState( if(isActive) backgroundColor else inactiveBackgroundColor )
+    val actualBorderColor by animateColorAsState( if(isActive) borderColor else inactiveBorderColor )
+    val actualIconColor  by animateColorAsState( if(isActive) iconColor else inactiveIconColor )
+    IconButton(
+        modifier = Modifier//.size(buttonSize)
+            .border(1.dp, actualBorderColor, RectangleShape)
+            .background(actualBackgroundColor, RectangleShape)
+            .size(buttonSize)
+            ,
+//        colors = ButtonDefaults.outlinedButtonColors(
+//            backgroundColor = actualBackgroundColor
+//        ),
+//        border = BorderStroke(borderWidth, actualBorderColor),
+//        shape = RectangleShape,
+        onClick = { if (isActive) onClick() }
+    ){
+        Icon(
+            modifier = Modifier.size(buttonSize / 4 * 3),
+            painter = painterResource(id = iconId),
+            contentDescription = null, // decorative element
+            tint = actualIconColor
+        )
+    }
+}
+@Composable
 fun CustomButton(iconId: Int = -1, text: String = "",
                  isActive: Boolean = true, buttonSize: Dp = 60.dp, adaptSizeToIconButton: Boolean = false,
-                 fontSize: Int = 16,
+                 fontSize: Int = 16, borderWidth: Dp = 2.dp,
                  colors: AppColors,
                  borderColor: Color = colors.iconButtonBorderColor,
                  iconColor: Color = colors.iconButtonIconColor,
@@ -37,6 +78,8 @@ fun CustomButton(iconId: Int = -1, text: String = "",
     val actualBackgroundColor by animateColorAsState( if(isActive) backgroundColor else inactiveBackgroundColor )
     val actualIconColor  by animateColorAsState( if(isActive) iconColor else inactiveIconColor )
     val actualBorderColor by animateColorAsState( if(isActive) borderColor else inactiveBorderColor )
+    val border = borderWidth
+    val padding = 3.dp
     if (iconId != -1) {
         if (text.isNotEmpty()) { //MK button (Icon + Text)
             val textStyle = TextStyle(
@@ -45,16 +88,22 @@ fun CustomButton(iconId: Int = -1, text: String = "",
                 color = actualIconColor
             )
             IconButton(modifier = Modifier
-                .padding(2.dp)
-                .background(actualBackgroundColor, RoundedCornerShape(4.dp))
+                .padding(padding)
+                .background(actualBackgroundColor)
                 .then(
                     Modifier
                         .size(buttonSize)
-                        .border(2.dp, actualBorderColor)
+                        .border(border, actualBorderColor, RectangleShape)
                 ),
+//                colors = ButtonDefaults.outlinedButtonColors(
+//                    backgroundColor = actualBackgroundColor,
+//                    contentColor = actualIconColor
+//                ),
+//                border = BorderStroke(border, actualBorderColor),
+//                shape = RectangleShape,
                 onClick = { if (isActive) onClick() })
             {
-                Row {
+                Row{
                     Icon(
                         modifier = Modifier.size(buttonSize/3 + buttonSize/7),
                         painter = painterResource(id = iconId),
@@ -63,16 +112,15 @@ fun CustomButton(iconId: Int = -1, text: String = "",
                     )
                     Text(text = text, style = textStyle)
                 }
-
             }
         } else { // Icon button
             IconButton(modifier = Modifier
-                .padding(2.dp)
-                .background(actualBackgroundColor, RoundedCornerShape(4.dp))
+                .padding(padding)
+                .background(actualBackgroundColor, RectangleShape)
                 .then(
                     Modifier
                         .size(buttonSize)
-                        .border(2.dp, actualBorderColor)
+                        .border(border, actualBorderColor, RectangleShape)
                 ),
                 onClick = { if (isActive) onClick() }
             )
@@ -88,19 +136,28 @@ fun CustomButton(iconId: Int = -1, text: String = "",
     } else {
         if (text.isNotEmpty()) { // text button
             val actualModifier = if (adaptSizeToIconButton)
-                Modifier.padding(2.dp).border(2.dp, actualBorderColor).width(buttonSize).height(buttonSize)
-            else Modifier.padding(2.dp).border(2.dp, actualBorderColor)
-            Button(modifier = actualModifier,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = actualBackgroundColor,
-                    contentColor = iconColor
+                Modifier
+                    .padding(padding)
+                    .width(buttonSize)
+                    .height(buttonSize)
+                    //.background(actualBackgroundColor)
+            else Modifier
+                .padding(padding)
+               // .background(actualBackgroundColor)
+            Button(
+                modifier = actualModifier,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = actualBackgroundColor
                 ),
+                border = BorderStroke(border, actualBorderColor),
+                shape = RectangleShape,
                 onClick = { if (isActive) onClick() })
             {
                 Text(
                     text = text,
                     style = TextStyle(
                         color = actualIconColor,
+                        background= actualBackgroundColor,
                         fontSize = fontSize.sp,
                         fontWeight = FontWeight.Bold
                     ),
@@ -393,22 +450,23 @@ fun FreePartsButtons(
     onDescDynamicClick: () -> Unit, onDescStaticClick: () -> Unit
 ) {
     
-    Row() {
-        Column() {
+    Column() {
+        Row(verticalAlignment = Alignment.Bottom) {
             //FPad Button
             CustomButton(fontSize = fontSize, text = "∼➚", isActive = isActive, colors = colors) {
                 onAscDynamicClick()
             }
-            //FPdd Button
-            CustomButton(fontSize = fontSize, text = "∼➘", isActive = isActive, colors = colors) {
-                onDescDynamicClick()
-            }
-        }
-        Column() {
             // \u2B08
             //FPas Button
             CustomButton(fontSize = fontSize, text = "-➚", isActive = isActive, colors = colors) {
                 onAscStaticClick()
+            }
+
+        }
+        Row(verticalAlignment = Alignment.Bottom) {
+            //FPdd Button
+            CustomButton(fontSize = fontSize, text = "∼➘", isActive = isActive, colors = colors) {
+                onDescDynamicClick()
             }
             // \u2B0A
             //FPds Button

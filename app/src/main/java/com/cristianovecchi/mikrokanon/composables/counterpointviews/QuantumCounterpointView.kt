@@ -40,7 +40,7 @@ fun QuantumCounterpointView(model: AppViewModel, counterpoint: Counterpoint, app
     val error = redNotes != null
     val selectedCounterpoint by model.selectedCounterpoint.observeAsState()
     val isSelected = counterpoint == selectedCounterpoint
-    val borderWidth by animateIntAsState(if(isSelected) 4 else 0)
+    val borderWidth by animateIntAsState(if(isSelected) 3 else 0)
    // val cellDarkColor by animateColorAsState( if(isSelected) colors.cellDarkColorSelected else colors.cellDarkColorUnselected )
     val cellLightColor by animateColorAsState( if(isSelected) colors.cellLightColorSelected else colors.cellLightColorUnselected )
     val selectionColor = if(error) errorColor else colors.selectionBorderColor

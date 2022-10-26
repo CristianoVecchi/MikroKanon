@@ -59,7 +59,8 @@ fun MultiSelectListDialog(
                     val listState = rememberLazyListState()
                     if(listDialogData.value.itemList.isNotEmpty()){
                         LazyColumn( state = listState,
-                            modifier = modifierA
+                            modifier = modifierA,
+                            //verticalArrangement = Arrangement.spacedBy(10.dp),
                         ) { items(listDialogData.value.itemList) { item ->
                             val selected = if (selectedOptions.isEmpty()) {
                                 listOf<String>()
@@ -122,12 +123,14 @@ fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextU
                     onClickListener(text)
                 }
             )
-            .background(if (isSelected) backgroundColorLighter else backgroundColor)
-            .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 16.dp)
+            .background(if (isSelected) backgroundColorLighter else backgroundColor),
+            verticalAlignment = Alignment.CenterVertically
     ) {
         // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.
         // So have Text Composable to show text.
         androidx.compose.material.RadioButton(
+            modifier = Modifier.size(30.dp),
             selected = isSelected,
             onClick = {
                 onClickListener(text)
@@ -135,9 +138,10 @@ fun MultiRadioButton(text: String, selectedValues: List<String>, fontSize: TextU
         )
         Text(
             text = text,
+            modifier = Modifier.padding(start = 16.dp),
             color = fontColor,
             style = MaterialTheme.typography.body1.merge().copy(fontSize = fontSize),
-            modifier = Modifier.padding(start = 16.dp)
+
         )
     }
 }

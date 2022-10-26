@@ -799,7 +799,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                     colors = colors,
                                     isSelected = isOn,
                                     onClick = {
-                                        model.exportMidi(model.midiPath)
+                                        if(isOn) model.exportMidi(model.midiPath)
                                     })
                             }
                         }

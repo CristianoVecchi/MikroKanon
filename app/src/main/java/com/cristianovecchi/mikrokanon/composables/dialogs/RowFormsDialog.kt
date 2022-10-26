@@ -25,6 +25,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
+import com.cristianovecchi.mikrokanon.composables.SimpleIconButton
 import com.cristianovecchi.mikrokanon.locale.rowFormsMap
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
@@ -296,29 +297,27 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         }
                     }
                     Row(
-                        modifier = modifierC.fillMaxWidth(),
+                        modifier = modifierC.fillMaxWidth()
+                            .background(backgroundColor),
+
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val buttonSize = dimensions.dialogButtonSize / 4 * 3
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            text = "",
+                        val buttonSize = dimensions.dialogButtonSize / 5 * 4
+                        SimpleIconButton(
                             iconId = model.iconMap["done"]!!,
-                            fontSize = fontSize,
                             buttonSize = buttonSize.dp,
+                            borderWidth = 0.dp,
                             iconColor = Color.Green,
                             colors = model.appColors
                         ) {
                             multiNumberDialogData.value.onSubmitButtonClick.invoke(formsText)
                             onDismissRequest.invoke()
                         }
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            text = "",
+                        SimpleIconButton(
                             iconId = model.iconMap["bar"]!!,
-                            fontSize = fontSize,
                             buttonSize = buttonSize.dp,
+                            borderWidth = 0.dp,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
@@ -327,11 +326,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             pairs[cursor] = Pair( counterpoint, form * -1)
                             formsText = pairs.toIntPairsString()
                         }
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            text = "",
+                        SimpleIconButton(
                             iconId = model.iconMap["delete"]!!,
                             buttonSize = buttonSize.dp,
+                            borderWidth = 0.dp,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
@@ -343,11 +341,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 cursor = if (newCursor < 0) 0 else newCursor
                             }
                         }
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            text = "",
+                        SimpleIconButton(
                             iconId = model.iconMap["add"]!!,
                             buttonSize = buttonSize.dp,
+                            borderWidth = 0.dp,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
@@ -358,11 +355,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             cursor = rebuilding.second
                             formsText = values.toMutableList().toIntPairsString()
                         }
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            text = "",
+                        SimpleIconButton(
                             iconId = model.iconMap["tritone_substitution"]!!,
                             buttonSize = buttonSize.dp,
+                            borderWidth = 0.dp,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
@@ -372,11 +368,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             formsText = pairs.toIntPairsString()
                         }
                         if (!playing) {
-                            CustomButton(
-                                adaptSizeToIconButton = true,
-                                text = "",
+                            SimpleIconButton(
                                 iconId = model.iconMap["play"]!!,
                                 buttonSize = buttonSize.dp,
+                                borderWidth = 0.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {
@@ -385,12 +380,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 model.onPlayExample(counterpoint, form)
                             }
                         } else {
-                            CustomButton(
-                                adaptSizeToIconButton = true,
-                                text = "",
+                            SimpleIconButton(
                                 iconId = model.iconMap["stop"]!!,
-                                fontSize = fontSize,
                                 buttonSize = buttonSize.dp,
+                                borderWidth = 0.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
                                 colors = model.appColors
                             ) {

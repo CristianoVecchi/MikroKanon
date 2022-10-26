@@ -126,6 +126,7 @@ fun RadioButton(text: String, selectedValue: String, showAsSelected: Boolean = f
         // The Default Radio Button in Jetpack Compose doesn't accept text as an argument.
         // So have Text Composable to show text.
         androidx.compose.material.RadioButton(
+            modifier = Modifier.size(30.dp),
             selected = (text == selectedValue),
             onClick = {
                 onClickListener(text)

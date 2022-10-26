@@ -98,7 +98,7 @@ fun SingleSelectDialog(
                             Text(text = okText, style = TextStyle(fontSize = fontSize.sp))
                         }
                         if(showRepeatButton){
-                            Row{
+                            Row(verticalAlignment = Alignment.CenterVertically){
                                 Checkbox(
                                     checked = repeated,
                                     onCheckedChange = { checked ->
