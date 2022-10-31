@@ -5,12 +5,12 @@ package com.cristianovecchi.mikrokanon.dataAnalysis
 import java.util.Random
 import kotlin.math.*
 
-data class Point(var x: Double, var y: Double, var group: Int)
+data class Point(var x: Double, var y: Double, var group: Int, val tick: Int, val velocity: Int)
 
 typealias LPoint = List<Point>
 typealias MLPoint = MutableList<Point>
 
-val origin get() = Point(0.0, 0.0, 0)
+val origin get() = Point(0.0, 0.0, 0, 0, 0)
 val r = Random()
 val hugeVal = Double.POSITIVE_INFINITY
 

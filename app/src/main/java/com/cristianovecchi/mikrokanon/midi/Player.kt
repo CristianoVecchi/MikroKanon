@@ -248,6 +248,22 @@ object Player {
                                     tracks.addChordTrack(harmonizations, bars,
                                         counterpointTrackData, audio8D, totalLength, false)
 
+                                    //ADD DRUMS TRACK (channel=9)
+                                    try{
+                                        val drumsData = listOf<DrumsData>(
+                                            DrumsData(DrumsType.CENTROIDS, 0.03f),
+                                            DrumsData(DrumsType.CENTROIDS, 1f),
+                                            DrumsData(DrumsType.NONE, 1f),
+                                            DrumsData(DrumsType.CENTROIDS, 0.5f),
+                                            DrumsData(DrumsType.CENTROIDS, 0.1f)
+                                        )
+                                        val drumsTrack = MidiTrack()
+                                        drumsTrack.addDrumsToTrack(actualCounterpointTrackData, drumsData, totalLength.toInt())
+                                        tracks.add(drumsTrack)
+                                    } catch(e: java.lang.Exception){
+                                        println("Exception adding drums: ${e.message}")
+                                    }
+
                                     val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
                                     //println("JOB ACTIVE: ${job.isActive}")
                                     // WARNING: nTotalNotes returned is not considering check and replace modifications!!!

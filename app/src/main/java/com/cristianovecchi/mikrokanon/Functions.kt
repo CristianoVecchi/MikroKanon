@@ -15,6 +15,55 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
+fun main(){
+    val arr = intArrayOf(0, 267, 348, 1024, 4056, 5890, 6056, 6987, 7654, 8751, 10987)
+    val arr2 = intArrayOf()
+    val arr3 = intArrayOf(5678, 10540, 20000)
+    val section1 = listOf(arr, arr2, arr3).findIndicesInSection(0, 1024)
+    val section2 = listOf(arr, arr2, arr3).findIndicesInSection(1024, 10000)
+    val section3 = listOf(arr, arr2, arr3).findIndicesInSection(11024, 10000)
+    println(section1)
+    println(section2)
+    println(section3)
+
+    println("Total section 1: ${section1.nElements()}")
+    println("Total section 2: ${section2.nElements()}")
+    println("Total section 3: ${section3.nElements()}")
+}
+fun List<IntRange?>.nElements(): Int{
+    return this.filterNotNull().sumOf { it.count() }
+}
+fun List<IntArray>.findIndicesInSection(sectionStart:Int, sectionDuration:Int,): List<IntRange?>{
+    val result = mutableListOf<IntRange?>()
+    this.forEach {
+        var start = -1
+
+        for(i in it.indices){
+            if(it[i] >= sectionStart){
+                start = i
+                break
+            }
+        }
+        if(start > -1) {
+            var end = -1
+            val sectionLimit = sectionStart + sectionDuration
+            for(j in it.size - 1 downTo start) {
+                if(it[j] < sectionLimit) {
+                    end = j
+                    break
+                }
+            }
+            if(end != -1){
+                result += IntRange(start, end)
+            } else {
+                result += null
+            }
+        } else {
+            result += null
+        }
+    }
+    return result
+}
 fun tritoneSubstitution(absPitch: Int): Int {
     return when (absPitch) {
         1 -> 7
