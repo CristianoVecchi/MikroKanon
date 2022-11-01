@@ -140,7 +140,7 @@ import androidx.room.PrimaryKey
                      "515|0" , // priority on custom color 515
                     0,"System", 0, "1" ,
                     ";;;;;;","","0|1","0",
-                    "0","0|-1", 0)
+                    "","0|-1", 0)
             }
             fun updateUserOptionsData(
                 optionsDataClone: UserOptionsData,

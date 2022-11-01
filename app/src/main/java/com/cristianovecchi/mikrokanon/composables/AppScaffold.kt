@@ -22,9 +22,9 @@ import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.db.CounterpointData
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.*
-import com.cristianovecchi.mikrokanon.midi.HarmonizationData
-import com.cristianovecchi.mikrokanon.midi.HarmonizationType
-import com.cristianovecchi.mikrokanon.midi.chordsInstruments
+import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationData
+import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationType
+import com.cristianovecchi.mikrokanon.AIMUSIC.chordsInstruments
 import com.cristianovecchi.mikrokanon.ui.AppColorThemes
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
@@ -94,6 +94,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
     val doublingDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val audio8DDialogData by lazy { mutableStateOf(MultiListDialogData())}
     val harmonyDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
+    val drumsDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val checkAndReplaceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val chordsToEnhanceDialogData by lazy { mutableStateOf(MultiNumberDialogData(model = model))}
     val clearSlotsDialogData by lazy { mutableStateOf(MultiListDialogData())}
@@ -124,6 +125,9 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
 
         "Harmony", "Chords to Enhance", "Enhance in Transpositions",
         "Check and Replace",
+
+        "Drums",
+
         "Clear Slots", "Spacer", "Export MIDI",
 
         "Spread where possible", "Deep Search in 4 part MK",
@@ -171,6 +175,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
         ListDialog(ritornelloDialogData, dimensions, lang.OkButton, colors, fillPrevious = true)
         ListDialog(vibratoDialogData, dimensions, lang.OkButton, colors, fillPrevious = true)
         HarmonyDialog(harmonyDialogData, dimensions)
+        DrumsDialog(drumsDialogData, dimensions)
         CheckAndReplaceDialog(checkAndReplaceDialogData, dimensions)
         ChordsToEnhanceDialog(chordsToEnhanceDialogData, dimensions)
 
@@ -744,6 +749,49 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                             }
                                         })
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+            ScaffoldTabs.DRUMS -> {
+                LazyColumn(modifier = tabModifier, state = listState)
+                {
+                    items(optionNames) { optionName ->
+                        val fontSize = dimensions.optionsFontSize
+                        when (optionName) {
+                            "Drums" -> {
+                                var drumsDatas =
+                                    DrumsData.createDrumsDatasFromCsv(userOptions.drums)
+                                drumsDatas = drumsDatas.ifEmpty { listOf(DrumsData()) }
+                                val isSelected =
+                                    !(drumsDatas.size == 1 && drumsDatas[0].type == DrumsType.NONE)
+                                SelectableCard(
+                                    text = if (!isSelected) lang.drums
+                                    else "${lang.drums}: \n\n${
+                                        drumsDatas.mapIndexed { i, hm ->
+                                            "${i + 1}: ${hm.describe()}"
+                                        }.joinToString("\n\n")
+                                    }",
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isSelected,
+                                    onClick = {
+                                        drumsDialogData.value = MultiNumberDialogData(
+                                            true,
+                                            lang.selectDrumsType,
+                                            model = model,
+                                            names = DrumKits.values().map { it.title },
+                                            anySequence = drumsDatas,
+                                        ) { drumsCsv ->
+                                            model.updateUserOptions(
+                                                "drums",
+                                                drumsCsv
+                                            )
+                                            drumsDialogData.value =
+                                                MultiNumberDialogData(model = model)
+                                        }
+                                    })
                             }
                         }
                     }

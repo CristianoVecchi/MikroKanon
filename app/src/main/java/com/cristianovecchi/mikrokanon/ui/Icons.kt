@@ -56,7 +56,9 @@ object Icons {
             "doubling" to R.drawable.ic_baseline_stacked_line_chart_24,
             "construction" to R.drawable.ic_baseline_construction_24,
             "parade" to R.drawable.ic_baseline_star_rate_24,
-            "chess" to R.drawable.ic_baseline_view_compact_24
+            "chess" to R.drawable.ic_baseline_view_compact_24,
+            "density" to R.drawable.ic_baseline_tornado_24,
+            "drums" to R.drawable.ic_baseline_fitness_center_24
         )
     }
 }

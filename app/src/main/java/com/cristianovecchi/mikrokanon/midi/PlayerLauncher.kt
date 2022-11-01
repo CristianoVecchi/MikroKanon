@@ -135,6 +135,9 @@ suspend fun launchPlayer(
     val enhanceChordsInTranspositions: Boolean =
         0 != (userOptionsData?.let { userOptionsData.enhanceChordsInTranspositions.toInt() }
             ?: 0)
+    val drumsData: List<DrumsData> =
+        userOptionsData?.let {DrumsData.createDrumsDatasFromCsv(userOptionsData.drums)}
+            ?: listOf()
         //selectedCounterpoint.value!!.display()
         Player.playCounterpoint(
             context,
@@ -165,7 +168,8 @@ suspend fun launchPlayer(
             checkAndReplace,
             harmonizations,
             chordsToEnhance,
-            enhanceChordsInTranspositions
+            enhanceChordsInTranspositions,
+            drumsData
         )
     }
 

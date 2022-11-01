@@ -22,42 +22,41 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
+import com.cristianovecchi.mikrokanon.AIMUSIC.DrumKits
+import com.cristianovecchi.mikrokanon.AIMUSIC.DrumsData
+import com.cristianovecchi.mikrokanon.AIMUSIC.DrumsType
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationData
-import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationType
-import com.cristianovecchi.mikrokanon.AIMUSIC.chordsInstruments
-import com.cristianovecchi.mikrokanon.AIMUSIC.starredChordsInstruments
-import com.cristianovecchi.mikrokanon.AIMUSIC.ListaStrumenti
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
-                   dimensions: Dimensions,
-                   onDismissRequest: () -> Unit = {
-                       multiNumberDialogData.value =
-                           MultiNumberDialogData(model = multiNumberDialogData.value.model,
-                               value = multiNumberDialogData.value.value) }) {
+fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
+                  dimensions: Dimensions,
+                  onDismissRequest: () -> Unit = {
+                      multiNumberDialogData.value =
+                          MultiNumberDialogData(model = multiNumberDialogData.value.model,
+                              value = multiNumberDialogData.value.value) }) {
     if (multiNumberDialogData.value.dialogState) {
         val model = multiNumberDialogData.value.model
         val appColors = model.appColors
         val fontColor = appColors.dialogFontColor
         val backgroundColor = appColors.dialogBackgroundColor
-        val ratedChordsInstruments = chordsInstruments.mapIndexed{i, ch ->
-            "${ListaStrumenti.getNameByIndex(i)}${if(starredChordsInstruments.contains(i)) " *" else ""}"
-        }
+        val drumKits = DrumKits.values().map { it.title }
+        val drumsTypes = DrumsType.values().map{ it.title }
         val lang = Lang.provideLanguage(model.getUserLangDef())
-        val harmNames = HarmonizationType.values().map{ it.title }
-        val harmTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
-        val instrumentDialogData by lazy { mutableStateOf(ListDialogData()) }
+
+        val drumsTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val drumKitsDialogData by lazy { mutableStateOf(ListDialogData()) }
         val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val densityDialogData by lazy { mutableStateOf(ListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            ListDialog(harmTypeDialogData, dimensions, lang.OkButton, appColors)
-            ListDialog(instrumentDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(drumsTypeDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(drumKitsDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(densityDialogData, dimensions, lang.OkButton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
                 else dimensions.dialogWidth
@@ -84,7 +83,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         .padding(8.dp)
                         .weight(weights.third)
 
-                    var harmDatas by remember { mutableStateOf(multiNumberDialogData.value.anySequence.map{ it as HarmonizationData}) }
+                    var drumsDatas by remember { mutableStateOf(multiNumberDialogData.value.anySequence.map{ it as DrumsData}) }
                     var cursor by remember { mutableStateOf(0) }
                     val fontSize = dimensions.dialogFontSize.sp
                     val fontWeight = FontWeight.Normal
@@ -105,7 +104,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         val intervalPadding = 4.dp
                         val innerPadding = 10.dp
                         val nCols = 1
-                        val nRows = (harmDatas.size / nCols) + 1
+                        val nRows = (drumsDatas.size / nCols) + 1
                         val rows = (0 until nRows).toList()
                         LazyColumn(state = listState) {
                             items(rows) { row ->
@@ -116,8 +115,8 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     horizontalArrangement = Arrangement.Start
                                 ) {
                                     for (j in 0 until nCols) {
-                                        if (index != harmDatas.size) {
-                                            val text = harmDatas[index].describe()
+                                        if (index != drumsDatas.size) {
+                                            val text = drumsDatas[index].describe()
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -147,7 +146,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 }
                             }
                             if (cursor > -1) coroutineScope.launch {
-                                val rowIndex = if (harmDatas.size <= nCols) 1 else cursor / nCols
+                                val rowIndex = if (drumsDatas.size <= nCols) 1 else cursor / nCols
                                 listState.animateScrollToItem(rowIndex)
                             }
                         }
@@ -167,62 +166,85 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val harmData = harmDatas[cursor]
-                            harmTypeDialogData.value = ListDialogData(
+                            val drumData = drumsDatas[cursor]
+                            drumsTypeDialogData.value = ListDialogData(
                                 true,
-                                harmNames,
-                                harmData.type.ordinal,
-                                lang.selectHarmonizationType
-                            ) { newHarmonizationType ->
-                                val newHarmDatas = harmDatas.toMutableList()
-                                newHarmDatas[cursor] = harmDatas[cursor].copy(type = HarmonizationType.values()[newHarmonizationType])
-                                harmDatas = newHarmDatas
-                                ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                                drumsTypes,
+                                drumData.type.ordinal,
+                                lang.selectDrumsType
+                            ) { newDrumsType ->
+                                val newDrumsDatas = drumsDatas.toMutableList()
+                                newDrumsDatas[cursor] = drumsDatas[cursor].copy(type = DrumsType.values()[newDrumsType])
+                                drumsDatas = newDrumsDatas
+                                ListDialogData(itemList = drumsTypeDialogData.value.itemList)
                             }
                         }
                         CustomButton(
                             adaptSizeToIconButton = true,
                             text = "",
-                            isActive = harmDatas[cursor].type != HarmonizationType.NONE,
+                            isActive = drumsDatas[cursor].type != DrumsType.NONE,
                             iconId = model.iconMap["sound"]!!,
                             buttonSize = buttonSize.dp,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val harmData = harmDatas[cursor]
-                            harmTypeDialogData.value = ListDialogData(
+                            val drumData = drumsDatas[cursor]
+                            drumKitsDialogData.value = ListDialogData(
                                 true,
-                                ratedChordsInstruments,
-                                chordsInstruments.indexOf(harmData.instrument),
-                                lang.selectHarmonizationInstruments
-                            ) { instrumentIndex ->
-                                val newHarmDatas = harmDatas.toMutableList()
-                                newHarmDatas[cursor] = harmDatas[cursor].copy(instrument = chordsInstruments[instrumentIndex])
-                                harmDatas = newHarmDatas
-                                ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                                drumKits,
+                                drumData.drumKit.ordinal,
+                                lang.selectDrumKit
+                            ) { drumKitIndex ->
+                                val newDrumsDatas = drumsDatas.toMutableList()
+                                newDrumsDatas[cursor] = drumsDatas[cursor].copy(drumKit = DrumKits.values()[drumKitIndex])
+                                drumsDatas = newDrumsDatas
+                                ListDialogData(itemList = drumKitsDialogData.value.itemList)
                             }
                         }
                         CustomButton(
                             adaptSizeToIconButton = true,
                             text = "",
-                            isActive = harmDatas[cursor].type != HarmonizationType.NONE,
+                            isActive = drumsDatas[cursor].type != DrumsType.NONE,
+                            iconId = model.iconMap["density"]!!,
+                            buttonSize = buttonSize.dp,
+                            iconColor = model.appColors.iconButtonIconColor,
+                            colors = model.appColors
+                        ) {
+                            val drumData = drumsDatas[cursor]
+                            val densities = listOf(100,90,80,70,60,50,45,40,35,30,26,23,20,16,13,10,8,6,4,2)
+                            densityDialogData.value = ListDialogData(
+                                true,
+                                densities.map{"$it%"},
+                                densities.indexOf((drumData.volume * 100).toInt()),
+                                lang.selectDrumsDensity
+                            ) { densityIndex ->
+                                val newDrumsDatas = drumsDatas.toMutableList()
+                                newDrumsDatas[cursor] = drumsDatas[cursor].copy(density = densities[densityIndex] / 100f)
+                                drumsDatas = newDrumsDatas
+                                ListDialogData(itemList = densityDialogData.value.itemList)
+                            }
+                        }
+                        CustomButton(
+                            adaptSizeToIconButton = true,
+                            text = "",
+                            isActive = drumsDatas[cursor].type != DrumsType.NONE,
                             iconId = model.iconMap["volume"]!!,
                             buttonSize = buttonSize.dp,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val harmData = harmDatas[cursor]
+                            val drumData = drumsDatas[cursor]
                             val volumes = listOf(100,90,80,70,60,50,45,40,35,30,26,23,20,16,13,10,8,6,4,2)
-                            harmTypeDialogData.value = ListDialogData(
+                            volumeDialogData.value = ListDialogData(
                                 true,
                                 volumes.map{"$it%"},
-                                volumes.indexOf((harmData.volume * 100).toInt()),
-                                lang.selectHarmonizationVolume
+                                volumes.indexOf((drumData.volume * 100).toInt()),
+                                lang.selectDrumsVolume
                             ) { volumeIndex ->
-                                val newHarmDatas = harmDatas.toMutableList()
-                                newHarmDatas[cursor] = harmDatas[cursor].copy(volume = volumes[volumeIndex] / 100f)
-                                harmDatas = newHarmDatas
-                                ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                                val newDrumsDatas = drumsDatas.toMutableList()
+                                newDrumsDatas[cursor] = drumsDatas[cursor].copy(volume = volumes[volumeIndex] / 100f)
+                                drumsDatas = newDrumsDatas
+                                ListDialogData(itemList = volumeDialogData.value.itemList)
                             }
                         }
                     }
@@ -242,7 +264,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             colors = model.appColors
                         ) {
                             multiNumberDialogData.value.onSubmitButtonClick.invoke(
-                                harmDatas.joinToString(",") { it.toCsv()}
+                                drumsDatas.joinToString(",") { it.toCsv()}
                             )
                             onDismissRequest.invoke()
                         }
@@ -255,11 +277,11 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            if (harmDatas.size > 1) {
-                                val newHarmDatas = harmDatas.toMutableList()
-                                newHarmDatas.removeAt(cursor)
-                                harmDatas = newHarmDatas.toList()
-                                val newCursor = if (harmDatas.size > 1) cursor - 1 else 0
+                            if (drumsDatas.size > 1) {
+                                val newDrumsDatas = drumsDatas.toMutableList()
+                                newDrumsDatas.removeAt(cursor)
+                                drumsDatas = newDrumsDatas.toList()
+                                val newCursor = if (drumsDatas.size > 1) cursor - 1 else 0
                                 cursor = if (newCursor < 0) 0 else newCursor
                             }
                         }
@@ -270,18 +292,18 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             iconColor = model.appColors.iconButtonIconColor,
                             colors = model.appColors
                         ) {
-                            val harmData = harmDatas[cursor]
-                            harmTypeDialogData.value = ListDialogData(
+                            val drumsData = drumsDatas[cursor]
+                            drumsTypeDialogData.value = ListDialogData(
                                 true,
-                                harmNames,
-                                harmData.type.ordinal,
-                                lang.selectHarmonizationType
-                            ) { newHarmonizationType ->
-                                val rebuilding = harmDatas.addOrInsert(
-                                    HarmonizationData(type = HarmonizationType.values()[newHarmonizationType]), cursor)
-                                harmDatas = rebuilding.first
+                                drumsTypes,
+                                drumsData.type.ordinal,
+                                lang.selectDrumsType
+                            ) { newDrumsType ->
+                                val rebuilding = drumsDatas.addOrInsert(
+                                    DrumsData(type = DrumsType.values()[newDrumsType]), cursor)
+                                drumsDatas = rebuilding.first
                                 cursor = rebuilding.second
-                                ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                                ListDialogData(itemList = drumsTypeDialogData.value.itemList)
                             }
                         }
                     }

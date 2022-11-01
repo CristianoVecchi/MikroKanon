@@ -134,7 +134,8 @@ object Player {
         checkAndReplace: List<List<CheckAndReplaceData>> = listOf(),
         harmonizations: List<HarmonizationData> = listOf(),
         chordsToEnhance: List<ChordToEnhanceData> = listOf(),
-        enhanceChordsInTransposition: Boolean = false
+        enhanceChordsInTransposition: Boolean = false,
+        drumsData: List<DrumsData> = listOf()
     ): String = withContext(context){
         // BUILD ACTUAL COUNTERPOINT
         val job = context.job
@@ -250,13 +251,13 @@ object Player {
 
                                     //ADD DRUMS TRACK (channel=9)
                                     try{
-                                        val drumsData = listOf<DrumsData>(
-                                            DrumsData(DrumsType.CENTROIDS, 0.03f),
-                                            DrumsData(DrumsType.CENTROIDS, 1f),
-                                            DrumsData(DrumsType.NONE, 1f),
-                                            DrumsData(DrumsType.CENTROIDS, 0.5f),
-                                            DrumsData(DrumsType.CENTROIDS, 0.1f)
-                                        )
+//                                        val drumsData = listOf(
+//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.2f),
+//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.4f),
+//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.5f),
+//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.7f),
+//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 1f)
+//                                        )
                                         val drumsTrack = MidiTrack()
                                         drumsTrack.addDrumsToTrack(actualCounterpointTrackData, drumsData, totalLength.toInt())
                                         tracks.add(drumsTrack)

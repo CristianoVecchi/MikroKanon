@@ -16,7 +16,7 @@ fun main(){
 
 }
 fun MidiTrack.addDrumsToTrack(trackDatas: List<TrackData>, drumsDatas: List<DrumsData>, totalLength: Int){
-    if(drumsDatas.isEmpty() || totalLength == 0) return
+    if(drumsDatas.isEmpty() || drumsDatas.all {it.type == DrumsType.NONE} || totalLength == 0 ) return
     val sectionDurations = totalLength.divideDistributingRest(drumsDatas.size)
     var tick = 0
     val sectionTicks = sectionDurations.map{
@@ -35,7 +35,7 @@ fun MidiTrack.addDrumsToTrack(trackDatas: List<TrackData>, drumsDatas: List<Drum
         val start = sectionTicks[index]
         val duration = sectionDurations[index]
         when (drumsData.type) {
-            DrumsType.CENTROIDS -> this.addDrumsToTrackByCentroids(trackDatas, drumsData.drumKit, start, duration, drumsData.density)
+            DrumsType.CENTROIDS -> this.addDrumsToTrackByCentroids(trackDatas, drumsData.drumKit.drumKit, start, duration, drumsData.density, drumsData.volume)
             else -> {}
         }
     }
@@ -44,7 +44,7 @@ fun MidiTrack.addDrumsToTrack(trackDatas: List<TrackData>, drumsDatas: List<Drum
 //        0, totalLength.toInt(),0.5F)
 }
 fun MidiTrack.addDrumsToTrackByCentroids(trackDatas: List<TrackData>, drumKit: DrumKit,
-                                sectionStart:Int, sectionDuration:Int, density: Float){
+                                sectionStart:Int, sectionDuration:Int, density: Float, volume: Float){
     val sectionIndices = trackDatas.map{ it.ticks }.findIndicesInSection(sectionStart, sectionDuration)
     var nElements = sectionIndices.nElements()
 //    println("Drums section: $sectionStart - ${sectionStart + sectionDuration -1}  density: $density")
@@ -56,8 +56,8 @@ fun MidiTrack.addDrumsToTrackByCentroids(trackDatas: List<TrackData>, drumKit: D
     if(nElements > 5000){
         val sectionHalves = sectionDuration.divideDistributingRest(2)
         println("--- DRUMS SECTION SPLIT ---")
-        this.addDrumsToTrackByCentroids(trackDatas, drumKit, sectionStart, sectionHalves[0], density / 2)
-        this.addDrumsToTrackByCentroids(trackDatas, drumKit, sectionStart + sectionHalves[0], sectionHalves[1], density / 2)
+        this.addDrumsToTrackByCentroids(trackDatas, drumKit, sectionStart, sectionHalves[0], density / 2, volume)
+        this.addDrumsToTrackByCentroids(trackDatas, drumKit, sectionStart + sectionHalves[0], sectionHalves[1], density / 2, volume)
     } else {
         val soundList = drumKit.soundList()
         val emptyCentroids = ((1f - density) * soundList.size / 2).toInt() * 3// add density
@@ -97,14 +97,18 @@ fun MidiTrack.addDrumsToTrackByCentroids(trackDatas: List<TrackData>, drumKit: D
 //        println("sums: $sums")
 //        println("sumsPairs: $sumsPairs")
 //        println("ascendant sums: ${ascendantSums.contentToString()}")
+        val volumePercentage = if(volume <=0.5f) volume * 2 else 1f + volume / 4
         points.forEach {
             //println(it)
             val group = ascendantSums.indexOf(it.group)
+            val duration = if(it.y > 1920) 1920L else it.y.toLong()
             if(group < soundList.size) {
                 val start = it.tick.toLong()
                 val sound = soundList[group]
-                val on = NoteOn(start, 9, sound, it.velocity)
-                val off = NoteOff(start + it.y.toLong(), 9, sound, it.velocity)
+                val velocity = (it.velocity * volumePercentage).toInt().coerceIn(0,127)
+                //println("Volume:$volume ${it.velocity}->$velocity")
+                val on = NoteOn(start, 9, sound, velocity)
+                val off = NoteOff(start + duration, 9, sound, velocity)
                 //println("Drum sound: $sound   tick: $start")
                 this.insertEvent(on)
                 this.insertEvent(off)
