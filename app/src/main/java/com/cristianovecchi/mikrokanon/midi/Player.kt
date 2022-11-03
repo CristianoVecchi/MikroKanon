@@ -206,80 +206,84 @@ object Player {
                             }
                             // CHECK AND REPLACE
                             val actualCounterpointTrackData = counterpointTrackData.applyMultiCheckAndReplace(job, dispatch, checkAndReplace,totalLength)
+
+                            // CREATE DRUMS TRACK (channel=9)
+                            val drumsTrack: MidiTrack? = createDrumsTrack(job, dispatch, actualCounterpointTrackData, drumsData, totalLength.toInt())
+                                            //val drumsData = listOf(
+//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.2f),
+//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.4f),
+//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.5f),
+//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.7f),
+//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 1f)
+//                                          )
+
                             if (!job.isActive) {
                                 //dispatch("Cancelled during Check'n'replace building!")
-                                "Cancelled during Check'n'replace building!"
+                                "Cancelled during Check'n'replace or Drums building!"
                             } else {
-                                // TRANSFORM DATATRACKS IN MIDITRACKS
-                                val counterpointTracks = actualCounterpointTrackData.map {
-                                    yield() //delay(1)
-                                    if(job.isActive) {
-                                        //dispatch("Building MidiTrack Channel: ${it.channel}")
-                                        dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
-                                        convertToMidiTrack(it, actualCounterpointTrackData.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} })
-                                    } else MidiTrack()
-                                }
-                                if (!job.isActive) {
-                                    //dispatch("Cancelled during MidiTracks building!")
-                                    "Cancelled during MidiTracks building!"
+                                val totalNotes = actualCounterpointTrackData.sumOf{it.pitches.size}
+                                println("Total of notes after Check'n'replace: $totalNotes")
+                                if(totalNotes > 100000){
+                                    dispatch(Triple(AppViewModel.Building.NONE, 0, 0))
+                                    "-1" // ERROR: TOO MUCH NOTES!!!
                                 } else {
-                                    // ADD ATTACK TO MIDITRACKS
+                                    // TRANSFORM DATATRACKS IN MIDITRACKS
+                                    val counterpointTracks = actualCounterpointTrackData.map {
+                                        yield() //delay(1)
+                                        if(job.isActive) {
+                                            //dispatch("Building MidiTrack Channel: ${it.channel}")
+                                            dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
+                                            println("Total on notes after Check'n'replace: ${actualCounterpointTrackData.sumOf{it.pitches.size}}")
+                                            convertToMidiTrack(it, actualCounterpointTrackData.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} })
+                                        } else MidiTrack()
+                                    }
+                                    if (!job.isActive) {
+                                        //dispatch("Cancelled during MidiTracks building!")
+                                        "Cancelled during MidiTracks building!"
+                                    } else {
+                                        // ADD ATTACK TO MIDITRACKS
 //                                    if(checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} }){
 //                                        actualCounterpointTrackData.forEachIndexed { i, trackData ->
 //                                            println(trackData)
 //                                            trackData.addAttackToMidiTrack(counterpointTracks[i])
 //                                        }
 //                                    }
-                                    // ADD BPM AND VOLUME CHANGES
-                                    val tempoTrack = buildTempoTrack(bpms, totalLength)
-                                    tempoTrack.addVolumeToTrack(dynamics, totalLength)
+                                        // ADD BPM AND VOLUME CHANGES
+                                        val tempoTrack = buildTempoTrack(bpms, totalLength)
+                                        tempoTrack.addVolumeToTrack(dynamics, totalLength)
 
-                                    // ADD METRO CHANGES
-                                    val nRhythmSteps = durations.filter { it > -1 }.count()
-                                    val actualRhythm = multiplyRhythmPatternDatas(nTotalNotes, nRhythmSteps, rhythm)
-                                    val bars = tempoTrack.setTimeSignatures(actualRhythm, totalLength)
+                                        // ADD METRO CHANGES
+                                        val nRhythmSteps = durations.filter { it > -1 }.count()
+                                        val actualRhythm = multiplyRhythmPatternDatas(nTotalNotes, nRhythmSteps, rhythm)
+                                        val bars = tempoTrack.setTimeSignatures(actualRhythm, totalLength)
 
-                                    //BUILD MIDI FILE
-                                    val tracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
-                                    tracks.add(tempoTrack)
-                                    tracks.addAll(counterpointTracks)
+                                        //BUILD MIDI FILE
+                                        val tracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
+                                        tracks.add(tempoTrack)
+                                        tracks.addAll(counterpointTracks)
 
-                                    //ADD CHORD TRACK IF NEEDED
-                                    //println(harmonizations)
-                                    tracks.addChordTrack(harmonizations, bars,
-                                        counterpointTrackData, audio8D, totalLength, false)
+                                        //ADD CHORD TRACK AND DRUMS TRACKS IF NEEDED
+                                        //println(harmonizations)
+                                        tracks.addChordTrack(harmonizations, bars,
+                                            counterpointTrackData, audio8D, totalLength, false)
+                                        drumsTrack?.let{tracks.add(it)}
 
-                                    //ADD DRUMS TRACK (channel=9)
-                                    try{
-//                                        val drumsData = listOf(
-//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.2f),
-//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.4f),
-//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.5f),
-//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.7f),
-//                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 1f)
-//                                        )
-                                        val drumsTrack = MidiTrack()
-                                        drumsTrack.addDrumsToTrack(actualCounterpointTrackData, drumsData, totalLength.toInt())
-                                        tracks.add(drumsTrack)
-                                    } catch(e: java.lang.Exception){
-                                        println("Exception adding drums: ${e.message}")
-                                    }
-
-                                    val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
-                                    //println("JOB ACTIVE: ${job.isActive}")
-                                    // WARNING: nTotalNotes returned is not considering check and replace modifications!!!
-                                    //dispatch(Triple(AppViewModel.Building.NONE, 0,0))
-                                    //delay(1)
-                                    yield()
-                                    if(job.isActive) {
-                                        saveAndPlayMidiFile(job, dispatch, mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
+                                        val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
+                                        //println("JOB ACTIVE: ${job.isActive}")
+                                        // WARNING: nTotalNotes returned is not considering check and replace modifications!!!
+                                        //dispatch(Triple(AppViewModel.Building.NONE, 0,0))
+                                        //delay(1)
+                                        yield()
+                                        if(job.isActive) {
+                                            saveAndPlayMidiFile(job, dispatch, mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
 //                                        val testTracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
 //                                        testTracks.add(octaveTest(MidiTrack()))
 //                                        val testMidi = MidiFile(MidiFile.DEFAULT_RESOLUTION, testTracks)
 //                                            saveAndPlayMidiFile(job, dispatch, mediaPlayer,  testMidi, looping, play, midiFile, nTotalNotes)
-                                    }
-                                    else {
-                                        "Canceled before playing Midi File!"
+                                        }
+                                        else {
+                                            "Canceled before playing Midi File!"
+                                        }
                                     }
                                 }
                             }

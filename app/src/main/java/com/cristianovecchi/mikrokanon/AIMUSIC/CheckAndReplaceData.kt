@@ -277,7 +277,8 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
     data class Fantasia(override val title: String = "Fantasia", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
 }
 data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
-                               val replace: ReplaceType = ReplaceType.Mordente(),){
+                               val replace: ReplaceType = ReplaceType.Mordente(),
+                               val range: IntRange = IntRange(A0, C8)){
     fun describe(glissSymbols: String = "Gl"): String {
         val retr = if(replace.isRetrograde) "←" else ""
         val gliss = if(replace.addGliss) glissSymbols else ""
@@ -338,7 +339,10 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
 fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>) -> Boolean {
     return when(checkType){
         is CheckType.None -> { _, _, _ -> false }
-        is CheckType.EqualOrGreater -> { trackData, index, trackDataList -> trackData.durations[index] >= checkType.limit }
+        is CheckType.EqualOrGreater -> { trackData, index, trackDataList ->
+            trackData.pitches[index]
+            trackData.durations[index] >= checkType.limit
+        }
         is CheckType.StartPhrase -> { trackData, index, trackDataList ->
             trackData.isPreviousRest[index]
         }

@@ -5,7 +5,7 @@ package com.cristianovecchi.mikrokanon.dataAnalysis
 import java.util.Random
 import kotlin.math.*
 
-data class Point(var x: Double, var y: Double, var group: Int, val tick: Int, val velocity: Int)
+data class Point(var x: Double, var y: Double, var group: Int, val partIndex: Int, val noteIndex: Int)
 
 typealias LPoint = List<Point>
 typealias MLPoint = MutableList<Point>

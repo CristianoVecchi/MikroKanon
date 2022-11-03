@@ -266,8 +266,16 @@ class AppViewModel(
                         )
                         dispatchError(error)
                         error.toIntOrNull()?.let{
-                            val timestamp = System.currentTimeMillis()
-                            updateUserOptions("lastPlayData", "$it|$timestamp")
+                            if(it < 0){
+                                println("Can't create MIDI track: too much notes!!!")
+                                withContext(Dispatchers.Main) {
+                                    onStop()
+                                    //_playing.value = false
+                                }
+                            } else {
+                                val timestamp = System.currentTimeMillis()
+                                updateUserOptions("lastPlayData", "$it|$timestamp")
+                            }
                         }
                     }
                     dispatchError(error)
@@ -281,7 +289,7 @@ class AppViewModel(
         //println("MIDI building ends with: $error")
     }
     enum class Building {
-        NONE, START, DATATRACKS, CHECK_N_REPLACE, MIDITRACKS, WRITE_FILE
+        NONE, START, DATATRACKS, CHECK_N_REPLACE, DRUMS, MIDITRACKS, WRITE_FILE
     }
     var _buildingState: MutableLiveData<Triple<Building,List<Int>,Int>> =
                 MutableLiveData(Triple(Building.NONE, listOf(),0))
@@ -294,6 +302,7 @@ class AppViewModel(
             Building.START -> Triple(Building.START, listOf(),0)
             Building.DATATRACKS -> Triple(Building.DATATRACKS,list + message.second ,message.third)
             Building.CHECK_N_REPLACE -> Triple(Building.CHECK_N_REPLACE,list + message.second ,message.third)
+            Building.DRUMS -> Triple(Building.DRUMS,list + message.second ,message.third)
             Building.MIDITRACKS -> Triple(Building.MIDITRACKS,list + message.second ,message.third)
             Building.WRITE_FILE -> Triple(Building.WRITE_FILE,list + message.second ,message.third)
         }

@@ -88,6 +88,7 @@ onMenuClick: () -> Unit, onCreditsClick: () -> Unit){
                     AppViewModel.Building.START -> model.iconMap["sound"]
                     AppViewModel.Building.DATATRACKS -> model.iconMap["building"]
                     AppViewModel.Building.CHECK_N_REPLACE -> model.iconMap["accompanist"]
+                    AppViewModel.Building.DRUMS -> model.iconMap["drums"]
                     AppViewModel.Building.MIDITRACKS -> model.iconMap["construction"]
                     AppViewModel.Building.WRITE_FILE -> model.iconMap["save"]
                 }

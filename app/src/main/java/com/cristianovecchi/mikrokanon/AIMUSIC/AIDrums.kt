@@ -29,7 +29,20 @@ data class DrumsData(val type: DrumsType = DrumsType.NONE,val drumKit: DrumKits 
     }
 }
 enum class DrumsType(val title:String) {
-    NONE("No Drums"), CENTROIDS("CENTROIDS")
+    NONE("No Drums"),
+    PITCHES_DURS("NOTES+DURS"),
+    DURS_PITCHES("DURS+NOTES"),
+    PITCHES_VELS("NOTES+VELS"),
+    VELS_PITCHES("VELS+NOTES"),
+    DURS_VELS("DURS+VELS"),
+    VELS_DURS("VELS+DURS"),
+    TICKS_PITCHES("TIME+NOTES"),
+    PITCHES_TICKS("NOTES+TIME"),
+    TICKS_DURS("TIME+DURS"),
+    DURS_TICKS("DURS+TIME"),
+    TICKS_VELS("TIME+VELS"),
+    VELS_TICKS("VELS+TIME"),
+
 }
 enum class DrumKits(val title:String, val drumKit: DrumKit){
     FULL("Full", DrumKit()),
@@ -46,7 +59,25 @@ enum class DrumKits(val title:String, val drumKit: DrumKit){
         intArrayOf(),
         intArrayOf(CRASH_CYMBAL_1, CRASH_CYMBAL_2, SPLASH_CYMBAL, RIDE_CYMBAL_1, RIDE_CYMBAL_2, CHINESE_CYMBAL),
         intArrayOf(RIDE_BELL, COWBELL)
-    ))
+    )),
+    MINI("Mini", DrumKit(
+        intArrayOf(ELECTRIC_BASS_DRUM),
+        intArrayOf(SNARE_OFF),
+        intArrayOf(SIDE_STICK),
+        intArrayOf(CLOSED_HI_HAT),
+        intArrayOf(HI_MID_TOM),
+        intArrayOf(CRASH_CYMBAL_1, RIDE_CYMBAL_1),
+        intArrayOf(COWBELL)
+    )),
+    TOMS("Toms", DrumKit(
+        intArrayOf(),
+        intArrayOf(),
+        intArrayOf(),
+        intArrayOf(),
+        intArrayOf(LOW_TOM, LOW_MID_TOM, HI_MID_TOM, HIGH_TOM),
+        intArrayOf(),
+        intArrayOf()
+    )),
 
 }
 data class DrumKit(
