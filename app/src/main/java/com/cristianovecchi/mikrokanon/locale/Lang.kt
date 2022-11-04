@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.locale
 
+import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import java.text.DateFormat
 import java.util.*
@@ -283,6 +284,15 @@ val rangeTypeMap = mapOf(
 val legatoTypeMap = mapOf(
     0 to "S+", 1 to "S", 2 to "P", 3 to "A", 4 to "L", 5 to "L+"
 )
+fun IntRange.describeWithNotes(noteNames: List<String>): String{
+    val firstName = Clip.convertAbsToClipText(first % 12, noteNames)
+    val lastName = Clip.convertAbsToClipText(last % 12, noteNames)
+    return "$firstName${first/12-1}-$lastName${last/12-1}"
+}
+fun Int.describeAsNote(noteNames: List<String>): String {
+    val name = Clip.convertAbsToClipText(this % 12, noteNames)
+    return "$name${this/12-1}"
+}
 
 val convertToLocaleDate = { timestamps:List<String>, langDef:String ->
     //println("langDef = $langDef")

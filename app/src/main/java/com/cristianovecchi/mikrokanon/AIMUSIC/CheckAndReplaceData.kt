@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import com.cristianovecchi.mikrokanon.divideDistributingRest
+import com.cristianovecchi.mikrokanon.locale.describeWithNotes
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -191,6 +192,13 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
 
         }
     }
+    fun titleAsRetrograde(): String{
+        return when{
+            title.contains("<>") -> title.replace("<>", "><")
+            title.contains("<") -> title.replace("<", ">")
+            else -> "←$title"
+        }
+    }
     companion object{
         val titles: List<String> = listOf(  "Mordente", "Mordente 2X",
         "Mordente 3x", "Gruppetto", "Note di cambio", "Onda",
@@ -264,7 +272,7 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
     data class TremoloCrescDim(override val title: String = "Tremolo<>", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Glissando(override val title: String = "Glissando", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Velocity(override val title: String = "Dinamica", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
-    data class Attack(override val title: String = "Attacco", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
+    data class Attack(override val title: String = "Attacco<", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Irregular2m(override val title: String = "Irregolare 2m", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Irregular2M(override val title: String = "Irregolare 2M", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class SOS(override val title: String = "SOS", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
@@ -279,21 +287,49 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
 data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
                                val replace: ReplaceType = ReplaceType.Mordente(),
                                val range: IntRange = IntRange(A0, C8)){
-    fun describe(glissSymbols: String = "Gl"): String {
-        val retr = if(replace.isRetrograde) "←" else ""
-        val gliss = if(replace.addGliss) glissSymbols else ""
+    fun requiresGlissando(): Boolean {
+        return when (replace) {
+            is ReplaceType.TremoloCrescendo, is ReplaceType.TremoloCrescDim,
+            is ReplaceType.RibattutoCrescendo, is ReplaceType.RibattutoCrescDim,
+            is ReplaceType.DrammaticoCrescendo, is ReplaceType.DrammaticoCrescDim,
+            is ReplaceType.Accento, is ReplaceType.SOS,
+            is ReplaceType.Glissando, is ReplaceType.Velocity, is ReplaceType.Attack -> false
+            else -> true
+        }
+    }
+    fun requiresRetrograde(): Boolean {
+        return when (replace)
+        {
+            is ReplaceType.Glissando, is ReplaceType.Velocity -> false
+            else -> true
+        }
+    }
+    fun requiresStress(): Boolean {
+        return when (replace)
+        {
+            is ReplaceType.Glissando -> false
+            else -> true
+        }
+    }
+    fun describe(glissSymbols: String = "Gl", noteNames: List<String>): String {
+        val title = if(requiresRetrograde() && replace.isRetrograde) replace.titleAsRetrograde() else "${replace.title}"
+        //val retr = if(requiresRetrograde() && replace.isRetrograde) "←" else ""
+        val gliss = if(requiresGlissando() && replace.addGliss) glissSymbols else ""
+        val stress = if(requiresStress()) "^${replace.stress}" else ""
+        val rangeNotes = if(range == IntRange(A0, C8)) "" else range.describeWithNotes(noteNames)
+
         return when(check){
             is CheckType.None -> check.describe()
-            is CheckType.EqualOrGreater -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
-            is CheckType.StartPhrase -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
-            is CheckType.EndPhrase -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
-            is CheckType.SingleNote -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
-            is CheckType.AtTheExtremes -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
-            is CheckType.NotAtTheExtremes -> "${check.describe()} $retr${replace.title}$gliss ^${replace.stress}"
+            is CheckType.EqualOrGreater -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
+            is CheckType.StartPhrase -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
+            is CheckType.EndPhrase -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
+            is CheckType.SingleNote -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
+            is CheckType.AtTheExtremes -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
+            is CheckType.NotAtTheExtremes -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
         }
     }
     fun toCsv(): String {
-        return "${this.check.toCsv()}|${this.replace.toCsv()}"
+        return "${this.check.toCsv()}|${this.replace.toCsv()}|${this.range.first}#${this.range.last}"
     }
     companion object{
         fun insertInMultiCheckAndReplaceCsv(index: Int, cnrCsv: String, multiCsv: String): String {
@@ -319,9 +355,12 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
         }
         fun createCheckAndReplaceDataFromCsv(csv: String): CheckAndReplaceData{
             if(csv.isBlank()) return CheckAndReplaceData()
-            val (checkCsv, replaceCsv) = csv.split("|")
+            val csvValues = csv.split("|")
+            val (checkCsv, replaceCsv) = csvValues
+            val rangeCsv = csvValues.getOrElse(2) {"$A0#$C8"}
             val checkValues = checkCsv.split("#")
             val replaceValues = replaceCsv.split("#")
+            val rangeValues = rangeCsv.split("#")
             val limit = checkValues.getOrElse(1) { "0"}
             val check = CheckType.provideCheckType(checkValues[0].toInt(), limit.toInt())
             val stress = replaceValues.getOrElse(1) {"0"}
@@ -329,7 +368,8 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
             val addGliss = replaceValues.getOrElse(3) {"0"}
             val replace = ReplaceType.provideReplaceType(replaceValues[0].toInt(),
                 stress.toInt(), isRetrograde.toInt() != 0, addGliss.toInt() != 0)
-            return CheckAndReplaceData(check, replace)
+            val range = IntRange(rangeValues[0].toInt(), rangeValues[1]. toInt())
+            return CheckAndReplaceData(check, replace, range)
         }
     }
 }

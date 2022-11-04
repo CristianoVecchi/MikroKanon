@@ -25,6 +25,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
+import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getGlissandoSymbols
 import com.cristianovecchi.mikrokanon.ui.Dimensions
@@ -51,10 +52,12 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
         val checkTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val replaceTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val stressDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val rangeDialogData by lazy { mutableStateOf(MultiFloatDialogData(model = model)) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             ListDialog(checkTypeDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(replaceTypeDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(stressDialogData, dimensions, lang.OkButton, appColors)
+            PitchRangeDialog(rangeDialogData, dimensions, lang.OkButton)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
                 else dimensions.dialogWidth
@@ -114,7 +117,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 ) {
                                     for (j in 0 until nCols) {
                                         if (index != checkAndReplaceDatas.size) {
-                                            val text = checkAndReplaceDatas[index].describe(glissSymbol)
+                                            val text = checkAndReplaceDatas[index].describe(glissSymbol, lang.noteNames)
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -209,7 +212,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                             CustomButton( // stress edit
                                 adaptSizeToIconButton = true,
                                 text = "",
-                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
+                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None && checkAndReplaceDatas[cursor].requiresStress(),
                                 iconId = model.iconMap["volume"]!!,
                                 buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
@@ -239,7 +242,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                         ) {
                             CustomButton(
                                 adaptSizeToIconButton = true,
-                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
+                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None && checkAndReplaceDatas[cursor].requiresRetrograde(),
                                 iconId = model.iconMap["back"]!!,
                                 buttonSize = buttonSize.dp,
                                 iconColor = model.appColors.iconButtonIconColor,
@@ -256,7 +259,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                             }
                             CustomButton(
                                 adaptSizeToIconButton = true,
-                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
+                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None && checkAndReplaceDatas[cursor].requiresGlissando(),
                                 text = glissSymbol,
 //                                iconId = model.iconMap["back"]!!,
                                 buttonSize = buttonSize.dp,
@@ -271,6 +274,30 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                     replace = oldReplace.clone(addGliss = !oldReplace.addGliss))
                                 checkAndReplaceDatas = newCnrDatas
                                 ListDialogData(itemList = stressDialogData.value.itemList)
+                            }
+                            CustomButton( // range button
+                                adaptSizeToIconButton = true,
+                                isActive = checkAndReplaceDatas[cursor].check !is CheckType.None,
+                                iconId = model.iconMap["range"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val cnrDatas = checkAndReplaceDatas[cursor]
+                                val limits = listOf(cnrDatas.range.first, cnrDatas.range.last)
+                                rangeDialogData.value = MultiFloatDialogData(
+                                    true,
+                                    "Select the range!",
+                                    "${limits[0]},${limits[1]}",
+                                        A0.toFloat(), C8.toFloat(), model
+                                ) { rangeCsv ->
+                                    val newCnrDatas = checkAndReplaceDatas.toMutableList()
+                                    val oldCnrData = checkAndReplaceDatas[cursor]
+                                    val (down, up) = rangeCsv.extractIntsFromCsv()
+                                    newCnrDatas[cursor] = oldCnrData.copy(range = IntRange(down, up))
+                                    checkAndReplaceDatas = newCnrDatas
+                                    ListDialogData(itemList = stressDialogData.value.itemList)
+                                }
                             }
                         }
                     }
@@ -328,8 +355,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 CheckType.getIndex(checkAndReplaceData.check),
                                 lang.selectCheckType
                             ) { newCheckTypeIndex ->
-                                val rebuilding = checkAndReplaceDatas.addOrInsert(
-                                CheckAndReplaceData(check = checkList[newCheckTypeIndex]), cursor)
+                                val rebuilding = checkAndReplaceDatas.addOrInsert(CheckAndReplaceData(checkList[newCheckTypeIndex], checkAndReplaceData.replace, checkAndReplaceData.range), cursor)
                                 checkAndReplaceDatas = rebuilding.first
                                 cursor = rebuilding.second
                                 ListDialogData(itemList = checkTypeDialogData.value.itemList)
