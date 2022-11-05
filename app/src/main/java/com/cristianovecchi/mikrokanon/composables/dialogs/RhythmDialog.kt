@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.*
+import com.cristianovecchi.mikrokanon.AIMUSIC.AIRhythm
+import com.cristianovecchi.mikrokanon.AIMUSIC.RhythmType
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
@@ -43,10 +45,10 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
         val fontColor = appColors.dialogFontColor
         val backgroundColor = appColors.dialogBackgroundColor
             val patternNames = patterns.map{ it.title }
-            val listDialogData by lazy { mutableStateOf(ListDialogData())}
+            val groupingDialogData by lazy { mutableStateOf(GroupingDialogData())}
             val repetitionsDialogData by lazy { mutableStateOf(ListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            ListDialog(listDialogData, dimensions, lang.OkButton, appColors)
+            GroupingListDialog(groupingDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(repetitionsDialogData, dimensions, lang.OkButton, appColors, fillPrevious = true)
             val width = if(dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
@@ -255,14 +257,20 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                     val pattern = value.first
                                     val repetitions = value.second.absoluteValue
                                     val back = if(value.second < 0) -1 else 1
-                                    listDialogData.value = ListDialogData(
-                                        true, patternNames, pattern, lang.selectRhythm
+                                    val itemGroups = RhythmPatterns.values()
+                                        .groupBy { it.type }.values.map{ it.map{ it.title}}
+                                    val groupNames = RhythmType.values().map { it.name }
+                                    groupingDialogData.value = GroupingDialogData(
+                                        true, itemGroups, groupNames,
+                                        pattern,
+                                        lang.selectRhythm
                                     ) { index ->
                                         values[cursor] = Pair(index, repetitions * back)
                                         patternText = values.toIntPairsString()
 
-                                        listDialogData.value =
-                                            ListDialogData(itemList = listDialogData.value.itemList)
+                                        groupingDialogData.value =
+                                            GroupingDialogData(itemGroups = groupingDialogData.value.itemGroups,
+                                                groupNames = groupingDialogData.value.groupNames, selectedListDialogItem = index)
                                     }
 
                                 }
@@ -293,16 +301,24 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                     var values = patternText.extractIntPairsFromCsv()
                                     val selectedValue = values[cursor]
                                     val pattern = selectedValue.first
-                                    listDialogData.value = ListDialogData(
-                                        true, patternNames, pattern, lang.selectRhythm
+                                    val itemGroups = RhythmPatterns.values()
+                                        .groupBy { it.type }.values.map{ it.map{ it.title}}
+                                    val groupNames = RhythmType.values().map { it.name }
+                                    groupingDialogData.value = GroupingDialogData(
+                                        true, itemGroups, groupNames,
+                                        pattern,
+                                        lang.selectRhythm
                                     ) { index ->
                                         val rebuilding = values.addOrInsert(Pair(index,1), cursor)
                                         values = rebuilding.first
                                         cursor = rebuilding.second
                                         patternText = values.toMutableList().toIntPairsString()
 
-                                        listDialogData.value =
-                                            ListDialogData(itemList = listDialogData.value.itemList)
+                                        groupingDialogData.value =
+                                            GroupingDialogData(itemGroups = groupingDialogData.value.itemGroups,
+                                            groupNames = groupingDialogData.value.groupNames,
+                                                selectedListDialogItem = index
+                                            )
                                     }
 
                                 }
@@ -315,7 +331,7 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                 }
             }
         }
-    }
+}
 
 
 

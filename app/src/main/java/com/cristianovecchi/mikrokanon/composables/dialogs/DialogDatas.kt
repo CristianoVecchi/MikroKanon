@@ -5,8 +5,14 @@ import androidx.compose.ui.unit.dp
 import com.cristianovecchi.mikrokanon.AIMUSIC.ARPEGGIO
 import com.cristianovecchi.mikrokanon.AppViewModel
 
-
-data class ListDialogData (val dialogState: Boolean = false, val itemList: List<String> = listOf(),
+data class GroupingDialogData (val dialogState: Boolean = false,
+                           val itemGroups: List<List<String>> = listOf(),
+                           val groupNames: List<String> = listOf(),
+                           val selectedListDialogItem: Int = -1,
+                           val dialogTitle: String = "",
+                           val onSubmitButtonClick: (Int) -> Unit = {} )
+data class ListDialogData (val dialogState: Boolean = false,
+                           val itemList: List<String> = listOf(),
                           val selectedListDialogItem: Int = -1,
                           val dialogTitle: String = "",
                           val onSubmitButtonClick: (Int) -> Unit = {} )

@@ -15,20 +15,74 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
-fun main(){
-    val arr = intArrayOf(0, 267, 348, 1024, 4056, 5890, 6056, 6987, 7654, 8751, 10987)
-    val arr2 = intArrayOf()
-    val arr3 = intArrayOf(5678, 10540, 20000)
-    val section1 = listOf(arr, arr2, arr3).findIndicesInSection(0, 1024)
-    val section2 = listOf(arr, arr2, arr3).findIndicesInSection(1024, 10000)
-    val section3 = listOf(arr, arr2, arr3).findIndicesInSection(11024, 10000)
-    println(section1)
-    println(section2)
-    println(section3)
-
-    println("Total section 1: ${section1.nElements()}")
-    println("Total section 2: ${section2.nElements()}")
-    println("Total section 3: ${section3.nElements()}")
+//fun main(){
+//    val arr = intArrayOf(0, 267, 348, 1024, 4056, 5890, 6056, 6987, 7654, 8751, 10987)
+//    val arr2 = intArrayOf()
+//    val arr3 = intArrayOf(5678, 10540, 20000)
+//    val section1 = listOf(arr, arr2, arr3).findIndicesInSection(0, 1024)
+//    val section2 = listOf(arr, arr2, arr3).findIndicesInSection(1024, 10000)
+//    val section3 = listOf(arr, arr2, arr3).findIndicesInSection(11024, 10000)
+//    println(section1)
+//    println(section2)
+//    println(section3)
+//
+//    println("Total section 1: ${section1.nElements()}")
+//    println("Total section 2: ${section2.nElements()}")
+//    println("Total section 3: ${section3.nElements()}")
+//}
+fun List<List<String>>.indexInTotalOf(item: String): Int{
+    var partialTotal = 0
+    for(i in 0 until this.size){
+        val groupSize = this[i].size
+        if(groupSize == 0) continue
+        val partialIndex = this[i].indexOf(item)
+        if(partialIndex != -1) return partialTotal + partialIndex
+        partialTotal += groupSize
+    }
+    return -1
+}
+fun <E> List<List<E>>.retrieveByIndexInTotal(indexInTotal: Int): E?{
+    if(indexInTotal<0) return null
+    var partialTotal = 0
+    for(i in 0 until this.size){
+        val groupSize = this[i].size
+        if(groupSize == 0) continue
+        val partialIndex = indexInTotal - partialTotal
+        if(partialIndex<groupSize) return this[i][partialIndex]
+        partialTotal += groupSize
+    }
+    return null
+}
+fun List<List<Any>>.findRanges(): List<IntRange?>{
+    var startGroup = 0
+    val ranges = mutableListOf<IntRange?>()
+    for(i in 0 until this.size){
+        val groupSize = this[i].size
+        if(groupSize == 0) {
+            ranges += null
+        } else {
+            val nextStart = startGroup + groupSize
+            ranges += IntRange(startGroup, nextStart-1)
+            startGroup = nextStart
+        }
+    }
+    return ranges//.also{ println("Ranges: $it")}
+}
+fun List<List<Any>>.findGroupIndex(itemIndex: Int): Int? {
+    val ranges = this.findRanges()
+    //println("Search item index:$itemIndex in $ranges")
+    for(i in 0 until ranges.size){
+        ranges[i]?.let{
+            if(it.contains(itemIndex)) {
+               // println("Item found in group: $i")
+                return i
+            }
+        }
+    }
+    //println("Search item index:$itemIndex in $ranges")
+    return null//.also{
+       // println("Search item index: Null")
+    //}
 }
 fun List<IntRange?>.nElements(): Int{
     return this.filterNotNull().sumOf { it.count() }
