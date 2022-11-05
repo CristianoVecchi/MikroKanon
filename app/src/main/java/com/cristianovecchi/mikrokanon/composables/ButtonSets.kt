@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -79,7 +81,7 @@ fun CustomButton(iconId: Int = -1, text: String = "",
     val actualIconColor  by animateColorAsState( if(isActive) iconColor else inactiveIconColor )
     val actualBorderColor by animateColorAsState( if(isActive) borderColor else inactiveBorderColor )
     val border = borderWidth
-    val padding = 3.dp
+    val padding = 4.dp
     if (iconId != -1) {
         if (text.isNotEmpty()) { //MK button (Icon + Text)
             val textStyle = TextStyle(
@@ -135,35 +137,56 @@ fun CustomButton(iconId: Int = -1, text: String = "",
         }
     } else {
         if (text.isNotEmpty()) { // text button
-            val actualModifier = if (adaptSizeToIconButton)
-                Modifier
-                    .padding(padding)
-                    .width(buttonSize)
-                    .height(buttonSize)
-                    //.background(actualBackgroundColor)
-            else Modifier
-                .padding(padding)
-               // .background(actualBackgroundColor)
-            Button(
-                modifier = actualModifier,
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = actualBackgroundColor
-                ),
-                border = BorderStroke(border, actualBorderColor),
-                shape = RectangleShape,
-                onClick = { if (isActive) onClick() })
-            {
-                Text(
-                    text = text,
-                    style = TextStyle(
-                        color = actualIconColor,
-                        background= actualBackgroundColor,
-                        fontSize = fontSize.sp,
-                        fontWeight = FontWeight.Bold
+            if(adaptSizeToIconButton){
+                Button(
+                    modifier = Modifier
+                        .padding(padding)
+                        .background(actualBackgroundColor, RectangleShape)
+                        .then(
+                            Modifier
+                                .size(buttonSize)
+                                .border(border, actualBorderColor, RectangleShape)
+                        ),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = actualBackgroundColor
                     ),
-                    overflow = TextOverflow.Clip,
-                    maxLines = 1
-                )
+
+                    onClick = { if (isActive) onClick() })
+                {
+                    Text(
+                        text = text,
+                        style = TextStyle(
+                            color = actualIconColor,
+                            background= actualBackgroundColor,
+                            fontSize = fontSize.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        overflow = TextOverflow.Clip,
+                        maxLines = 1
+                    )
+                }
+            } else {
+                Button(
+                    modifier = Modifier.padding(padding)
+                    .background(actualBackgroundColor)
+                    .border(border, actualBorderColor, RectangleShape)
+                    .height(buttonSize / 10 * 7),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = actualBackgroundColor
+                    ),
+                    onClick = { if (isActive) onClick() })
+                {
+                        Text(
+                            text = text,
+                            textAlign = TextAlign.Center,
+                            fontSize = fontSize.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = actualIconColor,
+                            overflow = TextOverflow.Clip,
+                            maxLines = 1,
+                            modifier = Modifier.height(buttonSize / 10 * 7).wrapContentHeight()
+                        )
+                }
             }
         }
     }

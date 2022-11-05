@@ -54,7 +54,7 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
             Surface(
                 modifier = Modifier
                     .width(width)
-                    .height(height),
+                    .height(dimensions.dialogHeight),
                 color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
@@ -77,9 +77,14 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                     var rangeText by remember { mutableStateOf(multiFloatDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setLimit = { index: Int, absPitch: Int, octave: Int ->
-                        val newLimit = (absPitch + (octave+1)*12).coerceIn(A0, C8)
+                        var newLimit = (absPitch + octave * 12)
+                        newLimit = if(newLimit<A0) newLimit+12 else newLimit
+                        newLimit = if(newLimit>C8) newLimit-12 else newLimit
                         val limitValues = rangeText.extractIntsFromCsv().toMutableList()
-                        limitValues[index] = newLimit
+                        limitValues[index] = when(index){
+                            0 -> if(newLimit > limitValues[1]) limitValues[1] else newLimit
+                            else -> if(newLimit < limitValues[0]) limitValues[0] else newLimit
+                        }
                         rangeText = limitValues.joinToString(",")
                     }
                     val limits = rangeText.extractIntsFromCsv()
@@ -107,14 +112,14 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                         val nCols = 2
                         val nRows = (limits.size / nCols) + 1
                         val rows = (0 until nRows).toList()
-                        LazyColumn(state = listState) {
+                        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, state = listState) {
                             items(rows) { row ->
                                 var index = row * nCols
                                 //Text(text = "ROW #$row")
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Start
+                                    horizontalArrangement = Arrangement.Center
                                 ) {
                                     for (j in 0 until nCols) {
                                         if (index != limits.size) {
@@ -387,7 +392,7 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     colors = model.appColors
                                 ) {
                                     val absPitch = limits[cursor] % 12
-                                    setLimit(cursor, absPitch, 0)
+                                    setLimit(cursor, absPitch, 1)
                                 }
                             CustomButton(
                                 adaptSizeToIconButton = true,
@@ -398,7 +403,7 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 colors = model.appColors
                             ) {
                                 val absPitch = limits[cursor] % 12
-                                setLimit(cursor, absPitch, 1)
+                                setLimit(cursor, absPitch, 2)
                             }
                             CustomButton(
                                 adaptSizeToIconButton = true,
@@ -409,7 +414,7 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 colors = model.appColors
                             ) {
                                 val absPitch = limits[cursor] % 12
-                                setLimit(cursor, absPitch, 2)
+                                setLimit(cursor, absPitch, 3)
                             }
                             CustomButton(
                                 adaptSizeToIconButton = true,
@@ -420,7 +425,7 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 colors = model.appColors
                             ) {
                                 val absPitch = limits[cursor] % 12
-                                setLimit(cursor, absPitch, 3)
+                                setLimit(cursor, absPitch, 4)
                             }
                         }
                             Row(
@@ -436,7 +441,7 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     colors = model.appColors
                                 ) {
                                     val absPitch = limits[cursor] % 12
-                                    setLimit(cursor, absPitch, 4)
+                                    setLimit(cursor, absPitch, 5)
                                 }
                                 CustomButton(
                                     adaptSizeToIconButton = true,
@@ -447,7 +452,7 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     colors = model.appColors
                                 ) {
                                     val absPitch = limits[cursor] % 12
-                                    setLimit(cursor, absPitch, 5)
+                                    setLimit(cursor, absPitch, 6)
                                 }
                                 CustomButton(
                                     adaptSizeToIconButton = true,
@@ -458,7 +463,7 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     colors = model.appColors
                                 ) {
                                     val absPitch = limits[cursor] % 12
-                                    setLimit(cursor, absPitch, 6)
+                                    setLimit(cursor, absPitch, 7)
                                 }
                                 CustomButton(
                                     adaptSizeToIconButton = true,
@@ -469,7 +474,7 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                     colors = model.appColors
                                 ) {
                                     val absPitch = limits[cursor] % 12
-                                    setLimit(cursor, absPitch, 7)
+                                    setLimit(cursor, absPitch, 8)
                                 }
                             }
                     }
@@ -483,7 +488,7 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                             val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                             val buttonSize = dimensions.dialogButtonSize
                             CustomButton(
-                                adaptSizeToIconButton = true,
+                                adaptSizeToIconButton = false,
                                 text = "",
                                 iconId = model.iconMap["done"]!!,
                                 buttonSize = buttonSize.dp,
@@ -495,17 +500,31 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
                                 )
                                 onDismissRequest.invoke()
                             }
-                            CustomButton(
-                                adaptSizeToIconButton = true,
-                                text = "",
-                                iconId = model.iconMap["undo"]!!,
-                                buttonSize = buttonSize.dp,
-                                iconColor = Color.Green,
-                                colors = model.appColors
-                            ) {
-                                setLimit(0,9,0)
-                                setLimit(1,0,8)
+                            Button(modifier = Modifier
+                                .padding(buttonPadding),
+                                onClick = {
+                                    setLimit(0,9,1)
+                                    setLimit(1,0,9)
+                                })
+                            {
+                                Text(
+                                    text = "∞",
+                                    style = TextStyle(
+                                        fontSize = fontSize.sp,
+                                        fontWeight = FontWeight.Bold
+                                    ), color = fontColor
+                                )
                             }
+//                            CustomButton(
+//                                adaptSizeToIconButton = true,
+//                                text = "∞",
+//                                buttonSize = buttonSize.dp,
+//                                iconColor = model.appColors.iconButtonIconColor,
+//                                colors = model.appColors
+//                            ) {
+//                                setLimit(0,9,1)
+//                                setLimit(1,0,9)
+//                            }
 
                         }
 

@@ -320,12 +320,12 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
 
         return when(check){
             is CheckType.None -> check.describe()
-            is CheckType.EqualOrGreater -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
-            is CheckType.StartPhrase -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
-            is CheckType.EndPhrase -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
-            is CheckType.SingleNote -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
-            is CheckType.AtTheExtremes -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
-            is CheckType.NotAtTheExtremes -> "${check.describe()} $title$gliss ${stress} ${rangeNotes}"
+            is CheckType.EqualOrGreater -> "${check.describe()} $rangeNotes $title$gliss $stress"
+            is CheckType.StartPhrase -> "${check.describe()} $rangeNotes $title$gliss $stress"
+            is CheckType.EndPhrase -> "${check.describe()} $rangeNotes $title$gliss $stress"
+            is CheckType.SingleNote -> "${check.describe()} $rangeNotes $title$gliss $stress"
+            is CheckType.AtTheExtremes -> "${check.describe()} $rangeNotes $title$gliss $stress"
+            is CheckType.NotAtTheExtremes -> "${check.describe()} $rangeNotes $title$gliss $stress"
         }
     }
     fun toCsv(): String {

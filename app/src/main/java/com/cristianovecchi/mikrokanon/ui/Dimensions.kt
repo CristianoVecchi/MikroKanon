@@ -94,7 +94,7 @@ data class Dimensions( // 1600px width and over
                 //selectorButtonSize = 58.dp,
                 selectorButtonSize = (selectorButtonSizePx / dpDensity).toInt().dp,//50.dp,
                 selectorMKbuttonFontSize =(selectorButtonSizePx /4).pxToSp,
-                selectorFPbuttonFontSize= (selectorButtonSizePx /2).pxToSp,
+                selectorFPbuttonFontSize= (selectorButtonSizePx /3).pxToSp,
                 inputNclipColumns = 6,
                 inputButtonSize = (width/7).pxToDp.dp,
                 inputButtonFontSize = (width/24).pxToSp, // 14
@@ -119,7 +119,7 @@ data class Dimensions( // 1600px width and over
                 selectorClipFontSize = (width/22).pxToSp,
                 selectorButtonSize = (selectorButtonSizePx / dpDensity).toInt().dp,//50.dp,
                 selectorMKbuttonFontSize = (selectorButtonSizePx /4).pxToSp,
-                selectorFPbuttonFontSize = (selectorButtonSizePx /2).pxToSp,
+                selectorFPbuttonFontSize = (selectorButtonSizePx /3).pxToSp,
                 selectorWeights = if(height >= 2400) Pair(10f,5f) else Pair(10f, 6f),
                 optionsFontSize = (width/22).pxToSp,
 
@@ -150,7 +150,7 @@ data class Dimensions( // 1600px width and over
                 dpDensity = dpDensity,
                 selectorButtonSize = (selectorButtonSizePx / dpDensity).toInt().dp,//50.dp,
                 selectorMKbuttonFontSize =(selectorButtonSizePx /4).pxToSp,
-                selectorFPbuttonFontSize= (selectorButtonSizePx /2).pxToSp,// sp20,
+                selectorFPbuttonFontSize= (selectorButtonSizePx /3).pxToSp,// sp20,
                 selectorClipFontSize = (width/30).pxToSp,
                 dialogFontSize = (width/27).pxToSp,
                 dialogWeights = Triple(4f, 4f, 1f),
