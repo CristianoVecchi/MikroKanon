@@ -93,7 +93,7 @@ fun ResultDisplay(model: AppViewModel,
     val (colors, detectorIntervalSet, detectorExtensions) = triple
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val notesNames = language.noteNames
-    val counterpointView = model.counterpointView
+    val counterpointView by model.counterpointView.asFlow().collectAsState(0)
     val counterpoints by counterpointsFlow.collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<Any>>>> by derivedStateOf {
         when (counterpointView){
@@ -279,7 +279,7 @@ fun ResultDisplay(model: AppViewModel,
                         val indexItem = model.indexOfSelectedCounterpoint()
                         model.updateUserOptions(
                             "counterpointView",
-                            ++model.counterpointView % 3
+                            (counterpointView + 1) % 3
                         )
                         scrollToItem = indexItem
 //                        if(indexItem != -1) {
@@ -306,7 +306,8 @@ fun ResultDisplay(model: AppViewModel,
                     Row{
                         val percentStyle = androidx.compose.ui.text.TextStyle(
                             fontSize = percentFontSize.sp,
-                            color = colors.selCardTextColorSelected.shift(0.1f), fontWeight = FontWeight.Bold
+                            color = colors.selCardTextColorSelected.shift(0.1f),
+                            fontWeight = FontWeight.Bold
                         )
                         val percent = ( 1f - selCounterpoint.findEmptiness() ) * 100f
                         val nNotes = selCounterpoint.nNotes()

@@ -69,6 +69,17 @@ fun GroupingListDialog(
                         val selectedGroup by derivedStateOf {
                             groups[groupIndex ?: 0]
                         }
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Row( modifier = modifierB.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically ){
+                            Text(
+                                text = if(groupNames.isNotEmpty() && groupIndex!=-1) groupNames[groupIndex ?: 0] else "",
+                                color = fontColor,
+                                fontSize = (fontSize  * 2).sp,
+                                fontWeight = FontWeight.ExtraBold
+                            )
+                        }
                         LazyColumn(
                             state = listState,
                             modifier = modifierA.padding(end = 5.dp)
@@ -108,17 +119,6 @@ fun GroupingListDialog(
 //                                }
 //                            }
 //                        }
-                        Spacer(modifier = Modifier.height(5.dp))
-                        Row( modifier = modifierB.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically ){
-                            Text(
-                                text = if(groupNames.isNotEmpty() && groupIndex!=-1) groupNames[groupIndex ?: 0] else "",
-                                color = fontColor,
-                                fontSize = (fontSize  * 2).sp,
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                        }
                         Spacer(modifier = Modifier.height(5.dp))
                         Row( modifier = modifierC.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,

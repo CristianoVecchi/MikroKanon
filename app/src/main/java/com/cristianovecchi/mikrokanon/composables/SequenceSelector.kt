@@ -150,7 +150,7 @@ fun SequenceSelector(model: AppViewModel,
                     )
                     MikroKanonsButtons(
                         model = model, isActive = activeButtons.mikrokanon,
-                        buttonSize = buttonSize, colors = appColors,
+                        buttonSize = buttonSize / 10 * 9, colors = appColors,
                         fontSize = dimensions.selectorMKbuttonFontSize,
                         onMK2Click = {
                             onMikroKanons2(sequences[selected])

@@ -1,11 +1,9 @@
 package com.cristianovecchi.mikrokanon.composables
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,7 +14,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -80,7 +77,6 @@ fun CustomButton(iconId: Int = -1, text: String = "",
     val actualBackgroundColor by animateColorAsState( if(isActive) backgroundColor else inactiveBackgroundColor )
     val actualIconColor  by animateColorAsState( if(isActive) iconColor else inactiveIconColor )
     val actualBorderColor by animateColorAsState( if(isActive) borderColor else inactiveBorderColor )
-    val border = borderWidth
     val padding = 4.dp
     if (iconId != -1) {
         if (text.isNotEmpty()) { //MK button (Icon + Text)
@@ -90,13 +86,14 @@ fun CustomButton(iconId: Int = -1, text: String = "",
                 color = actualIconColor
             )
             IconButton(modifier = Modifier
+
+
                 .padding(padding)
+                .size(buttonSize)
+                .border(borderWidth, actualBorderColor, RectangleShape)
                 .background(actualBackgroundColor)
-                .then(
-                    Modifier
-                        .size(buttonSize)
-                        .border(border, actualBorderColor, RectangleShape)
-                ),
+
+                ,
 //                colors = ButtonDefaults.outlinedButtonColors(
 //                    backgroundColor = actualBackgroundColor,
 //                    contentColor = actualIconColor
@@ -118,12 +115,9 @@ fun CustomButton(iconId: Int = -1, text: String = "",
         } else { // Icon button
             IconButton(modifier = Modifier
                 .padding(padding)
-                .background(actualBackgroundColor, RectangleShape)
-                .then(
-                    Modifier
-                        .size(buttonSize)
-                        .border(border, actualBorderColor, RectangleShape)
-                ),
+                .size(buttonSize)
+                .border(borderWidth, actualBorderColor, RectangleShape)
+                .background(actualBackgroundColor, RectangleShape),
                 onClick = { if (isActive) onClick() }
             )
             {
@@ -140,13 +134,13 @@ fun CustomButton(iconId: Int = -1, text: String = "",
             if(adaptSizeToIconButton){
                 Button(
                     modifier = Modifier
+
+
                         .padding(padding)
+                        .border(borderWidth, actualBorderColor, RectangleShape)
                         .background(actualBackgroundColor, RectangleShape)
-                        .then(
-                            Modifier
-                                .size(buttonSize)
-                                .border(border, actualBorderColor, RectangleShape)
-                        ),
+                        .size(buttonSize)
+                    ,
                     colors = ButtonDefaults.outlinedButtonColors(
                         backgroundColor = actualBackgroundColor
                     ),
@@ -167,9 +161,11 @@ fun CustomButton(iconId: Int = -1, text: String = "",
                 }
             } else {
                 Button(
-                    modifier = Modifier.padding(padding)
+                    modifier = Modifier
+
+                        .padding(padding)
                     .background(actualBackgroundColor)
-                    .border(border, actualBorderColor, RectangleShape)
+                    .border(borderWidth, actualBorderColor, RectangleShape)
                     .height(buttonSize / 10 * 7),
                     colors = ButtonDefaults.outlinedButtonColors(
                         backgroundColor = actualBackgroundColor

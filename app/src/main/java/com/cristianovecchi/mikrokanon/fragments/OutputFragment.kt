@@ -53,7 +53,7 @@ class OutputFragment: Fragment() {
                         model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                         model.dispatchIntervals()
                     }
-                    model.counterpointView = it[0].counterpointView
+                    model._counterpointView.value = it[0].counterpointView
                     model.refreshZodiacFlags()
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())
                     model.spread = it[0].spread.toInt()

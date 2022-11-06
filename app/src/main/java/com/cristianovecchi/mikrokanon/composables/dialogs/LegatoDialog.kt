@@ -249,12 +249,12 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
                                 val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
-                                val buttonSize = dimensions.selectorButtonSize / 2
-                                val fontSizeOctave = dimensions.dialogFontSize /// 3 * 2
+                                val buttonSize = dimensions.selectorButtonSize
+                                val ribattutoFontSize = dimensions.dialogFontSize
                                 CustomButton(
                                     adaptSizeToIconButton = false,
                                     text = ribattutos[6],
-                                    fontSize = fontSizeOctave,
+                                    fontSize = ribattutoFontSize,
                                     buttonSize = buttonSize,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
@@ -267,7 +267,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 CustomButton(
                                     adaptSizeToIconButton = false,
                                     text = ribattutos[5],
-                                    fontSize = fontSizeOctave,
+                                    fontSize = ribattutoFontSize,
                                     buttonSize = buttonSize,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
@@ -280,7 +280,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 CustomButton(
                                     adaptSizeToIconButton = false,
                                     text = ribattutos[4],
-                                    fontSize = fontSizeOctave,
+                                    fontSize = ribattutoFontSize,
                                     buttonSize = buttonSize,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
@@ -293,7 +293,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 CustomButton(
                                     adaptSizeToIconButton = false,
                                     text = ribattutos[3],
-                                    fontSize = fontSizeOctave,
+                                    fontSize = ribattutoFontSize,
                                     buttonSize = buttonSize,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors
@@ -306,7 +306,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 CustomButton(
                                     adaptSizeToIconButton = false,
                                     text = ribattutos[2],
-                                    fontSize = fontSizeOctave,
+                                    fontSize = ribattutoFontSize,
                                     buttonSize = buttonSize,
                                     iconColor = model.appColors.iconButtonIconColor,
                                     colors = model.appColors

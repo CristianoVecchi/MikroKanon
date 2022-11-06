@@ -230,8 +230,8 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 verticalArrangement = Arrangement.SpaceBetween
                             ) {
                                 val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
-                                val buttonSize = dimensions.dialogButtonSize / 4 * 3
-                                val fontSizeOctave = dimensions.dialogFontSize / 3 * 2
+                                val buttonSize = dimensions.dialogButtonSize / 4 * 5
+                                val fontSizeOctave = dimensions.dialogFontSize / 6 * 5
                                 CustomButton(
                                     adaptSizeToIconButton = false,
                                     text = octaves[4], // +15

@@ -1095,7 +1095,8 @@ class AppViewModel(
     // COLORS -------------------------------------------------------------------------------------
     var usingCustomColors: Boolean = false
     var appColors: AppColors = AppColors.allBlack()
-    var counterpointView = 0
+    var _counterpointView = MutableLiveData(-1)
+    val counterpointView : LiveData<Int> = _counterpointView
     var lastIndexCustomColors = -1
     var lastAppColors = ""
     fun setAppColors(defs: String){

@@ -59,7 +59,8 @@ object Icons {
             "parade" to R.drawable.ic_baseline_star_rate_24,
             "chess" to R.drawable.ic_baseline_view_compact_24,
             "density" to R.drawable.ic_baseline_tornado_24,
-            "drums" to R.drawable.ic_baseline_fitness_center_24
+            "drums" to R.drawable.ic_baseline_fitness_center_24,
+            "glissando" to R.drawable.ic_baseline_swap_calls_24
         )
     }
 }

@@ -365,6 +365,7 @@ data class Lang( // English by default
     val selectDrumsVolume: String = "Select the volume of the drums!",
     val selectDrumsDensity: String = "Select the density of the drums!",
     val checkAndReplace: String= "Check and replace",
+    val selectPitchRange: String= "Select a range!",
     val selectCheckType: String = "Select the check type!",
     val selectReplaceType: String = "Select the replace type!",
     val selectStress: String = "Select the replace stress!",

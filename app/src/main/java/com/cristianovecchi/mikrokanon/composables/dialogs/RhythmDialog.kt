@@ -159,7 +159,6 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                     ) {
                         val buttonSize = dimensions.dialogButtonSize
                         CustomButton(
-                            adaptSizeToIconButton = true,
                             iconId = model.iconMap["back"]!!,
                             buttonSize = buttonSize.dp,
                             iconColor = model.appColors.iconButtonIconColor,
@@ -201,8 +200,6 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
 //                            setPattern(cursor, pattern, repetitions * back)
 //                        }
                         CustomButton( // Replace edit
-                            adaptSizeToIconButton = true,
-                            text = "",
                             iconId = model.iconMap["glue"]!!,
                             buttonSize = buttonSize.dp,
                             iconColor = model.appColors.iconButtonIconColor,
@@ -232,8 +229,6 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
 
                                 val buttonSize = dimensions.dialogButtonSize
                                 CustomButton(
-                                    adaptSizeToIconButton = true,
-                                    text = "",
                                     iconId = model.iconMap["done"]!!,
                                     buttonSize = buttonSize.dp,
                                     iconColor = Color.Green,
@@ -245,8 +240,6 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                     onDismissRequest.invoke()
                                 }
                                 CustomButton(
-                                    adaptSizeToIconButton = true,
-                                    text = "",
                                     iconId = model.iconMap["edit"]!!,
                                     buttonSize = buttonSize.dp,
                                     iconColor = model.appColors.iconButtonIconColor,
@@ -275,8 +268,6 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
 
                                 }
                                 CustomButton(
-                                    adaptSizeToIconButton = true,
-                                    text = "",
                                     iconId = model.iconMap["delete"]!!,
                                     buttonSize = buttonSize.dp,
                                     iconColor = model.appColors.iconButtonIconColor,
@@ -291,8 +282,6 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                     }
                                 }
                                 CustomButton(
-                                    adaptSizeToIconButton = true,
-                                    text = "",
                                     iconId = model.iconMap["add"]!!,
                                     buttonSize = buttonSize.dp,
                                     iconColor = model.appColors.iconButtonIconColor,
@@ -324,9 +313,6 @@ fun RhythmDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>, dim
                                 }
 
                             }
-
-
-
                     }
                 }
             }
