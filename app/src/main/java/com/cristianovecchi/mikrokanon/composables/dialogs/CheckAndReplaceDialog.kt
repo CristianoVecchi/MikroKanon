@@ -239,7 +239,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 val limits = listOf(cnrDatas.range.first, cnrDatas.range.last)
                                 rangeDialogData.value = MultiFloatDialogData(
                                     true,
-                                    lang.selectPitchRange,
+                                    lang.selectRange,
                                     "${limits[0]},${limits[1]}",
                                     A0.toFloat(), C8.toFloat(), model
                                 ) { rangeCsv ->

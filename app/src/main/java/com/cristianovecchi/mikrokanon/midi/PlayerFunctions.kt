@@ -55,6 +55,14 @@ suspend fun createDrumsTrack(context: CoroutineContext, dispatch: (Triple<AppVie
                     DrumsType.VELS_TICKS ->
                                             track.addDrumsToTrackByCentroids(trackDatas, drumsData.drumKit.drumKit,
                                             start, duration, drumsData.density, drumsData.volume, drumsData.type)
+                    DrumsType.PATTERN -> {
+                        val patternDurations = RhythmPatterns.values()[drumsData.pattern].values
+                        track.addDrumsToTrackByPattern(
+                            trackDatas, start, duration,
+                            drumsData.drumKit.drumKit, drumsData.density,
+                            drumsData.volume, drumsData.type, patternDurations
+                        )
+                    }
                     else -> {}
                 }
             }
@@ -65,6 +73,39 @@ suspend fun createDrumsTrack(context: CoroutineContext, dispatch: (Triple<AppVie
 //    drumsTrack.addDrumsToTrackByCentroids(actualCounterpointTrackData, DrumKit(),
 //        0, totalLength.toInt(),0.5F)
 }
+
+private fun MidiTrack.addDrumsToTrackByPattern(trackDatas: List<TrackData>, sectionStart:Int, sectionDuration:Int,
+                                               drumKit: DrumKit, density: Float, volume: Float, type: DrumsType, patternValues: List<Int>
+) {
+    try {
+        val sectionIndices = trackDatas.map{ it.ticks }.findIndicesInSection(sectionStart, sectionDuration)
+        val nElements = sectionIndices.nElements()
+        val soundList = drumKit.soundList()
+        val (patternTicks, patternDurations) = patternValues.patternTicksAndDurationInSection(sectionStart, sectionDuration)
+        println("pattern ticks(${patternTicks.size}): $patternTicks")
+        println("pattern durs(${patternDurations.size}): $patternDurations")
+        val patternWeights = trackDatas.countNotesInPattern(sectionIndices, patternTicks, patternDurations)
+        println("pattern weights(${patternWeights.size}): ${patternWeights.contentToString()}")
+        patternWeights.forEachIndexed{ index, weight ->
+            val sound = soundList.getOrNull(weight)
+            sound?.let{
+                val velocity = 127
+                val start = patternTicks[index].toLong()
+                val duration = patternDurations[index]
+                val on = NoteOn(start, 9, sound, velocity)
+                val off = NoteOff(start + duration, 9, sound, velocity)
+                //println("Drum sound: $sound   tick: $start")
+                this.insertEvent(on)
+                this.insertEvent(off)
+            }
+        }
+    } catch(e: java.lang.Exception){
+        println("Pattern Error: ${e.message}")
+    }
+
+
+}
+
 fun MidiTrack.addDrumsToTrackByCentroids(trackDatas: List<TrackData>, drumKit: DrumKit,
                                 sectionStart:Int, sectionDuration:Int, density: Float, volume: Float, type: DrumsType){
     val sectionIndices = trackDatas.map{ it.ticks }.findIndicesInSection(sectionStart, sectionDuration)
@@ -82,7 +123,7 @@ fun MidiTrack.addDrumsToTrackByCentroids(trackDatas: List<TrackData>, drumKit: D
         this.addDrumsToTrackByCentroids(trackDatas, drumKit, sectionStart + sectionHalves[0], sectionHalves[1], density, volume, type)
     } else {
         val soundList = drumKit.soundList()
-        val emptyCentroids = ((1f - density) * soundList.size / 2).toInt() * 3// add density
+        val emptyCentroids = ((1f - density) * soundList.size).toInt()// add density
         val nCentroids = soundList.size + emptyCentroids
         println("empty Centroids: $emptyCentroids   nCentroids: $nCentroids   density:$density")
         val points = mutableListOf<Point>()
@@ -121,44 +162,45 @@ fun MidiTrack.addDrumsToTrackByCentroids(trackDatas: List<TrackData>, drumKit: D
                 }
             }
         }
-
-        var count = 0
-        val centroids = lloyd(points, points.size, nCentroids) // assign the group to points
-        val sums = points.groupingBy { it.group }.eachCount().toSortedMap()
-        val sumsPairs = sums.entries.sortedBy {
-            it.value
-        }
-        val ascendantSums = IntArray(sumsPairs.size)
-        sumsPairs.forEachIndexed{ i, entry ->
-            ascendantSums[i] = entry.key
-        }
+        if(points.isNotEmpty()){
+            var count = 0
+            val centroids = lloyd(points, points.size, nCentroids) // assign the group to points
+            val sums = points.groupingBy { it.group }.eachCount().toSortedMap()
+            val sumsPairs = sums.entries.sortedBy {
+                it.value
+            }
+            val ascendantSums = IntArray(sumsPairs.size)
+            sumsPairs.forEachIndexed{ i, entry ->
+                ascendantSums[i] = entry.key
+            }
 //        println("sums: $sums")
 //        println("sumsPairs: $sumsPairs")
 //        println("ascendant sums: ${ascendantSums.contentToString()}")
-        val volumePercentage = if(volume <= 0.5f) volume * 2 else 1f + volume / 4
-        val trackDatasArray = trackDatas.sortedBy { it.partIndex }.toTypedArray()
-        points.forEach {
-            //println(it)
-            val group = ascendantSums.indexOf(it.group)
-            if(group < soundList.size) {
-                val part = trackDatasArray[it.partIndex]
-                val noteIndex = it.noteIndex
-                val duration = if(part.durations[noteIndex] > 1920) 1920L else part.durations[noteIndex].toLong()
-                val start = part.ticks[noteIndex].toLong()
-                val sound = soundList[group]
-                val velocity = (part.velocities[noteIndex] * volumePercentage).toInt().coerceIn(0,127)
-                //println("Volume:$volume ${it.velocity}->$velocity")
-                val on = NoteOn(start, 9, sound, velocity)
-                val off = NoteOff(start + duration, 9, sound, velocity)
-                //println("Drum sound: $sound   tick: $start")
-                this.insertEvent(on)
-                this.insertEvent(off)
-                count++
-            } else {
-                //println("Note without drums")
+            val volumePercentage = if(volume <= 0.5f) volume * 2 else 1f + volume / 4
+            val trackDatasArray = trackDatas.sortedBy { it.partIndex }.toTypedArray()
+            points.forEach {
+                //println(it)
+                val group = ascendantSums.indexOf(it.group)
+                if(group < soundList.size) {
+                    val part = trackDatasArray[it.partIndex]
+                    val noteIndex = it.noteIndex
+                    val duration = if(part.durations[noteIndex] > 1920) 1920L else part.durations[noteIndex].toLong()
+                    val start = part.ticks[noteIndex].toLong()
+                    val sound = soundList[group]
+                    val velocity = (part.velocities[noteIndex] * volumePercentage).toInt().coerceIn(0,127)
+                    //println("Volume:$volume ${it.velocity}->$velocity")
+                    val on = NoteOn(start, 9, sound, velocity)
+                    val off = NoteOff(start + duration, 9, sound, velocity)
+                    //println("Drum sound: $sound   tick: $start")
+                    this.insertEvent(on)
+                    this.insertEvent(off)
+                    count++
+                } else {
+                    //println("Note without drums")
+                }
             }
+            println("Drum Sounds assigned: $count/${points.size} ")
         }
-        println("Drum Sounds assigned: $count/${points.size} ")
     }
 }
 fun buildTempoTrack(bpms: List<Float>, totalLength: Long): MidiTrack {

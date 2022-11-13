@@ -93,11 +93,13 @@ fun ResultDisplay(model: AppViewModel,
     val (colors, detectorIntervalSet, detectorExtensions) = triple
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val notesNames = language.noteNames
+    val zodiacFlags by model.zodiacFlags.asFlow().collectAsState(initial = Triple(false,false,false))
+    val (zodiacPlanetsActive, zodiacSignsActive, zodiacEmojisActive) = zodiacFlags
     val counterpointView by model.counterpointView.asFlow().collectAsState(0)
     val counterpoints by counterpointsFlow.collectAsState(initial = emptyList())
     val counterpointsData: List<Pair<Counterpoint, List<List<Any>>>> by derivedStateOf {
         when (counterpointView){
-            0 -> counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, model.zodiacSignsActive, model.zodiacEmojisActive))}
+            0 -> counterpoints.map{Pair(it, Clip.toClipsText(it, notesNames, zodiacSignsActive, zodiacEmojisActive))}
             1 -> counterpoints.map{Pair(it, it.getRibattutos())}
             else -> counterpoints.map{Pair(it, listOf(listOf()))}
         }
@@ -250,7 +252,7 @@ fun ResultDisplay(model: AppViewModel,
             ) {
 
                 val filledSlots by model.filledSlots.asFlow().collectAsState(initial = setOf())
-                val sequencesToString by lazy {model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }}
+                val sequencesToString by lazy {model.sequences.value!!.map { it.toStringAll(notesNames, zodiacSignsActive, zodiacEmojisActive) }}
                 SequencesDialog(dialogState = dialogState, dimensions = dimensions,
                     title = language.choose2ndSequence, repeatText = language.repeatSequence,
                     okText = language.OkButton, appColors = colors,
@@ -337,7 +339,7 @@ fun ResultDisplay(model: AppViewModel,
                             if (!elaborating) {
                                 val flags = model.userOptionsData.value!![0].intSetHorFlags
                                 val intsFromFlags = convertFlagsToInts(flags)
-                                val intervalNames = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet.map{ it.replace("\n"," / ") }
+                                val intervalNames = if(zodiacPlanetsActive) getZodiacPlanets(zodiacEmojisActive) else language.intervalSet.map{ it.replace("\n"," / ") }
                                 intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
                                     intsFromFlags.toSet(), dialogTitle = "${language.selectHorizontalIntervals}" // \n${language.FPremember}"
                                 ) { indexes ->
@@ -528,8 +530,8 @@ fun ResultDisplay(model: AppViewModel,
             ) {
                 IntervalSetSelector(
                     model,
-                    fontSize = if(model.zodiacPlanetsActive) dimensions.outputIntervalSetFontSize * 2 else dimensions.outputIntervalSetFontSize,
-                    names = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet, colors = colors
+                    fontSize = if(zodiacPlanetsActive) dimensions.outputIntervalSetFontSize * 2 else dimensions.outputIntervalSetFontSize,
+                    names = if(zodiacPlanetsActive) getZodiacPlanets(zodiacEmojisActive) else language.intervalSet, colors = colors
                 ) {  }
             }
             LaunchedEffect(key1 = counterpointView) {

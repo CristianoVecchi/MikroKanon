@@ -45,6 +45,8 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
     if (multiNumberDialogData.value.dialogState) {
         val lang = Lang.provideLanguage(model.getUserLangDef())
         val notesNames = lang.noteNames
+        val zodiacFlags by model.zodiacFlags.asFlow().collectAsState(initial = Triple(false,false,false))
+        val (zodiacPlanetsActive, zodiacSignsActive, zodiacEmojisActive) = zodiacFlags
         val appColors = model.appColors
         val fontColor = appColors.dialogFontColor
         val backgroundColor = appColors.dialogBackgroundColor
@@ -114,7 +116,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                                         if (index != sequences.size) {
                                             val transpose = if(transposeMap.contains(index)) transposeMap[index]!! else 0
                                             val sequence = Clip.convertAbsPitchesToClips(sequences[index].transpose(transpose))
-                                            val text = sequence.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive)
+                                            val text = sequence.toStringAll(notesNames, zodiacSignsActive, zodiacEmojisActive)
                                             val id = index
                                             Card(
                                                 modifier = Modifier
@@ -247,7 +249,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             val newSequencesAll = (multiNumberDialogData.value.intSequences.map{it.filter{it != -1}}
                                 .map{Clip.convertAbsPitchesToClips(it.cutAdjacentRepetitions())} + allSequences)
                                 .distinctBy{it.map{it.abstractNote}}
-                            val newSequenceTexts = newSequencesAll.map{ it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
+                            val newSequenceTexts = newSequencesAll.map{ it.toStringAll(notesNames, zodiacSignsActive, zodiacEmojisActive) }
                             val newIndex = newSequencesAll.indexOfFirst {
                                 it.map{it.abstractNote} == sequence }
                             listDialogData.value = ListDialogData(
@@ -293,7 +295,7 @@ fun MultiSequenceDialog(multiNumberDialogData: MutableState<MultiNumberDialogDat
                             val newSequencesAll = (multiNumberDialogData.value.intSequences.map{it.filter{it != -1}}
                                 .map{Clip.convertAbsPitchesToClips(it.cutAdjacentRepetitions())} + allSequences)
                                 .distinctBy{it.map{it.abstractNote}}
-                            val newSequenceTexts = newSequencesAll.map{ it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
+                            val newSequenceTexts = newSequencesAll.map{ it.toStringAll(notesNames, zodiacSignsActive, zodiacEmojisActive) }
                             val newIndex = newSequencesAll.indexOfFirst {
                                 it.map{it.abstractNote} == sequence }
                             listDialogData.value = ListDialogData(

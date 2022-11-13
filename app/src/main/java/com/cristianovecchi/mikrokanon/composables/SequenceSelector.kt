@@ -68,7 +68,6 @@ fun SequenceSelector(model: AppViewModel,
     val backgroundColor = appColors.sequencesListBackgroundColor
     val buttonsBackgroundColor = appColors.buttonsDisplayBackgroundColor
     val listState = rememberLazyListState()
-
     val notesNames = language.noteNames
     val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
     val weights = dimensions.selectorWeights
@@ -97,8 +96,11 @@ fun SequenceSelector(model: AppViewModel,
             val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val privacyDialogData = remember { mutableStateOf(TextDialogData())}
             val buttonSize = dimensions.selectorButtonSize
-            val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, model.zodiacSignsActive, model.zodiacEmojisActive) }
+            val zodiacFlags by model.zodiacFlags.asFlow().collectAsState(initial = Triple(false,false,false))
+            val (zodiacPlanetsActive, zodiacSignsActive, zodiacEmojisActive) = zodiacFlags
+            val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, zodiacSignsActive, zodiacEmojisActive) }
             val filledSlots by model.filledSlots.asFlow().collectAsState(initial = setOf())
+
             if(!model.privacyIsAccepted){
                 privacyDialogData.value = TextDialogData(
                     true, "",
@@ -131,7 +133,7 @@ fun SequenceSelector(model: AppViewModel,
             SequenceScrollableColumn( listState = listState, colors = appColors,
                 modifier = modifier3, fontSize = dimensions.selectorClipFontSize,
                 notesNames = notesNames,
-                zodiacSigns = model.zodiacSignsActive, emoji = model.zodiacEmojisActive,
+                zodiacSigns = zodiacSignsActive, emoji = zodiacEmojisActive,
                 sequences = sequences,
                 selected = selected, onSelect = onSelectComposition
             )
@@ -290,11 +292,12 @@ fun SequenceScrollableColumn(
 {
 val coroutineScope = rememberCoroutineScope()
 if(sequences.isNotEmpty()){
-        LazyColumn(state = listState,modifier = modifier)
+    val padding = 8.dp
+        LazyColumn(state = listState, modifier = modifier.padding(top = padding))
 
         {
             itemsIndexed(items = sequences) { index, sequence ->
-                Row(modifier = Modifier.padding(8.dp)){
+                Row(modifier = Modifier.padding(padding)){
                     if (index == selected) {
                         SelectableCard(sequence.toStringAll(notesNames, zodiacSigns, emoji), fontSize, isSelected = true, colors = colors, onClick = {})
                     } else {

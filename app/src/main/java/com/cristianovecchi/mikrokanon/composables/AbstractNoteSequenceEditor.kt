@@ -27,6 +27,8 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
     }
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val notesNames = language.noteNames
+    val zodiacFlags by model.zodiacFlags.asFlow().collectAsState(initial = Triple(false,false,false))
+    val (zodiacPlanetsActive, zodiacSignsActive, zodiacEmojisActive) = zodiacFlags
     val playing by model.playing.asFlow().collectAsState(initial = false)
     val cursor = remember { mutableStateOf(clips.size -1) }
     val id = remember { mutableStateOf(0) }
@@ -53,9 +55,9 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
             .fillMaxWidth()
             .weight(weights.second)
         SequenceAnalyzer(modifier = modifierAnalyzer, absPitches = clips.map{it.abstractNote},
-                        fontSize = if(model.zodiacPlanetsActive) dimensions.inputAnalyzerFontSize  / 3 * 4 else dimensions.inputAnalyzerFontSize,
+                        fontSize = if(zodiacPlanetsActive) dimensions.inputAnalyzerFontSize  / 3 * 4 else dimensions.inputAnalyzerFontSize,
                         colors = appColors ,
-                        intervalNames = if(model.zodiacPlanetsActive) getZodiacPlanets(model.zodiacEmojisActive) else language.intervalSet)
+                        intervalNames = if(zodiacPlanetsActive) getZodiacPlanets(zodiacEmojisActive) else language.intervalSet)
 //        Row(modifier1) {
 //            Text(text = "Build a Sequence!")
 //        }
@@ -64,7 +66,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
 
                 NoteClipDisplay(
                     modifier = Modifier.fillMaxWidth(),  clips = clips.toList(), hintText = language.enterSomeNotes,
-                    notesNames = notesNames,  zodiacSigns = model.zodiacSignsActive, emoji = model.zodiacEmojisActive,
+                    notesNames = notesNames,  zodiacSigns = zodiacSignsActive, emoji = zodiacEmojisActive,
                     colors = appColors, cursor = mutableStateOf(cursor.value),
                     nCols = dimensions.inputNclipColumns, fontSize = dimensions.inputClipFontSize
                 ) { id ->

@@ -59,6 +59,8 @@ class AppViewModel(
     var language: LiveData<Lang> = _language
     val _lastScaffoldTab = MutableLiveData(ScaffoldTabs.SETTINGS)
     val lastScaffoldTab: LiveData<ScaffoldTabs> = _lastScaffoldTab
+    var _counterpointView = MutableLiveData(-1)
+    val counterpointView : LiveData<Int> = _counterpointView
     // + 0.86f
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
     var cadenzaValues = "0,1,0,1,1"
@@ -126,24 +128,8 @@ class AppViewModel(
     val allSequencesData: LiveData<List<SequenceData>>
     val allCounterpointsData: LiveData<List<CounterpointData>>
     val userOptionsData: LiveData<List<UserOptionsData>>
-
     private val computationStack = Stack<Computation>()
-
-    val savedCounterpoints: Array<Counterpoint?> = Array(16) { null }
-    private val _filledSlots = MutableLiveData(setOf<Int>())
-    val filledSlots: LiveData<Set<Int>> = _filledSlots
-    fun refreshFilledSlots(){
-            val result = mutableListOf<Int>()
-            savedCounterpoints.forEachIndexed { index, counterpoint ->  counterpoint?.let{ result.add(index)}}
-            _filledSlots.value = result.toSet()
-        }
-    val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MK_lastPlay.mid")
-//    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-//        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
-//     else {
-//        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
-//    }
-
+    
     init{
         //RhythmPatterns.checkIntegrity()
         //readFileLineByLineUsingForEachLine()
@@ -174,6 +160,21 @@ class AppViewModel(
             size
         }
     }
+    val savedCounterpoints: Array<Counterpoint?> = Array(16) { null }
+    private val _filledSlots = MutableLiveData(setOf<Int>())
+    val filledSlots: LiveData<Set<Int>> = _filledSlots
+    fun refreshFilledSlots(){
+        val result = mutableListOf<Int>()
+        savedCounterpoints.forEachIndexed { index, counterpoint ->  counterpoint?.let{ result.add(index)}}
+        _filledSlots.value = result.toSet()
+    }
+    val midiPath: File = File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MK_lastPlay.mid")
+//    val midiPath: File = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+//        File(getApplication<MikroKanonApplication>().applicationContext.filesDir, "MKexecution.mid")
+//     else {
+//        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "MKexecution.mid")
+//    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onLifeCycleStop() {
         onStop()
@@ -1095,8 +1096,6 @@ class AppViewModel(
     // COLORS -------------------------------------------------------------------------------------
     var usingCustomColors: Boolean = false
     var appColors: AppColors = AppColors.allBlack()
-    var _counterpointView = MutableLiveData(-1)
-    val counterpointView : LiveData<Int> = _counterpointView
     var lastIndexCustomColors = -1
     var lastAppColors = ""
     fun setAppColors(defs: String){
@@ -1135,15 +1134,18 @@ class AppViewModel(
     fun getSystemLangDef(): String {
         return Locale.getDefault().language
     }
-    var zodiacPlanetsActive = false
-    var zodiacSignsActive = false
-    var zodiacEmojisActive = false
+//    var zodiacPlanetsActive = false
+//    var zodiacSignsActive = false
+//    var zodiacEmojisActive = false
+    val _zodiacFlags = MutableLiveData(Triple(false, false, false))
+    val zodiacFlags: LiveData<Triple<Boolean,Boolean,Boolean>> = _zodiacFlags
     fun refreshZodiacFlags() {
         if(userOptionsData.value != null && userOptionsData.value!!.isNotEmpty()){
             val flags = userOptionsData.value!![0].zodiacFlags
-            zodiacPlanetsActive = (flags and 1) == 1
-            zodiacSignsActive = (flags and 2) == 2
-            zodiacEmojisActive = (flags and 4) == 4
+            val zodiacPlanetsActive = (flags and 1) == 1
+            val zodiacSignsActive = (flags and 2) == 2
+            val zodiacEmojisActive = (flags and 4) == 4
+            _zodiacFlags.value = Triple(zodiacPlanetsActive, zodiacSignsActive, zodiacEmojisActive)
         }
     }
 

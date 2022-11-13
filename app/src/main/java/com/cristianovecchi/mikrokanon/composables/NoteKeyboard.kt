@@ -54,8 +54,10 @@ fun NoteKeyboard(
     dispatch : (Out) -> Unit ) {
     model.userOptionsData.observeAsState(initial = listOf()).value // to force recomposing when options change
     val language = Lang.provideLanguage(model.getUserLangDef())
-    val zodiacSigns = getZodiacSigns(model.zodiacEmojisActive)
-    val names = if(model.zodiacSignsActive) listOf(zodiacSigns[0], zodiacSigns[2], zodiacSigns[4],
+    val zodiacFlags by model.zodiacFlags.asFlow().collectAsState(initial = Triple(false,false,false))
+    val (zodiacPlanetsActive, zodiacSignsActive, zodiacEmojisActive) = zodiacFlags
+    val zodiacSigns = getZodiacSigns(zodiacEmojisActive)
+    val names = if(zodiacSignsActive) listOf(zodiacSigns[0], zodiacSigns[2], zodiacSigns[4],
                                     zodiacSigns[5], zodiacSigns[7], zodiacSigns[9], zodiacSigns[11])
                 else language.noteNames
     val playing by model.playing.asFlow().collectAsState(initial = false)

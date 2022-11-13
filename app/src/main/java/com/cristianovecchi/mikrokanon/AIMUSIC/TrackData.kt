@@ -205,6 +205,30 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         }
     }
 }
+fun List<TrackData>.countNotesInPattern(sectionIndices: List<IntRange?>,
+                                        patternTicks: List<Int>, patternDurations: List<Int>): IntArray{
+    val result = IntArray(patternTicks.size)
+    val patternSize = patternTicks.size
+    this.forEachIndexed { index, trackData ->
+        val trackTicks = trackData.ticks
+        sectionIndices[index]?.let{
+            var patternIndex = 0
+            while(patternIndex < patternSize){
+                val valueStart = patternTicks[patternIndex]
+                val valueEnd = valueStart + patternDurations[patternIndex]
+                notes@ for(i in it){
+                    val noteTick = trackTicks[i]
+                    if(noteTick >= valueEnd) {
+                        break@notes
+                    }
+                    if(noteTick >= valueStart) result[patternIndex]++
+                }
+                patternIndex++
+            }
+        }
+    }
+    return result
+}
 fun List<TrackData>.applyMultiCheckAndReplace(context:CoroutineContext, dispatch: (Triple<AppViewModel.Building, Int, Int>) -> Unit,
                                               checkAndReplace: List<List<CheckAndReplaceData>>,
                                                 totalLength: Long) : List<TrackData>{

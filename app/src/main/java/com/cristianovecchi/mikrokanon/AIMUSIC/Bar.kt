@@ -65,14 +65,23 @@ fun List<Bar>.resizeLastBar(totalDuration: Long): List<Bar>{
         indexLastBar++
     }
     val realSequence = this.subList(0, indexLastBar)
-    val diff = totalDuration - realSequence.sumBy { it.duration.toInt() }
-//    println("Bar duration = ${realSequence.sumBy { it.duration.toInt() }} Total duration = $totalDuration  Diff = $diff LastBarIndex=$indexLastBar ")
+    val barsDuration = realSequence.sumBy { it.duration.toInt() }
+    val originalBarsDuration = this.sumBy { it.duration.toInt() }
+    val diff = totalDuration - barsDuration
+   // println("Bars duration = $barsDuration Total duration = $totalDuration  Diff = $diff LastBarIndex=$indexLastBar ")
     if(diff == 0L) return realSequence
     result.addAll(realSequence)
-    val lastBar = this[indexLastBar]//.apply{println("old last bar = $this")}
-    result.add(lastBar.copy(duration = diff))//.apply{println("new last bar = $this")})
-//    println("input list size = ${this.size}  output list size = ${result.size}")
-    return result.toList()
+    val lastBar = if(totalDuration <= originalBarsDuration) {
+        this[indexLastBar]
+    } else {
+        val metro = RhythmPatterns.createQuarterMetroFromDuration(diff.toInt())
+        Bar(metro, barsDuration.toLong(), diff)
+    }
+    //println("new last bar: $lastBar")
+    result.add(lastBar.copy(duration = diff))
+    //println("input list size = ${this.size}  output list size = ${result.size}")
+    //println(result)
+    return result
 }
 fun List<Bar>.mergeOnesInMetro(): List<Bar>{
     val result = mutableListOf<Bar>()
@@ -119,5 +128,6 @@ data class Bar(var metro: Pair<Int,Int> = METRO_4_4, val tick: Long, var duratio
         }
         return chordFaultsGrid
     }
+
 }
 

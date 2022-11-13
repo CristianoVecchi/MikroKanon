@@ -4,6 +4,44 @@ import com.cristianovecchi.mikrokanon.divideDistributingRest
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
+fun List<Int>.patternTicksAndDurations(): Pair<List<Int>, List<Int>>{
+    val ticks = mutableListOf<Int>()
+    val durs = mutableListOf<Int>()
+    var cursor = 0
+    this.forEach {
+        if(it < 0){
+            cursor += it.absoluteValue
+        } else {
+            ticks += cursor
+            durs += it
+            cursor += it
+        }
+    }
+    return ticks to durs
+}
+fun List<Int>.patternTicksAndDurationInSection(sectionStart: Int, sectionDuration: Int ): Pair<List<Int>, List<Int>>{
+    if(sectionDuration == 0) return listOf<Int>() to listOf<Int>()
+    val ticks = mutableListOf<Int>()
+    val durs = mutableListOf<Int>()
+    val sectionEnd = sectionStart + sectionDuration
+    var cursor = sectionStart
+    var index = 0
+    val valuesSize = this.size
+    while(cursor < sectionEnd){
+        val value = this[index % valuesSize]
+        if(value < 0) {
+            cursor += value
+        } else {
+            ticks += cursor
+            val cursorEnd = cursor + value
+            durs += if(cursorEnd < sectionEnd) value else sectionEnd - cursor
+
+            cursor += value
+        }
+        index++
+    }
+    return ticks to durs
+}
 fun List<Int>.resizePatternByDuration(duration: Int, startTick: Int = 0): Pair<List<Int>, List<Int>>{
     val durs = mutableListOf<Int>()
     val ticks = mutableListOf<Int>()
@@ -454,6 +492,12 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     }
 
     companion object {
+        fun createQuarterMetroFromDuration(duration: Int): Pair<Int, Int>{
+            if(duration <= 0) return 4 to 4
+            val numerator = duration / 480
+            val rest = if(duration % 480 == 0) 0 else 1
+            return numerator + rest to 4
+        }
         fun checkIntegrity(){
             val wrongPatterns = RhythmPatterns.values().filter{ !it.isIntegrityOk()}
             if(wrongPatterns.isEmpty()) println("Rhythm patterns are OK!!!")

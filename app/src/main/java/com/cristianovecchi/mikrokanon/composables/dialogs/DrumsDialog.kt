@@ -22,12 +22,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
-import com.cristianovecchi.mikrokanon.AIMUSIC.DrumKits
-import com.cristianovecchi.mikrokanon.AIMUSIC.DrumsData
-import com.cristianovecchi.mikrokanon.AIMUSIC.DrumsType
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
@@ -52,7 +51,9 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         val drumKitsDialogData by lazy { mutableStateOf(ListDialogData()) }
         val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val densityDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val groupingDialogData by lazy { mutableStateOf(GroupingDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
+            GroupingListDialog(groupingDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(drumsTypeDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(drumKitsDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
@@ -167,16 +168,40 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             colors = model.appColors
                         ) {
                             val drumData = drumsDatas[cursor]
+                            val pattern = drumData.pattern
                             drumsTypeDialogData.value = ListDialogData(
                                 true,
                                 drumsTypes,
                                 drumData.type.ordinal,
                                 lang.selectDrumsType
                             ) { newDrumsType ->
-                                val newDrumsDatas = drumsDatas.toMutableList()
-                                newDrumsDatas[cursor] = drumsDatas[cursor].copy(type = DrumsType.values()[newDrumsType])
-                                drumsDatas = newDrumsDatas
-                                ListDialogData(itemList = drumsTypeDialogData.value.itemList)
+                                if(newDrumsType == 1){ // choose pattern
+                                    val itemGroups = RhythmPatterns.values()
+                                        .groupBy { it.type }.values.map{ it.map{ it.title}}
+                                    val groupNames = RhythmType.values().map { it.name }
+                                    groupingDialogData.value = GroupingDialogData(
+                                        true, itemGroups, groupNames,
+                                        pattern,
+                                        lang.selectRhythm
+                                    ) { index ->
+                                        val newDrumData = drumData.copy(type = DrumsType.PATTERN, pattern = index)
+                                        groupingDialogData.value =
+                                            GroupingDialogData(itemGroups = groupingDialogData.value.itemGroups,
+                                                groupNames = groupingDialogData.value.groupNames,
+                                                selectedListDialogItem = index
+                                            )
+                                        val newDrumsDatas = drumsDatas.toMutableList()
+                                        newDrumsDatas[cursor] = newDrumData
+                                        drumsDatas = newDrumsDatas
+                                        ListDialogData(itemList = drumsTypeDialogData.value.itemList)
+                                    }
+                                } else {
+                                    val newDrumsDatas = drumsDatas.toMutableList()
+                                    newDrumsDatas[cursor] = drumsDatas[cursor].copy(type = DrumsType.values()[newDrumsType])
+                                    drumsDatas = newDrumsDatas
+                                    ListDialogData(itemList = drumsTypeDialogData.value.itemList)
+                                }
+
                             }
                         }
                         CustomButton(
@@ -211,7 +236,7 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             colors = model.appColors
                         ) {
                             val drumData = drumsDatas[cursor]
-                            val densities = listOf(100,90,80,70,60,50,45,40,35,30,26,23,20,16,13,10,8,6,4,2)
+                            val densities = listOf(100,95,90,85,80,75,70,65,60,55,50,45,40,35,30,25,20,15,10,5)
                             densityDialogData.value = ListDialogData(
                                 true,
                                 densities.map{"$it%"},
@@ -293,17 +318,40 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             colors = model.appColors
                         ) {
                             val drumsData = drumsDatas[cursor]
+                            val pattern = drumsData.pattern
                             drumsTypeDialogData.value = ListDialogData(
                                 true,
                                 drumsTypes,
                                 drumsData.type.ordinal,
                                 lang.selectDrumsType
                             ) { newDrumsType ->
-                                val rebuilding = drumsDatas.addOrInsert(
-                                    DrumsData(type = DrumsType.values()[newDrumsType]), cursor)
-                                drumsDatas = rebuilding.first
-                                cursor = rebuilding.second
-                                ListDialogData(itemList = drumsTypeDialogData.value.itemList)
+                                if(newDrumsType == 1){ // choose pattern
+                                    val itemGroups = RhythmPatterns.values()
+                                        .groupBy { it.type }.values.map{ it.map{ it.title}}
+                                    val groupNames = RhythmType.values().map { it.name }
+                                    groupingDialogData.value = GroupingDialogData(
+                                        true, itemGroups, groupNames,
+                                        pattern,
+                                        lang.selectRhythm
+                                    ) { index ->
+                                        val newDrumData = drumsData.copy(DrumsType.PATTERN, pattern = index)
+                                        groupingDialogData.value =
+                                            GroupingDialogData(itemGroups = groupingDialogData.value.itemGroups,
+                                                groupNames = groupingDialogData.value.groupNames,
+                                                selectedListDialogItem = index
+                                            )
+                                        val rebuilding = drumsDatas.addOrInsert(newDrumData, cursor)
+                                        drumsDatas = rebuilding.first
+                                        cursor = rebuilding.second
+                                        ListDialogData(itemList = drumsTypeDialogData.value.itemList)
+                                    }
+                                } else {
+                                    val newDrumData = drumsData.copy(type = DrumsType.values()[newDrumsType])
+                                    val rebuilding = drumsDatas.addOrInsert(newDrumData, cursor)
+                                    drumsDatas = rebuilding.first
+                                    cursor = rebuilding.second
+                                    ListDialogData(itemList = drumsTypeDialogData.value.itemList)
+                                }
                             }
                         }
                     }

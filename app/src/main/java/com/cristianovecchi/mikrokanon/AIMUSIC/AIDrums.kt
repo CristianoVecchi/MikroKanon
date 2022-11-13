@@ -1,14 +1,20 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 data class DrumsData(val type: DrumsType = DrumsType.NONE,val drumKit: DrumKits = DrumKits.FULL,
-                     val density: Float = 0.5f, val volume: Float = 0.5f,
+                     val density: Float = 0.5f, val volume: Float = 0.5f, val pattern: Int = 0,
                     ){
     fun describe(): String {
-        return if(type == DrumsType.NONE) "  ---  ${this.type.title}  ---"
-        else "  ---  ${this.type.title}  ${this.drumKit.title}  ---\nDensity: ${String.format("%.0f%%",this.density*100)}   Volume: ${String.format("%.0f%%",this.volume*100)}"
+        val patternTitle = RhythmPatterns.values()[pattern].title
+        return when(type){
+            DrumsType.NONE -> "  ---  ${this.type.title}  ---"
+            DrumsType.PATTERN -> "  ---  $patternTitle  ${this.drumKit.title}  ---\n    Density: ${String.format("%.0f%%", this.density * 100)}   Volume: ${String.format("%.0f%%", this.volume * 100)}"
+            else -> "  ---  ${this.type.title}  ${this.drumKit.title}  ---\n    Density: ${String.format("%.0f%%",this.density*100)}   Volume: ${String.format("%.0f%%",this.volume*100)}"
+        }
+
+
     }
     fun toCsv(): String {
-        return "${this.type.ordinal}|${this.drumKit.ordinal}|${this.density}|${this.volume}"
+        return "${this.type.ordinal}|${this.drumKit.ordinal}|${this.density}|${this.volume}|$pattern"
     }
     companion object{
         fun createDrumsDatasFromCsv(csv: String): List<DrumsData>{
@@ -21,15 +27,17 @@ data class DrumsData(val type: DrumsType = DrumsType.NONE,val drumKit: DrumKits 
                 val drumKit = subValues.getOrElse(1) {"0"}
                 val density = subValues.getOrElse(2) {"0.5"}
                 val volume = subValues.getOrElse(3) {"0.5"}
+                val pattern = subValues.getOrElse(4) {"0"}
                 DrumsData(drumsTypeValues[subValues[0].toInt()],
                     drumKitsValues[drumKit.toInt()],
-                    density.toFloat(), volume.toFloat())
+                    density.toFloat(), volume.toFloat(), pattern.toInt())
             }
         }
     }
 }
 enum class DrumsType(val title:String) {
     NONE("No Drums"),
+    PATTERN("PATTERN"),
     PITCHES_DURS("NOTES+DURS"),
     DURS_PITCHES("DURS+NOTES"),
     PITCHES_VELS("NOTES+VELS"),

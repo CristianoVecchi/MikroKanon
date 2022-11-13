@@ -194,6 +194,7 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
     }
     fun titleAsRetrograde(): String{
         return when{
+            title.contains("+") -> title.replace("+", "-")
             title.contains("<>") -> title.replace("<>", "><")
             title.contains("<") -> title.replace("<", ">")
             else -> "←$title"
@@ -207,7 +208,7 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
             "Accento",  "SOS",
             "Trillo< 2m", "Trillo< 2M", "Trillo<> 2m", "Trillo<> 2M",
             "Oscillazione 2m", "Oscillazione 2M", "Irregolare 2m", "Irregolare 2M",
-            "Glissando", "Dinamica", "Attacco",
+            "Glissando", "Dinamica +", "Attacco",
             "Tornado", "Fantasia" )
         fun provideReplaceType(index: Int, stress: Int = 16, isRetrograde: Boolean = false, addGliss: Boolean = false): ReplaceType{
             return when (index) {
@@ -271,7 +272,7 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
     data class TremoloCrescendo(override val title: String = "Tremolo<", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class TremoloCrescDim(override val title: String = "Tremolo<>", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Glissando(override val title: String = "Glissando", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
-    data class Velocity(override val title: String = "Dinamica", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
+    data class Velocity(override val title: String = "Dinamica +", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Attack(override val title: String = "Attacco<", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Irregular2m(override val title: String = "Irregolare 2m", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Irregular2M(override val title: String = "Irregolare 2M", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
@@ -300,7 +301,7 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
     fun requiresRetrograde(): Boolean {
         return when (replace)
         {
-            is ReplaceType.Glissando, is ReplaceType.Velocity -> false
+            is ReplaceType.Glissando -> false
             else -> true
         }
     }

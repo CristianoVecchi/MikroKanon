@@ -164,9 +164,12 @@ object Player {
                         acc + if (triple.second) triple.first.retrogradeValues()
                             .repeat(triple.third) else triple.first.values.repeat(triple.third)
                     }.mergeNegativeValues()
-                    //println("durations: $durations")
+                    println("durations: $durations")
                     var actualDurations = multiplyDurations(nTotalNotes, durations)
+                    println("actual durations: ${actualDurations.contentToString()}")
+
                     if (rhythmShuffle) actualDurations.shuffle()
+                    println("durations after shuffle: ${actualDurations.contentToString()}")
                     actualDurations = if (swingShuffle != 0.5f) actualDurations.applySwing(swingShuffle) else actualDurations
                     //println(actualDurations.contentToString())
                     val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
