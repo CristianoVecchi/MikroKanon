@@ -30,7 +30,7 @@ fun List<Int>.patternTicksAndDurationInSection(sectionStart: Int, sectionDuratio
     while(cursor < sectionEnd){
         val value = this[index % valuesSize]
         if(value < 0) {
-            cursor += value
+            cursor += value.absoluteValue
         } else {
             ticks += cursor
             val cursorEnd = cursor + value

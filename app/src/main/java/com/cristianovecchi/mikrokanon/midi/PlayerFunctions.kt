@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 fun main(){
 
@@ -79,17 +80,29 @@ private fun MidiTrack.addDrumsToTrackByPattern(trackDatas: List<TrackData>, sect
 ) {
     try {
         val sectionIndices = trackDatas.map{ it.ticks }.findIndicesInSection(sectionStart, sectionDuration)
-        val nElements = sectionIndices.nElements()
+        //val nElements = sectionIndices.nElements()
         val soundList = drumKit.soundList()
         val (patternTicks, patternDurations) = patternValues.patternTicksAndDurationInSection(sectionStart, sectionDuration)
         println("pattern ticks(${patternTicks.size}): $patternTicks")
         println("pattern durs(${patternDurations.size}): $patternDurations")
-        val patternWeights = trackDatas.countNotesInPattern(sectionIndices, patternTicks, patternDurations)
-        println("pattern weights(${patternWeights.size}): ${patternWeights.contentToString()}")
-        patternWeights.forEachIndexed{ index, weight ->
-            val sound = soundList.getOrNull(weight)
+        val (weightTicks, weightVelocities, weightPitches) = trackDatas.analysisInPattern(sectionIndices, patternTicks, patternDurations)
+        println("ticks weights(${weightTicks.size}): ${weightTicks.contentToString()}")
+        println("velocities weights(${weightVelocities.size}): ${weightVelocities.contentToString()}")
+        println("pitches weights(${weightPitches.size}): ${weightPitches.contentToString()}")
+        val pitchesSet = weightPitches.toSet().sortedDescending()
+        println("pitches set(${pitchesSet.size}): $pitchesSet")
+        val pitchesMap = weightPitches.map { pitchesSet.indexOf(it) }.toIntArray()
+        println("pitches map(${pitchesMap.size}): ${pitchesMap.contentToString()}")
+        val densitySwitch = ((1f - density) * 20).roundToInt()
+        val volumePercentage = findVolumePercentage(volume)
+        weightTicks.forEachIndexed{ index, weight ->
+            val soundIndex = weight + densitySwitch
+            val sound = soundList.getOrNull(soundIndex)
+            val sound2Index = soundIndex + pitchesMap[index] + 1
+            val sound2 = soundList.getOrNull(sound2Index)
             sound?.let{
-                val velocity = 127
+                val velocity = if(weight == 0) (96 * volumePercentage).toInt().coerceIn(0 , 127)
+                                else (weightVelocities[index] * volumePercentage).toInt().coerceIn(0 , 127)
                 val start = patternTicks[index].toLong()
                 val duration = patternDurations[index]
                 val on = NoteOn(start, 9, sound, velocity)
@@ -97,7 +110,17 @@ private fun MidiTrack.addDrumsToTrackByPattern(trackDatas: List<TrackData>, sect
                 //println("Drum sound: $sound   tick: $start")
                 this.insertEvent(on)
                 this.insertEvent(off)
+                println("Index: $index Tick: ${patternTicks[index]}  Sounds: $sound $sound2   Indices: $soundIndex $sound2Index  Velocity: $velocity  VolumePercentage: $volumePercentage  Density: $density  DensitySwitch: $densitySwitch")
+                sound2?.let{
+                    val on2 = NoteOn(start, 9, sound2, velocity)
+                    val off2 = NoteOff(start + duration, 9, sound2, velocity)
+                    //println("Drum sound: $sound   tick: $start")
+                    this.insertEvent(on2)
+                    this.insertEvent(off2)
+                }
+//
             }
+
         }
     } catch(e: java.lang.Exception){
         println("Pattern Error: ${e.message}")
@@ -105,7 +128,9 @@ private fun MidiTrack.addDrumsToTrackByPattern(trackDatas: List<TrackData>, sect
 
 
 }
-
+fun findVolumePercentage(volume: Float): Float {
+    return if(volume <= 0.5f) volume * 2 else 1f + volume / 4
+}
 fun MidiTrack.addDrumsToTrackByCentroids(trackDatas: List<TrackData>, drumKit: DrumKit,
                                 sectionStart:Int, sectionDuration:Int, density: Float, volume: Float, type: DrumsType){
     val sectionIndices = trackDatas.map{ it.ticks }.findIndicesInSection(sectionStart, sectionDuration)
@@ -176,7 +201,7 @@ fun MidiTrack.addDrumsToTrackByCentroids(trackDatas: List<TrackData>, drumKit: D
 //        println("sums: $sums")
 //        println("sumsPairs: $sumsPairs")
 //        println("ascendant sums: ${ascendantSums.contentToString()}")
-            val volumePercentage = if(volume <= 0.5f) volume * 2 else 1f + volume / 4
+            val volumePercentage = findVolumePercentage(volume)
             val trackDatasArray = trackDatas.sortedBy { it.partIndex }.toTypedArray()
             points.forEach {
                 //println(it)

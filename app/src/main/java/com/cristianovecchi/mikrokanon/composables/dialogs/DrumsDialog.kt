@@ -184,6 +184,7 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         pattern,
                                         lang.selectRhythm
                                     ) { index ->
+                                        ListDialogData(itemList = drumsTypeDialogData.value.itemList)
                                         val newDrumData = drumData.copy(type = DrumsType.PATTERN, pattern = index)
                                         groupingDialogData.value =
                                             GroupingDialogData(itemGroups = groupingDialogData.value.itemGroups,
@@ -193,7 +194,6 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         val newDrumsDatas = drumsDatas.toMutableList()
                                         newDrumsDatas[cursor] = newDrumData
                                         drumsDatas = newDrumsDatas
-                                        ListDialogData(itemList = drumsTypeDialogData.value.itemList)
                                     }
                                 } else {
                                     val newDrumsDatas = drumsDatas.toMutableList()
@@ -240,7 +240,7 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             densityDialogData.value = ListDialogData(
                                 true,
                                 densities.map{"$it%"},
-                                densities.indexOf((drumData.volume * 100).toInt()),
+                                densities.indexOf((drumData.density * 100).toInt()),
                                 lang.selectDrumsDensity
                             ) { densityIndex ->
                                 val newDrumsDatas = drumsDatas.toMutableList()
@@ -334,6 +334,7 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         pattern,
                                         lang.selectRhythm
                                     ) { index ->
+                                        ListDialogData(itemList = drumsTypeDialogData.value.itemList)
                                         val newDrumData = drumsData.copy(DrumsType.PATTERN, pattern = index)
                                         groupingDialogData.value =
                                             GroupingDialogData(itemGroups = groupingDialogData.value.itemGroups,
@@ -343,7 +344,6 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         val rebuilding = drumsDatas.addOrInsert(newDrumData, cursor)
                                         drumsDatas = rebuilding.first
                                         cursor = rebuilding.second
-                                        ListDialogData(itemList = drumsTypeDialogData.value.itemList)
                                     }
                                 } else {
                                     val newDrumData = drumsData.copy(type = DrumsType.values()[newDrumsType])
