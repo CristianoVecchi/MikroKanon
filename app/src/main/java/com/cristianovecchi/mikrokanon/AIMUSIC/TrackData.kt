@@ -206,15 +206,17 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
     }
 }
 fun List<TrackData>.analysisInPattern(sectionIndices: List<IntRange?>,
-                                        patternTicks: List<Int>, patternDurations: List<Int>): Triple<IntArray, IntArray, IntArray>{
+                                        patternTicks: List<Int>, patternDurations: List<Int>): List<IntArray>{
     val resultTicks = IntArray(patternTicks.size)
     val resultVelocities = IntArray(patternTicks.size)
     val resultPitches = IntArray(patternTicks.size)
+    val resultDurations = IntArray(patternTicks.size)
     val patternSize = patternTicks.size
     this.forEachIndexed { index, trackData ->
         val trackTicks = trackData.ticks
         val trackVelocities = trackData.velocities
         val trackPitches = trackData.pitches
+        val trackDurations = trackData.durations
         sectionIndices[index]?.let{
             var patternIndex = 0
             while(patternIndex < patternSize){
@@ -230,13 +232,14 @@ fun List<TrackData>.analysisInPattern(sectionIndices: List<IntRange?>,
                         val newVelocity = trackVelocities[i]
                         if(newVelocity > resultVelocities[patternIndex]) resultVelocities[patternIndex] = newVelocity
                         resultPitches[patternIndex] += trackPitches[i]
+                        resultDurations[patternIndex] += trackDurations[i]
                     }
                 }
                 patternIndex++
             }
         }
     }
-    return Triple(resultTicks, resultVelocities, resultPitches)
+    return listOf(resultTicks, resultVelocities, resultPitches, resultDurations)
 }
 fun List<TrackData>.applyMultiCheckAndReplace(context:CoroutineContext, dispatch: (Triple<AppViewModel.Building, Int, Int>) -> Unit,
                                               checkAndReplace: List<List<CheckAndReplaceData>>,

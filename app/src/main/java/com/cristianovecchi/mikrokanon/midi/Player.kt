@@ -164,12 +164,12 @@ object Player {
                         acc + if (triple.second) triple.first.retrogradeValues()
                             .repeat(triple.third) else triple.first.values.repeat(triple.third)
                     }.mergeNegativeValues()
-                    println("durations: $durations")
+                    //println("durations: $durations")
                     var actualDurations = multiplyDurations(nTotalNotes, durations)
-                    println("actual durations: ${actualDurations.contentToString()}")
+                    //println("actual durations: ${actualDurations.contentToString()}")
 
                     if (rhythmShuffle) actualDurations.shuffle()
-                    println("durations after shuffle: ${actualDurations.contentToString()}")
+                    //println("durations after shuffle: ${actualDurations.contentToString()}")
                     actualDurations = if (swingShuffle != 0.5f) actualDurations.applySwing(swingShuffle) else actualDurations
                     //println(actualDurations.contentToString())
                     val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
@@ -225,7 +225,7 @@ object Player {
                                 "Cancelled during Check'n'replace or Drums building!"
                             } else {
                                 val totalNotes = actualCounterpointTrackData.sumOf{it.pitches.size}
-                                println("Total of notes after Check'n'replace: $totalNotes")
+                                //println("Total of notes after Check'n'replace: $totalNotes")
                                 if(totalNotes > 100000){
                                     dispatch(Triple(AppViewModel.Building.NONE, 0, 0))
                                     "-1" // ERROR: TOO MUCH NOTES!!!
@@ -236,7 +236,7 @@ object Player {
                                         if(job.isActive) {
                                             //dispatch("Building MidiTrack Channel: ${it.channel}")
                                             dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
-                                            println("Total on notes after Check'n'replace: ${actualCounterpointTrackData.sumOf{it.pitches.size}}")
+                                            //println("Total on notes after Check'n'replace: ${actualCounterpointTrackData.sumOf{it.pitches.size}}")
                                             convertToMidiTrack(it, actualCounterpointTrackData.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} })
                                         } else MidiTrack()
                                     }

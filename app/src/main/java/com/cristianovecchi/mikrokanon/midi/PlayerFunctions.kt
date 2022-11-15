@@ -2,8 +2,6 @@ package com.cristianovecchi.mikrokanon.midi
 
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
-import com.cristianovecchi.mikrokanon.dataAnalysis.K
-import com.cristianovecchi.mikrokanon.dataAnalysis.PTS
 import com.cristianovecchi.mikrokanon.dataAnalysis.Point
 import com.cristianovecchi.mikrokanon.dataAnalysis.lloyd
 import com.leff.midi.MidiTrack
@@ -34,12 +32,12 @@ suspend fun createDrumsTrack(context: CoroutineContext, dispatch: (Triple<AppVie
             tick += it
             oldTick
         }
-        println("Total length: $totalLength")
+        //println("Total length: $totalLength")
         drumsDatas.forEachIndexed { index, drumsData ->
             val start = sectionTicks[index]
             val duration = sectionDurations[index]
-            println("$start-${start+duration-1}")
-            println("$drumsData")
+            //println("$start-${start+duration-1}")
+            //println("$drumsData")
         }
         val job = context.job
         drumsDatas.forEachIndexed { index, drumsData ->
@@ -82,26 +80,38 @@ private fun MidiTrack.addDrumsToTrackByPattern(trackDatas: List<TrackData>, sect
         val sectionIndices = trackDatas.map{ it.ticks }.findIndicesInSection(sectionStart, sectionDuration)
         //val nElements = sectionIndices.nElements()
         val soundList = drumKit.soundList()
+        val soundListSize = soundList.size
         val (patternTicks, patternDurations) = patternValues.patternTicksAndDurationInSection(sectionStart, sectionDuration)
-        println("pattern ticks(${patternTicks.size}): $patternTicks")
-        println("pattern durs(${patternDurations.size}): $patternDurations")
-        val (weightTicks, weightVelocities, weightPitches) = trackDatas.analysisInPattern(sectionIndices, patternTicks, patternDurations)
-        println("ticks weights(${weightTicks.size}): ${weightTicks.contentToString()}")
-        println("velocities weights(${weightVelocities.size}): ${weightVelocities.contentToString()}")
-        println("pitches weights(${weightPitches.size}): ${weightPitches.contentToString()}")
-        val pitchesSet = weightPitches.toSet().sortedDescending()
-        println("pitches set(${pitchesSet.size}): $pitchesSet")
-        val pitchesMap = weightPitches.map { pitchesSet.indexOf(it) }.toIntArray()
-        println("pitches map(${pitchesMap.size}): ${pitchesMap.contentToString()}")
-        val densitySwitch = ((1f - density) * 20).roundToInt()
+        //println("pattern ticks(${patternTicks.size}): $patternTicks")
+        //println("pattern durs(${patternDurations.size}): $patternDurations")
+        val (weightTicks, weightVelocities, weightPitches, weightDurations) = trackDatas.analysisInPattern(sectionIndices, patternTicks, patternDurations)
+        //println("ticks weights(${weightTicks.size}): ${weightTicks.contentToString()}")
+        //println("velocities weights(${weightVelocities.size}): ${weightVelocities.contentToString()}")
+        //println("pitches weights(${weightPitches.size}): ${weightPitches.contentToString()}")
+        val weightTicksGrades = soundListSize + ((1f-density) * soundListSize).toInt()
+        val pitchesSet = weightPitches.toSet().sortedDescending()//.take(soundListSize/2)
+        //println("pitches set(${pitchesSet.size}): $pitchesSet")
+        val auxiliarySoundsGrades = 4
+        val pitchesMap = weightPitches.map { pitchesSet.indexOf(it) / auxiliarySoundsGrades}.toIntArray()
+        //println("pitches map(${pitchesMap.size}): ${pitchesMap.contentToString()}")
+        //println("durations weights(${weightDurations.size}): ${weightDurations.contentToString()}")
+        val durationsSet = weightDurations.toSet().sortedDescending()//.take(soundListSize/2)
+        //println("durations set(${durationsSet.size}): $durationsSet")
+        val durationsMap = weightDurations.map { durationsSet.indexOf(it) / auxiliarySoundsGrades}.toIntArray()
+        //println("durations map(${durationsMap.size}): ${durationsMap.contentToString()}")
+        val densitySwitch = ((1f - density) * weightTicksGrades).roundToInt()
         val volumePercentage = findVolumePercentage(volume)
-        weightTicks.forEachIndexed{ index, weight ->
-            val soundIndex = weight + densitySwitch
-            val sound = soundList.getOrNull(soundIndex)
-            val sound2Index = soundIndex + pitchesMap[index] + 1
-            val sound2 = soundList.getOrNull(sound2Index)
+        val expression = Controller(sectionStart.toLong(), 9, 11, (127 * volume).toInt())
+        this.insertEvent(expression)
+        val weightTicksWithGrades = weightTicks.map { it / weightTicksGrades}.toIntArray()
+        //println("Weight ticks grades: $weightTicksGrades")
+        //println("Grades map(${weightTicksWithGrades.size}): ${weightTicksWithGrades.contentToString()}")
+        weightTicksWithGrades.forEachIndexed{ index, weight ->
+            val sound = soundList.getOrNull(weight)
             sound?.let{
-                val velocity = if(weight == 0) (96 * volumePercentage).toInt().coerceIn(0 , 127)
+                val sound2Index = if(pitchesMap[index] == -1) -1 else weight + pitchesMap[index] + 1 + densitySwitch
+                val sound2 = soundList.getOrNull(sound2Index)
+                val velocity = if(weightTicks[index] == 0) (104 * volumePercentage).toInt().coerceIn(0 , 127)
                                 else (weightVelocities[index] * volumePercentage).toInt().coerceIn(0 , 127)
                 val start = patternTicks[index].toLong()
                 val duration = patternDurations[index]
@@ -110,13 +120,22 @@ private fun MidiTrack.addDrumsToTrackByPattern(trackDatas: List<TrackData>, sect
                 //println("Drum sound: $sound   tick: $start")
                 this.insertEvent(on)
                 this.insertEvent(off)
-                println("Index: $index Tick: ${patternTicks[index]}  Sounds: $sound $sound2   Indices: $soundIndex $sound2Index  Velocity: $velocity  VolumePercentage: $volumePercentage  Density: $density  DensitySwitch: $densitySwitch")
+                //println("Index: $index Tick: ${patternTicks[index]}  Sounds: $sound $sound2 $sound3   Indices: $weight $sound2Index $sound3Index  Velocity: $velocity  VolumePercentage: $volumePercentage  Density: $density  DensitySwitch: $densitySwitch")
                 sound2?.let{
+                    val sound3Index = if(durationsMap[index] == -1) -1 else sound2Index  + durationsMap[index] + 1 + densitySwitch
+                    val sound3 = soundList.getOrNull(sound3Index)
                     val on2 = NoteOn(start, 9, sound2, velocity)
                     val off2 = NoteOff(start + duration, 9, sound2, velocity)
                     //println("Drum sound: $sound   tick: $start")
                     this.insertEvent(on2)
                     this.insertEvent(off2)
+                    sound3?.let{
+                        val on3 = NoteOn(start, 9, sound3, velocity)
+                        val off3 = NoteOff(start + duration, 9, sound3, velocity)
+                        //println("Drum sound: $sound   tick: $start")
+                        this.insertEvent(on3)
+                        this.insertEvent(off3)
+                    }
                 }
 //
             }
