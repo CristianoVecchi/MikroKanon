@@ -4,9 +4,11 @@ package com.cristianovecchi.mikrokanon.composables.dialogs
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -20,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
+import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationType
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
@@ -53,8 +56,11 @@ fun ResolutioDialog(
             val width = if(dimensions.width <= 884) (dimensions.width / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             val height = dimensions.dialogHeight
+            var isNoteList by remember { mutableStateOf(model.isResolutioWithNotes) }
             Surface(
-                modifier = Modifier.width(width).height(height),
+                modifier = Modifier
+                    .width(width)
+                    .height(height),
                 color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
@@ -70,10 +76,11 @@ fun ResolutioDialog(
                     val modifierC = Modifier
                         //.fillMaxSize()
                         .weight(1f)
-                    var columnModifier = Modifier.weight(1f)
+                    val columnModifier = Modifier.weight(1f)
                     val source = model.resolutioValues
                     var absPitches by remember{mutableStateOf(source.first)}
                     var cadenzaText by remember { mutableStateOf(source.second) }
+                    var harmonySelected by remember { mutableStateOf(source.third) }
                     val setCadenza = { index: Int, cadenzaValue: Int ->
                         val newCadenza = cadenzaValue.coerceIn(
                             multiNumberDialogData.value.min,
@@ -89,44 +96,61 @@ fun ResolutioDialog(
                     val numberFontWeight = FontWeight.Bold
                     val buttonPadding = 4.dp
                     val itemList = (0..11).map{ Clip.convertAbsToClipText(it, model.language.value!!.noteNames)}.reversed()
-                    val listState = rememberLazyListState()
+                    val harmonies = HarmonizationType.values().map{ it.title }
+                    val listStateNotes = rememberLazyListState()
+                    val listStateHarmony = rememberLazyListState()
                     Text(text = multiNumberDialogData.value.title, fontWeight = FontWeight.Bold, color = fontColor, style = TextStyle(fontSize = fontSize))
                     Spacer(modifier = Modifier.height(20.dp))
-                    LazyColumn( state = listState,
-                        modifier = modifierA
-                    ) {
-                        items(itemList) { item ->
-                            val selected = if (absPitches.isEmpty()) {
-                                listOf<String>()
-                            } else {
-                                itemList.filterIndexed { index, _ -> absPitches.contains(11 - index) }
-                                //sequencesList[selectedOption.value]
-                            }
-                            Spacer(modifier = Modifier.height(2.dp))
-                            MultiRadioButton(
-                                item,
-                                selected,
-                                model.dimensions.value!!.dialogFontSize.sp,
-                                model.appColors
-                            ) { selectedValue ->
-                                val index = 11-itemList.indexOf(selectedValue)
-
-                                absPitches = if (
-                                absPitches.contains(index)) {
-
-                                    absPitches.toMutableSet().also {
-                                        it.remove(index)
-                                    }.sorted().toSet()
+                    if(isNoteList){
+                        LazyColumn( state = listStateNotes,
+                            modifier = modifierA
+                        ) {
+                            items(itemList) { item ->
+                                val selected = if (absPitches.isEmpty()) {
+                                    listOf()
                                 } else {
-
-                                    absPitches.toMutableSet().also {
-                                        it.add(index)
-                                    }.sorted().toSet()
+                                    itemList.filterIndexed { index, _ -> absPitches.contains(11 - index) }
+                                    //sequencesList[selectedOption.value]
                                 }
+                                Spacer(modifier = Modifier.height(2.dp))
+                                MultiRadioButton(
+                                    item,
+                                    selected,
+                                    model.dimensions.value!!.dialogFontSize.sp,
+                                    model.appColors
+                                ) { selectedValue ->
+                                    val index = 11-itemList.indexOf(selectedValue)
 
+                                    absPitches = if (
+                                        absPitches.contains(index)) {
+
+                                        absPitches.toMutableSet().also {
+                                            it.remove(index)
+                                        }.sorted().toSet()
+                                    } else {
+
+                                        absPitches.toMutableSet().also {
+                                            it.add(index)
+                                        }.sorted().toSet()
+                                    }
+
+                                }
+                            }
+                        }
+                    } else {
+                        LazyColumn( state = listStateHarmony,
+                            modifier = modifierA
+                        ) {
+                            itemsIndexed(harmonies) { index, item ->
+                                val selected = harmonies[harmonySelected]
+                                Spacer(modifier = Modifier.height(2.dp))
+                                RadioButton(item, selected, fontSize = fontSize, appColors = model.appColors) { selectedValue ->
+                                    harmonySelected = harmonies.indexOf(selectedValue)
+                                }
                             }
                         }
                     }
+
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Row(modifier = modifierB.fillMaxWidth(),
@@ -312,7 +336,7 @@ fun ResolutioDialog(
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(
                         modifierC.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.Bottom
                     ) {
                         val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
@@ -325,8 +349,19 @@ fun ResolutioDialog(
                             iconColor = Color.Green,
                             colors = model.appColors
                         ) {
-                            multiNumberDialogData.value.dispatchResolutio.invoke(Pair(absPitches, cadenzaText))
+                            multiNumberDialogData.value.dispatchResolutio.invoke(Triple(absPitches, cadenzaText, harmonySelected))
                             onDismissRequest.invoke()
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically){
+                            Checkbox(
+                                checked = !isNoteList,
+                                onCheckedChange = { checked ->
+                                    model.isResolutioWithNotes = !isNoteList
+                                    isNoteList = !isNoteList
+
+                                }
+                            )
+                            Text(text = model.language.value!!.harmony, color = fontColor)
                         }
 
                     }

@@ -51,13 +51,27 @@ const val SITAR = 104
 const val BANJO = 105
 const val SHAMISEN = 106
 const val KOTO = 107
+const val KALIMBA = 108
 const val BAG_PIPE = 109
+const val FIDDLE = 110
+const val SHANAI = 111
+
+//"112 - Tinkle Bell","113 - Agogo","114 - Steel Drums",
+//"115 - Woodblock","116 - Taiko Drum","117 - Melodic Tom",
+//"118 - Syn Drum","119 - Reverse Cymbal",
 
 //"009 - Glockenspiel","010 - Music Box","011 - Vibraphone","012 - Marimba","013 - Xylophone","014 - Tubular Bell","
 const val HARPSICHORD = 6
 const val CELESTA = 8
 const val TIMPANI = 47
+const val TINKLE_BELLS = 112
+const val AGOGO = 113
+const val STEEL_DRUMS = 114
 const val WOODBLOCKS = 115
+const val TAIKO_DRUMS = 116
+const val MELODIC_TOMS = 117
+const val SYN_DRUMS = 118
+const val REVERSE_CYMBALS = 119
 const val ELECTRIC_PIANO_1 = 4
 const val ELECTRIC_PIANO_2 = 5
 const val HAMMOND_ORGAN = 16
@@ -212,7 +226,8 @@ enum class RANGES(val octaves: IntArray) {
     CELESTA(intArrayOf(0, 4,5,5,5,6,6,6)),BELLS(intArrayOf(0, 3,4,4,4,4,5,5)),
     TIMPANI(intArrayOf(0, 2,2,2,3,3,3,3)),WOODBLOCKS(intArrayOf(0, 2,2,2,3,3,3,4)),
     BAG_PIPES(intArrayOf(0, 2,2,3,3,4,4,5)),RECORDERS(intArrayOf(0, 3,3,4,4,5,5,6)),
-    SYN_SAW(intArrayOf(0, 3,3,4,4,4,5,5))
+    SYN_SAW(intArrayOf(0, 3,3,4,4,4,5,5)), SHAMISEN(intArrayOf(0, 4,4,4,5,5,5,6)),
+    FIDDLE(intArrayOf(0, 4,4,4,5,5,6,7)), SHANAI(intArrayOf(0, 4,4,4,4,5,5,5)),
 }
 fun IntRange.getOctave(): Int {
     return (((this.last + this.first) / 2) / 12) - 1

@@ -52,7 +52,7 @@ fun SequenceSelector(model: AppViewModel,
                      onMikroKanons6reducted: (ArrayList<Clip>) -> Unit,
                      onMaze: (List<List<Int>>) -> Unit,
                      onEWH: (ArrayList<Clip>, Int) -> Unit,
-                     onResolutio: (ArrayList<Clip>, Pair<Set<Int>,String>) -> Unit,
+                     onResolutio: (ArrayList<Clip>, Triple<Set<Int>, String, Int>) -> Unit,
                      onDoubling: (ArrayList<Clip>, List<Pair<Int,Int>>) -> Unit,
                      onChess: (ArrayList<Clip>, Int) -> Unit
                     )

@@ -8,10 +8,7 @@ import android.media.MediaPlayer
 import android.os.Build
 import android.view.WindowManager
 import androidx.lifecycle.*
-import com.cristianovecchi.mikrokanon.AIMUSIC.ARPEGGIO
-import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
-import com.cristianovecchi.mikrokanon.AIMUSIC.Counterpoint
-import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.db.*
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
@@ -64,7 +61,8 @@ class AppViewModel(
     // + 0.86f
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
     var cadenzaValues = "0,1,0,1,1"
-    var resolutioValues = Pair((0..11).toSet(),"0,1,0,1,0")
+    var resolutioValues = Triple((0..11).toSet(),"0,1,0,1,0", 0)
+    var isResolutioWithNotes = true
     val dynamicMap: Map<Float,String> =  dynamicSteps.zip(getDynamicSymbols()).toMap()
 
     val stackIcons = mutableListOf<String>()
@@ -349,7 +347,7 @@ class AppViewModel(
         computationStack.pushAndDispatch(Computation.ProgressiveEWH(originalCounterpoints, index))
         progressiveEWHonCounterpoints(originalCounterpoints, index)
     }
-    val onResolutio = { list: ArrayList<Clip>?, resolutioData: Pair<Set<Int>,String> ->
+    val onResolutio = { list: ArrayList<Clip>?, resolutioData: Triple<Set<Int>,String,Int> ->
         //println("on Resolutio: ${resolutioData.first} ${resolutioData.second}")
         val originalCounterpoints = if(list != null) {
             changeFirstSequence(list)
@@ -358,8 +356,9 @@ class AppViewModel(
         } else {
             counterpoints.value!!.map{ it.clone() }
         }
-        computationStack.pushAndDispatch(Computation.Resolutio(originalCounterpoints,resolutioData))
-        resolutioOnCounterpoints(originalCounterpoints, resolutioData.first, resolutioData.second.extractIntsFromCsv())
+        computationStack.pushAndDispatch(Computation.Resolutio(originalCounterpoints,resolutioData, isResolutioWithNotes))
+        resolutioOnCounterpoints(originalCounterpoints, resolutioData.first, resolutioData.second.extractIntsFromCsv(),
+                                        HarmonizationType.values()[resolutioData.third], isResolutioWithNotes)
     }
     val onDoubling = { list: ArrayList<Clip>?, doublingData: List<Pair<Int,Int>> ->
         //println("on Doubling: ${doublingData}")
@@ -778,7 +777,8 @@ class AppViewModel(
                     is Computation.Resolutio -> {
                         if (stepBack) {
                             resolutioOnCounterpoints( previousComputation.counterpoints,
-                                previousComputation.resolutioData.first, previousComputation.resolutioData.second.extractIntsFromCsv())
+                                previousComputation.resolutioData.first, previousComputation.resolutioData.second.extractIntsFromCsv(),
+                                HarmonizationType.values()[previousComputation.resolutioData.third],previousComputation.isWithNotes)
                         }
                     }
                     is Computation.Doubling -> {

@@ -7,10 +7,12 @@ enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, GAMELAN, SAXOPHONES, FLUTES,
     DOUBLE_REEDS,  CLARINETS, FRENCH_HORNS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
     BAROQUE, PLUCKED_STRINGS, CHOIR, SPOOKY,
-    NYLON_GUITAR, STEEL_GUITAR, JAZZ_GUITAR, CLEAN_GUITAR, MUTED_GUITAR, OVERDRIVE_GUITAR, DISTORTION_GUITAR,
+    NYLON_GUITAR, STEEL_GUITAR, JAZZ_GUITAR, CLEAN_GUITAR, MUTED_GUITAR, OVERDRIVE_GUITAR, DISTORTION_GUITAR, BANJO,
     ACOUSTIC_BASS, FRETLESS_BASS, SLAP_BASS_1, SYN_BASS_1,
-    TREMOLO_STRINGS, PIZZICATO, MUTED_BRASS, BAG_PIPES,
-    RECORDER, HARPSICHORD, XYLOPHONE, MARIMBA, VIBRAPHONE, CELESTA, BELLS, TIMPANI, WOODBLOCKS,
+    TREMOLO_STRINGS, PIZZICATO, FIDDLE, MUTED_BRASS,
+    BAG_PIPES, RECORDER, SHANAI, SITAR, SHAMISEN, KOTO,
+    HARPSICHORD, XYLOPHONE, MARIMBA, KALIMBA, VIBRAPHONE, CELESTA, BELLS, TINKLE_BELLS, AGOGO, STEEL_DRUMS, REVERSE_CYMBALS,
+    TIMPANI, WOODBLOCKS, TAIKO_DRUMS, MELODIC_TOMS, SYN_DRUMS,
     ELECTRIC_PIANO_1, ELECTRIC_PIANO_2,
     HAMMOND_ORGAN, PERC_ORGAN, BLUES_ORGAN, CHURCH_ORGAN, REED_ORGAN, ACCORDION, TANGO_ACCORDION,
     SYN_SQUARE_WAVE, SYN_SAW_WAVE, SYN_CALLIOPE, SYN_CHIFF,
@@ -94,23 +96,37 @@ object Ensembles {
             EnsembleType.MUTED_GUITAR -> getKeyboardInstrument(MUTED_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
             EnsembleType.OVERDRIVE_GUITAR -> getKeyboardInstrument(OVERDRIVE_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
             EnsembleType.DISTORTION_GUITAR -> getKeyboardInstrument(DISTORTION_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
+            EnsembleType.BANJO -> getKeyboardInstrument(BANJO, nParts, RANGES.SYN_SAW, IntRange(C3, C5 + 3))
             EnsembleType.ACOUSTIC_BASS -> getKeyboardInstrument(ACOUSTIC_BASS, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
             EnsembleType.FRETLESS_BASS -> getKeyboardInstrument(FRETLESS_BASS, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
             EnsembleType.SLAP_BASS_1 -> getKeyboardInstrument(SLAP_BASS_1, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
             EnsembleType.SYN_BASS_1 -> getKeyboardInstrument(SYN_BASS_1, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
             EnsembleType.TREMOLO_STRINGS -> getKeyboardInstrument(TREMOLO_STRINGS, nParts, RANGES.NO_EXTREME_OCTAVES, IntRange(E1, C8))
             EnsembleType.PIZZICATO -> getKeyboardInstrument(PIZZICATO, nParts, RANGES.NO_EXTREME_OCTAVES, IntRange(E1, C8))
+            EnsembleType.FIDDLE -> getKeyboardInstrument(FIDDLE, nParts, RANGES.FIDDLE, IntRange(G3, C8))
             EnsembleType.MUTED_BRASS -> getKeyboardInstrument(MUTED_TRUMPET, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C7))
             EnsembleType.BAG_PIPES -> getKeyboardInstrument(BAG_PIPE, nParts, RANGES.BAG_PIPES, IntRange(C1, C6))
             EnsembleType.RECORDER -> getKeyboardInstrument(RECORDER, nParts, RANGES.RECORDERS, IntRange(C3, C7))
+            EnsembleType.SHANAI -> getKeyboardInstrument(SHANAI, nParts, RANGES.SHANAI, IntRange(C4 - 3, C6 - 3))
+            EnsembleType.SITAR -> getKeyboardInstrument(SITAR, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C6))
+            EnsembleType.SHAMISEN -> getKeyboardInstrument(SHAMISEN, nParts, RANGES.SHAMISEN, IntRange(C4 , C7 - 3))
+            EnsembleType.KOTO -> getKeyboardInstrument(KOTO, nParts, RANGES.SYN_SAW, IntRange(C3, C6))
             EnsembleType.HARPSICHORD -> getKeyboardInstrument(HARPSICHORD, nParts)
             EnsembleType.XYLOPHONE -> getKeyboardInstrument(XYLOPHONE, nParts, RANGES.HALF, IntRange(C4, C8))
             EnsembleType.MARIMBA -> getKeyboardInstrument(MARIMBA, nParts, RANGES.HALF_PLUS_1,  IntRange(C2, C7))
+            EnsembleType.KALIMBA -> getKeyboardInstrument(KALIMBA, nParts, RANGES.SHAMISEN,  IntRange(G3, C6 + 2))
             EnsembleType.VIBRAPHONE -> getKeyboardInstrument(VIBRAPHONE, nParts, RANGES.HALF_PLUS_1, IntRange(C3, C7))
             EnsembleType.CELESTA -> getKeyboardInstrument(CELESTA, nParts, RANGES.CELESTA, IntRange(C4, C8))
             EnsembleType.BELLS -> getKeyboardInstrument(TUBULAR_BELLS, nParts, RANGES.BELLS, IntRange(55, C6)) // G3 - C6
+            EnsembleType.TINKLE_BELLS -> getKeyboardInstrument(TINKLE_BELLS, nParts, RANGES.PIANO, IntRange(C1, C8))
+            EnsembleType.AGOGO -> getKeyboardInstrument(AGOGO, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C6))
+            EnsembleType.STEEL_DRUMS -> getKeyboardInstrument(STEEL_DRUMS, nParts, RANGES.NO_LOWER_OCTAVE, IntRange(C2, C7))
+            EnsembleType.REVERSE_CYMBALS -> getKeyboardInstrument(REVERSE_CYMBALS, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C6))
             EnsembleType.TIMPANI -> getKeyboardInstrument(TIMPANI, nParts, RANGES.TIMPANI, IntRange(C2, C4))
             EnsembleType.WOODBLOCKS -> getKeyboardInstrument(WOODBLOCKS, nParts, RANGES.WOODBLOCKS, IntRange(C2, C5))
+            EnsembleType.TAIKO_DRUMS -> getKeyboardInstrument(TAIKO_DRUMS, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C6))
+            EnsembleType.MELODIC_TOMS -> getKeyboardInstrument(MELODIC_TOMS, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C6))
+            EnsembleType.SYN_DRUMS -> getKeyboardInstrument(SYN_DRUMS, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C6))
             EnsembleType.ELECTRIC_PIANO_1 -> getKeyboardInstrument(ELECTRIC_PIANO_1, nParts, RANGES.NO_EXTREME_OCTAVES, IntRange(C2, C8))
             EnsembleType.ELECTRIC_PIANO_2-> getKeyboardInstrument(ELECTRIC_PIANO_2, nParts, RANGES.NO_EXTREME_OCTAVES, IntRange(C2, C8))
             EnsembleType.HAMMOND_ORGAN -> getKeyboardInstrument(HAMMOND_ORGAN, nParts,  RANGES.NO_EXTREME_OCTAVES, IntRange(C2, 89))

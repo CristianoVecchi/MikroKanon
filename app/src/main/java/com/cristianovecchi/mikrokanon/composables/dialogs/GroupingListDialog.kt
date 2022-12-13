@@ -144,7 +144,8 @@ fun GroupingListDialog(
                                     },
                                     shape = MaterialTheme.shapes.large
                                 ) {
-                                    Text(text = "-", fontSize = fontSize.sp)
+                                    //Text(text = "←", fontSize = fontSize.sp)
+                                    Text(text = "<<", fontSize = fontSize.sp)
                                 }
                                 Button(
                                     onClick = {
@@ -154,7 +155,8 @@ fun GroupingListDialog(
                                     },
                                     shape = MaterialTheme.shapes.large
                                 ) {
-                                    Text(text = "+", fontSize = fontSize.sp)
+                                    //Text(text = "→", fontSize = fontSize.sp)
+                                    Text(text = ">>", fontSize = fontSize.sp)
                                 }
                             }
                         }

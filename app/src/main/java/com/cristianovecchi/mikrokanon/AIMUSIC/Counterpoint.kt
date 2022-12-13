@@ -5,6 +5,10 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.getIntOrEmptyValue
+import com.cristianovecchi.mikrokanon.midi.createExtendedWeightedHarmonyTrack
+import com.cristianovecchi.mikrokanon.midi.createFull12HarmonizedTrack
+import com.cristianovecchi.mikrokanon.midi.createJazzChordsTrack
+import com.cristianovecchi.mikrokanon.midi.createPopChordsTrack
 import com.cristianovecchi.mikrokanon.shiftCycling
 import com.cristianovecchi.mikrokanon.tritoneSubstitutionOnIntervalSet
 import com.cristianovecchi.mikrokanon.ui.readFileLineByLineUsingForEachLine
@@ -528,7 +532,50 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         return clone.copy(parts = newParts).cutExtraNotes().apply { this.findAndSetEmptiness() }
     }
-    fun addResolutiones(absPitchesSet: Set<Int>, resolutioForm: List<Int> = listOf(0,1,0,1,0)): Counterpoint {
+    fun addResolutionesOnHarmony(harmony: HarmonizationType, resolutioForm: List<Int> = listOf(0,1,0,1,0)): Counterpoint {
+        val clone = this.normalizePartsSize(false)
+        val result = clone.cloneWithEmptyParts()
+        try {
+            var index = 0
+            val maxSize = clone.maxSize()
+            val (nBeforeRests, nFirstNotes, nMiddleRests, nSecondNotes, nAfterRests ) = resolutioForm
+            val dodecaBytes = IntArray(maxSize) { index ->
+                Insieme.dodecaByteFromAbsPitches(clone.getColumnValuesWithoutEmptyValues(index).toIntArray())
+            }
+            val (resolutiones, roots) = when (harmony){
+                HarmonizationType.NONE -> return clone
+                HarmonizationType.POP -> createPopJazzChordsSequence(dodecaBytes, harmony, false, false)
+                HarmonizationType.POP7 -> createPopJazzChordsSequence(dodecaBytes, harmony,true, false)
+                HarmonizationType.JAZZ -> createPopJazzChordsSequence(dodecaBytes, harmony,true, false)
+                HarmonizationType.JAZZ11 -> createPopJazzChordsSequence(dodecaBytes, harmony,true, true)
+                HarmonizationType.XWH -> createXWHChordsSequence(dodecaBytes)
+                HarmonizationType.FULL12 -> createXWHChordsSequence(dodecaBytes)
+            }
+            while (index < maxSize){
+                val column = clone.getColumnValuesWithEmptyValues(index)
+                val resolutioSet = resolutiones[index].toSet()
+                if(column.all{ it == -1} || resolutioSet.containsAll(column.filter{ it != -1})){
+                    result.addColumn(column)
+                } else {
+
+                    val resolutioColumn = column.map{Insieme.resolveOnAbsPitch(it, resolutioSet)}
+
+                    (0 until nBeforeRests).forEach{ _ -> result.addEmptyColumn() }
+                    (0 until nFirstNotes).forEach{ _ -> result.addColumn(column) }
+                    (0 until nMiddleRests).forEach{ _ -> result.addEmptyColumn() }
+                    (0 until nSecondNotes).forEach{ _ -> result.addColumn(resolutioColumn) }
+                    (0 until nAfterRests).forEach{ _ -> result.addEmptyColumn() }
+
+                }
+                index++
+            }
+
+        } catch(e: java.lang.Exception){
+            println("Error in  addResolutionesOnHarmony: ${e.message}")
+        }
+        return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
+    }
+    fun addResolutionesOnSet(absPitchesSet: Set<Int>, resolutioForm: List<Int> = listOf(0,1,0,1,0)): Counterpoint {
         val clone = this.normalizePartsSize(false)
         //if(absPitchesSet.isEmpty()) return clone() // if absPitchesSet is empty resolutioColumn == column
         val result = clone.cloneWithEmptyParts()

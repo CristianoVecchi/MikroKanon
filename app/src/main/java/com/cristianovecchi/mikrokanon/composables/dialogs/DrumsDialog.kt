@@ -77,9 +77,9 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         .padding(8.dp)
-                        .weight(weights.first + weights.second / 6 * 5)
+                        .weight(weights.first + weights.second / 3 * 2)
                     val modifierB = Modifier
-                        .weight(weights.second / 6)
+                        .weight(weights.second / 3)
                     val modifierC = Modifier
                         .padding(8.dp)
                         .weight(weights.third)
@@ -153,126 +153,167 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         }
                     }
                     Row(
-                        modifier = modifierB.fillMaxWidth(),
+                        modifierB.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                         val buttonSize = dimensions.dialogButtonSize
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            text = "",
-                            iconId = model.iconMap["edit"]!!,
-                            buttonSize = buttonSize.dp,
-                            iconColor = model.appColors.iconButtonIconColor,
-                            colors = model.appColors
-                        ) {
-                            val drumData = drumsDatas[cursor]
-                            val pattern = drumData.pattern
-                            drumsTypeDialogData.value = ListDialogData(
-                                true,
-                                drumsTypes,
-                                drumData.type.ordinal,
-                                lang.selectDrumsType
-                            ) { newDrumsType ->
-                                if(newDrumsType == 1){ // choose pattern
-                                    val itemGroups = RhythmPatterns.values()
-                                        .groupBy { it.type }.values.map{ it.map{ it.title}}
-                                    val groupNames = RhythmType.values().map { it.name }
-                                    groupingDialogData.value = GroupingDialogData(
-                                        true, itemGroups, groupNames,
-                                        pattern,
-                                        lang.selectRhythm
-                                    ) { index ->
-                                        ListDialogData(itemList = drumsTypeDialogData.value.itemList)
-                                        val newDrumData = drumData.copy(type = DrumsType.PATTERN, pattern = index)
-                                        groupingDialogData.value =
-                                            GroupingDialogData(itemGroups = groupingDialogData.value.itemGroups,
-                                                groupNames = groupingDialogData.value.groupNames,
-                                                selectedListDialogItem = index
-                                            )
-                                        val newDrumsDatas = drumsDatas.toMutableList()
-                                        newDrumsDatas[cursor] = newDrumData
-                                        drumsDatas = newDrumsDatas
-                                    }
-                                } else {
-                                    val newDrumsDatas = drumsDatas.toMutableList()
-                                    newDrumsDatas[cursor] = drumsDatas[cursor].copy(type = DrumsType.values()[newDrumsType])
-                                    drumsDatas = newDrumsDatas
-                                    ListDialogData(itemList = drumsTypeDialogData.value.itemList)
-                                }
+                        Column(
 
-                            }
-                        }
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            text = "",
-                            isActive = drumsDatas[cursor].type != DrumsType.NONE,
-                            iconId = model.iconMap["sound"]!!,
-                            buttonSize = buttonSize.dp,
-                            iconColor = model.appColors.iconButtonIconColor,
-                            colors = model.appColors
+                            verticalArrangement = Arrangement.SpaceBetween,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            val drumData = drumsDatas[cursor]
-                            drumKitsDialogData.value = ListDialogData(
-                                true,
-                                drumKits,
-                                drumData.drumKit.ordinal,
-                                lang.selectDrumKit
-                            ) { drumKitIndex ->
-                                val newDrumsDatas = drumsDatas.toMutableList()
-                                newDrumsDatas[cursor] = drumsDatas[cursor].copy(drumKit = DrumKits.values()[drumKitIndex])
-                                drumsDatas = newDrumsDatas
-                                ListDialogData(itemList = drumKitsDialogData.value.itemList)
+
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "",
+                                iconId = model.iconMap["edit"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val drumData = drumsDatas[cursor]
+                                val pattern = drumData.pattern
+                                drumsTypeDialogData.value = ListDialogData(
+                                    true,
+                                    drumsTypes,
+                                    drumData.type.ordinal,
+                                    lang.selectDrumsType
+                                ) { newDrumsType ->
+                                    if (newDrumsType == 1) { // choose pattern
+                                        val itemGroups = RhythmPatterns.values()
+                                            .groupBy { it.type }.values.map { it.map { it.title } }
+                                        val groupNames = RhythmType.values().map { it.name }
+                                        groupingDialogData.value = GroupingDialogData(
+                                            true, itemGroups, groupNames,
+                                            pattern,
+                                            lang.selectRhythm
+                                        ) { index ->
+                                            ListDialogData(itemList = drumsTypeDialogData.value.itemList)
+                                            val newDrumData = drumData.copy(
+                                                type = DrumsType.PATTERN,
+                                                pattern = index
+                                            )
+                                            groupingDialogData.value =
+                                                GroupingDialogData(
+                                                    itemGroups = groupingDialogData.value.itemGroups,
+                                                    groupNames = groupingDialogData.value.groupNames,
+                                                    selectedListDialogItem = index
+                                                )
+                                            val newDrumsDatas = drumsDatas.toMutableList()
+                                            newDrumsDatas[cursor] = newDrumData
+                                            drumsDatas = newDrumsDatas
+                                        }
+                                    } else {
+                                        val newDrumsDatas = drumsDatas.toMutableList()
+                                        newDrumsDatas[cursor] =
+                                            drumsDatas[cursor].copy(type = DrumsType.values()[newDrumsType])
+                                        drumsDatas = newDrumsDatas
+                                        ListDialogData(itemList = drumsTypeDialogData.value.itemList)
+                                    }
+
+                                }
+                            }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "",
+                                iconId = model.iconMap["pattern"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val drumData = drumsDatas[cursor]
+                                val pattern = drumData.pattern
+                                val itemGroups = RhythmPatterns.values()
+                                    .groupBy { it.type }.values.map { it.map { it.title } }
+                                val groupNames = RhythmType.values().map { it.name }
+                                groupingDialogData.value = GroupingDialogData(
+                                    true, itemGroups, groupNames,
+                                    pattern,
+                                    lang.selectRhythm
+                                ) { index ->
+                                    val newDrumData = drumData.copy(
+                                        type = DrumsType.PATTERN,
+                                        pattern = index
+                                    )
+                                    val newDrumsDatas = drumsDatas.toMutableList()
+                                    newDrumsDatas[cursor] = newDrumData
+                                    drumsDatas = newDrumsDatas
+                                }
                             }
                         }
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            text = "",
-                            isActive = drumsDatas[cursor].type != DrumsType.NONE,
-                            iconId = model.iconMap["density"]!!,
-                            buttonSize = buttonSize.dp,
-                            iconColor = model.appColors.iconButtonIconColor,
-                            colors = model.appColors
-                        ) {
-                            val drumData = drumsDatas[cursor]
-                            val densities = listOf(100,95,90,85,80,75,70,65,60,55,50,45,40,35,30,25,20,15,10,5)
-                            densityDialogData.value = ListDialogData(
-                                true,
-                                densities.map{"$it%"},
-                                densities.indexOf((drumData.density * 100).toInt()),
-                                lang.selectDrumsDensity
-                            ) { densityIndex ->
-                                val newDrumsDatas = drumsDatas.toMutableList()
-                                newDrumsDatas[cursor] = drumsDatas[cursor].copy(density = densities[densityIndex] / 100f)
-                                drumsDatas = newDrumsDatas
-                                ListDialogData(itemList = densityDialogData.value.itemList)
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "",
+                                isActive = drumsDatas[cursor].type != DrumsType.NONE,
+                                iconId = model.iconMap["sound"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val drumData = drumsDatas[cursor]
+                                drumKitsDialogData.value = ListDialogData(
+                                    true,
+                                    drumKits,
+                                    drumData.drumKit.ordinal,
+                                    lang.selectDrumKit
+                                ) { drumKitIndex ->
+                                    val newDrumsDatas = drumsDatas.toMutableList()
+                                    newDrumsDatas[cursor] = drumsDatas[cursor].copy(drumKit = DrumKits.values()[drumKitIndex])
+                                    drumsDatas = newDrumsDatas
+                                    ListDialogData(itemList = drumKitsDialogData.value.itemList)
+                                }
+                            }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "",
+                                isActive = drumsDatas[cursor].type != DrumsType.NONE,
+                                iconId = model.iconMap["density"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val drumData = drumsDatas[cursor]
+                                val densities = listOf(100,95,90,85,80,75,70,65,60,55,50,45,40,35,30,25,20,15,10,5)
+                                densityDialogData.value = ListDialogData(
+                                    true,
+                                    densities.map{"$it%"},
+                                    densities.indexOf((drumData.density * 100).toInt()),
+                                    lang.selectDrumsDensity
+                                ) { densityIndex ->
+                                    val newDrumsDatas = drumsDatas.toMutableList()
+                                    newDrumsDatas[cursor] = drumsDatas[cursor].copy(density = densities[densityIndex] / 100f)
+                                    drumsDatas = newDrumsDatas
+                                    ListDialogData(itemList = densityDialogData.value.itemList)
+                                }
+                            }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "",
+                                isActive = drumsDatas[cursor].type != DrumsType.NONE,
+                                iconId = model.iconMap["volume"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val drumData = drumsDatas[cursor]
+                                val volumes = listOf(100,90,80,70,60,50,45,40,35,30,26,23,20,16,13,10,8,6,4,2)
+                                volumeDialogData.value = ListDialogData(
+                                    true,
+                                    volumes.map{"$it%"},
+                                    volumes.indexOf((drumData.volume * 100).toInt()),
+                                    lang.selectDrumsVolume
+                                ) { volumeIndex ->
+                                    val newDrumsDatas = drumsDatas.toMutableList()
+                                    newDrumsDatas[cursor] = drumsDatas[cursor].copy(volume = volumes[volumeIndex] / 100f)
+                                    drumsDatas = newDrumsDatas
+                                    ListDialogData(itemList = volumeDialogData.value.itemList)
+                                }
                             }
                         }
-                        CustomButton(
-                            adaptSizeToIconButton = true,
-                            text = "",
-                            isActive = drumsDatas[cursor].type != DrumsType.NONE,
-                            iconId = model.iconMap["volume"]!!,
-                            buttonSize = buttonSize.dp,
-                            iconColor = model.appColors.iconButtonIconColor,
-                            colors = model.appColors
-                        ) {
-                            val drumData = drumsDatas[cursor]
-                            val volumes = listOf(100,90,80,70,60,50,45,40,35,30,26,23,20,16,13,10,8,6,4,2)
-                            volumeDialogData.value = ListDialogData(
-                                true,
-                                volumes.map{"$it%"},
-                                volumes.indexOf((drumData.volume * 100).toInt()),
-                                lang.selectDrumsVolume
-                            ) { volumeIndex ->
-                                val newDrumsDatas = drumsDatas.toMutableList()
-                                newDrumsDatas[cursor] = drumsDatas[cursor].copy(volume = volumes[volumeIndex] / 100f)
-                                drumsDatas = newDrumsDatas
-                                ListDialogData(itemList = volumeDialogData.value.itemList)
-                            }
-                        }
-                    }
+
+
                     Row(
                         modifier = modifierC.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,

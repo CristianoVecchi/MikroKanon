@@ -85,8 +85,11 @@ suspend fun buildRound(originalCounterpoints: List<Counterpoint> ): List<Counter
 suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint>, values: List<Int>): List<Counterpoint>{
      return originalCounterpoints.map{it.addCadenzas(horIntervalSet, values)}
 }
-suspend fun addResolutioOnCounterpoints(originalCounterpoints: List<Counterpoint>, absPitchesSet: Set<Int>, resolutioForm: List<Int>): List<Counterpoint>{
-     return originalCounterpoints.map{it.addResolutiones(absPitchesSet, resolutioForm)}
+suspend fun addResolutioOnCounterpointsWithSet(originalCounterpoints: List<Counterpoint>, absPitchesSet: Set<Int>, resolutioForm: List<Int>): List<Counterpoint>{
+     return originalCounterpoints.map{it.addResolutionesOnSet(absPitchesSet, resolutioForm)}
+}
+suspend fun addResolutioOnCounterpointsWithHarmony(originalCounterpoints: List<Counterpoint>, harmony: HarmonizationType, resolutioForm: List<Int>): List<Counterpoint>{
+     return originalCounterpoints.map{it.addResolutionesOnHarmony(harmony, resolutioForm)}
 }
 suspend fun addDoublingOnCounterpoints(originalCounterpoints: List<Counterpoint>,  doublingList: List<Pair<Int,Int>>, maxParts: Int): List<Counterpoint>{
      return originalCounterpoints.map{it.addMultipleDoublingParts(doublingList, maxParts)}
@@ -155,7 +158,7 @@ suspend fun paradeAllOnCounterpoint(
      vertIntervalSet: List<Int>,
      horIntervalSet: List<Int>,
      cadenzaForm: List<Int>, resolutioAbsPitches: Set<Int>,
-     resolutioForm: List<Int>,): List<Counterpoint>{
+     resolutioForm: List<Int>, resolutioHarmony: HarmonizationType,): List<Counterpoint>{
      val partResult = mutableListOf<Counterpoint>()
      val list = listOf(counterpoint)
 
@@ -176,7 +179,8 @@ suspend fun paradeAllOnCounterpoint(
      result += chessOnCounterpoints(list,1).sortedBy { it.emptiness }.take(howMany)
      result += duplicateAllInCounterpoint(counterpoint).sortedBy { it.emptiness }.take(howMany)
      result += addCadenzasOnCounterpoints(horIntervalSet, list, cadenzaForm).sortedBy { it.emptiness }.take(howMany)
-     result += addResolutioOnCounterpoints(list, resolutioAbsPitches, resolutioForm).sortedBy { it.emptiness }.take(howMany)
+     result += addResolutioOnCounterpointsWithSet(list, resolutioAbsPitches, resolutioForm).sortedBy { it.emptiness }.take(howMany)
+     result += addResolutioOnCounterpointsWithHarmony(list, resolutioHarmony, resolutioForm).sortedBy { it.emptiness }.take(howMany)
      result += eraseHorizontalIntervalsOnCounterpoints(horIntervalSet, list).sortedBy { it.emptiness }.take(howMany)
      result += reduceCounterpointsToSinglePart(list).sortedBy { it.emptiness }.take(howMany)
      result += flourish(list, vertIntervalSet, horIntervalSet).sortedBy { it.emptiness }.take(howMany)

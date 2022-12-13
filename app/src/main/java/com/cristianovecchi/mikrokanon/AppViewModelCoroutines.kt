@@ -202,12 +202,15 @@ fun AppViewModel.cadenzasOnCounterpoints(originalCounterpoints: List<Counterpoin
         }
     }
 }
-fun AppViewModel.resolutioOnCounterpoints(originalCounterpoints: List<Counterpoint>, absPitchesSet: Set<Int>, resolutioForm: List<Int>){
+fun AppViewModel.resolutioOnCounterpoints(originalCounterpoints: List<Counterpoint>, absPitchesSet: Set<Int>,
+                                          resolutioForm: List<Int>, harmony: HarmonizationType, isWithNotes: Boolean){
     if(!selectedCounterpoint.value!!.isEmpty()){
         viewModelScope.launch(Dispatchers.Main){
             var newList: List<Counterpoint>
             withContext(Dispatchers.Default){
-                newList = addResolutioOnCounterpoints(originalCounterpoints, absPitchesSet, resolutioForm)
+                newList = if(isWithNotes) addResolutioOnCounterpointsWithSet(originalCounterpoints, absPitchesSet, resolutioForm)
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                else addResolutioOnCounterpointsWithHarmony(originalCounterpoints, harmony, resolutioForm)
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimitAndCache(newList, true)
@@ -247,7 +250,8 @@ fun AppViewModel.paradeOnCounterpoint(originalCounterpoint: Counterpoint){
                 newList = paradeAllOnCounterpoint(originalCounterpoint, 1, MAX_PARTS,
                                             intervalSet.value!!, intervalSetHorizontal.value!!,
                                             cadenzaValues.extractIntsFromCsv(),
-                                            resolutioValues.first.toSet(), resolutioValues.second.extractIntsFromCsv())
+                                            resolutioValues.first.toSet(), resolutioValues.second.extractIntsFromCsv(),
+                                            HarmonizationType.values()[resolutioValues.third])
                     .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                     .sortedByDescending { it.parts.size }

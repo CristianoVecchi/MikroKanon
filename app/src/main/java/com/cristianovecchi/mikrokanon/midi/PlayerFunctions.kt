@@ -874,20 +874,21 @@ fun addVibratoToTrack(mt: MidiTrack, start: Long, duration: Long, channel: Int, 
         }
     }
 }
-//fun octaveTest(mt: MidiTrack): MidiTrack {
-//    val pitches = listOf(60,72,83, 84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,96,84,72,60,48,36,24)
-//    var tick = 0L
-//    pitches.forEach {
-//        val pc: MidiEvent = ProgramChange(tick, 0, RECORDER) // cambia strumento
-//        mt.insertEvent(pc)
-//        val on = NoteOn(tick, 0, it, 100)
-//        val off = NoteOff(tick + 480 - 1, 0, it, 80)
-//        mt.insertEvent(on)
-//        mt.insertEvent(off)
-//        tick += 480
-//    }
-//    return mt
-//}
+fun octaveTest(mt: MidiTrack): MidiTrack {
+    val pitches = listOf(60,72,83, 84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,96,84,72,60, 55, 48,36,24,23,22,21)
+    //val pitches = listOf(60,72,84,60, 55, 48,36,24,23,22,21)
+    var tick = 0L
+    pitches.forEach {
+        val pc: MidiEvent = ProgramChange(tick, 0, REVERSE_CYMBALS) // cambia strumento
+        mt.insertEvent(pc)
+        val on = NoteOn(tick, 0, it, 100)
+        val off = NoteOff(tick + 480 - 1, 0, it, 80)
+        mt.insertEvent(on)
+        mt.insertEvent(off)
+        tick += 480
+    }
+    return mt
+}
 //fun pitchBenderTest(mt: MidiTrack): MidiTrack {
 //    val pitches2m = listOf(61, 60, 59, 61, 60, 59)
 //    val noBend = 8192

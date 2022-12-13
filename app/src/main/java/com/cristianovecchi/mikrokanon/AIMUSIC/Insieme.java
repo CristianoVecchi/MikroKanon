@@ -131,6 +131,13 @@ public class Insieme {
         }
         return dByte;
     }
+    public static Integer[] absPitchesFromDodecaByte(int dodecabyte){
+        Vector<Integer> absPitches = new Vector<Integer>();
+        for(int i = 0; i<12; i++){
+            if((dodecabyte & (1 << i)) != 0) absPitches.add(i);
+        }
+        return absPitches.toArray(new Integer[0]);
+    }
     public static Vector listaNote(int numero) {
         Vector listaNote = new Vector();
         int j = 1;

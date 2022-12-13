@@ -184,6 +184,59 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
             channel, 80, vibrato, doublingFlags,
             audio8D, partIndex, changes)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TrackData
+
+        if (!pitches.contentEquals(other.pitches)) return false
+        if (!ticks.contentEquals(other.ticks)) return false
+        if (!durations.contentEquals(other.durations)) return false
+        if (!velocities.contentEquals(other.velocities)) return false
+        if (!glissando.contentEquals(other.glissando)) return false
+        if (!attacks.contentEquals(other.attacks)) return false
+        if (!isPreviousRest.contentEquals(other.isPreviousRest)) return false
+        if (articulationDurations != null) {
+            if (other.articulationDurations == null) return false
+            if (!articulationDurations.contentEquals(other.articulationDurations)) return false
+        } else if (other.articulationDurations != null) return false
+        if (ribattutos != null) {
+            if (other.ribattutos == null) return false
+            if (!ribattutos.contentEquals(other.ribattutos)) return false
+        } else if (other.ribattutos != null) return false
+        if (channel != other.channel) return false
+        if (velocityOff != other.velocityOff) return false
+        if (vibrato != other.vibrato) return false
+        if (doublingFlags != other.doublingFlags) return false
+        if (audio8D != other.audio8D) return false
+        if (partIndex != other.partIndex) return false
+        if (changes != other.changes) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = pitches.contentHashCode()
+        result = 31 * result + ticks.contentHashCode()
+        result = 31 * result + durations.contentHashCode()
+        result = 31 * result + velocities.contentHashCode()
+        result = 31 * result + glissando.contentHashCode()
+        result = 31 * result + attacks.contentHashCode()
+        result = 31 * result + isPreviousRest.contentHashCode()
+        result = 31 * result + (articulationDurations?.contentHashCode() ?: 0)
+        result = 31 * result + (ribattutos?.contentHashCode() ?: 0)
+        result = 31 * result + channel
+        result = 31 * result + velocityOff
+        result = 31 * result + vibrato
+        result = 31 * result + doublingFlags
+        result = 31 * result + audio8D.hashCode()
+        result = 31 * result + partIndex
+        result = 31 * result + changes.hashCode()
+        return result
+    }
+
     companion object {
         fun emptyTrack(): TrackData{
             return TrackData(intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(),
