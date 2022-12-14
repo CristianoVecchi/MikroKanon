@@ -484,14 +484,14 @@ fun printNoteLimits(ticks: IntArray, durations: IntArray) {
     }
     println()
 }
-fun convertToMidiTrack(trackData: TrackData, nParts: Int, addAttack: Boolean = false): MidiTrack {
+fun TrackData.convertToMidiTrack(nParts: Int, addAttack: Boolean = false): MidiTrack {
     val track = MidiTrack()
-    val channel = trackData.channel
-    val vibrato = trackData.vibrato
-    val velocityOff = trackData.velocityOff
-    val (pitches, ticks, durations, velocities, glissando) = trackData
-    val articulationDurations = trackData.articulationDurations ?: durations
-    val ribattutos = trackData.ribattutos ?: IntArray(pitches.size){ 1 }
+    val channel = this.channel
+    val vibrato = this.vibrato
+    val velocityOff = this.velocityOff
+    val (pitches, ticks, durations, velocities, glissando) = this
+    val articulationDurations = this.articulationDurations ?: durations
+    val ribattutos = this.ribattutos ?: IntArray(pitches.size){ 1 }
 
     // Instrument changes
 //    println()
@@ -499,9 +499,9 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int, addAttack: Boolean = f
     var lastTick = -1L // avoid overriding
    // var noteIndex = -1
     //printNoteLimits(ticks, articulationDurations)
-    if(addAttack) trackData.addAttackToMidiTrack(track)
+    if(addAttack) this.addAttackToMidiTrack(track)
 
-    trackData.changes.forEach{
+    this.changes.forEach{
        // println("Intrument change: $it")
         val tick = it.tick
 //        do {
@@ -522,14 +522,14 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int, addAttack: Boolean = f
     // STEREO
     val panStep: Int = 127 / nParts
     val pans = (0 until nParts).map { it * panStep + panStep / 2 }//.also { println(it) }
-    if (!trackData.audio8D) { // set a fixed pan if 8D AUDIO is not set on this track
-        val pan = Controller(0, channel, 10, pans[trackData.partIndex])
+    if (!this.audio8D) { // set a fixed pan if 8D AUDIO is not set on this track
+        val pan = Controller(0, channel, 10, pans[this.partIndex])
         track.insertEvent(pan)
     }
 
 //        var lastIsGliss = false
 //        var attackIsDelayed = false
-    if (trackData.doublingFlags == 0) {
+    if (this.doublingFlags == 0) {
         for (i in pitches.indices) {
             val tick = ticks[i].toLong()
             val gliss = glissando[i]
@@ -541,7 +541,7 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int, addAttack: Boolean = f
             val dur = if(overLegato && (glissando.getOrElse(i) { 0 } >0 || gliss >0)  )
                 duration.toLong() else articulationDuration.toLong()
             //println("note $i attack: $attackDelay")
-            if (trackData.vibrato != 0) {
+            if (this.vibrato != 0) {
                 addVibratoToTrack(track, tick, dur, channel, vibrato)
             }
 //                if (attackDelay > 0){
@@ -559,7 +559,7 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int, addAttack: Boolean = f
         }
 
     } else {
-        val doubling = convertFlagsToInts(trackData.doublingFlags)
+        val doubling = convertFlagsToInts(this.doublingFlags)
         for (i in pitches.indices) {
             val tick = ticks[i].toLong()
             val gliss = glissando[i]
@@ -572,7 +572,7 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int, addAttack: Boolean = f
                 duration.toLong() else articulationDuration.toLong()
             val pitch = pitches[i]
             val velocity = velocities[i]
-            if (trackData.vibrato != 0) {
+            if (this.vibrato != 0) {
                 addVibratoToTrack(track, tick, dur, channel, vibrato)
             }
             Player.insertNoteWithGlissando(
@@ -588,8 +588,8 @@ fun convertToMidiTrack(trackData: TrackData, nParts: Int, addAttack: Boolean = f
         }
     }
     // STEREO ALTERATIONS FOR EACH TRACK
-    if(trackData.audio8D && track.lengthInTicks > 0) {
-        val nRevolutions = (12 - trackData.partIndex) * 2
+    if(this.audio8D && track.lengthInTicks > 0) {
+        val nRevolutions = (12 - this.partIndex) * 2
         setAudio8D(track, nRevolutions, channel)
     }
     return track//.apply { this.dumpEvents() }
@@ -854,25 +854,27 @@ fun insertNote(
     mt.insertEvent(attackAmount)
 }
 fun addVibratoToTrack(mt: MidiTrack, start: Long, duration: Long, channel: Int, vibratoDivisor: Int){
-    val nVibrations = (duration / vibratoDivisor).toInt() // 4 vibrations in a quarter
-    if(nVibrations == 0 ) {
-        val expressionOn = Controller(start + duration / 3,channel,1, 0b1111111)
-        val expressionOff = Controller(start + duration - 4,channel,1, 0)
-        mt.insertEvent(expressionOn)
-        mt.insertEvent(expressionOff)
-    } else {
-        val vibrationDur = duration / nVibrations
-        val vibrationHalfDur = vibrationDur / 2
-        val vibrationQuarterDur = vibrationDur / 4
-        (0 until nVibrations).forEach(){
-            val expressionMiddle1 = Controller(start + vibrationDur * it + vibrationQuarterDur , channel,1, 64)
-            val expressionOn = Controller(start + vibrationDur * it + vibrationHalfDur , channel,1, 0b1111111)
-            val expressionMiddle2 = Controller(start + vibrationDur * it + vibrationHalfDur + vibrationQuarterDur , channel,1, 64)
-            val expressionOff = Controller(start +  vibrationDur * (it + 1) ,channel,1, 0)
-            mt.insertEvent(expressionMiddle1)
+    if(duration > 5) {
+        val nVibrations = (duration / vibratoDivisor).toInt() // 4 vibrations in a quarter
+        if(nVibrations == 0 || duration in 6..12) { // add just one vibration if possible
+            val expressionOn = Controller(start + duration / 3,channel,1, 0b1111111)
+            val expressionOff = Controller(start + duration - 2,channel,1, 0)
             mt.insertEvent(expressionOn)
-            mt.insertEvent(expressionMiddle2)
             mt.insertEvent(expressionOff)
+        } else {
+            val vibrationDur = duration / nVibrations
+            val vibrationHalfDur = vibrationDur / 2
+            val vibrationQuarterDur = vibrationDur / 4
+            (0 until nVibrations).forEach(){
+                val expressionMiddle1 = Controller(start + vibrationDur * it + vibrationQuarterDur , channel,1, 64)
+                val expressionOn = Controller(start + vibrationDur * it + vibrationHalfDur , channel,1, 0b1111111)
+                val expressionMiddle2 = Controller(start + vibrationDur * it + vibrationHalfDur + vibrationQuarterDur , channel,1, 64)
+                val expressionOff = Controller(start +  vibrationDur * (it + 1) ,channel,1, 0)
+                mt.insertEvent(expressionMiddle1)
+                mt.insertEvent(expressionOn)
+                mt.insertEvent(expressionMiddle2)
+                mt.insertEvent(expressionOff)
+            }
         }
     }
 }

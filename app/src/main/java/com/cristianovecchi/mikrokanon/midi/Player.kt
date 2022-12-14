@@ -179,7 +179,7 @@ object Player {
                     val actualEnsemblePartsList = if (partsShuffle) ensemblePartsList.map { it.shuffled() } else ensemblePartsList
                     val glissando: List<Int> = if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
                     val audio8D: List<Int> = if (audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
-                    val vibratoExtensions = intArrayOf(0, 360, 240, 160, 120, 80, 60, 30, 15)
+                    val vibratoExtensions = intArrayOf(0, 480, 360, 240, 160, 120, 80, 60, 30, 15, 12, 8, 6)
                     //dispatch(AppViewModel.Building.DATATRACKS to nParts)
                     val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
                         context, dispatch,
@@ -237,7 +237,7 @@ object Player {
                                             //dispatch("Building MidiTrack Channel: ${it.channel}")
                                             dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
                                             //println("Total on notes after Check'n'replace: ${actualCounterpointTrackData.sumOf{it.pitches.size}}")
-                                            convertToMidiTrack(it, actualCounterpointTrackData.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} })
+                                            it.convertToMidiTrack(actualCounterpointTrackData.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} })
                                         } else MidiTrack()
                                     }
                                     if (!job.isActive) {

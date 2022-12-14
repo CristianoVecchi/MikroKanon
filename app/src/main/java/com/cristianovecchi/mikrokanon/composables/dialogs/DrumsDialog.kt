@@ -255,6 +255,10 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 val drumData = drumsDatas[cursor]
                                 val selectedValue = drumData.resize
                                 val values = listOf(
+                                    8f, 7.875f, 7.75f, 7.66f, 7.625f, 7.5f, 7.375f, 7.33f, 7.25f, 7.125f,
+                                    7f, 6.875f, 6.75f, 6.66f, 6.625f, 6.5f, 6.375f, 6.33f, 6.25f, 6.125f,
+                                    6f, 5.875f, 5.75f, 5.66f, 5.625f, 5.5f, 5.375f, 5.33f, 5.25f, 5.125f,
+                                    5f, 4.875f, 4.75f, 4.66f, 4.625f, 4.5f, 4.375f, 4.33f, 4.25f, 4.125f,
                                     4f, 3.875f, 3.75f, 3.66f, 3.625f, 3.5f, 3.375f, 3.33f, 3.25f, 3.125f,
                                     3f, 2.875f, 2.75f, 2.66f, 2.625f, 2.5f, 2.375f, 2.33f, 2.25f, 2.125f,
                                     2f, 1.875f, 1.75f, 1.66f, 1.625f, 1.5f, 1.375f, 1.33f, 1.25f, 1.125f,
