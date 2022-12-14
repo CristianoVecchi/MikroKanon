@@ -52,12 +52,14 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val densityDialogData by lazy { mutableStateOf(ListDialogData()) }
         val groupingDialogData by lazy { mutableStateOf(GroupingDialogData())}
+        val resizeDialogData by lazy { mutableStateOf(ListDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             GroupingListDialog(groupingDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(drumsTypeDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(drumKitsDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(densityDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(resizeDialogData, dimensions, lang.OkButton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
                 else dimensions.dialogWidth
@@ -77,9 +79,9 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         .padding(8.dp)
-                        .weight(weights.first + weights.second / 3 * 2)
+                        .weight(weights.first + weights.second / 2)
                     val modifierB = Modifier
-                        .weight(weights.second / 3)
+                        .weight(weights.second / 2)
                     val modifierC = Modifier
                         .padding(8.dp)
                         .weight(weights.third)
@@ -152,17 +154,16 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             }
                         }
                     }
-                    Row(
-                        modifierB.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifierB.fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                         val buttonSize = dimensions.dialogButtonSize
-                        Column(
-
-                            verticalArrangement = Arrangement.SpaceBetween,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Row(modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
 
                             CustomButton(
@@ -242,7 +243,42 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     drumsDatas = newDrumsDatas
                                 }
                             }
+                            CustomButton(
+                                adaptSizeToIconButton = true,
+                                text = "",
+                                isActive = drumsDatas[cursor].type == DrumsType.PATTERN,
+                                iconId = model.iconMap["expand"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val drumData = drumsDatas[cursor]
+                                val selectedValue = drumData.resize
+                                val values = listOf(
+                                    4f, 3.875f, 3.75f, 3.66f, 3.625f, 3.5f, 3.375f, 3.33f, 3.25f, 3.125f,
+                                    3f, 2.875f, 2.75f, 2.66f, 2.625f, 2.5f, 2.375f, 2.33f, 2.25f, 2.125f,
+                                    2f, 1.875f, 1.75f, 1.66f, 1.625f, 1.5f, 1.375f, 1.33f, 1.25f, 1.125f,
+                                    1f, 0.875f, 0.75f, 0.66f, 0.625f, 0.5f, 0.375f, 0.33f, 0.25f, 0.125f
+                                ).reversed()
+                                resizeDialogData.value = ListDialogData(
+                                    true,
+                                    values.map{"${(it * 100).toInt()}%"},
+                                    values.indexOf(selectedValue),
+                                    lang.selectDrumsResize
+                                ) { index ->
+                                    val newDrumData = drumData.copy(
+                                        resize = values[index]
+                                    )
+                                    val newDrumsDatas = drumsDatas.toMutableList()
+                                    newDrumsDatas[cursor] = newDrumData
+                                    drumsDatas = newDrumsDatas
+                                }
+                            }
                         }
+                        Row(modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "",
@@ -312,6 +348,7 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 }
                             }
                         }
+                    }
 
 
                     Row(

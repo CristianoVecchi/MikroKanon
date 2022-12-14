@@ -358,7 +358,7 @@ class AppViewModel(
         }
         computationStack.pushAndDispatch(Computation.Resolutio(originalCounterpoints,resolutioData, isResolutioWithNotes))
         resolutioOnCounterpoints(originalCounterpoints, resolutioData.first, resolutioData.second.extractIntsFromCsv(),
-                                        HarmonizationType.values()[resolutioData.third], isResolutioWithNotes)
+                                        HarmonizationType.values()[resolutioData.third + 1], isResolutioWithNotes)
     }
     val onDoubling = { list: ArrayList<Clip>?, doublingData: List<Pair<Int,Int>> ->
         //println("on Doubling: ${doublingData}")
@@ -778,7 +778,7 @@ class AppViewModel(
                         if (stepBack) {
                             resolutioOnCounterpoints( previousComputation.counterpoints,
                                 previousComputation.resolutioData.first, previousComputation.resolutioData.second.extractIntsFromCsv(),
-                                HarmonizationType.values()[previousComputation.resolutioData.third],previousComputation.isWithNotes)
+                                HarmonizationType.values()[previousComputation.resolutioData.third + 1],previousComputation.isWithNotes)
                         }
                     }
                     is Computation.Doubling -> {

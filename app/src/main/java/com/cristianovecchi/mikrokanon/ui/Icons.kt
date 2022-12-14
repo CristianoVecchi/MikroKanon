@@ -61,7 +61,8 @@ object Icons {
             "density" to R.drawable.ic_baseline_tornado_24,
             "drums" to R.drawable.ic_baseline_fitness_center_24,
             "glissando" to R.drawable.ic_baseline_swap_calls_24,
-            "pattern" to R.drawable.ic_baseline_linear_scale_24
+            "pattern" to R.drawable.ic_baseline_linear_scale_24,
+            "format" to R.drawable.ic_baseline_sync_alt_24
         )
     }
 }

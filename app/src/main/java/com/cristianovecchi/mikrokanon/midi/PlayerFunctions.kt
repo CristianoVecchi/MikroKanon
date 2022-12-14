@@ -59,7 +59,7 @@ suspend fun createDrumsTrack(context: CoroutineContext, dispatch: (Triple<AppVie
                         track.addDrumsToTrackByPattern(
                             trackDatas, start, duration,
                             drumsData.drumKit.drumKit, drumsData.density,
-                            drumsData.volume, drumsData.type, patternDurations
+                            drumsData.volume, drumsData.type, patternDurations, drumsData.resize
                         )
                     }
                     else -> {}
@@ -74,14 +74,16 @@ suspend fun createDrumsTrack(context: CoroutineContext, dispatch: (Triple<AppVie
 }
 
 private fun MidiTrack.addDrumsToTrackByPattern(trackDatas: List<TrackData>, sectionStart:Int, sectionDuration:Int,
-                                               drumKit: DrumKit, density: Float, volume: Float, type: DrumsType, patternValues: List<Int>
+                                               drumKit: DrumKit, density: Float, volume: Float,
+                                               type: DrumsType, patternValues: List<Int>, resize: Float,
 ) {
     try {
         val sectionIndices = trackDatas.map{ it.ticks }.findIndicesInSection(sectionStart, sectionDuration)
         //val nElements = sectionIndices.nElements()
         val soundList = drumKit.soundList()
         val soundListSize = soundList.size
-        val (patternTicks, patternDurations) = patternValues.patternTicksAndDurationInSection(sectionStart, sectionDuration)
+        val resizedPatternValues = if(resize == 1f) patternValues else patternValues.map{ (it * resize).toInt()}
+        val (patternTicks, patternDurations) = resizedPatternValues.patternTicksAndDurationInSection(sectionStart, sectionDuration)
         //println("pattern ticks(${patternTicks.size}): $patternTicks")
         //println("pattern durs(${patternDurations.size}): $patternDurations")
         val (weightTicks, weightVelocities, weightPitches, weightDurations) = trackDatas.analysisInPattern(sectionIndices, patternTicks, patternDurations)

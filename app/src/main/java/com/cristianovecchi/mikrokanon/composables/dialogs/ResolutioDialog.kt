@@ -96,7 +96,7 @@ fun ResolutioDialog(
                     val numberFontWeight = FontWeight.Bold
                     val buttonPadding = 4.dp
                     val itemList = (0..11).map{ Clip.convertAbsToClipText(it, model.language.value!!.noteNames)}.reversed()
-                    val harmonies = HarmonizationType.values().map{ it.title }
+                    val harmonies = HarmonizationType.values().map{ it.title }.drop(1).dropLast(2)
                     val listStateNotes = rememberLazyListState()
                     val listStateHarmony = rememberLazyListState()
                     Text(text = multiNumberDialogData.value.title, fontWeight = FontWeight.Bold, color = fontColor, style = TextStyle(fontSize = fontSize))
