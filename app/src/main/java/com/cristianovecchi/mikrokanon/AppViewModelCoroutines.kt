@@ -202,6 +202,17 @@ fun AppViewModel.cadenzasOnCounterpoints(originalCounterpoints: List<Counterpoin
         }
     }
 }
+fun AppViewModel.formatOnCounterpoint(originalCounterpoint: Counterpoint, values: List<Int>){
+    if(!selectedCounterpoint.value!!.isEmpty()){
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                newList = addFormatOnCounterpoint(originalCounterpoint, values)
+            }
+            changeCounterpointsWithLimitAndCache(newList, true)
+        }
+    }
+}
 fun AppViewModel.resolutioOnCounterpoints(originalCounterpoints: List<Counterpoint>, absPitchesSet: Set<Int>,
                                           resolutioForm: List<Int>, harmony: HarmonizationType, isWithNotes: Boolean){
     if(!selectedCounterpoint.value!!.isEmpty()){

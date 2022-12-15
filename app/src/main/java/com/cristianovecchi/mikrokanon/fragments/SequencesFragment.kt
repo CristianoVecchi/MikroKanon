@@ -112,6 +112,10 @@ var start = true
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onCadenzaFromSelector(list, values)
                                     },
+                                    onFormat = { list, values ->
+                                        findNavController().navigate(R.id.outputFragment)
+                                        model.onFormatFromSelector(list, values)
+                                    },
                                     onScarlatti = { list ->
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onScarlattiFromSelector(list)

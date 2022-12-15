@@ -62,7 +62,7 @@ data class ButtonsDialogData(
     val onCounterpointSelected: (Int) -> Unit = {}, val onEWH: (Int) -> Unit = {},
     val onResolutio: () -> Unit = {}, val onDoubling: () -> Unit = {}, val onParade: () -> Unit = {},
     val progressiveEWH: () -> Unit = {}, val onChess: () -> Unit = {},
-    val onSubmitButtonClick: (Any?) -> Unit = {} )
+    val onSubmitButtonClick: (Any?) -> Unit = {}, val onFormat: () -> Unit = {}, )
 
 
 data class ExportDialogData(val dialogState: Boolean = false, val title:String = "", val path:String = "",

@@ -62,6 +62,7 @@ class AppViewModel(
     // + 0.86f
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
     var cadenzaValues = "0,1,0,1,1"
+    var formatValues = "0,1,1,0"
     var resolutioValues = Triple((0..11).toSet(),"0,1,0,1,0", 0)
     var isResolutioWithNotes = true
     val dynamicMap: Map<Float,String> =  dynamicSteps.zip(getDynamicSymbols()).toMap()
@@ -408,6 +409,17 @@ class AppViewModel(
         computationStack.pushAndDispatch(Computation.Cadenza(originalCounterpoints, null, values))
         cadenzasOnCounterpoints(originalCounterpoints, values)
     }
+    val onFormatFromSelector = { list: ArrayList<Clip>, values: List<Int> ->
+        changeFirstSequence(list)
+        convertFirstSequenceToSelectedCounterpoint()
+        computationStack.pushAndDispatch(Computation.Format(selectedCounterpoint.value!!.clone(), list, values))
+        formatOnCounterpoint(selectedCounterpoint.value!!.clone(), values)
+    }
+    val onFormat = { values: List<Int> ->
+        val originalCounterpoint = selectedCounterpoint.value!!.clone()
+        computationStack.pushAndDispatch(Computation.Format(originalCounterpoint, null, values))
+        formatOnCounterpoint(originalCounterpoint, values)
+    }
     val onOverlapFromSelector = { list: ArrayList<Clip>, position: Int, crossover: Boolean ->
         if(position == -1 || savedCounterpoints[position] != null){
             changeFirstSequence(list)
@@ -689,6 +701,7 @@ class AppViewModel(
                     is Computation.Round -> computationStack.lastElement()
                     is Computation.Doppelgänger -> computationStack.lastElement()
                     is Computation.Cadenza -> computationStack.lastElement()
+                    is Computation.Format -> computationStack.lastElement()
                     is Computation.Resolutio -> computationStack.lastElement()
                     is Computation.Doubling -> computationStack.lastElement()
                     is Computation.Parade -> computationStack.lastElement()
@@ -774,6 +787,11 @@ class AppViewModel(
                     }
                     is Computation.Cadenza -> {
                             cadenzasOnCounterpoints( previousComputation.counterpoints, previousComputation.values)
+                    }
+                    is Computation.Format -> {
+                        if(stepBack){
+                            formatOnCounterpoint( previousComputation.counterpoint, previousComputation.values)
+                        }
                     }
                     is Computation.Resolutio -> {
                         if (stepBack) {

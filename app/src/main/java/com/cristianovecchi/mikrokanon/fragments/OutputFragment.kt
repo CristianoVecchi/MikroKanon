@@ -163,6 +163,9 @@ class OutputFragment: Fragment() {
                                 onChess = { range ->
                                     model.onChess(null, range)
                                 },
+                                onFormat = { values ->
+                                    model.onFormat(values)
+                                },
                                 onParade = {
                                     model.onParade()
                                 },

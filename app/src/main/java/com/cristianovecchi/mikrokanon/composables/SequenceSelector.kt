@@ -35,6 +35,7 @@ fun SequenceSelector(model: AppViewModel,
                      onTritoneSubstitution: (Int) -> Unit,
                      onRound: (ArrayList<Clip>) -> Unit,
                      onCadenza: (ArrayList<Clip>, List<Int>) -> Unit,
+                     onFormat: (ArrayList<Clip>, List<Int>) -> Unit,
                      onScarlatti: (ArrayList<Clip>) -> Unit,
                      onOverlap: (ArrayList<Clip>, Int, Boolean) -> Unit,
                      onGlue: (ArrayList<Clip>, Int) -> Unit,
@@ -90,6 +91,7 @@ fun SequenceSelector(model: AppViewModel,
             val buttonsDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
             val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val resolutioDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+            val formatDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val doublingDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
             val chessDialogData = remember { mutableStateOf(ListDialogData())}
@@ -129,6 +131,7 @@ fun SequenceSelector(model: AppViewModel,
                 dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
             CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
             ResolutioDialog(resolutioDialogData, buttonsDialogData, dimensions, language.OkButton, model)
+            FormatDialog(formatDialogData, buttonsDialogData, dimensions, language.OkButton, model)
             TransposeDialog(doublingDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
             SequenceScrollableColumn( listState = listState, colors = appColors,
                 modifier = modifier3, fontSize = dimensions.selectorClipFontSize,
@@ -184,18 +187,28 @@ fun SequenceSelector(model: AppViewModel,
                                // onCadenza = { onCadenza(sequences[selected]) },
                                 onCadenza = {
                                     cadenzaDialogData.value = MultiNumberDialogData(true,
-                                    language.selectCadenzaForm, model.cadenzaValues, 0, 16, model = model,
+                                    language.selectCadenzaForm, model.cadenzaValues, 0, Int.MAX_VALUE, model = model,
                                         dispatchCsv= { newValues ->
                                             model.cadenzaValues = newValues
                                             onCadenza( sequences[selected], newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
                                 }) },
                                 onResolutio = {
                                      resolutioDialogData.value = MultiNumberDialogData(true,
-                                         language.selectResolutioForm, model.cadenzaValues, 0, 16, model = model,
+                                         language.selectResolutioForm, model.cadenzaValues, 0, Int.MAX_VALUE, model = model,
                                     dispatchResolutio = { resolutioData ->
                                         model.resolutioValues = resolutioData
                                         onResolutio(sequences[selected], resolutioData)
                                 }) },
+                                onFormat = {
+                                    val counterpointSize = sequences[selected].size
+                                    formatDialogData.value = MultiNumberDialogData(true,
+                                        language.selectFormatForm, model.formatValues, 0, counterpointSize, model = model,
+                                        dispatchCsv= { newValues ->
+                                            model.formatValues = newValues
+                                            onFormat( sequences[selected], newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
+                                        }
+                                    )
+                                },
                                 onDoubling = {
                                     doublingDialogData.value = MultiNumberDialogData(
                                         true, language.selectDoubling, value = "0|1",

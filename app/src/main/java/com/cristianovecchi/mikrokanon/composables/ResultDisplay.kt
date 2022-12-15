@@ -69,6 +69,7 @@ fun ResultDisplay(model: AppViewModel,
                   onEWH: (Int) -> Unit = {},
                   progressiveEWH: () -> Unit = {},
                   onChess: (Int) -> Unit,
+                  onFormat: (List<Int>) -> Unit = {},
                   onResolutio: (Triple<Set<Int>,String,Int>) -> Unit,
                   onDoubling: (List<Pair<Int,Int>>) -> Unit,
                   onParade: () -> Unit = {},
@@ -126,6 +127,7 @@ fun ResultDisplay(model: AppViewModel,
     val doublingDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val cadenzaDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val resolutioDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+    val formatDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
     val chessDialogData = remember { mutableStateOf(ListDialogData())}
     val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
@@ -269,6 +271,7 @@ fun ResultDisplay(model: AppViewModel,
                 TransposeDialog(doublingDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
                 ResolutioDialog(resolutioDialogData, buttonsDialogData, dimensions, language.OkButton, model)
+                FormatDialog(formatDialogData, buttonsDialogData, dimensions, language.OkButton, model)
                 ListDialog(listDialogData = chessDialogData, dimensions = dimensions, appColors = colors, fillPrevious = true )
                 SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                     dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
@@ -387,22 +390,33 @@ fun ResultDisplay(model: AppViewModel,
                                     onRound = { onRound(); close() },
                                     onCadenza = {
                                         cadenzaDialogData.value = MultiNumberDialogData(true,
-                                            language.selectCadenzaForm, model.cadenzaValues, 0, 16, model = model,
+                                            language.selectCadenzaForm, model.formatValues, 0, Int.MAX_VALUE, model = model,
                                             dispatchCsv= { newValues ->
                                                 close()
-                                                model.cadenzaValues = newValues
-                                                onCadenza( newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
+                                                model.formatValues = newValues
+                                                onFormat( newValues.extractIntsFromCsv() ) // FORMAT DIALOG OK BUTTON
                                             }
                                         )
                                     },
                                     onResolutio = {
                                         resolutioDialogData.value = MultiNumberDialogData(true,
-                                            language.selectResolutioForm, model.cadenzaValues, 0, 16, model = model,
+                                            language.selectResolutioForm, model.cadenzaValues, 0, Int.MAX_VALUE, model = model,
                                             dispatchResolutio = { resolutioData ->
                                                 model.resolutioValues = resolutioData
                                                 onResolutio(resolutioData)
                                                 resolutioDialogData.value = MultiNumberDialogData(model = model)
                                             }) },
+                                    onFormat = {
+                                        val counterpointSize = model.selectedCounterpoint.value?.maxSize() ?: 0
+                                        formatDialogData.value = MultiNumberDialogData(true,
+                                            language.selectFormatForm, model.formatValues, 0, counterpointSize, model = model,
+                                            dispatchCsv= { newValues ->
+                                                close()
+                                                model.formatValues = newValues
+                                                onFormat( newValues.extractIntsFromCsv() ) // CADENZA DIALOG OK BUTTON
+                                            }
+                                        )
+                                    },
                                     onDoubling = {
                                         doublingDialogData.value = MultiNumberDialogData(
                                             true, language.selectDoubling, value = "0|1",

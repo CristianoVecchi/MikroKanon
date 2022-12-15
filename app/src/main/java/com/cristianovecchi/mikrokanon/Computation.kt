@@ -18,6 +18,7 @@ sealed class Computation(open val icon: String = "") {
     data class Fioritura(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, override val icon: String = "fioritura"): Computation()
     data class Round(val counterpoints: List<Counterpoint>, val index: Int, override val icon: String = "round"): Computation()
     data class Cadenza(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val values: List<Int>, override val icon: String = "cadenza"): Computation()
+    data class Format(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, val values: List<Int>, override val icon: String = "format"): Computation()
     data class Sort(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val sortType: Int, override val icon: String = "sort_up"): Computation()
     data class UpsideDown(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, override val icon: String = "upside_down"): Computation()
     data class Arpeggio(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>?, val index: Int, val arpeggioType: ARPEGGIO, override val icon: String = "arpeggio"): Computation()

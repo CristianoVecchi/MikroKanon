@@ -630,6 +630,31 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
         return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
     }
+    fun format(values: List<Int> = listOf(0,1,1,0)): Counterpoint{
+        val clone = this.normalizePartsSize(false)
+        val cloneSize = clone.maxSize()
+        val result = clone.cloneWithEmptyParts()
+
+        val (nBeforeRests, nFirstColumn, nLastColumn, nAfterRests ) = values
+        val firstColumn = if(cloneSize > 0) clone.getColumnValuesWithEmptyValues(0) else null
+        val lastColumn = if(cloneSize > 1) clone.getColumnValuesWithEmptyValues(cloneSize -1) else null
+        val bodyRange = if(cloneSize > 0) IntRange(0, cloneSize - 1) else null
+        (0 until nBeforeRests).forEach{ _ -> result.addEmptyColumn() }
+        firstColumn?.let{
+            (0 until nFirstColumn).forEach{ _ -> result.addColumn(firstColumn) }
+        }
+        bodyRange?.let{
+            bodyRange.forEach {
+                result.addColumn(clone.getColumnValuesWithEmptyValues(it))
+            }
+        }
+        lastColumn?.let{
+            (0 until nLastColumn).forEach{ _ -> result.addColumn(lastColumn) }
+        }
+        (0 until nAfterRests).forEach{ _ -> result.addEmptyColumn() }
+
+        return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
+    }
     fun eraseIntervalsOnBothNotes(horizontalIntervalSet: List<Int>): Counterpoint{
         val clone = this.normalizePartsSize(false)
         val newParts = mutableListOf<AbsPart>()
