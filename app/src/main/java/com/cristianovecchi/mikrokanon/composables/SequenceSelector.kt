@@ -33,7 +33,7 @@ fun SequenceSelector(model: AppViewModel,
                      onWave: (Int, ArrayList<Clip>) -> Unit,
                      onLoadingCounterpoint: (Int) -> Unit,
                      onTritoneSubstitution: (Int) -> Unit,
-                     onRound: (ArrayList<Clip>) -> Unit,
+                     onRound: (ArrayList<Clip>, List<Pair<Int,Int>>) -> Unit,
                      onCadenza: (ArrayList<Clip>, List<Int>) -> Unit,
                      onFormat: (ArrayList<Clip>, List<Int>) -> Unit,
                      onScarlatti: (ArrayList<Clip>) -> Unit,
@@ -93,6 +93,7 @@ fun SequenceSelector(model: AppViewModel,
             val resolutioDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val formatDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val doublingDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+            val roundDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
             val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
             val chessDialogData = remember { mutableStateOf(ListDialogData())}
             val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
@@ -133,6 +134,7 @@ fun SequenceSelector(model: AppViewModel,
             ResolutioDialog(resolutioDialogData, buttonsDialogData, dimensions, language.OkButton, model)
             FormatDialog(formatDialogData, buttonsDialogData, dimensions, language.OkButton, model)
             TransposeDialog(doublingDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
+            TransposeDialog(roundDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
             SequenceScrollableColumn( listState = listState, colors = appColors,
                 modifier = modifier3, fontSize = dimensions.selectorClipFontSize,
                 notesNames = notesNames,
@@ -183,7 +185,12 @@ fun SequenceSelector(model: AppViewModel,
                                 onWave4 = { onWave(4, sequences[selected]) },
                                 onWave6 = { onWave(6, sequences[selected]) },
                                 onTritoneSubstitution = { onTritoneSubstitution(selected) },
-                                onRound = { onRound(sequences[selected]) },
+                                onRound = {
+                                    roundDialogData.value = MultiNumberDialogData(
+                                        true, language.selectTranspositions, value = "0|1",
+                                        model = model) { transpositions ->
+                                        onRound(sequences[selected], transpositions.extractIntPairsFromCsv())
+                                    } },
                                // onCadenza = { onCadenza(sequences[selected]) },
                                 onCadenza = {
                                     cadenzaDialogData.value = MultiNumberDialogData(true,

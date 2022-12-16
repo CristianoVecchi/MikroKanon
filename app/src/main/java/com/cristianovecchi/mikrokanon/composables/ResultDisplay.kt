@@ -47,7 +47,7 @@ fun ResultDisplay(model: AppViewModel,
                   onTranspose: (List<Pair<Int,Int>>) -> Unit,
                   onWave: (Int) -> Unit,
                   onTritoneSubstitution: () -> Unit = {},
-                  onRound: () -> Unit = {},
+                  onRound: (List<Pair<Int,Int>>) -> Unit = {},
                   onCadenza: (List<Int>) -> Unit = {},
                   onScarlatti: () -> Unit = {},
                   onOverlap: (Int, Boolean) -> Unit,
@@ -387,7 +387,13 @@ fun ResultDisplay(model: AppViewModel,
                                     onWave4 = { onWave(4); close() },
                                     onWave6 = { onWave(6); close() },
                                     onTritoneSubstitution = { onTritoneSubstitution(); close() },
-                                    onRound = { onRound(); close() },
+                                    onRound = { transposeDialogData.value = MultiNumberDialogData(
+                                        true, language.selectTranspositions, value = "0|1",
+                                        model = model) { transpositions ->
+                                        close()
+                                        onRound(transpositions.extractIntPairsFromCsv())
+                                        transposeDialogData.value = MultiNumberDialogData(model = model)
+                                    }},
                                     onCadenza = {
                                         cadenzaDialogData.value = MultiNumberDialogData(true,
                                             language.selectCadenzaForm, model.formatValues, 0, Int.MAX_VALUE, model = model,

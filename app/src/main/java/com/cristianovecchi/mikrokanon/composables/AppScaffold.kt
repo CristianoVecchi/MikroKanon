@@ -298,9 +298,13 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                 val feature = if(it.second.absoluteValue>1 ) " (${it.second.absoluteValue}x)" else ""
                                 arrow + rhythmNames[it.first] + feature
                             }
-                            val nl = newLineOrNot(rhythmTexts, 2)
+                            val patterns = RhythmPatterns.values()
+                            val totalNotes = rhythmPatterns.sumOf{
+                                patterns[it.first].nPositiveValues() * it.second.absoluteValue
+                            }
+                            //val nl = newLineOrNot(rhythmTexts, 2)
                             SelectableCard(
-                                text = "${lang.rhythm}: $nl${rhythmTexts.joinToString(" + ")}",
+                                text = "${lang.rhythm}: $totalNotes♪\n${rhythmTexts.joinToString(" + ")}",
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = true,
@@ -723,7 +727,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                             "Check and Replace" -> {
                                 val optCnrMultiDatas = userOptions.checkAndReplace
                                 val cnrMultiDatas = CheckAndReplaceData.createMultiCheckAndReplaceDatasFromCsv(optCnrMultiDatas).toMutableList()
-                                val numerals = listOf("I", "II", "III", "IV", "V", "VI", "VII")
+                                val numerals = listOf("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X")
                                 numerals.forEachIndexed{ index, num ->
                                     var cnrDatas = cnrMultiDatas.getOrElse(index) {listOf()}
                                     cnrDatas = cnrDatas.ifEmpty { listOf(CheckAndReplaceData()) }

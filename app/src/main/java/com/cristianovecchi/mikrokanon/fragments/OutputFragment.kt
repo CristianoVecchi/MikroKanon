@@ -116,8 +116,8 @@ class OutputFragment: Fragment() {
                                 onTritoneSubstitution = {
                                     model.onTritoneSubstitution()
                                 },
-                                onRound = {
-                                    model.onRound()
+                                onRound = { transpositions ->
+                                    model.onRound(transpositions)
                                 },
                                 onCadenza = { values ->
                                     model.onCadenza(values)

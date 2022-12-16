@@ -528,18 +528,18 @@ class AppViewModel(
         computationStack.pushAndDispatch(Computation.Doppelgänger(listOf(selectedCounterpoint.value!!.clone()), list))
         doppelgängerOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()))
     }
-    val onRoundFromSelector = { list: ArrayList<Clip> ->
+    val onRoundFromSelector = { list: ArrayList<Clip>, transpositions: List<Pair<Int,Int>> ->
         changeFirstSequence(list)
         convertFirstSequenceToSelectedCounterpoint()
-        computationStack.pushAndDispatch(Computation.Round(listOf(selectedCounterpoint.value!!.clone()),0))
+        computationStack.pushAndDispatch(Computation.Round(listOf(selectedCounterpoint.value!!.clone()), transpositions,0))
         //changeCounterpoints(listOf(selectedCounterpoint.value!!.clone()), true)
-        roundOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), 0)
+        roundOnCounterpoints(listOf(selectedCounterpoint.value!!.clone()), transpositions,0)
     }
-    val onRound = {
+    val onRound = { transpositions: List<Pair<Int,Int>> ->
         val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
         val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-        computationStack.pushAndDispatch(Computation.Round(originalCounterpoints,index))
-        roundOnCounterpoints(originalCounterpoints, index)
+        computationStack.pushAndDispatch(Computation.Round(originalCounterpoints, transpositions, index))
+        roundOnCounterpoints(originalCounterpoints, transpositions, index)
     }
     val onExpand = {
         //scrollToTopList = !lastComputationIsExpansion()
@@ -782,7 +782,7 @@ class AppViewModel(
                     }
                     is Computation.Round -> {
                         if(stepBack){
-                            roundOnCounterpoints(previousComputation.counterpoints, previousComputation.index)
+                            roundOnCounterpoints(previousComputation.counterpoints, previousComputation.transpositions, previousComputation.index)
                         }
                     }
                     is Computation.Cadenza -> {

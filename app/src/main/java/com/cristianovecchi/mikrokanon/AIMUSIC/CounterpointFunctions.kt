@@ -79,8 +79,8 @@ suspend fun mikroKanons2(sequence: List<Int>, intervalSet: List<Int>, depth: Int
 suspend fun flourish(originalCounterpoints: List<Counterpoint>, intervalSet: List<Int>, horIntervalSet: List<Int>): List<Counterpoint>{
      return originalCounterpoints.map{Counterpoint.flourish(it, intervalSet, horIntervalSet)}
 }
-suspend fun buildRound(originalCounterpoints: List<Counterpoint> ): List<Counterpoint>{
-     return originalCounterpoints.map{it.buildRound()}
+suspend fun buildRound(originalCounterpoints: List<Counterpoint>, transpositions: List<Pair<Int,Int>> ): List<Counterpoint>{
+     return originalCounterpoints.map{it.buildRound(transpositions)}
 }
 suspend fun addCadenzasOnCounterpoints(horIntervalSet: List<Int>, originalCounterpoints: List<Counterpoint>, values: List<Int>): List<Counterpoint>{
      return originalCounterpoints.map{it.addCadenzas(horIntervalSet, values)}
@@ -188,7 +188,7 @@ suspend fun paradeAllOnCounterpoint(
      result += reduceCounterpointsToSinglePart(list).sortedBy { it.emptiness }.take(howMany)
      result += flourish(list, vertIntervalSet, horIntervalSet).sortedBy { it.emptiness }.take(howMany)
      result += explodeCounterpointsToDoppelgänger(list, maxParts).sortedBy { it.emptiness }.take(howMany)
-     result += buildRound(list).sortedBy { it.emptiness }.take(howMany)
+     result += buildRound(list, listOf(Pair(0,1))).sortedBy { it.emptiness }.take(howMany)
      result += waves(list, vertIntervalSet, horIntervalSet, 3).sortedBy { it.emptiness }.take(howMany)
      result += waves(list, vertIntervalSet, horIntervalSet, 4).sortedBy { it.emptiness }.take(howMany)
      result += waves(list, vertIntervalSet, horIntervalSet, 6).sortedBy { it.emptiness }.take(howMany)

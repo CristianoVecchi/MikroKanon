@@ -172,6 +172,31 @@ data class Counterpoint(val parts: List<AbsPart>,
         val newParts = this.parts + AbsPart(roots)
         return clone.copy(parts = newParts).apply { this.findAndSetEmptiness() }
     }
+    fun buildRound(transpositions: List<Pair<Int,Int>>): Counterpoint {
+        var nParts = parts.size
+        var clone = this.normalizePartsSize(false)
+        if(nParts == 0) return clone
+        if(nParts == 1) {
+            clone = clone.addEmptyPart()
+            nParts = 2
+        }
+        println("transpositions: $transpositions")
+        val nTimes = if(transpositions.size > nParts) transpositions.size else nParts
+        var result = clone.cloneWithEmptyParts()
+        for(i in 0 until nTimes){
+            val (interval, rowForm) = transpositions[i % transpositions.size]
+            val newParts = clone.parts.map{ it.transpose(interval, rowForm)}
+            result = result.enqueue(clone.copy(newParts))
+            val shiftedCloneParts = mutableListOf<AbsPart>()
+            for(j in 1 until nParts){
+                shiftedCloneParts.add(clone.parts[j])
+            }
+            shiftedCloneParts.add(clone.parts[0])
+            clone  = clone.copy(parts = shiftedCloneParts)
+
+        }
+        return result.cutExtraNotes()
+    }
     fun buildRound(): Counterpoint {
         val nParts = parts.size
         val normalizedCounterpoint = this.normalizePartsSize(false)

@@ -441,12 +441,12 @@ fun AppViewModel.tritoneSubstitutionOnCounterpoints(originalCounterpoints: List<
         }
     }
 }
-fun AppViewModel.roundOnCounterpoints(originalCounterpoints: List<Counterpoint>, index: Int){
+fun AppViewModel.roundOnCounterpoints(originalCounterpoints: List<Counterpoint>, transpositions: List<Pair<Int,Int>>, index: Int){
     if(!selectedCounterpoint.value!!.isEmpty()){
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = buildRound(originalCounterpoints)
+                newList = buildRound(originalCounterpoints, transpositions)
             }
             changeCounterpointsWithLimitAndCache(newList, false)
             changeSelectedCounterpoint(counterpoints.value!![index])

@@ -104,9 +104,9 @@ var start = true
                                     onTritoneSubstitution = { index ->
                                         model.onTritoneSubstitutionFromSelector(index)
                                     },
-                                    onRound = { list ->
+                                    onRound = { list, transpositions ->
                                         findNavController().navigate(R.id.outputFragment)
-                                        model.onRoundFromSelector(list)
+                                        model.onRoundFromSelector(list, transpositions)
                                     },
                                     onCadenza = { list, values ->
                                         findNavController().navigate(R.id.outputFragment)
