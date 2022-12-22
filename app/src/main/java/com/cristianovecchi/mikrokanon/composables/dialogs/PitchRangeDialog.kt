@@ -54,26 +54,26 @@ fun PitchRangeDialog(multiFloatDialogData: MutableState<MultiFloatDialogData>,
             Surface(
                 modifier = Modifier
                     .width(width)
-                    .height(dimensions.dialogHeight),
+                    .height(dimensions.height.dp),
                 color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {
 
                 Column(modifier = Modifier
-                    .height((dimensions.height / 6 * 5).dp)
+                    .height(height)
                     .padding(10.dp)) {
                     val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(weights.first/2)
+                        .weight(weights.first/2 / 4 * 3)
                     val modifierB = Modifier
                         //.fillMaxSize()
                         .weight(weights.second + weights.first/2 )
                     val modifierC = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(weights.third)
+                        .weight(weights.third + weights.first / 4)
                     var rangeText by remember { mutableStateOf(multiFloatDialogData.value.value) }
                     var cursor by remember { mutableStateOf(0) }
                     val setLimit = { index: Int, absPitch: Int, octave: Int ->

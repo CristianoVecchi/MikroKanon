@@ -112,6 +112,16 @@ enum class DrumKits(val title:String, val drumKit: DrumKit){
         intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(),
         intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf()
     )),
+    BELL("Bell", DrumKit(
+        intArrayOf(),
+        intArrayOf(TAMBOURINE),
+        intArrayOf(),
+        intArrayOf(),
+        intArrayOf(),
+        intArrayOf(CHINESE_CYMBAL), intArrayOf(MUTE_TRIANGLE, OPEN_TRIANGLE), intArrayOf(RIDE_BELL, COWBELL),
+        intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(LOW_AGOGO, HIGH_AGOGO), intArrayOf(),
+        intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf()
+    )),
     CUBA("Cuba", DrumKit(
         intArrayOf(ACOUSTIC_BASS_DRUM),
         intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf()

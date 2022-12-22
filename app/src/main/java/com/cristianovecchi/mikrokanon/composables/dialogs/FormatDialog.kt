@@ -52,7 +52,7 @@ fun FormatDialog(
             val width = if(dimensions.width <= 884) (dimensions.width / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             Surface(
-                modifier = Modifier.width(width).height(dimensions.dialogHeight / 2),
+                modifier = Modifier.width(width).height(dimensions.dialogHeight / 3 * 2),
                 color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             ) {

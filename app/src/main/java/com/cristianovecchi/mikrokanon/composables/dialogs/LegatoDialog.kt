@@ -43,8 +43,7 @@ fun LegatoTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
             val fontColor = model.appColors.dialogFontColor
             val backgroundColor = model.appColors.dialogBackgroundColor
             val ribattutos = getRibattutoSymbols()
-            val height = if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
-                            else dimensions.dialogHeight
+            val height = dimensions.height.dp
             Surface(
                 modifier = Modifier.width(dimensions.dialogWidth).height(height),
                 color = backgroundColor,

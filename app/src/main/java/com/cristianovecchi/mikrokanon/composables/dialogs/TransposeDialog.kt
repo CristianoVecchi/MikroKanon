@@ -62,10 +62,10 @@ fun TransposeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(weights.first)
+                        .weight(weights.first / 4 * 3)
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(weights.second)//  + weights.third/2)
+                        .weight(weights.second + weights.first / 4)//  + weights.third/2)
                     val modifierC = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)

@@ -73,7 +73,7 @@ data class Dimensions( // 1600px width and over
             }
         }
         fun maxi(width: Int, height: Int, dpDensity: Float) : Dimensions {
-            //println("Dimensions provided: MAXI")
+            println("Dimensions provided: MAXI")
             val selectorButtonSizePx = width/8
             return Dimensions(width, height, dpDensity,
                 dialogFontSize = (width/23).pxToSp,
@@ -85,7 +85,7 @@ data class Dimensions( // 1600px width and over
             )
         }
         fun medium(width: Int, height: Int, dpDensity: Float) : Dimensions {
-           // println("Dimensions provided: MEDIUM")
+           println("Dimensions provided: MEDIUM")
             val selectorButtonSizePx = width / 7
             return Dimensions(
                 width = width,
@@ -94,7 +94,7 @@ data class Dimensions( // 1600px width and over
                 //selectorButtonSize = 58.dp,
                 selectorButtonSize = (selectorButtonSizePx / dpDensity).toInt().dp,//50.dp,
                 selectorMKbuttonFontSize =(selectorButtonSizePx /4).pxToSp,
-                selectorFPbuttonFontSize= (selectorButtonSizePx /3).pxToSp,
+                selectorFPbuttonFontSize= (selectorButtonSizePx / 3).pxToSp,
                 inputNclipColumns = 6,
                 inputButtonSize = (width/7).pxToDp.dp,
                 inputButtonFontSize = (width/24).pxToSp, // 14
@@ -108,7 +108,7 @@ data class Dimensions( // 1600px width and over
             )
         }
         fun mini(width: Int, height: Int, dpDensity: Float) : Dimensions {
-            //println("Dimensions provided: MINI")
+            println("Dimensions provided: MINI")
             val selectorButtonSizePx = width/7
             val outputButtonSizePx = width / 8
             return Dimensions(
@@ -140,7 +140,7 @@ data class Dimensions( // 1600px width and over
 
         }
         fun micro(width: Int, height: Int, dpDensity: Float) : Dimensions {
-            //println("Dimensions provided: MICRO")
+            println("Dimensions provided: MICRO")
             val selectorButtonSizePx = width/7
             val outputButtonSizePx = width / 9
             return Dimensions(
@@ -174,7 +174,7 @@ data class Dimensions( // 1600px width and over
             )
         }
         fun atomic(width: Int, height: Int, dpDensity: Float) : Dimensions {
-            //println("Dimensions provided: ATOMIC")
+            println("Dimensions provided: ATOMIC")
             val selectorButtonSizePx = width/7
             val outputButtonSizePx = width / 9
             return Dimensions(
@@ -209,7 +209,7 @@ data class Dimensions( // 1600px width and over
             )
         }
         fun res1080x1920(width: Int, height: Int, dpDensity: Float) : Dimensions {
-            //println("Dimensions provided: 1080x1920")
+            println("Dimensions provided: 1080x1920")
             val selectorButtonSizePx = width/7
             val outputButtonSizePx = width / 9
             return Dimensions(
@@ -233,10 +233,10 @@ data class Dimensions( // 1600px width and over
 
                 outputNoteTableFontSize= (width/44).pxToSp,//16,
                 outputNoteTableCellWidth = (width/8).pxToDp,
-                outputButtonSize = (outputButtonSizePx/ dpDensity).toInt().dp,
+                outputButtonSize = (outputButtonSizePx  / dpDensity).toInt().dp,
                 outputFPbuttonFontSize = (outputButtonSizePx /3).pxToSp,
                 outputIntervalSetFontSize= (outputButtonSizePx /5).pxToSp,
-                outputWeights= Pair(16f,6f)
+                outputWeights= Pair(14f,8f)
             )//.also{ println("Dialog width: ${it.dialogWidth}")}
         }
         fun default(): Dimensions {

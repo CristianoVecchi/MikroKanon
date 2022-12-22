@@ -62,7 +62,9 @@ object Icons {
             "drums" to R.drawable.ic_baseline_fitness_center_24,
             "glissando" to R.drawable.ic_baseline_swap_calls_24,
             "pattern" to R.drawable.ic_baseline_linear_scale_24,
-            "format" to R.drawable.ic_baseline_width_normal_24
+            "format" to R.drawable.ic_baseline_width_normal_24,
+            "static" to R.drawable.ic_baseline_horizontal_rule_24,
+            "dynamic" to R.drawable.ic_baseline_ssid_chart_24,
         )
     }
 }

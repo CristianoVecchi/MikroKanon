@@ -201,7 +201,7 @@ fun SequenceSelector(model: AppViewModel,
                                 }) },
                                 onResolutio = {
                                      resolutioDialogData.value = MultiNumberDialogData(true,
-                                         language.selectResolutioForm, model.cadenzaValues, 0, Int.MAX_VALUE, model = model,
+                                         language.selectResolutioForm, model.resolutioValues.second, 0, Int.MAX_VALUE, model = model,
                                     dispatchResolutio = { resolutioData ->
                                         model.resolutioValues = resolutioData
                                         onResolutio(sequences[selected], resolutioData)
@@ -280,8 +280,11 @@ fun SequenceSelector(model: AppViewModel,
                         }
                     )
                     FreePartsButtons(
+                        model = model,
                         colors = appColors,
-                        fontSize = dimensions.selectorFPbuttonFontSize, isActive = activeButtons.freeParts,
+                        fontSize = dimensions.selectorMKbuttonFontSize,
+                        isActive = activeButtons.freeParts,
+                        buttonSize = buttonSize / 10 * 9,
                         onAscDynamicClick = { onFreePart(sequences[selected], TREND.ASCENDANT_DYNAMIC ) },
                         onAscStaticClick = { onFreePart( sequences[selected], TREND.ASCENDANT_STATIC) },
                         onDescDynamicClick = { onFreePart( sequences[selected], TREND.DESCENDANT_DYNAMIC ) },

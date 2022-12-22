@@ -93,7 +93,6 @@ fun ButtonsDialog(
                                 2 -> BuildingButtons(
                                     model = buttonsDialogData.value.model,
                                     buttonSize = buttonSize,
-                                    fontSize = fontSize,
                                     colors = model.appColors,
                                     isActive = buttonsDialogData.value.isActiveSpecialFunctions1,
                                     onScarlatti = buttonsDialogData.value.onScarlatti,

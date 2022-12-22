@@ -278,7 +278,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 lang.selectHarmonizationType
                             ) { newHarmonizationType ->
                                 val rebuilding = harmDatas.addOrInsert(
-                                    HarmonizationData(type = HarmonizationType.values()[newHarmonizationType]), cursor)
+                                    harmData.copy(type = HarmonizationType.values()[newHarmonizationType]), cursor)
                                 harmDatas = rebuilding.first
                                 cursor = rebuilding.second
                                 ListDialogData(itemList = harmTypeDialogData.value.itemList)

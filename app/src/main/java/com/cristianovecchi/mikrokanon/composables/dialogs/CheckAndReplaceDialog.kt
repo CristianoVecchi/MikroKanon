@@ -77,9 +77,9 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                     val weights = dimensions.dialogWeights
                     val modifierA = Modifier
                         .padding(8.dp)
-                        .weight(weights.first + weights.second / 5 * 3)
+                        .weight(weights.first + weights.second / 5 * 2)
                     val modifierB = Modifier
-                        .weight(weights.second / 5 * 2)
+                        .weight(weights.second / 5 * 3)
                     val modifierC = Modifier
                         .padding(8.dp)
                         .weight(weights.third)

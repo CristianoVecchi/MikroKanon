@@ -46,10 +46,10 @@ fun RowFormsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
             val backgroundColor = appColors.dialogBackgroundColor
 
             val playing by model.playing.asFlow().collectAsState(initial = false)
-            val width = if(dimensions.width <=884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
-            else dimensions.dialogWidth
+            val width = (dimensions.width / 10 * 8 / dimensions.dpDensity).dp
+
             //val height = if(dimensions.height < 1280) (dimensions.height / dimensions.dpDensity).toInt().dp
-            val height = (dimensions.height / dimensions.dpDensity).toInt().dp
+            val height = (dimensions.height).toInt().dp
             Surface(
                 modifier = Modifier.width(width).height(height),
                 color = backgroundColor,

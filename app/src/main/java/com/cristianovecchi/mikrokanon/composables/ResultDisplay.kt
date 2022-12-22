@@ -396,17 +396,17 @@ fun ResultDisplay(model: AppViewModel,
                                     }},
                                     onCadenza = {
                                         cadenzaDialogData.value = MultiNumberDialogData(true,
-                                            language.selectCadenzaForm, model.formatValues, 0, Int.MAX_VALUE, model = model,
+                                            language.selectCadenzaForm, model.cadenzaValues, 0, Int.MAX_VALUE, model = model,
                                             dispatchCsv= { newValues ->
                                                 close()
-                                                model.formatValues = newValues
+                                                model.cadenzaValues = newValues
                                                 onFormat( newValues.extractIntsFromCsv() ) // FORMAT DIALOG OK BUTTON
                                             }
                                         )
                                     },
                                     onResolutio = {
                                         resolutioDialogData.value = MultiNumberDialogData(true,
-                                            language.selectResolutioForm, model.cadenzaValues, 0, Int.MAX_VALUE, model = model,
+                                            language.selectResolutioForm, model.resolutioValues.second, 0, Int.MAX_VALUE, model = model,
                                             dispatchResolutio = { resolutioData ->
                                                 model.resolutioValues = resolutioData
                                                 onResolutio(resolutioData)
@@ -502,9 +502,11 @@ fun ResultDisplay(model: AppViewModel,
                         }
                     )
                     FreePartsButtons(
+                        model = model,
                         colors = colors,
                         fontSize = dimensions.outputFPbuttonFontSize,
                         isActive = activeButtons.freeParts,
+                        buttonSize = buttonSize / 10 * 9,
                         onAscDynamicClick = {
                             if (!elaborating) onFreePart(TREND.ASCENDANT_DYNAMIC)
                         },

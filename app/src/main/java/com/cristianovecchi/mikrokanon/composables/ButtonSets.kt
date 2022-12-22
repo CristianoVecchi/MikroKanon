@@ -166,7 +166,7 @@ fun CustomButton(iconId: Int = -1, text: String = "",
                         .padding(padding)
                     .background(actualBackgroundColor)
                     .border(borderWidth, actualBorderColor, RectangleShape)
-                    .height(buttonSize / 10 * 7),
+                    .height(buttonSize),
                     colors = ButtonDefaults.outlinedButtonColors(
                         backgroundColor = actualBackgroundColor
                     ),
@@ -320,7 +320,7 @@ fun NotFromSelectorButtons(
 }
 @Composable
 fun BuildingButtons(
-    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
+    model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, colors: AppColors,
     onOverlap: () -> Unit, onCrossover: () -> Unit, onGlue: () -> Unit, onScarlatti: () -> Unit
 ) {
 
@@ -467,32 +467,32 @@ fun ExtensionButtons(
 
 @Composable
 fun FreePartsButtons(
-    fontSize: Int, isActive: Boolean = true, colors: AppColors,
+    model: AppViewModel, fontSize: Int, isActive: Boolean = true, buttonSize:Dp, colors: AppColors,
     onAscDynamicClick: () -> Unit, onAscStaticClick: () -> Unit,
     onDescDynamicClick: () -> Unit, onDescStaticClick: () -> Unit
 ) {
-    
+    //"∼➚" "-➚" "∼➘" "-➘"
     Column() {
         Row(verticalAlignment = Alignment.Bottom) {
             //FPad Button
-            CustomButton(fontSize = fontSize, text = "∼➚", isActive = isActive, colors = colors) {
+            CustomButton(iconId = model.iconMap["dynamic"]!!, fontSize = fontSize, buttonSize = buttonSize, text = "➚", isActive = isActive, colors = colors) {
                 onAscDynamicClick()
             }
             // \u2B08
             //FPas Button
-            CustomButton(fontSize = fontSize, text = "-➚", isActive = isActive, colors = colors) {
+            CustomButton(iconId = model.iconMap["static"]!!, fontSize = fontSize, buttonSize = buttonSize, text = "➚", isActive = isActive, colors = colors) {
                 onAscStaticClick()
             }
 
         }
         Row(verticalAlignment = Alignment.Bottom) {
             //FPdd Button
-            CustomButton(fontSize = fontSize, text = "∼➘", isActive = isActive, colors = colors) {
+            CustomButton(iconId = model.iconMap["dynamic"]!!, fontSize = fontSize, buttonSize = buttonSize,  text = "➘", isActive = isActive, colors = colors) {
                 onDescDynamicClick()
             }
             // \u2B0A
             //FPds Button
-            CustomButton(fontSize = fontSize, text = "-➘", isActive = isActive, colors = colors) {
+            CustomButton(iconId = model.iconMap["static"]!!, fontSize = fontSize, buttonSize = buttonSize,  text = "➘", isActive = isActive, colors = colors) {
                 onDescStaticClick()
             }
         }

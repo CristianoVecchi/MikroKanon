@@ -58,10 +58,10 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val modifierA = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
-                        .weight(weights.first)
+                        .weight(weights.first - (weights.second / 4))
                     val modifierB = Modifier
                         //.fillMaxSize()
-                        .weight(weights.second)
+                        .weight(weights.second / 4 * 5)
                     val modifierC = Modifier
                         //.fillMaxSize()
                         .padding(8.dp)
@@ -76,12 +76,14 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     val fontSize = dimensions.dialogFontSize
                     val fontWeight = FontWeight.Normal
                     val buttonPadding = 4.dp
+                    val listState = rememberLazyListState()
+                    val secondListState = rememberLazyListState()
                     Column(modifier = modifierA) {
                         Text(text = multiNumberDialogData.value.title, fontWeight = FontWeight.Bold, color = fontColor, style = TextStyle(fontSize = fontSize.sp))
                         Spacer(modifier = Modifier.height(10.dp))
 
                         val colors = model.appColors
-                        val listState = rememberLazyListState()
+
                         val coroutineScope = rememberCoroutineScope()
                         val selectionBackColor = colors.selCardBackColorSelected
                         val selectionTextColor = colors.selCardTextColorSelected
@@ -157,7 +159,8 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             ) {
                                 Button(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(textButtonPadding), onClick = { setRange(cursor, 0) })
+                                    .padding(textButtonPadding),
+                                    onClick = { setRange(cursor, 0) })
                                 {
                                     Text(
                                         text = types[0],
@@ -225,92 +228,111 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 }
 
                             }
-                            Column(
-                                modifier = Modifier.width(IntrinsicSize.Max),
-                                verticalArrangement = Arrangement.SpaceBetween
+                            LazyColumn(
+                                state = secondListState,
+                                //modifier = Modifier.width(IntrinsicSize.Max),
                             ) {
-                                val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
+
+//                                val dimensions by model.dimensions.asFlow()
+//                                    .collectAsState(initial = model.dimensions.value!!)
                                 val buttonSize = dimensions.dialogButtonSize / 4 * 5
                                 val fontSizeOctave = dimensions.dialogFontSize / 6 * 5
-                                CustomButton(
-                                    adaptSizeToIconButton = false,
-                                    text = octaves[4], // +15
-                                    fontSize = fontSizeOctave,
-                                    buttonSize = buttonSize.dp,
-                                    iconColor = model.appColors.iconButtonIconColor,
-                                    colors = model.appColors
-                                ) {
-                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
-                                    val (range, octave) = pairs[cursor]
-                                    pairs[cursor] = Pair( range, if(octave ==2) 0 else 2 )
-                                    rangeText = pairs.toIntPairsString()
+                                item {
+                                    CustomButton(
+                                        adaptSizeToIconButton = false,
+                                        text = octaves[4], // +15
+                                        fontSize = fontSizeOctave,
+                                        buttonSize = buttonSize.dp,
+                                        iconColor = model.appColors.iconButtonIconColor,
+                                        colors = model.appColors
+                                    ) {
+                                        val pairs =
+                                            rangeText.extractIntPairsFromCsv().toMutableList()
+                                        val (range, octave) = pairs[cursor]
+                                        pairs[cursor] = Pair(range, if (octave == 2) 0 else 2)
+                                        rangeText = pairs.toIntPairsString()
+                                    }
                                 }
-                                CustomButton(
-                                    adaptSizeToIconButton = false,
-                                    text = octaves[3], // +8
-                                    fontSize = fontSizeOctave,
-                                    buttonSize = buttonSize.dp,
-                                    iconColor = model.appColors.iconButtonIconColor,
-                                    colors = model.appColors
-                                ) {
-                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
-                                    val (range, octave) = pairs[cursor]
-                                    pairs[cursor] = Pair( range, if(octave ==1) 0 else 1 )
-                                    rangeText = pairs.toIntPairsString()
+                                item {
+                                    CustomButton(
+                                        adaptSizeToIconButton = false,
+                                        text = octaves[3], // +8
+                                        fontSize = fontSizeOctave,
+                                        buttonSize = buttonSize.dp,
+                                        iconColor = model.appColors.iconButtonIconColor,
+                                        colors = model.appColors
+                                    ) {
+                                        val pairs =
+                                            rangeText.extractIntPairsFromCsv().toMutableList()
+                                        val (range, octave) = pairs[cursor]
+                                        pairs[cursor] = Pair(range, if (octave == 1) 0 else 1)
+                                        rangeText = pairs.toIntPairsString()
+                                    }
                                 }
-                                CustomButton(
-                                    adaptSizeToIconButton = false,
-                                    text = octaves[1], // -8
-                                    fontSize = fontSizeOctave,
-                                    buttonSize = buttonSize.dp,
-                                    iconColor = model.appColors.iconButtonIconColor,
-                                    colors = model.appColors
-                                ) {
-                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
-                                    val (range, octave) = pairs[cursor]
-                                    pairs[cursor] = Pair( range, if(octave == -1) 0 else -1)
-                                    rangeText = pairs.toIntPairsString()
+                                item {
+                                    CustomButton(
+                                        adaptSizeToIconButton = false,
+                                        text = octaves[1], // -8
+                                        fontSize = fontSizeOctave,
+                                        buttonSize = buttonSize.dp,
+                                        iconColor = model.appColors.iconButtonIconColor,
+                                        colors = model.appColors
+                                    ) {
+                                        val pairs =
+                                            rangeText.extractIntPairsFromCsv().toMutableList()
+                                        val (range, octave) = pairs[cursor]
+                                        pairs[cursor] = Pair(range, if (octave == -1) 0 else -1)
+                                        rangeText = pairs.toIntPairsString()
+                                    }
                                 }
-                                CustomButton(
-                                    adaptSizeToIconButton = false,
-                                    text = octaves[0], // -15
-                                    fontSize = fontSizeOctave,
-                                    buttonSize = buttonSize.dp,
-                                    iconColor = model.appColors.iconButtonIconColor,
-                                    colors = model.appColors
-                                ) {
-                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
-                                    val (range, octave) = pairs[cursor]
-                                    pairs[cursor] = Pair( range, if(octave == -2) 0 else -2)
-                                    rangeText = pairs.toIntPairsString()
+                                item {
+                                    CustomButton(
+                                        adaptSizeToIconButton = false,
+                                        text = octaves[0], // -15
+                                        fontSize = fontSizeOctave,
+                                        buttonSize = buttonSize.dp,
+                                        iconColor = model.appColors.iconButtonIconColor,
+                                        colors = model.appColors
+                                    ) {
+                                        val pairs =
+                                            rangeText.extractIntPairsFromCsv().toMutableList()
+                                        val (range, octave) = pairs[cursor]
+                                        pairs[cursor] = Pair(range, if (octave == -2) 0 else -2)
+                                        rangeText = pairs.toIntPairsString()
+                                    }
                                 }
-                                CustomButton(
-                                    adaptSizeToIconButton = false,
-                                    text = octaves[5], // |8
-                                    fontSize = fontSizeOctave,
-                                    buttonSize = buttonSize.dp,
-                                    iconColor = model.appColors.iconButtonIconColor,
-                                    colors = model.appColors
-                                ) {
-                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
-                                    val (range, octave) = pairs[cursor]
-                                    pairs[cursor] = Pair( range, if(octave == 3) 0 else 3)
-                                    rangeText = pairs.toIntPairsString()
+                                item {
+                                    CustomButton(
+                                        adaptSizeToIconButton = false,
+                                        text = octaves[5], // |8
+                                        fontSize = fontSizeOctave,
+                                        buttonSize = buttonSize.dp,
+                                        iconColor = model.appColors.iconButtonIconColor,
+                                        colors = model.appColors
+                                    ) {
+                                        val pairs =
+                                            rangeText.extractIntPairsFromCsv().toMutableList()
+                                        val (range, octave) = pairs[cursor]
+                                        pairs[cursor] = Pair(range, if (octave == 3) 0 else 3)
+                                        rangeText = pairs.toIntPairsString()
+                                    }
                                 }
-                                CustomButton(
-                                    adaptSizeToIconButton = false,
-                                    text = octaves[6], // |15
-                                    fontSize = fontSizeOctave,
-                                    buttonSize = buttonSize.dp,
-                                    iconColor = model.appColors.iconButtonIconColor,
-                                    colors = model.appColors
-                                ) {
-                                    val pairs = rangeText.extractIntPairsFromCsv().toMutableList()
-                                    val (range, octave) = pairs[cursor]
-                                    pairs[cursor] = Pair( range, if(octave == 4) 0 else 4)
-                                    rangeText = pairs.toIntPairsString()
+                                item {
+                                    CustomButton(
+                                        adaptSizeToIconButton = false,
+                                        text = octaves[6], // |15
+                                        fontSize = fontSizeOctave,
+                                        buttonSize = buttonSize.dp,
+                                        iconColor = model.appColors.iconButtonIconColor,
+                                        colors = model.appColors
+                                    ) {
+                                        val pairs =
+                                            rangeText.extractIntPairsFromCsv().toMutableList()
+                                        val (range, octave) = pairs[cursor]
+                                        pairs[cursor] = Pair(range, if (octave == 4) 0 else 4)
+                                        rangeText = pairs.toIntPairsString()
+                                    }
                                 }
-
 
                             }
                         }
