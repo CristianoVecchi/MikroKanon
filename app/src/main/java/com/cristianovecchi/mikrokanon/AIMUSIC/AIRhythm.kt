@@ -265,19 +265,45 @@ val N1rhythmDotted = listOf(360,120)
 val Ox4grz = listOf(240,60,-180,60,-180,60,-180); val Ox4grzH = listOf(120,30,-90,30,-90,30,-90)// Octave x 4 graziosetto
 val Ox3grz = listOf(240,60,-180,60,-180); val Ox3grzH = listOf(120,30,-90,30,-90)// Octave x 3 graziosetto
 val Ox2grz = listOf(240,60,-180); val Ox2grzH = listOf(120,30,-90)// Octave x 2 graziosetto
+val Ox5bow = listOf(240,240,240,240,60,-180)
+val Ox4bow = listOf(240,240,240,60,-180)
+val Ox3bow = listOf(240,240,60,-180)
+val Ox2bow = listOf(240,60,-180)
 val H1 = listOf(960); val H1h = listOf(480) // H = 2/4
+val Q = listOf(480); val O = listOf(240); val Orest = listOf(-240); val Ostaccato = listOf(60, -180)
 val METRO_2_4 = Pair(2,4)
 val METRO_3_4 = Pair(3,4)
 val METRO_4_4 = Pair(4,4)
 enum class RhythmType{
-     BASIC, PLAIN, BALLET, PUNTATO, MIX, DANCE, RAGTIME, QUOTE, BULGARIAN, HEMIOLIA, FLUX
+     BASIC, PLAIN, BALLET, PUNTATO, MIX, DANCE, RAGTIME, LATIN, QUOTE, BULGARIAN, HEMIOLIA, FLUX
 }
 // WARNING: can't have two negative values coupled (ex: -80, -20 ... write -100)
 enum class RhythmPatterns(val type: RhythmType, val title: String, val values: List<Int>,val metro: Pair<Int,Int> = METRO_4_4) {
+    BASIC_9_4(RhythmType.BASIC,"Basic 9/4", listOf(4320), Pair(9,4)),
+    BASIC_4_2(RhythmType.BASIC,"Basic 4/2", listOf(3840), Pair(4,2)),
+    BASIC_7_4(RhythmType.BASIC,"Basic 7/4", listOf(3360), Pair(7,4)),
+    BASIC_6_4(RhythmType.BASIC,"Basic 6/4", listOf(2880), Pair(6,4)),
+    BASIC_5_4(RhythmType.BASIC,"Basic 5/4", listOf(2400), Pair(5,4)),
+    BASIC_4_4(RhythmType.BASIC,"Basic 4/4", listOf(1920), Pair(4,4)),
+    BASIC_3_4(RhythmType.BASIC,"Basic 3/4", listOf(1440), Pair(3,4)),
+    BASIC_2_4(RhythmType.BASIC,"Basic 2/4", listOf(960), Pair(2,4)),
     BASIC_4(RhythmType.BASIC,"Basic ♩", listOf(480), Pair(1,4)),
+    BASIC_9_8(RhythmType.BASIC,"Basic 9/8", listOf(2160), Pair(9,8)),
+    BASIC_7_8(RhythmType.BASIC,"Basic 7/8", listOf(1680), Pair(7,8)),
+    BASIC_5_8(RhythmType.BASIC,"Basic 5/8", listOf(1200), Pair(5,8)),
+    BASIC_3_8(RhythmType.BASIC,"Basic 3/8", listOf(720), Pair(3,8)),
     BASIC_8(RhythmType.BASIC,"Basic ♪", listOf(240), Pair(1,8)),
+    BASIC_9_16(RhythmType.BASIC,"Basic 9/16", listOf(1080), Pair(9,16)),
+    BASIC_7_16(RhythmType.BASIC,"Basic 7/16", listOf(840), Pair(7,16)),
+    BASIC_5_16(RhythmType.BASIC,"Basic 5/16", listOf(600), Pair(5,16)),
+    BASIC_3_16(RhythmType.BASIC,"Basic 3/16", listOf(360), Pair(3,16)),
     BASIC_16(RhythmType.BASIC,"Basic 16", listOf(120), Pair(1,16)),
+    BASIC_9_32(RhythmType.BASIC,"Basic 9/32", listOf(540), Pair(9,32)),
+    BASIC_7_32(RhythmType.BASIC,"Basic 7/32", listOf(420), Pair(7,32)),
+    BASIC_5_32(RhythmType.BASIC,"Basic 5/32", listOf(300), Pair(5,32)),
+    BASIC_3_32(RhythmType.BASIC,"Basic 3/32", listOf(180), Pair(3,32)),
     BASIC_32(RhythmType.BASIC,"Basic 32", listOf(60), Pair(1,32)),
+    BASIC_3_64(RhythmType.BASIC,"Basic 3/64", listOf(90), Pair(3,64)),
     BASIC_64(RhythmType.BASIC,"Basic 64", listOf(30), Pair(1,64)),
     BASIC_128(RhythmType.BASIC,"Basic 128", listOf(15), Pair(1,128)),
     PLAIN_2_4_R4(RhythmType.PLAIN,"Plain 2/4♩♩", listOf(480,480), METRO_2_4),
@@ -388,6 +414,31 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     MAPLE_LEAF_3(RhythmType.RAGTIME,"Maple Leaf 3", listOf(180,-60,180,-60, 180,-60,120,240,120,120,120, 120,240,240,120,120,120, 120,240,120, 120,120,180,-60, 180, -180,120), Pair(2,4)),
     CASCADES_1(RhythmType.RAGTIME,"Cascades 1", listOf(180,-60,60,-60,180,-60,60,-60,180,-60, 480,120,120,120,90,-30, 480,60,-60,180,-60,120, 120,-120,120,120, 120,120,120,90,-30 ), Pair(2,4)),
     CASCADES_2(RhythmType.RAGTIME,"Cascades 2", listOf(120,120,120,120,120,120,120,90,-30, 60,-180,60,-60,180,-60,60,-60,180,-60, 60,-180,60,-60,180,-60,60,-60,180,-60, 60,-180,60,-60,180,-60, 120,120,120), Pair(2,4)),
+
+    MAMBO_1(RhythmType.LATIN,"Mambo 1", listOf(240,240,240,240,480,240,240, -240,240,240,240,480,240,240), Pair(4,4)),
+    MAMBO_2(RhythmType.LATIN,"Mambo 2", listOf(480,480,240,240,240,240, 480,240,240,-240,240,240,240), Pair(4,4)),
+    MAMBO_3(RhythmType.LATIN,"Mambo 3", listOf(480,480,240,240,-240,240, 480,240,240,-240,240,-240,240), Pair(4,4)),
+    MAMBO_4(RhythmType.LATIN,"Mambo 4", listOf(480,480,240,240,-240,480, 240,240,240,-240,240,-240,240), Pair(4,4)),
+    MAMBO_1BOW(RhythmType.LATIN,"Mambo 1♫", listOf(Ox4bow,Ox2bow,Ox2bow, Orest,Ox3bow,Q,Ox2bow).flatten(), Pair(4,4)),
+    MAMBO_2BOW(RhythmType.LATIN,"Mambo 2♫", listOf(Ox2bow,Ox2bow,Ox4bow, Ox2bow,Ox2bow,Orest,Ox3bow).flatten(), Pair(4,4)),
+    MAMBO_3BOW(RhythmType.LATIN,"Mambo 3♫", listOf(Ox2bow,Ox2bow,Ox2bow,Orest,Ox3bow,Ox2bow,Orest,listOf(60,-420,240)).flatten(), Pair(4,4)),
+    MAMBO_4BOW(RhythmType.LATIN,"Mambo 4♫", listOf(Ox2bow,Ox2bow,Ox2bow,Orest,Ox2bow,Ox3bow,Orest,listOf(60,-420,240)).flatten(), Pair(4,4)),
+    BOSSANOVA_1(RhythmType.LATIN,"Bossanova 1", listOf(480,720,720), Pair(4,4)),
+    BOSSANOVA_2(RhythmType.LATIN,"Bossanova 2", listOf(480,720,480,480,720,480,480), Pair(4,4)),
+    BOSSANOVA_3(RhythmType.LATIN,"Bossanova 3", listOf(480,720,480,720,720,720), Pair(4,4)),
+    BOSSANOVA_4(RhythmType.LATIN,"Bossanova 4", listOf(720,240,240,240,-240,480,240,-240,480,240,-240,960,240,240,240,-240,480,240,-240,480,240,-240,240), Pair(4,4)),
+    BOSSANOVA_1BOW(RhythmType.LATIN,"Bossanova 1♫", listOf(Ox2bow,Ox3bow,Ox3bow).flatten(), Pair(4,4)),
+    BOSSANOVA_2BOW(RhythmType.LATIN,"Bossanova 2♫", listOf(Ox2bow,Ox3bow,Ox2bow,Ox2bow,Ox3bow,Ox2bow,Ox2bow).flatten(), Pair(4,4)),
+    BOSSANOVA_3BOW(RhythmType.LATIN,"Bossanova 3♫", listOf(Ox2bow,Ox3bow,Ox2bow,Ox3bow,Ox3bow,Ox3bow).flatten(), Pair(4,4)),
+    BOSSANOVA_4BOW(RhythmType.LATIN,"Bossanova 4♫", listOf(Ox3bow,Ox3bow,Orest,Ox3bow,Orest,Ox3bow,Orest,Ox4bow,Ox3bow,Orest,Ox3bow,Orest,Ox3bow,Orest,O).flatten(), Pair(4,4)),
+    SALSA_1(RhythmType.LATIN,"Salsa 1", listOf(480,480,240,240,240,240, -240,240,240,240,480,240,240), Pair(4,4)),
+    SALSA_2(RhythmType.LATIN,"Salsa 2", listOf(480,480,240,480,480, 240,240,240,480,240,240), Pair(4,4)),
+    SALSA_3(RhythmType.LATIN,"Salsa 3", listOf(480,480,240,480,480, 240,240,240,960), Pair(4,4)),
+    SALSA_4(RhythmType.LATIN,"Salsa 4", listOf(240,240,240,240,-240,240,-240,240, -240,480,240,-240,480,240, 240,240,240,240,-240,240,-240,240, -240,480,240,-240,240,-240,240), Pair(4,4)),
+    SALSA_1BOW(RhythmType.LATIN,"Salsa 1♫", listOf(Ox2bow,Ox2bow,Ox4bow, Orest,Ox3bow,Ox2bow,Ox2bow).flatten(), Pair(4,4)),
+    SALSA_2BOW(RhythmType.LATIN,"Salsa 2♫", listOf(Ox2bow,Ox2bow,Ostaccato,Ox2bow,Ox2bow, Ox3bow,Ox2bow,Ox2bow).flatten(), Pair(4,4)),
+    SALSA_3BOW(RhythmType.LATIN,"Salsa 3♫", listOf(Ox2bow,Ox2bow,Ostaccato,Ox2bow,Ox2bow,Ox3bow,Ox4bow).flatten(), Pair(4,4)),
+    SALSA_4BOW(RhythmType.LATIN,"Salsa 4♫", listOf(Ox4bow,Orest,Ostaccato,Orest,Ostaccato, Orest,Ox2bow,Ostaccato,Orest,Ox2bow,Ox5bow,Orest,Ostaccato,Orest,Ostaccato, Orest,Ox2bow,Ostaccato,Orest,Ostaccato,Orest,Ostaccato).flatten(), Pair(4,4)),
 
     JUPITER(RhythmType.QUOTE,"Jupiter",listOf(N1,listOf(-240,80,80,80),N1,listOf(-240,80,80,80),N1,listOf(-1200,180,-60, 720,240,720,180,-60,960,480,-480)).flatten()),
     SCHERZO(RhythmType.QUOTE,"Scherzo",listOf(listOf(360,60,-60,60,-180), Ox3staccato, Ox3staccato).flatten(), Pair(3,8)),

@@ -400,7 +400,7 @@ fun ResultDisplay(model: AppViewModel,
                                             dispatchCsv= { newValues ->
                                                 close()
                                                 model.cadenzaValues = newValues
-                                                onFormat( newValues.extractIntsFromCsv() ) // FORMAT DIALOG OK BUTTON
+                                                onCadenza( newValues.extractIntsFromCsv() )
                                             }
                                         )
                                     },
