@@ -73,7 +73,7 @@ fun kpp(pts: LPoint, len: Int, cent: MLPoint) {
     if (pts.isEmpty() || len == 0) return
     val nCent = cent.size
     val d = DoubleArray(len)
-    println("points size:${pts.size}  length:$len")
+    //println("points size:${pts.size}  length:$len")
     cent[0] = pts[rand() % len].copy()
     for (nCluster in 1 until nCent) {
         var sum = 0.0

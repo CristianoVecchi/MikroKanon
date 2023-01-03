@@ -164,14 +164,14 @@ fun MidiTrack.addDrumsToTrackByCentroids(trackDatas: List<TrackData>, drumKit: D
 //    val densities = mutableListOf(density)
     if(nElements > 3000){
         val sectionHalves = sectionDuration.divideDistributingRest(2)
-        println("--- DRUMS SECTION SPLIT ---")
+        //println("--- DRUMS SECTION SPLIT ---")
         this.addDrumsToTrackByCentroids(trackDatas, drumKit, sectionStart, sectionHalves[0], density, volume, type)
         this.addDrumsToTrackByCentroids(trackDatas, drumKit, sectionStart + sectionHalves[0], sectionHalves[1], density, volume, type)
     } else {
         val soundList = drumKit.soundList()
         val emptyCentroids = ((1f - density) * soundList.size).toInt()// add density
         val nCentroids = soundList.size + emptyCentroids
-        println("empty Centroids: $emptyCentroids   nCentroids: $nCentroids   density:$density")
+       // println("empty Centroids: $emptyCentroids   nCentroids: $nCentroids   density:$density")
         val points = mutableListOf<Point>()
         trackDatas.forEachIndexed { index, trackData ->
             val (xs, ys) = when(type) {
@@ -245,7 +245,7 @@ fun MidiTrack.addDrumsToTrackByCentroids(trackDatas: List<TrackData>, drumKit: D
                     //println("Note without drums")
                 }
             }
-            println("Drum Sounds assigned: $count/${points.size} ")
+            //println("Drum Sounds assigned: $count/${points.size} ")
         }
     }
 }
