@@ -278,7 +278,7 @@ val METRO_2_4 = Pair(2,4)
 val METRO_3_4 = Pair(3,4)
 val METRO_4_4 = Pair(4,4)
 enum class RhythmType{
-     BASIC, PLAIN, BALLET, PUNTATO, MIX, DANCE, RAGTIME, LATIN, QUOTE, BULGARIAN, HEMIOLIA, FLUX
+     BASIC, PLAIN, BALLET, PUNTATO, MIX, DANCE, RAGTIME, LATIN, QUOTE, BULGARIAN, HEMIOLIA, FLUX, MATH
 }
 // WARNING: can't have two negative values coupled (ex: -80, -20 ... write -100)
 enum class RhythmPatterns(val type: RhythmType, val title: String, val values: List<Int>,val metro: Pair<Int,Int> = METRO_4_4) {
@@ -516,6 +516,8 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     HEMIOLIA43(RhythmType.HEMIOLIA,"Hemiolia 4=3", listOf(180,60,120,120,60,180),Pair(3,8)),
     HEMIOLIA54(RhythmType.HEMIOLIA,"Hemiolia 5=4", listOf(240,60,180,120,120,180,60,240),Pair(5,8)),
     HEMIOLIA65(RhythmType.HEMIOLIA,"Hemiolia 6=5", listOf(600,120,480,240,360,360, 240,480,120,600),Pair(6,16)),
+    HEMIOLIA76(RhythmType.HEMIOLIA,"Hemiolia 7=6", listOf(720, 120,600, 240,480, 360,360, 480,240, 600,120, 720),Pair(6,16)),
+    HEMIOLIA87(RhythmType.HEMIOLIA,"Hemiolia 8=7", listOf(840,120, 720,240, 600,360, 480,480, 360,600, 240,720, 120,840),Pair(2,4)),
 
     FLUX_3454(RhythmType.FLUX,"Flux 3454",listOf(N3,N4,N5,N4).flatten()),
     FLUX_345654(RhythmType.FLUX,"Flux 345654",listOf(N3,N4,N5, N6,N5,N4).flatten(),Pair(3,4)),
@@ -531,6 +533,17 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     DEC_876543(RhythmType.FLUX,"Dec 876543", listOf(N8,N7,N6,N5,N4,N3).flatten(), Pair(3,4)),
     DEC_T98765432(RhythmType.FLUX,"Dec T98765432", listOf(N10,N9,N8,N7,N6,N5,N4,N3,N2).flatten(), Pair(3,4)),
     DEC_T9876_87654_65432(RhythmType.FLUX,"Dec T9876 87654 65432", listOf(N10,N9,N8,N7,N6, N8,N7,N6,N5,N4, N6,N5,N4,N3,N2).flatten(), Pair(5,4)),
+
+    FIBONACCI_N8(RhythmType.MATH,"Fibonacci<8", listOf(120,120,240,360,600,960), Pair(5,16)), // 20
+    FIBONACCI_N13(RhythmType.MATH,"Fibonacci<13", listOf(120,120,240,360,600,960,1560), Pair(11,16)), // 33
+    FIBONACCI_N21(RhythmType.MATH,"Fibonacci<21", listOf(120,120,240,360,600,960,1560,2520), Pair(9,16)), // 54
+    FIBONACCI_N34(RhythmType.MATH,"Fibonacci<34", listOf(120,120,240,360,600,960,1560,2520,4080), Pair(2,4)), // 88
+
+    FIBONACCI_N8_1(RhythmType.MATH,"Fibonacci<8>", listOf(120,120,240,360,600,960, 600,360,240,120), Pair(1,16)), // 31
+    FIBONACCI_N13_1(RhythmType.MATH,"Fibonacci<13>", listOf(120,120,240,360,600,960,1560, 960,600,360,240,120 ), Pair(2,8)), // 52
+    FIBONACCI_N21_1(RhythmType.MATH,"Fibonacci<21>", listOf(120,120,240,360,600,960,1560,2520, 1560,960,600,360,240,120), Pair(2,16)), // 86
+    FIBONACCI_N34_1(RhythmType.MATH,"Fibonacci<34>", listOf(120,120,240,360,600,960,1560,2520,4080, 2520,1560,960,600,360,240,120 ), Pair(3,16)), // 141
+
     ;
     fun durationSum(nNotes: Int): Int{
        return RhythmPatterns.durationSum(nNotes, values)

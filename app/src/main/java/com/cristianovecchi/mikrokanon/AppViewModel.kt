@@ -131,7 +131,7 @@ class AppViewModel(
     private val computationStack = Stack<Computation>()
     
     init{
-        RhythmPatterns.checkIntegrity()
+        //RhythmPatterns.checkIntegrity()
         //readFileLineByLineUsingForEachLine()
         //createArrayColorsFile()
         val size = getDeviceResolution()
