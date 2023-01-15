@@ -59,6 +59,7 @@ var start = true
         }
 
         model.selectedSequence.observe(viewLifecycleOwner){
+            println("Sequence selected: ${model.selectedSequence.value!!}")
             model.changeActiveButtons( if(model.selectedSequence.value!! != -1 )
                 ActiveButtons(editing = true, mikrokanon = true, counterpoint = true,
                     specialFunctions = true, freeParts = true, waves = true, pedals = true)

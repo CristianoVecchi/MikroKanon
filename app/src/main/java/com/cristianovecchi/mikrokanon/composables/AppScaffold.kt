@@ -230,7 +230,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = isOn,
-                                onClick = { _ ->
+                                onClick = {
                                     doublingDialogData.value = MultiListDialogData(
                                         true, intervalsForGlissando, intsFromFlags.toSet(), lang.selectGlissando
                                     ) { indexes ->
@@ -390,7 +390,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = isOn,
-                                onClick = { _ ->
+                                onClick = {
                                     doublingDialogData.value = MultiListDialogData(
                                         true, lang.doublingNames, intsFromFlags.toSet(), lang.selectDoubling
                                     ) { indexes ->
@@ -418,7 +418,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = isOn,
-                                onClick = { _ ->
+                                onClick = {
                                     doublingDialogData.value = MultiListDialogData(
                                         true, (1..12).map{it.toString()}, intsFromFlags.toSet(), lang.selectAudio8D
                                     ) { indexes ->
@@ -1066,7 +1066,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                     fontSize = fontSize,
                                     colors = colors,
                                     isSelected = isOn,
-                                    onClick = { _ ->
+                                    onClick = {
                                         zodiacDialogData.value = MultiListDialogData(
                                             true,
                                             lang.zodiacOptions,

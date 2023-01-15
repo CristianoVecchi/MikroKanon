@@ -24,7 +24,9 @@ import com.cristianovecchi.mikrokanon.ui.shift
 
 
 @Composable
-fun SelectableCard(text: String, fontSize: Int, colors:AppColors, isSelected: Boolean, onClick: (Int) -> Unit ){
+fun SelectableCard(text: String, fontSize: Int, colors:AppColors, isSelected: Boolean,
+                   selectedFontWeight: FontWeight = FontWeight.Bold,
+                   onClick: () -> Unit ){
 
     val backColor by animateColorAsState( if(isSelected) colors.selCardBackColorSelected.shift(-0.1f) else colors.selCardBackColorUnselected.shift(-0.2f) )
     val textColor  by animateColorAsState( if(isSelected) colors.selCardTextColorSelected.shift(0.1f) else colors.selCardTextColorUnselected )
@@ -37,12 +39,12 @@ fun SelectableCard(text: String, fontSize: Int, colors:AppColors, isSelected: Bo
         //.aspectRatio( if (portraitMode) 3/4f else 16/9f)
         .padding(padding)
         .clip(RoundedCornerShape(4.dp))
-        .clickable { if (isSelected) onClick(1) else onClick(-1) }
+        .clickable { onClick() }
 
     ) {
         Text(text = text, modifier = Modifier.padding(14.dp),
             style = TextStyle(fontSize = fontSize.sp,
-                fontWeight = FontWeight.Bold)
+                fontWeight = if(isSelected) selectedFontWeight else FontWeight.Bold)
         )
     }
 }

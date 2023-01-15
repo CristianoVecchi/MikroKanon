@@ -201,7 +201,7 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
         }
     }
     companion object{
-        val titles: List<String> = listOf(  "Mordente", "Mordente 2X",
+        val titles: List<String> = listOf(  "Mordente", "Mordente 2x",
         "Mordente 3x", "Gruppetto", "Note di cambio", "Onda",
             "Cromatica", "Diatonica", "Cromatica di cambio", "Diatonica di cambio",
             "Tremolo<","Tremolo<>","Ribattuto<", "Ribattuto<>", "Drammatico<", "Drammatico<>",
