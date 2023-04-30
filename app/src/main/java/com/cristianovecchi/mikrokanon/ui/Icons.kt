@@ -65,6 +65,7 @@ object Icons {
             "format" to R.drawable.ic_baseline_width_normal_24,
             "static" to R.drawable.ic_baseline_horizontal_rule_24,
             "dynamic" to R.drawable.ic_baseline_ssid_chart_24,
+            "quote" to R.drawable.ic_baseline_format_quote_24,
         )
     }
 }

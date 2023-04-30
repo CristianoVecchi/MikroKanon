@@ -518,6 +518,23 @@ fun AppViewModel.addSequenceToCounterpoint(repeat: Boolean){
         }
     }
 }
+fun AppViewModel.addQuotesToCounterpoint(repeat: Boolean){
+    if(!selectedCounterpoint.value!!.isEmpty()){
+        var newList: List<Counterpoint>
+        viewModelScope.launch(Dispatchers.Main){
+            withContext(Dispatchers.Default){
+                newList = addQuotes(selectedCounterpoint.value!! , listOf(MelodyGenre.BEBOP), intervalSet.value!! ,repeat, 7)
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
+                    .pmapIf(spread != 0){
+                        it.spreadAsPossible(true, intervalSet = intervalSet.value!!)}
+                    //.map{ it.emptiness = it.findEmptiness(); it}
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                    .also { println("n results: ${it.size}") }
+            }
+            changeCounterpointsWithLimitAndCache(newList, true)
+        }
+    }
+}
 fun AppViewModel.extendedWeightedHarmonyOnCounterpoints(originalCounterpoints: List<Counterpoint>, nParts: Int){
     if(!selectedCounterpoint.value!!.isEmpty()){
         var newList: List<Counterpoint>

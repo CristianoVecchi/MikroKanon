@@ -154,6 +154,14 @@ suspend fun addSequence(counterpoint: Counterpoint,sequence: List<Clip>, interva
           Counterpoint.findAllCounterpoints(counterpoint, sequence.map { it.abstractNote }, intervalSet, depth)
      }
 }
+suspend fun addQuotes(counterpoint: Counterpoint, genres: List<MelodyGenre>, intervalSet: List<Int>, repeat: Boolean,depth: Int = 6): List<Counterpoint> {
+     val sequences = MelodyQuotes.getAbsPitchesByGenres(genres)
+     return if(repeat){
+          Counterpoint.findAllCounterpointsWithRepeatedSequences(counterpoint, sequences, intervalSet, depth)
+     } else {
+          Counterpoint.findAllCounterpointsWithSequences(counterpoint, sequences, intervalSet, depth)
+     }
+}
 suspend fun paradeAllOnCounterpoint(
      counterpoint: Counterpoint,
      howMany: Int,

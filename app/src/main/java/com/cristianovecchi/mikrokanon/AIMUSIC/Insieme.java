@@ -626,6 +626,20 @@ public class Insieme {
 
     }
 
+    public static int[] fromMidiPitchesToAbsPitches(int[] midiPitches) {
+        int length = midiPitches.length;
+        int[] result = new int[length];
+        for (int i=0; i<length; i++) {
+            int midiPitch = midiPitches[i];
+            if(midiPitch == -1){
+                result[i] = -1;
+            } else {
+                result[i] = midiPitch % 12;
+            }
+        }
+        return result;
+    }
+
     public static int[] calcolaFond(int insieme){
         int[] valFond = {0,0,0,0,0,0,0,0,0,0,0,0};
         for (int i=0; i<12; i++) { //tutti i valFond

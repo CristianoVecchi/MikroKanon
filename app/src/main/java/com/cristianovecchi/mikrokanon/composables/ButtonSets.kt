@@ -395,7 +395,7 @@ fun SpecialFunctions1Buttons(
 @Composable
 fun WavesButtons(
     model: AppViewModel, isActive: Boolean = true, buttonSize: Dp, fontSize: Int, colors: AppColors,
-    onWave3Click: () -> Unit, onWave4Click: () -> Unit, onWave6Click: () -> Unit
+    onWave3Click: () -> Unit, onWave4Click: () -> Unit, onWave6Click: () -> Unit, onQuote: () -> Unit
 ) {
     Row(){
         CustomButton(iconId = model.iconMap["waves"]!!, text = "3", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize, colors = colors) {
@@ -406,6 +406,9 @@ fun WavesButtons(
         }
         CustomButton(iconId = model.iconMap["waves"]!!, text = "6", isActive = isActive, buttonSize = buttonSize, fontSize = fontSize, colors = colors) {
             onWave6Click()
+        }
+        CustomButton(iconId = model.iconMap["quote"]!!, isActive = isActive, buttonSize = buttonSize, fontSize = fontSize, colors = colors) {
+            onQuote()
         }
     }
 }

@@ -9,8 +9,10 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asFlow
+import androidx.navigation.findNavController
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.MainActivity
+import com.cristianovecchi.mikrokanon.R
 import com.cristianovecchi.mikrokanon.composables.AppScaffold
 import com.cristianovecchi.mikrokanon.composables.ResultDisplay
 import com.cristianovecchi.mikrokanon.createIntervalSetFromFlags
@@ -112,6 +114,9 @@ class OutputFragment: Fragment() {
                                 },
                                 onWave = { nWaves ->
                                     model.onWaveFurtherSelection(nWaves)
+                                },
+                                onQuote = { repeat ->
+                                    model.onQuoteFurtherSelections(repeat)
                                 },
                                 onTritoneSubstitution = {
                                     model.onTritoneSubstitution()

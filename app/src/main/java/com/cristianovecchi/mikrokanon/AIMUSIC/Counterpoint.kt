@@ -1396,7 +1396,36 @@ data class Counterpoint(val parts: List<AbsPart>,
             val repeatedSequence = Collections.nCopies(nRepetitions, sequence).flatten()
             return findAllCounterpoints(target, repeatedSequence, intervalSet, deepness)
         }
-
+        fun findAllCounterpointsWithRepeatedSequences(
+            target: Counterpoint, sequences: List<List<Int>>,
+            intervalSet: List<Int>, deepness: Int
+        ): List<Counterpoint> {
+            val result = mutableListOf<Counterpoint>()
+            val nResultsForEachSequence = ((12 * 4 * deepness) / sequences.size).coerceAtLeast(1)
+            sequences.forEach{ sequence ->
+                result.addAll(findAllCounterpointsWithRepeatedSequence(target, sequence, intervalSet, deepness)
+                    .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                    .take(nResultsForEachSequence))
+            }
+            return result
+        }
+        fun findAllCounterpointsWithSequences(
+            target: Counterpoint,
+            sequences: List<List<Int>>,
+            intervalSet: List<Int>,
+            deepness: Int
+        ): List<Counterpoint> {
+            val result = mutableListOf<Counterpoint>()
+            val nResultsForEachSequence = ((12 * 4 * deepness) / sequences.size).coerceAtLeast(1)
+            sequences.forEach{ sequence ->
+                result.addAll(
+                    findAllCounterpoints(target, sequence, intervalSet, deepness)
+                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                        .take(nResultsForEachSequence)
+                )
+            }
+            return result
+        }
         fun findAllCounterpoints(
             target: Counterpoint,
             sequence: List<Int>,

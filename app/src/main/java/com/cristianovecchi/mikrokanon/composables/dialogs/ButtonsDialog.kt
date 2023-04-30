@@ -128,7 +128,8 @@ fun ButtonsDialog(
                                     colors = model.appColors,
                                     onWave3Click = buttonsDialogData.value.onWave3,
                                     onWave4Click = buttonsDialogData.value.onWave4,
-                                    onWave6Click = buttonsDialogData.value.onWave6
+                                    onWave6Click = buttonsDialogData.value.onWave6,
+                                    onQuote = buttonsDialogData.value.onQuote,
                                 )
                                 5 -> PedalsButtons(
                                     model = buttonsDialogData.value.model,

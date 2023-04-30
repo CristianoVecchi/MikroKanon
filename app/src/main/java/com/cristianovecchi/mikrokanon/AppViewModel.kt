@@ -565,6 +565,17 @@ class AppViewModel(
         changeSequenceToAdd(sequences.value!![index])
         addSequenceToCounterpoint(repeat)
     }
+    val onQuoteFurtherSelections = { repeat: Boolean ->
+        computationStack.pushAndDispatch(Computation.FurtherFromQuote(selectedCounterpoint.value!!.clone(), repeat))
+        addQuotesToCounterpoint(repeat)
+    }
+    val onQuotefromFirstSelection = {list: ArrayList<Clip>, repeat: Boolean ->
+        changeFirstSequence(list)
+        computationStack.pushAndDispatch(Computation.FirstFromQuote(selectedCounterpoint.value!!.clone(),
+            ArrayList(firstSequence.value!!), repeat))
+        convertFirstSequenceToSelectedCounterpoint()
+        addQuotesToCounterpoint(repeat)
+    }
     val onLoadingCounterpointFromSelector = { position: Int ->
         val retrievedCounterpoint = savedCounterpoints[position]?.clone() ?: Counterpoint.empty(1,1)
         computationStack.pushAndDispatch(Computation.FirstFromLoading(listOf(retrievedCounterpoint),
@@ -756,6 +767,14 @@ class AppViewModel(
                     is Computation.FurtherFromKP -> {
                         changeSelectedCounterpoint(previousComputation.counterpoint)
                         onKPfurtherSelections(previousComputation.indexSequenceToAdd,previousComputation.repeat)
+                    }
+                    is Computation.FirstFromQuote -> onQuotefromFirstSelection(
+                        previousComputation.firstSequence,
+                        previousComputation.repeat
+                    )
+                    is Computation.FurtherFromQuote -> {
+                        changeSelectedCounterpoint(previousComputation.counterpoint)
+                        onQuoteFurtherSelections(previousComputation.repeat)
                     }
                     is Computation.MikroKanonOnly -> {
                         when (previousComputation.nParts) {

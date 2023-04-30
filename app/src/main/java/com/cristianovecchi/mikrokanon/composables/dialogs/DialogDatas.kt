@@ -48,7 +48,7 @@ data class ButtonsDialogData(
     val dialogState: Boolean = false, val title:String = "",
     val model: AppViewModel, val buttonSize: Dp = 60.dp, val fontSize: Int = 18,
     val isActiveWaves: Boolean = false, val isActivePedals: Boolean = false, val isActiveSpecialFunctions1: Boolean = true,
-    val onWave3: () -> Unit = {}, val onWave4: () -> Unit = {}, val onWave6: () -> Unit = {},
+    val onWave3: () -> Unit = {}, val onWave4: () -> Unit = {}, val onWave6: () -> Unit = {}, val onQuote: () -> Unit = {},
     val onPedal1: () -> Unit = {}, val onPedal3: () -> Unit = {}, val onPedal5: () -> Unit = {},
     val onTritoneSubstitution: () -> Unit = {}, val onRound: () -> Unit = {},
     val onCadenza: () -> Unit = {}, val onScarlatti: () -> Unit = {},

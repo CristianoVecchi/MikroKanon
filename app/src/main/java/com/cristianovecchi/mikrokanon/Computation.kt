@@ -8,10 +8,12 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.TREND
 sealed class Computation(open val icon: String = "") {
     data class MikroKanonOnly(val counterpoint: Counterpoint, val sequenceToMikroKanon: ArrayList<Clip>, val nParts: Int, override val icon: String = "mikrokanon"): Computation()
     data class FirstFromKP(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val indexSequenceToAdd: Int, val repeat: Boolean, override val icon: String = "counterpoint"): Computation()
+    data class FirstFromQuote(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val repeat: Boolean, override val icon: String = "quote"): Computation()
     data class FirstFromWave(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val nWaves: Int, override val icon: String = "waves"): Computation()
     data class FirstFromLoading(val counterpoints: List<Counterpoint>, val firstSequence: ArrayList<Clip>, val position: Int, override val icon: String = "save"): Computation()
     data class Pedal(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>?, val nPedals: Int, override val icon: String = "pedal" ): Computation()
     data class FurtherFromKP(val counterpoint: Counterpoint, val indexSequenceToAdd: Int, val repeat: Boolean, override val icon: String = "counterpoint"): Computation()
+    data class FurtherFromQuote(val counterpoint: Counterpoint, val repeat: Boolean, override val icon: String = "quote"): Computation()
     data class FurtherFromWave(val counterpoints: List<Counterpoint>, val nWaves: Int, override val icon: String = "waves"): Computation()
     data class FirstFromFreePart(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val trend: TREND, override val icon: String = "free_parts"): Computation()
     data class FurtherFromFreePart(val counterpoint: Counterpoint, val firstSequence: ArrayList<Clip>, val trend: TREND, override val icon: String = "free_parts"): Computation()
