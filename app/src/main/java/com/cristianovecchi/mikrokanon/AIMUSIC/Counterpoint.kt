@@ -1416,13 +1416,15 @@ data class Counterpoint(val parts: List<AbsPart>,
             deepness: Int
         ): List<Counterpoint> {
             val result = mutableListOf<Counterpoint>()
-            val nResultsForEachSequence = ((12 * 4 * deepness) / sequences.size).coerceAtLeast(1)
-            sequences.forEach{ sequence ->
-                result.addAll(
-                    findAllCounterpoints(target, sequence, intervalSet, deepness)
-                        .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                        .take(nResultsForEachSequence)
-                )
+            if(sequences.isNotEmpty()) {
+                val nResultsForEachSequence = ((12 * 4 * deepness) / sequences.size).coerceAtLeast(1)
+                sequences.forEach{ sequence ->
+                    result.addAll(
+                        findAllCounterpoints(target, sequence, intervalSet, deepness)
+                            .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
+                            .take(nResultsForEachSequence)
+                    )
+                }
             }
             return result
         }

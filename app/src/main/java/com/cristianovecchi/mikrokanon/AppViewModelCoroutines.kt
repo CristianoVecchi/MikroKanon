@@ -518,12 +518,12 @@ fun AppViewModel.addSequenceToCounterpoint(repeat: Boolean){
         }
     }
 }
-fun AppViewModel.addQuotesToCounterpoint(repeat: Boolean){
+fun AppViewModel.addQuotesToCounterpoint(genres: List<MelodyGenre> = listOf(MelodyGenre.BEBOP), repeat: Boolean){
     if(!selectedCounterpoint.value!!.isEmpty()){
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = addQuotes(selectedCounterpoint.value!! , listOf(MelodyGenre.BEBOP), intervalSet.value!! ,repeat, 7)
+                newList = addQuotes(selectedCounterpoint.value!! , genres, intervalSet.value!! ,repeat, 7)
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
                     .pmapIf(spread != 0){
                         it.spreadAsPossible(true, intervalSet = intervalSet.value!!)}

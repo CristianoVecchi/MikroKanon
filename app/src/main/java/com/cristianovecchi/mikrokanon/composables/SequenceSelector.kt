@@ -31,7 +31,7 @@ fun SequenceSelector(model: AppViewModel,
                      onDelete: (Int) -> Unit = model::deleteSequence,
                      onAdd: (ArrayList<Clip>, Boolean) -> Unit,
                      onWave: (Int, ArrayList<Clip>) -> Unit,
-                     onQuote: (ArrayList<Clip>, Boolean) -> Unit,
+                     onQuote: (ArrayList<Clip>, List<MelodyGenre>, Boolean) -> Unit,
                      onLoadingCounterpoint: (Int) -> Unit,
                      onTritoneSubstitution: (Int) -> Unit,
                      onRound: (ArrayList<Clip>, List<Pair<Int,Int>>) -> Unit,
@@ -87,6 +87,7 @@ fun SequenceSelector(model: AppViewModel,
     val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val chessDialogData = remember { mutableStateOf(ListDialogData())}
     val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+    val genreDialogData = remember { mutableStateOf(MultiListDialogData())}
     val privacyDialogData = remember { mutableStateOf(TextDialogData())}
     val buttonSize = dimensions.selectorButtonSize
     val zodiacFlags by model.zodiacFlags.asFlow().collectAsState(initial = Triple(false,false,false))
@@ -140,6 +141,7 @@ fun SequenceSelector(model: AppViewModel,
             TransposeDialog(doublingDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
             TransposeDialog(roundDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
             MultiSequenceDialog(multiSequenceDialogData, buttonsDialogData, dimensions, model)
+            MultiListDialog(genreDialogData, dimensions, language.OkButton, appColors, language.repeatSequence)
             ListDialog(listDialogData = chessDialogData, dimensions = dimensions, appColors = appColors, fillPrevious = true )
             PrivacyDialog(privacyDialogData, dimensions, language.OkButton)
 
@@ -195,7 +197,19 @@ fun SequenceSelector(model: AppViewModel,
                                         onWave3 = { onWave(3, sequences[selectedIndex]) },
                                         onWave4 = { onWave(4, sequences[selectedIndex]) },
                                         onWave6 = { onWave(6, sequences[selectedIndex]) },
-                                        onQuote = { onQuote(sequences[selectedIndex], false)},
+                                        onQuote = {
+                                            genreDialogData.value = MultiListDialogData(
+                                                true, MelodyGenre.values().map{ it.toString()},
+                                                model.selectedMelodyGenres, language.selectQuoteGenres, language.repeatSequence,
+                                            ) { indices, repeat ->
+                                                    if(indices.isNotEmpty()){
+                                                        val genres = MelodyGenre.values()
+                                                        val selectedGenres = indices.map{genres[it]}
+                                                        model.selectedMelodyGenres = indices.toSortedSet()
+                                                        onQuote(sequences[selectedIndex], selectedGenres, repeat)
+                                                    }
+                                                }
+                                              },
                                         onTritoneSubstitution = { onTritoneSubstitution(selectedIndex) },
                                         onRound = {
                                             roundDialogData.value = MultiNumberDialogData(

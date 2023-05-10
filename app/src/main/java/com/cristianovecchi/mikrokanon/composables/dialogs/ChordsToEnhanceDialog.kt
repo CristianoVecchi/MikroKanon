@@ -165,7 +165,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 absPitchNames.reversed(),
                                 chordToEnhanceData.absPitches.map{11 - it}.toSet(),
                                 lang.selectChordsToEnhance
-                            ) { pitchIndeces ->
+                            ) { pitchIndeces, _ ->
                                 val actualPitches = pitchIndeces.map{11 - it}.toSortedSet()
                                 if(chordsToEnhanceDatas.all{it.absPitches != actualPitches}){
                                     val newCteDatas = chordsToEnhanceDatas.toMutableList()
@@ -251,7 +251,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 absPitchNames.reversed(),
                                 setOf(),
                                 lang.selectChordsToEnhance
-                            ) { pitchIndeces ->
+                            ) { pitchIndeces, _ ->
                                 val actualPitches = pitchIndeces.map{11 - it}.toSortedSet()
                                 if(chordsToEnhanceDatas.all{it.absPitches != actualPitches}){
                                     val rebuilding = chordsToEnhanceDatas.addOrInsert(

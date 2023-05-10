@@ -115,8 +115,8 @@ class OutputFragment: Fragment() {
                                 onWave = { nWaves ->
                                     model.onWaveFurtherSelection(nWaves)
                                 },
-                                onQuote = { repeat ->
-                                    model.onQuoteFurtherSelections(repeat)
+                                onQuote = { genres, repeat ->
+                                    model.onQuoteFurtherSelections(genres, repeat)
                                 },
                                 onTritoneSubstitution = {
                                     model.onTritoneSubstitution()

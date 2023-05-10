@@ -46,7 +46,7 @@ fun ResultDisplay(model: AppViewModel,
                   onKP: (Int, Boolean) -> Unit = { _, _ -> },
                   onTranspose: (List<Pair<Int,Int>>) -> Unit,
                   onWave: (Int) -> Unit,
-                  onQuote: (Boolean) -> Unit,
+                  onQuote: (List<MelodyGenre>,Boolean) -> Unit,
                   onTritoneSubstitution: () -> Unit = {},
                   onRound: (List<Pair<Int,Int>>) -> Unit = {},
                   onCadenza: (List<Int>) -> Unit = {},
@@ -132,6 +132,7 @@ fun ResultDisplay(model: AppViewModel,
     val chessDialogData = remember { mutableStateOf(ListDialogData())}
     val selectCounterpointDialogData = remember { mutableStateOf(ButtonsDialogData(model = model))}
     val multiSequenceDialogData = remember { mutableStateOf(MultiNumberDialogData(model = model))}
+    val genreDialogData = remember { mutableStateOf(MultiListDialogData())}
     val selCounterpoint: Counterpoint by selectedCounterpointFlow.collectAsState(initial = model.selectedCounterpoint.value!!)
 
     Column(
@@ -277,6 +278,7 @@ fun ResultDisplay(model: AppViewModel,
                 SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                     dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
                 MultiSequenceDialog(multiSequenceDialogData, buttonsDialogData, dimensions, model)
+                MultiListDialog(genreDialogData, dimensions, language.OkButton, colors, language.repeatSequence)
                 // STACK ICONS
                 Row(modifier = Modifier
                     .fillMaxWidth()
@@ -346,7 +348,7 @@ fun ResultDisplay(model: AppViewModel,
                                 val intervalNames = if(zodiacPlanetsActive) getZodiacPlanets(zodiacEmojisActive) else language.intervalSet.map{ it.replace("\n"," / ") }
                                 intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
                                     intsFromFlags.toSet(), dialogTitle = "${language.selectHorizontalIntervals}" // \n${language.FPremember}"
-                                ) { indexes ->
+                                ) { indexes, _ ->
                                     model.updateUserOptions(
                                         "intSetHorFlags",
                                         if(indexes.isEmpty()) 0b1111111 else convertIntsToFlags(indexes.toSortedSet())
@@ -387,7 +389,20 @@ fun ResultDisplay(model: AppViewModel,
                                     onWave3 = { onWave(3); close() },
                                     onWave4 = { onWave(4); close() },
                                     onWave6 = { onWave(6); close() },
-                                    onQuote = { onQuote(false); close() },
+                                    onQuote = {
+                                        genreDialogData.value = MultiListDialogData(
+                                            true, MelodyGenre.values().map{ it.toString()},
+                                            model.selectedMelodyGenres, language.selectQuoteGenres, language.repeatSequence,
+                                        ) { indices, repeat ->
+                                            if(indices.isNotEmpty()){
+                                                close()
+                                                val genres = MelodyGenre.values()
+                                                val selectedGenres = indices.map{genres[it]}
+                                                model.selectedMelodyGenres = indices.toSortedSet()
+                                                onQuote(selectedGenres, repeat)
+                                            }
+                                        }
+                                    },
                                     onTritoneSubstitution = { onTritoneSubstitution(); close() },
                                     onRound = { transposeDialogData.value = MultiNumberDialogData(
                                         true, language.selectTranspositions, value = "0|1",

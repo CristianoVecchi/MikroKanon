@@ -63,6 +63,7 @@ class AppViewModel(
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
     var cadenzaValues = "0,1,0,1,1"
     var formatValues = "0,1,1,0"
+    var selectedMelodyGenres = setOf<Int>()
     var resolutioValues = Triple((0..11).toSet(),"0,1,0,1,0", 0)
     var isResolutioWithNotes = true
     val dynamicMap: Map<Float,String> =  dynamicSteps.zip(getDynamicSymbols()).toMap()
@@ -565,16 +566,16 @@ class AppViewModel(
         changeSequenceToAdd(sequences.value!![index])
         addSequenceToCounterpoint(repeat)
     }
-    val onQuoteFurtherSelections = { repeat: Boolean ->
-        computationStack.pushAndDispatch(Computation.FurtherFromQuote(selectedCounterpoint.value!!.clone(), repeat))
-        addQuotesToCounterpoint(repeat)
+    val onQuoteFurtherSelections = { genres: List<MelodyGenre>, repeat: Boolean ->
+        computationStack.pushAndDispatch(Computation.FurtherFromQuote(selectedCounterpoint.value!!.clone(), genres, repeat))
+        addQuotesToCounterpoint(genres, repeat)
     }
-    val onQuotefromFirstSelection = {list: ArrayList<Clip>, repeat: Boolean ->
+    val onQuotefromFirstSelection = {list: ArrayList<Clip>, genres: List<MelodyGenre>, repeat: Boolean ->
         changeFirstSequence(list)
         computationStack.pushAndDispatch(Computation.FirstFromQuote(selectedCounterpoint.value!!.clone(),
-            ArrayList(firstSequence.value!!), repeat))
+            ArrayList(firstSequence.value!!), genres, repeat))
         convertFirstSequenceToSelectedCounterpoint()
-        addQuotesToCounterpoint(repeat)
+        addQuotesToCounterpoint(genres, repeat)
     }
     val onLoadingCounterpointFromSelector = { position: Int ->
         val retrievedCounterpoint = savedCounterpoints[position]?.clone() ?: Counterpoint.empty(1,1)
@@ -769,12 +770,12 @@ class AppViewModel(
                         onKPfurtherSelections(previousComputation.indexSequenceToAdd,previousComputation.repeat)
                     }
                     is Computation.FirstFromQuote -> onQuotefromFirstSelection(
-                        previousComputation.firstSequence,
+                        previousComputation.firstSequence, previousComputation.genres,
                         previousComputation.repeat
                     )
                     is Computation.FurtherFromQuote -> {
                         changeSelectedCounterpoint(previousComputation.counterpoint)
-                        onQuoteFurtherSelections(previousComputation.repeat)
+                        onQuoteFurtherSelections(previousComputation.genres, previousComputation.repeat)
                     }
                     is Computation.MikroKanonOnly -> {
                         when (previousComputation.nParts) {

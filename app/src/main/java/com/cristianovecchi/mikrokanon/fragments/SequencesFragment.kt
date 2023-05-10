@@ -102,9 +102,9 @@ var start = true
                                         findNavController().navigate(R.id.outputFragment)
                                         model.onWaveFromFirstSelection(nWaves, list)
                                     },
-                                    onQuote = { list, repeat ->
+                                    onQuote = { list, genres, repeat ->
                                         findNavController().navigate(R.id.outputFragment)
-                                        model.onQuotefromFirstSelection(list, repeat)
+                                        model.onQuotefromFirstSelection(list, genres, repeat)
                                     },
                                     onTritoneSubstitution = { index ->
                                         model.onTritoneSubstitutionFromSelector(index)

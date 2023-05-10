@@ -179,7 +179,7 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 ensNames,
                                 ensemble.toSet(),
                                 lang.selectEnsemble
-                            ) { newEnsembleMix ->
+                            ) { newEnsembleMix, _ ->
                                 val newEnsembles = ensembles.toMutableList()
                                 newEnsembles[cursor] = newEnsembleMix.ifEmpty { listOf(2) }
                                 ensembles = newEnsembles.toList()
@@ -215,7 +215,7 @@ fun EnsembleDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 ensNames,
                                 ensemble.toSet(),
                                 lang.selectEnsemble
-                            ) { newEnsembleMix ->
+                            ) { newEnsembleMix, _ ->
                                 val rebuilding = ensembles.addOrInsert(
                                     newEnsembleMix.ifEmpty { listOf(2) }, cursor)
                                 ensembles = rebuilding.first

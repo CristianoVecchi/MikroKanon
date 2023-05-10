@@ -426,6 +426,7 @@ data class Lang( // English by default
     val creditsAndLicenses: String = "Credits & Licenses",
     val choose2ndSequence: String = "Choose the second sequence!",
     val chooseAnotherSequence: String = "Choose another sequence!",
+    val selectQuoteGenres: String = "Select genres for the quote!",
 
     val selectSpecialFunction: String = "Select a function!",
     val selectCadenzaForm: String = "Select a cadenza form!",

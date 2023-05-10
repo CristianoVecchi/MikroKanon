@@ -23,10 +23,10 @@ import com.cristianovecchi.mikrokanon.ui.shift
 
 @Composable
 fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>, dimensions: Dimensions,
-                    okText: String = "OK", appColors: AppColors) {
+                    okText: String = "OK", appColors: AppColors, optionText: String = "",) {
     MultiSelectListDialog(
         listDialogData = listDialogData,
-        dimensions = dimensions,  okText = okText, appColors = appColors,
+        dimensions = dimensions,  okText = okText, appColors = appColors, optionText = optionText,
         onDismissRequest = { listDialogData.value = MultiListDialogData(itemList = listDialogData.value.itemList)  }
     )
 }
@@ -34,6 +34,7 @@ fun MultiListDialog(listDialogData: MutableState<MultiListDialogData>, dimension
 fun MultiSelectListDialog(
     listDialogData: MutableState<MultiListDialogData>,
     dimensions: Dimensions, okText: String = "OK", appColors: AppColors,
+    optionText: String = "",
     onDismissRequest: () -> Unit
 ) {
     if (listDialogData.value.dialogState) {
@@ -41,6 +42,7 @@ fun MultiSelectListDialog(
         val backgroundColor = appColors.dialogBackgroundColor
         val fontSize = dimensions.dialogFontSize
         var selectedOptions by remember{ mutableStateOf(listDialogData.value.selectedListDialogItems) }
+        var option by remember{ mutableStateOf(false) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),
@@ -84,12 +86,13 @@ fun MultiSelectListDialog(
 
                         }
                         Spacer(modifier = Modifier.height(5.dp))
-                        Row( modifier = modifierB,
+                        Row( modifier = modifierB.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ){
                             Button(
                                 onClick = {
-                                    listDialogData.value.onSubmitButtonClick.invoke(selectedOptions.toList())
+                                    listDialogData.value.onSubmitButtonClick.invoke(selectedOptions.toList(), option)
                                     onDismissRequest.invoke()
                                 },
                                 shape = MaterialTheme.shapes.medium
@@ -97,6 +100,18 @@ fun MultiSelectListDialog(
                                 Text(text = okText ,style = TextStyle(
                                         fontSize = dimensions.dialogFontSize.sp)
                                 )
+                            }
+                            if(optionText.isNotBlank()){
+                                Row(verticalAlignment = Alignment.CenterVertically){
+                                    Checkbox(
+                                        checked = option,
+                                        onCheckedChange = { checked ->
+                                            option = !option
+                                        }
+                                    )
+                                    Text(text = optionText, color = fontColor)
+                                }
+
                             }
                         }
 

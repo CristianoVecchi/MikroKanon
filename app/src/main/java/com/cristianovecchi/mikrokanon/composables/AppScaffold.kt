@@ -233,7 +233,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                 onClick = {
                                     doublingDialogData.value = MultiListDialogData(
                                         true, intervalsForGlissando, intsFromFlags.toSet(), lang.selectGlissando
-                                    ) { indexes ->
+                                    ) { indexes, _ ->
                                         model.updateUserOptions(
                                             "glissandoFlags",
                                             convertIntsToFlags(indexes.map { it + 1 }.toSortedSet()).toString()
@@ -393,7 +393,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                 onClick = {
                                     doublingDialogData.value = MultiListDialogData(
                                         true, lang.doublingNames, intsFromFlags.toSet(), lang.selectDoubling
-                                    ) { indexes ->
+                                    ) { indexes, _ ->
                                         model.updateUserOptions(
                                             "doublingFlags",
                                             convertIntsToFlags(indexes.map { it + 1 }.toSortedSet()).toString()
@@ -421,7 +421,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                 onClick = {
                                     doublingDialogData.value = MultiListDialogData(
                                         true, (1..12).map{it.toString()}, intsFromFlags.toSet(), lang.selectAudio8D
-                                    ) { indexes ->
+                                    ) { indexes, _  ->
                                         model.updateUserOptions(
                                             "audio8DFlags",
                                             convertIntsToFlags(indexes.toSortedSet()).toString()
@@ -826,7 +826,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                     onClick = {
                                         doublingDialogData.value = MultiListDialogData(
                                             true, names, setOf(), lang.selectSlots
-                                        ) { indexes ->
+                                        ) { indexes, _ ->
                                             model.clearCounterpointsInDb(indexes.toSortedSet())
                                             model.retrieveCounterpointsFromDB()
                                             doublingDialogData.value =
@@ -920,7 +920,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                             intervalNames,
                                             intsFromFlags.toSet(),
                                             dialogTitle = lang.selectIntervalsToDetect
-                                        ) { indexes ->
+                                        ) { indexes, _ ->
                                             model.updateUserOptions(
                                                 "detectorFlags",
                                                 convertIntsToFlags(indexes.toSortedSet())
@@ -1072,7 +1072,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                             lang.zodiacOptions,
                                             intsFromFlags.toSet(),
                                             lang.selectZodiac
-                                        ) { indexes ->
+                                        ) { indexes, _  ->
                                             val actualIndexes = if (indexes.contains(2)) listOf(
                                                 indexes[0],
                                                 1,
