@@ -63,7 +63,7 @@ class AppViewModel(
     val dynamicSteps = listOf(0.000001f, 0.14f, 0.226f, 0.312f,  0.398f, 0.484f, 0.57f, 0.656f,  0.742f, 0.828f, 0.914f,1f )
     var cadenzaValues = "0,1,0,1,1"
     var formatValues = "0,1,1,0"
-    var selectedMelodyGenres = setOf<Int>()
+    var selectedMelodyGenres = Pair(setOf<Int>(), false)
     var resolutioValues = Triple((0..11).toSet(),"0,1,0,1,0", 0)
     var isResolutioWithNotes = true
     val dynamicMap: Map<Float,String> =  dynamicSteps.zip(getDynamicSymbols()).toMap()

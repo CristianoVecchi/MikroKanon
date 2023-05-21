@@ -42,7 +42,7 @@ fun MultiSelectListDialog(
         val backgroundColor = appColors.dialogBackgroundColor
         val fontSize = dimensions.dialogFontSize
         var selectedOptions by remember{ mutableStateOf(listDialogData.value.selectedListDialogItems) }
-        var option by remember{ mutableStateOf(false) }
+        var option by remember{ mutableStateOf(listDialogData.value.optionChecked) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier.width(dimensions.dialogWidth).height(dimensions.dialogHeight),

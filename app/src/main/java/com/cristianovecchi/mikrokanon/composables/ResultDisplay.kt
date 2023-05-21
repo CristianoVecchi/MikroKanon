@@ -392,13 +392,13 @@ fun ResultDisplay(model: AppViewModel,
                                     onQuote = {
                                         genreDialogData.value = MultiListDialogData(
                                             true, MelodyGenre.values().map{ it.toString()},
-                                            model.selectedMelodyGenres, language.selectQuoteGenres, language.repeatSequence,
+                                            model.selectedMelodyGenres.first, language.selectQuoteGenres, language.repeatSequence, model.selectedMelodyGenres.second
                                         ) { indices, repeat ->
                                             if(indices.isNotEmpty()){
                                                 close()
                                                 val genres = MelodyGenre.values()
                                                 val selectedGenres = indices.map{genres[it]}
-                                                model.selectedMelodyGenres = indices.toSortedSet()
+                                                model.selectedMelodyGenres = indices.toSortedSet() to repeat
                                                 onQuote(selectedGenres, repeat)
                                             }
                                         }

@@ -20,7 +20,7 @@ data class ListDialogData (val dialogState: Boolean = false,
 data class MultiListDialogData(val dialogState: Boolean = false, val itemList: List<String> = listOf(),
                                val selectedListDialogItems: Set<Int> = setOf(),
                                val dialogTitle: String = "",
-                               val optionText: String = "",
+                               val optionText: String = "", val optionChecked: Boolean = false,
                                val onSubmitButtonClick: (List<Int>, Boolean) -> Unit = { list, option ->  })
 
 

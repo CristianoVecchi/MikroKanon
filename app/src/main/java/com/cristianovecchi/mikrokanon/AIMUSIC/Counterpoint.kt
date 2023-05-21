@@ -1418,6 +1418,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             val result = mutableListOf<Counterpoint>()
             if(sequences.isNotEmpty()) {
                 val nResultsForEachSequence = ((12 * 4 * deepness) / sequences.size).coerceAtLeast(1)
+                    .also{println("Minimum results for each Sequence: $it")}
                 sequences.forEach{ sequence ->
                     result.addAll(
                         findAllCounterpoints(target, sequence, intervalSet, deepness)
