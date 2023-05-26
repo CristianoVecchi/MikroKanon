@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.locale
 
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
+import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationStyle
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import java.text.DateFormat
 import java.util.*
@@ -340,7 +341,6 @@ data class Lang( // English by default
     val beatsPerMinute: String = "Beats Per Minute",
     val ensemble: String = "Ensemble",
     val selectRange: String = "Select the range!",
-    val selectOctaves: String = "Select octaves!",
     val range: String = "Range",
     val rangeOptions: List<String> = listOf("Free", "Of the instrument", "Delimited", "Almost closed", "Closed"),
     val articulation: String = "Articulation",
@@ -362,6 +362,8 @@ data class Lang( // English by default
     val selectHarmonizationType: String = "Select the harmonization type!",
     val selectHarmonizationInstruments: String = "Select the harmonization instruments!",
     val selectHarmonizationVolume: String = "Select the harmonization volume!",
+    val selectOctaves: String = "Select octaves!",
+    val selectHarmonizationStyle: String = "Select the harmonization style!",
     val drums: String= "Drums",
     val selectDrumsType: String = "Select the style of the drums!",
     val selectDrumKit: String = "Select the drum-kit!",

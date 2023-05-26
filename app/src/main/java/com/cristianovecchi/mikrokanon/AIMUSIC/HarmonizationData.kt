@@ -47,7 +47,7 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
             .also{ println("Converted to: $it") }
     }
     fun describeOctaves(): String {
-        if(this.octavesByte == 248) return ""
+        //if(this.octavesByte == 248) return ""
         return convertFromOctavesByte().joinToString("") { it.toString() }
     }
     companion object{

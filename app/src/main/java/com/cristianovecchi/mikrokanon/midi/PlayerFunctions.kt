@@ -283,10 +283,11 @@ fun MidiTrack.addVolumeToTrack(dynamics: List<Float>, totalLength: Long) {
 
 
 fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, roots: MutableList<Int>,
-                                     diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+                                     diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, octaves: List<Int>) {
     data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
     val notes = mutableListOf<Note>()
     val rootNotes = mutableListOf<Note>()
+    val actualOctaves = octaves.map{ it +1 }
     for (absPitch in 0..11) {
         val contains = BooleanArray(bars.size) { false }
         bars.forEachIndexed { index, bar ->
@@ -337,24 +338,32 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
             val tick = it.tick
             val duration = it.duration
             val velocity = (it.velocity - diffChordVelocity).coerceIn(0,127)
-            for (octave in 4..8) {
+            actualOctaves.forEach { octave ->
                 Player.insertNoteWithGlissando(
                     chordsTrack, tick, duration, chordsChannel,
                     octave * 12 + absPitch, velocity, 70, 0
                 )
             }
         }
-            if(!justVoicing){
+            val addBassesTo2ndOctave = !actualOctaves.contains(2)
+            val addBassesTo3rdOctave = !actualOctaves.contains(3)
+            if(!justVoicing && (addBassesTo2ndOctave || addBassesTo3rdOctave)){
             rootNotes.sortedBy { it.tick }.forEach {
                 //println("Root: $it")
                 val absPitch = it.pitch
                 val tick = it.tick
                 val duration = it.duration
                 val velocity = (it.velocity - diffRootVelocity).coerceIn(0,127)
-                for (octave in 2..3) {
+                if(addBassesTo2ndOctave){
                     Player.insertNoteWithGlissando(
                         chordsTrack, tick, duration, chordsChannel,
-                        octave * 12 + absPitch, velocity, 50, 0
+                        24 + absPitch, velocity, 50, 0
+                    )
+                }
+                if(addBassesTo3rdOctave) {
+                    Player.insertNoteWithGlissando(
+                        chordsTrack, tick, duration, chordsChannel,
+                        36 + absPitch, velocity, 50, 0
                     )
                 }
             }
@@ -374,26 +383,26 @@ fun findAscendingNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Ba
                 val durs = barDur.divideDistributingRest(pitches.size)
                 var tick = bar.tick
                 pitches = if(pitches.first() == lastPitch) pitches.shiftCycling() else pitches
-                    pitches.forEachIndexed { j, absPitch ->
-                        val duration = durs[j]
-                        val velocity = (bar.minVelocity!! - diffRootVelocity).coerceIn(0,127)
-                        actualOctaves.forEach{ octave ->
-                            Player.insertNoteWithGlissando(
-                                chordsTrack, tick, duration, chordsChannel,
-                                octave * 12 + absPitch, velocity, 70, 0
-                            )
-                        }
-                        tick += duration
+                pitches.forEachIndexed { j, absPitch ->
+                    val duration = durs[j]
+                    val velocity = (bar.minVelocity!! - diffChordVelocity).coerceIn(0,127)
+                    actualOctaves.forEach{ octave ->
+                        Player.insertNoteWithGlissando(
+                            chordsTrack, tick, duration, chordsChannel,
+                            octave * 12 + absPitch, velocity, 70, 0
+                        )
                     }
+                    tick += duration
+                }
+                lastPitch = pitches.last()
             }
-            lastPitch = pitches.last()
-        }
 
+        }
 }
 fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, octaves: List<Int>) {
     data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
-
+    val actualOctaves = octaves.map{ it +1 }
     val notes = mutableListOf<Note>()
     val roots = mutableListOf<Note>()
     for (absPitch in 0..11) {
@@ -443,25 +452,32 @@ fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
         val tick = it.tick
         val duration = it.duration
         val velocity = (it.velocity - diffChordVelocity).coerceIn(0,127)
-        for (octave in 4..8) {
+        actualOctaves.forEach{ octave ->
             Player.insertNoteWithGlissando(
                 chordsTrack, tick, duration, chordsChannel,
                 octave * 12 + absPitch, velocity, 70, 0
             )
         }
     }
-    if(!justVoicing){
+    val addBassesTo2ndOctave = !actualOctaves.contains(2)
+    val addBassesTo3rdOctave = !actualOctaves.contains(3)
+    if(!justVoicing && (addBassesTo2ndOctave || addBassesTo3rdOctave)){
         roots.sortedBy { it.tick }.forEach {
             //println("Root: $it")
             val absPitch = it.pitch
             val tick = it.tick
             val duration = it.duration
             val velocity = (it.velocity - diffRootVelocity).coerceIn(0,127)
-            for (octave in 2..3) {
-                //val pitch = octave * 12 + absPitch
+            if(addBassesTo2ndOctave){
                 Player.insertNoteWithGlissando(
                     chordsTrack, tick, duration, chordsChannel,
-                    octave * 12 + absPitch, velocity, 50, 0
+                    24 + absPitch, velocity, 50, 0
+                )
+            }
+            if(addBassesTo3rdOctave) {
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, duration, chordsChannel,
+                    36 + absPitch, velocity, 50, 0
                 )
             }
         }

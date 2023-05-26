@@ -48,15 +48,18 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         }
         val lang = Lang.provideLanguage(model.getUserLangDef())
         val harmNames = HarmonizationType.values().map{ it.title }
+        val styleNames = HarmonizationStyle.values().map{ it.title }
         val harmTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val instrumentDialogData by lazy { mutableStateOf(ListDialogData()) }
         val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val octavesDialogData by lazy { mutableStateOf(MultiListDialogData()) }
+        val styleDialogData by lazy { mutableStateOf(ListDialogData()) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             ListDialog(harmTypeDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(instrumentDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
             MultiListDialog(octavesDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(styleDialogData, dimensions, lang.OkButton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
                 else dimensions.dialogWidth
@@ -277,8 +280,30 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         lang.selectOctaves
                                     ) { octaveList, _ ->
                                         val newHarmDatas = harmDatas.toMutableList()
+                                        val correctedOctaveList = if(octaveList.isEmpty()) listOf(0,1,2,3,4) else octaveList
                                         newHarmDatas[cursor] =
-                                            harmDatas[cursor].copy(octavesByte = octaveList.map{7 - it}.convertToOctavesByte())
+                                            harmDatas[cursor].copy(octavesByte = correctedOctaveList.map{7 - it}.convertToOctavesByte())
+                                        harmDatas = newHarmDatas
+                                        ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                                    }
+                                }
+                                CustomButton(
+                                    isActive = harmDatas[cursor].type != HarmonizationType.NONE,
+                                    iconId = model.iconMap["accompanist"]!!,
+                                    buttonSize = buttonSize.dp,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val harmData = harmDatas[cursor]
+                                    harmTypeDialogData.value = ListDialogData(
+                                        true,
+                                        styleNames,
+                                        harmData.style.ordinal,
+                                        lang.selectHarmonizationStyle
+                                    ) { newHarmonizationStyle ->
+                                        val newHarmDatas = harmDatas.toMutableList()
+                                        newHarmDatas[cursor] =
+                                            harmDatas[cursor].copy(style = HarmonizationStyle.values()[newHarmonizationStyle])
                                         harmDatas = newHarmDatas
                                         ListDialogData(itemList = harmTypeDialogData.value.itemList)
                                     }

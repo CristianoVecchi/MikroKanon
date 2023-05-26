@@ -11,7 +11,7 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
     barGroups.forEachIndexed{ index, barGroup ->
         val harmonizationData = harmonizations[index]
         val harmonizationType = harmonizationData.type
-        val harmonizationStyle = HarmonizationStyle.ASCENDING
+        val harmonizationStyle = harmonizationData.style
         val octaves = harmonizationData.convertFromOctavesByte()
         if (harmonizationType != HarmonizationType.NONE){
             val diffChordVelocity = 40 - (harmonizationData.volume * 40).toInt()  // 1f = 0, 0f = 40
@@ -19,12 +19,12 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
             val chordsInstrument = harmonizationData.instrument
             when(harmonizationStyle){
                 HarmonizationStyle.FULL_CHORDS -> when (harmonizationType){
-                    HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, false, chordsInstrument, diffChordVelocity, justVoicing)
-                    HarmonizationType.POP7 -> createPopChordsTrack(chordsTrack, barGroup, true,chordsInstrument, diffChordVelocity, justVoicing)
-                    HarmonizationType.JAZZ -> createJazzChordsTrack(chordsTrack, barGroup, false, chordsInstrument, diffChordVelocity, justVoicing)
-                    HarmonizationType.JAZZ11 -> createJazzChordsTrack(chordsTrack, barGroup, true, chordsInstrument, diffChordVelocity, justVoicing)
-                    HarmonizationType.XWH -> createExtendedWeightedHarmonyTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity, justVoicing)
-                    HarmonizationType.FULL12 -> createFull12HarmonizedTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity)
+                    HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, false, chordsInstrument, diffChordVelocity, justVoicing, octaves)
+                    HarmonizationType.POP7 -> createPopChordsTrack(chordsTrack, barGroup, true,chordsInstrument, diffChordVelocity, justVoicing, octaves)
+                    HarmonizationType.JAZZ -> createJazzChordsTrack(chordsTrack, barGroup, false, chordsInstrument, diffChordVelocity, justVoicing, octaves)
+                    HarmonizationType.JAZZ11 -> createJazzChordsTrack(chordsTrack, barGroup, true, chordsInstrument, diffChordVelocity, justVoicing, octaves)
+                    HarmonizationType.XWH -> createExtendedWeightedHarmonyTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity, justVoicing, octaves)
+                    HarmonizationType.FULL12 -> createFull12HarmonizedTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity, octaves)
                     else -> {}
                 }
                 HarmonizationStyle.ASCENDING -> {
@@ -111,9 +111,10 @@ fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, 
         this.add(chordsTrack)
     }
 }
-fun createFull12HarmonizedTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: Int, diffChordVelocity: Int){
+fun createFull12HarmonizedTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: Int, diffChordVelocity: Int, octaves: List<Int>){
     data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
     val notes = mutableListOf<Note>()
+    val actualOctaves = octaves.map{ it +1 }
     for (absPitch in 0..11) {
         val contains = BooleanArray(bars.size) { false }
         bars.forEachIndexed { index, bar ->
@@ -153,7 +154,7 @@ fun createFull12HarmonizedTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrum
         val absPitch = it.pitch
         val tick = it.tick
         val duration = it.duration
-        for (octave in 2..8) {
+        actualOctaves.forEach { octave ->
             Player.insertNoteWithGlissando(
                 chordsTrack, tick, duration, chordsChannel,
                 octave * 12 + absPitch, it.velocity - diffChordVelocity, 70, 0
@@ -162,7 +163,7 @@ fun createFull12HarmonizedTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrum
     }
 }
 fun createExtendedWeightedHarmonyTrack(chordsTrack: MidiTrack, bars: List<Bar>, instrument: Int,
-                                       diffChordVelocity: Int, justVoicing: Boolean){
+                                       diffChordVelocity: Int, justVoicing: Boolean, octaves: List<Int>){
     val priority = intArrayOf(5, 8, 2, 10, 6, 4, 1, 11, 9, 7, 3, 0)
     var lastRoot = (Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
     val roots = mutableListOf<Int>()
@@ -202,10 +203,10 @@ fun createExtendedWeightedHarmonyTrack(chordsTrack: MidiTrack, bars: List<Bar>, 
 
 //    println("${bars.map{ convertFlagsToInts(it.dodecaByte1stHalf!!)}}")
 //    println("XWH roots: $roots")
-    findExtendedWeightedHarmonyNotes(chordsTrack, chordsChannel, bars, roots, diffChordVelocity, diffChordVelocity / 2, justVoicing)
+    findExtendedWeightedHarmonyNotes(chordsTrack, chordsChannel, bars, roots, diffChordVelocity, diffChordVelocity / 2, justVoicing, octaves)
 }
 fun createPopChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, with7: Boolean = true, instrument: Int,
-                         diffChordVelocity: Int, justVoicing: Boolean){
+                         diffChordVelocity: Int, justVoicing: Boolean, octaves: List<Int>){
     var priority = priorityFrom2and5Just7 // assuming a dominant chord previously
     var lastRoot = (Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
     var previousChord = JazzChord.EMPTY
@@ -227,11 +228,11 @@ fun createPopChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, with7: Boolean
     val chordsChannel = 15
     val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento
     chordsTrack.insertEvent(pc)
-    findChordNotes(chordsTrack, chordsChannel, bars, diffChordVelocity, diffChordVelocity / 2, justVoicing)
+    findChordNotes(chordsTrack, chordsChannel, bars, diffChordVelocity, diffChordVelocity / 2, justVoicing, octaves)
 }
 
 fun createJazzChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, with11: Boolean = true, instrument: Int,
-                          diffChordVelocity: Int, justVoicing: Boolean){
+                          diffChordVelocity: Int, justVoicing: Boolean, octaves: List<Int>){
     var priority = priorityFrom2and5 // assuming a dominant chord previously
     var lastRoot = (Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
     var previousChord = JazzChord.EMPTY
@@ -255,5 +256,5 @@ fun createJazzChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, with11: Boole
     val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento
 
     chordsTrack.insertEvent(pc)
-    findChordNotes(chordsTrack, chordsChannel, bars, diffChordVelocity, diffChordVelocity / 2, justVoicing)
+    findChordNotes(chordsTrack, chordsChannel, bars, diffChordVelocity, diffChordVelocity / 2, justVoicing, octaves)
 }
