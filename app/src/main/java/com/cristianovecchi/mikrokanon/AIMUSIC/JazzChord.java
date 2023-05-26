@@ -49,6 +49,14 @@ public enum JazzChord {
     public static int[] priorityFromTonicJust7 = {9, 5, 2, 7, 4, 10, 3, 8, 11, 1, 6, 0}; // from Do -> La, Fa, Re, Sol, Mi, Si, Sib, Mib, Lab, Si, Reb, Solb, Do
     public static int[] priorityFrom2and5Just7= {5, 10, 2, 9, 7, 3, 1, 8, 11, 4, 6, 0};//from Sol -> Do, Fa, La, Mi, Re, Sib, Lab, Mib, Solb, Si, Reb, Sol
 
+    public static int[] choosePriority(HarmonizationType harmType){
+        switch (harmType) {
+            case POP: case POP7: return priorityFrom2and5Just7;
+            case JAZZ: case JAZZ11: return priorityFrom2and5;
+            case XWH: return  new int[] {5, 8, 2, 10, 6, 4, 1, 11, 9, 7, 3, 0};
+        }
+        return new int[] {5, 8, 2, 10, 6, 4, 1, 11, 9, 7, 3, 0};
+    }
     // JAZZ
     public static int[] findRootMovementPriority(@NotNull JazzChord previousChord) {
         switch (previousChord){

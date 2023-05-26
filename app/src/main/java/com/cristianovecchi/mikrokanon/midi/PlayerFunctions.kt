@@ -360,6 +360,36 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
             }
         }
 }
+fun findAscendingNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+    //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
+        bars.forEach { println(it) }
+        var lastPitch = -1
+        val actualOctaves = octaves.map{ it +1 }
+            .also{println("Octaves: $octaves -> Actual octaves: $it")}
+        bars.forEachIndexed { i, bar ->
+            val barDur = bar.duration
+            var pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)} else absPitches[i]
+            if(pitches.isNotEmpty()){
+                val durs = barDur.divideDistributingRest(pitches.size)
+                var tick = bar.tick
+                pitches = if(pitches.first() == lastPitch) pitches.shiftCycling() else pitches
+                    pitches.forEachIndexed { j, absPitch ->
+                        val duration = durs[j]
+                        val velocity = (bar.minVelocity!! - diffRootVelocity).coerceIn(0,127)
+                        actualOctaves.forEach{ octave ->
+                            Player.insertNoteWithGlissando(
+                                chordsTrack, tick, duration, chordsChannel,
+                                octave * 12 + absPitch, velocity, 70, 0
+                            )
+                        }
+                        tick += duration
+                    }
+            }
+            lastPitch = pitches.last()
+        }
+
+}
 fun findChordNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>,
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
     data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)

@@ -309,6 +309,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     BASIC_3_64(RhythmType.BASIC,"Basic 3/64", listOf(90), Pair(3,64)),
     BASIC_64(RhythmType.BASIC,"Basic 64", listOf(30), Pair(1,64)),
     BASIC_128(RhythmType.BASIC,"Basic 128", listOf(15), Pair(1,128)),
+
     PLAIN_2_4_R4(RhythmType.PLAIN,"Plain 2/4♩♩", listOf(480,480), METRO_2_4),
     PLAIN_3_4_R4(RhythmType.PLAIN,"Plain 3/4♩♩♩", listOf(480,480,480), METRO_3_4),
     PLAIN_4_4_R4(RhythmType.PLAIN,"Plain 4/4♩♩♩♩", listOf(480,480,480,480)),
@@ -344,6 +345,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     PLAIN_6_16_R8_16(RhythmType.PLAIN,"Plain 6/16♪16", listOf(240,120,240,120), Pair(6,16)),
     PLAIN_9_16_R8_16(RhythmType.PLAIN,"Plain 9/16♪16", listOf(240,120,240,120,240,120), Pair(9,16)),
     PLAIN_12_16_R8_16(RhythmType.PLAIN,"Plain 12/16♪16", listOf(240,120,240,120,240,120,240,120), Pair(12,16)),
+
     STACCATO_2_8_R8(RhythmType.BALLET,"Staccato 2/8♪",listOf(60,-180,60,-180), Pair(2,8)),
     STACCATO_3_8_R8(RhythmType.BALLET,"Staccato 3/8♪",listOf(60,-180,60,-180,60,-180), Pair(3,8)),
     STACCATO_2_4_R8(RhythmType.BALLET,"Staccato 2/4♪",listOf(60,-180,60,-180,60,-180,60,-180), METRO_2_4),
@@ -373,6 +375,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     GRAZIOSETTO_FLUX_4564(RhythmType.BALLET,"Graziosetto Flux 4565",listOf(N4graziosetto, N5graziosetto, N6graziosetto, N5graziosetto).flatten(), Pair(4,4)),
     GRAZIOSETTO_FLUX_345654(RhythmType.BALLET,"Graziosetto Flux 345654",listOf(N3graziosetto, N4graziosetto, N5graziosetto, N6graziosetto, N5graziosetto, N4graziosetto).flatten(), Pair(3,4)),
     GRAZIOSETTO_FLUX_23456543(RhythmType.BALLET,"Graziosetto Flux 23456543",listOf(N2grazioso, N3graziosetto, N4graziosetto, N5graziosetto, N6graziosetto, N5graziosetto, N4graziosetto, N3graziosetto).flatten()),
+
     DOTTED1_1_4(RhythmType.PUNTATO,"Dotted1 1/4", listOf(360,120), Pair(1,4)),
     DOTTED1_2_4(RhythmType.PUNTATO,"Dotted1 2/4", listOf(360,120,360,120), METRO_2_4),
     DOTTED1_3_4(RhythmType.PUNTATO,"Dotted1 3/4", listOf(360,120,360,120,360,120), METRO_3_4),
@@ -398,20 +401,22 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
         listOf(N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N6rhythmDotted, N5rhythmDotted,N4rhythmDotted,N3rhythmDotted,).flatten()),
     DOTTED_FLUX_1234565432(RhythmType.PUNTATO,"Dotted Flux 1234565432",
         listOf(N1rhythmDotted,N2rhythmDotted, N3rhythmDotted, N4rhythmDotted, N5rhythmDotted, N6rhythmDotted, N5rhythmDotted,N4rhythmDotted, N3rhythmDotted, N2rhythmDotted).flatten(),Pair(5,4)),
+
     MIXED_8_8T(RhythmType.MIX, "Mix 3/8 (♪+♪t)", listOf(240, 160,160,160), Pair(3,8)),
     MIXED_3X8_8T(RhythmType.MIX, "Mix 5/8 (3♪+♪t)", listOf(240,240,240, 160,160,160), Pair(5,8)),
     MIXED_8T_16(RhythmType.MIX, "Mix 5/16 (♪t+16)", listOf(160,160,160, 120), Pair(5,16)),
     MIXED_8T_3X16(RhythmType.MIX, "Mix 7/16 (♪t+3X16)", listOf(160,160,160, 120,120,120), Pair(7,16)),
     MIXED_16_16T(RhythmType.MIX, "Mix 3/16 (16+16t)", listOf(120, 80,80,80), Pair(3,16)),
     MIXED_3X16_16T(RhythmType.MIX, "Mix 5/16 (3X16+16t)", listOf(120,120,120, 80,80,80), Pair(5,16)),
+
     SNARE(RhythmType.DANCE,"Snare", listOf(90,-30, 30,-30,30,-30, 90,-30, 30,-30,30,-30, 90,-30, 30,-30,30,-30, 30,-30,30,-30, 30,-30,30,-30), Pair(2,4)),
     CANCAN(RhythmType.DANCE,"Cancan", listOf(listOf(360,-120),N4graziosetto, N2détaché, N4graziosetto, N2détaché, N4graziosetto, N4staccatissimo, N4staccatissimo).flatten(),Pair(4,8)),
-
     HABANERA(RhythmType.DANCE,"Habanera", listOf(360,120,60,-180,60,-180), Pair(2,4)),
     SARABANDA(RhythmType.DANCE,"Sarabanda", listOf(360,-120,480,-240,240, 360,-120, 720,-240), Pair(3,4)),
     SICILIANA(RhythmType.DANCE,"Siciliana", listOf(240,60,-60, 120,120,60,-60, 240,60,-60, 120,120,60,-60, 180,-60,60,-60, 180,-60,60,-60,  120,120,60,-180,120,60,-60,
         240,60,-60, 120,120,60,-60, 240,60,-60, 120,120,60,-60, 120,120,60,-60,120,120,60,-60, 240,-240,120,60,-60), Pair(6,16)),
     GET5(RhythmType.DANCE,"Get Five",listOf(120,240,120,180,-60,180,-60,180,-60), Pair(5,8)),
+
     MAPLE_LEAF_1(RhythmType.RAGTIME,"Maple Leaf 1", listOf(-120,120,120,120, 120,240,120, 120,120,120,600), Pair(2,4)),
     MAPLE_LEAF_2(RhythmType.RAGTIME,"Maple Leaf 2", listOf(-120,120,120,120,120,240,120, 120,120,120,240,120,120,120 ), Pair(2,4)),
     MAPLE_LEAF_3(RhythmType.RAGTIME,"Maple Leaf 3", listOf(180,-60,180,-60, 180,-60,120,240,120,120,120, 120,240,240,120,120,120, 120,240,120, 120,120,180,-60, 180, -180,120), Pair(2,4)),
@@ -468,7 +473,10 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     MONTUNO_2BOW(RhythmType.LATIN,"Montuno 2♫♫", listOf(Ox2bow,listOf(120,120),Ostaccato,listOf(120,120),Ox2bow,Ox2bow,Ox2bow,Ox2bow,Ox2bow,O).flatten(), Pair(4,4)),
     MONTUNO_3BOW(RhythmType.LATIN,"Montuno 3♫♫", listOf(Ox4bow,Orest,Ox2bow,Ostaccato, Orest,Ox3bow,Orest,Ox2bow,O).flatten(), Pair(4,4)),
     MONTUNO_4BOW(RhythmType.LATIN,"Montuno 4♫♫", listOf(Ox4bow,Orest,Ox2bow,Ostaccato, Orest,Ox4bow,Ox4bow,Ox3bow,Orest,Ox2bow,Ostaccato, Orest,Ox2bow,Ostaccato,Orest,Ox2bow,O).flatten(), Pair(4,4)),
-
+    MILONGA(RhythmType.LATIN,"Milonga", listOf(360,120,60,-180,120,60,-60), Pair(2,4)),
+    MILONGA_BOW(RhythmType.LATIN,"Milonga ♫♫", listOf(Ohx3bow, listOf(300,-60),Ohx2bow).flatten(), Pair(2,4)),
+    TANGO_1(RhythmType.LATIN,"Tango 1", listOf(360,120,60,-180,60,-180, 120,240,120,60,-180, 120,60,-60), Pair(2,4)),
+    TANGO_2(RhythmType.LATIN,"Tango 2", listOf(60,-180,60,-180,60,-180,240, -120,240,60,60, 240,60,-60,60,60), Pair(2,4)),
 
     JUPITER(RhythmType.QUOTE,"Jupiter",listOf(N1,listOf(-240,80,80,80),N1,listOf(-240,80,80,80),N1,listOf(-1200,180,-60, 720,240,720,180,-60,960,480,-480)).flatten()),
     SCHERZO(RhythmType.QUOTE,"Scherzo",listOf(listOf(360,60,-60,60,-180), Ox3staccato, Ox3staccato).flatten(), Pair(3,8)),
@@ -487,6 +495,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     JINGLE_BELLS_4(RhythmType.QUOTE,"Jingle Bells 4",listOf(180,-60,180,-60,180,-60,180,-60,900,-60, 180,-60,180,-60,180,-60,180,-60,900,-60, 180,-60,180,-60,180,-60,180,-60, 900,-60, 180,-60,180,-60,180,-60,180,-60,900,-60), Pair(4,4)),
     JINGLE_BELLS_5(RhythmType.QUOTE,"Jingle Bells 5",listOf(180,-60,180,-60,180,-60,180,-60,780,-60,60,-60, 180,-60,180,-60,180,-60,180,-60,660,-60,60,-60,60,-60, 180,-60,180,-60,180,-60,180,-60,180,-60,180,-60,180,-60,60,-60,60,-60,180,-60,180,-60,180,-60,180,-60,480,420,-60), Pair(4,4)),
     SOS(RhythmType.QUOTE,"SOS",listOf(90, -30,90, -30,90, -30,-120, 180,-60,180,-60,180,-300, 90, -30,90, -30,90, -630), Pair(5,4)),
+
     BULGARIAN1(RhythmType.BULGARIAN,"Bulgarian1 4+2+3♫",listOf(H1,N1,N1dotted).flatten(),Pair(9,8)),
     BULGARIAN2(RhythmType.BULGARIAN,"Bulgarian2 2+2+3♫",listOf(N1,N1,N1dotted).flatten(),Pair(7,8)),
     BULGARIAN3(RhythmType.BULGARIAN,"Bulgarian3 2+3♫",listOf(N1,N1dotted).flatten(),Pair(5,8)),
@@ -538,7 +547,6 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
     FIBONACCI_N13(RhythmType.MATH,"Fibonacci<13", listOf(120,120,240,360,600,960,1560), Pair(11,16)), // 33
     FIBONACCI_N21(RhythmType.MATH,"Fibonacci<21", listOf(120,120,240,360,600,960,1560,2520), Pair(9,16)), // 54
     FIBONACCI_N34(RhythmType.MATH,"Fibonacci<34", listOf(120,120,240,360,600,960,1560,2520,4080), Pair(2,4)), // 88
-
     FIBONACCI_N8_1(RhythmType.MATH,"Fibonacci<8>", listOf(120,120,240,360,600,960, 600,360,240,120), Pair(1,16)), // 31
     FIBONACCI_N13_1(RhythmType.MATH,"Fibonacci<13>", listOf(120,120,240,360,600,960,1560, 960,600,360,240,120 ), Pair(2,8)), // 52
     FIBONACCI_N21_1(RhythmType.MATH,"Fibonacci<21>", listOf(120,120,240,360,600,960,1560,2520, 1560,960,600,360,240,120), Pair(2,16)), // 86

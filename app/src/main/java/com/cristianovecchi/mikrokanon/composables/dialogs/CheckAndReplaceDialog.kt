@@ -154,6 +154,8 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                     }
                     Column(
                         modifier = modifierB.fillMaxWidth(),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ){
                         val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
                         val buttonSize = dimensions.dialogButtonSize

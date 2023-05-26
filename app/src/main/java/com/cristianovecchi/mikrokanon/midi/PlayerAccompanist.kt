@@ -10,22 +10,88 @@ import com.leff.midi.event.ProgramChange
 fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>, harmonizations: List<HarmonizationData>, justVoicing: Boolean){
     barGroups.forEachIndexed{ index, barGroup ->
         val harmonizationData = harmonizations[index]
-        if (harmonizationData.type != HarmonizationType.NONE){
+        val harmonizationType = harmonizationData.type
+        val harmonizationStyle = HarmonizationStyle.ASCENDING
+        val octaves = harmonizationData.convertFromOctavesByte()
+        if (harmonizationType != HarmonizationType.NONE){
             val diffChordVelocity = 40 - (harmonizationData.volume * 40).toInt()  // 1f = 0, 0f = 40
            // println("diff: $diffChordVelocity")
             val chordsInstrument = harmonizationData.instrument
-            when (harmonizationData.type){
-                HarmonizationType.NONE -> Unit
-                HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, false, chordsInstrument, diffChordVelocity, justVoicing)
-                HarmonizationType.POP7 -> createPopChordsTrack(chordsTrack, barGroup, true,chordsInstrument, diffChordVelocity, justVoicing)
-                HarmonizationType.JAZZ -> createJazzChordsTrack(chordsTrack, barGroup, false, chordsInstrument, diffChordVelocity, justVoicing)
-                HarmonizationType.JAZZ11 -> createJazzChordsTrack(chordsTrack, barGroup, true, chordsInstrument, diffChordVelocity, justVoicing)
-                HarmonizationType.XWH -> createExtendedWeightedHarmonyTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity, justVoicing)
-                HarmonizationType.FULL12 -> createFull12HarmonizedTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity)
+            when(harmonizationStyle){
+                HarmonizationStyle.FULL_CHORDS -> when (harmonizationType){
+                    HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, false, chordsInstrument, diffChordVelocity, justVoicing)
+                    HarmonizationType.POP7 -> createPopChordsTrack(chordsTrack, barGroup, true,chordsInstrument, diffChordVelocity, justVoicing)
+                    HarmonizationType.JAZZ -> createJazzChordsTrack(chordsTrack, barGroup, false, chordsInstrument, diffChordVelocity, justVoicing)
+                    HarmonizationType.JAZZ11 -> createJazzChordsTrack(chordsTrack, barGroup, true, chordsInstrument, diffChordVelocity, justVoicing)
+                    HarmonizationType.XWH -> createExtendedWeightedHarmonyTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity, justVoicing)
+                    HarmonizationType.FULL12 -> createFull12HarmonizedTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity)
+                    else -> {}
+                }
+                HarmonizationStyle.ASCENDING -> {
+                    barGroup.findChordSequence(harmonizationType)
+                    val absPitches: List<List<Int>> = when (harmonizationType){
+                        HarmonizationType.XWH -> {
+                           barGroup.map { bar ->
+                               val root = bar.chord1!!.root
+                               val pitches = Insieme.absPitchesFromDodecaByte(bar.dodecaByte1stHalf!!).toMutableList()
+                               if(!pitches.contains(root)){pitches.add(root)}
+                               pitches.sorted()
+                                   .also{
+                                       println(it)
+                                   }
+                           }
+                        }
+                        HarmonizationType.FULL12 -> {
+                            barGroup.map { bar ->
+                                Insieme.absPitchesFromDodecaByte(bar.dodecaByte1stHalf!! xor 0B111111111111 ).toList().
+                                also{
+                                   println("${bar.dodecaByte1stHalf!!.toString(2)} -> ${(bar.dodecaByte1stHalf!! xor 0B111111111111).toString(2)}")
+                                }
+                            }
+                        }
+                        else -> {
+                            barGroup.map { bar -> bar.extractChordAbsPitches().also{println(it)} }
+                        }
+                    }
+                    val chordsChannel = 15
+                    val pc: MidiEvent = ProgramChange(barGroup[0].tick, chordsChannel, chordsInstrument) // cambia strumento
+                    chordsTrack.insertEvent(pc)
+                    findAscendingNotes(chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing)
+                }
+
             }
+
         }
     }
 }
+
+//private fun List<Int>.selectAbsPitchesFromDodecaBytes(type: HarmonizationType): List<List<Int>> {
+//    return when(type){
+//        HarmonizationType.FULL12, HarmonizationType.NONE -> this.map{ Insieme.absPitchesFromDodecaByte(it).toList()}
+//        else -> {
+//           val nToTake = when(type){
+//               HarmonizationType.POP -> 3
+//               HarmonizationType.POP7 -> 4
+//               HarmonizationType.JAZZ -> 6
+//               HarmonizationType.JAZZ11 -> 7
+//               HarmonizationType.XWH -> 5
+//               else -> Int.MAX_VALUE
+//           }
+//            emptyList<>()
+//        }
+//    }
+//
+//}
+
+//private fun Int.selectAbsPitchesFromDodecaByte(type: HarmonizationType): List<Int> {
+//    val pitches = Insieme.absPitchesFromDodecaByte(this)
+//    val sortedPitches = when(type){
+//        HarmonizationType.FULL12, HarmonizationType.NONE -> pitches
+//        else ->
+//    }
+//}
+
 fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, bars: List<Bar>,
                                        trackData: List<TrackData>, audio8D: List<Int>,
                                        totalLength: Long, justVoicing: Boolean){

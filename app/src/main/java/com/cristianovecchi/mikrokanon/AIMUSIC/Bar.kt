@@ -128,6 +128,87 @@ data class Bar(var metro: Pair<Int,Int> = METRO_4_4, val tick: Long, var duratio
         }
         return chordFaultsGrid
     }
+    fun extractChordAbsPitches(): List<Int>{
+        return if (this.chord1 == null) {
+            emptyList()
+        } else this.chord1!!.absoluteNotes.toList()
+    }
+}
 
+fun List<Bar>.findChordSequence(harmonizationType: HarmonizationType){
+    if(harmonizationType == HarmonizationType.NONE || harmonizationType == HarmonizationType.FULL12 || this.isEmpty()) return
+    var priority = JazzChord.choosePriority(harmonizationType)
+    var lastRoot = (Insieme.trovaFond(this[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
+    val roots = mutableListOf<Int>()
+    var previousChord = JazzChord.EMPTY
+    when (harmonizationType){
+        HarmonizationType.POP, HarmonizationType.POP7 -> {
+            val selectChordArea = if(harmonizationType == HarmonizationType.POP7) {
+                previousChord: JazzChord -> JazzChord.selectChordArea_just_7(previousChord)}
+            else {
+                previousChord:JazzChord -> JazzChord.selectChordArea_no_7(previousChord)}
+            this.forEach {
+                val jazzChords = selectChordArea(previousChord)
+                val chordFaultsGrid =  it.findChordFaultsGrid(jazzChords)
+                priority = JazzChord.findRootMovementPriorityJust7(previousChord)
+                val chordPosition = chordFaultsGrid.findBestChordPosition(lastRoot, priority)
+                val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
+                it.chord1 = chord
+                lastRoot = chordPosition.first
+                previousChord = chord.chord
+                //println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+            }
+        }
+        HarmonizationType.JAZZ, HarmonizationType.JAZZ11 -> {
+            val selectChordArea = if(harmonizationType == HarmonizationType.JAZZ11) {
+                    prevChord: JazzChord -> JazzChord.selectChordArea_11(previousChord)}
+            else {
+                    prevChord:JazzChord -> JazzChord.selectChordArea_no_11(previousChord)}
+            this.forEach {
+                val jazzChords = selectChordArea(previousChord)
+                val chordFaultsGrid =  it.findChordFaultsGrid(jazzChords)
+                priority = JazzChord.findRootMovementPriority(previousChord)
+                val chordPosition = chordFaultsGrid.findBestChordPosition(lastRoot, priority)
+                val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
+                it.chord1 = chord
+                lastRoot = chordPosition.first
+                previousChord = chord.chord
+//        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+            }
+        }
+        HarmonizationType.XWH -> {
+            this.forEachIndexed { i, bar ->
+                ///val ewhChords = selectChordArea(previousChord)
+                //println("Bar $i: ${bar.dodecaByte1stHalf!!.toString(2)}")
+                val bools = HarmonyEye.selNotesFrom12Byte(bar.dodecaByte1stHalf!!)//.apply {
+                //println(this.contentToString()) }
+
+                val harmonyResults = (0..11).map{
+                    val boolsWithRoot = bools.reversedArray()
+                    boolsWithRoot[it] = true
+                    HarmonyEye.findHarmonyResult(boolsWithRoot)
+                        .apply {
+                            this.dodecaByte = bar.dodecaByte1stHalf!! or (1 shl it)}
+                }
+//        harmonyResults.forEach{
+//            println("HarResult ${it.roots.contentToString()} ${it.weight} ${it.dodecaByte.toString(2)}")
+//        }
+                val sortedHarmonyResults = harmonyResults.sortedBy { it.weight }
+                val priorityTransposed = priority.map{ (it + lastRoot) % 12}
+                rootSearch@ for( priorityTr in priorityTransposed){
+                    for(result in sortedHarmonyResults){
+                        if (result.roots.contains(priorityTr)){
+                            roots.add(priorityTr)
+                            lastRoot = priorityTr
+                            bar.dodecaByte1stHalf = result.dodecaByte
+                            bar.chord1 = Chord(priorityTr, JazzChord.EMPTY)
+                            break@rootSearch
+                        }
+                    }
+                }
+            }
+        }
+        else -> return
+    }
 }
 
