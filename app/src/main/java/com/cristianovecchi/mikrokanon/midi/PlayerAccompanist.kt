@@ -27,7 +27,8 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     HarmonizationType.FULL12 -> createFull12HarmonizedTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity, octaves)
                     else -> {}
                 }
-                HarmonizationStyle.ASCENDING -> {
+                HarmonizationStyle.ASCENDING, HarmonizationStyle.DESCENDING, HarmonizationStyle.RANDOM,
+                HarmonizationStyle.ASCENDING_RIVER, HarmonizationStyle.DESCENDING_RIVER, HarmonizationStyle.RANDOM_RIVER -> {
                     barGroup.findChordSequence(harmonizationType)
                     val absPitches: List<List<Int>> = when (harmonizationType){
                         HarmonizationType.XWH -> {
@@ -56,7 +57,7 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     val chordsChannel = 15
                     val pc: MidiEvent = ProgramChange(barGroup[0].tick, chordsChannel, chordsInstrument) // cambia strumento
                     chordsTrack.insertEvent(pc)
-                    findAscendingNotes(chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                    findNoteLine(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing)
                 }
 

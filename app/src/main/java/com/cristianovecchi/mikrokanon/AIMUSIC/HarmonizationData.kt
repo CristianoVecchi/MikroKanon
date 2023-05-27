@@ -11,7 +11,12 @@ enum class HarmonizationType(val title: String) {
 }
 enum class HarmonizationStyle(val title: String) {
     FULL_CHORDS("Full chords"),
-    ASCENDING("Ascending")
+    ASCENDING("Ascending"),
+    DESCENDING("Descending"),
+    RANDOM("Random Flow"),
+    ASCENDING_RIVER("Asc. River"),
+    DESCENDING_RIVER("Desc. River"),
+    RANDOM_RIVER("Random River")
 }
 
 val starredChordsInstruments = listOf(

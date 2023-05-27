@@ -369,32 +369,60 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
             }
         }
 }
-fun findAscendingNotes(chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+fun findNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
-        bars.forEach { println(it) }
+        //bars.forEach { println(it) }
         var lastPitch = -1
         val actualOctaves = octaves.map{ it +1 }
-            .also{println("Octaves: $octaves -> Actual octaves: $it")}
+        val isRiver = when(harmonizationStyle){
+            HarmonizationStyle.ASCENDING_RIVER, HarmonizationStyle.DESCENDING_RIVER, HarmonizationStyle.RANDOM_RIVER -> true
+            else -> false
+        }
+            //.also{println("Octaves: $octaves -> Actual octaves: $it")}
         bars.forEachIndexed { i, bar ->
             val barDur = bar.duration
-            var pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)} else absPitches[i]
+            var pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+                else {
+                    when (harmonizationStyle){
+                        HarmonizationStyle.DESCENDING, HarmonizationStyle.DESCENDING_RIVER ->  absPitches[i].reversed()
+                        HarmonizationStyle.RANDOM, HarmonizationStyle.RANDOM_RIVER ->  absPitches[i].shuffled()
+                        else -> absPitches[i]
+                    }
+                }
             if(pitches.isNotEmpty()){
                 val durs = barDur.divideDistributingRest(pitches.size)
-                var tick = bar.tick
-                pitches = if(pitches.first() == lastPitch) pitches.shiftCycling() else pitches
-                pitches.forEachIndexed { j, absPitch ->
-                    val duration = durs[j]
-                    val velocity = (bar.minVelocity!! - diffChordVelocity).coerceIn(0,127)
-                    actualOctaves.forEach{ octave ->
-                        Player.insertNoteWithGlissando(
-                            chordsTrack, tick, duration, chordsChannel,
-                            octave * 12 + absPitch, velocity, 70, 0
-                        )
+                val velocity = (bar.minVelocity!! - diffChordVelocity).coerceIn(0, 127)
+                if(isRiver){
+                    actualOctaves.forEach { octave ->
+                        var tick = bar.tick
+                        //pitches = if(pitches.first() == lastPitch) pitches.shiftCycling() else pitches
+                        pitches.forEachIndexed { j, absPitch ->
+                            val duration = durs[j]
+                            Player.insertNoteWithGlissando(
+                                chordsTrack, tick, duration, chordsChannel,
+                                octave * 12 + absPitch, velocity, 70, 0
+                            )
+                            tick += duration
+                        }
+                        pitches = pitches.shiftCycling()
+                       // lastPitch = pitches.last()
                     }
-                    tick += duration
+                } else {
+                    var tick = bar.tick
+                    pitches = if(pitches.first() == lastPitch) pitches.shiftCycling() else pitches
+                    pitches.forEachIndexed { j, absPitch ->
+                        val duration = durs[j]
+                        actualOctaves.forEach{ octave ->
+                            Player.insertNoteWithGlissando(
+                                chordsTrack, tick, duration, chordsChannel,
+                                octave * 12 + absPitch, velocity, 70, 0
+                            )
+                        }
+                        tick += duration
+                    }
+                    lastPitch = pitches.last()
                 }
-                lastPitch = pitches.last()
             }
 
         }
