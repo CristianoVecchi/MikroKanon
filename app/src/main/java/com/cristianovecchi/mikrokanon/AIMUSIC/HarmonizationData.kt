@@ -1,7 +1,5 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
-import kotlin.math.pow
-
 
 enum class HarmonizationType(val title: String) {
     NONE("No Harm."),
@@ -10,13 +8,16 @@ enum class HarmonizationType(val title: String) {
     XWH("XW HARMONY"), FULL12("FULL 12")
 }
 enum class HarmonizationStyle(val title: String) {
-    FULL_CHORDS("Full chords"),
-    ASCENDING("Ascending"),
-    DESCENDING("Descending"),
-    RANDOM("Random Flow"),
-    ASCENDING_RIVER("Asc. River"),
-    DESCENDING_RIVER("Desc. River"),
-    RANDOM_RIVER("Random River")
+    CHORDS("Chords"),
+    DRAMMATICO("Drammatico"),
+    RIBATTUTO("Ribattuto"),
+    TREMOLO("Tremolo"),
+    ASCENDING_LINE("Line➚"),
+    DESCENDING_LINE("Line➘"),
+    RANDOM_LINE("Line~"),
+    ASCENDING_FLOW("Flow➚"),
+    DESCENDING_FLOW("Flow➘"),
+    RANDOM_FLOW("Flow~")
 }
 
 val starredChordsInstruments = listOf(
@@ -37,11 +38,11 @@ fun List<Int>.convertToOctavesByte(): Int {
 }
 data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NONE,
                              val instrument: Int = 48, val volume: Float = 0.1f,
-                             val style: HarmonizationStyle = HarmonizationStyle.FULL_CHORDS,
+                             val style: HarmonizationStyle = HarmonizationStyle.CHORDS,
                              val octavesByte: Int = 248){ // from octave 3 to 7 (numbers 4 to 8)
     fun describe(): String {
         return if(type == HarmonizationType.NONE) "  ---  ${this.type.title}  ---"
-        else "  ---  ${this.type.title}  ---\n${ListaStrumenti.getNameByIndex(this.instrument)} ${String.format("%.0f%%",this.volume*100)}\n[${this.describeOctaves()}] ${this.style.title}"
+        else "${this.type.title} ${this.style.title}\n  ${ListaStrumenti.getNameByIndex(this.instrument)} ${this.describeOctaves()} ${String.format("%.0f%%",this.volume*100)}"
     }
     fun toCsv(): String {
         return "${this.type.ordinal}|${this.instrument}|${this.volume}|${this.style.ordinal}|${this.octavesByte}"
@@ -52,8 +53,9 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
             .also{ println("Converted to: $it") }
     }
     fun describeOctaves(): String {
-        //if(this.octavesByte == 248) return ""
-        return convertFromOctavesByte().joinToString("") { it.toString() }
+
+        if(this.octavesByte == 254) return "∞"
+        return convertFromOctavesByte().joinToString("", "[", "]") { it.toString() }
     }
     companion object{
         fun createHarmonizationsFromCsv(csv: String): List<HarmonizationData>{

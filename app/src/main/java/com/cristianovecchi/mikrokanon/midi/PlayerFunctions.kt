@@ -369,14 +369,47 @@ fun findExtendedWeightedHarmonyNotes(chordsTrack: MidiTrack, chordsChannel: Int,
             }
         }
 }
-fun findNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+fun createRibattuto(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+    val actualOctaves = octaves.map{ it +1 }
+    bars.forEachIndexed { i, bar ->
+        val pitches = absPitches[i]
+        var (steps, stepDur) = when (harmonizationStyle) {
+            HarmonizationStyle.TREMOLO -> bar.metro.first * 4 to RhythmPatterns.denominatorMidiValue(bar.metro.second) / 4
+            HarmonizationStyle.RIBATTUTO -> bar.metro.first * 2 to RhythmPatterns.denominatorMidiValue(bar.metro.second) / 2
+            else -> bar.metro.first to RhythmPatterns.denominatorMidiValue(bar.metro.second)
+        }
+        steps = if(stepDur < 8) (bar.duration.toInt() / 8) else steps
+        stepDur = if(stepDur < 8) (bar.duration.toInt() / steps) else stepDur
+//        val stepDur = RhythmPatterns.denominatorMidiValue(bar.metro.second)
+//        val steps = bar.metro.first
+        val staccatoDur = (stepDur / 4).coerceAtLeast(6).toLong()
+        if(pitches.isNotEmpty()){
+            val velocity = (bar.minVelocity!! - diffChordVelocity).coerceIn(0, 127)
+            var tick = bar.tick
+            (0 until steps).forEach { _ ->
+                println("tick: $tick")
+                actualOctaves.forEach { octave ->
+                    pitches.forEachIndexed { j, absPitch ->
+                        Player.insertNoteWithGlissando(
+                            chordsTrack, tick, staccatoDur, chordsChannel,
+                            octave * 12 + absPitch, velocity, 50, 0
+                        )
+                    }
+                }
+                tick += stepDur
+            }
+        }
+    }
+}
+fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
         //bars.forEach { println(it) }
         var lastPitch = -1
         val actualOctaves = octaves.map{ it +1 }
         val isRiver = when(harmonizationStyle){
-            HarmonizationStyle.ASCENDING_RIVER, HarmonizationStyle.DESCENDING_RIVER, HarmonizationStyle.RANDOM_RIVER -> true
+            HarmonizationStyle.ASCENDING_FLOW, HarmonizationStyle.DESCENDING_FLOW, HarmonizationStyle.RANDOM_FLOW -> true
             else -> false
         }
             //.also{println("Octaves: $octaves -> Actual octaves: $it")}
@@ -385,8 +418,8 @@ fun findNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack,
             var pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
                 else {
                     when (harmonizationStyle){
-                        HarmonizationStyle.DESCENDING, HarmonizationStyle.DESCENDING_RIVER ->  absPitches[i].reversed()
-                        HarmonizationStyle.RANDOM, HarmonizationStyle.RANDOM_RIVER ->  absPitches[i].shuffled()
+                        HarmonizationStyle.DESCENDING_LINE, HarmonizationStyle.DESCENDING_FLOW ->  absPitches[i].reversed()
+                        HarmonizationStyle.RANDOM_LINE, HarmonizationStyle.RANDOM_FLOW ->  absPitches[i].shuffled()
                         else -> absPitches[i]
                     }
                 }
