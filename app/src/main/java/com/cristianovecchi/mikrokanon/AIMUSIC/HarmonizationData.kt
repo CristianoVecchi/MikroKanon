@@ -12,12 +12,18 @@ enum class HarmonizationStyle(val title: String) {
     DRAMMATICO("Drammatico"),
     RIBATTUTO("Ribattuto"),
     TREMOLO("Tremolo"),
+    ASCENDING_ARPEGGIO("Arpeggio➚"),
+    DESCENDING_ARPEGGIO("Arpeggio➘"),
     ASCENDING_LINE("Line➚"),
     DESCENDING_LINE("Line➘"),
     RANDOM_LINE("Line~"),
     ASCENDING_FLOW("Flow➚"),
     DESCENDING_FLOW("Flow➘"),
-    RANDOM_FLOW("Flow~")
+    RANDOM_FLOW("Flow~"),
+    ASCENDING_BICINIUM("Bicinium➚"),
+    DESCENDING_BICINIUM("Bicinium➘"),
+    RANDOM_BICINIUM("Bicinium~")
+
 }
 
 val starredChordsInstruments = listOf(
@@ -59,6 +65,7 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
     }
     companion object{
         fun createHarmonizationsFromCsv(csv: String): List<HarmonizationData>{
+            println("Harmonization csv: $csv")
             if(csv.isBlank()) return listOf()
             val values = csv.split(",")
             val harmValues = HarmonizationType.values()

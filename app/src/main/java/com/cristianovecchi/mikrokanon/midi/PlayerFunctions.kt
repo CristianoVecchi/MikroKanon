@@ -12,6 +12,7 @@ import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -388,7 +389,7 @@ fun createRibattuto(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
             val velocity = (bar.minVelocity!! - diffChordVelocity).coerceIn(0, 127)
             var tick = bar.tick
             (0 until steps).forEach { _ ->
-                println("tick: $tick")
+                //println("tick: $tick")
                 actualOctaves.forEach { octave ->
                     pitches.forEachIndexed { j, absPitch ->
                         Player.insertNoteWithGlissando(
@@ -402,31 +403,144 @@ fun createRibattuto(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
         }
     }
 }
+fun createArpeggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+    val actualOctaves = if(harmonizationStyle == HarmonizationStyle.DESCENDING_ARPEGGIO) octaves.map{ it +1 }.reversed() else octaves.map{ it +1 }
+    bars.forEachIndexed { i, bar ->
+        //println("BAR #$i dur:${bar.duration}")
+        val barDur = bar.duration
+        var pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+        else {
+            when (harmonizationStyle){
+                HarmonizationStyle.DESCENDING_ARPEGGIO ->  absPitches[i].sortedDescending()
+                else -> absPitches[i]
+            }
+        }
+        if(pitches.isNotEmpty()){
+            val durs = barDur.divideDistributingRest(pitches.size * actualOctaves.size)
+           // println("note durs: $durs")
+            val velocity = (bar.minVelocity!! - diffChordVelocity + 24).coerceIn(0, 127)
+            var tick = bar.tick
+
+           if(durs.any{it < 4}) {
+               val nNotes = bar.duration.toInt() / 4
+               var noteIndex = 0
+               reductedArpeggio@ for (octave in actualOctaves) {
+                   //println("Octave: $octave")
+                   for(absPitch in pitches) {
+                       //println("${octave * 12 + absPitch}" + "tick:$tick dur:4")
+                       Player.insertNoteWithGlissando(
+                           chordsTrack, tick, 4, chordsChannel,
+                           octave * 12 + absPitch, velocity, 70, 0
+                       )
+                       tick += 4
+                       noteIndex++
+                       if(noteIndex == nNotes) break@reductedArpeggio
+                   }
+               }
+           } else {
+               var durationIndex = 0
+               actualOctaves.forEach { octave ->
+                  // println("Octave: $octave")
+                   pitches.forEach { absPitch ->
+                       val dur = durs[durationIndex]
+                       //println("${octave * 12 + absPitch}" + "tick:$tick dur:$dur")
+                       Player.insertNoteWithGlissando(
+                           chordsTrack, tick, dur, chordsChannel,
+                           octave * 12 + absPitch, velocity, 70, 0
+                       )
+                       durationIndex++
+                       tick += dur
+                   }
+               }
+           }
+        }
+    }
+
+}
+fun createNoteDoubleLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+    var lastPitch1 = -1
+    var lastPitch2 = -1
+    val actualOctaves = octaves.map{ it + 1 }
+    bars.forEachIndexed { i, bar ->
+        val barDur = bar.duration
+        val pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+        else {
+            when (harmonizationStyle){
+                HarmonizationStyle.DESCENDING_BICINIUM ->  absPitches[i].sortedDescending()
+                HarmonizationStyle.RANDOM_BICINIUM ->  absPitches[i].shuffled()
+                else -> absPitches[i]
+            }
+        }.also{println("Original pitches: $it")}
+        if(pitches.isNotEmpty()){
+            val nHalfPitches = pitches.size / 2
+            var pitches1 = pitches.subList(0, nHalfPitches)
+            var pitches2 = pitches.subList(nHalfPitches, pitches.size)
+            println("A:$pitches1 B:$pitches2")
+            val velocity = (bar.minVelocity!! - diffChordVelocity + 12).coerceIn(0, 127)
+            if(pitches1.isNotEmpty()){
+                val durs = barDur.divideDistributingRest(pitches1.size)
+                var tick = bar.tick
+                pitches1 = if(pitches1.first() == lastPitch1) pitches1.shiftCycling() else pitches1
+                pitches1.forEachIndexed { j, absPitch ->
+                    val duration = durs[j]
+                    actualOctaves.forEach{ octave ->
+                        Player.insertNoteWithGlissando(
+                            chordsTrack, tick, duration, chordsChannel,
+                            octave * 12 + absPitch, velocity, 70, 0
+                        )
+                    }
+                    tick += duration
+                }
+                lastPitch1 = pitches1.last()
+            }
+            if(pitches2.isNotEmpty()){
+                val durs = barDur.divideDistributingRest(pitches2.size)
+                var tick = bar.tick
+                pitches2 = if(pitches2.first() == lastPitch2) pitches2.shiftCycling() else pitches2
+                pitches2.forEachIndexed { j, absPitch ->
+                    val duration = durs[j]
+                    actualOctaves.forEach{ octave ->
+                        Player.insertNoteWithGlissando(
+                            chordsTrack, tick, duration, chordsChannel,
+                            octave * 12 + absPitch, velocity, 70, 0
+                        )
+                    }
+                    tick += duration
+                }
+                lastPitch2 = pitches2.last()
+            }
+        }
+    }
+}
 fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
         //bars.forEach { println(it) }
         var lastPitch = -1
         val actualOctaves = octaves.map{ it +1 }
-        val isRiver = when(harmonizationStyle){
+        val isFlow = when(harmonizationStyle){
             HarmonizationStyle.ASCENDING_FLOW, HarmonizationStyle.DESCENDING_FLOW, HarmonizationStyle.RANDOM_FLOW -> true
             else -> false
         }
             //.also{println("Octaves: $octaves -> Actual octaves: $it")}
         bars.forEachIndexed { i, bar ->
+
             val barDur = bar.duration
-            var pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+            var pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
                 else {
                     when (harmonizationStyle){
-                        HarmonizationStyle.DESCENDING_LINE, HarmonizationStyle.DESCENDING_FLOW ->  absPitches[i].reversed()
+                        HarmonizationStyle.DESCENDING_LINE, HarmonizationStyle.DESCENDING_FLOW ->  absPitches[i].sortedDescending()
                         HarmonizationStyle.RANDOM_LINE, HarmonizationStyle.RANDOM_FLOW ->  absPitches[i].shuffled()
                         else -> absPitches[i]
                     }
                 }
             if(pitches.isNotEmpty()){
+                //println("BAR #$i  pitches: $pitches")
                 val durs = barDur.divideDistributingRest(pitches.size)
-                val velocity = (bar.minVelocity!! - diffChordVelocity).coerceIn(0, 127)
-                if(isRiver){
+                val velocity = (bar.minVelocity!! - diffChordVelocity + 12).coerceIn(0, 127)
+                if(isFlow){
                     actualOctaves.forEach { octave ->
                         var tick = bar.tick
                         //pitches = if(pitches.first() == lastPitch) pitches.shiftCycling() else pitches

@@ -28,6 +28,21 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     HarmonizationType.FULL12 -> createFull12HarmonizedTrack(chordsTrack, barGroup, chordsInstrument,  diffChordVelocity, octaves)
                     else -> {}
                 }
+
+                HarmonizationStyle.DRAMMATICO, HarmonizationStyle.RIBATTUTO, HarmonizationStyle.TREMOLO -> {
+                    barGroup.findChordSequence(harmonizationType)
+                    val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
+                    chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
+                    createRibattuto(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing)
+                }
+                HarmonizationStyle.ASCENDING_ARPEGGIO, HarmonizationStyle.DESCENDING_ARPEGGIO ->{
+                    barGroup.findChordSequence(harmonizationType)
+                    val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
+                    chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
+                    createArpeggio(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing)
+                }
                 HarmonizationStyle.ASCENDING_LINE, HarmonizationStyle.DESCENDING_LINE, HarmonizationStyle.RANDOM_LINE,
                 HarmonizationStyle.ASCENDING_FLOW, HarmonizationStyle.DESCENDING_FLOW, HarmonizationStyle.RANDOM_FLOW -> {
                     barGroup.findChordSequence(harmonizationType)
@@ -36,14 +51,13 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     createNoteLine(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing)
                 }
-                HarmonizationStyle.DRAMMATICO, HarmonizationStyle.RIBATTUTO, HarmonizationStyle.TREMOLO -> {
+                HarmonizationStyle.ASCENDING_BICINIUM, HarmonizationStyle.DESCENDING_BICINIUM, HarmonizationStyle.RANDOM_BICINIUM -> {
                     barGroup.findChordSequence(harmonizationType)
                     val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
                     chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
-                    createRibattuto(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                    createNoteDoubleLine(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing)
                 }
-
             }
 
         }
@@ -63,21 +77,21 @@ fun List<Bar>.extractAbsPitchesFromDodecaBytes(type: HarmonizationType): List<Li
                 val pitches = Insieme.absPitchesFromDodecaByte(bar.dodecaByte1stHalf!!).toMutableList()
                 if(!pitches.contains(root)){pitches.add(root)}
                 pitches.sorted()
-                    .also{
-                        println(it)
-                    }
+//                    .also{
+//                        println(it)
+//                    }
             }
         }
         HarmonizationType.FULL12 -> {
             this.map { bar ->
-                Insieme.absPitchesFromDodecaByte(bar.dodecaByte1stHalf!! xor 0B111111111111 ).toList().
-                also{
-                    println("${bar.dodecaByte1stHalf!!.toString(2)} -> ${(bar.dodecaByte1stHalf!! xor 0B111111111111).toString(2)}")
-                }
+                Insieme.absPitchesFromDodecaByte(bar.dodecaByte1stHalf!! xor 0B111111111111 ).toList()
+//                .also{
+//                    println("${bar.dodecaByte1stHalf!!.toString(2)} -> ${(bar.dodecaByte1stHalf!! xor 0B111111111111).toString(2)}")
+//                }
             }
         }
         else -> {
-            this.map { bar -> bar.extractChordAbsPitches().also{println(it)} }
+            this.map { bar -> bar.extractChordAbsPitches().sorted() }
         }
     }
 }
