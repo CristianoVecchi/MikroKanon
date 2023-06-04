@@ -29,11 +29,19 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     else -> {}
                 }
 
-                HarmonizationStyle.DRAMMATICO, HarmonizationStyle.RIBATTUTO, HarmonizationStyle.TREMOLO -> {
+                HarmonizationStyle.DRAMMATICO, HarmonizationStyle.RIBATTUTO, HarmonizationStyle.RIBATTUTO_3,
+                HarmonizationStyle.TREMOLO, HarmonizationStyle.TREMOLO_5, HarmonizationStyle.TREMOLO_6 -> {
                     barGroup.findChordSequence(harmonizationType)
                     val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
                     chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
                     createRibattuto(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing)
+                }
+                HarmonizationStyle.TRILLO -> {
+                    barGroup.findChordSequence(harmonizationType)
+                    val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
+                    chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
+                    createTrillo(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing)
                 }
                 HarmonizationStyle.ASCENDING_ARPEGGIO, HarmonizationStyle.DESCENDING_ARPEGGIO ->{

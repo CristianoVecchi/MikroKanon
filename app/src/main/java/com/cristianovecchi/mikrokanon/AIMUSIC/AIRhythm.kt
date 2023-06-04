@@ -173,7 +173,18 @@ fun findTrillDurations(duration: Int): Pair<List<Int>,Int>{
         in (60..239) -> 3
         in (240..359) -> 5 // 34 - 42
         in (360..479) -> 7 // 32 - 38
-        in (480..Int.MAX_VALUE) -> (480 / 43) * (duration / 480)
+        in (480..Int.MAX_VALUE) -> 11 * (duration / 480) // 480 / 43 == 11
+        else -> -1
+    }
+    return if(div == -1) Pair(listOf(duration), div) else Pair(duration.divideDistributingRest(div), div)
+}
+fun findEvenTrillDurations(duration: Int): Pair<List<Int>,Int>{
+    val div = when(duration){
+        in (0..59) -> -1
+        in (60..239) -> 4
+        in (240..359) -> 6 // 34 - 42
+        in (360..479) -> 8 // 32 - 38
+        in (480..Int.MAX_VALUE) -> 12 * (duration / 480)
         else -> -1
     }
     return if(div == -1) Pair(listOf(duration), div) else Pair(duration.divideDistributingRest(div), div)

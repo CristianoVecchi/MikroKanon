@@ -134,6 +134,15 @@ data class Bar(var metro: Pair<Int,Int> = METRO_4_4, val tick: Long, var duratio
         } else this.chord1!!.absoluteNotes.toList()
     }
 }
+fun List<Bar>.getProgressiveVelocities(index: Int, div: Int, diffChordVelocity: Int): List<Int> {
+    val velocity = (this[index].minVelocity!! - diffChordVelocity).coerceIn(0, 127)
+    val goalVelocity = (this.getNextBarVelocity(index) - diffChordVelocity).coerceIn(0, 127)
+    return accumulateVelocities(div, velocity, goalVelocity - velocity)
+}
+fun List<Bar>.getNextBarVelocity(index: Int): Int {
+    val nextBar = this.getOrNull(index+1)
+    return nextBar?.let { it.minVelocity!! } ?: this[index].minVelocity!!
+}
 
 fun List<Bar>.findChordSequence(harmonizationType: HarmonizationType){
     if(harmonizationType == HarmonizationType.NONE || harmonizationType == HarmonizationType.FULL12 || this.isEmpty()) return
