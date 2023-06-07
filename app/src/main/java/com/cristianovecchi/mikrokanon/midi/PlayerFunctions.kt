@@ -389,7 +389,7 @@ fun createRibattuto(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
 //        val steps = bar.metro.first
         val staccatoDur = (stepDur / 4).coerceAtLeast(6).toLong()
         if(pitches.isNotEmpty()){
-            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity)
+            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, 0)
             var tick = bar.tick
             (0 until steps).forEach { step ->
                 //println("tick: $tick")
@@ -428,7 +428,7 @@ diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
            if(durs.any{it < 4}) {
                val nNotes = bar.duration.toInt() / 4
                var noteIndex = 0
-               val velocities = bars.getProgressiveVelocities(i, nNotes, diffChordVelocity)
+               val velocities = bars.getProgressiveVelocities(i, nNotes, diffChordVelocity, 24)
                reductedArpeggio@ for (octave in actualOctaves) {
                    //println("Octave: $octave")
                    for(absPitch in pitches) {
@@ -444,7 +444,7 @@ diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
                }
            } else {
                var durationIndex = 0
-               val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity)
+               val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, 24)
                actualOctaves.forEach { octave ->
                   // println("Octave: $octave")
                    pitches.forEach { absPitch ->
@@ -486,7 +486,7 @@ fun createNoteDoubleLine(harmonizationStyle: HarmonizationStyle, chordsTrack: Mi
            // println("A:$pitches1 B:$pitches2")
             if(pitches1.isNotEmpty()){
                 val durs = barDur.divideDistributingRest(pitches1.size)
-                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity)
+                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, 10)
                 var tick = bar.tick
                 pitches1 = if(pitches1.first() == lastPitch1) pitches1.shiftCycling() else pitches1
                 pitches1.forEachIndexed { j, absPitch ->
@@ -504,7 +504,7 @@ fun createNoteDoubleLine(harmonizationStyle: HarmonizationStyle, chordsTrack: Mi
             }
             if(pitches2.isNotEmpty()){
                 val durs = barDur.divideDistributingRest(pitches2.size)
-                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity)
+                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, 0)
                 var tick = bar.tick
                 pitches2 = if(pitches2.first() == lastPitch2) pitches2.shiftCycling() else pitches2
                 pitches2.forEachIndexed { j, absPitch ->
@@ -532,7 +532,7 @@ fun createTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack,
         if(pitches.isNotEmpty()){
             val (durs, div) = findEvenTrillDurations(barDur.toInt())
             if (div != -1){
-                val velocities = bars.getProgressiveVelocities(i, div, diffChordVelocity)
+                val velocities = bars.getProgressiveVelocities(i, div, diffChordVelocity, 0)
                 //println("Interval: $velocity - $goalVelocity   Velocities:$velocities")
                 val trills = pitches.chunked(2).also{println("Trills: $it")}
                 val firstNotes = trills.map{ it.first() }
@@ -585,6 +585,53 @@ fun createTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack,
 
     }
 }
+fun createSincopato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+    val actualOctaves = octaves.map{ it +1 }
+    var lastPitch = -1
+    bars.forEachIndexed { i, bar ->
+        val barDur = bar.duration
+        val pitches = if(barDur < 16 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+                        else  absPitches[i]
+        if(pitches.isNotEmpty()){
+            var firstNote = pitches[0]
+            var lastNote = pitches.getOrElse(1) { pitches[0]}
+            if(firstNote == lastPitch) {
+                firstNote -= lastNote
+                lastNote += firstNote
+                firstNote = lastNote - firstNote
+            }
+            val syncopeNotes = if(pitches.size < 3) pitches else pitches.takeLast(pitches.size - 2)
+            //println("Syncope: $firstNote $syncopeNotes $lastNote")
+            val durs = barDur.divideDistributingRest(4)
+            val velocities = bars.getProgressiveVelocities(i, 4, diffChordVelocity, 26)
+            val firstDur = durs[0]
+            val lastDur = durs[3]
+            val syncopeDur = durs[1] + durs[2]
+            actualOctaves.forEach { octave ->
+                var tick = bar.tick
+                val octavePitch = octave * 12
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, firstDur, chordsChannel,
+                    octavePitch + firstNote, velocities[0], 70, 0
+                )
+                tick += firstDur
+                syncopeNotes.forEach { syncopeNote ->
+                    Player.insertNoteWithGlissando(
+                        chordsTrack, tick, syncopeDur, chordsChannel,
+                        octavePitch + syncopeNote, velocities[1], 70, 0
+                    )
+                }
+                tick += syncopeDur
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, lastDur, chordsChannel,
+                    octavePitch + lastNote, velocities[3], 70, 0
+                )
+            }
+            lastPitch = lastNote
+        }
+    }
+}
 fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
@@ -610,7 +657,7 @@ fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
             if(pitches.isNotEmpty()){
                 //println("BAR #$i  pitches: $pitches")
                 val durs = barDur.divideDistributingRest(pitches.size)
-                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity)
+                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, 12)
                 if(isFlow){
                     actualOctaves.forEach { octave ->
                         var tick = bar.tick

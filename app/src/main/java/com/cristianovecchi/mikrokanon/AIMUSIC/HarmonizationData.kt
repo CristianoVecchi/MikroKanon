@@ -15,6 +15,7 @@ enum class HarmonizationStyle(val title: String) {
     TREMOLO("Tremolo"),
     TREMOLO_5("Tremolo 5"),
     TREMOLO_6("Tremolo 6"),
+    SINCOPATO("Sincopato"),
     TRILLO("Trillo"),
     ASCENDING_ARPEGGIO("Arpeggio➚"),
     DESCENDING_ARPEGGIO("Arpeggio➘"),
@@ -37,14 +38,14 @@ val starredChordsInstruments = listOf(
     62,63, 52, 53,54,
     //80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,99,100,101,102,103
 )
-val chordsInstruments = (0..103).toList()
+val chordsInstruments = (0..127).toList()
 
 fun List<Int>.convertToOctavesByte(): Int {
-    println("Octave list: $this")
+    //println("Octave list: $this")
     return this.fold(0){ byte, octave ->
         byte or (1 shl(octave))
     }
-        .also{println("Converted to: "+ it.toString(2))}
+        //.also{println("Converted to: "+ it.toString(2))}
 }
 data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NONE,
                              val instrument: Int = 48, val volume: Float = 0.1f,
@@ -58,18 +59,17 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
         return "${this.type.ordinal}|${this.instrument}|${this.volume}|${this.style.ordinal}|${this.octavesByte}"
     }
     fun convertFromOctavesByte(): List<Int>{
-        println("Octaves Byte: " + octavesByte.toString(2))
+        //println("Octaves Byte: " + octavesByte.toString(2))
         return IntRange(0,7).filter { position -> octavesByte and (1 shl position) > 0 }
-            .also{ println("Converted to: $it") }
+            //.also{ println("Converted to: $it") }
     }
     fun describeOctaves(): String {
-
         if(this.octavesByte == 254) return "∞"
         return convertFromOctavesByte().joinToString("", "[", "]") { it.toString() }
     }
     companion object{
         fun createHarmonizationsFromCsv(csv: String): List<HarmonizationData>{
-            println("Harmonization csv: $csv")
+            //println("Harmonization csv: $csv")
             if(csv.isBlank()) return listOf()
             val values = csv.split(",")
             val harmValues = HarmonizationType.values()

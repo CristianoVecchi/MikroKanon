@@ -7,6 +7,13 @@ import com.leff.midi.MidiTrack
 import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.ProgramChange
 
+fun foundAbsPitchesAndInitialize(barGroup: List<Bar>, harmonizationType: HarmonizationType,
+chordsTrack: MidiTrack, chordsChannel: Int, chordsInstrument: Int): List<List<Int>> {
+    barGroup.findChordSequence(harmonizationType)
+    val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
+    chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
+    return absPitches
+}
 fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>, harmonizations: List<HarmonizationData>, justVoicing: Boolean){
     barGroups.forEachIndexed{ index, barGroup ->
         val harmonizationData = harmonizations[index]
@@ -31,38 +38,33 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
 
                 HarmonizationStyle.DRAMMATICO, HarmonizationStyle.RIBATTUTO, HarmonizationStyle.RIBATTUTO_3,
                 HarmonizationStyle.TREMOLO, HarmonizationStyle.TREMOLO_5, HarmonizationStyle.TREMOLO_6 -> {
-                    barGroup.findChordSequence(harmonizationType)
-                    val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
-                    chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, harmonizationType, chordsTrack, chordsChannel, chordsInstrument)
                     createRibattuto(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing)
                 }
+                HarmonizationStyle.SINCOPATO -> {
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, harmonizationType, chordsTrack, chordsChannel, chordsInstrument)
+                    createSincopato(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing)
+                }
                 HarmonizationStyle.TRILLO -> {
-                    barGroup.findChordSequence(harmonizationType)
-                    val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
-                    chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, harmonizationType, chordsTrack, chordsChannel, chordsInstrument)
                     createTrillo(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing)
                 }
                 HarmonizationStyle.ASCENDING_ARPEGGIO, HarmonizationStyle.DESCENDING_ARPEGGIO ->{
-                    barGroup.findChordSequence(harmonizationType)
-                    val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
-                    chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, harmonizationType, chordsTrack, chordsChannel, chordsInstrument)
                     createArpeggio(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing)
                 }
                 HarmonizationStyle.ASCENDING_LINE, HarmonizationStyle.DESCENDING_LINE, HarmonizationStyle.RANDOM_LINE,
                 HarmonizationStyle.ASCENDING_FLOW, HarmonizationStyle.DESCENDING_FLOW, HarmonizationStyle.RANDOM_FLOW -> {
-                    barGroup.findChordSequence(harmonizationType)
-                    val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
-                    chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, harmonizationType, chordsTrack, chordsChannel, chordsInstrument)
                     createNoteLine(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing)
                 }
                 HarmonizationStyle.ASCENDING_BICINIUM, HarmonizationStyle.DESCENDING_BICINIUM, HarmonizationStyle.RANDOM_BICINIUM -> {
-                    barGroup.findChordSequence(harmonizationType)
-                    val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
-                    chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, harmonizationType, chordsTrack, chordsChannel, chordsInstrument)
                     createNoteDoubleLine(harmonizationStyle, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing)
                 }
