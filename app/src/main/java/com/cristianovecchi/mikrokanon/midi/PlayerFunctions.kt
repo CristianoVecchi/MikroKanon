@@ -408,15 +408,22 @@ fun createRibattuto(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
     }
 }
 fun createArpeggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
-    val actualOctaves = if(harmonizationStyle == HarmonizationStyle.DESCENDING_ARPEGGIO) octaves.map{ it +1 }.reversed() else octaves.map{ it +1 }
+diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
+
+    val actualOctaves = when(direction) {
+        HarmonizationDirection.DESCENDING -> octaves.map{ it +1 }.reversed()
+        HarmonizationDirection.RANDOM -> octaves.map{ it +1 }.shuffled()
+        else -> octaves.map{ it +1 }
+    }
+
     bars.forEachIndexed { i, bar ->
         //println("BAR #$i dur:${bar.duration}")
         val barDur = bar.duration
-        var pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+        val pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
         else {
-            when (harmonizationStyle){
-                HarmonizationStyle.DESCENDING_ARPEGGIO ->  absPitches[i].sortedDescending()
+            when (direction){
+                HarmonizationDirection.DESCENDING ->  absPitches[i].sortedDescending()
+                HarmonizationDirection.RANDOM ->  absPitches[i].shuffled()
                 else -> absPitches[i]
             }
         }
@@ -465,7 +472,7 @@ diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
 }
 
 fun createNoteDoubleLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
     var lastPitch1 = -1
     var lastPitch2 = -1
     val actualOctaves = octaves.map{ it + 1 }
@@ -473,9 +480,9 @@ fun createNoteDoubleLine(harmonizationStyle: HarmonizationStyle, chordsTrack: Mi
         val barDur = bar.duration
         val pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
         else {
-            when (harmonizationStyle){
-                HarmonizationStyle.DESCENDING_BICINIUM ->  absPitches[i].sortedDescending()
-                HarmonizationStyle.RANDOM_BICINIUM ->  absPitches[i].shuffled()
+            when (direction){
+                HarmonizationDirection.DESCENDING ->  absPitches[i].sortedDescending()
+                HarmonizationDirection.RANDOM ->  absPitches[i].shuffled()
                 else -> absPitches[i]
             }
         }.also{println("Original pitches: $it")}
@@ -586,13 +593,19 @@ fun createTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack,
     }
 }
 fun createSincopato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
     val actualOctaves = octaves.map{ it +1 }
     var lastPitch = -1
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
         val pitches = if(barDur < 16 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
-                        else  absPitches[i]
+        else {
+            when (direction){
+                HarmonizationDirection.DESCENDING->  absPitches[i].sortedDescending()
+                HarmonizationDirection.RANDOM ->  absPitches[i].shuffled()
+                else -> absPitches[i]
+            }
+        }
         if(pitches.isNotEmpty()){
             var firstNote = pitches[0]
             var lastNote = pitches.getOrElse(1) { pitches[0]}
@@ -633,13 +646,13 @@ fun createSincopato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
     }
 }
 fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
         //bars.forEach { println(it) }
         var lastPitch = -1
         val actualOctaves = octaves.map{ it +1 }
         val isFlow = when(harmonizationStyle){
-            HarmonizationStyle.ASCENDING_FLOW, HarmonizationStyle.DESCENDING_FLOW, HarmonizationStyle.RANDOM_FLOW -> true
+            HarmonizationStyle.FLOW -> true
             else -> false
         }
             //.also{println("Octaves: $octaves -> Actual octaves: $it")}
@@ -648,9 +661,9 @@ fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
             val barDur = bar.duration
             var pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
                 else {
-                    when (harmonizationStyle){
-                        HarmonizationStyle.DESCENDING_LINE, HarmonizationStyle.DESCENDING_FLOW ->  absPitches[i].sortedDescending()
-                        HarmonizationStyle.RANDOM_LINE, HarmonizationStyle.RANDOM_FLOW ->  absPitches[i].shuffled()
+                    when (direction){
+                        HarmonizationDirection.DESCENDING->  absPitches[i].sortedDescending()
+                        HarmonizationDirection.RANDOM ->  absPitches[i].shuffled()
                         else -> absPitches[i]
                     }
                 }

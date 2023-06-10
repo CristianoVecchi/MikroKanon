@@ -7,28 +7,23 @@ enum class HarmonizationType(val title: String) {
     JAZZ("JAZZ"), JAZZ11("JAZZ 11"),
     XWH("XW HARMONY"), FULL12("FULL 12")
 }
-enum class HarmonizationStyle(val title: String) {
-    CHORDS("Chords"),
-    DRAMMATICO("Drammatico"),
-    RIBATTUTO("Ribattuto"),
-    RIBATTUTO_3("Ribattuto 3"),
-    TREMOLO("Tremolo"),
-    TREMOLO_5("Tremolo 5"),
-    TREMOLO_6("Tremolo 6"),
-    SINCOPATO("Sincopato"),
-    TRILLO("Trillo"),
-    ASCENDING_ARPEGGIO("Arpeggio➚"),
-    DESCENDING_ARPEGGIO("Arpeggio➘"),
-    ASCENDING_LINE("Line➚"),
-    DESCENDING_LINE("Line➘"),
-    RANDOM_LINE("Line~"),
-    ASCENDING_FLOW("Flow➚"),
-    DESCENDING_FLOW("Flow➘"),
-    RANDOM_FLOW("Flow~"),
-    ASCENDING_BICINIUM("Bicinium➚"),
-    DESCENDING_BICINIUM("Bicinium➘"),
-    RANDOM_BICINIUM("Bicinium~")
-
+enum class HarmonizationDirection(val symbol: String) {
+    ASCENDING("➚"), DESCENDING("➘"), RANDOM("~")
+}
+enum class HarmonizationStyle(val title: String, val hasDirection: Boolean) {
+    CHORDS("Chords", false),
+    DRAMMATICO("Drammatico", false),
+    RIBATTUTO("Ribattuto", false),
+    RIBATTUTO_3("Ribattuto 3", false),
+    TREMOLO("Tremolo", false),
+    TREMOLO_5("Tremolo 5", false),
+    TREMOLO_6("Tremolo 6", false),
+    SINCOPATO("Sincopato", true),
+    TRILLO("Trillo", false),
+    ARPEGGIO("Arpeggio", true),
+    LINE("Line", true),
+    FLOW("Flow", true),
+    BICINIUM("Bicinium", true)
 }
 
 val starredChordsInstruments = listOf(
@@ -50,13 +45,14 @@ fun List<Int>.convertToOctavesByte(): Int {
 data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NONE,
                              val instrument: Int = 48, val volume: Float = 0.1f,
                              val style: HarmonizationStyle = HarmonizationStyle.CHORDS,
-                             val octavesByte: Int = 248){ // from octave 3 to 7 (numbers 4 to 8)
+                             val octavesByte: Int = 248, val direction: HarmonizationDirection = HarmonizationDirection.ASCENDING){ // from octave 3 to 7 (numbers 4 to 8)
     fun describe(): String {
+        val direction = if(this.style.hasDirection) this.direction.symbol else ""
         return if(type == HarmonizationType.NONE) "  ---  ${this.type.title}  ---"
-        else "${this.type.title} ${this.style.title}\n  ${ListaStrumenti.getNameByIndex(this.instrument)} ${this.describeOctaves()} ${String.format("%.0f%%",this.volume*100)}"
+        else "${this.type.title} ${this.style.title}${direction}\n  ${ListaStrumenti.getNameByIndex(this.instrument)} ${this.describeOctaves()} ${String.format("%.0f%%",this.volume*100)}"
     }
     fun toCsv(): String {
-        return "${this.type.ordinal}|${this.instrument}|${this.volume}|${this.style.ordinal}|${this.octavesByte}"
+        return "${this.type.ordinal}|${this.instrument}|${this.volume}|${this.style.ordinal}|${this.octavesByte}|${this.direction.ordinal}"
     }
     fun convertFromOctavesByte(): List<Int>{
         //println("Octaves Byte: " + octavesByte.toString(2))
@@ -74,13 +70,15 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
             val values = csv.split(",")
             val harmValues = HarmonizationType.values()
             val styleValues = HarmonizationStyle.values()
+            val directionValues = HarmonizationDirection.values()
             return values.map{
                 val subValues = it.split("|")
                 HarmonizationData(harmValues[subValues[0].toInt()], subValues[1].toInt(),
                     subValues[2].toFloat(), styleValues[subValues.getOrElse(3){"0"}.toInt()],
-                    subValues.getOrElse(4){"248"}.toInt())
+                    subValues.getOrElse(4){"248"}.toInt(),
+                    directionValues[subValues.getOrElse(5){"0"}.toInt()]
+                )
             }
         }
-
     }
 }

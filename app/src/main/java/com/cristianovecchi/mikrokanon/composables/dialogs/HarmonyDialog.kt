@@ -210,6 +210,21 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     ListDialogData(itemList = harmTypeDialogData.value.itemList)
                                 }
                             }
+                            CustomButton(
+                                isActive = harmDatas[cursor].style.hasDirection,
+                                iconId = model.iconMap["horizontal_movements"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val newHarmDatas = harmDatas.toMutableList()
+                                val oldHarmData = harmDatas[cursor]
+                                val directions = HarmonizationDirection.values()
+                                val newDirection = directions[(oldHarmData.direction.ordinal + 1) % directions.size]
+                                newHarmDatas[cursor] = oldHarmData.copy(direction = newDirection)
+                                harmDatas = newHarmDatas
+                                ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                            }
                          }
 
                             Row(
