@@ -420,13 +420,7 @@ diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direct
         //println("BAR #$i dur:${bar.duration}")
         val barDur = bar.duration
         val pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
-        else {
-            when (direction){
-                HarmonizationDirection.DESCENDING ->  absPitches[i].sortedDescending()
-                HarmonizationDirection.RANDOM ->  absPitches[i].shuffled()
-                else -> absPitches[i]
-            }
-        }
+                        else direction.applyDirection(absPitches[i])
         if(pitches.isNotEmpty()){
             val durs = barDur.divideDistributingRest(pitches.size * actualOctaves.size)
            // println("note durs: $durs")
@@ -479,21 +473,16 @@ fun createNoteDoubleLine(harmonizationStyle: HarmonizationStyle, chordsTrack: Mi
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
         val pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
-        else {
-            when (direction){
-                HarmonizationDirection.DESCENDING ->  absPitches[i].sortedDescending()
-                HarmonizationDirection.RANDOM ->  absPitches[i].shuffled()
-                else -> absPitches[i]
-            }
-        }.also{println("Original pitches: $it")}
+                        else direction.applyDirection(absPitches[i])
         if(pitches.isNotEmpty()){
             val nHalfPitches = pitches.size / 2
             var pitches1 = pitches.subList(0, nHalfPitches)
             var pitches2 = pitches.subList(nHalfPitches, pitches.size)
+            val increase = 10
            // println("A:$pitches1 B:$pitches2")
             if(pitches1.isNotEmpty()){
                 val durs = barDur.divideDistributingRest(pitches1.size)
-                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, 10)
+                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, increase)
                 var tick = bar.tick
                 pitches1 = if(pitches1.first() == lastPitch1) pitches1.shiftCycling() else pitches1
                 pitches1.forEachIndexed { j, absPitch ->
@@ -511,7 +500,7 @@ fun createNoteDoubleLine(harmonizationStyle: HarmonizationStyle, chordsTrack: Mi
             }
             if(pitches2.isNotEmpty()){
                 val durs = barDur.divideDistributingRest(pitches2.size)
-                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, 0)
+                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, increase)
                 var tick = bar.tick
                 pitches2 = if(pitches2.first() == lastPitch2) pitches2.shiftCycling() else pitches2
                 pitches2.forEachIndexed { j, absPitch ->
@@ -599,13 +588,7 @@ fun createSincopato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
         val pitches = if(barDur < 16 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
-        else {
-            when (direction){
-                HarmonizationDirection.DESCENDING->  absPitches[i].sortedDescending()
-                HarmonizationDirection.RANDOM ->  absPitches[i].shuffled()
-                else -> absPitches[i]
-            }
-        }
+                        else direction.applyDirection(absPitches[i])
         if(pitches.isNotEmpty()){
             var firstNote = pitches[0]
             var lastNote = pitches.getOrElse(1) { pitches[0]}
@@ -645,6 +628,56 @@ fun createSincopato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
         }
     }
 }
+fun createAlberti(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
+    val actualOctaves = octaves.map{ it +1 }
+    var lastPitch = -1
+    bars.forEachIndexed { i, bar ->
+        val barDur = bar.duration
+        val pitches = if(barDur < 16 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+        else direction.applyDirection(absPitches[i])
+        val size = pitches.size
+        if(size > 0){
+            var firstNote = pitches.first()
+            var lastNote = pitches.last()
+            if(firstNote == lastPitch) {
+                firstNote -= lastNote
+                lastNote += firstNote
+                firstNote = lastNote - firstNote
+            }
+            val middleNotes = if(size < 3) pitches else pitches.subList(1, size -1)
+            //println("Syncope: $firstNote $middleNotes $lastNote")
+            val durs = barDur.divideDistributingRest(4)
+            val velocities = bars.getProgressiveVelocities(i, 4, diffChordVelocity, 26)
+            actualOctaves.forEach { octave ->
+                var tick = bar.tick
+                val octavePitch = octave * 12
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, durs[0], chordsChannel,
+                    octavePitch + firstNote, velocities[0], 70, 0
+                )
+                tick += durs[0]
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, durs[1], chordsChannel,
+                    octavePitch + lastNote, velocities[1], 70, 0
+                )
+                tick += durs[1]
+                middleNotes.forEach { middleNote ->
+                    Player.insertNoteWithGlissando(
+                        chordsTrack, tick, durs[2], chordsChannel,
+                        octavePitch + middleNote, velocities[2], 70, 0
+                    )
+                }
+                tick += durs[3]
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, durs[3], chordsChannel,
+                    octavePitch + lastNote, velocities[3], 70, 0
+                )
+            }
+            lastPitch = lastNote
+        }
+    }
+}
 fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
@@ -660,13 +693,7 @@ fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
 
             val barDur = bar.duration
             var pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
-                else {
-                    when (direction){
-                        HarmonizationDirection.DESCENDING->  absPitches[i].sortedDescending()
-                        HarmonizationDirection.RANDOM ->  absPitches[i].shuffled()
-                        else -> absPitches[i]
-                    }
-                }
+                else direction.applyDirection(absPitches[i])
             if(pitches.isNotEmpty()){
                 //println("BAR #$i  pitches: $pitches")
                 val durs = barDur.divideDistributingRest(pitches.size)

@@ -45,6 +45,11 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     createSincopato(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
                 }
+                HarmonizationStyle.ALBERTI -> {
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    createAlberti(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
+                }
                 HarmonizationStyle.TRILLO -> {
                     val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
                     createTrillo(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,

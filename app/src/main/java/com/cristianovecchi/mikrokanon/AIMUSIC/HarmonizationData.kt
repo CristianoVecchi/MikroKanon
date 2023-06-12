@@ -8,7 +8,15 @@ enum class HarmonizationType(val title: String) {
     XWH("XW HARMONY"), FULL12("FULL 12")
 }
 enum class HarmonizationDirection(val symbol: String) {
-    ASCENDING("➚"), DESCENDING("➘"), RANDOM("~")
+    ASCENDING("➚"), DESCENDING("➘"), RANDOM("~");
+
+    fun applyDirection(pitches: List<Int>): List<Int>{
+        return when (this){
+            DESCENDING ->  pitches.sortedDescending()
+            RANDOM ->  pitches.shuffled()
+            else -> pitches
+        }
+    }
 }
 enum class HarmonizationStyle(val title: String, val hasDirection: Boolean) {
     CHORDS("Chords", false),
@@ -19,6 +27,7 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean) {
     TREMOLO_5("Tremolo 5", false),
     TREMOLO_6("Tremolo 6", false),
     SINCOPATO("Sincopato", true),
+    ALBERTI("Alberti", true),
     TRILLO("Trillo", false),
     ARPEGGIO("Arpeggio", true),
     LINE("Line", true),
