@@ -50,6 +50,11 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     createAlberti(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
                 }
+                HarmonizationStyle.RICAMATO, HarmonizationStyle.RICAMATO_6, HarmonizationStyle.RICAMATO_8 -> {
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    createRicamato(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
+                }
                 HarmonizationStyle.TRILLO -> {
                     val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
                     createTrillo(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,

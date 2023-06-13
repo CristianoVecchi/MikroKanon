@@ -678,6 +678,70 @@ fun createAlberti(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack
         }
     }
 }
+fun createRicamato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+                  diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
+    val actualOctaves = octaves.map{ it +1 }
+    var lastPitch = -1
+    val nRepetitions = when (harmonizationStyle) {
+        HarmonizationStyle.RICAMATO_8 -> 3
+        HarmonizationStyle.RICAMATO_6 -> 2
+        else -> 1
+    }
+    val steps = 2 + 2 * nRepetitions
+    bars.forEachIndexed { i, bar ->
+        val barDur = bar.duration
+        val pitches = if(barDur < 4 * steps ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+        else direction.applyDirection(absPitches[i])
+        val size = pitches.size
+        if(size > 0){
+            var firstNote = pitches.first()
+            var lastNote = pitches.last()
+            if(firstNote == lastPitch) {
+                firstNote -= lastNote
+                lastNote += firstNote
+                firstNote = lastNote - firstNote
+            }
+            val middleNotes = if(size < 3) pitches else pitches.subList(1, size -1)
+            //println("Ricamato: $firstNote $middleNotes $lastNote")
+            val durs = barDur.divideDistributingRest(steps)
+            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, 26)
+            actualOctaves.forEach { octave ->
+                var tick = bar.tick
+                val octavePitch = octave * 12
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, durs[0], chordsChannel,
+                    octavePitch + firstNote, velocities[0], 70, 0
+                )
+                tick += durs[0]
+                middleNotes.forEach { middleNote ->
+                    Player.insertNoteWithGlissando(
+                        chordsTrack, tick, durs[1], chordsChannel,
+                        octavePitch + middleNote, velocities[1], 70, 0
+                    )
+                }
+                tick += durs[1]
+                (0 until nRepetitions).forEach { repeat ->
+                    var step = 2 + repeat * 2
+                    Player.insertNoteWithGlissando(
+                        chordsTrack, tick, durs[step], chordsChannel,
+                        octavePitch + lastNote, velocities[step], 70, 0
+                    )
+                    tick += durs[step]
+                    step++
+                    middleNotes.forEach { middleNote ->
+                        Player.insertNoteWithGlissando(
+                            chordsTrack, tick, durs[step], chordsChannel,
+                            octavePitch + middleNote, velocities[step], 70, 0
+                        )
+                    }
+                    tick += durs[step]
+                }
+
+            }
+            lastPitch = lastNote
+        }
+    }
+}
 fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
