@@ -24,7 +24,7 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
             val diffChordVelocity = 40 - (volume * 40).toInt()  // 1f = 0, 0f = 40
            // println("diff: $diffChordVelocity")
             when(style){
-                HarmonizationStyle.CHORDS -> when (type){
+                HarmonizationStyle.ACCORDI -> when (type){
                     HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, false, instrument, diffChordVelocity, justVoicing, octaves)
                     HarmonizationType.POP7 -> createPopChordsTrack(chordsTrack, barGroup, true,instrument, diffChordVelocity, justVoicing, octaves)
                     HarmonizationType.JAZZ -> createJazzChordsTrack(chordsTrack, barGroup, false, instrument, diffChordVelocity, justVoicing, octaves)
@@ -65,7 +65,7 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     createArpeggio(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
                 }
-                HarmonizationStyle.LINE, HarmonizationStyle.FLOW -> {
+                HarmonizationStyle.LINEA, HarmonizationStyle.FLUSSO, HarmonizationStyle.ACCUMULO, HarmonizationStyle.ACCUMULO_FLUSSO -> {
                     val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
                     createNoteLine(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)

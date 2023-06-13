@@ -12,7 +12,6 @@ import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -742,6 +741,7 @@ fun createRicamato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
         }
     }
 }
+
 fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
@@ -749,7 +749,11 @@ fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
         var lastPitch = -1
         val actualOctaves = octaves.map{ it +1 }
         val isFlow = when(harmonizationStyle){
-            HarmonizationStyle.FLOW -> true
+            HarmonizationStyle.FLUSSO, HarmonizationStyle.ACCUMULO_FLUSSO -> true
+            else -> false
+        }
+        val isAccumulo = when(harmonizationStyle){
+            HarmonizationStyle.ACCUMULO, HarmonizationStyle.ACCUMULO_FLUSSO -> true
             else -> false
         }
             //.also{println("Octaves: $octaves -> Actual octaves: $it")}
@@ -759,20 +763,27 @@ fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
             var pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
                 else direction.applyDirection(absPitches[i])
             if(pitches.isNotEmpty()){
-                //println("BAR #$i  pitches: $pitches")
+                println("BAR #$i  pitches: $pitches")
                 val durs = barDur.divideDistributingRest(pitches.size)
+                val actualDurs = if(isAccumulo){
+                    var tick = -durs[0]
+                    durs.map{dur ->
+                        tick += dur
+                        barDur - tick }
+                        .toMutableList()
+                } else durs
+                //println("actualdurs = $actualDurs")
                 val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, 12)
                 if(isFlow){
                     actualOctaves.forEach { octave ->
                         var tick = bar.tick
                         //pitches = if(pitches.first() == lastPitch) pitches.shiftCycling() else pitches
                         pitches.forEachIndexed { j, absPitch ->
-                            val duration = durs[j]
                             Player.insertNoteWithGlissando(
-                                chordsTrack, tick, duration, chordsChannel,
+                                chordsTrack, tick, actualDurs[j], chordsChannel,
                                 octave * 12 + absPitch, velocities[j], 70, 0
                             )
-                            tick += duration
+                            tick += durs[j]
                         }
                         pitches = pitches.shiftCycling()
                        // lastPitch = pitches.last()
@@ -781,15 +792,15 @@ fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                     var tick = bar.tick
                     pitches = if(pitches.first() == lastPitch) pitches.shiftCycling() else pitches
                     pitches.forEachIndexed { j, absPitch ->
-                        val duration = durs[j]
+                        val actualDuration = actualDurs[j]
                         val velocity = velocities[j]
                         actualOctaves.forEach{ octave ->
                             Player.insertNoteWithGlissando(
-                                chordsTrack, tick, duration, chordsChannel,
+                                chordsTrack, tick, actualDuration, chordsChannel,
                                 octave * 12 + absPitch, velocity, 70, 0
                             )
                         }
-                        tick += duration
+                        tick += durs[j]
                     }
                     lastPitch = pitches.last()
                 }
