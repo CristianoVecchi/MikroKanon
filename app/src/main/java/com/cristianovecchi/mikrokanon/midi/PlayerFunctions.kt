@@ -580,6 +580,46 @@ fun createTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack,
 
     }
 }
+fun createControtempo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+    val actualOctaves = octaves.map{ it +1 }
+    val steps = when(harmonizationStyle){
+        HarmonizationStyle.CONTROTEMPO_4 -> 4
+        HarmonizationStyle.CONTROTEMPO_6 -> 6
+        HarmonizationStyle.CONTROTEMPO_8 -> 8
+        HarmonizationStyle.CONTROTEMPO_10 -> 10
+        HarmonizationStyle.CONTROTEMPO_12 -> 12
+        else -> 2
+    }
+    bars.forEachIndexed { i, bar ->
+        val barDur = bar.duration
+        val pitches = absPitches[i]
+        if(pitches.isNotEmpty()){
+            val durs = barDur.divideDistributingRest(steps)
+            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, 0)
+               // .also{println("velocities: $it")}
+            actualOctaves.forEach { octave ->
+                val octavePitch = octave * 12
+                var tick = bar.tick
+                for(step in 0 until steps step 2){
+                    tick += durs[step]
+                    val offBeatStep = step + 1
+                    val offBeatDur = durs[offBeatStep]
+                    val staccatoDur = offBeatDur / 4
+                    val offBeatVelocity = velocities[offBeatStep]
+                   // println("step:$step velocity:${velocities[offBeatStep]}")
+                    pitches.forEach { absPitch ->
+                        Player.insertNoteWithGlissando(
+                            chordsTrack, tick, staccatoDur, chordsChannel,
+                            octavePitch + absPitch, offBeatVelocity, 70, 0
+                        )
+                    }
+                    tick += offBeatDur
+                }
+            }
+        }
+    }
+}
 fun createSincopato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
     val actualOctaves = octaves.map{ it +1 }
@@ -682,8 +722,10 @@ fun createRicamato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
     val actualOctaves = octaves.map{ it +1 }
     var lastPitch = -1
     val nRepetitions = when (harmonizationStyle) {
-        HarmonizationStyle.RICAMATO_8 -> 3
         HarmonizationStyle.RICAMATO_6 -> 2
+        HarmonizationStyle.RICAMATO_8 -> 3
+        HarmonizationStyle.RICAMATO_10 -> 4
+        HarmonizationStyle.RICAMATO_12 -> 5
         else -> 1
     }
     val steps = 2 + 2 * nRepetitions
