@@ -41,11 +41,13 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean) {
     RICAMATO_12("Ricamato 12", true),
     TRILLO("Trillo", false),
     ARPEGGIO("Arpeggio", true),
+    CAPRICCIO("Capriccio", true),
     LINEA("Linea", true),
     ACCUMULO("Accumulo", true),
     FLUSSO("Flusso", true),
     ACCUMULO_FLUSSO("Flussaccumulo", true),
-    BICINIUM("Bicinium", true)
+    BICINIUM("Bicinium", true),
+    TRICINIUM("Tricinium", true)
 }
 
 val starredChordsInstruments = listOf(
