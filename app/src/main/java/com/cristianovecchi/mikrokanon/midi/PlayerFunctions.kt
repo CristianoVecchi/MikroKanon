@@ -15,9 +15,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-fun main(){
-
-}
 suspend fun createDrumsTrack(context: CoroutineContext, dispatch: (Triple<AppViewModel.Building, Int, Int>) -> Unit,
                      trackDatas: List<TrackData>, drumsDatas: List<DrumsData>, totalLength: Int): MidiTrack?
     = withContext(context) {
@@ -656,17 +653,29 @@ fun createCapriccio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
         val pitches = if(barDur < 16 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
         else direction.applyDirection(absPitches[i])
         val velocities = bars.getProgressiveVelocities(i, 4, diffChordVelocity, increase)
+           // .also{println("Subdivision velocities: $it")}
         if(pitches.isNotEmpty()){
             val arpeggioPitches = pitches.dropLast(1)
-
+            val size = arpeggioPitches.size
             val lastPitch = pitches.last()
             val lastVelocity = velocities[2]
             val durs = barDur.divideDistributingRest(4)
-            if(arpeggioPitches.isNotEmpty()){
-                val size = arpeggioPitches.size
-                val arpeggioVelocities = accumulateVelocities(size, velocities[1], velocities[2] - velocities[1])
+            val staccatoDur = durs[2] / 4
+            if(harmonizationStyle == HarmonizationStyle.CAPRICCIO_2){
+                actualOctaves.forEach { octave ->
+                    val tick = bar.tick
+                    Player.insertNoteWithGlissando(
+                        chordsTrack, tick, staccatoDur, chordsChannel,
+                        octave * 12 + lastPitch, velocities[0], 70, 0
+                    )
+                }
+            }
+            if(size > 0) {
+                val arpeggioVelocities =
+                    accumulateVelocities(size, velocities[1], velocities[2] - velocities[1])
+                        //.also{println("${velocities[0]} + $it")}
                 val arpeggioDurs = durs[1].divideDistributingRest(size)
-                val staccatoDur = durs[2] / 4
+
                 actualOctaves.forEach { octave ->
                     var tick = bar.tick + durs[0]
                     val octavePitch = octave * 12
@@ -674,23 +683,106 @@ fun createCapriccio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
                         val dur = arpeggioDurs[i]
                         //val velocity = arpeggioVelocities[i]
                         Player.insertNoteWithGlissando(
-                            chordsTrack, tick, dur , chordsChannel,
+                            chordsTrack, tick, dur, chordsChannel,
                             octavePitch + arpeggioPitch, arpeggioVelocities[i], 70, 0
                         )
                         tick += dur
                     }
                 }
-
+            }
+            actualOctaves.forEach { octave ->
+                val tick = bar.tick + durs[0] + durs[1]
+                Player.insertNoteWithGlissando(
+                    chordsTrack, tick, staccatoDur, chordsChannel,
+                    octave * 12 + lastPitch, lastVelocity, 70, 0
+                )
+            }
+            if(harmonizationStyle == HarmonizationStyle.CAPRICCIO_2 && size > 0) {
+                val goalVelocity = (bars.getNextBarVelocity(i) - diffChordVelocity + increase).coerceIn(0, 127)
+                val arpeggioVelocities = accumulateVelocities(size, velocities[3], goalVelocity - velocities[3])
+                    //.also{println("${velocities[2]} + $it -> $goalVelocity")}
+                val arpeggioDurs = durs[3].divideDistributingRest(size)
+                val originalTick = bar.tick + durs[0] + durs[1] + durs[2]
                 actualOctaves.forEach { octave ->
-                    val tick = bar.tick + durs[0] + durs[1]
+                    var tick = originalTick
                     val octavePitch = octave * 12
+                    arpeggioPitches.forEachIndexed { i, arpeggioPitch ->
+                        val dur = arpeggioDurs[i]
+                        //val velocity = arpeggioVelocities[i]
+                        Player.insertNoteWithGlissando(
+                            chordsTrack, tick, dur, chordsChannel,
+                            octavePitch + arpeggioPitch, arpeggioVelocities[i], 70, 0
+                        )
+                        tick += dur
+                    }
+                }
+            }
+
+        }
+    }
+}
+fun createAcciaccatura(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
+                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
+    val actualOctaves = octaves.map{ it +1 }
+    bars.forEachIndexed { i, bar ->
+        val barDur = bar.duration
+        val pitches = if(barDur < 16 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)} else absPitches[i]
+        if(pitches.isNotEmpty()){
+            val acciaccaturaPitches = when(direction){
+                HarmonizationDirection.ASCENDING -> pitches.map { it - 1 }
+                HarmonizationDirection.DESCENDING -> pitches.map { it + 1 }
+                HarmonizationDirection.RANDOM -> (0..11).filter{ !pitches.contains(it) }
+            }
+            val durs = barDur.divideDistributingRest(4)
+            var acciaccaturaDur = durs[0] / 4
+            var actualDur = durs[0] - acciaccaturaDur
+            val velocities = bars.getProgressiveVelocities(i, 4, diffChordVelocity, 0)
+            var actualVelocity = velocities[0]
+            var acciaccaturaVelocity = (actualVelocity + 12).coerceAtMost(127)
+
+            actualOctaves.forEach { octave ->
+                var tick = bar.tick
+                val octavePitch = octave * 12
+                acciaccaturaPitches.forEach { acciaccatura ->
                     Player.insertNoteWithGlissando(
-                        chordsTrack, tick, staccatoDur, chordsChannel,
-                        octavePitch + lastPitch, lastVelocity, 70, 0
+                        chordsTrack, tick, acciaccaturaDur, chordsChannel,
+                        octavePitch + acciaccatura, acciaccaturaVelocity, 70, 0
+                    )
+                }
+                tick += acciaccaturaDur
+                pitches.forEach { pitch ->
+                    Player.insertNoteWithGlissando(
+                        chordsTrack, tick, actualDur, chordsChannel,
+                        octavePitch + pitch, actualVelocity, 70, 0
                     )
                 }
             }
+            if(harmonizationStyle == HarmonizationStyle.ACCIACCATURA_2){
+                acciaccaturaDur = durs[2] / 4
+                actualDur = durs[2] - acciaccaturaDur
+                val halfBarTick = bar.tick + durs[0] + durs[1]
+                actualVelocity = velocities[2]
+                acciaccaturaVelocity = (actualVelocity + 12).coerceAtMost(127)
+                actualOctaves.forEach { octave ->
+                    var tick = halfBarTick
+                    val octavePitch = octave * 12
+                    acciaccaturaPitches.forEach { acciaccatura ->
+                        Player.insertNoteWithGlissando(
+                            chordsTrack, tick, acciaccaturaDur, chordsChannel,
+                            octavePitch + acciaccatura, acciaccaturaVelocity, 70, 0
+                        )
+                    }
+                    tick += acciaccaturaDur
+                    pitches.forEach { pitch ->
+                        Player.insertNoteWithGlissando(
+                            chordsTrack, tick, actualDur, chordsChannel,
+                            octavePitch + pitch, actualVelocity, 70, 0
+                        )
+                    }
+                }
+            }
         }
+
     }
 }
 fun createSincopato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
@@ -1290,7 +1382,7 @@ fun MidiTrack.setTimeSignatures(rhythm: List<Triple<RhythmPatterns, Boolean, Int
     return bars.toList()
 }
 
-fun alterateArticulation(
+fun alterArticulation(
     ticks: IntArray, durations: IntArray,
     legatoAlterations: List<Float>, ribattutos: List<Int>, legatoDeltas: List<Long>,
     pivots: List<Int>, previousIsRest: BooleanArray, maxLegato: Int, changes: List<TickChangeData>

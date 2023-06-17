@@ -19,13 +19,15 @@ enum class HarmonizationDirection(val symbol: String) {
     }
 }
 enum class HarmonizationStyle(val title: String, val hasDirection: Boolean) {
-    ACCORDI("Accordi", false),
+    ACCORDO("Accordo", false),
     DRAMMATICO("Drammatico", false),
     RIBATTUTO("Ribattuto", false),
     RIBATTUTO_3("Ribattuto 3", false),
     TREMOLO("Tremolo", false),
     TREMOLO_5("Tremolo 5", false),
     TREMOLO_6("Tremolo 6", false),
+    ACCIACCATURA("Acciaccatura", true),
+    ACCIACCATURA_2("Acciaccatura 2", true),
     SINCOPATO("Sincopato", true),
     CONTROTEMPO("Controtempo", false),
     CONTROTEMPO_4("Controtempo 4", false),
@@ -42,6 +44,7 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean) {
     TRILLO("Trillo", false),
     ARPEGGIO("Arpeggio", true),
     CAPRICCIO("Capriccio", true),
+    CAPRICCIO_2("Capriccio 2", true),
     LINEA("Linea", true),
     ACCUMULO("Accumulo", true),
     FLUSSO("Flusso", true),
@@ -68,7 +71,7 @@ fun List<Int>.convertToOctavesByte(): Int {
 }
 data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NONE,
                              val instrument: Int = 48, val volume: Float = 0.1f,
-                             val style: HarmonizationStyle = HarmonizationStyle.ACCORDI,
+                             val style: HarmonizationStyle = HarmonizationStyle.ACCORDO,
                              val octavesByte: Int = 248, val direction: HarmonizationDirection = HarmonizationDirection.ASCENDING){ // from octave 3 to 7 (numbers 4 to 8)
     fun describe(): String {
         val direction = if(this.style.hasDirection) this.direction.symbol else ""

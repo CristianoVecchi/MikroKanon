@@ -3,7 +3,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 import android.os.Build
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.alterateLegatosWithDistribution
-import com.cristianovecchi.mikrokanon.midi.alterateArticulation
+import com.cristianovecchi.mikrokanon.midi.alterArticulation
 import kotlinx.coroutines.job
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.absoluteValue
@@ -335,7 +335,7 @@ fun List<TrackData>.addLegatoAndRibattuto(maxLegato: Int, articulations: FloatAr
         this
             .parallelStream()
             .forEach {
-                val pair = alterateArticulation(
+                val pair = alterArticulation(
                     it.ticks,
                     it.durations,
                     legatoAlterations,
@@ -351,7 +351,7 @@ fun List<TrackData>.addLegatoAndRibattuto(maxLegato: Int, articulations: FloatAr
             }
     } else {
         this.forEach {
-            val pair = alterateArticulation(
+            val pair = alterArticulation(
                 it.ticks,
                 it.durations,
                 legatoAlterations,
