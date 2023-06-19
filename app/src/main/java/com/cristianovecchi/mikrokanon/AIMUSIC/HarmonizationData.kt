@@ -43,6 +43,7 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean) {
     RICAMATO_10("Ricamato 10", true),
     RICAMATO_12("Ricamato 12", true),
     TRILLO("Trillo", false),
+    TRILLO_2("Trillo 2", true),
     ARPEGGIO("Arpeggio", true),
     CAPRICCIO("Capriccio", true),
     CAPRICCIO_2("Capriccio 2", true),

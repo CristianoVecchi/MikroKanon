@@ -1,6 +1,6 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
-import com.cristianovecchi.mikrokanon.midi.findChordNotes
+
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.ProgramChange

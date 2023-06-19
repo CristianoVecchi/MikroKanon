@@ -5,10 +5,6 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.getIntOrEmptyValue
-import com.cristianovecchi.mikrokanon.midi.createExtendedWeightedHarmonyTrack
-import com.cristianovecchi.mikrokanon.midi.createFull12HarmonizedTrack
-import com.cristianovecchi.mikrokanon.midi.createJazzChordsTrack
-import com.cristianovecchi.mikrokanon.midi.createPopChordsTrack
 import com.cristianovecchi.mikrokanon.shiftCycling
 import com.cristianovecchi.mikrokanon.tritoneSubstitutionOnIntervalSet
 import com.cristianovecchi.mikrokanon.ui.readFileLineByLineUsingForEachLine

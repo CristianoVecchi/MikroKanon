@@ -3,7 +3,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 
 fun accumulateVelocities(nNotes: Int, start: Int, diff: Int): List<Int>{
-    if(diff == 0) return List(nNotes) { start }
+    if(diff == 0 || nNotes == 1) return List(nNotes) { start }
     val result = mutableListOf<Int>()
     val increments = diff.divideDistributingRest(nNotes-1)
     var step = start
@@ -14,7 +14,7 @@ fun accumulateVelocities(nNotes: Int, start: Int, diff: Int): List<Int>{
     return result.apply{ this += step}
 }
 fun accumulateVelocitiesCrescDim(nNotes: Int, start: Int, diff: Int, isDimCresc: Boolean = false): List<Int>{
-    if(diff == 0) return List(nNotes) { start }
+    if(diff == 0 || nNotes == 1) return List(nNotes) { start }
     val result = mutableListOf<Int>()
     val nNotesFirst = nNotes / 2 + nNotes % 2
     val firstArch = accumulateVelocities(nNotesFirst, start, diff)
