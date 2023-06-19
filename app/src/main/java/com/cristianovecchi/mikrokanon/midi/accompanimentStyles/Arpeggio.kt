@@ -17,7 +17,7 @@ fun createArpeggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
         HarmonizationDirection.RANDOM -> octaves.map{ (it +1) * 12 }.shuffled()
         else -> octaves.map{ (it +1) * 12}
     }
-
+    val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         //println("BAR #$i dur:${bar.duration}")
         val barDur = bar.duration
@@ -31,7 +31,7 @@ fun createArpeggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
             if(durs.any{it < 4}) {
                 val nNotes = bar.duration.toInt() / 4
                 var noteIndex = 0
-                val velocities = bars.getProgressiveVelocities(i, nNotes, diffChordVelocity, 24)
+                val velocities = bars.getProgressiveVelocities(i, nNotes, diffChordVelocity, increase)
                 reductedArpeggio@ for (octave in actualOctavePitches) {
                     //println("Octave: $octave")
                     for(absPitch in pitches) {
@@ -47,7 +47,7 @@ fun createArpeggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                 }
             } else {
                 var durationIndex = 0
-                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, 24)
+                val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, increase)
                 actualOctavePitches.forEach { octave ->
                     // println("Octave: $octave")
                     pitches.forEach { absPitch ->

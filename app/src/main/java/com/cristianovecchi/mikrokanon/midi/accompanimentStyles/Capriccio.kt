@@ -9,7 +9,7 @@ fun createCapriccio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
                     diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
 ) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
-    val increase = 26
+    val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
         val pitches = if(barDur < 16 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}

@@ -132,7 +132,7 @@ object Player {
         audio8DFlags: Int = 0,
         vibrato: Int = 0,
         checkAndReplace: List<List<CheckAndReplaceData>> = listOf(),
-        harmonizations: List<HarmonizationData> = listOf(),
+        harmonizations: Pair<List<HarmonizationData>, List<HarmonizationData>> = Pair(listOf(),listOf()),
         chordsToEnhance: List<ChordToEnhanceData> = listOf(),
         enhanceChordsInTransposition: Boolean = false,
         drumsData: List<DrumsData> = listOf()
@@ -267,8 +267,10 @@ object Player {
 
                                         //ADD CHORD TRACK AND DRUMS TRACKS IF NEEDED
                                         //println(harmonizations)
-                                        tracks.addChordTrack(harmonizations, bars,
-                                            counterpointTrackData, audio8D, totalLength, false)
+                                        tracks.addChordTrack(harmonizations.first, bars,
+                                            counterpointTrackData, audio8D, totalLength, false, 13)
+                                        tracks.addChordTrack(harmonizations.second, bars,
+                                            counterpointTrackData, audio8D, totalLength, false, 14)
                                         drumsTrack?.let{tracks.add(it)}
 
                                         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)

@@ -12,6 +12,7 @@ fun createAcciaccatura(harmonizationStyle: HarmonizationStyle, chordsTrack: Midi
                        diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
 ) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
+    val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
         val pitches = if(barDur < 16 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)} else absPitches[i]
@@ -24,7 +25,7 @@ fun createAcciaccatura(harmonizationStyle: HarmonizationStyle, chordsTrack: Midi
             val durs = barDur.divideDistributingRest(4)
             var acciaccaturaDur = durs[0] / 4
             var actualDur = durs[0] - acciaccaturaDur
-            val velocities = bars.getProgressiveVelocities(i, 4, diffChordVelocity, 0)
+            val velocities = bars.getProgressiveVelocities(i, 4, diffChordVelocity, increase)
             var actualVelocity = velocities[0]
             var acciaccaturaVelocity = (actualVelocity + 12).coerceAtMost(127)
 

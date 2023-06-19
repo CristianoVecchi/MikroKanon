@@ -10,6 +10,7 @@ import com.leff.midi.MidiTrack
 fun createRibattuto(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                     diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
+    val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val pitches = absPitches[i]
         var (steps, stepDur) = when (harmonizationStyle) {
@@ -26,7 +27,7 @@ fun createRibattuto(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
 //        val steps = bar.metro.first
         val staccatoDur = (stepDur / 4).coerceAtLeast(6).toLong()
         if(pitches.isNotEmpty()){
-            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, 0)
+            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, increase)
             var tick = bar.tick
             (0 until steps).forEach { step ->
                 //println("tick: $tick")

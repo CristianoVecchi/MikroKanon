@@ -25,7 +25,7 @@ data class ActiveButtons(val editing: Boolean = false, val mikrokanon: Boolean =
                          val counterpoint: Boolean = false,
                          val specialFunctions: Boolean = false, val specialFunctions1: Boolean = false,
                          val freeParts: Boolean = false, val playOrStop: Boolean = true)
-enum class ScaffoldTabs { SOUND, BUILDING, ACCOMPANIST, DRUMS, IO, SETTINGS }
+enum class ScaffoldTabs { SOUND, BUILDING, ACCOMPANIST, CHECK_N_REPLACE, DRUMS, IO, SETTINGS }
 
 class AppViewModel(
     application: Application,

@@ -15,6 +15,7 @@ fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
     //bars.forEach { println(it) }
     var lastPitch = -1
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
+    val increase = harmonizationStyle.increase
     val isFlow = when(harmonizationStyle){
         HarmonizationStyle.FLUSSO, HarmonizationStyle.ACCUMULO_FLUSSO -> true
         else -> false
@@ -40,7 +41,7 @@ fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                     .toMutableList()
             } else durs
             //println("actualdurs = $actualDurs")
-            val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, 12)
+            val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, increase)
             if(isFlow){
                 actualOctavePitches.forEach { octave ->
                     var tick = bar.tick
@@ -83,6 +84,7 @@ fun createNoteDoubleTripleLine(harmonizationStyle: HarmonizationStyle, chordsTra
     var lastPitch2 = -1
     var lastPitch3 = -1
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
+    val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
         val pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
@@ -99,7 +101,6 @@ fun createNoteDoubleTripleLine(harmonizationStyle: HarmonizationStyle, chordsTra
                     Triple(pitches.subList(0, nHalfPitches), pitches.subList(nHalfPitches, pitches.size), listOf<Int>() )
                 }
             }
-            val increase = 10
             println("Original:$pitches -> A:$pitches1 B:$pitches2 C:$pitches3")
             if(pitches1.isNotEmpty()){
                 val durs = barDur.divideDistributingRest(pitches1.size)

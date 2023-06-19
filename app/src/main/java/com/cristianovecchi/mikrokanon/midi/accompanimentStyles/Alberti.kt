@@ -12,6 +12,7 @@ fun createAlberti(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack
                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
 ) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
+    val increase = harmonizationStyle.increase
     var lastPitch = -1
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
@@ -29,7 +30,7 @@ fun createAlberti(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack
             val middleNotes = if(size < 3) pitches else pitches.subList(1, size -1)
             //println("Syncope: $firstNote $middleNotes $lastNote")
             val durs = barDur.divideDistributingRest(4)
-            val velocities = bars.getProgressiveVelocities(i, 4, diffChordVelocity, 26)
+            val velocities = bars.getProgressiveVelocities(i, 4, diffChordVelocity, increase)
             actualOctavePitches.forEach { octave ->
                 var tick = bar.tick
                 Player.insertNoteWithGlissando(

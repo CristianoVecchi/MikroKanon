@@ -18,43 +18,43 @@ enum class HarmonizationDirection(val symbol: String) {
         }
     }
 }
-enum class HarmonizationStyle(val title: String, val hasDirection: Boolean) {
-    ACCORDO("Accordo", false),
-    DRAMMATICO("Drammatico", false),
-    RIBATTUTO("Ribattuto", false),
-    RIBATTUTO_3("Ribattuto 3", false),
-    TREMOLO("Tremolo", false),
-    TREMOLO_5("Tremolo 5", false),
-    TREMOLO_6("Tremolo 6", false),
-    POLIRITMIA("Poliritmia", true),
-    ACCIACCATURA("Acciaccatura", true),
-    ACCIACCATURA_2("Acciaccatura 2", true),
-    SINCOPATO("Sincopato", true),
-    CONTROTEMPO("Controtempo", false),
-    CONTROTEMPO_4("Controtempo 4", false),
-    CONTROTEMPO_6("Controtempo 6", false),
-    CONTROTEMPO_8("Controtempo 8", false),
-    CONTROTEMPO_10("Controtempo 10", false),
-    CONTROTEMPO_12("Controtempo 12", false),
-    ALBERTI("Alberti", true),
-    RICAMATO("Ricamato", true),
-    RICAMATO_6("Ricamato 6", true),
-    RICAMATO_8("Ricamato 8", true),
-    RICAMATO_10("Ricamato 10", true),
-    RICAMATO_12("Ricamato 12", true),
-    TRILLO("Trillo", false),
-    TRILLO_2("Trillo 2", true),
-    ARPEGGIO("Arpeggio", true),
-    CAPRICCIO("Capriccio", true),
-    CAPRICCIO_2("Capriccio 2", true),
-    LINEA("Linea", true),
-    ACCUMULO("Accumulo", true),
-    FLUSSO("Flusso", true),
-    ACCUMULO_FLUSSO("Flussaccumulo", true),
-    RADIO("Radio", false),
-    RADIO_FLUSSO("Radioflusso", false),
-    BICINIUM("Bicinium", true),
-    TRICINIUM("Tricinium", true)
+enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val increase: Int) {
+    ACCORDO("Accordo", false, 0),
+    DRAMMATICO("Drammatico", false, 0),
+    RIBATTUTO("Ribattuto", false, 0),
+    RIBATTUTO_3("Ribattuto 3", false, 0),
+    TREMOLO("Tremolo", false, 0),
+    TREMOLO_5("Tremolo 5", false, 0),
+    TREMOLO_6("Tremolo 6", false, 0),
+    POLIRITMIA("Poliritmia", true, 8),
+    ACCIACCATURA("Acciaccatura", true, 0),
+    ACCIACCATURA_2("Acciaccatura 2", true, 0),
+    SINCOPATO("Sincopato", true, 26),
+    CONTROTEMPO("Controtempo", false, 20),
+    CONTROTEMPO_4("Controtempo 4", false, 20),
+    CONTROTEMPO_6("Controtempo 6", false, 20),
+    CONTROTEMPO_8("Controtempo 8", false, 20),
+    CONTROTEMPO_10("Controtempo 10", false, 20),
+    CONTROTEMPO_12("Controtempo 12", false, 20),
+    ALBERTI("Alberti", true, 26),
+    RICAMATO("Ricamato", true, 26),
+    RICAMATO_6("Ricamato 6", true, 26),
+    RICAMATO_8("Ricamato 8", true, 26),
+    RICAMATO_10("Ricamato 10", true, 26),
+    RICAMATO_12("Ricamato 12", true, 26),
+    TRILLO("Trillo", false, 12),
+    TRILLO_2("Trillo 2", true, 12),
+    ARPEGGIO("Arpeggio", true, 24),
+    CAPRICCIO("Capriccio", true, 26),
+    CAPRICCIO_2("Capriccio 2", true, 26),
+    LINEA("Linea", true, 12),
+    ACCUMULO("Accumulo", true, 12),
+    FLUSSO("Flusso", true, 12),
+    ACCUMULO_FLUSSO("Flussaccumulo", true, 12),
+    RADIO("Radio", false, 12),
+    RADIO_FLUSSO("Radioflusso", false, 12),
+    BICINIUM("Bicinium", true, 10),
+    TRICINIUM("Tricinium", true, 10)
 }
 
 val starredChordsInstruments = listOf(
@@ -95,6 +95,18 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
         return convertFromOctavesByte().joinToString("", "[", "]") { it.toString() }
     }
     companion object{
+        fun getHarmonizationsCsvValues(csv: String): Pair<String, String>{
+            if(csv.isBlank()) return Pair("", "")
+            val values = csv.split("~")
+            return values[0] to values.getOrElse(1){""}
+        }
+        fun getHarmonizationsPair(csv: String): Pair<List<HarmonizationData>, List<HarmonizationData>>{
+            val pair = getHarmonizationsCsvValues(csv)
+            return createHarmonizationsFromCsv(pair.first) to createHarmonizationsFromCsv(pair.second)
+        }
+        fun buildHarmonizationPair(csv1: String, csv2: String): String {
+            return "$csv1~$csv2"
+        }
         fun createHarmonizationsFromCsv(csv: String): List<HarmonizationData>{
             //println("Harmonization csv: $csv")
             if(csv.isBlank()) return listOf()

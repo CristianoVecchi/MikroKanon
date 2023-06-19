@@ -12,6 +12,7 @@ fun createSincopato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
                     diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
 ) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
+    val increase = harmonizationStyle.increase
     var lastPitch = -1
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
@@ -28,7 +29,7 @@ fun createSincopato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
             val syncopeNotes = if(pitches.size < 3) pitches else pitches.takeLast(pitches.size - 2)
             //println("Syncope: $firstNote $syncopeNotes $lastNote")
             val durs = barDur.divideDistributingRest(4)
-            val velocities = bars.getProgressiveVelocities(i, 4, diffChordVelocity, 26)
+            val velocities = bars.getProgressiveVelocities(i, 4, diffChordVelocity, increase)
             val firstDur = durs[0]
             val lastDur = durs[3]
             val syncopeDur = durs[1] + durs[2]

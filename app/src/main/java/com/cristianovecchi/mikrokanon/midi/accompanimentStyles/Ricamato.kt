@@ -12,6 +12,7 @@ fun createRicamato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
 ) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
+    val increase = harmonizationStyle.increase
     var lastPitch = -1
     val nRepetitions = when (harmonizationStyle) {
         HarmonizationStyle.RICAMATO_6 -> 2
@@ -37,7 +38,7 @@ fun createRicamato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
             val middleNotes = if(size < 3) pitches else pitches.subList(1, size -1)
             //println("Ricamato: $firstNote $middleNotes $lastNote")
             val durs = barDur.divideDistributingRest(steps)
-            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, 26)
+            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, increase)
             actualOctavePitches.forEach { octave ->
                 var tick = bar.tick
                 Player.insertNoteWithGlissando(

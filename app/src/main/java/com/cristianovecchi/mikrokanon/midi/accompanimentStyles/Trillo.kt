@@ -8,7 +8,7 @@ import com.leff.midi.MidiTrack
 fun createMultiTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                  diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
-    val increase = 12
+    val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration.toInt()
         val pitches = if(barDur < 18 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}

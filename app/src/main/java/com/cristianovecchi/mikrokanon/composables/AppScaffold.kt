@@ -123,8 +123,9 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
         "Spacer",
         "Ritornello", "Transpose", "Row Forms",
 
-        "Harmony", "Chords to Enhance", "Enhance in Transpositions",
-        "Check and Replace",
+        "Harmony I", "Harmony II",
+
+        "Chords to Enhance", "Enhance in Transpositions", "Check and Replace",
 
         "Drums",
 
@@ -650,16 +651,17 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
             ScaffoldTabs.ACCOMPANIST -> {
                 LazyColumn(modifier = tabModifier, state = listState)
                 {
+                    val harmonizations = HarmonizationData.getHarmonizationsPair(userOptions.harmonizations)
                     items(optionNames) { optionName ->
                         val fontSize = dimensions.optionsFontSize
                         when (optionName) {
-                            "Harmony" -> {
-                                var harmDatas = HarmonizationData.createHarmonizationsFromCsv(userOptions.harmonizations)
+                            "Harmony I" -> {
+                                var harmDatas = harmonizations.first
                                 harmDatas = harmDatas.ifEmpty { listOf(HarmonizationData()) }
                                 val isSelected = !(harmDatas.size == 1 && harmDatas[0].type == HarmonizationType.NONE)
                                 SelectableCard(
-                                    text = if(!isSelected) lang.harmony
-                                            else "${lang.harmony}: \n\n${harmDatas.mapIndexed{i, hm -> 
+                                    text = if(!isSelected) lang.harmony + " I"
+                                            else "${lang.harmony} I : \n\n${harmDatas.mapIndexed{i, hm -> 
                                         "${i+1}: ${hm.describe()}"}.joinToString("\n\n")}",
                                     fontSize = fontSize,
                                     colors = colors,
@@ -670,15 +672,55 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                             model = model, names = chordsInstruments.map{ListaStrumenti.getNameByIndex(it)},
                                             anySequence = harmDatas,
                                         ) { harmonizationsCsv ->
+                                            val csv2 = HarmonizationData.getHarmonizationsCsvValues(userOptions.harmonizations).second
                                             model.updateUserOptions(
                                                 "harmonizations",
-                                                harmonizationsCsv
+                                                HarmonizationData.buildHarmonizationPair(harmonizationsCsv, csv2)
                                             )
                                             harmonyDialogData.value =
                                                 MultiNumberDialogData(model = model)
                                         }
                                     })
                             }
+                            "Harmony II" -> {
+                                var harmDatas = harmonizations.second
+                                harmDatas = harmDatas.ifEmpty { listOf(HarmonizationData()) }
+                                val isSelected = !(harmDatas.size == 1 && harmDatas[0].type == HarmonizationType.NONE)
+                                SelectableCard(
+                                    text = if(!isSelected) lang.harmony+ " II"
+                                    else "${lang.harmony} II : \n\n${harmDatas.mapIndexed{i, hm ->
+                                        "${i+1}: ${hm.describe()}"}.joinToString("\n\n")}",
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isSelected,
+                                    onClick = {
+                                        harmonyDialogData.value = MultiNumberDialogData(
+                                            true, lang.selectHarmonizationType,
+                                            model = model, names = chordsInstruments.map{ListaStrumenti.getNameByIndex(it)},
+                                            anySequence = harmDatas,
+                                        ) { harmonizationsCsv ->
+                                            val csv1 = HarmonizationData.getHarmonizationsCsvValues(userOptions.harmonizations).first
+                                            model.updateUserOptions(
+                                                "harmonizations",
+                                                HarmonizationData.buildHarmonizationPair(csv1, harmonizationsCsv)
+                                            )
+                                            harmonyDialogData.value =
+                                                MultiNumberDialogData(model = model)
+                                        }
+                                    })
+                            }
+
+
+                        }
+                    }
+                }
+            }
+            ScaffoldTabs.CHECK_N_REPLACE -> {
+                LazyColumn(modifier = tabModifier, state = listState)
+                {
+                    items(optionNames) { optionName ->
+                        val fontSize = dimensions.optionsFontSize
+                        when (optionName) {
                             "Chords to Enhance" -> {
                                 val absPitchNames = (0..11).map{Clip.convertAbsToClipText(it, lang.noteNames)}
                                 var cteDatas = userOptions.chordsToEnhance.extractIntPairsFromCsv()
@@ -755,6 +797,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                         })
                                 }
                             }
+
                         }
                     }
                 }

@@ -12,7 +12,7 @@ fun createPoliritmia(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTr
                      diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
 ) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
-
+    val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
         val size = absPitches[i].size
@@ -23,7 +23,7 @@ fun createPoliritmia(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTr
             pitches.forEach{ absPitch ->
                 division++
                 val durs = barDur.divideDistributingRest(division)
-                val velocities = bars.getProgressiveVelocities(i, division, diffChordVelocity, 8)
+                val velocities = bars.getProgressiveVelocities(i, division, diffChordVelocity, increase)
                 var tick = bar.tick
                 durs.forEachIndexed{ j, dur ->
                     val velocity = velocities[j]

@@ -15,12 +15,12 @@ chordsTrack: MidiTrack, chordsChannel: Int, chordsInstrument: Int): List<List<In
     chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
     return absPitches
 }
-fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>, harmonizations: List<HarmonizationData>, justVoicing: Boolean){
+fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
+                             harmonizations: List<HarmonizationData>, justVoicing: Boolean, chordsChannel: Int){
     barGroups.forEachIndexed{ index, barGroup ->
         val harmonizationData = harmonizations[index]
         val (type, instrument, volume, style, _, direction) = harmonizationData
         val octaves = harmonizationData.convertFromOctavesByte()
-        val chordsChannel = 15
         if (type != HarmonizationType.NONE){
             val diffChordVelocity = 40 - (volume * 40).toInt()  // 1f = 0, 0f = 40
            // println("diff: $diffChordVelocity")
@@ -156,7 +156,7 @@ fun List<Bar>.extractAbsPitchesFromDodecaBytes(type: HarmonizationType): List<Li
 
 fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, bars: List<Bar>,
                                        trackData: List<TrackData>, audio8D: List<Int>,
-                                       totalLength: Long, justVoicing: Boolean){
+                                       totalLength: Long, justVoicing: Boolean, channel: Int){
     if(harmonizations.isNotEmpty() && !harmonizations.all { it.type == HarmonizationType.NONE }) {
         val doubledBars = bars.mergeOnesInMetro()
             .resizeLastBar(totalLength)
@@ -166,9 +166,9 @@ fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, 
         val barGroups = if(harmonizations.size == 1) listOf(doubledBars)
         else doubledBars.splitBarsInGroups(harmonizations.size)
         val chordsTrack = MidiTrack()
-        addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations, justVoicing)
+        addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations, justVoicing, channel)
         if(audio8D.isNotEmpty()){
-            setAudio8D(chordsTrack, 12, 15)
+            setAudio8D(chordsTrack, 12, channel)
         }
         this.add(chordsTrack)
     }

@@ -10,6 +10,7 @@ import com.leff.midi.MidiTrack
 fun createControtempo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                       diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
+    val increase = harmonizationStyle.increase
     val steps = when(harmonizationStyle){
         HarmonizationStyle.CONTROTEMPO_4 -> 4
         HarmonizationStyle.CONTROTEMPO_6 -> 6
@@ -23,7 +24,7 @@ fun createControtempo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiT
         val pitches = absPitches[i]
         if(pitches.isNotEmpty()){
             val durs = barDur.divideDistributingRest(steps)
-            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, 20)
+            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, increase)
             // .also{println("velocities: $it")}
             actualOctavePitches.forEach { octave ->
                 var tick = bar.tick
