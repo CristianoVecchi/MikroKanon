@@ -26,6 +26,7 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean) {
     TREMOLO("Tremolo", false),
     TREMOLO_5("Tremolo 5", false),
     TREMOLO_6("Tremolo 6", false),
+    POLIRITMIA("Poliritmia", true),
     ACCIACCATURA("Acciaccatura", true),
     ACCIACCATURA_2("Acciaccatura 2", true),
     SINCOPATO("Sincopato", true),
@@ -49,6 +50,8 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean) {
     ACCUMULO("Accumulo", true),
     FLUSSO("Flusso", true),
     ACCUMULO_FLUSSO("Flussaccumulo", true),
+    RADIO("Radio", false),
+    RADIO_FLUSSO("Radioflusso", false),
     BICINIUM("Bicinium", true),
     TRICINIUM("Tricinium", true)
 }
