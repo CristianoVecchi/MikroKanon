@@ -47,6 +47,7 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val 
     ARPEGGIO("Arpeggio", true, 24),
     CAPRICCIO("Capriccio", true, 26),
     CAPRICCIO_2("Capriccio 2", true, 26),
+    FARFALLA("Farfalla", true, 12),
     LINEA("Linea", true, 12),
     ACCUMULO("Accumulo", true, 12),
     FLUSSO("Flusso", true, 12),
