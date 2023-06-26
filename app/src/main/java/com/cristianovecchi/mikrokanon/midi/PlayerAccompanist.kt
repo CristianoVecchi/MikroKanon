@@ -173,7 +173,7 @@ fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, 
         val chordsTrack = MidiTrack()
         addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations, justVoicing, channel)
         if(audio8D.isNotEmpty()){
-            setAudio8D(chordsTrack, 12, channel)
+            setAudio8D(chordsTrack, channel, channel)
         }
         this.add(chordsTrack)
     }

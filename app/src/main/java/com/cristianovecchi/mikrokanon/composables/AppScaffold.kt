@@ -123,7 +123,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
         "Spacer",
         "Ritornello", "Transpose", "Row Forms",
 
-        "Harmony I", "Harmony II",
+        "Harmony I", "Harmony II", "Harmony III",
 
         "Chords to Enhance", "Enhance in Transpositions", "Check and Replace",
 
@@ -651,7 +651,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
             ScaffoldTabs.ACCOMPANIST -> {
                 LazyColumn(modifier = tabModifier, state = listState)
                 {
-                    val harmonizations = HarmonizationData.getHarmonizationsPair(userOptions.harmonizations)
+                    val harmonizations = HarmonizationData.getHarmonizationsTriple(userOptions.harmonizations)
                     items(optionNames) { optionName ->
                         val fontSize = dimensions.optionsFontSize
                         when (optionName) {
@@ -672,10 +672,10 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                             model = model, names = chordsInstruments.map{ListaStrumenti.getNameByIndex(it)},
                                             anySequence = harmDatas,
                                         ) { harmonizationsCsv ->
-                                            val csv2 = HarmonizationData.getHarmonizationsCsvValues(userOptions.harmonizations).second
+                                            val ( _, csv2, csv3) = HarmonizationData.getHarmonizationsCsvValues(userOptions.harmonizations)
                                             model.updateUserOptions(
                                                 "harmonizations",
-                                                HarmonizationData.buildHarmonizationPair(harmonizationsCsv, csv2)
+                                                HarmonizationData.buildHarmonizationTriple(harmonizationsCsv, csv2, csv3)
                                             )
                                             harmonyDialogData.value =
                                                 MultiNumberDialogData(model = model)
@@ -699,10 +699,37 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                             model = model, names = chordsInstruments.map{ListaStrumenti.getNameByIndex(it)},
                                             anySequence = harmDatas,
                                         ) { harmonizationsCsv ->
-                                            val csv1 = HarmonizationData.getHarmonizationsCsvValues(userOptions.harmonizations).first
+                                            val (csv1, _ , csv3) = HarmonizationData.getHarmonizationsCsvValues(userOptions.harmonizations)
                                             model.updateUserOptions(
                                                 "harmonizations",
-                                                HarmonizationData.buildHarmonizationPair(csv1, harmonizationsCsv)
+                                                HarmonizationData.buildHarmonizationTriple(csv1, harmonizationsCsv, csv3)
+                                            )
+                                            harmonyDialogData.value =
+                                                MultiNumberDialogData(model = model)
+                                        }
+                                    })
+                            }
+                            "Harmony III" -> {
+                                var harmDatas = harmonizations.third
+                                harmDatas = harmDatas.ifEmpty { listOf(HarmonizationData()) }
+                                val isSelected = !(harmDatas.size == 1 && harmDatas[0].type == HarmonizationType.NONE)
+                                SelectableCard(
+                                    text = if(!isSelected) lang.harmony+ " III"
+                                    else "${lang.harmony} III : \n\n${harmDatas.mapIndexed{i, hm ->
+                                        "${i+1}: ${hm.describe()}"}.joinToString("\n\n")}",
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isSelected,
+                                    onClick = {
+                                        harmonyDialogData.value = MultiNumberDialogData(
+                                            true, lang.selectHarmonizationType,
+                                            model = model, names = chordsInstruments.map{ListaStrumenti.getNameByIndex(it)},
+                                            anySequence = harmDatas,
+                                        ) { harmonizationsCsv ->
+                                            val (csv1, csv2, _ ) = HarmonizationData.getHarmonizationsCsvValues(userOptions.harmonizations)
+                                            model.updateUserOptions(
+                                                "harmonizations",
+                                                HarmonizationData.buildHarmonizationTriple(csv1, csv2, harmonizationsCsv)
                                             )
                                             harmonyDialogData.value =
                                                 MultiNumberDialogData(model = model)

@@ -96,17 +96,17 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
         return convertFromOctavesByte().joinToString("", "[", "]") { it.toString() }
     }
     companion object{
-        fun getHarmonizationsCsvValues(csv: String): Pair<String, String>{
-            if(csv.isBlank()) return Pair("", "")
+        fun getHarmonizationsCsvValues(csv: String): Triple<String, String, String>{
+            if(csv.isBlank()) return Triple("", "", "")
             val values = csv.split("~")
-            return values[0] to values.getOrElse(1){""}
+            return Triple(values[0], values.getOrElse(1){""}, values.getOrElse(2){""})
         }
-        fun getHarmonizationsPair(csv: String): Pair<List<HarmonizationData>, List<HarmonizationData>>{
-            val pair = getHarmonizationsCsvValues(csv)
-            return createHarmonizationsFromCsv(pair.first) to createHarmonizationsFromCsv(pair.second)
+        fun getHarmonizationsTriple(csv: String): Triple<List<HarmonizationData>, List<HarmonizationData>, List<HarmonizationData>>{
+            val triple = getHarmonizationsCsvValues(csv)
+            return Triple(createHarmonizationsFromCsv(triple.first), createHarmonizationsFromCsv(triple.second), createHarmonizationsFromCsv(triple.third))
         }
-        fun buildHarmonizationPair(csv1: String, csv2: String): String {
-            return "$csv1~$csv2"
+        fun buildHarmonizationTriple(csv1: String, csv2: String, csv3: String): String {
+            return "$csv1~$csv2~$csv3"
         }
         fun createHarmonizationsFromCsv(csv: String): List<HarmonizationData>{
             //println("Harmonization csv: $csv")

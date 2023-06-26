@@ -124,9 +124,9 @@ suspend fun launchPlayer(
     val checkAndReplace: List<List<CheckAndReplaceData>> =
         userOptionsData?.let {CheckAndReplaceData.createMultiCheckAndReplaceDatasFromCsv(userOptionsData.checkAndReplace)}
             ?: listOf()
-    val harmonizations: Pair<List<HarmonizationData>, List<HarmonizationData>> =
-        userOptionsData?.let {HarmonizationData.getHarmonizationsPair(userOptionsData.harmonizations)}
-            ?: Pair(listOf(), listOf())
+    val harmonizations: Triple<List<HarmonizationData>, List<HarmonizationData>, List<HarmonizationData>> =
+        userOptionsData?.let {HarmonizationData.getHarmonizationsTriple(userOptionsData.harmonizations)}
+            ?: Triple(listOf(), listOf(), listOf())
     val chordsToEnhance: List<ChordToEnhanceData> =
         userOptionsData?.let {
             userOptionsData.chordsToEnhance.extractIntPairsFromCsv().map{
