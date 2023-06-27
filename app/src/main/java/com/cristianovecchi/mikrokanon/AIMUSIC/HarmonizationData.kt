@@ -18,44 +18,52 @@ enum class HarmonizationDirection(val symbol: String) {
         }
     }
 }
-enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val increase: Int) {
-    ACCORDO("Accordo", false, 0),
-    DRAMMATICO("Drammatico", false, 0),
-    RIBATTUTO("Ribattuto", false, 0),
-    RIBATTUTO_3("Ribattuto 3", false, 0),
-    TREMOLO("Tremolo", false, 0),
-    TREMOLO_5("Tremolo 5", false, 0),
-    TREMOLO_6("Tremolo 6", false, 0),
-    POLIRITMIA("Poliritmia", true, 8),
-    ACCIACCATURA("Acciaccatura", true, 0),
-    ACCIACCATURA_2("Acciaccatura 2", true, 0),
-    SINCOPATO("Sincopato", true, 26),
-    CONTROTEMPO("Controtempo", false, 20),
-    CONTROTEMPO_4("Controtempo 4", false, 20),
-    CONTROTEMPO_6("Controtempo 6", false, 20),
-    CONTROTEMPO_8("Controtempo 8", false, 20),
-    CONTROTEMPO_10("Controtempo 10", false, 20),
-    CONTROTEMPO_12("Controtempo 12", false, 20),
-    ALBERTI("Alberti", true, 26),
-    RICAMATO("Ricamato", true, 26),
-    RICAMATO_6("Ricamato 6", true, 26),
-    RICAMATO_8("Ricamato 8", true, 26),
-    RICAMATO_10("Ricamato 10", true, 26),
-    RICAMATO_12("Ricamato 12", true, 26),
-    TRILLO("Trillo", false, 12),
-    TRILLO_2("Trillo 2", true, 12),
-    ARPEGGIO("Arpeggio", true, 24),
-    CAPRICCIO("Capriccio", true, 26),
-    CAPRICCIO_2("Capriccio 2", true, 26),
-    FARFALLA("Farfalla", true, 12),
-    LINEA("Linea", true, 12),
-    ACCUMULO("Accumulo", true, 12),
-    FLUSSO("Flusso", true, 12),
-    ACCUMULO_FLUSSO("Flussaccumulo", true, 12),
-    RADIO("Radio", false, 12),
-    RADIO_FLUSSO("Radioflusso", false, 12),
-    BICINIUM("Bicinium", true, 10),
-    TRICINIUM("Tricinium", true, 10)
+enum class StyleType {
+    CHORDS, LINES, PATTERNS, TEXTURES, AERIALS
+}
+enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val increase: Int, val type: StyleType) {
+    ACCORDO("Accordo", false, 0, StyleType.CHORDS),
+    DRAMMATICO("Drammatico", false, 0, StyleType.CHORDS),
+    RIBATTUTO("Ribattuto", false, 0, StyleType.CHORDS),
+    RIBATTUTO_3("Ribattuto 3", false, 0, StyleType.CHORDS),
+    TREMOLO("Tremolo", false, 0, StyleType.CHORDS),
+    TREMOLO_5("Tremolo 5", false, 0, StyleType.CHORDS),
+    TREMOLO_6("Tremolo 6", false, 0, StyleType.CHORDS),
+    CONTROTEMPO("Controtempo", false, 20, StyleType.CHORDS),
+    CONTROTEMPO_4("Controtempo 4", false, 20, StyleType.CHORDS),
+    CONTROTEMPO_6("Controtempo 6", false, 20, StyleType.CHORDS),
+    CONTROTEMPO_8("Controtempo 8", false, 20, StyleType.CHORDS),
+    CONTROTEMPO_10("Controtempo 10", false, 20, StyleType.CHORDS),
+    CONTROTEMPO_12("Controtempo 12", false, 20, StyleType.CHORDS),
+
+    LINEA("Linea", true, 12, StyleType.LINES),
+    ACCUMULO("Accumulo", true, 12, StyleType.LINES),
+    FLUSSO("Flusso", true, 12, StyleType.LINES),
+    ACCUMULO_FLUSSO("Flussaccumulo", true, 12, StyleType.LINES),
+    RADIO("Radio", false, 12, StyleType.LINES),
+    RADIO_FLUSSO("Radioflusso", false, 12, StyleType.LINES),
+
+    ACCIACCATURA("Acciaccatura", true, 0, StyleType.PATTERNS),
+    ACCIACCATURA_2("Acciaccatura 2", true, 0, StyleType.PATTERNS),
+    SINCOPATO("Sincopato", true, 26, StyleType.PATTERNS),
+    ALBERTI("Alberti", true, 26, StyleType.PATTERNS),
+    RICAMATO("Ricamato", true, 26, StyleType.PATTERNS),
+    RICAMATO_6("Ricamato 6", true, 26, StyleType.PATTERNS),
+    RICAMATO_8("Ricamato 8", true, 26, StyleType.PATTERNS),
+    RICAMATO_10("Ricamato 10", true, 26, StyleType.PATTERNS),
+    RICAMATO_12("Ricamato 12", true, 26, StyleType.PATTERNS),
+
+    BICINIUM("Bicinium", true, 10, StyleType.TEXTURES),
+    TRICINIUM("Tricinium", true, 10, StyleType.TEXTURES),
+    POLIRITMIA("Poliritmia", true, 8, StyleType.TEXTURES),
+
+    TRILLO("Trillo", false, 12, StyleType.AERIALS),
+    TRILLO_2("Trillo 2", true, 12, StyleType.AERIALS),
+    ARPEGGIO("Arpeggio", true, 24, StyleType.AERIALS),
+    CAPRICCIO("Capriccio", true, 26, StyleType.AERIALS),
+    CAPRICCIO_2("Capriccio 2", true, 26, StyleType.AERIALS),
+    FARFALLA("Farfalla", true, 12, StyleType.AERIALS),
+
 }
 
 val starredChordsInstruments = listOf(

@@ -27,6 +27,7 @@ import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
+import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
@@ -53,13 +54,15 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         val instrumentDialogData by lazy { mutableStateOf(ListDialogData()) }
         val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val octavesDialogData by lazy { mutableStateOf(MultiListDialogData()) }
-        val styleDialogData by lazy { mutableStateOf(ListDialogData()) }
+        //val styleDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val groupingDialogData by lazy { mutableStateOf(GroupingDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             ListDialog(harmTypeDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(instrumentDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
             MultiListDialog(octavesDialogData, dimensions, lang.OkButton, appColors)
-            ListDialog(styleDialogData, dimensions, lang.OkButton, appColors)
+            //ListDialog(styleDialogData, dimensions, lang.OkButton, appColors)
+            GroupingListDialog(groupingDialogData, dimensions, lang.OkButton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
                 else dimensions.dialogWidth
@@ -197,18 +200,36 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 colors = model.appColors
                             ) {
                                 val harmData = harmDatas[cursor]
-                                harmTypeDialogData.value = ListDialogData(
-                                    true,
-                                    styleNames,
+                                val itemGroups = HarmonizationStyle.values()
+                                    .groupBy { it.type }.values.map { it.map { it.title } }
+                                val groupNames = StyleType.values().map { it.name }
+                                groupingDialogData.value = GroupingDialogData(
+                                    true, itemGroups, groupNames,
                                     harmData.style.ordinal,
                                     lang.selectHarmonizationStyle
-                                ) { newHarmonizationStyle ->
+                                ) { index ->
                                     val newHarmDatas = harmDatas.toMutableList()
                                     newHarmDatas[cursor] =
-                                        harmDatas[cursor].copy(style = HarmonizationStyle.values()[newHarmonizationStyle])
+                                        harmDatas[cursor].copy(style = HarmonizationStyle.values()[index])
                                     harmDatas = newHarmDatas
-                                    ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                                    GroupingDialogData(
+                                        itemGroups = groupingDialogData.value.itemGroups,
+                                        groupNames = groupingDialogData.value.groupNames,
+                                        selectedListDialogItem = index
+                                    )
                                 }
+//                                harmTypeDialogData.value = ListDialogData(
+//                                    true,
+//                                    styleNames,
+//                                    harmData.style.ordinal,
+//                                    lang.selectHarmonizationStyle
+//                                ) { newHarmonizationStyle ->
+//                                    val newHarmDatas = harmDatas.toMutableList()
+//                                    newHarmDatas[cursor] =
+//                                        harmDatas[cursor].copy(style = HarmonizationStyle.values()[newHarmonizationStyle])
+//                                    harmDatas = newHarmDatas
+//                                    ListDialogData(itemList = harmTypeDialogData.value.itemList)
+//                                }
                             }
                             CustomButton(
                                 isActive = harmDatas[cursor].style.hasDirection,
