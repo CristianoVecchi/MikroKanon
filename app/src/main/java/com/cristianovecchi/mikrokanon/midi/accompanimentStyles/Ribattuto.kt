@@ -13,18 +13,20 @@ fun createRibattuto(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
     val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val pitches = absPitches[i]
-        var (steps, stepDur) = when (harmonizationStyle) {
-            HarmonizationStyle.TREMOLO_6 -> bar.metro.first * 6 to RhythmPatterns.denominatorMidiValue(bar.metro.second) / 6
-            HarmonizationStyle.TREMOLO_5 -> bar.metro.first * 5 to RhythmPatterns.denominatorMidiValue(bar.metro.second) / 5
-            HarmonizationStyle.TREMOLO -> bar.metro.first * 4 to RhythmPatterns.denominatorMidiValue(bar.metro.second) / 4
-            HarmonizationStyle.RIBATTUTO_3 -> bar.metro.first * 3 to RhythmPatterns.denominatorMidiValue(bar.metro.second) / 3
-            HarmonizationStyle.RIBATTUTO -> bar.metro.first * 2 to RhythmPatterns.denominatorMidiValue(bar.metro.second) / 2
-            else -> bar.metro.first to RhythmPatterns.denominatorMidiValue(bar.metro.second)
+        val barDur = bar.duration
+        var stepDur = when (harmonizationStyle) {
+            HarmonizationStyle.TREMOLO_6 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 6
+            HarmonizationStyle.TREMOLO_5 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 5
+            HarmonizationStyle.TREMOLO -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 4
+            HarmonizationStyle.RIBATTUTO_3 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 3
+            HarmonizationStyle.RIBATTUTO -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 2
+            else -> RhythmPatterns.denominatorMidiValue(bar.metro.second)
         }
-        steps = if(stepDur < 8) (bar.duration.toInt() / 8) else steps
-        stepDur = if(stepDur < 8) (bar.duration.toInt() / steps) else stepDur
+        val steps = if(stepDur < 8) (barDur.toInt() / 8) else barDur.toInt() / stepDur
+        stepDur = if(stepDur < 8) (barDur.toInt() / steps) else stepDur
 //        val stepDur = RhythmPatterns.denominatorMidiValue(bar.metro.second)
 //        val steps = bar.metro.first
+       // println("Bar#$i ${bar.metro.first}/${bar.metro.second}  barDur: $barDur  steps: $steps  stepDur: $stepDur")
         val staccatoDur = (stepDur / 4).coerceAtLeast(6).toLong()
         if(pitches.isNotEmpty()){
             val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, increase)

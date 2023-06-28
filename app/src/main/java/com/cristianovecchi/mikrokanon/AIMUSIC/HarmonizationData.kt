@@ -17,9 +17,16 @@ enum class HarmonizationDirection(val symbol: String) {
             else -> pitches
         }
     }
+    fun invert(): HarmonizationDirection {
+        return when (this) {
+            DESCENDING -> ASCENDING
+            ASCENDING -> DESCENDING
+            else -> RANDOM
+        }
+    }
 }
 enum class StyleType {
-    CHORDS, LINES, PATTERNS, TEXTURES, AERIALS
+    CHORDS, TEXTURES, PATTERNS, LINES, AERIALS
 }
 enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val increase: Int, val type: StyleType) {
     ACCORDO("Accordo", false, 0, StyleType.CHORDS),
@@ -36,12 +43,9 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val 
     CONTROTEMPO_10("Controtempo 10", false, 20, StyleType.CHORDS),
     CONTROTEMPO_12("Controtempo 12", false, 20, StyleType.CHORDS),
 
-    LINEA("Linea", true, 12, StyleType.LINES),
-    ACCUMULO("Accumulo", true, 12, StyleType.LINES),
-    FLUSSO("Flusso", true, 12, StyleType.LINES),
-    ACCUMULO_FLUSSO("Flussaccumulo", true, 12, StyleType.LINES),
-    RADIO("Radio", false, 12, StyleType.LINES),
-    RADIO_FLUSSO("Radioflusso", false, 12, StyleType.LINES),
+    BICINIUM("Bicinium", true, 10, StyleType.TEXTURES),
+    TRICINIUM("Tricinium", true, 10, StyleType.TEXTURES),
+    POLIRITMIA("Poliritmia", true, 8, StyleType.TEXTURES),
 
     ACCIACCATURA("Acciaccatura", true, 0, StyleType.PATTERNS),
     ACCIACCATURA_2("Acciaccatura 2", true, 0, StyleType.PATTERNS),
@@ -53,16 +57,20 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val 
     RICAMATO_10("Ricamato 10", true, 26, StyleType.PATTERNS),
     RICAMATO_12("Ricamato 12", true, 26, StyleType.PATTERNS),
 
-    BICINIUM("Bicinium", true, 10, StyleType.TEXTURES),
-    TRICINIUM("Tricinium", true, 10, StyleType.TEXTURES),
-    POLIRITMIA("Poliritmia", true, 8, StyleType.TEXTURES),
+    LINEA("Linea", true, 12, StyleType.LINES),
+    ACCUMULO("Accumulo", true, 12, StyleType.LINES),
+    FLUSSO("Flusso", true, 12, StyleType.LINES),
+    ACCUMULO_FLUSSO("Flussaccumulo", true, 12, StyleType.LINES),
 
     TRILLO("Trillo", false, 12, StyleType.AERIALS),
     TRILLO_2("Trillo 2", true, 12, StyleType.AERIALS),
     ARPEGGIO("Arpeggio", true, 24, StyleType.AERIALS),
+    PASSAGGIO("Passaggio", true, 24, StyleType.AERIALS),
     CAPRICCIO("Capriccio", true, 26, StyleType.AERIALS),
     CAPRICCIO_2("Capriccio 2", true, 26, StyleType.AERIALS),
     FARFALLA("Farfalla", true, 12, StyleType.AERIALS),
+    RADIO("Radio", false, 12, StyleType.AERIALS),
+    RADIO_FLUSSO("Radioflusso", false, 12, StyleType.AERIALS),
 
 }
 
