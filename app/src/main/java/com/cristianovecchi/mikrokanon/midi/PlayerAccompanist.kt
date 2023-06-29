@@ -103,6 +103,11 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     createFarfalla(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
                 }
+                HarmonizationStyle.GRAZIOSO_3, HarmonizationStyle.GRAZIOSO_4 ->{
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    createGrazioso(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
+                }
                 HarmonizationStyle.LINEA, HarmonizationStyle.FLUSSO, HarmonizationStyle.ACCUMULO, HarmonizationStyle.ACCUMULO_FLUSSO -> {
                     val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
                     createNoteLine(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,

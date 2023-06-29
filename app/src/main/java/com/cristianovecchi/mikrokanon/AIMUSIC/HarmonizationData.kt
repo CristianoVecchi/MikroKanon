@@ -69,6 +69,8 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val 
     CAPRICCIO("Capriccio", true, 26, StyleType.AERIALS),
     CAPRICCIO_2("Capriccio 2", true, 26, StyleType.AERIALS),
     FARFALLA("Farfalla", true, 12, StyleType.AERIALS),
+    GRAZIOSO_3("Grazioso 3", true, 12, StyleType.AERIALS),
+    GRAZIOSO_4("Grazioso 4", true, 12, StyleType.AERIALS),
     RADIO("Radio", false, 12, StyleType.AERIALS),
     RADIO_FLUSSO("Radioflusso", false, 12, StyleType.AERIALS),
 

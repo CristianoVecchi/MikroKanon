@@ -8,6 +8,23 @@ enum class TREND(val directions: List<Int>) {
     ASCENDANT_STATIC(Insieme.TREND_ASCENDANT_STATIC.toList()),
     DESCENDANT_STATIC(Insieme.TREND_DESCENDANT_STATIC.toList())
 }
+fun getPairIndices(nNotes: Int): List<Pair<Int,Int>> {
+    return when (nNotes) {
+        1 -> listOf(Pair(0,0), Pair(0,0), Pair(0,0), Pair(0,0))
+        2 -> listOf(Pair(0,1), Pair(1,0), Pair(0,1), Pair(1,0))
+        3 -> listOf(Pair(0,1), Pair(1,2), Pair(0,1), Pair(1,2))
+        4 -> listOf(Pair(0,1), Pair(1,2), Pair(2,3), Pair(3,2))
+        5 -> listOf(Pair(0,1), Pair(1,2), Pair(2,3), Pair(3,4))
+        6 -> listOf(Pair(0,1), Pair(1,2), Pair(2,3), Pair(3,4), Pair(4,5))
+        7 -> listOf(Pair(0,1), Pair(1,2), Pair(2,3), Pair(3,4), Pair(4,5), Pair(5,6))
+        8 -> listOf(Pair(0,1), Pair(1,2), Pair(2,3), Pair(4,5), Pair(5,6), Pair(6,7))
+        9 -> listOf(Pair(0,1), Pair(1,2), Pair(3,4), Pair(4,5), Pair(6,7), Pair(7,8))
+        10 -> listOf(Pair(0,1), Pair(1,2), Pair(3,4), Pair(4,5), Pair(6,7), Pair(8,9))
+        11 -> listOf(Pair(0,1), Pair(1,2), Pair(3,4), Pair(5,6), Pair(7,8), Pair(9,10))
+        12 -> listOf(Pair(0,1), Pair(2,3), Pair(4,5), Pair(6,7), Pair(8,9), Pair(10,11))
+        else -> listOf()
+    }
+}
 fun getButterflyIndices(nNotes: Int): List<Int> {
     return when (nNotes) {
         2 -> listOf(0,1,0, 1,0,1 ,0,1,0, 1,0,1)
