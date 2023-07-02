@@ -46,6 +46,8 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val 
     BICINIUM("Bicinium", true, 10, StyleType.TEXTURES),
     TRICINIUM("Tricinium", true, 10, StyleType.TEXTURES),
     POLIRITMIA("Poliritmia", true, 8, StyleType.TEXTURES),
+    POLIRITMIA_2("Poliritmia 2", true, 8, StyleType.TEXTURES),
+    POLIRITMIA_3("Poliritmia 3", true, 8, StyleType.TEXTURES),
 
     ACCIACCATURA("Acciaccatura", true, 0, StyleType.PATTERNS),
     ACCIACCATURA_2("Acciaccatura 2", true, 0, StyleType.PATTERNS),

@@ -46,6 +46,11 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     createPoliritmia(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
                 }
+                HarmonizationStyle.POLIRITMIA_2, HarmonizationStyle.POLIRITMIA_3 -> {
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    createMultiPoliritmia(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
+                }
                 HarmonizationStyle.ACCIACCATURA, HarmonizationStyle.ACCIACCATURA_2 -> {
                     val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
                     createAcciaccatura(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,

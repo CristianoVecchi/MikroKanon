@@ -41,6 +41,17 @@ fun List<List<String>>.indexInTotalOf(item: String): Int{
     }
     return -1
 }
+fun <E> List<E>.repeatCycling(nElements: Int): List<E>{
+    if(this.isEmpty()) return emptyList()
+    val result = mutableListOf<E>()
+    var listIndex = 0
+    while( result.size < nElements) {
+        result.add(this[listIndex])
+        listIndex++
+        if(listIndex == this.size) listIndex = 0
+    }
+    return result
+}
 fun <E> List<List<E>>.retrieveByIndexInTotal(indexInTotal: Int): E?{
     if(indexInTotal<0) return null
     var partialTotal = 0

@@ -23,6 +23,15 @@ fun createGrazioso(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
             }
             if(barDur >= nSteps * 4){
                 val durs = barDur.divideDistributingRest(nSteps)
+                val phrasingDurs = when(harmonizationStyle) {
+                    HarmonizationStyle.GRAZIOSO_3 -> {
+                        durs.mapIndexed{ j, dur -> if(j % 3 == 2) dur / 2 else dur}
+                    }
+                    else -> {
+                        durs.mapIndexed{ j, dur -> if(j % 4 == 3) dur / 2 else dur}
+                    }
+                }
+                //println("durs: $durs  phrasing durs: $phrasingDurs")
                 val velocities = bars.getProgressiveVelocities(i, nSteps, diffChordVelocity, increase)
                 val pattern = mutableListOf<Int>()
                 when (harmonizationStyle) {
@@ -46,14 +55,14 @@ fun createGrazioso(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                 actualOctavePitches.forEach { octave ->
                     var tick = bar.tick
                     pattern.forEachIndexed { j, pitch ->
-                        val dur = durs[j]
+                        //val dur = durs[j]
                         if(pitch > -1) {
                             Player.insertNoteWithGlissando(
-                                chordsTrack, tick, dur, chordsChannel,
+                                chordsTrack, tick, phrasingDurs[j], chordsChannel,
                                 octave + pitch, velocities[j], 70, 0
                             )
                         }
-                        tick += dur
+                        tick += durs[j]
                     }
                 }
             }
