@@ -1,9 +1,6 @@
 package com.cristianovecchi.mikrokanon.midi.accompanimentStyles
 
-import com.cristianovecchi.mikrokanon.AIMUSIC.Bar
-import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationDirection
-import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationStyle
-import com.cristianovecchi.mikrokanon.AIMUSIC.getProgressiveVelocities
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
 import com.cristianovecchi.mikrokanon.repeatCycling
@@ -28,7 +25,7 @@ fun createMultiPoliritmia(harmonizationStyle: HarmonizationStyle, chordsTrack: M
             val groups = pitches.chunked(div)
             groups.forEach{ group ->
                 division++
-                val pitchArray = group.repeatCycling(division)//.also{println("pitch array: $it")}
+                val pitchArray = group.getWaveCycling(division)//.also{println("[bar#$i]  pitch array: $it")}
                 val durs = barDur.divideDistributingRest(division)
                 val velocities = bars.getProgressiveVelocities(i, division, diffChordVelocity, increase)
                 var tick = bar.tick

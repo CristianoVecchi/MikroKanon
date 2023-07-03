@@ -1,9 +1,6 @@
 package com.cristianovecchi.mikrokanon.midi.accompanimentStyles
 
-import com.cristianovecchi.mikrokanon.AIMUSIC.Bar
-import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationDirection
-import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationStyle
-import com.cristianovecchi.mikrokanon.AIMUSIC.getProgressiveVelocities
+import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
 import com.leff.midi.MidiTrack
@@ -21,14 +18,15 @@ fun createArpeggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
     bars.forEachIndexed { i, bar ->
         //println("BAR #$i dur:${bar.duration}")
         val barDur = bar.duration
-        val pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+        var pitches = if(barDur < 48) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
         else direction.applyDirection(absPitches[i])
         if(pitches.isNotEmpty()){
+            pitches = if (harmonizationStyle == HarmonizationStyle.SCAMBIARPEGGIO) pitches.exchangeNotes() else pitches
             val durs = barDur.divideDistributingRest(pitches.size * actualOctavePitches.size)
             // println("note durs: $durs")
             var tick = bar.tick
 
-            if(durs.any{it < 4}) {
+            if(durs[0] < 4) {
                 val nNotes = bar.duration.toInt() / 4
                 var noteIndex = 0
                 val velocities = bars.getProgressiveVelocities(i, nNotes, diffChordVelocity, increase)

@@ -8,6 +8,74 @@ enum class TREND(val directions: List<Int>) {
     ASCENDANT_STATIC(Insieme.TREND_ASCENDANT_STATIC.toList()),
     DESCENDANT_STATIC(Insieme.TREND_DESCENDANT_STATIC.toList())
 }
+fun List<Int>.exchangeNotes(): List<Int>{
+    return when (size) {
+        0 -> listOf()
+        1, 2 -> this
+        else -> {
+            val result = mutableListOf<Int>()
+            result.add(this[0])
+            (1 until size step 2).forEach{
+                if(it == size -1) result.add(this[it])
+                else {
+                    result.add(this[it+1])
+                    result.add(this[it])
+                }
+            }
+            result//.also { println("Exchange: $this -> $it") }
+        }
+    }
+}
+fun List<Int>.getWaveCycling(nNotes: Int): List<Int>{
+    return when(this.size){
+        1 -> List(nNotes) {this[0]}
+        2 -> {
+            val (e1, e2) = this
+            when (nNotes) {
+                1 -> listOf(e1)
+                2 -> listOf(e1, e2)
+                3 -> listOf(e1, e2, e1)
+                4 -> listOf(e1, e2, e1, e2)
+                5 -> listOf(e1, e2, e1, e2, e1)
+                6 -> listOf(e1, e2, e1, e2, e1, e2)
+                7 -> listOf(e1, e2, e1, e2, e1, e2, e1)
+                8 -> listOf(e1, e2, e1, e2, e1, e2, e1, e2)
+                9 -> listOf(e1, e2, e1, e2, e1, e2, e1, e2, e1)
+                10 -> listOf(e1, e2, e1, e2, e1, e2, e1, e2, e1, e2)
+                11 -> listOf(e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1)
+                12 -> listOf(e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1, e2)
+                13 -> listOf(e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1)
+                14 -> listOf(e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1, e2)
+                15 -> listOf(e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1)
+                16 -> listOf(e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1, e2, e1, e2)
+                else -> listOf()
+            }
+        }
+        3 -> {
+            val (e1, e2, e3) = this
+            when (nNotes) {
+                1 -> listOf(e1)
+                2 -> listOf(e1, e2)
+                3 -> listOf(e1, e2, e3)
+                4 -> listOf(e1, e2, e3, e2)
+                5 -> listOf(e1, e2, e3, e1, e2)
+                6 -> listOf(e1, e2, e3, e2, e1, e2)
+                7 -> listOf(e1, e2, e3, e2, e1, e2, e3)
+                8 -> listOf(e1, e2, e3, e2, e1, e2, e3, e2)
+                9 -> listOf(e1, e2, e3, e2, e1, e2, e3, e1, e2)
+                10 -> listOf(e1, e2, e3, e2, e1, e2, e3, e2, e1, e2)
+                11 -> listOf(e1, e2, e3, e2, e1, e2, e3, e2, e1, e2, e3)
+                12 -> listOf(e1, e2, e3, e2, e1, e2, e3, e2, e1, e2, e3, e2)
+                13 -> listOf(e1, e2, e3, e2, e1, e2, e3, e2, e1, e2, e3, e1, e2)
+                14 -> listOf(e1, e2, e3, e2, e1, e2, e3, e2, e1, e2, e3, e2, e1, e2)
+                15 -> listOf(e1, e2, e3, e2, e1, e2, e3, e2, e1, e2, e3, e2, e1, e2, e3)
+                16 -> listOf(e1, e2, e3, e2, e1, e2, e3, e2, e1, e2, e3, e2, e1, e2, e3, e2)
+                else -> listOf()
+            }
+        }
+        else -> listOf()
+    }
+}
 fun getPairIndices(nNotes: Int): List<Pair<Int,Int>> {
     return when (nNotes) {
         1 -> listOf(Pair(0,0), Pair(0,0), Pair(0,0), Pair(0,0))

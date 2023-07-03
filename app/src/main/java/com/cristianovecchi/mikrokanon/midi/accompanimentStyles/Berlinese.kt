@@ -34,7 +34,7 @@ fun createBerlinese(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
             (0 until nSteps-1).forEach {
                 val index = it * 4 + 3
                 val acciaccaturaDur = durs[index]
-                val acciaccaturaVel = velocities[index]
+                val acciaccaturaVel = (velocities[index] + 2).coerceAtMost(127)
                 acciaccaturaPitches.forEach { acciaccatura ->
                     actualOctavePitches.forEach { octave ->
                         Player.insertNoteWithGlissando(
