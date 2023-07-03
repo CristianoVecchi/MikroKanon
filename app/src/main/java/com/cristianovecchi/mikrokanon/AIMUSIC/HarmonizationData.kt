@@ -58,6 +58,9 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val 
     RICAMATO_8("Ricamato 8", true, 26, StyleType.PATTERNS),
     RICAMATO_10("Ricamato 10", true, 26, StyleType.PATTERNS),
     RICAMATO_12("Ricamato 12", true, 26, StyleType.PATTERNS),
+    BERLINESE("Berlinese", true, 0, StyleType.PATTERNS),
+    BERLINESE_2("Berlinese 2", true, 0, StyleType.PATTERNS),
+    BERLINESE_4("Berlinese 4", true, 0, StyleType.PATTERNS),
 
     LINEA("Linea", true, 12, StyleType.LINES),
     ACCUMULO("Accumulo", true, 12, StyleType.LINES),

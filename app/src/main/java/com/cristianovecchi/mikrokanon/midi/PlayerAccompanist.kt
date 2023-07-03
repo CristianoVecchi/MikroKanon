@@ -61,6 +61,11 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     createSincopato(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
                 }
+                HarmonizationStyle.BERLINESE, HarmonizationStyle.BERLINESE_2, HarmonizationStyle.BERLINESE_4 -> {
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    createBerlinese(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
+                }
                 HarmonizationStyle.CONTROTEMPO, HarmonizationStyle.CONTROTEMPO_4,
                 HarmonizationStyle.CONTROTEMPO_6, HarmonizationStyle.CONTROTEMPO_8, HarmonizationStyle.CONTROTEMPO_10, HarmonizationStyle.CONTROTEMPO_12 -> {
                     val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
