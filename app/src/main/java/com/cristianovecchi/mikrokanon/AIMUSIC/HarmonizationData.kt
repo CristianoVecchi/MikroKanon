@@ -26,7 +26,7 @@ enum class HarmonizationDirection(val symbol: String) {
     }
 }
 enum class StyleType {
-    CHORDS, TEXTURES, PATTERNS, LINES, AERIALS
+    CHORDS, TEXTURES, PATTERNS, LINES, AERIALS, ALEA
 }
 enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val increase: Int, val type: StyleType) {
     ACCORDO("Accordo", false, 0, StyleType.CHORDS),
@@ -77,8 +77,11 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val 
     FARFALLA("Farfalla", true, 12, StyleType.AERIALS),
     GRAZIOSO_3("Grazioso 3", true, 12, StyleType.AERIALS),
     GRAZIOSO_4("Grazioso 4", true, 12, StyleType.AERIALS),
-    RADIO("Radio", false, 12, StyleType.AERIALS),
-    RADIO_FLUSSO("Radioflusso", false, 12, StyleType.AERIALS),
+
+    RADIO("Radio", false, 12, StyleType.ALEA),
+    RADIO_FLUSSO("Radioflusso", false, 12, StyleType.ALEA),
+    NEVE("Neve", true, 12, StyleType.ALEA),
+    NEVE_2("Neve 2", true, 12, StyleType.ALEA),
 
 }
 

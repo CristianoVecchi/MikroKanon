@@ -128,6 +128,15 @@ fun findScaleTicks(tick: Int, scaleDurations: List<Int>): List<Int>{
         return listOf(tick, *ticks.toTypedArray())
 
 }
+fun findScaleTicks(tick: Long, scaleDurations: List<Long>): List<Long>{
+    var lastTick = tick
+    val ticks = (0 until scaleDurations.size -1).map {
+        lastTick += scaleDurations[it]
+        lastTick
+    }
+    return listOf(tick, *ticks.toTypedArray())
+
+}
 fun find2ShortAndLongDurations(duration: Int, maxShortNote: Int): List<Int>{
     val dur = if (maxShortNote * 4 > duration) duration / 4 else maxShortNote
     return listOf(dur, dur, duration - dur * 2)
