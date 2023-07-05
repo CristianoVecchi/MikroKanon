@@ -25,7 +25,7 @@ fun createNeve2(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, 
             actualOctavePitches.forEach { octave ->
                 nSteps = (nSteps -1).coerceAtLeast(3)
                 val durs = barDur.divideDistributingRest(nSteps)
-                println("pitches: $pitches")
+               // println("pitches: $pitches")
                 if(durs[0] > 3) {
                     val velocities = bars.getProgressiveVelocities(i, nSteps, diffChordVelocity, increase)
                     val ticks = findScaleTicks(tick, durs)
@@ -33,10 +33,10 @@ fun createNeve2(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, 
                     println("bar#$i octave:$octave nSteps:$nSteps durs:$durs ticks:$ticks vels:$velocities")
                     val half1 = IntRange(0, nSteps / 2 - 1)
                     val half2 = IntRange(nSteps / 2, nSteps -1)
-                    println("1st half: $half1  2nd half: $half2")
+                    //println("1st half: $half1  2nd half: $half2")
                     pitches.forEach { pitch ->
                         val index = half1.random()
-                        println("index:$index pitch:$pitch tick:${ticks[index]}  ")
+                        //println("index:$index pitch:$pitch tick:${ticks[index]}  ")
                         Player.insertNoteWithGlissando(
                             chordsTrack, ticks[index], staccatoDurs[index], chordsChannel,
                             octave + pitch, velocities[index], 70, 0
@@ -44,7 +44,7 @@ fun createNeve2(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, 
                     }
                     pitches.forEach { pitch ->
                         val index = half2.random()
-                        println("index:$index pitch:$pitch tick:${ticks[index]}  ")
+                       // println("index:$index pitch:$pitch tick:${ticks[index]}  ")
                         Player.insertNoteWithGlissando(
                             chordsTrack, ticks[index], staccatoDurs[index], chordsChannel,
                             octave + pitch, velocities[index], 70, 0
@@ -90,7 +90,6 @@ fun createNeve(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, c
                             octave + pitch, velocities[index], 70, 0
                         )
                     }
-
                 }
             }
         }

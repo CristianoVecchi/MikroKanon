@@ -123,6 +123,12 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     createNoteLine(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
                 }
+                HarmonizationStyle.ECO, HarmonizationStyle.ECO_2, HarmonizationStyle.ECO_3,
+                HarmonizationStyle.ECO_4, HarmonizationStyle.ECO_5, HarmonizationStyle.ECO_6 -> {
+                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    createEco(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
+                }
                 HarmonizationStyle.BICINIUM, HarmonizationStyle.TRICINIUM -> {
                     val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
                     createNoteDoubleTripleLine(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,

@@ -66,6 +66,12 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val 
     ACCUMULO("Accumulo", true, 12, StyleType.LINES),
     FLUSSO("Flusso", true, 12, StyleType.LINES),
     ACCUMULO_FLUSSO("Flussaccumulo", true, 12, StyleType.LINES),
+    ECO("Eco", true, 6, StyleType.LINES),
+    ECO_2("Eco 2", true, 6, StyleType.LINES),
+    ECO_3("Eco 3", true, 6, StyleType.LINES),
+    ECO_4("Eco 4", true, 6, StyleType.LINES),
+    ECO_5("Eco 5", true, 6, StyleType.LINES),
+    ECO_6("Eco 6", true, 6, StyleType.LINES),
 
     TRILLO("Trillo", false, 12, StyleType.AERIALS),
     TRILLO_2("Trillo 2", true, 12, StyleType.AERIALS),
