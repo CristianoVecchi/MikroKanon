@@ -132,12 +132,12 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                 HarmonizationStyle.BICINIUM, HarmonizationStyle.TRICINIUM -> {
                     val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
                     createNoteDoubleTripleLine(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
-                        diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow)
                 }
-                HarmonizationStyle.RADIO, HarmonizationStyle.RADIO_FLUSSO -> {
+                HarmonizationStyle.RADIO -> {
                     val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
                     createRadio(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
-                        diffChordVelocity, diffChordVelocity / 2, justVoicing)
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing, isFlow)
                 }
                 HarmonizationStyle.NEVE -> {
                     val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
@@ -150,7 +150,6 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
                 }
             }
-
         }
     }
 }

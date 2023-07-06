@@ -9,11 +9,10 @@ import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createRadio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+                diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, isFlow: Boolean) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
     val increase = harmonizationStyle.increase
     var lastPitch = -1
-    val isFlow = harmonizationStyle == HarmonizationStyle.RADIO_FLUSSO
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
         val pitches = if(barDur < 6 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)} else absPitches[i]

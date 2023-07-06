@@ -85,10 +85,10 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val 
     GRAZIOSO_3("Grazioso 3", true, true,12, StyleType.AERIALS),
     GRAZIOSO_4("Grazioso 4", true, true,12, StyleType.AERIALS),
 
-    RADIO("Radio", false, true,12, StyleType.ALEA),
-    RADIO_FLUSSO("Radioflusso", false, true,12, StyleType.ALEA),
-    NEVE("Neve", true, false,12, StyleType.ALEA),
-    NEVE_2("Neve 2", true, false,12, StyleType.ALEA),
+    RADIO("Radio", false, true,18, StyleType.ALEA),
+    //RADIO_FLUSSO("Radioflusso", false, true,12, StyleType.ALEA),
+    NEVE("Neve", true, false,24, StyleType.ALEA),
+    NEVE_2("Neve 2", true, false,24, StyleType.ALEA),
 
 }
 
