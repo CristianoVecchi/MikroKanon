@@ -3,15 +3,16 @@ package com.cristianovecchi.mikrokanon.midi.accompanimentStyles
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
+import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createMultiTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                 diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }
+                 diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean) {
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration.toInt()
-        val pitches = if(barDur < 18 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+        var pitches = if(barDur < 18 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
         else direction.applyDirection(absPitches[i])
         when (val size = pitches.size) {
             0 -> Unit
@@ -26,7 +27,7 @@ fun createMultiTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiT
 //                }
 //            }
             else -> {
-                val trills = pitches.chunked(2).toMutableList()
+                var trills = pitches.chunked(2).toMutableList()
                 if(trills.last().size == 1){
                     trills[trills.size -1 ] = listOf(pitches[size-1], pitches.getOrElse(size-2){pitches[size-1]})
                 }
@@ -42,6 +43,7 @@ fun createMultiTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiT
                         velocities.getOrElse(j+1){ (bars.getNextBarVelocity(i) - diffChordVelocity + increase).coerceIn(0, 127) } - velocities[j])
                 }
                 actualOctavePitches.forEach { octave ->
+                    println("Octave: $octave  Trills: $trills")
                     var tick = bar.tick
                     trills.forEachIndexed { j, trill ->
                         val firstNote = trill.first()
@@ -65,26 +67,34 @@ fun createMultiTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiT
                             }
 
                     }
+                    if(isFlow){
+                        pitches = pitches.shiftCycling()
+                        trills = pitches.chunked(2).toMutableList()
+                        if(trills.last().size == 1){
+                            trills[trills.size -1 ] = listOf(pitches[size-1], pitches.getOrElse(size-2){pitches[size-1]})
+                        }
+                    }
                 }
             }
         }
     }
 }
 fun createTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                 diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }
+                 diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, isFlow: Boolean) {
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
-        val pitches = if(barDur < 18 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)} else absPitches[i]
+        var pitches = if(barDur < 18 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)} else absPitches[i]
         if(pitches.isNotEmpty()){
             val (durs, div) = findEvenTrillDurations(barDur.toInt())
             if (div != -1){
                 val velocities = bars.getProgressiveVelocities(i, div, diffChordVelocity, 12)
                 //println("Interval: $velocity - $goalVelocity   Velocities:$velocities")
-                val trills = pitches.chunked(2)//.also{println("Trills: $it")}
-                val firstNotes = trills.map{ it.first() }
-                val secondNotes = trills.map{ it.last() }.filter{!firstNotes.contains(it)}
+                var trills = pitches.chunked(2)//.also{println("Trills: $it")}
+                var firstNotes = trills.map{ it.first() }
+                var secondNotes = trills.map{ it.last() }.filter{!firstNotes.contains(it)}
                 actualOctavePitches.forEach { octave ->
+                    println("Octave: $octave  Syncope: $trills $firstNotes $secondNotes")
                     var tick = bar.tick
                     for(index in 0 until div step 2){
                         var duration = durs[index]
@@ -105,6 +115,12 @@ fun createTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack,
                             )
                         }
                         tick += duration
+                    }
+                    if (isFlow) {
+                        //pitches = pitches.shiftCycling()
+                        trills = trills.map{ it.reversed() }
+                        firstNotes = trills.map{ it.first() }
+                        secondNotes = trills.map{ it.last() }.filter{!firstNotes.contains(it)}
                     }
                 }
 //                trills.forEach { trill ->

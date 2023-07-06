@@ -28,66 +28,67 @@ enum class HarmonizationDirection(val symbol: String) {
 enum class StyleType {
     CHORDS, TEXTURES, PATTERNS, LINES, AERIALS, ALEA
 }
-enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val increase: Int, val type: StyleType) {
-    ACCORDO("Accordo", false, 0, StyleType.CHORDS),
-    DRAMMATICO("Drammatico", false, 0, StyleType.CHORDS),
-    RIBATTUTO("Ribattuto", false, 0, StyleType.CHORDS),
-    RIBATTUTO_3("Ribattuto 3", false, 0, StyleType.CHORDS),
-    TREMOLO("Tremolo", false, 0, StyleType.CHORDS),
-    TREMOLO_5("Tremolo 5", false, 0, StyleType.CHORDS),
-    TREMOLO_6("Tremolo 6", false, 0, StyleType.CHORDS),
-    CONTROTEMPO("Controtempo", false, 20, StyleType.CHORDS),
-    CONTROTEMPO_4("Controtempo 4", false, 20, StyleType.CHORDS),
-    CONTROTEMPO_6("Controtempo 6", false, 20, StyleType.CHORDS),
-    CONTROTEMPO_8("Controtempo 8", false, 20, StyleType.CHORDS),
-    CONTROTEMPO_10("Controtempo 10", false, 20, StyleType.CHORDS),
-    CONTROTEMPO_12("Controtempo 12", false, 20, StyleType.CHORDS),
 
-    BICINIUM("Bicinium", true, 10, StyleType.TEXTURES),
-    TRICINIUM("Tricinium", true, 10, StyleType.TEXTURES),
-    POLIRITMIA("Poliritmia", true, 8, StyleType.TEXTURES),
-    POLIRITMIA_2("Poliritmia 2", true, 8, StyleType.TEXTURES),
-    POLIRITMIA_3("Poliritmia 3", true, 8, StyleType.TEXTURES),
+enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val hasFlow: Boolean, val increase: Int, val type: StyleType) {
+    ACCORDO("Accordo", false, false,0, StyleType.CHORDS),
+    DRAMMATICO("Drammatico", false, false,0, StyleType.CHORDS),
+    RIBATTUTO("Ribattuto", false, false,0, StyleType.CHORDS),
+    RIBATTUTO_3("Ribattuto 3", false, false,0, StyleType.CHORDS),
+    TREMOLO("Tremolo", false, false,0, StyleType.CHORDS),
+    TREMOLO_5("Tremolo 5", false, false,0, StyleType.CHORDS),
+    TREMOLO_6("Tremolo 6", false, false,0, StyleType.CHORDS),
+    CONTROTEMPO("Controtempo", false, false,20, StyleType.CHORDS),
+    CONTROTEMPO_4("Controtempo 4", false, false,20, StyleType.CHORDS),
+    CONTROTEMPO_6("Controtempo 6", false, false,20, StyleType.CHORDS),
+    CONTROTEMPO_8("Controtempo 8", false, false,20, StyleType.CHORDS),
+    CONTROTEMPO_10("Controtempo 10", false, false,20, StyleType.CHORDS),
+    CONTROTEMPO_12("Controtempo 12", false, false,20, StyleType.CHORDS),
 
-    SINCOPATO("Sincopato", true, 26, StyleType.PATTERNS),
-    ALBERTI("Alberti", true, 26, StyleType.PATTERNS),
-    RICAMATO("Ricamato", true, 26, StyleType.PATTERNS),
-    RICAMATO_6("Ricamato 6", true, 26, StyleType.PATTERNS),
-    RICAMATO_8("Ricamato 8", true, 26, StyleType.PATTERNS),
-    RICAMATO_10("Ricamato 10", true, 26, StyleType.PATTERNS),
-    RICAMATO_12("Ricamato 12", true, 26, StyleType.PATTERNS),
-    ACCIACCATURA("Acciaccatura", true, 0, StyleType.PATTERNS),
-    ACCIACCATURA_2("Acciaccatura 2", true, 0, StyleType.PATTERNS),
-    BERLINESE("Berlinese", true, 0, StyleType.PATTERNS),
-    BERLINESE_2("Berlinese 2", true, 0, StyleType.PATTERNS),
-    BERLINESE_4("Berlinese 4", true, 0, StyleType.PATTERNS),
+    BICINIUM("Bicinium", true, true,10, StyleType.TEXTURES),
+    TRICINIUM("Tricinium", true, true,10, StyleType.TEXTURES),
+    POLIRITMIA("Poliritmia", true, true,8, StyleType.TEXTURES),
+    POLIRITMIA_2("Poliritmia 2", true, true,8, StyleType.TEXTURES),
+    POLIRITMIA_3("Poliritmia 3", true, true,8, StyleType.TEXTURES),
 
-    LINEA("Linea", true, 12, StyleType.LINES),
-    ACCUMULO("Accumulo", true, 12, StyleType.LINES),
-    FLUSSO("Flusso", true, 12, StyleType.LINES),
-    ACCUMULO_FLUSSO("Flussaccumulo", true, 12, StyleType.LINES),
-    ECO("Eco", true, 6, StyleType.LINES),
-    ECO_2("Eco 2", true, 6, StyleType.LINES),
-    ECO_3("Eco 3", true, 6, StyleType.LINES),
-    ECO_4("Eco 4", true, 6, StyleType.LINES),
-    ECO_5("Eco 5", true, 6, StyleType.LINES),
-    ECO_6("Eco 6", true, 6, StyleType.LINES),
+    SINCOPATO("Sincopato", true, true,26, StyleType.PATTERNS),
+    ALBERTI("Alberti", true, true,26, StyleType.PATTERNS),
+    RICAMATO("Ricamato", true, true,26, StyleType.PATTERNS),
+    RICAMATO_6("Ricamato 6", true, true,26, StyleType.PATTERNS),
+    RICAMATO_8("Ricamato 8", true, true,26, StyleType.PATTERNS),
+    RICAMATO_10("Ricamato 10", true, true,26, StyleType.PATTERNS),
+    RICAMATO_12("Ricamato 12", true, true,26, StyleType.PATTERNS),
+    ACCIACCATURA("Acciaccatura", true, false,0, StyleType.PATTERNS),
+    ACCIACCATURA_2("Acciaccatura 2", true, false,0, StyleType.PATTERNS),
+    BERLINESE("Berlinese", true, false,0, StyleType.PATTERNS),
+    BERLINESE_2("Berlinese 2", true, false,0, StyleType.PATTERNS),
+    BERLINESE_4("Berlinese 4", true, false,0, StyleType.PATTERNS),
 
-    TRILLO("Trillo", false, 12, StyleType.AERIALS),
-    TRILLO_2("Trillo 2", true, 12, StyleType.AERIALS),
-    ARPEGGIO("Arpeggio", true, 24, StyleType.AERIALS),
-    SCAMBIARPEGGIO("Scambiarpeggio", true, 24, StyleType.AERIALS),
-    PASSAGGIO("Passaggio", true, 24, StyleType.AERIALS),
-    CAPRICCIO("Capriccio", true, 26, StyleType.AERIALS),
-    CAPRICCIO_2("Capriccio 2", true, 26, StyleType.AERIALS),
-    FARFALLA("Farfalla", true, 12, StyleType.AERIALS),
-    GRAZIOSO_3("Grazioso 3", true, 12, StyleType.AERIALS),
-    GRAZIOSO_4("Grazioso 4", true, 12, StyleType.AERIALS),
+    LINEA("Linea", true, true,12, StyleType.LINES),
+    ACCUMULO("Accumulo", true, true,12, StyleType.LINES),
+    //FLUSSO("Flusso", true, true,12, StyleType.LINES),
+    //ACCUMULO_FLUSSO("Flussaccumulo", true,true, 12, StyleType.LINES),
+    ECO("Eco", true, true,6, StyleType.LINES),
+    ECO_2("Eco 2", true, true,6, StyleType.LINES),
+    ECO_3("Eco 3", true, true,6, StyleType.LINES),
+    ECO_4("Eco 4", true, true,6, StyleType.LINES),
+    ECO_5("Eco 5", true, true,6, StyleType.LINES),
+    ECO_6("Eco 6", true, true,6, StyleType.LINES),
 
-    RADIO("Radio", false, 12, StyleType.ALEA),
-    RADIO_FLUSSO("Radioflusso", false, 12, StyleType.ALEA),
-    NEVE("Neve", true, 12, StyleType.ALEA),
-    NEVE_2("Neve 2", true, 12, StyleType.ALEA),
+    TRILLO("Trillo", false, true,12, StyleType.AERIALS),
+    TRILLO_2("Trillo 2", true, true,12, StyleType.AERIALS),
+    ARPEGGIO("Arpeggio", true, false,24, StyleType.AERIALS),
+    SCAMBIARPEGGIO("Scambiarpeggio", false,true, 24, StyleType.AERIALS),
+    PASSAGGIO("Passaggio", true, true,24, StyleType.AERIALS),
+    CAPRICCIO("Capriccio", true, true,26, StyleType.AERIALS),
+    CAPRICCIO_2("Capriccio 2", true, true,26, StyleType.AERIALS),
+    FARFALLA("Farfalla", true, true,12, StyleType.AERIALS),
+    GRAZIOSO_3("Grazioso 3", true, true,12, StyleType.AERIALS),
+    GRAZIOSO_4("Grazioso 4", true, true,12, StyleType.AERIALS),
+
+    RADIO("Radio", false, true,12, StyleType.ALEA),
+    RADIO_FLUSSO("Radioflusso", false, true,12, StyleType.ALEA),
+    NEVE("Neve", true, false,12, StyleType.ALEA),
+    NEVE_2("Neve 2", true, false,12, StyleType.ALEA),
 
 }
 
@@ -110,14 +111,17 @@ fun List<Int>.convertToOctavesByte(): Int {
 data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NONE,
                              val instrument: Int = 48, val volume: Float = 0.1f,
                              val style: HarmonizationStyle = HarmonizationStyle.ACCORDO,
-                             val octavesByte: Int = 248, val direction: HarmonizationDirection = HarmonizationDirection.ASCENDING){ // from octave 3 to 7 (numbers 4 to 8)
+                             val octavesByte: Int = 248, val direction: HarmonizationDirection = HarmonizationDirection.ASCENDING,
+                             val isFlow: Boolean = false){ // from octave 3 to 7 (numbers 4 to 8)
     fun describe(): String {
         val direction = if(this.style.hasDirection) this.direction.symbol else ""
+        val withFlow = if(this.style.hasFlow && isFlow) "§" else ""
         return if(type == HarmonizationType.NONE) "  ---  ${this.type.title}  ---"
-        else "${this.type.title} ${this.style.title}${direction}\n  ${ListaStrumenti.getNameByIndex(this.instrument)} ${this.describeOctaves()} ${String.format("%.0f%%",this.volume*100)}"
+        else "${this.type.title} ${this.style.title} ${withFlow}${direction}\n  ${ListaStrumenti.getNameByIndex(this.instrument)} ${this.describeOctaves()} ${String.format("%.0f%%",this.volume*100)}"
     }
     fun toCsv(): String {
-        return "${this.type.ordinal}|${this.instrument}|${this.volume}|${this.style.ordinal}|${this.octavesByte}|${this.direction.ordinal}"
+        val flowBool = if(isFlow) 1 else 0
+        return "${this.type.ordinal}|${this.instrument}|${this.volume}|${this.style.ordinal}|${this.octavesByte}|${this.direction.ordinal}|$flowBool"
     }
     fun convertFromOctavesByte(): List<Int>{
         //println("Octaves Byte: " + octavesByte.toString(2))
@@ -150,10 +154,12 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
             val directionValues = HarmonizationDirection.values()
             return values.map{
                 val subValues = it.split("|")
+                val flowCsv = subValues.getOrElse(6) { "0" }
                 HarmonizationData(harmValues[subValues[0].toInt()], subValues[1].toInt(),
                     subValues[2].toFloat(), styleValues[subValues.getOrElse(3){"0"}.toInt()],
                     subValues.getOrElse(4){"248"}.toInt(),
-                    directionValues[subValues.getOrElse(5){"0"}.toInt()]
+                    directionValues[subValues.getOrElse(5){"0"}.toInt()],
+                    flowCsv != "0"
                 )
             }
         }

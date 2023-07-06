@@ -10,18 +10,14 @@ import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection) {
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
     //bars.forEach { println(it) }
     var lastPitch = -1
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
-    val isFlow = when(harmonizationStyle){
-        HarmonizationStyle.FLUSSO, HarmonizationStyle.ACCUMULO_FLUSSO -> true
-        else -> false
-    }
     val isAccumulo = when(harmonizationStyle){
-        HarmonizationStyle.ACCUMULO, HarmonizationStyle.ACCUMULO_FLUSSO -> true
+        HarmonizationStyle.ACCUMULO -> true
         else -> false
     }
     //.also{println("Octaves: $octaves -> Actual octaves: $it")}
@@ -101,7 +97,7 @@ fun createNoteDoubleTripleLine(harmonizationStyle: HarmonizationStyle, chordsTra
                     Triple(pitches.subList(0, nHalfPitches), pitches.subList(nHalfPitches, pitches.size), listOf<Int>() )
                 }
             }
-            println("Original:$pitches -> A:$pitches1 B:$pitches2 C:$pitches3")
+            //println("Original:$pitches -> A:$pitches1 B:$pitches2 C:$pitches3")
             if(pitches1.isNotEmpty()){
                 val durs = barDur.divideDistributingRest(pitches1.size)
                 val velocities = bars.getProgressiveVelocities(i, durs.size, diffChordVelocity, increase)

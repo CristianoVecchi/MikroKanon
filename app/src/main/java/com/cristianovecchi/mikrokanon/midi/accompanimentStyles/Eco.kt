@@ -7,12 +7,12 @@ import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createEco(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
 ) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
     //bars.forEach { println(it) }
     var lastPitch = -1
-    val actualOctavePitches = octaves.map { (it + 1) * 12 }
+    val actualOctavePitches = octaves.map { (it + 1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
     val delay = when (harmonizationStyle) {
         HarmonizationStyle.ECO_2 -> 2
@@ -37,31 +37,35 @@ fun createEco(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, ch
             val duxDurs = durs.toMutableList().apply { this[size-1] = this[size-1] / 2 }
             val comesDurs = durs.toMutableList().apply { this[nSteps-1] = this[nSteps-1] / 2 }
             pitches = if(pitches.first() == lastPitch) pitches.shiftCycling() else pitches
-            pitches.forEachIndexed { j, absPitch ->
-                val tick = ticks[j]
-                val actualDuration = duxDurs[j]
-                val velocity = velocities[j]
-                actualOctavePitches.forEach{ octave ->
-                    Player.insertNoteWithGlissando(
-                        chordsTrack, tick, actualDuration, chordsChannel,
-                        octave + absPitch, velocity, 70, 0
-                    )
-                }
-            }
-            var index = delay
-            pitches.forEachIndexed { j, absPitch ->
-                val tick = ticks[index]
-                val actualDuration = comesDurs[index]
-                val velocity = comesVelocities[index]
-                actualOctavePitches.forEach{ octave ->
-                    Player.insertNoteWithGlissando(
-                        chordsTrack, tick, actualDuration, chordsChannel,
-                        octave + absPitch, velocity, 70, 0
-                    )
-                }
-                index++
-            }
             lastPitch = pitches.last()
+            actualOctavePitches.forEach { octave ->
+                //println("Octave:$octave pattern:$pitches")
+                pitches.forEachIndexed { j, absPitch ->
+                    val tick = ticks[j]
+                    val actualDuration = duxDurs[j]
+                    val velocity = velocities[j]
+                    Player.insertNoteWithGlissando(
+                        chordsTrack, tick, actualDuration, chordsChannel,
+                        octave + absPitch, velocity, 70, 0
+                    )
+
+                }
+                var index = delay
+                pitches.forEach { absPitch ->
+                    val tick = ticks[index]
+                    val actualDuration = comesDurs[index]
+                    val velocity = comesVelocities[index]
+                    Player.insertNoteWithGlissando(
+                        chordsTrack, tick, actualDuration, chordsChannel,
+                        octave + absPitch, velocity, 70, 0
+                    )
+                    index++
+                }
+                if(isFlow){
+                    pitches = pitches.shiftCycling()
+                }
+            }
+
         }
     }
 }

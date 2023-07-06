@@ -7,9 +7,9 @@ import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createFarfalla(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                  diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
+                  diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
 ) {
-    val actualOctavePitches = octaves.map { (it + 1) * 12 }
+    val actualOctavePitches = octaves.map { (it + 1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
     var lastPitch = -1
     bars.forEachIndexed { i, bar ->
@@ -23,7 +23,9 @@ fun createFarfalla(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
             val velocities = bars.getProgressiveVelocities(i, 12, diffChordVelocity, increase)
             var pattern = indices.map{ pitches[it] }
             pattern = if(pattern.last() == lastPitch) pattern.shiftCycling() else pattern
+            lastPitch = pattern.last()
             actualOctavePitches.forEach { octave ->
+                //println("Octave:$octave pattern:$pattern")
                 var tick = bar.tick
                 pattern.forEachIndexed { j, pitch ->
                     val dur = durs[j]
@@ -33,9 +35,10 @@ fun createFarfalla(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                     )
                     tick += dur
                 }
+                if(isFlow){
+                    pattern = pattern.shiftCycling()
+                }
             }
-            lastPitch = pattern.last()
         }
-
     }
 }

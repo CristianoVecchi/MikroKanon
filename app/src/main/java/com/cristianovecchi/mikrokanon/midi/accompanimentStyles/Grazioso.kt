@@ -3,16 +3,17 @@ package com.cristianovecchi.mikrokanon.midi.accompanimentStyles
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
+import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createGrazioso(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
 ) {
-    val actualOctavePitches = octaves.map { (it + 1) * 12 }
+    val actualOctavePitches = octaves.map { (it + 1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
-        val pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+        var pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
         else direction.applyDirection(absPitches[i])
         val size = pitches.size
         if(size > 0){
@@ -33,7 +34,7 @@ fun createGrazioso(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                 }
                 //println("durs: $durs  phrasing durs: $phrasingDurs")
                 val velocities = bars.getProgressiveVelocities(i, nSteps, diffChordVelocity, increase)
-                val pattern = mutableListOf<Int>()
+                var pattern = mutableListOf<Int>()
                 when (harmonizationStyle) {
                     HarmonizationStyle.GRAZIOSO_3 -> {
                         indices.forEach {
@@ -53,6 +54,7 @@ fun createGrazioso(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                 }
                 //println("pattern: $pattern")
                 actualOctavePitches.forEach { octave ->
+                    //println("Octave:$octave pattern:$pattern")
                     var tick = bar.tick
                     pattern.forEachIndexed { j, pitch ->
                         //val dur = durs[j]
@@ -63,6 +65,28 @@ fun createGrazioso(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                             )
                         }
                         tick += durs[j]
+                    }
+                    if(isFlow){
+                        pitches = pitches.shiftCycling()
+                        pattern.clear()
+                        //TO DO optimize arrays
+                        when (harmonizationStyle) {
+                            HarmonizationStyle.GRAZIOSO_3 -> {
+                                indices.forEach {
+                                    pattern.add(-1)
+                                    pattern.add(pitches[it.first])
+                                    pattern.add(pitches[it.second])
+                                }
+                            }
+                            else -> {
+                                indices.forEach {
+                                    pattern.add(-1)
+                                    pattern.add(pitches[it.first])
+                                    pattern.add(pitches[it.second])
+                                    pattern.add(pitches[it.first])
+                                }
+                            }
+                        }
                     }
                 }
             }

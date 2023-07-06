@@ -162,8 +162,8 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                         verticalArrangement = Arrangement.SpaceEvenly,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        val dimensions by model.dimensions.asFlow()
-                            .collectAsState(initial = model.dimensions.value!!)
+//                        val dimensions by model.dimensions.asFlow()
+//                            .collectAsState(initial = model.dimensions.value!!)
                         val buttonSize = dimensions.dialogButtonSize
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -230,6 +230,20 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
 //                                    harmDatas = newHarmDatas
 //                                    ListDialogData(itemList = harmTypeDialogData.value.itemList)
 //                                }
+                            }
+                            CustomButton( // style flow
+                                isActive = harmDatas[cursor].style.hasFlow,
+                                iconId = model.iconMap["arpeggio"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val newHarmDatas = harmDatas.toMutableList()
+                                val oldHarmData = harmDatas[cursor]
+                                val newFlow = !oldHarmData.isFlow
+                                newHarmDatas[cursor] = oldHarmData.copy(isFlow = newFlow)
+                                harmDatas = newHarmDatas
+                                ListDialogData(itemList = harmTypeDialogData.value.itemList)
                             }
                             CustomButton(
                                 isActive = harmDatas[cursor].style.hasDirection,

@@ -6,24 +6,25 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationStyle
 import com.cristianovecchi.mikrokanon.AIMUSIC.getProgressiveVelocities
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
+import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createPassaggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                       diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
+                       diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
 ) {
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
-        val pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)} else absPitches[i]
+        var pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)} else absPitches[i]
         if(pitches.isNotEmpty()) {
-            val passaggioPitches = when (direction) {
+            var passaggioPitches = when (direction) {
                 HarmonizationDirection.ASCENDING -> pitches.map { it - 1 }
                 HarmonizationDirection.DESCENDING -> pitches.map { it + 1 }.reversed()
                 HarmonizationDirection.RANDOM -> (0..11).filter { !pitches.contains(it) }.shuffled()
             }
             //val goalPitches = direction.invert().applyDirection(pitches)
-            val allPitches = passaggioPitches + direction.invert().applyDirection(pitches)
+            var allPitches = passaggioPitches + direction.invert().applyDirection(pitches)
 
             val size = allPitches.size
             val durs = barDur.divideDistributingRest(size)
@@ -31,6 +32,7 @@ fun createPassaggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
 //            print("Bar#$i ${bar.metro.first}/${bar.metro.second}  barDur: $barDur")
 //            println("  allPitches: $allPitches  barDur: $barDur  durs: $durs  velocities: $velocities")
             actualOctavePitches.forEach { octave ->
+               // println("Octave:$octave passaggio:$passaggioPitches pitches:$pitches  allPitches: $allPitches")
                 var tick = bar.tick
                 allPitches.forEachIndexed { j, pitch ->
                     val dur = durs[j]
@@ -39,6 +41,11 @@ fun createPassaggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
                         octave + pitch, velocities[j], 70, 0
                     )
                     tick += dur
+                }
+                if(isFlow){
+                    pitches = pitches.shiftCycling()
+                    passaggioPitches = passaggioPitches.shiftCycling()
+                    allPitches = passaggioPitches + pitches
                 }
             }
         }
