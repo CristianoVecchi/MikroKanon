@@ -8,15 +8,15 @@ import com.cristianovecchi.mikrokanon.midi.Player
 import com.leff.midi.MidiTrack
 
 fun createControtempo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                      diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+                      diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, density: Int) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
     val increase = harmonizationStyle.increase
-    val steps = when(harmonizationStyle){
-        HarmonizationStyle.CONTROTEMPO_4 -> 4
-        HarmonizationStyle.CONTROTEMPO_6 -> 6
-        HarmonizationStyle.CONTROTEMPO_8 -> 8
-        HarmonizationStyle.CONTROTEMPO_10 -> 10
-        HarmonizationStyle.CONTROTEMPO_12 -> 12
+    val steps = when(density){
+        2 -> 4
+        3 -> 6
+        4 -> 8
+        5 -> 10
+        6 -> 12
         else -> 2
     }
     bars.forEachIndexed { i, bar ->

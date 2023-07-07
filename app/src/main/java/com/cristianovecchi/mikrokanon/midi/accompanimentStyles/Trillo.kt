@@ -84,7 +84,9 @@ fun createTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack,
     val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
-        var pitches = if(barDur < 18 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)} else absPitches[i]
+        var pitches = if(barDur < 18 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
+        else absPitches[i]
+
         if(pitches.isNotEmpty()){
             val (durs, div) = findEvenTrillDurations(barDur.toInt())
             if (div != -1){

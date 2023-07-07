@@ -10,16 +10,16 @@ import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createRicamato(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean, density: Int
 ) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
     var lastPitch = -1
-    val nRepetitions = when (harmonizationStyle) {
-        HarmonizationStyle.RICAMATO_6 -> 2
-        HarmonizationStyle.RICAMATO_8 -> 3
-        HarmonizationStyle.RICAMATO_10 -> 4
-        HarmonizationStyle.RICAMATO_12 -> 5
+    val nRepetitions = when (density) {
+        2 -> 2
+        3 -> 3
+        4 -> 4
+        5 -> 5
         else -> 1
     }
     val steps = 2 + 2 * nRepetitions

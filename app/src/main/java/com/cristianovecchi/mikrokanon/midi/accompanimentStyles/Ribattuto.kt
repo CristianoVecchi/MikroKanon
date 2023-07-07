@@ -8,18 +8,18 @@ import com.cristianovecchi.mikrokanon.midi.Player
 import com.leff.midi.MidiTrack
 
 fun createRibattuto(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true) {
+                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, density: Int) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
     val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val pitches = absPitches[i]
         val barDur = bar.duration
-        var stepDur = when (harmonizationStyle) {
-            HarmonizationStyle.TREMOLO_6 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 6
-            HarmonizationStyle.TREMOLO_5 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 5
-            HarmonizationStyle.TREMOLO -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 4
-            HarmonizationStyle.RIBATTUTO_3 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 3
-            HarmonizationStyle.RIBATTUTO -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 2
+        var stepDur = when (density) {
+            6 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 6
+            5 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 5
+            4 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 4
+            3 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 3
+            2 -> RhythmPatterns.denominatorMidiValue(bar.metro.second) / 2
             else -> RhythmPatterns.denominatorMidiValue(bar.metro.second)
         }
         val steps = if(stepDur < 8) (barDur.toInt() / 8) else barDur.toInt() / stepDur

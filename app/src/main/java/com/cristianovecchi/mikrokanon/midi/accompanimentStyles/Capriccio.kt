@@ -7,7 +7,7 @@ import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createCapriccio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
+                    diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean, density: Int
 ) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
@@ -28,7 +28,7 @@ fun createCapriccio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
             actualOctavePitches.forEach { octave ->
                 //println("Octave:$octave arpeggio:$arpeggioPitches last:$lastPitch")
                 var tick = bar.tick
-                if(i > 0 && harmonizationStyle == HarmonizationStyle.CAPRICCIO_2){
+                if(i > 0 && density == 2){
 
                     Player.insertNoteWithGlissando(
                         chordsTrack, tick, staccatoDur, chordsChannel,
@@ -56,7 +56,7 @@ fun createCapriccio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
                     chordsTrack, tick, staccatoDur, chordsChannel,
                     octave + lastPitch, lastVelocity, 70, 0
                 )
-                if(i != bars.size-1 && harmonizationStyle == HarmonizationStyle.CAPRICCIO_2 && size > 0) {
+                if(i != bars.size-1 && density == 2 && size > 0) {
                     val goalVelocity = (bars.getNextBarVelocity(i) - diffChordVelocity + increase).coerceIn(0, 127)
                     val arpeggioVelocities = accumulateVelocities(size, velocities[3], goalVelocity - velocities[3])
                     //.also{println("${velocities[2]} + $it -> $goalVelocity")}

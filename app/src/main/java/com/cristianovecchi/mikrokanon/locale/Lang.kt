@@ -364,6 +364,7 @@ data class Lang( // English by default
     val selectHarmonizationVolume: String = "Select the harmonization volume!",
     val selectOctaves: String = "Select octaves!",
     val selectHarmonizationStyle: String = "Select the harmonization style!",
+    val selectStyleDensity: String = "Select the style density!",
     val drums: String= "Drums",
     val selectDrumsType: String = "Select the style of the drums!",
     val selectDrumKit: String = "Select the drum-kit!",

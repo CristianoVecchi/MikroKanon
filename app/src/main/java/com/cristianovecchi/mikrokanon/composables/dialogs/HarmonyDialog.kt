@@ -51,6 +51,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         val harmNames = HarmonizationType.values().map{ it.title }
         val styleNames = HarmonizationStyle.values().map{ it.title }
         val harmTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val densityDialogData by lazy { mutableStateOf(ListDialogData()) }
         val instrumentDialogData by lazy { mutableStateOf(ListDialogData()) }
         val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val octavesDialogData by lazy { mutableStateOf(MultiListDialogData()) }
@@ -58,6 +59,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         val groupingDialogData by lazy { mutableStateOf(GroupingDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             ListDialog(harmTypeDialogData, dimensions, lang.OkButton, appColors)
+            ListDialog(densityDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(instrumentDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
             MultiListDialog(octavesDialogData, dimensions, lang.OkButton, appColors)
@@ -203,14 +205,18 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 val itemGroups = HarmonizationStyle.values()
                                     .groupBy { it.type }.values.map { it.map { it.title } }
                                 val groupNames = StyleType.values().map { it.name }
+
                                 groupingDialogData.value = GroupingDialogData(
                                     true, itemGroups, groupNames,
                                     harmData.style.ordinal,
                                     lang.selectHarmonizationStyle
                                 ) { index ->
                                     val newHarmDatas = harmDatas.toMutableList()
+                                    val newStyle = HarmonizationStyle.values()[index]
+//                                    val maxDensity = newStyle.maxDensity
+//                                    val checkedDensity = if(harmData.density > maxDensity) maxDensity else harmData.density
                                     newHarmDatas[cursor] =
-                                        harmDatas[cursor].copy(style = HarmonizationStyle.values()[index])
+                                        harmDatas[cursor].copy(style = newStyle)//, density = checkedDensity)
                                     harmDatas = newHarmDatas
                                     GroupingDialogData(
                                         itemGroups = groupingDialogData.value.itemGroups,
@@ -231,6 +237,29 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
 //                                    ListDialogData(itemList = harmTypeDialogData.value.itemList)
 //                                }
                             }
+                            CustomButton( // density
+                                isActive = harmDatas[cursor].style.maxDensity > 1,
+                                iconId = model.iconMap["density"]!!,
+                                buttonSize = buttonSize.dp,
+                                iconColor = model.appColors.iconButtonIconColor,
+                                colors = model.appColors
+                            ) {
+                                val harmData = harmDatas[cursor]
+                                val maxDensity = harmData.style.maxDensity
+                                val initialValue = if(harmData.density > maxDensity) maxDensity -1 else harmData.density -1
+                                densityDialogData.value = ListDialogData(
+                                    true,
+                                    (0 until maxDensity).map{ it +1 }.map{ it.toString() },
+                                    initialValue,
+                                    lang.selectStyleDensity
+                                ) { densityIndex ->
+                                    val newHarmDatas = harmDatas.toMutableList()
+                                    newHarmDatas[cursor] =
+                                        harmDatas[cursor].copy(density = densityIndex + 1)
+                                    harmDatas = newHarmDatas
+                                    ListDialogData(itemList = densityDialogData.value.itemList)
+                                }
+                            }
                             CustomButton( // style flow
                                 isActive = harmDatas[cursor].style.hasFlow,
                                 iconId = model.iconMap["arpeggio"]!!,
@@ -245,21 +274,8 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 harmDatas = newHarmDatas
                                 ListDialogData(itemList = harmTypeDialogData.value.itemList)
                             }
-                            CustomButton(
-                                isActive = harmDatas[cursor].style.hasDirection,
-                                iconId = model.iconMap["horizontal_movements"]!!,
-                                buttonSize = buttonSize.dp,
-                                iconColor = model.appColors.iconButtonIconColor,
-                                colors = model.appColors
-                            ) {
-                                val newHarmDatas = harmDatas.toMutableList()
-                                val oldHarmData = harmDatas[cursor]
-                                val directions = HarmonizationDirection.values()
-                                val newDirection = directions[(oldHarmData.direction.ordinal + 1) % directions.size]
-                                newHarmDatas[cursor] = oldHarmData.copy(direction = newDirection)
-                                harmDatas = newHarmDatas
-                                ListDialogData(itemList = harmTypeDialogData.value.itemList)
-                            }
+
+
                          }
 
                             Row(
@@ -357,6 +373,21 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         harmDatas = newHarmDatas
                                         ListDialogData(itemList = harmTypeDialogData.value.itemList)
                                     }
+                                }
+                                CustomButton(
+                                    isActive = harmDatas[cursor].style.hasDirection,
+                                    iconId = model.iconMap["horizontal_movements"]!!,
+                                    buttonSize = buttonSize.dp,
+                                    iconColor = model.appColors.iconButtonIconColor,
+                                    colors = model.appColors
+                                ) {
+                                    val newHarmDatas = harmDatas.toMutableList()
+                                    val oldHarmData = harmDatas[cursor]
+                                    val directions = HarmonizationDirection.values()
+                                    val newDirection = directions[(oldHarmData.direction.ordinal + 1) % directions.size]
+                                    newHarmDatas[cursor] = oldHarmData.copy(direction = newDirection)
+                                    harmDatas = newHarmDatas
+                                    ListDialogData(itemList = harmTypeDialogData.value.itemList)
                                 }
                             }
                     }

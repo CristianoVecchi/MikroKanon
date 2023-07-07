@@ -7,7 +7,7 @@ import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createGrazioso(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean, density: Int
 ) {
     val actualOctavePitches = octaves.map { (it + 1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
@@ -18,14 +18,14 @@ fun createGrazioso(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
         val size = pitches.size
         if(size > 0){
             val indices = getPairIndices(size)
-            val nSteps = when(harmonizationStyle) {
-                HarmonizationStyle.GRAZIOSO_3 -> indices.size * 3
+            val nSteps = when(density) {
+                1 -> indices.size * 3
                 else -> indices.size * 4
             }
             if(barDur >= nSteps * 4){
                 val durs = barDur.divideDistributingRest(nSteps)
-                val phrasingDurs = when(harmonizationStyle) {
-                    HarmonizationStyle.GRAZIOSO_3 -> {
+                val phrasingDurs = when(density) {
+                    1 -> {
                         durs.mapIndexed{ j, dur -> if(j % 3 == 2) dur / 2 else dur}
                     }
                     else -> {
@@ -35,8 +35,8 @@ fun createGrazioso(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                 //println("durs: $durs  phrasing durs: $phrasingDurs")
                 val velocities = bars.getProgressiveVelocities(i, nSteps, diffChordVelocity, increase)
                 var pattern = mutableListOf<Int>()
-                when (harmonizationStyle) {
-                    HarmonizationStyle.GRAZIOSO_3 -> {
+                when (density) {
+                    1 -> {
                         indices.forEach {
                             pattern.add(-1)
                             pattern.add(pitches[it.first])
@@ -70,8 +70,8 @@ fun createGrazioso(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
                         pitches = pitches.shiftCycling()
                         pattern.clear()
                         //TO DO optimize arrays
-                        when (harmonizationStyle) {
-                            HarmonizationStyle.GRAZIOSO_3 -> {
+                        when (density) {
+                            1 -> {
                                 indices.forEach {
                                     pattern.add(-1)
                                     pattern.add(pitches[it.first])

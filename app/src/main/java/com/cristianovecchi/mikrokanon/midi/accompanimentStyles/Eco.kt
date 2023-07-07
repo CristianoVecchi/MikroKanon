@@ -7,19 +7,19 @@ import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createEco(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
+                   diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean, density: Int
 ) {
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
     //bars.forEach { println(it) }
     var lastPitch = -1
     val actualOctavePitches = octaves.map { (it + 1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
-    val delay = when (harmonizationStyle) {
-        HarmonizationStyle.ECO_2 -> 2
-        HarmonizationStyle.ECO_3 -> 3
-        HarmonizationStyle.ECO_4 -> 4
-        HarmonizationStyle.ECO_5 -> 5
-        HarmonizationStyle.ECO_6 -> 6
+    val delay = when (density) {
+        2 -> 2
+        3 -> 3
+        4 -> 4
+        5 -> 5
+        6 -> 6
         else -> 1
     }
     bars.forEachIndexed { i, bar ->

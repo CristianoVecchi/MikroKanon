@@ -9,14 +9,14 @@ import com.cristianovecchi.mikrokanon.midi.Player
 import com.leff.midi.MidiTrack
 
 fun createBerlinese(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                       diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
+                       diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, density: Int
 ) {
     val actualOctavePitches = octaves.map { (it + 1) * 12 }
     val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
-        val nSteps = when (harmonizationStyle) {
-            HarmonizationStyle.BERLINESE_2 -> bar.metro.first * 2
-            HarmonizationStyle.BERLINESE_4 -> bar.metro.first * 4
+        val nSteps = when (density) {
+            2 -> bar.metro.first * 2
+            3 -> bar.metro.first * 4
             else -> bar.metro.first
         }
         val barDur = bar.duration

@@ -9,7 +9,7 @@ import com.cristianovecchi.mikrokanon.midi.Player
 import com.leff.midi.MidiTrack
 
 fun createAcciaccatura(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                       diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection
+                       diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, density: Int
 ) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }
     val increase = harmonizationStyle.increase
@@ -45,7 +45,7 @@ fun createAcciaccatura(harmonizationStyle: HarmonizationStyle, chordsTrack: Midi
                     )
                 }
             }
-            if(harmonizationStyle == HarmonizationStyle.ACCIACCATURA_2){
+            if(density == 2){
                 acciaccaturaDur = durs[2] / 4
                 actualDur = durs[2] - acciaccaturaDur
                 val halfBarTick = bar.tick + durs[0] + durs[1]

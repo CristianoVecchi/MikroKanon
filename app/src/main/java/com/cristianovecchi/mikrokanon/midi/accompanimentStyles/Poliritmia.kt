@@ -8,12 +8,12 @@ import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createMultiPoliritmia(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
-                     diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
+                     diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean, density: Int
 ) {
     val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
     val increase = harmonizationStyle.increase
-    val (div, start) = when (harmonizationStyle){
-        HarmonizationStyle.POLIRITMIA_3 -> 3 to 3
+    val (div, start) = when (density){
+        3 -> 3 to 3
         else -> 2 to 2
     }
     bars.forEachIndexed { i, bar ->
@@ -30,11 +30,10 @@ fun createMultiPoliritmia(harmonizationStyle: HarmonizationStyle, chordsTrack: M
                 groups.forEach { group ->
                     division++
                     val pitchArray =
-                        group.getWaveCycling(division)//.also{println("[bar#$i]  pitch array: $it")}
+                        group.getWaveCycling(division)//.also{println("[bar#$i] division: $division pitch array: $it")}
                     // TO DO optimize arrays
                     val durs = barDur.divideDistributingRest(division)
-                    val velocities =
-                        bars.getProgressiveVelocities(i, division, diffChordVelocity, increase)
+                    val velocities = bars.getProgressiveVelocities(i, division, diffChordVelocity, increase)
                     var tick = bar.tick
                     durs.forEachIndexed { j, dur ->
                         val absPitch = pitchArray[j]
