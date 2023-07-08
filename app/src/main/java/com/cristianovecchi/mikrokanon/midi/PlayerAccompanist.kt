@@ -1,47 +1,46 @@
 package com.cristianovecchi.mikrokanon.midi
 
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
-import com.cristianovecchi.mikrokanon.AIMUSIC.JazzChord.*
-import com.cristianovecchi.mikrokanon.convertDodecabyteToInts
 import com.cristianovecchi.mikrokanon.midi.accompanimentStyles.*
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.ProgramChange
 
-fun foundAbsPitchesAndInitialize(barGroup: List<Bar>, harmonizationType: HarmonizationType,
-chordsTrack: MidiTrack, chordsChannel: Int, chordsInstrument: Int): List<List<Int>> {
+fun findAbsPitches(barGroup: List<Bar>, harmonizationType: HarmonizationType,
+                   chordsTrack: MidiTrack, chordsChannel: Int): List<List<Int>> {
     barGroup.findChordSequence(harmonizationType)
     val absPitches: List<List<Int>> = barGroup.extractAbsPitchesFromDodecaBytes(harmonizationType)
-    chordsTrack.initializeChordTrack(barGroup[0].tick, chordsChannel, chordsInstrument)
     return absPitches
 }
 fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                              harmonizations: List<HarmonizationData>, justVoicing: Boolean, chordsChannel: Int){
     barGroups.forEachIndexed{ index, barGroup ->
+        //barGroup.forEachIndexed { i, bar -> println("bar#$i $bar)")}
         val harmonizationData = harmonizations[index]
-        val (type, instrument, volume, style, _, direction, isFlow, density) = harmonizationData
+        val (type, instruments, volume, style, _, direction, isFlow, density) = harmonizationData
         val octaves = harmonizationData.convertFromOctavesByte()
+
         if (type != HarmonizationType.NONE){
             val diffChordVelocity = 40 - (volume * 40).toInt()  // 1f = 0, 0f = 40
            // println("diff: $diffChordVelocity")
             when(style){
                 HarmonizationStyle.ACCORDO -> when (type){
-                    HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, false, instrument, diffChordVelocity, justVoicing, octaves)
-                    HarmonizationType.POP7 -> createPopChordsTrack(chordsTrack, barGroup, true,instrument, diffChordVelocity, justVoicing, octaves)
-                    HarmonizationType.JAZZ -> createJazzChordsTrack(chordsTrack, barGroup, false, instrument, diffChordVelocity, justVoicing, octaves)
-                    HarmonizationType.JAZZ11 -> createJazzChordsTrack(chordsTrack, barGroup, true, instrument, diffChordVelocity, justVoicing, octaves)
-                    HarmonizationType.XWH -> createExtendedWeightedHarmonyTrack(chordsTrack, barGroup, instrument,  diffChordVelocity, justVoicing, octaves)
-                    HarmonizationType.FULL12 -> createFull12HarmonizedTrack(chordsTrack, barGroup, instrument,  diffChordVelocity, octaves)
+                    HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, false, diffChordVelocity, justVoicing, octaves, chordsChannel)
+                    HarmonizationType.POP7 -> createPopChordsTrack(chordsTrack, barGroup, true, diffChordVelocity, justVoicing, octaves, chordsChannel)
+                    HarmonizationType.JAZZ -> createJazzChordsTrack(chordsTrack, barGroup, false, diffChordVelocity, justVoicing, octaves, chordsChannel)
+                    HarmonizationType.JAZZ11 -> createJazzChordsTrack(chordsTrack, barGroup, true, diffChordVelocity, justVoicing, octaves, chordsChannel)
+                    HarmonizationType.XWH -> createExtendedWeightedHarmonyTrack(chordsTrack, barGroup,  diffChordVelocity, justVoicing, octaves, chordsChannel)
+                    HarmonizationType.FULL12 -> createFull12HarmonizedTrack(chordsTrack, barGroup,  diffChordVelocity, octaves, chordsChannel)
                     else -> {}
                 }
 
                 HarmonizationStyle.RIBATTUTO -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createRibattuto(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, density)
                 }
                 HarmonizationStyle.POLIRITMIA -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     when (density) {
                         2, 3 -> createMultiPoliritmia(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                             diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow, density)
@@ -50,92 +49,92 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     }
                 }
                 HarmonizationStyle.ACCIACCATURA -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createAcciaccatura(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, density)
                 }
                 HarmonizationStyle.SINCOPATO -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createSincopato(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow)
                 }
                 HarmonizationStyle.BERLINESE -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createBerlinese(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, density)
                 }
                 HarmonizationStyle.CONTROTEMPO -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createControtempo(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, density)
                 }
                 HarmonizationStyle.ALBERTI -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createAlberti(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow)
                 }
                 HarmonizationStyle.RICAMATO -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createRicamato(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow, density)
                 }
                 HarmonizationStyle.TRILLO -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createTrillo(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, isFlow)
                 }
                 HarmonizationStyle.TUTTITRILLI -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createMultiTrillo(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow)
                 }
                 HarmonizationStyle.ARPEGGIO, HarmonizationStyle.SCAMBIARPEGGIO ->{
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createArpeggio(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
                 }
                 HarmonizationStyle.PASSAGGIO ->{
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createPassaggio(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow)
                 }
                 HarmonizationStyle.CAPRICCIO ->{
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createCapriccio(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow, density)
                 }
                 HarmonizationStyle.FARFALLA ->{
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createFarfalla(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow)
                 }
                 HarmonizationStyle.GRAZIOSO ->{
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createGrazioso(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow, density)
                 }
                 HarmonizationStyle.LINEA, HarmonizationStyle.ACCUMULO  -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createNoteLine(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow)
                 }
                 HarmonizationStyle.ECO -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createEco(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow, density)
                 }
                 HarmonizationStyle.BICINIUM, HarmonizationStyle.TRICINIUM -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createNoteDoubleTripleLine(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, direction, isFlow)
                 }
                 HarmonizationStyle.RADIO -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createRadio(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                         diffChordVelocity, diffChordVelocity / 2, justVoicing, isFlow)
                 }
                 HarmonizationStyle.NEVE -> {
-                    val absPitches = foundAbsPitchesAndInitialize(barGroup, type, chordsTrack, chordsChannel, instrument)
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     when (density) {
                         2 -> createNeve2(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
                             diffChordVelocity, diffChordVelocity / 2, justVoicing, direction)
@@ -145,11 +144,19 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
 
                 }
             }
+            chordsTrack.addInstrumentsToTrackCycling(barGroup.map { it.tick }, chordsChannel, instruments)
         }
     }
 }
 
+fun MidiTrack.addInstrumentsToTrackCycling(barStarts: List<Long>, chordsChannel: Int, instruments: List<Int>) {
+    barStarts.forEachIndexed { i, start ->
+        this.initializeChordTrack(start, chordsChannel, instruments[i % instruments.size])
+    }
+}
+
 fun MidiTrack.initializeChordTrack(startTick:Long, chordsChannel: Int, chordsInstrument: Int){
+    //println("tick: $startTick  instrument: $chordsInstrument  channel: $chordsChannel")
     val pc: MidiEvent = ProgramChange(startTick, chordsChannel, chordsInstrument) // cambia strumento
     this.insertEvent(pc)
 }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import java.util.stream.Collectors
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.absoluteValue
 
 fun findTopNuances(stabilities: List<Float>, minNuance: Float, maxNuance: Float) : List<Float>{
     val n = stabilities.size
@@ -24,6 +25,28 @@ data class TickChangeData(val tick: Long, val instrument: Int, val noteIndex: In
 
 
 object CounterpointInterpreter {
+    fun calculateTotalLengthForEmptyCounterpoint(counterpoint: Counterpoint, durations: IntArray = intArrayOf(240) ): Long {
+        var result = 0
+        val nNotes = counterpoint.maxSize()
+        var noteIndex = 0
+        var durIndex = 0
+        while(noteIndex < nNotes){
+            val dur = durations[durIndex]//.also{println("new dur: $it")}
+            if(dur > 0) {
+                result += dur
+                durIndex++
+                noteIndex++
+                while(durations[durIndex] < 0){
+                    result += durations[durIndex].absoluteValue
+                    durIndex++
+                }
+            } else {
+                result += dur.absoluteValue
+                durIndex++
+            }
+        }
+        return result.toLong()
+    }
     suspend fun doTheMagic(context: CoroutineContext,
                            dispatch: (Triple<AppViewModel.Building, Int, Int>) -> Unit,
                            counterpoint: Counterpoint,

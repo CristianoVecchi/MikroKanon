@@ -109,7 +109,7 @@ fun List<Int>.convertToOctavesByte(): Int {
         //.also{println("Converted to: "+ it.toString(2))}
 }
 data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NONE,
-                             val instrument: Int = 48, val volume: Float = 0.1f,
+                             val instruments: List<Int> = listOf(48), val volume: Float = 0.1f,
                              val style: HarmonizationStyle = HarmonizationStyle.ACCORDO,
                              val octavesByte: Int = 248, val direction: HarmonizationDirection = HarmonizationDirection.ASCENDING,
                              val isFlow: Boolean = false, var density: Int = 1){ // from octave 3 to 7 (numbers 4 to 8)
@@ -123,12 +123,14 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
         val direction = if(this.style.hasDirection) this.direction.symbol else ""
         val withFlow = if(this.style.hasFlow && isFlow) "§" else ""
         val densityString = if(density < 2) "" else "^$density"
+        val instrumentList = instruments.joinToString(", ") { ListaStrumenti.getNameByIndex(it) }
         return if(type == HarmonizationType.NONE) "  ---  ${this.type.title}  ---"
-        else "${this.type.title} ${this.style.title}$densityString ${withFlow}${direction}\n  ${ListaStrumenti.getNameByIndex(this.instrument)} ${this.describeOctaves()} ${String.format("%.0f%%",this.volume*100)}"
+        else "${this.type.title} ${this.style.title}$densityString ${withFlow}${direction}\n  $instrumentList ${this.describeOctaves()} ${String.format("%.0f%%",this.volume*100)}"
     }
     fun toCsv(): String {
         val flowBool = if(isFlow) 1 else 0
-        return "${this.type.ordinal}|${this.instrument}|${this.volume}|${this.style.ordinal}|${this.octavesByte}|${this.direction.ordinal}|$flowBool|$density"
+        val instrumentCsv = instruments.joinToString("§") { it.toString() }
+        return "${this.type.ordinal}|${instrumentCsv}|${this.volume}|${this.style.ordinal}|${this.octavesByte}|${this.direction.ordinal}|$flowBool|$density"
     }
     fun convertFromOctavesByte(): List<Int>{
         //println("Octaves Byte: " + octavesByte.toString(2))
@@ -161,9 +163,11 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
             val directionValues = HarmonizationDirection.values()
             return values.map{
                 val subValues = it.split("|")
+                val instrumentList = subValues[1].split("§").map{ it.toInt() }
                 val flowCsv = subValues.getOrElse(6) { "0" }
                 val densityInt = subValues.getOrElse(7){ "1" }.toInt()
-                HarmonizationData(harmValues[subValues[0].toInt()], subValues[1].toInt(),
+
+                HarmonizationData(harmValues[subValues[0].toInt()], instrumentList,
                     subValues[2].toFloat(), styleValues[subValues.getOrElse(3){"0"}.toInt()],
                     subValues.getOrElse(4){"248"}.toInt(),
                     directionValues[subValues.getOrElse(5){"0"}.toInt()],

@@ -181,13 +181,13 @@ object Player {
                     val audio8D: List<Int> = if (audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
                     val vibratoExtensions = intArrayOf(0, 480, 360, 240, 160, 120, 80, 60, 30, 15, 12, 8, 6)
                     //dispatch(AppViewModel.Building.DATATRACKS to nParts)
-                    val counterpointTrackData: List<TrackData> = CounterpointInterpreter.doTheMagic(
+                    val counterpointTrackDatas: List<TrackData> = CounterpointInterpreter.doTheMagic(
                         context, dispatch,
                         actualCounterpoint, actualDurations, actualEnsemblePartsList,
                         nuances, doublingFlags, rangeTypes, melodyTypes,
                         glissando, audio8D, vibratoExtensions[vibrato]
                     )
-                    if (counterpointTrackData.isEmpty()) {
+                    if (counterpointTrackDatas.isEmpty()) {
                         "No Tracks in Counterpoint!!!"
                     } else {
                         //counterpointTrackData.forEach{ println(it.pitches.contentToString())}
@@ -196,19 +196,22 @@ object Player {
                             "Cancelled during DataTracks building!"
                         } else {
                             // TOTAL LENGTH OF THE PIECE
-                            val totalLength = (counterpointTrackData.filter { it.ticks.isNotEmpty() }
+                            var totalLength = (counterpointTrackDatas.filter { it.ticks.isNotEmpty() }
                                 .maxOfOrNull { it.ticks.last() + it.durations.last() }
                                 ?: 0).toLong()//.also{println("Total length: $it")} // Empty tracks have 0 length
+                            totalLength = if(totalLength > 0) totalLength else {
+                                CounterpointInterpreter.calculateTotalLengthForEmptyCounterpoint(actualCounterpoint, actualDurations)
+                            }
                             //LEGATO AND RIBATTUTO DURATION ZONE
                             // none, staccatissimo, staccato, portato, articolato, legato, legatissimo
                             //println("legatoTypes: $legatoTypes")
                             if (legatoTypes != listOf(Pair(4, 0))) {
                                 val maxLegato = rhythm.minByOrNull { it.first.metroDenominatorMidiValue() }!!.first.metroDenominatorMidiValue() / 3
                                 val articulations = floatArrayOf(1f, 0.125f, 0.25f, 0.75f, 1f, 1.125f, 1.25f)
-                                counterpointTrackData.addLegatoAndRibattuto(maxLegato, articulations, legatoTypes, totalLength)
+                                counterpointTrackDatas.addLegatoAndRibattuto(maxLegato, articulations, legatoTypes, totalLength)
                             }
                             // CHECK AND REPLACE
-                            val actualCounterpointTrackData = counterpointTrackData.applyMultiCheckAndReplace(job, dispatch, checkAndReplace,totalLength)
+                            val actualCounterpointTrackData = counterpointTrackDatas.applyMultiCheckAndReplace(job, dispatch, checkAndReplace,totalLength)
 
                             // CREATE DRUMS TRACK (channel=9)
                             val drumsTrack: MidiTrack? = createDrumsTrack(job, dispatch, actualCounterpointTrackData, drumsData, totalLength.toInt())
@@ -268,11 +271,11 @@ object Player {
                                         //ADD CHORD TRACK AND DRUMS TRACKS IF NEEDED
                                         //println(harmonizations)
                                         tracks.addChordTrack(harmonizations.first, bars,
-                                            counterpointTrackData, audio8D, totalLength, false, 13)
+                                            counterpointTrackDatas, audio8D, totalLength, false, 13)
                                         tracks.addChordTrack(harmonizations.second, bars,
-                                            counterpointTrackData, audio8D, totalLength, false, 14)
+                                            counterpointTrackDatas, audio8D, totalLength, false, 14)
                                         tracks.addChordTrack(harmonizations.third, bars,
-                                            counterpointTrackData, audio8D, totalLength, false, 15)
+                                            counterpointTrackDatas, audio8D, totalLength, false, 15)
                                         drumsTrack?.let{tracks.add(it)}
 
                                         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)

@@ -96,7 +96,7 @@ fun createTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack,
                 var firstNotes = trills.map{ it.first() }
                 var secondNotes = trills.map{ it.last() }.filter{!firstNotes.contains(it)}
                 actualOctavePitches.forEach { octave ->
-                    println("Octave: $octave  Syncope: $trills $firstNotes $secondNotes")
+                    //println("Octave: $octave  Syncope: $trills $firstNotes $secondNotes")
                     var tick = bar.tick
                     for(index in 0 until div step 2){
                         var duration = durs[index]

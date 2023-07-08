@@ -512,6 +512,7 @@ fun setAudio8D(track: MidiTrack, nRevolutions: Int, channel: Int) {
 
 
 fun MidiTrack.setTimeSignatures(rhythm: List<Triple<RhythmPatterns, Boolean, Int>>, totalLength: Long): List<Bar> {
+    //println("total length: $totalLength")
     val bars = mutableListOf<Bar>()
     var tick = 0L
     var barTick = 0L
@@ -540,7 +541,7 @@ fun MidiTrack.setTimeSignatures(rhythm: List<Triple<RhythmPatterns, Boolean, Int
                 TimeSignature.DEFAULT_METER, TimeSignature.DEFAULT_DIVISION
             )
             this.insertEvent(ts)
-            // println("SIGNATURE #$index: tick = $tick  metro = ${newSignature.first}/${newSignature.second}")
+            //println("SIGNATURE #$index: tick = $tick  metro = ${newSignature.first}/${newSignature.second}")
             lastSignature = newSignature
         }
         tick += signatures[index].first

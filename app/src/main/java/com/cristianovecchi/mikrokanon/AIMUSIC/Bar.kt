@@ -148,7 +148,8 @@ fun List<Bar>.getNextBarVelocity(index: Int): Int {
 fun List<Bar>.findChordSequence(harmonizationType: HarmonizationType){
     if(harmonizationType == HarmonizationType.NONE || harmonizationType == HarmonizationType.FULL12 || this.isEmpty()) return
     var priority = JazzChord.choosePriority(harmonizationType)
-    var lastRoot = (Insieme.trovaFond(this[0].dodecaByte1stHalf!!)[0] - priority[0] + 12) % 12
+    val originalRoots = Insieme.trovaFond(this[0].dodecaByte1stHalf!!)
+    var lastRoot = (originalRoots.getOrElse(0){ 0 } - priority[0] + 12) % 12
     val roots = mutableListOf<Int>()
     var previousChord = JazzChord.EMPTY
     when (harmonizationType){

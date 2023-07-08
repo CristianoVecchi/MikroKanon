@@ -49,21 +49,18 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         }
         val lang = Lang.provideLanguage(model.getUserLangDef())
         val harmNames = HarmonizationType.values().map{ it.title }
-        val styleNames = HarmonizationStyle.values().map{ it.title }
         val harmTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val densityDialogData by lazy { mutableStateOf(ListDialogData()) }
-        val instrumentDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val instrumentDialogData by lazy { mutableStateOf(MultiListDialogData()) }
         val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val octavesDialogData by lazy { mutableStateOf(MultiListDialogData()) }
-        //val styleDialogData by lazy { mutableStateOf(ListDialogData()) }
         val groupingDialogData by lazy { mutableStateOf(GroupingDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             ListDialog(harmTypeDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(densityDialogData, dimensions, lang.OkButton, appColors)
-            ListDialog(instrumentDialogData, dimensions, lang.OkButton, appColors)
+            MultiListDialog(instrumentDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
             MultiListDialog(octavesDialogData, dimensions, lang.OkButton, appColors)
-            //ListDialog(styleDialogData, dimensions, lang.OkButton, appColors)
             GroupingListDialog(groupingDialogData, dimensions, lang.OkButton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
@@ -94,8 +91,8 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     var harmDatas by remember { mutableStateOf(multiNumberDialogData.value.anySequence.map{ it as HarmonizationData}) }
                     var cursor by remember { mutableStateOf(0) }
                     val fontSize = dimensions.dialogFontSize.sp
-                    val fontWeight = FontWeight.Normal
-                    val buttonPadding = 4.dp
+//                    val fontWeight = FontWeight.Normal
+//                    val buttonPadding = 4.dp
                     Column(modifier = modifierA) {
                         Text(text = multiNumberDialogData.value.title, fontWeight = FontWeight.Bold, color = fontColor, style = TextStyle(fontSize = fontSize))
                         Spacer(modifier = Modifier.height(20.dp))
@@ -224,18 +221,6 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         selectedListDialogItem = index
                                     )
                                 }
-//                                harmTypeDialogData.value = ListDialogData(
-//                                    true,
-//                                    styleNames,
-//                                    harmData.style.ordinal,
-//                                    lang.selectHarmonizationStyle
-//                                ) { newHarmonizationStyle ->
-//                                    val newHarmDatas = harmDatas.toMutableList()
-//                                    newHarmDatas[cursor] =
-//                                        harmDatas[cursor].copy(style = HarmonizationStyle.values()[newHarmonizationStyle])
-//                                    harmDatas = newHarmDatas
-//                                    ListDialogData(itemList = harmTypeDialogData.value.itemList)
-//                                }
                             }
                             CustomButton( // density
                                 isActive = harmDatas[cursor].style.maxDensity > 1,
@@ -293,15 +278,15 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     colors = model.appColors
                                 ) {
                                     val harmData = harmDatas[cursor]
-                                    harmTypeDialogData.value = ListDialogData(
+                                    instrumentDialogData.value = MultiListDialogData(
                                         true,
                                         ratedChordsInstruments,
-                                        chordsInstruments.indexOf(harmData.instrument),
+                                        harmData.instruments.map{chordsInstruments.indexOf(it)}.toSet(),
                                         lang.selectHarmonizationInstruments
-                                    ) { instrumentIndex ->
+                                    ) { instrumentIndices, _ ->
                                         val newHarmDatas = harmDatas.toMutableList()
                                         newHarmDatas[cursor] =
-                                            harmDatas[cursor].copy(instrument = chordsInstruments[instrumentIndex])
+                                            harmDatas[cursor].copy(instruments = instrumentIndices)
                                         harmDatas = newHarmDatas
                                         ListDialogData(itemList = harmTypeDialogData.value.itemList)
                                     }
@@ -326,7 +311,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         newHarmDatas[cursor] =
                                             harmDatas[cursor].copy(octavesByte = correctedOctaveList.map{7 - it}.convertToOctavesByte())
                                         harmDatas = newHarmDatas
-                                        ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                                        MultiListDialogData(itemList = harmTypeDialogData.value.itemList)
                                     }
                                 }
                                 CustomButton(

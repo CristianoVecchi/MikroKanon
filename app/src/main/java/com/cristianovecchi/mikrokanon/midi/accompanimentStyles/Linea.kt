@@ -97,7 +97,7 @@ fun createNoteDoubleTripleLine(harmonizationStyle: HarmonizationStyle, chordsTra
                     Triple(pitches.subList(0, nHalfPitches), pitches.subList(nHalfPitches, pitches.size), listOf<Int>() )
                 }
             }
-            println("Original:$pitches -> A:$pitches1 B:$pitches2 C:$pitches3")
+            //println("Original:$pitches -> A:$pitches1 B:$pitches2 C:$pitches3")
             var durs1: MutableList<Long> = mutableListOf()
             var durs2: MutableList<Long> = mutableListOf()
             var durs3: MutableList<Long> = mutableListOf()
