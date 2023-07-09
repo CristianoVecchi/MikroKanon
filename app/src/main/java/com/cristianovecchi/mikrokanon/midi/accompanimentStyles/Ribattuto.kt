@@ -29,12 +29,12 @@ fun createRibattuto(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
        // println("Bar#$i ${bar.metro.first}/${bar.metro.second}  barDur: $barDur  steps: $steps  stepDur: $stepDur")
         val staccatoDur = (stepDur / 4).coerceAtLeast(6).toLong()
         if(pitches.isNotEmpty()){
-            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, increase)
+            val velocities = bars.getProgressiveVelocities(i, steps, diffChordVelocity, increase)//.also{println(it)}
             var tick = bar.tick
             (0 until steps).forEach { step ->
                 //println("tick: $tick")
+                val velocity = velocities[step]
                 actualOctavePitches.forEach { octave ->
-                    val velocity = velocities[step]
                     pitches.forEachIndexed { j, absPitch ->
                         Player.insertNoteWithGlissando(
                             chordsTrack, tick, staccatoDur, chordsChannel,

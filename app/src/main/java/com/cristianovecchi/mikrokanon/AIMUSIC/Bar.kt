@@ -167,7 +167,7 @@ fun List<Bar>.findChordSequence(harmonizationType: HarmonizationType){
                 it.chord1 = chord
                 lastRoot = chordPosition.first
                 previousChord = chord.chord
-                //println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+                println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
             }
         }
         HarmonizationType.JAZZ, HarmonizationType.JAZZ11 -> {
@@ -184,7 +184,7 @@ fun List<Bar>.findChordSequence(harmonizationType: HarmonizationType){
                 it.chord1 = chord
                 lastRoot = chordPosition.first
                 previousChord = chord.chord
-//        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
             }
         }
         HarmonizationType.XWH -> {

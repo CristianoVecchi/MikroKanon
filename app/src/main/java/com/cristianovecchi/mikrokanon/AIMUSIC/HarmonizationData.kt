@@ -74,12 +74,12 @@ enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val 
 //    ECO_5("Eco 5", true, true,6, StyleType.LINES),
 //    ECO_6("Eco 6", true, true,6, StyleType.LINES),
 
-    TRILLO("Trillo", false, true,12, StyleType.AERIALS),
-    TUTTITRILLI("Tuttitrilli", true, true,12, StyleType.AERIALS),
-    ARPEGGIO("Arpeggio", true, false,24, StyleType.AERIALS),
-    SCAMBIARPEGGIO("Scambiarpeggio", false,true, 24, StyleType.AERIALS),
-    PASSAGGIO("Passaggio", true, true,24, StyleType.AERIALS),
-    CAPRICCIO("Capriccio", true, true,26, StyleType.AERIALS, 2),
+    TRILLO("Trillo", false, true,0, StyleType.AERIALS),
+    TUTTITRILLI("Tuttitrilli", true, true,0, StyleType.AERIALS),
+    ARPEGGIO("Arpeggio", true, false,12, StyleType.AERIALS),
+    SCAMBIARPEGGIO("Scambiarpeggio", true,false, 12, StyleType.AERIALS),
+    PASSAGGIO("Passaggio", true, true,12, StyleType.AERIALS),
+    CAPRICCIO("Capriccio", true, true,14, StyleType.AERIALS, 2),
     //CAPRICCIO_2("Capriccio 2", true, true,26, StyleType.AERIALS),
     FARFALLA("Farfalla", true, true,12, StyleType.AERIALS),
     GRAZIOSO("Grazioso", true, true,12, StyleType.AERIALS, 2),
@@ -117,8 +117,6 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
         val maxDensity = style.maxDensity
         density = if(density > maxDensity) maxDensity else density
     }
-
-
     fun describe(): String {
         val direction = if(this.style.hasDirection) this.direction.symbol else ""
         val withFlow = if(this.style.hasFlow && isFlow) "§" else ""

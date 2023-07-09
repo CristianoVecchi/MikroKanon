@@ -43,7 +43,7 @@ fun createMultiTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiT
                         velocities.getOrElse(j+1){ (bars.getNextBarVelocity(i) - diffChordVelocity + increase).coerceIn(0, 127) } - velocities[j])
                 }
                 actualOctavePitches.forEach { octave ->
-                    println("Octave: $octave  Trills: $trills")
+                    //println("Octave: $octave  Trills: $trills")
                     var tick = bar.tick
                     trills.forEachIndexed { j, trill ->
                         val firstNote = trill.first()
