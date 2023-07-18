@@ -345,6 +345,7 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
     fun display() {
         parts.forEachIndexed { index, absPart ->
+            //println("Counterpoint size: ${parts.size}")
             println("Part #$index(${absPart.absPitches.size}): ${absPart.absPitches.toIntArray().contentToString()}")
         }
     }
@@ -567,6 +568,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                 HarmonizationType.NONE -> return clone
                 HarmonizationType.POP -> createPopJazzChordsSequence(dodecaBytes, harmony, false, false)
                 HarmonizationType.POP7 -> createPopJazzChordsSequence(dodecaBytes, harmony,true, false)
+                HarmonizationType.LIBERTY -> createPopJazzChordsSequence(dodecaBytes, harmony, true, false)
                 HarmonizationType.JAZZ -> createPopJazzChordsSequence(dodecaBytes, harmony,true, false)
                 HarmonizationType.JAZZ11 -> createPopJazzChordsSequence(dodecaBytes, harmony,true, true)
                 HarmonizationType.XWH -> createXWHChordsSequence(dodecaBytes)

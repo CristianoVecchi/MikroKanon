@@ -714,7 +714,7 @@ fun octaveTest(mt: MidiTrack): MidiTrack {
     //val pitches = listOf(60,72,84,60, 55, 48,36,24,23,22,21)
     var tick = 0L
     pitches.forEach {
-        val pc: MidiEvent = ProgramChange(tick, 0, REVERSE_CYMBALS) // cambia strumento
+        val pc: MidiEvent = ProgramChange(tick, 0, SYN_CHARANG) // cambia strumento
         mt.insertEvent(pc)
         val on = NoteOn(tick, 0, it, 100)
         val off = NoteOff(tick + 480 - 1, 0, it, 80)

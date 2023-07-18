@@ -172,6 +172,8 @@ object Player {
                     //println("durations after shuffle: ${actualDurations.contentToString()}")
                     actualDurations = if (swingShuffle != 0.5f) actualDurations.applySwing(swingShuffle) else actualDurations
                     //println(actualDurations.contentToString())
+                   // println("counterpoints size: ${counterpoints.size}")
+                    //counterpoints.forEach { it?.display() }
                     val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
                     val ensemblePartsList: List<List<EnsemblePart>> =
                         if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
@@ -286,10 +288,10 @@ object Player {
                                         yield()
                                         if(job.isActive) {
                                             saveAndPlayMidiFile(job, dispatch, mediaPlayer,  midi, looping, play, midiFile, nTotalNotes)
-//                                        val testTracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
-//                                        testTracks.add(octaveTest(MidiTrack()))
-//                                        val testMidi = MidiFile(MidiFile.DEFAULT_RESOLUTION, testTracks)
-//                                            saveAndPlayMidiFile(job, dispatch, mediaPlayer,  testMidi, looping, play, midiFile, nTotalNotes)
+//                                            val testTracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
+//                                            testTracks.add(octaveTest(MidiTrack()))
+//                                            val testMidi = MidiFile(MidiFile.DEFAULT_RESOLUTION, testTracks)
+//                                                saveAndPlayMidiFile(job, dispatch, mediaPlayer,  testMidi, looping, play, midiFile, nTotalNotes)
                                         }
                                         else {
                                             "Canceled before playing Midi File!"

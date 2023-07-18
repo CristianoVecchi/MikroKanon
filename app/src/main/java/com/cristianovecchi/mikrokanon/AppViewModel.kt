@@ -239,7 +239,7 @@ class AppViewModel(
 //                    jobPlay = null
 //                }
 //            }
-            val counterpoints = listOf(selectedCounterpoint.value!!) + savedCounterpoints.toList()
+            val counterpoints = if(simplify) listOf(selectedCounterpoint.value!!) else listOf(selectedCounterpoint.value!!) + savedCounterpoints.toList()
             userOptionsData.value?.let{
                 _playing.value = true
                 viewModelScope.launch(Dispatchers.Main) {

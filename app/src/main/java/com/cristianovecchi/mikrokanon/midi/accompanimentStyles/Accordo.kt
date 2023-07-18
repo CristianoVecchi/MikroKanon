@@ -274,15 +274,39 @@ fun createExtendedWeightedHarmonyTrack(chordsTrack: MidiTrack, bars: List<Bar>,
 //    println("XWH roots: $roots")
     findExtendedWeightedHarmonyNotes(chordsTrack, chordsChannel, bars, roots, diffChordVelocity, diffChordVelocity / 2, justVoicing, octaves)
 }
+fun createLibertyChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, diffChordVelocity: Int, justVoicing: Boolean, octaves: List<Int>, chordsChannel: Int){
+    var priority = JazzChord.priorityFrom2and5Just7 // assuming a dominant chord previously
+    val roots = Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)
+    var lastRoot = (roots.getOrElse(0){ 0 } - priority[0] + 12) % 12
+    var previousChord = JazzChord.EMPTY
+    val selectChordArea = { prevChord: JazzChord -> JazzChord.selectChordAreaJust9(prevChord)}
 
+    //println("start root = $lastRoot")
+    bars.forEach {
+        val jazzChords = selectChordArea(previousChord)
+        val chordFaultsGrid =  it.findChordFaultsGrid(jazzChords)
+        priority = JazzChord.findRootMovementPriorityJust7(previousChord)
+        val chordPosition = chordFaultsGrid.findBestChordPosition(lastRoot, priority)
+
+        val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
+        it.chord1 = chord
+        lastRoot = chordPosition.first
+        previousChord = chord.chord
+        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+    }
+    // val chordsChannel = 15
+//    val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento
+//    chordsTrack.insertEvent(pc)
+    findChordNotes(chordsTrack, chordsChannel, bars, diffChordVelocity, diffChordVelocity / 2, justVoicing, octaves)
+}
 fun createPopChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, with7: Boolean = true,
                          diffChordVelocity: Int, justVoicing: Boolean, octaves: List<Int>, chordsChannel: Int){
     var priority = JazzChord.priorityFrom2and5Just7 // assuming a dominant chord previously
     val roots = Insieme.trovaFond(bars[0].dodecaByte1stHalf!!)
     var lastRoot = (roots.getOrElse(0){ 0 } - priority[0] + 12) % 12
     var previousChord = JazzChord.EMPTY
-    val selectChordArea = if(with7) { previousChord: JazzChord -> JazzChord.selectChordArea_just_7(previousChord)}
-    else {previousChord: JazzChord -> JazzChord.selectChordArea_no_7(previousChord)}
+    val selectChordArea = if(with7) { prevChord: JazzChord -> JazzChord.selectChordArea_just_7(prevChord)}
+    else {prevChord: JazzChord -> JazzChord.selectChordArea_no_7(prevChord)}
     //println("start root = $lastRoot")
     bars.forEach {
         val jazzChords = selectChordArea(previousChord)
@@ -309,8 +333,8 @@ fun createJazzChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, with11: Boole
     var lastRoot = (roots.getOrElse(0){ 0 } - priority[0] + 12) % 12
     var previousChord = JazzChord.EMPTY
     //println("start root = $lastRoot")
-    val selectChordArea = if(with11) { prevChord: JazzChord -> JazzChord.selectChordArea_11(previousChord)}
-    else {prevChord: JazzChord -> JazzChord.selectChordArea_no_11(previousChord)}
+    val selectChordArea = if(with11) { prevChord: JazzChord -> JazzChord.selectChordArea_11(prevChord)}
+    else {prevChord: JazzChord -> JazzChord.selectChordArea_no_11(prevChord)}
     bars.forEach {
         val jazzChords = selectChordArea(previousChord)
         val chordFaultsGrid =  it.findChordFaultsGrid(jazzChords)

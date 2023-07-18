@@ -4,6 +4,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 enum class HarmonizationType(val title: String) {
     NONE("No Harm."),
     POP("POP"), POP7("POP 7"),
+    LIBERTY("LIBERTY"),
     JAZZ("JAZZ"), JAZZ11("JAZZ 11"),
     XWH("XW HARMONY"), FULL12("FULL 12")
 }

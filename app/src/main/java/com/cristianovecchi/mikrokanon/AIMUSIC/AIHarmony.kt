@@ -57,16 +57,19 @@ fun createPopJazzChordsSequence(dodecaBytes: IntArray, harmony: HarmonizationTyp
     var previousChord = JazzChord.EMPTY
     val selectChordArea = when (harmony){
         HarmonizationType.POP, HarmonizationType.POP7 -> {
-            if(with7) { prevChord: JazzChord -> JazzChord.selectChordArea_just_7(previousChord)}
-            else {prevChord:JazzChord -> JazzChord.selectChordArea_no_7(previousChord)}
+            if(with7) { prevChord: JazzChord -> JazzChord.selectChordArea_just_7(prevChord)}
+            else {prevChord:JazzChord -> JazzChord.selectChordArea_no_7(prevChord)}
+        }
+        HarmonizationType.LIBERTY -> {
+            { prevChord: JazzChord -> JazzChord.selectChordAreaJust9(prevChord)}
         }
         HarmonizationType.JAZZ, HarmonizationType.JAZZ11 -> {
-            if(with11) { prevChord: JazzChord -> JazzChord.selectChordArea_11(previousChord)}
-            else {prevChord:JazzChord -> JazzChord.selectChordArea_no_11(previousChord)}
-    }
+            if(with11) { prevChord: JazzChord -> JazzChord.selectChordArea_11(prevChord)}
+            else {prevChord:JazzChord -> JazzChord.selectChordArea_no_11(prevChord)}
+        }
         else -> {
-            if(with7) { prevChord: JazzChord -> JazzChord.selectChordArea_just_7(previousChord)}
-            else {prevChord:JazzChord -> JazzChord.selectChordArea_no_7(previousChord)}
+            if(with7) { prevChord: JazzChord -> JazzChord.selectChordArea_just_7(prevChord)}
+            else {prevChord:JazzChord -> JazzChord.selectChordArea_no_7(prevChord)}
         }
     }
     //println("start root = $lastRoot")

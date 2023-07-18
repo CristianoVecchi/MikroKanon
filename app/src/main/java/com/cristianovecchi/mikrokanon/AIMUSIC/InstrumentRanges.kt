@@ -154,9 +154,10 @@ val PARTS_SYN_VOICE: List<EnsemblePart> by lazy { listOf( // the array index ind
 //val SYN_SAW_WAVE_ALL = IntRange(A0, C8)
 //val SYN_CALLIOPE_ALL = IntRange(A0, C8)
 //val SYN_CHIFF_ALL = IntRange(A0, C8)
-//val SYN_CHARANG_ALL = IntRange(A0, C8)
+val SYN_CHARANG_ALL = IntRange(A0, C8)
 //val SYN_FIFTHS_SAW_ALL = IntRange(A0, C8)
 //val SYN_BRASS_AND_LEAD_ALL = IntRange(A0, C8)
+val SYN_CHARANG_LOW5 = IntRange(C1, G2)
 
 val PARTS_HARP by lazy{ createKeyboardInstrumentParts(HARP, IntRange(24, 104)) } // Cflat0 to Gsharp7
 
@@ -165,6 +166,17 @@ val GUITAR_LOW5 = IntRange(40, 59) // E2 - B3
 val GUITAR_MIDDLE5 = IntRange(50, 69) // D3 - A4
 val GUITAR_HIGH5 = IntRange(59, 78) // B3 - F#5
 val GUITAR_HIGHEST5 = IntRange(65, C6) // F4 - C6
+val GUITAR_HARMONIC_ALL = IntRange(52, C7) // E3 - C7
+val GUITAR_HARMONIC_HIGHEST5 = IntRange(77, C7) // F5 - C7
+
+val BANJO_ALL = IntRange(C3, 75) // C3 - D5
+val BANJO_HIGHEST5 = IntRange(G3, 75) // G3 - D5
+val KOTO_ALL = IntRange(C3, C6) // C3 - C6
+val KOTO_HIGHEST5 = IntRange(65 ,C6) // F4 - D5
+val SITAR_ALL = IntRange(C2, C6) // C2 - C6
+val SITAR_HIGH5 = IntRange(C4 ,G5) // C4 - G5
+val SHAMISEN_ALL = IntRange(C4, 93) // C4 - A6
+val SHAMISEN_LOW5 = IntRange(C4 ,G5) // C4 - G5
 
 // USED FOR SPOOKY
 val PARTS_BOWED_GLASS by lazy{ createKeyboardInstrumentParts(BOWED_GLASS) }
@@ -223,7 +235,7 @@ enum class RANGES(val octaves: IntArray) {
     HALF_PLUS_1(intArrayOf(0, 3,3,3,4,4,5,6)), NO_LOWER_OCTAVE(intArrayOf(0, 2,3,4,4,5,6,7)),
     NO_EXTREME_OCTAVES(intArrayOf(0, 2,3,3,4,4,5,6)), OCTAVES_2334455(intArrayOf(0, 2,3,3,4,4,5,5)),
     GUITAR(intArrayOf(0, 2,2,3,3,4,4,5)), BASS_GUITAR(intArrayOf(0, 1,1,1,1,2,2,3)),
-    CELESTA(intArrayOf(0, 4,5,5,5,6,6,6)),BELLS(intArrayOf(0, 3,4,4,4,4,5,5)),
+    CELESTA(intArrayOf(0, 4,5,5,5,6,6,6)),BELLS(intArrayOf(0, 4,4,4,4,5,5,5)),
     TIMPANI(intArrayOf(0, 2,2,2,3,3,3,3)),WOODBLOCKS(intArrayOf(0, 2,2,2,3,3,3,4)),
     BAG_PIPES(intArrayOf(0, 2,2,3,3,4,4,5)),RECORDERS(intArrayOf(0, 3,3,4,4,5,5,6)),
     SYN_SAW(intArrayOf(0, 3,3,4,4,4,5,5)), SHAMISEN(intArrayOf(0, 4,4,4,5,5,5,6)),
@@ -249,7 +261,13 @@ fun createKeyboardInstrumentParts(instrument: Int, rangeAll: IntRange = IntRange
         *(1..7).map{
             EnsemblePart(instrument, ranges[it].getOctave(), rangeAll, ranges[it])
         }.toTypedArray()
-    )//.also{ println("keyboardParts: $it")}
+    )
+//        .also{
+//            println("INSTRUMENT: $instrument  (createKeyboardInstrumentParts in InstrumentRanges.kt")
+//            it.forEach { part ->
+//                println("octave: ${part.octave}  all range: ${part.allRange}  color range: ${part.colorRange}  family range:${part.familyRange}")
+//            }
+//        }
 }
 fun IntRange.octaveTranspose(octaveTranspose: Int, familyRange: IntRange): IntRange {
 

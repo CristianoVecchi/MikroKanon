@@ -6,7 +6,7 @@ fun accumulateVelocities(nNotes: Int, start: Int, diff: Int): List<Int>{
     if(diff == 0 || nNotes == 1) return List(nNotes) { start }
     val result = mutableListOf<Int>()
     val increments = diff.divideDistributingRest(nNotes-1)
-    println("increments:$increments")
+    //println("increments:$increments")
     var step = start
     increments.forEach {
         result += step

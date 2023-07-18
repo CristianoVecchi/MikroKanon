@@ -27,6 +27,7 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                 HarmonizationStyle.ACCORDO -> when (type){
                     HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, false, diffChordVelocity, justVoicing, octaves, chordsChannel)
                     HarmonizationType.POP7 -> createPopChordsTrack(chordsTrack, barGroup, true, diffChordVelocity, justVoicing, octaves, chordsChannel)
+                    HarmonizationType.LIBERTY -> createLibertyChordsTrack(chordsTrack, barGroup, diffChordVelocity, justVoicing, octaves, chordsChannel)
                     HarmonizationType.JAZZ -> createJazzChordsTrack(chordsTrack, barGroup, false, diffChordVelocity, justVoicing, octaves, chordsChannel)
                     HarmonizationType.JAZZ11 -> createJazzChordsTrack(chordsTrack, barGroup, true, diffChordVelocity, justVoicing, octaves, chordsChannel)
                     HarmonizationType.XWH -> createExtendedWeightedHarmonyTrack(chordsTrack, barGroup,  diffChordVelocity, justVoicing, octaves, chordsChannel)

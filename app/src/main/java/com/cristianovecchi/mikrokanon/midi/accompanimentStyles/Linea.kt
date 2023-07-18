@@ -97,7 +97,7 @@ fun createNoteDoubleTripleLine(harmonizationStyle: HarmonizationStyle, chordsTra
                     Triple(pitches.subList(0, nHalfPitches), pitches.subList(nHalfPitches, pitches.size), listOf<Int>() )
                 }
             }
-            //println("Original:$pitches -> A:$pitches1 B:$pitches2 C:$pitches3")
+           // println("Original:$pitches -> A:$pitches1 B:$pitches2 C:$pitches3")
             var durs1: MutableList<Long> = mutableListOf()
             var durs2: MutableList<Long> = mutableListOf()
             var durs3: MutableList<Long> = mutableListOf()
@@ -123,7 +123,7 @@ fun createNoteDoubleTripleLine(harmonizationStyle: HarmonizationStyle, chordsTra
                 vels3 = bars.getProgressiveVelocities(i, durs3.size, diffChordVelocity, increase)
             } else { lastPitch3 = -1 }
             actualOctavePitches.forEach{ octave ->
-                //println("Octave:$octave p1:$pitches1 p2:$pitches2 p3:$pitches3")
+              //  println("Octave:$octave p1:$pitches1 p2:$pitches2 p3:$pitches3")
                 if(pitches1.isNotEmpty()) {
                     var tick = bar.tick
                     pitches1.forEachIndexed { j, absPitch ->

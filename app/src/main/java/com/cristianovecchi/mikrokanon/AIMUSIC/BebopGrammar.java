@@ -20,23 +20,44 @@ public class BebopGrammar {
         Integer[] valuesMajorJust7M = {0b001010010001,0b100100100100}; // beat notes and passage notes for Major7 just 7
         grammar.put(JazzChord.MAJOR_JUST7MAJ,valuesMajorJust7M);
 
+        Integer[] valuesMajorJust7M_9 = {0b001010010101,0b100100100100}; // beat notes and passage notes for Major7 just 7
+        grammar.put(JazzChord.MAJOR_JUST7MAJ_9,valuesMajorJust7M_9);
+
         Integer[] valuesMajorAdd6 = {0b001010010001,0b100100100100}; // beat notes and passage notes for Major add6
         grammar.put(JazzChord.MAJOR_ADD6,valuesMajorAdd6);
+
+        Integer[] valuesMajorAdd6_9 = {0b001010010101,0b100100100100}; // beat notes and passage notes for Major add6 & 9M
+        grammar.put(JazzChord.MAJOR_ADD6_9, valuesMajorAdd6_9);
 
         Integer[] valuesMinorJust7 = {0b010010001001,0b101000100100}; // beat notes and passage notes for minor just 7
         grammar.put(JazzChord.MINOR_JUST7,valuesMinorJust7);
 
+        Integer[] valuesMinorJust7_9 = {0b010010001101,0b101000100100}; // beat notes and passage notes for minor just 7
+        grammar.put(JazzChord.MINOR_JUST7_9,valuesMinorJust7_9);
+
         Integer[] valuesMinorAdd6 = {0b001010001001,0b100100100100}; // beat notes and passage notes for minor add 6M
         grammar.put(JazzChord.MINOR_ADD6,valuesMinorAdd6);
+
+        Integer[] valuesMinorAdd6_9 = {0b001010001101,0b100100100100}; // beat notes and passage notes for minor add 6M & 9M
+        grammar.put(JazzChord.MINOR_ADD6,valuesMinorAdd6_9);
 
         Integer[] valuesDomJust7 = {0b010010010001,0b101000100100}; // beat notes and passage notes for dominant 7 (just 7)
         grammar.put(JazzChord.DOM_JUST7,valuesDomJust7);
 
+        Integer[] valuesDomJust7_9 = {0b010010010101,0b101000100100}; // beat notes and passage notes for dominant 7 (just 7) + 9M
+        grammar.put(JazzChord.DOM_JUST7_9,valuesDomJust7_9);
+
         Integer[] valuesHalfDimJust7 = {0b010001001001,0b100100100010}; // beat notes and passage notes for an Empty Chord: Solo style
         grammar.put(JazzChord.HALFDIM_JUST7,valuesHalfDimJust7);
 
+        Integer[] valuesHalfDimJust7_9m = {0b010001001011,0b100100100010}; // beat notes and passage notes for an Empty Chord: Solo style
+        grammar.put(JazzChord.HALFDIM_JUST7_9MIN,valuesHalfDimJust7_9m);
+
         Integer[] valuesSus4just7 = {0b010010100001,0b101001000100}; // beat notes and passage notes for Sus4 (C D F F# G A Bb B)
         grammar.put(JazzChord.SUS4_JUST7,valuesSus4just7);
+
+        Integer[] valuesSus4just7_9 = {0b010010100101,0b101001000100}; // beat notes and passage notes for Sus4 (C D F F# G A Bb B)
+        grammar.put(JazzChord.SUS4_JUST7,valuesSus4just7_9);
 
         Integer[] valuesDim = {0b001001001001,0b100100100100}; // beat notes and passage notes for dim (CD EbF F#G# AB) octatonica
         grammar.put(JazzChord.DIM,valuesDim);

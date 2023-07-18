@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import com.cristianovecchi.mikrokanon.divideDistributingRest
+import com.cristianovecchi.mikrokanon.locale.NoteNamesIt
 
 
 fun List<Bar>.splitBarsInGroups(nGroups: Int):  List<List<Bar>>{
@@ -65,8 +66,8 @@ fun List<Bar>.resizeLastBar(totalDuration: Long): List<Bar>{
         indexLastBar++
     }
     val realSequence = this.subList(0, indexLastBar)
-    val barsDuration = realSequence.sumBy { it.duration.toInt() }
-    val originalBarsDuration = this.sumBy { it.duration.toInt() }
+    val barsDuration = realSequence.sumOf { it.duration.toInt() }
+    val originalBarsDuration = this.sumOf { it.duration.toInt() }
     val diff = totalDuration - barsDuration
    // println("Bars duration = $barsDuration Total duration = $totalDuration  Diff = $diff LastBarIndex=$indexLastBar ")
     if(diff == 0L) return realSequence
@@ -155,9 +156,9 @@ fun List<Bar>.findChordSequence(harmonizationType: HarmonizationType){
     when (harmonizationType){
         HarmonizationType.POP, HarmonizationType.POP7 -> {
             val selectChordArea = if(harmonizationType == HarmonizationType.POP7) {
-                previousChord: JazzChord -> JazzChord.selectChordArea_just_7(previousChord)}
+                prevChord: JazzChord -> JazzChord.selectChordArea_just_7(prevChord)}
             else {
-                previousChord:JazzChord -> JazzChord.selectChordArea_no_7(previousChord)}
+                prevChord:JazzChord -> JazzChord.selectChordArea_no_7(prevChord)}
             this.forEach {
                 val jazzChords = selectChordArea(previousChord)
                 val chordFaultsGrid =  it.findChordFaultsGrid(jazzChords)
@@ -167,14 +168,31 @@ fun List<Bar>.findChordSequence(harmonizationType: HarmonizationType){
                 it.chord1 = chord
                 lastRoot = chordPosition.first
                 previousChord = chord.chord
-                println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+                //println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${Clip.convertAbsPitchesToClipText(chord.absoluteNotes.toList(), NoteNamesIt.values().map{it.toString()})}")
+
+            }
+        }
+        HarmonizationType.LIBERTY -> {
+            val selectChordArea =
+                { prevChord: JazzChord -> JazzChord.selectChordAreaJust9(prevChord)}
+            this.forEach {
+                val jazzChords = selectChordArea(previousChord)
+                val chordFaultsGrid =  it.findChordFaultsGrid(jazzChords)
+                priority = JazzChord.findRootMovementPriorityJust9(previousChord)
+                val chordPosition = chordFaultsGrid.findBestChordPosition(lastRoot, priority)
+                val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
+                it.chord1 = chord
+                lastRoot = chordPosition.first
+                previousChord = chord.chord
+                //println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${Clip.convertAbsPitchesToClipText(chord.absoluteNotes.toList(), NoteNamesIt.values().map{it.toString()})}")
+
             }
         }
         HarmonizationType.JAZZ, HarmonizationType.JAZZ11 -> {
             val selectChordArea = if(harmonizationType == HarmonizationType.JAZZ11) {
-                    prevChord: JazzChord -> JazzChord.selectChordArea_11(previousChord)}
+                    prevChord: JazzChord -> JazzChord.selectChordArea_11(prevChord)}
             else {
-                    prevChord:JazzChord -> JazzChord.selectChordArea_no_11(previousChord)}
+                    prevChord:JazzChord -> JazzChord.selectChordArea_no_11(prevChord)}
             this.forEach {
                 val jazzChords = selectChordArea(previousChord)
                 val chordFaultsGrid =  it.findChordFaultsGrid(jazzChords)
@@ -184,11 +202,11 @@ fun List<Bar>.findChordSequence(harmonizationType: HarmonizationType){
                 it.chord1 = chord
                 lastRoot = chordPosition.first
                 previousChord = chord.chord
-        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+                //println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${Clip.convertAbsPitchesToClipText(chord.absoluteNotes.toList(), NoteNamesIt.values().map{it.toString()})}")
             }
         }
         HarmonizationType.XWH -> {
-            this.forEachIndexed { i, bar ->
+            this.forEachIndexed { _, bar ->
                 ///val ewhChords = selectChordArea(previousChord)
                 //println("Bar $i: ${bar.dodecaByte1stHalf!!.toString(2)}")
                 val bools = HarmonyEye.selNotesFrom12Byte(bar.dodecaByte1stHalf!!)//.apply {

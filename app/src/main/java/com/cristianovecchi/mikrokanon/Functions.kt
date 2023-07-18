@@ -423,7 +423,10 @@ fun Long.divideDistributingRest(divisor: Int): MutableList<Long>{
     val add = if(restOfRest < 0) -1 else 1
     //println("result=$result rest=$rest restDiv=$restDiv restOfRest=$restOfRest")
     (0 until divisor).forEach{ i -> if(i and 1 == 1) list.add(result) else list.add(resultPlusRestDiv) }
-    (0 until restOfRest.toInt().absoluteValue).forEach{ i -> list[i*2+1] = list[i*2+1]+add}
+    (0 until restOfRest.toInt().absoluteValue).forEach{ i ->
+        val index = i*2+1
+        list[index] = list[index]+add
+    }
     //if(addOne) list[0] = list[0] + 1
     return list
 }
@@ -440,7 +443,10 @@ fun Int.divideDistributingRest(divisor: Int): MutableList<Int>{
     val add = if(restOfRest < 0) -1 else 1
     //println("result=$result rest=$rest restDiv=$restDiv restOfRest=$restOfRest")
     (0 until divisor).forEach{ i -> if(i and 1 == 1) list.add(result) else list.add(resultPlusRestDiv) }
-    (0 until restOfRest.absoluteValue).forEach{ i -> list[i*2+1] = list[i*2+1]+add}
+    (0 until restOfRest.absoluteValue).forEach{ i ->
+        val index = i*2+1
+        list[index] = list[index]+add
+    }
     //if(addOne) list[0] = list[0] + 1
     return list
 }

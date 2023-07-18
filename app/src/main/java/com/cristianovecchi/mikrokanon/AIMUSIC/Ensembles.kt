@@ -11,7 +11,7 @@ enum class EnsembleType {
     ACOUSTIC_BASS, FRETLESS_BASS, SLAP_BASS_1, SYN_BASS_1,
     TREMOLO_STRINGS, PIZZICATO, FIDDLE, MUTED_BRASS,
     BAG_PIPES, RECORDER, SHANAI, SITAR, SHAMISEN, KOTO,
-    HARPSICHORD, XYLOPHONE, MARIMBA, KALIMBA, VIBRAPHONE, CELESTA, BELLS, TINKLE_BELLS, AGOGO, STEEL_DRUMS, REVERSE_CYMBALS,
+    HARPSICHORD, XYLOPHONE, MARIMBA, KALIMBA, VIBRAPHONE, GLOCKENSPIEL, CELESTA, BELLS, TINKLE_BELLS, AGOGO, STEEL_DRUMS, REVERSE_CYMBALS,
     TIMPANI, WOODBLOCKS, TAIKO_DRUMS, MELODIC_TOMS, SYN_DRUMS,
     ELECTRIC_PIANO_1, ELECTRIC_PIANO_2,
     HAMMOND_ORGAN, PERC_ORGAN, BLUES_ORGAN, CHURCH_ORGAN, REED_ORGAN, ACCORDION, TANGO_ACCORDION,
@@ -57,7 +57,7 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
 
 object Ensembles {
     fun getEnsembleMix(nParts: Int, types: List<EnsembleType>):  List<EnsemblePart> {
-       // println("nParts: $nParts    Ensemble Types: $types")
+       //println("nParts: $nParts    Ensemble Types: $types")
         val mix = types.map{ getEnsemble(nParts, it)}
      //   mix.forEachIndexed{ i, it -> println("ensemble #$i: $it")}
         return (0 until nParts).toList().map{
@@ -96,7 +96,7 @@ object Ensembles {
             EnsembleType.MUTED_GUITAR -> getKeyboardInstrument(MUTED_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
             EnsembleType.OVERDRIVE_GUITAR -> getKeyboardInstrument(OVERDRIVE_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
             EnsembleType.DISTORTION_GUITAR -> getKeyboardInstrument(DISTORTION_GUITAR, nParts, RANGES.GUITAR, IntRange(40, 83))
-            EnsembleType.BANJO -> getKeyboardInstrument(BANJO, nParts, RANGES.SYN_SAW, IntRange(C3, C5 + 3))
+            EnsembleType.BANJO -> getKeyboardInstrument(BANJO, nParts, RANGES.SYN_SAW, BANJO_ALL)
             EnsembleType.ACOUSTIC_BASS -> getKeyboardInstrument(ACOUSTIC_BASS, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
             EnsembleType.FRETLESS_BASS -> getKeyboardInstrument(FRETLESS_BASS, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
             EnsembleType.SLAP_BASS_1 -> getKeyboardInstrument(SLAP_BASS_1, nParts, RANGES.BASS_GUITAR, IntRange(E1, G4))
@@ -108,16 +108,17 @@ object Ensembles {
             EnsembleType.BAG_PIPES -> getKeyboardInstrument(BAG_PIPE, nParts, RANGES.BAG_PIPES, IntRange(C1, C6))
             EnsembleType.RECORDER -> getKeyboardInstrument(RECORDER, nParts, RANGES.RECORDERS, IntRange(C3, C7))
             EnsembleType.SHANAI -> getKeyboardInstrument(SHANAI, nParts, RANGES.SHANAI, IntRange(C4 - 3, C6 - 3))
-            EnsembleType.SITAR -> getKeyboardInstrument(SITAR, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C6))
-            EnsembleType.SHAMISEN -> getKeyboardInstrument(SHAMISEN, nParts, RANGES.SHAMISEN, IntRange(C4 , C7 - 3))
-            EnsembleType.KOTO -> getKeyboardInstrument(KOTO, nParts, RANGES.SYN_SAW, IntRange(C3, C6))
+            EnsembleType.SITAR -> getKeyboardInstrument(SITAR, nParts, RANGES.OCTAVES_2334455, SITAR_ALL)
+            EnsembleType.SHAMISEN -> getKeyboardInstrument(SHAMISEN, nParts, RANGES.SHAMISEN, SHAMISEN_ALL)
+            EnsembleType.KOTO -> getKeyboardInstrument(KOTO, nParts, RANGES.SYN_SAW, KOTO_ALL)
             EnsembleType.HARPSICHORD -> getKeyboardInstrument(HARPSICHORD, nParts)
             EnsembleType.XYLOPHONE -> getKeyboardInstrument(XYLOPHONE, nParts, RANGES.HALF, IntRange(C4, C8))
             EnsembleType.MARIMBA -> getKeyboardInstrument(MARIMBA, nParts, RANGES.HALF_PLUS_1,  IntRange(C2, C7))
             EnsembleType.KALIMBA -> getKeyboardInstrument(KALIMBA, nParts, RANGES.SHAMISEN,  IntRange(G3, C6 + 2))
-            EnsembleType.VIBRAPHONE -> getKeyboardInstrument(VIBRAPHONE, nParts, RANGES.HALF_PLUS_1, IntRange(C3, C7))
+            EnsembleType.VIBRAPHONE -> getKeyboardInstrument(VIBRAPHONE, nParts, RANGES.HALF_PLUS_1, IntRange(53, 89)) // F3 - F6
+            EnsembleType.GLOCKENSPIEL -> getKeyboardInstrument(GLOCKENSPIEL, nParts, RANGES.CELESTA, IntRange(C3, C7))
             EnsembleType.CELESTA -> getKeyboardInstrument(CELESTA, nParts, RANGES.CELESTA, IntRange(C4, C8))
-            EnsembleType.BELLS -> getKeyboardInstrument(TUBULAR_BELLS, nParts, RANGES.BELLS, IntRange(55, C6)) // G3 - C6
+            EnsembleType.BELLS -> getKeyboardInstrument(TUBULAR_BELLS, nParts, RANGES.BELLS, IntRange(C4, C6)) // G3 - C6
             EnsembleType.TINKLE_BELLS -> getKeyboardInstrument(TINKLE_BELLS, nParts, RANGES.PIANO, IntRange(C1, C8))
             EnsembleType.AGOGO -> getKeyboardInstrument(AGOGO, nParts, RANGES.OCTAVES_2334455, IntRange(C2, C6))
             EnsembleType.STEEL_DRUMS -> getKeyboardInstrument(STEEL_DRUMS, nParts, RANGES.NO_LOWER_OCTAVE, IntRange(C2, C7))
@@ -160,7 +161,7 @@ object Ensembles {
             EnsembleType.GOBLINS -> getKeyboardInstrument(GOBLINS, nParts, RANGES.NO_LOWER_OCTAVE, IntRange(C2, C8))
             EnsembleType.ECHO_DROPS -> getKeyboardInstrument(ECHO_DROPS, nParts, RANGES.NO_LOWER_OCTAVE, IntRange(C2, C8))
             EnsembleType.SCI_FI -> getKeyboardInstrument(SCI_FI, nParts, RANGES.NO_LOWER_OCTAVE, IntRange(C2, C8))
-        }
+        }//.onEach { ensemble -> println(ensemble) }
     }
 
     fun getStrings(nParts: Int): List<EnsemblePart> {
@@ -1295,7 +1296,7 @@ object Ensembles {
                 PARTS_HARP[3]
             )
             7 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_ALL, GUITAR_HIGHEST5),
+                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
@@ -1304,9 +1305,9 @@ object Ensembles {
                 PARTS_HARP[3]
             )
             8 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_ALL, GUITAR_HIGHEST5),
+                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
-                EnsemblePart(BANJO, 5),
+                EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
                 PARTS_HARP[4],
@@ -1314,52 +1315,51 @@ object Ensembles {
                 PARTS_HARP[3]
             )
             9 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_ALL, GUITAR_HIGHEST5),
+                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
-                EnsemblePart(BANJO, 5),
+                EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
-                EnsemblePart(SITAR, 4),
+                EnsemblePart(SITAR, 4, SITAR_ALL, SITAR_HIGH5),
                 PARTS_HARP[3],
                 EnsemblePart(NYLON_GUITAR, 3, GUITAR_ALL, GUITAR_LOW5),
                 PARTS_HARP[2]
             )
             10 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_ALL, GUITAR_HIGHEST5),
+                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
-                EnsemblePart(BANJO, 5),
-                EnsemblePart(KOTO, 5),
+                EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
+                EnsemblePart(KOTO, 5, KOTO_ALL, KOTO_HIGHEST5),
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
-                EnsemblePart(SITAR, 4),
+                EnsemblePart(SITAR, 4, SITAR_ALL, SITAR_HIGH5),
                 PARTS_HARP[3],
                 EnsemblePart(NYLON_GUITAR, 3, GUITAR_LOW5),
                 PARTS_HARP[2]
             )
             11 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_ALL, GUITAR_HIGHEST5),
+                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
-                EnsemblePart(BANJO, 5),
-                EnsemblePart(KOTO, 5),
+                EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
-                EnsemblePart(SITAR, 4),
+                EnsemblePart(SITAR, 4, SITAR_ALL, SITAR_HIGH5),
                 PARTS_HARP[3],
-                EnsemblePart(SHAMISEN, 3),
+                EnsemblePart(SHAMISEN, 4, SHAMISEN_ALL, SHAMISEN_LOW5),
                 EnsemblePart(NYLON_GUITAR, 3, GUITAR_ALL, GUITAR_LOW5),
                 PARTS_HARP[2]
             )
             12 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_ALL, GUITAR_HIGHEST5),
+                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
-                EnsemblePart(BANJO, 5),
-                EnsemblePart(KOTO, 5),
+                EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
+                EnsemblePart(KOTO, 5, KOTO_ALL, KOTO_HIGHEST5),
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
-                EnsemblePart(SITAR, 4),
+                EnsemblePart(SITAR, 4, SITAR_ALL, SITAR_HIGH5),
                 PARTS_HARP[3],
                 EnsemblePart(CLEAN_GUITAR, 3, GUITAR_ALL, GUITAR_LOW5..GUITAR_MIDDLE5),
-                EnsemblePart(SHAMISEN, 3),
+                EnsemblePart(SHAMISEN, 4, SHAMISEN_ALL, SHAMISEN_LOW5),
                 EnsemblePart(NYLON_GUITAR, 3, GUITAR_ALL, GUITAR_LOW5),
                 PARTS_HARP[2]
             )
@@ -1389,7 +1389,7 @@ object Ensembles {
                 PARTS_BOWED_GLASS[3],
                 PARTS_SOUNDTRACK[3],
                 PARTS_GOBLINS[2],
-                PARTS_SYN_VOICE[1]
+                EnsemblePart(SYN_CHARANG, 1, SYN_CHARANG_ALL, SYN_CHARANG_LOW5)
             )
             8 -> listOf(
                 PARTS_ECHO_DROPS[6],
@@ -1398,19 +1398,19 @@ object Ensembles {
                 PARTS_SOUNDTRACK[4],
                 PARTS_GOBLINS[3],
                 PARTS_WARM_PAD[3],
-                PARTS_GOBLINS[2],
-                PARTS_SYN_VOICE[1]
+                PARTS_SYN_VOICE[2],
+                EnsemblePart(SYN_CHARANG, 1, SYN_CHARANG_ALL, SYN_CHARANG_LOW5)
             )
             9 -> listOf(
                 PARTS_ECHO_DROPS[6],
                 PARTS_BOWED_GLASS[5],
                 PARTS_ECHO_DROPS[5],
-                PARTS_ECHO_DROPS[4],
+                PARTS_SYN_VOICE[4],
                 PARTS_WARM_PAD[4],
                 PARTS_BOWED_GLASS[3],
                 PARTS_SOUNDTRACK[3],
                 PARTS_GOBLINS[2],
-                PARTS_SYN_VOICE[1]
+                EnsemblePart(SYN_CHARANG, 1, SYN_CHARANG_ALL, SYN_CHARANG_LOW5)
             )
             in 10..12 -> listOf(
                 PARTS_WARM_PAD[7],
@@ -1419,12 +1419,12 @@ object Ensembles {
                 PARTS_BOWED_GLASS[5],
                 PARTS_WARM_PAD[5],
                 PARTS_ECHO_DROPS[4],
-                PARTS_WARM_PAD[4],
+                PARTS_SYN_VOICE[4],
                 PARTS_BOWED_GLASS[3],
                 PARTS_SOUNDTRACK[3],
                 PARTS_GOBLINS[2],
                 PARTS_WARM_PAD[2],
-                PARTS_SYN_VOICE[1]
+                EnsemblePart(SYN_CHARANG, 1, SYN_CHARANG_ALL, SYN_CHARANG_LOW5)
             )
             else -> listOf()
         }
