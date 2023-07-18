@@ -151,8 +151,12 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
 }
 
 fun MidiTrack.addInstrumentsToTrackCycling(barStarts: List<Long>, chordsChannel: Int, instruments: List<Int>) {
-    barStarts.forEachIndexed { i, start ->
-        this.initializeChordTrack(start, chordsChannel, instruments[i % instruments.size])
+    if(instruments.size == 1){
+        this.initializeChordTrack(barStarts[0], chordsChannel, instruments[0])
+    } else {
+        barStarts.forEachIndexed { i, start ->
+            this.initializeChordTrack(start, chordsChannel, instruments[i % instruments.size])
+        }
     }
 }
 

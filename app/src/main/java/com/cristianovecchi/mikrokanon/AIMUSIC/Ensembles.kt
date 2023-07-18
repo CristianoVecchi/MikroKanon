@@ -1341,6 +1341,7 @@ object Ensembles {
                 EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
                 EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
+                EnsemblePart(KOTO, 5, KOTO_ALL, KOTO_HIGHEST5),
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
                 EnsemblePart(SITAR, 4, SITAR_ALL, SITAR_HIGH5),
