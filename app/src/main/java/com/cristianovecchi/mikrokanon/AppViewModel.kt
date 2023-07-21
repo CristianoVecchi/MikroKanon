@@ -133,6 +133,7 @@ class AppViewModel(
     
     init{
         //RhythmPatterns.checkIntegrity()
+        //MelodyQuotes.checkDodecaphonicIntegrity()
         //readFileLineByLineUsingForEachLine()
         //createArrayColorsFile()
         val size = getDeviceResolution()

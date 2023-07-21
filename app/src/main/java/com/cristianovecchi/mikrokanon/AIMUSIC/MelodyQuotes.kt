@@ -3,7 +3,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 import com.cristianovecchi.mikrokanon.locale.NoteNamesIt
 
 enum class MelodyGenre {
-    GREGORIAN, BEBOP, COUPLE, TRIPLE, SCALES//, QUADRUPLE //CHORALE, DODECAPHONY, SCALES,  ALBERTI,
+    GREGORIAN, DODECAPHONY, BEBOP, COUPLE, TRIPLE, SCALES//, QUADRUPLE //CHORALE, SCALES,  ALBERTI,
 }
 enum class MelodyQuotes(val genre: MelodyGenre, val pitches: List<Int>) {
     VENI_1(MelodyGenre.GREGORIAN, listOf(65,67,65,63,65,67,65,70,72,70)),
@@ -26,6 +26,91 @@ enum class MelodyQuotes(val genre: MelodyGenre, val pitches: List<Int>) {
     F_M_M_2(MelodyGenre.GREGORIAN, listOf(62,64,65,67,65,69,71,69,67,67,65,64,65,67,67,67,-1,72,72,71,72,69,67)),
     G_I_E_D_1(MelodyGenre.GREGORIAN, listOf(65,67,69,67,67,65,67,69,67,69,67,69,65,67,69,67,65,67,67,69,71,72,69,67)),
     G_I_E_D_2(MelodyGenre.GREGORIAN, listOf(69,67,65,67,69,67,65,-1,67,69,65,62,64,65,67,69,69,67,67)),
+
+    AW_32LATER(MelodyGenre.DODECAPHONY, listOf(0,1,2,11,10,9, 5,4,3,6,7,8)),
+    IS_ABR_IS(MelodyGenre.DODECAPHONY, listOf(0,1,3,5,6,2, 4,8,7,9,11,10)),
+    AS_SER24_M5(MelodyGenre.DODECAPHONY, listOf(0,1,3,6,7,9, 8,10,11,2,4,5)),
+    AB_KAMMKONZ(MelodyGenre.DODECAPHONY, listOf(0,1,3,8,4,9, 10,7,6,5,11,2)),
+    AS_SUITE25(MelodyGenre.DODECAPHONY, listOf(0,1,3,9,2,11, 4,10,7,8,5,6)),
+    AW_VAR30(MelodyGenre.DODECAPHONY, listOf(0,1,4,3,2,5, 6,9,8,7,10,11)),
+    IS_AGON_PDD_4T(MelodyGenre.DODECAPHONY, listOf(0,1,4,3,2,5, 6,9,8,11,10,7)),
+    AS_JAKOB(MelodyGenre.DODECAPHONY, listOf(0,1,4,3,7,6, 11,2,10,9,5,8)),
+    EK_JER93(MelodyGenre.DODECAPHONY, listOf(0,1,4,6,8,10, 5,7,9,11,2,3)),
+    MB_COMP12(MelodyGenre.DODECAPHONY, listOf(0,1,4,9,5,8, 3,10,2,11,6,7)),
+    LD_QUAD(MelodyGenre.DODECAPHONY, listOf(0,1,5,8,10,4, 3,7,9,2,11,6)),
+    AS_VLK36(MelodyGenre.DODECAPHONY, listOf(0,1,6,2,7,9, 3,4,10,11,5,8)),
+    AS_WARSAW(MelodyGenre.DODECAPHONY, listOf(0,1,6,2,10,9, 4,7,3,8,11,5)),
+    MB_ALL_SET(MelodyGenre.DODECAPHONY, listOf(0,1,6,5,7,11, 2,10,3,9,8,4)),
+    AS_MOSES(MelodyGenre.DODECAPHONY, listOf(0,1,7,5,6,4, 10,8,9,11,2,3)),
+    IS_MOV(MelodyGenre.DODECAPHONY, listOf(0,1,7,5,6,11, 9,8,10,3,4,2)),
+    KS_ZEIT(MelodyGenre.DODECAPHONY, listOf(0,1,8,11,7,3, 2,5,4,10,9,6)),
+    AW_32ROW1(MelodyGenre.DODECAPHONY, listOf(0,1,9,11,3,2, 6,7,10,8,4,5)),
+    AW_PIANO27(MelodyGenre.DODECAPHONY, listOf(0,1,9,11,8,10, 4,5,6,2,3,7)),
+    LD_DIAL(MelodyGenre.DODECAPHONY, listOf(0,1,10,2,6,4, 5,3,7,11,8,9)),
+    LN_CANTO(MelodyGenre.DODECAPHONY, listOf(0,1,11,2,10,3, 9,4,8,5,7,6)),
+    IS_AGON_CODA_FLOOD(MelodyGenre.DODECAPHONY, listOf(0,2,1,3,4,6, 7,9,8,10,5,11)),
+    AB_LULU(MelodyGenre.DODECAPHONY, listOf(0,2,3,1,4,5, 6,7,8,9,11,10)),
+    IS_AGON_BRANSLES(MelodyGenre.DODECAPHONY, listOf(0,2,3,5,4,9, 7,8,10,11,1,6)),
+    AB_LULU2(MelodyGenre.DODECAPHONY, listOf(0,2,4,6,10,8, 11,7,9,1,3,5)),
+    IS_VAR(MelodyGenre.DODECAPHONY, listOf(0,2,5,3,10,4, 6,1,11,7,8,9)),
+    IS_OWL(MelodyGenre.DODECAPHONY, listOf(0,2,9,11,8,6, 5,7,10,1,4,3)),
+    IS_REQ1(MelodyGenre.DODECAPHONY, listOf(0,2,10,11,1,8, 6,7,9,4,3,5)),
+    MB_W_QUIN(MelodyGenre.DODECAPHONY, listOf(0,3,1,2,10,11, 8,9,5,7,6,4)),
+    KS_ARIES(MelodyGenre.DODECAPHONY, listOf(0,3,2,9,7,8, 11,6,1,5,4,10)),
+    AW_SYM21(MelodyGenre.DODECAPHONY, listOf(0,3,2,1,5,4, 10,11,7,8,9,6)),
+    KS_KLS_IV_2ND(MelodyGenre.DODECAPHONY, listOf(0,3,5,1,2,6, 4,11,7,8,10,9)),
+    KS_AQUARIUS(MelodyGenre.DODECAPHONY, listOf(0,3,5,4,10,11, 9,8,7,6,2,1)),
+    AB_VL_KNZ(MelodyGenre.DODECAPHONY, listOf(0,3,7,11,2,5, 9,1,4,6,8,10)),
+    AW_31(MelodyGenre.DODECAPHONY, listOf(0,3,11,10,2,9, 1,5,4,8,7,6)),
+    IS_ANTHEM(MelodyGenre.DODECAPHONY, listOf(0,4,2,5,7,8, 10,9,11,1,6,3)),
+    KS_LICHT_EVE(MelodyGenre.DODECAPHONY, listOf(0,4,3,2,5,6,10,11,9,1,7,8)),
+    AS_ODE29(MelodyGenre.DODECAPHONY, listOf(0,4,3,7,11,8, 9,6,5,1,2,10)),
+    KS_SCORPIO(MelodyGenre.DODECAPHONY, listOf(0,4,3,11,7,8, 10,9,2,5,1,6)),
+    AB_LULU3(MelodyGenre.DODECAPHONY, listOf(0,4,5,2,6,7, 8,9,11,10,3,1)),
+    AB_LULU_BASIC(MelodyGenre.DODECAPHONY, listOf(0,4,5,2,7,9, 6,8,11,10,3,1)),
+    KS_GEMINI(MelodyGenre.DODECAPHONY, listOf(0,4,5,10,7,6, 1,8,11,2,9,3)),
+    BB_TURN(MelodyGenre.DODECAPHONY, listOf(0,5,2,7,4,9, 6,11,8,1,10,3)),
+    DS_SYM14_M3(MelodyGenre.DODECAPHONY, listOf(0,5,2,7,10,1, 11,4,6,8,9,3)),
+    IS_THRENI(MelodyGenre.DODECAPHONY, listOf(0,5,4,7,10,6, 11,8,1,9,2,3)),
+    KS_LEO(MelodyGenre.DODECAPHONY, listOf(0,5,11,6,3,2, 8,7,9,10,4,1)),
+    KS_SAG(MelodyGenre.DODECAPHONY, listOf(0,6,5,2,3,4, 7,8,9,10,11,1)),
+    WL_FUN(MelodyGenre.DODECAPHONY, listOf(0,6,5,11,10,4, 3,9,8,2,1,7)),
+    WAM_K428(MelodyGenre.DODECAPHONY, listOf(0,6,7,8,9,1, 2,5,11,4,10,3)),
+    AS_VAR31(MelodyGenre.DODECAPHONY, listOf(0,6,8,5,7,11, 4,3,9,10,1,2)),
+    KS_KLS_IV_3RD(MelodyGenre.DODECAPHONY, listOf(0,7,1,10,11,9, 5,8,4,3,2,6)),
+    EC_P_CON(MelodyGenre.DODECAPHONY, listOf(0,7,4,11,6,10, 3,9,1,8,5,2)),
+    IS_REQ_2ND(MelodyGenre.DODECAPHONY, listOf(0,7,6,4,5,9, 8,10,3,1,11,2)),
+    AS_P_CON42(MelodyGenre.DODECAPHONY, listOf(0,7,11,2,1,9,3,5,10,6,8,4)),
+    AW_23(MelodyGenre.DODECAPHONY, listOf(0,7,11,8,2,10, 6,9,5,4,1,3)),
+    KS_CANCER(MelodyGenre.DODECAPHONY, listOf(0,7,11,10,9,8, 3,6,4,1,5,2)),
+    KS_GR_KLS_VII_IX_X(MelodyGenre.DODECAPHONY, listOf(0,8,1,10,9,11, 5,3,4,7,2,6)),
+    KS_KLS_V_VIII(MelodyGenre.DODECAPHONY, listOf(0,8,1,11,10,7, 5,9,4,6,3,2)),
+    EC_P_CON_SOLO(MelodyGenre.DODECAPHONY, listOf(0,8,4,9,10,3, 1,6,11,2,7,5)),
+    AW_VAR27_M3(MelodyGenre.DODECAPHONY, listOf(0,8,7,11,10,9, 3,1,4,2,6,5)),
+    AW_29(MelodyGenre.DODECAPHONY, listOf(0,8,11,10,2,1, 4,3,7,6,9,5)),
+    LD_PMN(MelodyGenre.DODECAPHONY, listOf(0,9,1,3,4,11, 2,8,7,5,10,6)),
+    KS_CAPRICORN(MelodyGenre.DODECAPHONY, listOf(0,9,2,8,7,5, 6,1,3,4,10,11)),
+    AW_22(MelodyGenre.DODECAPHONY, listOf(0,9,8,11,10,2, 3,4,5,7,1,6)),
+    PB_MAITRE(MelodyGenre.DODECAPHONY, listOf(0,10,1,2,5,4, 6,3,7,11,8,9)),
+    KS_KS(MelodyGenre.DODECAPHONY, listOf(0,10,9,11,7,2, 8,1,4,6,5,3)),
+    IS_AGON_DPQ(MelodyGenre.DODECAPHONY, listOf(0,11,1,2,9,8, 10,7,5,6,4,3)),
+    IS_FANFARE(MelodyGenre.DODECAPHONY, listOf(0,11,1,3,4,2, 5,7,6,8,10,9)),
+    IS_CS_II_IV(MelodyGenre.DODECAPHONY, listOf(0,11,1,3,4,2, 7,6,9,5,8,10)),
+    AW_SQ28(MelodyGenre.DODECAPHONY, listOf(0,11,2,1,5,6, 3,4,8,7,10,9)),
+    EC_SQ3(MelodyGenre.DODECAPHONY, listOf(0,11,2,9,5,3, 4,8,10,7,1,6)),
+    AS_VPH47(MelodyGenre.DODECAPHONY, listOf(0,11,3,1,7,9, 6,2,10,5,8,4)),
+    AW_C9I24(MelodyGenre.DODECAPHONY, listOf(0,11,3,4,8,7, 9,5,6,1,2,10)),
+    //LD_5C(MelodyGenre.DODECAPHONY, listOf(0,11,5,9,6,2, 7,3,1,4,10,9)),
+    PB_STRUCT_IA(MelodyGenre.DODECAPHONY, listOf(0,11,6,5,4,3, 1,10,9,7,2,8)),
+    AB_LYR_M3(MelodyGenre.DODECAPHONY, listOf(0,11,7,1,2,9, 3,8,10,4,5,6)),
+    AB_LYR_M4_R1(MelodyGenre.DODECAPHONY, listOf(0,11,7,1,4,8, 3,9,10,2,5,6)),
+    AB_LYR_M1(MelodyGenre.DODECAPHONY, listOf(0,11,7,4,2,9, 3,8,10,1,5,6)),
+    AS_SQ4(MelodyGenre.DODECAPHONY, listOf(0,11,7,8,3,1, 2,10,6,5,4,9)),
+    AB_LYR_R2(MelodyGenre.DODECAPHONY, listOf(0,11,8,9,7,6, 1,5,4,3,2,10)),
+    DS_SYM14_M1(MelodyGenre.DODECAPHONY, listOf(0,11,9,4,3,10, 8,7,5,6,1,2)),
+    IS_CS_II(MelodyGenre.DODECAPHONY, listOf(0,11,9,6,10,8, 7,5,2,4,3,1)),
+
+
 
     CP_1(MelodyGenre.BEBOP, listOf(62,57,60,57, 59,68,65,66, 67)),
     CP_2(MelodyGenre.BEBOP, listOf(65,63, 62,65,69, 72,70, 69,70, 74,77)),
@@ -139,6 +224,17 @@ enum class MelodyQuotes(val genre: MelodyGenre, val pitches: List<Int>) {
 
     ;
     companion object {
+        fun checkDodecaphonicIntegrity() {
+            val twelveNotes = (0..11).toList()
+            val wrongOnes = values().filter { it.genre == MelodyGenre.DODECAPHONY && it.pitches.sorted() != twelveNotes }
+            if(wrongOnes.isEmpty()){
+                println("All series are dodecaphonic ones!")
+            } else {
+                wrongOnes.forEach {
+                    println("WARNING!!! ${it.name} is not a dodecaphonic series!!! ")
+                }
+            }
+        }
         fun getAbsPitchesByGenres(genres: List<MelodyGenre>): List<List<Int>> {
             val noteNames = NoteNamesIt.values().map{it.toString()}
             return values().filter { genres.contains(it.genre) }
