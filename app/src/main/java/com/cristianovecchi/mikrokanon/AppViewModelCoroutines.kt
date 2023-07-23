@@ -529,7 +529,7 @@ fun AppViewModel.addQuotesToCounterpoint(genres: List<MelodyGenre> = listOf(Melo
                         it.spreadAsPossible(true, intervalSet = intervalSet.value!!)}
                     //.map{ it.emptiness = it.findEmptiness(); it}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                    .also { println("n results: ${it.size}") }
+                    //.also { println("n results: ${it.size}") }
             }
             changeCounterpointsWithLimitAndCache(newList, true)
         }
