@@ -3,7 +3,6 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.locale.NoteNamesIt
 
-
 fun List<Bar>.splitBarsInGroups(nGroups: Int):  List<List<Bar>>{
     if(nGroups >= this.size){
         return this.map{ listOf(it)}//.apply{ println("Size: ${this.size} Division: $this") }
@@ -16,7 +15,7 @@ fun List<Bar>.splitBarsInGroups(nGroups: Int):  List<List<Bar>>{
         index += it.toInt()
     }
     //println("Size: ${this.size} Division: $division")
-    return result.toList()
+    return result.toList().also{println("Split bars: $this")}
 }
 fun Array<IntArray>.findBestChordPosition(
     lastRoot: Int,
@@ -37,7 +36,45 @@ fun Array<IntArray>.findBestChordPosition(
     }
     return result
 }
+
+fun List<Bar>.splitByDivision(division: HarmonizationDivision): List<Bar>{
+    return when(division) {
+        HarmonizationDivision.WHOLE -> this
+        HarmonizationDivision.HALVES -> this.splitBarsInTwoParts()
+        HarmonizationDivision.THIRDS -> this.splitBarsInThreeParts()
+        HarmonizationDivision.QUARTERS -> this.splitBarsInTwoParts().splitBarsInTwoParts()
+        HarmonizationDivision.DUR_2_4 -> this.map{ it.splitByDuration(Pair(2,4))}.flatten()
+        HarmonizationDivision.DUR_3_8 -> this.map{ it.splitByDuration(Pair(3,8))}.flatten()
+        HarmonizationDivision.DUR_1_4 -> this.map{ it.splitByDuration(Pair(1,4))}.flatten()
+        HarmonizationDivision.DUR_1_8 -> this.map{ it.splitByDuration(Pair(1,8))}.flatten()
+    }
+//        .also {
+//        println("Original bars: ${this.size} $this")
+//        println("Split bars   : ${it.size} $it")
+//        println()
+//    }
+}
 fun List<Bar>.splitBarsInTwoParts(): List<Bar>{
+    val result = mutableListOf<Bar>()
+    for (bar in this) {
+        println("Input "+ bar)
+        val (numerator, denominator) = bar.metro
+        val quantumDur = RhythmPatterns.denominatorMidiValue(denominator).toLong()
+        if(bar.duration < quantumDur * numerator || numerator == 1){ // don't split
+            result.add(bar)
+            println("Output: ${result.takeLast(1)}")
+        } else {
+            val den2nd = numerator / 2
+            val den1st = den2nd + numerator % 2
+            val duration1st = quantumDur * den1st
+            result.add(Bar(Pair(den1st, denominator),bar.tick, duration1st, minVelocity = bar.minVelocity))
+            result.add(Bar(Pair(den2nd, denominator),bar.tick + duration1st, quantumDur * den2nd, minVelocity = bar.minVelocity))
+            println("Output: ${result.takeLast(2)}")
+        }
+    }
+    return result.toList()
+}
+fun List<Bar>.splitBarsInThreeParts(): List<Bar>{
     val result = mutableListOf<Bar>()
     for (bar in this) {
         //println("Input "+ bar)
@@ -45,12 +82,22 @@ fun List<Bar>.splitBarsInTwoParts(): List<Bar>{
         val quantumDur = RhythmPatterns.denominatorMidiValue(denominator).toLong()
         if(bar.duration < quantumDur * numerator || numerator == 1){ // don't split
             result.add(bar)
+            println("Input: ${result.takeLast(1)}")
+        } else if(numerator == 2){
+            val halfDen = numerator / 2
+            val halfDur = quantumDur * halfDen
+            result.add(Bar(Pair(halfDen, denominator), bar.tick, halfDur, minVelocity = bar.minVelocity))
+            result.add(Bar(Pair(halfDen, denominator),bar.tick + halfDur, halfDur, minVelocity = bar.minVelocity))
+            println("Output: ${result.takeLast(2)}")
         } else {
-            val den2nd = numerator / 2
-            val den1st = den2nd + numerator % 2
+            val otherDen = numerator / 3
+            val den1st = otherDen + numerator % 3
             val duration1st = quantumDur * den1st
-            result.add(Bar(Pair(den1st, denominator),bar.tick, duration1st, minVelocity = bar.minVelocity))
-            result.add(Bar(Pair(den2nd, denominator),bar.tick + duration1st, quantumDur * den2nd, minVelocity = bar.minVelocity))
+            val otherDuration = quantumDur * otherDen
+            result.add(Bar(Pair(den1st, denominator), bar.tick, duration1st, minVelocity = bar.minVelocity))
+            result.add(Bar(Pair(otherDen, denominator),bar.tick + duration1st, otherDuration, minVelocity = bar.minVelocity))
+            result.add(Bar(Pair(otherDen, denominator),bar.tick + duration1st + otherDuration, otherDuration, minVelocity = bar.minVelocity))
+            println("Output: ${result.takeLast(3)}")
         }
     }
     return result.toList()
@@ -59,7 +106,7 @@ fun List<Bar>.resizeLastBar(totalDuration: Long): List<Bar>{
     val result = mutableListOf<Bar>()
     var indexLastBar = 0
 //    this.forEachIndexed{ i, it ->
-//        println("$i:${it.tick}-${it.tick+it.duration}, ")
+//        println("bar#$i:${it.tick}-${it.tick+it.duration}, dur:${it.duration}")
 //    }
     for(i in this.indices){
         if(this[i].tick  + this[i].duration >= totalDuration) break
@@ -69,7 +116,7 @@ fun List<Bar>.resizeLastBar(totalDuration: Long): List<Bar>{
     val barsDuration = realSequence.sumOf { it.duration.toInt() }
     val originalBarsDuration = this.sumOf { it.duration.toInt() }
     val diff = totalDuration - barsDuration
-   // println("Bars duration = $barsDuration Total duration = $totalDuration  Diff = $diff LastBarIndex=$indexLastBar ")
+    //println("Bars duration = $barsDuration Total duration = $totalDuration  Diff = $diff LastBarIndex=$indexLastBar ")
     if(diff == 0L) return realSequence
     result.addAll(realSequence)
     val lastBar = if(totalDuration <= originalBarsDuration) {
@@ -85,6 +132,7 @@ fun List<Bar>.resizeLastBar(totalDuration: Long): List<Bar>{
     return result
 }
 fun List<Bar>.mergeOnesInMetro(): List<Bar>{
+
     val result = mutableListOf<Bar>()
     var index = 0
     var lastMetro = Pair(-1,-1)
@@ -92,22 +140,28 @@ fun List<Bar>.mergeOnesInMetro(): List<Bar>{
     while(index < size){
         val bar = this[index]
         if(bar.metro.first != 1){
+            //println("#$index Same bar added: $bar")
             result.add(bar)
             lastMetro = bar.metro
             lastBar = bar
         } else {
             if(lastMetro != bar.metro){
-                result.add(bar)
+                //println("#$index Cumulative bar added: $bar")
+                lastBar = bar.copy()
                 lastMetro = bar.metro
-                lastBar = bar
+                result.add(lastBar)
             } else {
+                //println("#$index Cumulative bar refined: $bar")
                 lastBar.duration += bar.duration
                 lastBar.metro = Pair(lastBar.metro.first +1, lastBar.metro.second)
             }
         }
         index++
     }
-   // println("mergeOneInMetro: nBars=${this.size} nResults=${result.size}")
+//    println("New bars     :$result")
+//    println("mergeOneInMetro: nBars=${this.size} nResults=${result.size}")
+//    println("mergeOneInMetro: nBars duration=${this.sumOf{ it.duration }} nResults duration=${result.sumOf{ it.duration }}")
+//    result.forEachIndexed { i, bar ->  println("mergeOneInMetro bar#$i ${bar.metro} ${bar.duration}")}
     return result.toList()
 }
 
@@ -133,6 +187,31 @@ data class Bar(var metro: Pair<Int,Int> = METRO_4_4, val tick: Long, var duratio
         return if (this.chord1 == null) {
             emptyList()
         } else this.chord1!!.absoluteNotes.toList()
+    }
+    fun splitByDuration(durationMetro:Pair<Int,Int>): List<Bar> {
+        val duration =
+            RhythmPatterns.denominatorMidiValue(durationMetro.second) * durationMetro.first
+        val barDur = this.duration.toInt()
+        if (duration >= barDur) return listOf(this)
+        val unitDur = RhythmPatterns.denominatorMidiValue(this.metro.second)
+        val nTimes = barDur / duration
+        val rest = barDur - duration * nTimes
+
+        if (rest % unitDur == 0) {
+            val result = mutableListOf<Bar>()
+            var tick = this.tick
+            (0 until nTimes).forEach {
+                result.add(Bar(durationMetro, tick, duration.toLong()))
+                tick += duration
+            }
+            if(rest != 0){
+                result.add(Bar(Pair(rest / unitDur, this.metro.second), tick, rest.toLong()))
+            }
+
+            return result
+        } else {
+            return listOf(this)
+        }
     }
 }
 fun List<Bar>.getProgressiveVelocities(index: Int, div: Int, diffChordVelocity: Int, increase: Int): List<Int> {

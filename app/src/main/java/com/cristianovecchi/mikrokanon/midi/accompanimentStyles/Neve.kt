@@ -30,7 +30,7 @@ fun createNeve2(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, 
                     val velocities = bars.getProgressiveVelocities(i, nSteps, diffChordVelocity, increase)
                     val ticks = findScaleTicks(tick, durs)
                     val staccatoDurs = durs.map { it / 4 }
-                    println("bar#$i octave:$octave nSteps:$nSteps durs:$durs ticks:$ticks vels:$velocities")
+                    //println("bar#$i octave:$octave nSteps:$nSteps durs:$durs ticks:$ticks vels:$velocities")
                     val half1 = IntRange(0, nSteps / 2 - 1)
                     val half2 = IntRange(nSteps / 2, nSteps -1)
                     //println("1st half: $half1  2nd half: $half2")

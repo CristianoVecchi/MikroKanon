@@ -360,6 +360,7 @@ data class Lang( // English by default
     val selectNuances: String = "Select dynamic nuances!",
     val harmony: String= "Harmony",
     val selectHarmonizationType: String = "Select the harmonization type!",
+    val selectHarmonizationDivision: String = "Select the bar division!",
     val selectHarmonizationInstruments: String = "Select the harmonization instruments!",
     val selectHarmonizationVolume: String = "Select the harmonization volume!",
     val selectOctaves: String = "Select octaves!",

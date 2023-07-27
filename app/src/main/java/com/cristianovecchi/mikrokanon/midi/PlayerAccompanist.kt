@@ -201,19 +201,21 @@ fun List<Bar>.extractAbsPitchesFromDodecaBytes(type: HarmonizationType): List<Li
 //    }
 //}
 
-fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, bars: List<Bar>,
+fun ArrayList<MidiTrack>.addChordTrack(harmonizations: List<HarmonizationData>, chordBars: List<Bar>,
                                        trackData: List<TrackData>, audio8D: List<Int>,
                                        totalLength: Long, justVoicing: Boolean, channel: Int){
     if(harmonizations.isNotEmpty() && !harmonizations.all { it.type == HarmonizationType.NONE }) {
-        val doubledBars = bars.mergeOnesInMetro()
-            .resizeLastBar(totalLength)
-            .splitBarsInTwoParts()
+        //println("channel:$channel $harmonizations")
         // using trackDatas without replacing for a better chord definition
-        assignDodecaBytesToBars(doubledBars.toTypedArray(), trackData, false)
-        val barGroups = if(harmonizations.size == 1) listOf(doubledBars)
-        else doubledBars.splitBarsInGroups(harmonizations.size)
+        val barGroups = if(harmonizations.size == 1) listOf(chordBars)
+        else chordBars.splitBarsInGroups(harmonizations.size)
+        val splitBarGroups = barGroups.mapIndexed{i, group -> group.splitByDivision(harmonizations[i].division)}
+        splitBarGroups.forEach { group ->
+            assignDodecaBytesToBars(group.toTypedArray(), trackData, false)
+        }
+
         val chordsTrack = MidiTrack()
-        addHarmonizationsToTrack(chordsTrack, barGroups, harmonizations, justVoicing, channel)
+        addHarmonizationsToTrack(chordsTrack, splitBarGroups, harmonizations, justVoicing, channel)
         if(audio8D.isNotEmpty()){
             setAudio8D(chordsTrack, channel, channel)
         }

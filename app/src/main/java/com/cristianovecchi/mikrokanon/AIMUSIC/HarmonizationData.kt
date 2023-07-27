@@ -8,6 +8,16 @@ enum class HarmonizationType(val title: String) {
     JAZZ("JAZZ"), JAZZ11("JAZZ 11"),
     XWH("XW HARMONY"), FULL12("FULL 12")
 }
+enum class HarmonizationDivision(val symbol: String) {
+    WHOLE("[ ]"),
+    HALVES("[ | ]"),
+    THIRDS("[ | | ]"),
+    QUARTERS("[ | | | ]"),
+    DUR_2_4("2/4"),
+    DUR_3_8("3/8"),
+    DUR_1_4("1/4"),
+    DUR_1_8("1/8"),
+}
 enum class HarmonizationDirection(val symbol: String) {
     ASCENDING("➚"), DESCENDING("➘"), RANDOM("~");
 
@@ -109,11 +119,17 @@ fun List<Int>.convertToOctavesByte(): Int {
     }
         //.also{println("Converted to: "+ it.toString(2))}
 }
+fun List<HarmonizationData>.isNotBlank(): Boolean {
+    return this.any{ it.type != HarmonizationType.NONE }
+}
+fun Triple<List<HarmonizationData>, List<HarmonizationData>, List<HarmonizationData>>.areNotBlank(): Boolean{
+    return first.isNotBlank() || second.isNotBlank() || third.isNotBlank()
+}
 data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NONE,
                              val instruments: List<Int> = listOf(48), val volume: Float = 0.1f,
                              val style: HarmonizationStyle = HarmonizationStyle.ACCORDO,
                              val octavesByte: Int = 248, val direction: HarmonizationDirection = HarmonizationDirection.ASCENDING,
-                             val isFlow: Boolean = false, var density: Int = 1){ // from octave 3 to 7 (numbers 4 to 8)
+                             val isFlow: Boolean = false, var density: Int = 1, val division: HarmonizationDivision = HarmonizationDivision.HALVES){ // from octave 3 to 7 (numbers 4 to 8)
     init {
         val maxDensity = style.maxDensity
         density = if(density > maxDensity) maxDensity else density
@@ -124,12 +140,12 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
         val densityString = if(density < 2) "" else "^$density"
         val instrumentList = instruments.joinToString(", ") { ListaStrumenti.getNameByIndex(it) }
         return if(type == HarmonizationType.NONE) "  ---  ${this.type.title}  ---"
-        else "${this.type.title} ${this.style.title}$densityString ${withFlow}${direction}\n  $instrumentList ${this.describeOctaves()} ${String.format("%.0f%%",this.volume*100)}"
+        else "${this.type.title} ${this.division.symbol} ${this.style.title}$densityString ${withFlow}${direction}\n  $instrumentList ${this.describeOctaves()} ${String.format("%.0f%%",this.volume*100)}"
     }
     fun toCsv(): String {
         val flowBool = if(isFlow) 1 else 0
         val instrumentCsv = instruments.joinToString("§") { it.toString() }
-        return "${this.type.ordinal}|${instrumentCsv}|${this.volume}|${this.style.ordinal}|${this.octavesByte}|${this.direction.ordinal}|$flowBool|$density"
+        return "${this.type.ordinal}|${instrumentCsv}|${this.volume}|${this.style.ordinal}|${this.octavesByte}|${this.direction.ordinal}|$flowBool|$density|${this.division.ordinal}"
     }
     fun convertFromOctavesByte(): List<Int>{
         //println("Octaves Byte: " + octavesByte.toString(2))
@@ -160,18 +176,19 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
             val harmValues = HarmonizationType.values()
             val styleValues = HarmonizationStyle.values()
             val directionValues = HarmonizationDirection.values()
+            val divisionValues = HarmonizationDivision.values()
             return values.map{
                 val subValues = it.split("|")
                 val instrumentList = subValues[1].split("§").map{ it.toInt() }
                 val flowCsv = subValues.getOrElse(6) { "0" }
                 val densityInt = subValues.getOrElse(7){ "1" }.toInt()
-
+                val divisionInt = subValues.getOrElse(8){ "1" }.toInt()
                 HarmonizationData(harmValues[subValues[0].toInt()], instrumentList,
                     subValues[2].toFloat(), styleValues[subValues.getOrElse(3){"0"}.toInt()],
                     subValues.getOrElse(4){"248"}.toInt(),
                     directionValues[subValues.getOrElse(5){"0"}.toInt()],
                     flowCsv != "0",
-                    densityInt
+                    densityInt, divisionValues[divisionInt]
                 )
             }
         }

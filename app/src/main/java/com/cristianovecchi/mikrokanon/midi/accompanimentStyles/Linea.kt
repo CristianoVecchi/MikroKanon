@@ -27,7 +27,7 @@ fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
         var pitches = if(barDur < 48 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
         else direction.applyDirection(absPitches[i])
         if(pitches.isNotEmpty()){
-            println("BAR #$i  pitches: $pitches")
+            //println("BAR #$i  pitches: $pitches")
             val durs = barDur.divideDistributingRest(pitches.size)
             val actualDurs = if(isAccumulo){
                 var tick = -durs[0]

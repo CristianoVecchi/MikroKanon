@@ -264,6 +264,7 @@ object Player {
                                         val nRhythmSteps = durations.filter { it > -1 }.count()
                                         val actualRhythm = multiplyRhythmPatternDatas(nTotalNotes, nRhythmSteps, rhythm)
                                         val bars = tempoTrack.setTimeSignatures(actualRhythm, totalLength)
+                                        //bars.forEachIndexed { i, bar -> println("[Player] Bar#$i: $bar") }
 
                                         //BUILD MIDI FILE
                                         val tracks: ArrayList<MidiTrack> = ArrayList<MidiTrack>()
@@ -272,13 +273,17 @@ object Player {
 
                                         //ADD CHORD TRACK AND DRUMS TRACKS IF NEEDED
                                         //println(harmonizations)
-                                        tracks.addChordTrack(harmonizations.first, bars,
-                                            counterpointTrackDatas, audio8D, totalLength, false, 13)
-                                        tracks.addChordTrack(harmonizations.second, bars,
-                                            counterpointTrackDatas, audio8D, totalLength, false, 14)
-                                        tracks.addChordTrack(harmonizations.third, bars,
-                                            counterpointTrackDatas, audio8D, totalLength, false, 15)
-                                        drumsTrack?.let{tracks.add(it)}
+                                        if(harmonizations.areNotBlank()) {
+                                                val chordBars = bars.resizeLastBar(totalLength)
+                                                tracks.addChordTrack(harmonizations.first, chordBars,
+                                                    counterpointTrackDatas, audio8D, totalLength, false, 13)
+                                                tracks.addChordTrack(harmonizations.second, chordBars,
+                                                    counterpointTrackDatas, audio8D, totalLength, false, 14)
+                                                tracks.addChordTrack(harmonizations.third, chordBars,
+                                                    counterpointTrackDatas, audio8D, totalLength, false, 15)
+                                                drumsTrack?.let{tracks.add(it)}
+                                        }
+
 
                                         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
                                         //println("JOB ACTIVE: ${job.isActive}")

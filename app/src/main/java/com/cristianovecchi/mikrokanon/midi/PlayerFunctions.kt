@@ -286,24 +286,38 @@ fun MidiTrack.addVolumeToTrack(dynamics: List<Float>, totalLength: Long) {
 
 fun assignDodecaBytesToBars(bars: Array<Bar>, counterpointTrackData: List<TrackData>, withArticulation: Boolean = false) {
     bars.forEach { it.dodecaByte1stHalf = 0 ; it.dodecaByte2ndHalf = 0 ; it.minVelocity = 80}
-    counterpointTrackData.forEach{ trackData ->
+    println("nBars: ${bars.size}")
+    val indices = counterpointTrackData.map{ it.ticks }.findIndicesInSection(bars.first().tick.toInt(),
+        bars.sumOf { it.duration .toInt()}, counterpointTrackData.map {it.durations} )
+    counterpointTrackData.forEachIndexed{ trackIndex, trackData ->
         val durations = if(trackData.articulationDurations != null && withArticulation) trackData.articulationDurations!! else trackData.durations
         var barIndex = 0
-        var pitchIndex = 0
-        while(pitchIndex < trackData.pitches.size){
-            val bar = bars[barIndex]
-            val pitch = trackData.pitches[pitchIndex]
-            val velocity = trackData.velocities[pitchIndex]
-            val barEnd = bar.tick + bar.duration
-            val pitchStart = trackData.ticks[pitchIndex]
-            val pitchEnd = pitchStart + durations[pitchIndex]
-            if(trackData.ticks[pitchIndex] < barEnd ){
-                bar.dodecaByte1stHalf = bar.dodecaByte1stHalf?.or((1 shl (pitch % 12)))
-                if(velocity < bar.minVelocity!! ) bar.minVelocity = velocity
-                if(pitchEnd > barEnd) barIndex++ else pitchIndex++
 
-            } else {
-                barIndex++
+        val pitchIndices = indices[trackIndex]
+
+        pitchIndices?.let {
+            var pitchIndex = it.first
+            while(pitchIndex <= it.last) {
+                val pitch = trackData.pitches[pitchIndex]
+                val velocity = trackData.velocities[pitchIndex]
+                val pitchStart = trackData.ticks[pitchIndex]
+                val pitchEnd = pitchStart + durations[pitchIndex]
+                val bar = bars.getOrNull(barIndex)
+                if(bar == null) {
+                    break
+                } else {
+                    val barEnd = bar.tick + bar.duration
+                    //println("pitch#$pitchIndex $pitchStart-$pitchEnd -> bar#$barIndex ${bar.tick}-$barEnd ${bar.metro} dur:${bar.duration}")
+                    if(trackData.ticks[pitchIndex] < barEnd ){
+                        println("pitch#$pitchIndex $pitchStart-$pitchEnd  -> bar#$barIndex ${bar.tick}-$barEnd ${bar.metro} dur:${bar.duration}")
+                        bar.dodecaByte1stHalf = bar.dodecaByte1stHalf?.or((1 shl (pitch % 12))).also{println("dByte: $it")}
+                        if(velocity < bar.minVelocity!! ) bar.minVelocity = velocity
+                        if(pitchEnd > barEnd) barIndex++ else pitchIndex++
+
+                    } else {
+                        barIndex++
+                    }
+                }
             }
         }
     }
@@ -529,11 +543,12 @@ fun MidiTrack.setTimeSignatures(rhythm: List<Triple<RhythmPatterns, Boolean, Int
         Pair(patternDuration * nRepetitions, metro)
     }
     var index = 0
+    var withOnes = false
     while (tick < totalLength) {
         var newSignature = signatures[index].second
         if (newSignature.first == 1) {
-            newSignature =
-                RhythmPatterns.mergeSequenceOfOnesInMetro(signatures[index].first, newSignature)
+            withOnes = true
+            newSignature = RhythmPatterns.mergeSequenceOfOnesInMetro(signatures[index].first, newSignature)
         }
         if (newSignature != lastSignature) {
             val ts = TimeSignature(
@@ -547,7 +562,7 @@ fun MidiTrack.setTimeSignatures(rhythm: List<Triple<RhythmPatterns, Boolean, Int
         tick += signatures[index].first
         index = ++index % signatures.size
     }
-    return bars.toList()
+    return if(withOnes) bars.mergeOnesInMetro() else bars
 }
 
 fun alterArticulation(

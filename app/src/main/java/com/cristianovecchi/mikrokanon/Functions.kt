@@ -98,17 +98,29 @@ fun List<List<Any>>.findGroupIndex(itemIndex: Int): Int? {
 fun List<IntRange?>.nElements(): Int{
     return this.filterNotNull().sumOf { it.count() }
 }
-fun List<IntArray>.findIndicesInSection(sectionStart:Int, sectionDuration:Int,): List<IntRange?>{
+fun List<IntArray>.findIndicesInSection(sectionStart:Int, sectionDuration:Int, durations: List<IntArray>? = null): List<IntRange?>{
     val result = mutableListOf<IntRange?>()
-    this.forEach {
+    this.forEachIndexed{ arrayIndex , it ->
         var start = -1
 
-        for(i in it.indices){
-            if(it[i] >= sectionStart){
-                start = i
-                break
+        if(durations != null) {
+            val durs = durations[arrayIndex]
+            for(i in it.indices){
+                val startTick = it[i]
+                if(startTick >= sectionStart || startTick + durs[i] > sectionStart){
+                    start = i
+                    break
+                }
+            }
+        } else {
+            for(i in it.indices){
+                if(it[i] >= sectionStart){
+                    start = i
+                    break
+                }
             }
         }
+
         if(start > -1) {
             var end = -1
             val sectionLimit = sectionStart + sectionDuration
