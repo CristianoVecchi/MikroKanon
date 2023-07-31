@@ -135,7 +135,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
          "Detector","Detector Extension",
         //"Colors",
         "Custom Colors", "Counterpoint View", "Language","Zodiac",
-        //"MBTI",
+        "MBTI",
         "Spacer", "Privacy Policy", "Credits", "Historia")
 
     val userOptionsData by userOptionsDataFlow.collectAsState(initial = listOf())
@@ -1157,42 +1157,43 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                         }
                                     })
                             }
-//                            "MBTI" -> {
-//                                val verticalIntervals by model.intervalSet.observeAsState(listOf(-1))
-//                                val mbtis = MBTI.listFromIntervals(
-//                                    if(verticalIntervals.contains(-1)) createIntervalSetFromFlags(userOptions.intSetVertFlags).toSet()
-//                                    else verticalIntervals.toSet()
-//                                )
-//                                val isOn = mbtis.isNotEmpty()
-//                                val nl = newLineOrNot(mbtis, 4)
-//                                val text = if (!isOn) lang.mbti else "${lang.mbti}: $nl${
-//                                    mbtis.joinToString(
-//                                        separator = " + "
-//                                    ) { it.name }
-//                                }"
-//                                val intsFromMbtis = MBTI.values().withIndex()
-//                                    .filter{mbtis.contains(it.value)}
-//                                    .map{ it.index}
-//                                SelectableCard(
-//                                    text = text,
-//                                    fontSize = fontSize,
-//                                    colors = colors,
-//                                    isSelected = isOn,
-//                                    onClick = {
-//                                        mbtiDialogData.value = MultiListDialogData(
-//                                            true,
-//                                            MBTI.values().map{"${it}\n  ${it.character}"},
-//                                            intsFromMbtis.toSet(),
-//                                            dialogTitle = lang.selectMbti
-//                                        ) { indices ->
-//                                            model.createVerticalIntervalSet(MBTI.intervalsFromIndices(indices).toList(), "AppScaffold")
-//                                            model.saveVerticalIntervalSet("AppScaffold")
-//                                            mbtiDialogData.value =
-//                                                MultiListDialogData(itemList = detectorDialogData.value.itemList)
-//
-//                                        }
-//                                    })
-//                            }
+                            "MBTI" -> {
+                                val verticalIntervals = createIntervalSetFromFlags(userOptions.intSetVertFlags)
+                                val mbtis = MBTI.listFromIntervals(
+                                    if(verticalIntervals.contains(-1)) createIntervalSetFromFlags(userOptions.intSetVertFlags).toSet()
+                                    else verticalIntervals.toSet()
+                                )
+                                val isOn = mbtis.isNotEmpty()
+                                val nl = newLineOrNot(mbtis, 4)
+                                val text = if (!isOn) lang.mbti else "${lang.mbti}: $nl${
+                                    mbtis.joinToString(
+                                        separator = " + "
+                                    ) { it.name }
+                                }"
+                                val intsFromMbtis = MBTI.values().withIndex()
+                                    .filter{mbtis.contains(it.value)}
+                                    .map{ it.index}
+                                SelectableCard(
+                                    text = text,
+                                    fontSize = fontSize,
+                                    colors = colors,
+                                    isSelected = isOn,
+                                    onClick = {
+                                        mbtiDialogData.value = MultiListDialogData(
+                                            true,
+                                            MBTI.values().map{"${it}    ${it.stringOfPlanets(getZodiacPlanets(model.zodiacFlags.value!!.third))}\n  ${it.character}"},
+                                            intsFromMbtis.toSet(),
+                                            dialogTitle = lang.selectMbti
+                                        ) { indices, _ ->
+                                            model.createVerticalIntervalSet(MBTI.intervalsFromIndices(indices).toList(), "AppScaffold")
+                                            model.saveVerticalIntervalSet("AppScaffold")
+                                            model.dispatchIntervals()
+                                            mbtiDialogData.value =
+                                                MultiListDialogData(itemList = detectorDialogData.value.itemList)
+
+                                        }
+                                    })
+                            }
                             "Spacer" -> {
                                 Spacer(modifier = Modifier.height(spacerHeight.dp))
                             }

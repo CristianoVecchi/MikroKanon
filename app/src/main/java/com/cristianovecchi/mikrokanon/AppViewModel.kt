@@ -320,6 +320,7 @@ class AppViewModel(
         //println("Building phase: ${buildingState.value}")
     }
     val dispatchIntervals = {
+        //println("dispatching intervals")
         if(computationStack.isNotEmpty())
             refreshComputation(false)
     }
@@ -1008,12 +1009,14 @@ class AppViewModel(
         val newList = intervalSet.value!!.toMutableList()
         newList.removeAll(list)
         changeIntervalSet(newList)
+        saveVerticalIntervalSet("from AppViewModel (remove)")
         dispatchIntervals()
     }
     fun addIntervalsAndRefresh(list: List<Int>){
         val newList = intervalSet.value!!.toMutableList()
         newList.addAll(list)
         changeIntervalSet(newList)
+        saveVerticalIntervalSet("from AppViewModel (add)")
         dispatchIntervals()
     }
     fun createHorizontalIntervalSet(horizontalIntervalSetFlag: Int) {

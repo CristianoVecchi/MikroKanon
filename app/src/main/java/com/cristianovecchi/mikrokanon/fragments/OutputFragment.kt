@@ -189,10 +189,10 @@ class OutputFragment: Fragment() {
     }
 
 
-    override fun onDestroyView() {
-       // println("OutputFragment view destroyed.")
-//        model.createVerticalIntervalSet(model.intervalSet.value!!, "Destroy OutputFragment")
-       model.saveVerticalIntervalSet("Destroy view OutputFragment")
-        super.onDestroyView()
-    }
+//    override fun onDestroyView() {
+//       // println("OutputFragment view destroyed.")
+////        model.createVerticalIntervalSet(model.intervalSet.value!!, "Destroy OutputFragment")
+//       model.saveVerticalIntervalSet("Destroy view OutputFragment")
+//        super.onDestroyView()
+//    }
 }

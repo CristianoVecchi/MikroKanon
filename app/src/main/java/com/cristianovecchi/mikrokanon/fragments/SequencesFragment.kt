@@ -40,7 +40,7 @@ var start = true
         model.userOptionsData.observe(viewLifecycleOwner){
             model.userOptionsData.value.let {
                 if(it!!.isNotEmpty()) {
-                    println(it[0])
+                    //println(it[0])
                     model.privacyIsAccepted = it[0].privacy != 0
                     model.createHorizontalIntervalSet(it[0].intSetHorFlags)
                     model.refreshZodiacFlags()
@@ -59,7 +59,7 @@ var start = true
         }
 
         model.selectedSequence.observe(viewLifecycleOwner){
-            println("Sequence selected: ${model.selectedSequence.value!!}")
+            //println("Sequence selected: ${model.selectedSequence.value!!}")
             model.changeActiveButtons( if(model.selectedSequence.value!! != -1 )
                 ActiveButtons(editing = true, mikrokanon = true, counterpoint = true,
                     specialFunctions = true, freeParts = true, waves = true, pedals = true)
@@ -212,13 +212,13 @@ var start = true
                 }
         }
     }
-    override fun onDestroyView() {
-       // println("SequencesFragment view destroyed.")
-        model.saveVerticalIntervalSet("Destroy view OutputFragment")
-        super.onDestroyView()
-
-
-//        model.createVerticalIntervalSet(model.intervalSet.value!!, "Destroy OutputFragment")
-
-    }
+//    override fun onDestroyView() {
+//       // println("SequencesFragment view destroyed.")
+//        model.saveVerticalIntervalSet("Destroy view OutputFragment")
+//        super.onDestroyView()
+//
+//
+////        model.createVerticalIntervalSet(model.intervalSet.value!!, "Destroy OutputFragment")
+//
+//    }
 }

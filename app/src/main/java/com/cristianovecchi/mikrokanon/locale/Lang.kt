@@ -6,36 +6,6 @@ import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import java.text.DateFormat
 import java.util.*
 
-//enum class MBTI(val character: String, val intervals: Set<Int>){
-//    ISTJ("The Inspector", setOf(6, 4,8, 3,9 )),
-//    ISTP("The Crafter", setOf(6, 4,8, 3,9 ,5,7 )),
-//    ISFJ("The Protector", setOf(6, 4,8, 2,10 )),
-//    ISFP("The Artist", setOf(6, 4,8, 2,10  ,5,7 )),
-//    INFJ("The Advocate", setOf(6, 1,11, 2,10  )),
-//    INFP("The Mediator", setOf(6, 1,11, 2,10  ,5,7 )),
-//    INTJ("The Architect", setOf(6, 1,11, 3,9  )),
-//    INTP("The Thinker", setOf(6, 1,11, 3,9  ,5,7 )),
-//    ESTP("The Persuader", setOf(0, 4,8, 3,9 ,5,7  )),
-//    ESTJ("The Director", setOf(0, 4,8, 3,9  )),
-//    ESFP("The Performer", setOf(0, 4,8, 2,10 ,5,7  )),
-//    ESFJ("The Caregiver", setOf(0, 4,8, 2,10  )),
-//    ENFP("The Champion", setOf(0, 1,11, 2,10  ,5,7 )),
-//    ENFJ("The Giver", setOf(0, 1,11, 2,10  )),
-//    ENTP("The Debater", setOf(0, 1,11, 3,9  ,5,7 )),
-//    ENTJ("The Commander", setOf(0, 1,11, 3,9  ));
-//    companion object {
-//        fun listFromIntervals(intervals: Set<Int>): List<MBTI> {
-//            val list = values().filter{ intervals.containsAll(it.intervals) }
-//            return if(intervals.containsAll(listOf(5,7))) list.filter{ it.intervals.containsAll(listOf(5,7))}
-//            else list.filter{ !it.intervals.containsAll(listOf(5,7))}
-//        }
-//        fun intervalsFromIndices(indices: List<Int>): Set<Int>{
-//            return values().filterIndexed{i, _-> indices.contains(i)}
-//                .fold(mutableListOf<Int>()){ acc, v -> acc.addAll(v.intervals); acc}.toSet()
-//        }
-//    }
-//
-//}
 enum class LANGUAGES(val language:String){
     ar("العربية"),
     de("Deutsch"),
