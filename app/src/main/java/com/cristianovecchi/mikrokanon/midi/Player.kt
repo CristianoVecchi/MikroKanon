@@ -154,7 +154,7 @@ object Player {
             if (actualCounterpoint.isEmpty()) {
                 "Counterpoint to play is empty!!!"
             } else {
-                if (actualCounterpoint.parts.any{ it.absPitches.size == 0}){
+                if (actualCounterpoint.parts.any{ it.absPitches.size == 0 }){
                     "Counterpoint parts are empty!!!"
                 } else {
                     // COUNTERPOINT FINAL SIZE (NOT CONSIDERING CHECK AND REPLACE!!!)
@@ -308,7 +308,7 @@ object Player {
                     }
                 }
             }
-        } else "NOT EVEN ONE COUNTERPOINT TO PLAY!!!"
+        } else "NOT EVEN ONE COUNTERPOINT TO PLAY!!! OR COUNTERPOINTS HAVE NO PARTS!!!"
     }
 
 

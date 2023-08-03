@@ -55,13 +55,27 @@ data class EnsemblePart( val instrument: Int, val octave: Int,
     }
 }
 
+//fun main() {
+//    val types = EnsembleType.values()
+//    (1..12).forEach { nParts ->
+//        println("nParts:$nParts")
+//        types.forEach { types ->
+//            if(Ensembles.getEnsemble(nParts,types).isEmpty()) println("Type:${types.name} for $nParts parts is empty!!!")
+//        }
+//    }
+//
+//}
 object Ensembles {
     fun getEnsembleMix(nParts: Int, types: List<EnsembleType>):  List<EnsemblePart> {
        //println("nParts: $nParts    Ensemble Types: $types")
+        if(types.isEmpty()) return getEnsemble(12, EnsembleType.STRING_ORCHESTRA)
+        if(nParts < 1) return getEnsemble(1, types.first())
         val mix = types.map{ getEnsemble(nParts, it)}
      //   mix.forEachIndexed{ i, it -> println("ensemble #$i: $it")}
         return (0 until nParts).toList().map{
-            mix[it % types.size][it]}
+            val ensembleMix = mix.getOrElse(it % types.size) { getEnsemble(12, EnsembleType.STRING_ORCHESTRA)}
+            ensembleMix.getOrElse(it) { PART_STRING_ORCHESTRA_VIOLIN_MIDDLE_HIGH_HIGHEST }
+        }
     }
     fun getEnsemblesListMix(nParts: Int, ensemblesList: List<List<EnsembleType>>): List<List<EnsemblePart>>{
         return ensemblesList.map {

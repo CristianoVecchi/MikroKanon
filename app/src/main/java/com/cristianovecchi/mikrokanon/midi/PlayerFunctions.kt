@@ -286,7 +286,7 @@ fun MidiTrack.addVolumeToTrack(dynamics: List<Float>, totalLength: Long) {
 
 fun assignDodecaBytesToBars(bars: Array<Bar>, counterpointTrackData: List<TrackData>, withArticulation: Boolean = false) {
     bars.forEach { it.dodecaByte1stHalf = 0 ; it.dodecaByte2ndHalf = 0 ; it.minVelocity = 80}
-    println("nBars: ${bars.size}")
+    //println("nBars: ${bars.size}")
     val indices = counterpointTrackData.map{ it.ticks }.findIndicesInSection(bars.first().tick.toInt(),
         bars.sumOf { it.duration .toInt()}, counterpointTrackData.map {it.durations} )
     counterpointTrackData.forEachIndexed{ trackIndex, trackData ->
@@ -309,8 +309,8 @@ fun assignDodecaBytesToBars(bars: Array<Bar>, counterpointTrackData: List<TrackD
                     val barEnd = bar.tick + bar.duration
                     //println("pitch#$pitchIndex $pitchStart-$pitchEnd -> bar#$barIndex ${bar.tick}-$barEnd ${bar.metro} dur:${bar.duration}")
                     if(trackData.ticks[pitchIndex] < barEnd ){
-                        println("pitch#$pitchIndex $pitchStart-$pitchEnd  -> bar#$barIndex ${bar.tick}-$barEnd ${bar.metro} dur:${bar.duration}")
-                        bar.dodecaByte1stHalf = bar.dodecaByte1stHalf?.or((1 shl (pitch % 12))).also{println("dByte: $it")}
+                        //println("pitch#$pitchIndex $pitchStart-$pitchEnd  -> bar#$barIndex ${bar.tick}-$barEnd ${bar.metro} dur:${bar.duration}")
+                        bar.dodecaByte1stHalf = bar.dodecaByte1stHalf?.or((1 shl (pitch % 12)))//.also{println("dByte: $it")}
                         if(velocity < bar.minVelocity!! ) bar.minVelocity = velocity
                         if(pitchEnd > barEnd) barIndex++ else pitchIndex++
 

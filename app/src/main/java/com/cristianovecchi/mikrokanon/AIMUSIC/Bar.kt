@@ -57,19 +57,19 @@ fun List<Bar>.splitByDivision(division: HarmonizationDivision): List<Bar>{
 fun List<Bar>.splitBarsInTwoParts(): List<Bar>{
     val result = mutableListOf<Bar>()
     for (bar in this) {
-        println("Input "+ bar)
+        //println("Input "+ bar)
         val (numerator, denominator) = bar.metro
         val quantumDur = RhythmPatterns.denominatorMidiValue(denominator).toLong()
         if(bar.duration < quantumDur * numerator || numerator == 1){ // don't split
             result.add(bar)
-            println("Output: ${result.takeLast(1)}")
+            //println("Output: ${result.takeLast(1)}")
         } else {
             val den2nd = numerator / 2
             val den1st = den2nd + numerator % 2
             val duration1st = quantumDur * den1st
             result.add(Bar(Pair(den1st, denominator),bar.tick, duration1st, minVelocity = bar.minVelocity))
             result.add(Bar(Pair(den2nd, denominator),bar.tick + duration1st, quantumDur * den2nd, minVelocity = bar.minVelocity))
-            println("Output: ${result.takeLast(2)}")
+            //println("Output: ${result.takeLast(2)}")
         }
     }
     return result.toList()
@@ -82,13 +82,13 @@ fun List<Bar>.splitBarsInThreeParts(): List<Bar>{
         val quantumDur = RhythmPatterns.denominatorMidiValue(denominator).toLong()
         if(bar.duration < quantumDur * numerator || numerator == 1){ // don't split
             result.add(bar)
-            println("Input: ${result.takeLast(1)}")
+            //println("Input: ${result.takeLast(1)}")
         } else if(numerator == 2){
             val halfDen = numerator / 2
             val halfDur = quantumDur * halfDen
             result.add(Bar(Pair(halfDen, denominator), bar.tick, halfDur, minVelocity = bar.minVelocity))
             result.add(Bar(Pair(halfDen, denominator),bar.tick + halfDur, halfDur, minVelocity = bar.minVelocity))
-            println("Output: ${result.takeLast(2)}")
+            //println("Output: ${result.takeLast(2)}")
         } else {
             val otherDen = numerator / 3
             val den1st = otherDen + numerator % 3
@@ -97,7 +97,7 @@ fun List<Bar>.splitBarsInThreeParts(): List<Bar>{
             result.add(Bar(Pair(den1st, denominator), bar.tick, duration1st, minVelocity = bar.minVelocity))
             result.add(Bar(Pair(otherDen, denominator),bar.tick + duration1st, otherDuration, minVelocity = bar.minVelocity))
             result.add(Bar(Pair(otherDen, denominator),bar.tick + duration1st + otherDuration, otherDuration, minVelocity = bar.minVelocity))
-            println("Output: ${result.takeLast(3)}")
+            //println("Output: ${result.takeLast(3)}")
         }
     }
     return result.toList()

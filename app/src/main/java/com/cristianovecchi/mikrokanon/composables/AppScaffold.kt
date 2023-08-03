@@ -1185,9 +1185,11 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                             intsFromMbtis.toSet(),
                                             dialogTitle = lang.selectMbti
                                         ) { indices, _ ->
-                                            model.createVerticalIntervalSet(MBTI.intervalsFromIndices(indices).toList(), "AppScaffold")
-                                            model.saveVerticalIntervalSet("AppScaffold")
-                                            model.dispatchIntervals()
+                                            if(indices.isNotEmpty()) {
+                                                model.createVerticalIntervalSet(MBTI.intervalsFromIndices(indices).toList(), "AppScaffold")
+                                                model.saveVerticalIntervalSet("AppScaffold")
+                                                model.dispatchIntervals()
+                                            }
                                             mbtiDialogData.value =
                                                 MultiListDialogData(itemList = detectorDialogData.value.itemList)
 
