@@ -276,6 +276,16 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 isRetrograde = isRetrograde,
                 addGliss = addGliss
             )
+            is Resolutio3m -> this.copy(
+                stress = stress,
+                isRetrograde = isRetrograde,
+                addGliss = addGliss
+            )
+            is Resolutio3M -> this.copy(
+                stress = stress,
+                isRetrograde = isRetrograde,
+                addGliss = addGliss
+            )
         }
         }
         fun toCsv(): String {
@@ -319,6 +329,8 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
 
                 is Resolutio2m -> "31#$stress#$retr#$gliss"
                 is Resolutio2M -> "32#$stress#$retr#$gliss"
+                is Resolutio3m -> "33#$stress#$retr#$gliss"
+                is Resolutio3M -> "34#$stress#$retr#$gliss"
 
             }
         }
@@ -343,7 +355,8 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 "Trillo< 2m", "Trillo< 2M", "Trillo<> 2m", "Trillo<> 2M",
                 "Oscillazione 2m", "Oscillazione 2M", "Irregolare 2m", "Irregolare 2M",
                 "Glissando", "Dinamica +", "Attacco",
-                "Tornado", "Fantasia", "Resolutio➚ 2m", "Resolutio➚ 2M"
+                "Tornado", "Fantasia",
+                "Resolutio➚ 2m", "Resolutio➚ 2M", "Resolutio➚ 3m", "Resolutio➚ 3M"
             )
 
             fun provideReplaceType(
@@ -496,6 +509,16 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
+                    33 -> Resolutio3m(
+                        stress = stress,
+                        isRetrograde = isRetrograde,
+                        addGliss = addGliss
+                    )
+                    34 -> Resolutio3M(
+                        stress = stress,
+                        isRetrograde = isRetrograde,
+                        addGliss = addGliss
+                    )
                     else -> Trillo2mCrescendo(
                         stress = stress,
                         isRetrograde = isRetrograde,
@@ -540,6 +563,8 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
 
     data class Resolutio2m(override val title: String = "Resolutio➚ 2m", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Resolutio2M(override val title: String = "Resolutio➚ 2M", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
+    data class Resolutio3m(override val title: String = "Resolutio➚ 3m", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
+    data class Resolutio3M(override val title: String = "Resolutio➚ 3M", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
 }
 data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
                                val replace: ReplaceType = ReplaceType.Mordente(),
@@ -1331,16 +1356,24 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 if(ribattuto == null) null else listOf(ribattuto) )
             //.apply { println("SUBSTITUTION NOTE: $this") }
     }
-    is ReplaceType.Resolutio2m, is ReplaceType.Resolutio2M -> { trackData, index, trackDataList ->
+    is ReplaceType.Resolutio2m, is ReplaceType.Resolutio2M,
+    is ReplaceType.Resolutio3m, is ReplaceType.Resolutio3M -> { trackData, index, trackDataList ->
         var (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
         val stress = replaceType.stress
         var actualDuration = articulationDuration ?: duration
         val direction = if(replaceType.isRetrograde) -1 else 1
-        val collisionCheck = if(replaceType is ReplaceType.Resolutio2m) {
-            note: Int -> note == pitch + direction
-        } else {
-            note: Int -> note == pitch + direction || note == pitch + direction * 2
+        val collisionCheck = when(replaceType){
+            is ReplaceType.Resolutio2m ->  { note: Int -> note == pitch + direction }
+            is ReplaceType.Resolutio2M -> { note: Int -> note == pitch + direction || note == pitch + direction * 2 }
+            is ReplaceType.Resolutio3m -> { note: Int -> note == pitch + direction || note == pitch + direction * 2 || note == pitch + direction * 3 }
+            is ReplaceType.Resolutio3M -> { note: Int -> note == pitch + direction || note == pitch + direction * 2 || note == pitch + direction * 3  || note == pitch + direction * 4}
+                else ->  {note: Int -> note == pitch + direction}
         }
+//        val collisionCheck = if(replaceType is ReplaceType.Resolutio2m) {
+//            note: Int -> note == pitch + direction
+//        } else {
+//            note: Int -> note == pitch + direction || note == pitch + direction * 2
+//        }
         val partIndex = trackData.partIndex
         val trackDatas = trackDataList.filter{ it.partIndex > partIndex}
         val indices = trackDatas.map{ it.ticks }.findIndicesInSection(tick, duration, trackDatas.map{it.durations})
@@ -1362,6 +1395,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 } else {
                     val secondDur = duration - firstDur
                     val goalPitch = trackDataList[it.first].pitches[it.second]
+                    println("moving from $pitch to $goalPitch")
                     val stressedVelocity = (velocity + stress).coerceAtMost(127)
                     val isStaccato = actualDuration < duration
                     val diff = if(isStaccato || glissando != 0) 0 else actualDuration - duration
@@ -1375,7 +1409,9 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         if(articulationDuration == null) null
                         else listOf(firstDur, secondDur + diff),
                         if(ribattuto == null) null else listOf(ribattuto, ribattuto) )
-                }//.also{ println("resolutio: $it")}
+                }.also{
+                    println("resolutio: $it")
+                }
             } ?: SubstitutionNotes(-1 ) // will not be considered
         } else {
             SubstitutionNotes(-1 ) // will not be considered

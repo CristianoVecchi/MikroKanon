@@ -14,6 +14,10 @@ fun String.extractIntsFromCsv(): List<Int>{
     //if(this.isEmpty() ) return listOf(0)
     return this.split(',').mapNotNull { it.toInt()}
 }
+fun String.extractIntTriplesFromCsv(): List<Triple<Int,Int,Int>>{
+    val triples = this.split(',')
+    return triples.map{ val split = it.split('|'); Triple(split[0].toInt(), split[1].toInt(), (split.getOrElse(2) {"0"}).toInt())}
+}
 fun String.extractIntPairsFromCsv(): List<Pair<Int,Int>>{
     val pairs = this.split(',')
     return pairs.map{ val split = it.split('|'); Pair(split[0].toInt(), split[1].toInt())}

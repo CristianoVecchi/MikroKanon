@@ -167,6 +167,7 @@ val GUITAR_MIDDLE5 = IntRange(50, 69) // D3 - A4
 val GUITAR_HIGH5 = IntRange(59, 78) // B3 - F#5
 val GUITAR_HIGHEST5 = IntRange(65, C6) // F4 - C6
 val GUITAR_HARMONIC_ALL = IntRange(52, C7) // E3 - C7
+val GUITAR_HARMONIC_HIGH5 = IntRange(C5, G6) // C5 - G6
 val GUITAR_HARMONIC_HIGHEST5 = IntRange(77, C7) // F5 - C7
 
 val BANJO_ALL = IntRange(C3, 75) // C3 - D5

@@ -46,8 +46,9 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
         val absPitchNames = multiNumberDialogData.value.names
         val pitchesDialogData by lazy { mutableStateOf(MultiListDialogData()) }
         val repetitionsDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val isSubSetSymbol = "[ ... ♪♪♪♪]"
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
-            MultiListDialog(pitchesDialogData, dimensions, lang.OkButton, appColors)
+            MultiListDialog(pitchesDialogData, dimensions, lang.OkButton, appColors, isSubSetSymbol)
             ListDialog(repetitionsDialogData, dimensions, lang.OkButton, appColors, fillPrevious = true)
 
             val width =
@@ -164,12 +165,14 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 true,
                                 absPitchNames.reversed(),
                                 chordToEnhanceData.absPitches.map{11 - it}.toSet(),
-                                lang.selectChordsToEnhance
-                            ) { pitchIndeces, _ ->
+                                lang.selectChordsToEnhance,
+                                isSubSetSymbol,
+                                chordToEnhanceData.isSubSet
+                            ) { pitchIndeces, isSubSet ->
                                 val actualPitches = pitchIndeces.map{11 - it}.toSortedSet()
-                                if(chordsToEnhanceDatas.all{it.absPitches != actualPitches}){
+                                if(chordsToEnhanceDatas.all{it.absPitches != actualPitches || it.isSubSet != isSubSet}){
                                     val newCteDatas = chordsToEnhanceDatas.toMutableList()
-                                    newCteDatas[cursor] = chordsToEnhanceDatas[cursor].copy(absPitches = actualPitches)
+                                    newCteDatas[cursor] = chordsToEnhanceDatas[cursor].copy(absPitches = actualPitches, isSubSet = isSubSet)
                                     chordsToEnhanceDatas = newCteDatas
                                 }
                                 MultiListDialogData(itemList = pitchesDialogData.value.itemList)
@@ -214,7 +217,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                             colors = model.appColors
                         ) {
                             multiNumberDialogData.value.onSubmitButtonClick.invoke(
-                                chordsToEnhanceDatas.distinctBy { it.absPitches }
+                                chordsToEnhanceDatas//.distinctBy { it.absPitches  it.isSubSet}
                                     .sortedByDescending { it.repetitions }
                                     .joinToString(",") { it.toCsv()}
                             )
@@ -250,12 +253,13 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 true,
                                 absPitchNames.reversed(),
                                 setOf(),
-                                lang.selectChordsToEnhance
-                            ) { pitchIndeces, _ ->
+                                lang.selectChordsToEnhance,
+                                isSubSetSymbol
+                            ) { pitchIndeces, isSubSet ->
                                 val actualPitches = pitchIndeces.map{11 - it}.toSortedSet()
-                                if(chordsToEnhanceDatas.all{it.absPitches != actualPitches}){
+                                if(chordsToEnhanceDatas.all{it.absPitches != actualPitches || it.isSubSet != isSubSet}){
                                     val rebuilding = chordsToEnhanceDatas.addOrInsert(
-                                        ChordToEnhanceData(actualPitches, 1), cursor)
+                                        ChordToEnhanceData(actualPitches, 1, isSubSet), cursor)
                                     chordsToEnhanceDatas = rebuilding.first
                                     cursor = rebuilding.second
                                 }

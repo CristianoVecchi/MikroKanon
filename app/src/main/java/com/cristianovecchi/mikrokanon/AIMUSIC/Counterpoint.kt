@@ -393,8 +393,9 @@ data class Counterpoint(val parts: List<AbsPart>,
         }
     }
     fun handleChordEnhancement(chordsToEnhance: List<ChordToEnhanceData>): Counterpoint {
-        return if(chordsToEnhance.isEmpty() || chordsToEnhance.all{it == ChordToEnhanceData(setOf(),1)}) this
-        else this.enhanceChords(chordsToEnhance.map{Pair(it.absPitches,it.repetitions)})
+        println("handlechords: $chordsToEnhance")
+        return if(chordsToEnhance.isEmpty() || chordsToEnhance.all{it == ChordToEnhanceData(setOf(),1) || it == ChordToEnhanceData(setOf(),1, true)}) this
+        else this.enhanceChords(chordsToEnhance.map{Triple(it.absPitches, it.repetitions, it.isSubSet)})
     }
     fun arpeggio(arpeggioType: ARPEGGIO): Counterpoint{
         if(counterpointIsEmpty()) return this
@@ -485,8 +486,8 @@ data class Counterpoint(val parts: List<AbsPart>,
         result.emptiness = result.findEmptiness()
         return result.cutBlankParts(true)
     }
-    fun enhanceChords(chordsToEnhance: List<Pair<Set<Int>, Int>>): Counterpoint {
-        //println("chords to enhance:$chordsToEnhance")
+    fun enhanceChords(chordsToEnhance: List<Triple<Set<Int>, Int, Boolean>>): Counterpoint {
+        println("chords to enhance:$chordsToEnhance")
         if (chordsToEnhance.isEmpty()) return this
         val clone = if(isNormalized()) this else this.normalizePartsSize(false)
         val result = clone.cloneWithEmptyParts()
@@ -494,14 +495,21 @@ data class Counterpoint(val parts: List<AbsPart>,
         val maxSize = clone.maxSize()
         val chords = chordsToEnhance.map{ it.first.toSortedSet() }
         val repetitions = chordsToEnhance.map{ it.second }
+        val isSubSet = chordsToEnhance.map{ it.third }
         while (index < maxSize){
             val columnSorted = clone.getColumnValuesWithoutEmptyValues(index).toSortedSet()
             var found = false
             chords@for(i in chords.indices){
-                if(chords[i] == columnSorted){
+                //println("chord#$i is subset:${isSubSet[i]}")
+                val check = if(isSubSet[i]){
+                    chord: SortedSet<Int> -> columnSorted.containsAll(chord)
+                } else {
+                    chord: SortedSet<Int> -> chord == columnSorted
+                }
+                if(check(chords[i])){
                     found = true
                     val repeatedColumn = clone.getColumnValuesWithEmptyValues(index)
-                    //println("index: $index  chord: ${chords[i]}  column sorted: $columnSorted  repeated column: $repeatedColumn")
+                    //println("index: $index  chord: ${chords[i]}  column : $columnSorted repeated column: $repeatedColumn")
                     (0 until repetitions[i]).forEach{ _ ->
                         result.addColumn(repeatedColumn)
                     }
@@ -511,6 +519,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             if(!found) result.addColumn(clone.getColumnValuesWithEmptyValues(index))
             index++
         }
+        println("original size: ${this.maxSize()} -> enhance chords: ${result.maxSize()}")
         return result.cutExtraNotes().apply { this.findAndSetEmptiness() }
     }
     fun addMultipleDoublingParts(doublingList: List<Pair<Int,Int>>, maxParts: Int): Counterpoint {

@@ -750,10 +750,10 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                         when (optionName) {
                             "Chords to Enhance" -> {
                                 val absPitchNames = (0..11).map{Clip.convertAbsToClipText(it, lang.noteNames)}
-                                var cteDatas = userOptions.chordsToEnhance.extractIntPairsFromCsv()
-                                    .map{ ChordToEnhanceData(convertFlagsToInts(it.first), it.second)}
+                                var cteDatas = userOptions.chordsToEnhance.extractIntTriplesFromCsv()
+                                    .map{ ChordToEnhanceData(convertFlagsToInts(it.first), it.second, it.third == 1)}
                                 cteDatas = cteDatas.ifEmpty { listOf(ChordToEnhanceData(setOf(),1)) }
-                                val isSelected = !cteDatas.all{it == ChordToEnhanceData(setOf(),1) }
+                                val isSelected = !cteDatas.all{it == ChordToEnhanceData(setOf(),1) || it == ChordToEnhanceData(setOf(),1, true) }
                                 SelectableCard(
                                     text = if(!isSelected) lang.chordsToEnhance
                                     else "${lang.chordsToEnhance}: \n${

@@ -129,8 +129,8 @@ suspend fun launchPlayer(
             ?: Triple(listOf(), listOf(), listOf())
     val chordsToEnhance: List<ChordToEnhanceData> =
         userOptionsData?.let {
-            userOptionsData.chordsToEnhance.extractIntPairsFromCsv().map{
-                ChordToEnhanceData(convertFlagsToInts(it.first), it.second)}
+            userOptionsData.chordsToEnhance.extractIntTriplesFromCsv().map{
+                ChordToEnhanceData(convertFlagsToInts(it.first), it.second, it.third == 1)}
         } ?: listOf()
     val enhanceChordsInTranspositions: Boolean =
         0 != (userOptionsData?.let { userOptionsData.enhanceChordsInTranspositions.toInt() }

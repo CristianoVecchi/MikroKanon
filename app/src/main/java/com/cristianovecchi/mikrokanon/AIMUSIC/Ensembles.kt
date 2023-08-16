@@ -1310,8 +1310,9 @@ object Ensembles {
                 PARTS_HARP[3]
             )
             7 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
+//                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
+                EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
                 PARTS_HARP[4],
@@ -1319,9 +1320,10 @@ object Ensembles {
                 PARTS_HARP[3]
             )
             8 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
+//                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
                 EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
+                EnsemblePart(CLEAN_GUITAR, 5, GUITAR_ALL, GUITAR_HIGH5),
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
                 PARTS_HARP[4],
@@ -1329,9 +1331,10 @@ object Ensembles {
                 PARTS_HARP[3]
             )
             9 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
+                //EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
                 EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
+                EnsemblePart(CLEAN_GUITAR, 5, GUITAR_ALL, GUITAR_HIGH5),
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
                 EnsemblePart(SITAR, 4, SITAR_ALL, SITAR_HIGH5),
@@ -1340,9 +1343,10 @@ object Ensembles {
                 PARTS_HARP[2]
             )
             10 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
+                //EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
                 PARTS_HARP[5],
                 EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
+                EnsemblePart(CLEAN_GUITAR, 5, GUITAR_ALL, GUITAR_HIGH5),
                 EnsemblePart(KOTO, 5, KOTO_ALL, KOTO_HIGHEST5),
                 EnsemblePart(CLEAN_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5..GUITAR_HIGH5),
                 EnsemblePart(NYLON_GUITAR, 4, GUITAR_ALL, GUITAR_MIDDLE5),
@@ -1352,7 +1356,7 @@ object Ensembles {
                 PARTS_HARP[2]
             )
             11 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
+                EnsemblePart(GUITAR_HARMONICS, 5, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGH5),
                 PARTS_HARP[5],
                 EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
                 EnsemblePart(KOTO, 5, KOTO_ALL, KOTO_HIGHEST5),
@@ -1365,7 +1369,7 @@ object Ensembles {
                 PARTS_HARP[2]
             )
             12 -> listOf(
-                EnsemblePart(GUITAR_HARMONICS, 6, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGHEST5),
+                EnsemblePart(GUITAR_HARMONICS, 5, GUITAR_HARMONIC_ALL, GUITAR_HARMONIC_HIGH5),
                 PARTS_HARP[5],
                 EnsemblePart(BANJO, 5, BANJO_ALL, BANJO_HIGHEST5),
                 EnsemblePart(KOTO, 5, KOTO_ALL, KOTO_HIGHEST5),

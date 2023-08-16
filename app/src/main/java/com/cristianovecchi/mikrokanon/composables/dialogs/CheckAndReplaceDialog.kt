@@ -201,7 +201,9 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                     val newCnrDatas = checkAndReplaceDatas.toMutableList()
                                     val oldCnrData = checkAndReplaceDatas[cursor]
                                     val oldStress = oldCnrData.replace.stress
-                                    newCnrDatas[cursor] = oldCnrData.copy(replace = ReplaceType.provideReplaceType(newReplaceTypeIndex, oldStress))
+                                    val oldIsRetrograde = oldCnrData.replace.isRetrograde
+                                    val oldAddGliss = oldCnrData.replace.addGliss
+                                    newCnrDatas[cursor] = oldCnrData.copy(replace = ReplaceType.provideReplaceType(newReplaceTypeIndex, oldStress, oldIsRetrograde, oldAddGliss))
                                     checkAndReplaceDatas = newCnrDatas
                                     ListDialogData(itemList = replaceTypeDialogData.value.itemList)
                                 }

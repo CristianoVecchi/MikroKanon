@@ -292,7 +292,7 @@ fun createLibertyChordsTrack(chordsTrack: MidiTrack, bars: List<Bar>, diffChordV
         it.chord1 = chord
         lastRoot = chordPosition.first
         previousChord = chord.chord
-        println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
+        //println("Chord: ${it.dodecaByte1stHalf!!.toString(2)} ${chord.name} ${chord.absoluteNotes.contentToString()}")
     }
     // val chordsChannel = 15
 //    val pc: MidiEvent = ProgramChange(bars[0].tick, chordsChannel, instrument) // cambia strumento

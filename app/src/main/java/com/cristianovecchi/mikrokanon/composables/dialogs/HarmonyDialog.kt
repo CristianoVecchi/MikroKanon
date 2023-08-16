@@ -187,20 +187,24 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     harmData.type.ordinal,
                                     lang.selectHarmonizationType
                                 ) { newHarmonizationType ->
-                                    harmDivisionDialogData.value = ListDialogData(
-                                        true,
-                                        divValues.map { it.symbol },
-                                        harmData.division.ordinal,
-                                        lang.selectHarmonizationDivision
-                                    ) { newHarmonizationDivision ->
-                                        val newHarmDatas = harmDatas.toMutableList()
-                                        newHarmDatas[cursor] =
-                                            harmDatas[cursor].copy(
-                                                type = HarmonizationType.values()[newHarmonizationType],
-                                                division = divValues[newHarmonizationDivision]
-                                            )
+                                    val newHarmDatas = harmDatas.toMutableList()
+                                    if(newHarmonizationType != 0) {
+                                        harmDivisionDialogData.value = ListDialogData(
+                                            true,
+                                            divValues.map { it.symbol },
+                                            harmData.division.ordinal,
+                                            lang.selectHarmonizationDivision
+                                        ) { newHarmonizationDivision ->
+                                            newHarmDatas[cursor] = harmDatas[cursor].copy(
+                                                    type = HarmonizationType.values()[newHarmonizationType],
+                                                    division = divValues[newHarmonizationDivision]
+                                                )
+                                            harmDatas = newHarmDatas
+                                            //ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                                        }
+                                    } else {
+                                        newHarmDatas[cursor] = harmDatas[cursor].copy(type = HarmonizationType.values()[newHarmonizationType],)
                                         harmDatas = newHarmDatas
-                                        //ListDialogData(itemList = harmTypeDialogData.value.itemList)
                                     }
                                 }
                             }
@@ -299,7 +303,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     ) { instrumentIndices, _ ->
                                         val newHarmDatas = harmDatas.toMutableList()
                                         newHarmDatas[cursor] =
-                                            harmDatas[cursor].copy(instruments = instrumentIndices)
+                                            harmDatas[cursor].copy(instruments = if(instrumentIndices.isEmpty()) listOf(48) else instrumentIndices)
                                         harmDatas = newHarmDatas
                                         ListDialogData(itemList = harmTypeDialogData.value.itemList)
                                     }
@@ -434,16 +438,32 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                             colors = model.appColors
                         ) {
                             val harmData = harmDatas[cursor]
+                            val divValues = HarmonizationDivision.values()
                             harmTypeDialogData.value = ListDialogData(
                                 true,
                                 harmNames,
                                 harmData.type.ordinal,
                                 lang.selectHarmonizationType
                             ) { newHarmonizationType ->
-                                val rebuilding = harmDatas.addOrInsert(
-                                    harmData.copy(type = HarmonizationType.values()[newHarmonizationType]), cursor)
-                                harmDatas = rebuilding.first
-                                cursor = rebuilding.second
+                                if(newHarmonizationType != 0) {
+                                    harmDivisionDialogData.value = ListDialogData(
+                                        true,
+                                        divValues.map { it.symbol },
+                                        harmData.division.ordinal,
+                                        lang.selectHarmonizationDivision
+                                    ) { newHarmonizationDivision ->
+                                        val rebuilding = harmDatas.addOrInsert(
+                                            harmData.copy(type = HarmonizationType.values()[newHarmonizationType],division = divValues[newHarmonizationDivision]), cursor)
+                                        harmDatas = rebuilding.first
+                                        cursor = rebuilding.second
+                                        //ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                                    }
+                                } else {
+                                    val rebuilding = harmDatas.addOrInsert(
+                                        harmData.copy(type = HarmonizationType.values()[newHarmonizationType]), cursor)
+                                    harmDatas = rebuilding.first
+                                    cursor = rebuilding.second
+                                }
                                 ListDialogData(itemList = harmTypeDialogData.value.itemList)
                             }
                         }
