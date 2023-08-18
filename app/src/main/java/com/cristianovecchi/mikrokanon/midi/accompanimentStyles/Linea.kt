@@ -129,7 +129,7 @@ fun createNoteDoubleTripleLine(harmonizationStyle: HarmonizationStyle, chordsTra
                     pitches1.forEachIndexed { j, absPitch ->
                         val duration = durs1[j]
                         Player.insertNoteWithGlissando(
-                            chordsTrack, tick, duration, chordsChannel,
+                            chordsTrack, tick, duration -1, chordsChannel,
                             octave + absPitch, vels1[j], 70, 0
                         )
                         tick += duration
@@ -141,7 +141,7 @@ fun createNoteDoubleTripleLine(harmonizationStyle: HarmonizationStyle, chordsTra
                         val duration = durs2[j]
                         actualOctavePitches.forEach{ octave ->
                             Player.insertNoteWithGlissando(
-                                chordsTrack, tick, duration, chordsChannel,
+                                chordsTrack, tick, duration -1, chordsChannel,
                                 octave + absPitch, vels2[j], 70, 0
                             )
                         }
@@ -154,7 +154,7 @@ fun createNoteDoubleTripleLine(harmonizationStyle: HarmonizationStyle, chordsTra
                         val duration = durs3[j]
                         actualOctavePitches.forEach{ octave ->
                             Player.insertNoteWithGlissando(
-                                chordsTrack, tick, duration, chordsChannel,
+                                chordsTrack, tick, duration -1, chordsChannel,
                                 octave + absPitch, vels3[j], 70, 0
                             )
                         }

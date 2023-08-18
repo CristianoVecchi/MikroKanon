@@ -46,7 +46,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
         val absPitchNames = multiNumberDialogData.value.names
         val pitchesDialogData by lazy { mutableStateOf(MultiListDialogData()) }
         val repetitionsDialogData by lazy { mutableStateOf(ListDialogData()) }
-        val isSubSetSymbol = "[ ... ♪♪♪♪]"
+        val isSubSetSymbol = " [ ... ♪♪♪♪]  "
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             MultiListDialog(pitchesDialogData, dimensions, lang.OkButton, appColors, isSubSetSymbol)
             ListDialog(repetitionsDialogData, dimensions, lang.OkButton, appColors, fillPrevious = true)
@@ -189,7 +189,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                             val chordToEnhanceData = chordsToEnhanceDatas[cursor]
                             repetitionsDialogData.value = ListDialogData(
                                 true,
-                                (0..256).map { it.toString() },
+                                listOf(listOf("0 → DELETE", "1 → NO CHANGES"),(2..256).map { it.toString() }).flatten(),
                                 chordToEnhanceData.repetitions,
                                 lang.selectRitornello
                             ) { newRepetitions ->
@@ -238,6 +238,8 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 chordsToEnhanceDatas = newCteDatas.toList()
                                 val newCursor = if (chordsToEnhanceDatas.size > 1) cursor - 1 else 0
                                 cursor = if (newCursor < 0) 0 else newCursor
+                            } else {
+                                chordsToEnhanceDatas = listOf(ChordToEnhanceData(setOf(),1))
                             }
                         }
                         CustomButton(

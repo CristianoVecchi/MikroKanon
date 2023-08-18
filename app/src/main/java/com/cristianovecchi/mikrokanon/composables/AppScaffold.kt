@@ -147,7 +147,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
     }
         val listState = rememberLazyListState()
         val selectedTab by model.lastScaffoldTab.asFlow().collectAsState(initial = ScaffoldTabs.SETTINGS)
-
+        val affectsHorizontallySymbol = "→ ➚➘➚➘➚  "
         EnsembleDialog(ensemblesDialogData, dimensions)
         ListDialog(listDialogData, dimensions, lang.OkButton, colors)
         RhythmDialog(rhythmDialogData, dimensions, patterns = RhythmPatterns.values().toList() )
@@ -167,7 +167,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
         PrivacyDialog(privacyDialogData, dimensions, lang.OkButton)
         CreditsDialog(creditsDialogData, dimensions, lang.OkButton)
         HistoriaDialog(historiaDialogData, dimensions, lang.OkButton)
-        MultiListDialog(mbtiDialogData, dimensions, lang.OkButton, colors)
+        MultiListDialog(mbtiDialogData, dimensions, lang.OkButton, colors, affectsHorizontallySymbol)
         MultiListDialog(detectorDialogData, dimensions, lang.OkButton, colors)
         ListDialog(detExtensionDialogData, dimensions, lang.OkButton, colors, fillPrevious = true)
         ListDialog(colorsDialogData, dimensions, lang.OkButton, colors)
@@ -1183,12 +1183,23 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                             true,
                                             MBTI.values().map{"${it}    ${it.stringOfPlanets(getZodiacPlanets(model.zodiacFlags.value!!.third))}\n  ${it.character}"},
                                             intsFromMbtis.toSet(),
-                                            dialogTitle = lang.selectMbti
-                                        ) { indices, _ ->
+                                            dialogTitle = lang.selectMbti,
+                                            affectsHorizontallySymbol,
+                                            model.MBTIaffectsHorizontally,
+                                        ) { indices, affectsHorizontally ->
                                             if(indices.isNotEmpty()) {
-                                                model.createVerticalIntervalSet(MBTI.intervalsFromIndices(indices).toList(), "AppScaffold")
+                                                val intervals = MBTI.intervalsFromIndices(indices).toList()
+                                                model.createVerticalIntervalSet(intervals, "AppScaffold")
                                                 model.saveVerticalIntervalSet("AppScaffold")
-                                                model.dispatchIntervals()
+                                                if(affectsHorizontally) {
+                                                    model.MBTIaffectsHorizontally = true
+                                                    val horFlags = createFlagsFromIntervalSet(intervals)
+                                                    model.createHorizontalIntervalSet(horFlags)
+                                                    model.updateUserOptions("intSetHorFlags", horFlags)
+                                                } else {
+                                                    model.dispatchIntervals()
+                                                    model.MBTIaffectsHorizontally = false
+                                                }
                                             }
                                             mbtiDialogData.value =
                                                 MultiListDialogData(itemList = detectorDialogData.value.itemList)

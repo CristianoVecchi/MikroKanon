@@ -1019,6 +1019,7 @@ class AppViewModel(
         saveVerticalIntervalSet("from AppViewModel (add)")
         dispatchIntervals()
     }
+    var MBTIaffectsHorizontally = false
     fun createHorizontalIntervalSet(horizontalIntervalSetFlag: Int) {
         _intervalSetHorizontal.value = createIntervalSetFromFlags(horizontalIntervalSetFlag)
     }

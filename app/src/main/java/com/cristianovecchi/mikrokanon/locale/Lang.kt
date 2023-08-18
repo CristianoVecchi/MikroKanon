@@ -44,6 +44,7 @@ enum class LANGUAGES(val language:String){
 enum class NoteNamesPt {
     Dó,Ré,Mi,Fá,Sol,Lá,Si,EMPTY
 }
+
 enum class NoteNamesIt {
     Do,Re,Mi,Fa,Sol,La,Si,EMPTY
 }
@@ -476,6 +477,7 @@ data class Lang( // English by default
                 selectNuances = "Choisissez les nuances pour la dynamique !",
                 harmony = "Harmonie ",
                 selectHarmonizationType = "Sélectionnez le type d'harmonisation !",
+                selectHarmonizationDivision = "Sélectionnez la division de mesure !",
                 selectHarmonizationInstruments = "Sélectionnez les instruments d'harmonisation !",
                 selectHarmonizationVolume = "Sélectionnez le volume d'harmonisation !",
                 selectOctaves = "Sélectionnez les octaves !",
@@ -575,6 +577,7 @@ data class Lang( // English by default
                 selectNuances = "Scegli le nuances per la dinamica!",
                 harmony = "Armonia",
                 selectHarmonizationType = "Scegli il tipo di armonizzazione!",
+                selectHarmonizationDivision = "Scegli la divisione della battuta!",
                 selectHarmonizationInstruments = "Scegli gli strumenti dell'armonizzazione!",
                 selectHarmonizationVolume = "Scegli il volume dell'armonizzazione!",
                 selectOctaves = "Seleziona le ottave!",
@@ -671,6 +674,7 @@ data class Lang( // English by default
                 selectNuances = "¡Elige los matices para la dinámica!",
                 harmony = "Armonía",
                 selectHarmonizationType = "¡Selecciona el tipo de armonización!",
+                selectHarmonizationDivision = "¡Seleccione la división de la barra!",
                 selectHarmonizationInstruments = "¡Selecciona los instrumentos de armonización!",
                 selectHarmonizationVolume = "¡Selecciona el volumen de armonización!",
                 selectOctaves = "¡Seleccione octavas!",
@@ -767,6 +771,7 @@ data class Lang( // English by default
                 selectNuances = "Wählen Sie die Nuancen für die Dynamik!",
                 harmony = "Harmonie",
                 selectHarmonizationType = "Wählen Sie den Harmonisierungstipp!",
+                selectHarmonizationDivision = "Wählen Sie die Takteinteilung!",
                 selectHarmonizationInstruments = "Wählen Sie die Harmonisierungsinstrumente!",
                 selectHarmonizationVolume = "Wählen Sie die Harmonisierungslautstärke!",
                 selectOctaves = "Oktaven auswählen!",
@@ -866,6 +871,7 @@ data class Lang( // English by default
                 selectNuances = "Вибирайте нюанси для динаміки!",
                 harmony = "Гармонія",
                 selectHarmonizationType = "Виберіть тип гармонізації!",
+                selectHarmonizationDivision = "Оберіть розділ такту!",
                 selectHarmonizationInstruments = "Обирайте інструменти гармонізації!",
                 selectHarmonizationVolume = "Обирайте гучність гармонізації!",
                 selectOctaves = "Виберіть октави!",
@@ -966,6 +972,7 @@ data class Lang( // English by default
                 nuancesOptions = listOf("Без нюансов", "В рельефе короткие ноты", "В рельефе длинные ноты"),
                 harmony = "Гармония",
                 selectHarmonizationType = "Выберите тип гармонизации!",
+                selectHarmonizationDivision = "Выберите подразделение такта!",
                 selectHarmonizationInstruments = "Выберите инструменты гармонизации!",
                 selectHarmonizationVolume = "Выберите громкость гармонизации!",
                 selectOctaves = "Выберите октавы!",
@@ -1063,6 +1070,7 @@ data class Lang( // English by default
                 nuancesOptions = listOf("뉘앙스가 없습니다", "안도의 짧은 음표", "긴 음표에 안심"),
                 harmony = "조화",
                 selectHarmonizationType = "하모나이제이션 팁을 선택하십시오!",
+                selectHarmonizationDivision = "바 부문을 선택하세요!",
                 selectHarmonizationInstruments = "화음 악기를 선택하십시오!",
                 selectHarmonizationVolume = "하모나이제이션 볼륨을 선택하십시오!",
                 selectOctaves = "옥타브 선택!",
@@ -1160,6 +1168,7 @@ data class Lang( // English by default
                 nuancesOptions = listOf("ニュアンスはありません", "安心して短い音符", "安心して長い音符"),
                 harmony = "調和",
                 selectHarmonizationType = "ハーモナイゼーションティペを選択してください！",
+                selectHarmonizationDivision = "小節分割を選択してください！",
                 selectHarmonizationInstruments = "ハーモナイゼーション楽器を選択してください！",
                 selectHarmonizationVolume = "ハーモナイゼーションボリュームを選択してください！",
                 selectOctaves = "オクターブを選択してください！",
@@ -1258,6 +1267,7 @@ data class Lang( // English by default
                 nuancesOptions = listOf("没有细微差别", "在浮雕的短音符", "长长的音符让人浮想联翩"),
                 harmony = "和谐",
                 selectHarmonizationType = "选择和声提示！",
+                selectHarmonizationDivision = "选择酒吧部门！",
                 selectHarmonizationInstruments = "选择协调工具！",
                 selectHarmonizationVolume = "选择和声音量！",
                 selectOctaves = "选择八度！",
@@ -1358,6 +1368,7 @@ data class Lang( // English by default
                 nuancesOptions = listOf("لا فارق بسيط", "في الإغاثة الملاحظات القصيرة", "الملاحظات الطويلة غير واضحة"),
                 harmony = "انسجام",
                 selectHarmonizationType = "حدد نصيحة المواءمة!",
+                selectHarmonizationDivision = "حدد تقسيم شريط!",
                 selectHarmonizationInstruments = "حدد أدوات التنسيق!\n",
                 selectHarmonizationVolume = "حدد حجم التنسيق!",
                 selectOctaves = "حدد الأوكتاف!",
@@ -1458,6 +1469,7 @@ data class Lang( // English by default
                 nuancesOptions = listOf("Καμία απόχρωση", "Ανακουφισμένες οι σύντομες νότες", "Ανακουφισμένες οι μακριές νότες"),
                 harmony = "Αρμονία",
                 selectHarmonizationType = "Επιλέξτε τον τύπο εναρμόνισης!",
+                selectHarmonizationDivision = "Επιλέξτε το τμήμα μπαρ!",
                 selectHarmonizationInstruments = "Επιλέξτε τα μέσα εναρμόνισης!",
                 selectHarmonizationVolume = "Επιλέξτε τον τόμο εναρμόνισης!",
                 selectOctaves = "Επιλέξτε οκτάβες!",
@@ -1555,6 +1567,7 @@ data class Lang( // English by default
                 nuancesOptions = listOf("Hakuna nuance", "Kwa utulivu maelezo mafupi ya muziki", "Kwa misaada noti ndefu za muziki"),
                 harmony = "Maelewano",
                 selectHarmonizationType = "Chagua njia ya kuoanisha!",
+                selectHarmonizationDivision = "Chagua mgawanyiko wa bar!",
                 selectHarmonizationInstruments = "Chagua vyombo vya kuoanisha!",
                 selectHarmonizationVolume = "Chagua sauti ya kuoanisha!",
                 selectOctaves = "Chagua oktaba!",
@@ -1652,6 +1665,7 @@ data class Lang( // English by default
                 nuancesOptions = listOf("Sem nuances", "Em relevo as notas curtas", "Em relevo as notas longas"),
                 harmony = "Harmonia",
                 selectHarmonizationType = "Selecione o tipo de harmonização!",
+                selectHarmonizationDivision = "Selecione a divisão da barra!",
                 selectHarmonizationInstruments = "Selecione os instrumentos de harmonização!",
                 selectHarmonizationVolume = "Selecione o volume de harmonização!",
                 selectOctaves = "Selecione oitavas!",
@@ -1750,6 +1764,7 @@ data class Lang( // English by default
                 nuancesOptions = listOf("Tidak ada nuansa", "Relief catatan musik pendek", "Relief catatan musik yang panjang"),
                 harmony = "Harmoni",
                 selectHarmonizationType = "Pilih tipe harmonisasi!",
+                selectHarmonizationDivision = "Pilih divisi bar!",
                 selectHarmonizationInstruments = "Pilih instrumen harmonisasi!",
                 selectHarmonizationVolume = "Pilih volume harmonisasi!",
                 selectOctaves = "Pilih oktaf!",
@@ -1822,7 +1837,7 @@ data class Lang( // English by default
         }
         fun hindi(): Lang {
             return Lang(
-                noteNames = NoteNamesEn.values().map { it.toString() },
+                noteNames = listOf("सा","रे","गा","मा","पा","ध","नि"),
                 intervalSet = intervalSetEn,
                 enterSomeNotes = "कुछ नोट्स टाइप करें!",
                 choose2ndSequence = "दूसरा क्रम चुनें!",
@@ -1849,6 +1864,7 @@ data class Lang( // English by default
                 selectNuances = "गतिकी के लिए बारीकियां चुनें!",
                 harmony = "समन्वय",
                 selectHarmonizationType = "सामंजस्य टिप का चयन करें!",
+                selectHarmonizationDivision = "बार डिवीजन का चयन करें!",
                 selectHarmonizationInstruments = "सामंजस्य उपकरणों का चयन करें!",
                 selectHarmonizationVolume = "सामंजस्य मात्रा का चयन करें!",
                 selectOctaves = "सप्तक चुनें!",
