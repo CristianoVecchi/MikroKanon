@@ -30,6 +30,8 @@ import kotlin.math.absoluteValue
 //    println("Total section 2: ${section2.nElements()}")
 //    println("Total section 3: ${section3.nElements()}")
 //}
+
+
 fun List<List<String>>.indexInTotalOf(item: String): Int{
     var partialTotal = 0
     for(i in 0 until this.size){
@@ -271,6 +273,7 @@ fun IntRange.extractFromMiddle(halfRange: Int): IntRange {
             if(this.contains(6))flags = flags or 0b100000
             if(this.contains(0)) flags = flags or 0b1000000
         }
+        //println("$intervalSet -> ${Integer.toBinaryString(flags)}")
         return flags
     }
 

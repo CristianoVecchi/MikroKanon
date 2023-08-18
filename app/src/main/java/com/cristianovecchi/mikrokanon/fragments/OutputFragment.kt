@@ -45,16 +45,13 @@ class OutputFragment: Fragment() {
         }
         if(model.userOptionsData.value != null && model.userOptionsData.value!!.isNotEmpty()){
             val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
+            val horizontalIntervalSetFlag = model.userOptionsData.value!![0].intSetHorFlags
             model.createVerticalIntervalSet(verticalIntervalSetFlag, "OutputFragment")
+            model.createHorizontalIntervalSet(horizontalIntervalSetFlag)
         }
         model.userOptionsData.observe(viewLifecycleOwner){
             model.userOptionsData.value.let {
                 if(it!!.isNotEmpty()) {
-                    val newIntervalSet = createIntervalSetFromFlags(it[0].intSetHorFlags)
-                    if(newIntervalSet != model.intervalSetHorizontal.value!!){
-                        model.createHorizontalIntervalSet(it[0].intSetHorFlags)
-                        model.dispatchIntervals()
-                    }
                     model._counterpointView.value = it[0].counterpointView
                     model.refreshZodiacFlags()
                     model._language.value = Lang.provideLanguage(model.getUserLangDef())

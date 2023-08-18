@@ -17,7 +17,7 @@ import com.cristianovecchi.mikrokanon.ui.AppColors
 @Composable
 fun IntervalSetSelector(model: AppViewModel, fontSize: Int,
                         colors: AppColors, names: List<String>, callback: () -> Unit = {}) {
-    val intervals by model.intervalSet.observeAsState(model.intervalSet.value!!)
+    val intervals by model.intervalSetVertical.observeAsState(model.intervalSetVertical.value!!)
     val backgroundColor = colors.buttonsDisplayBackgroundColor
     val elaborating by model.elaborating.asFlow().collectAsState(initial = false)
     val removeIntervalsAndRefresh = { list:List<Int> ->

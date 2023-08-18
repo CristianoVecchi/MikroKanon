@@ -119,8 +119,8 @@ class AppViewModel(
     private val _counterpoints = MutableLiveData<List<Counterpoint>>(listOf())
     val counterpoints : LiveData<List<Counterpoint>> = _counterpoints
 
-    private val _intervalSet = MutableLiveData(listOf(2, 10, 3, 9, 4, 8, 5, 7))
-    val intervalSet : LiveData<List<Int>> = _intervalSet
+    private val _intervalSetVertical = MutableLiveData(listOf(2, 10, 3, 9, 4, 8, 5, 7))
+    val intervalSetVertical : LiveData<List<Int>> = _intervalSetVertical
     private val _intervalSetHorizontal = MutableLiveData((0..11).toList())
     val intervalSetHorizontal : LiveData<List<Int>> = _intervalSetHorizontal
 
@@ -320,7 +320,7 @@ class AppViewModel(
         //println("Building phase: ${buildingState.value}")
     }
     val dispatchIntervals = {
-        //println("dispatching intervals")
+        println("dispatching intervals")
         if(computationStack.isNotEmpty())
             refreshComputation(false)
     }
@@ -396,8 +396,8 @@ class AppViewModel(
         } else {
             val index = counterpoints.value!!.indexOf(selectedCounterpoint.value!!)
             val originalCounterpoints = counterpoints.value!!.map{ it.clone() }
-            val previousIntervalSet = intervalSet.value!!
-            computationStack.pushAndDispatch(Computation.TritoneSubstitution(originalCounterpoints, intervalSet.value!!.toList(),index))
+            val previousIntervalSet = intervalSetVertical.value!!
+            computationStack.pushAndDispatch(Computation.TritoneSubstitution(originalCounterpoints, intervalSetVertical.value!!.toList(),index))
             tritoneSubstitutionOnCounterpoints(originalCounterpoints, index, previousIntervalSet)
         }
     }
@@ -737,7 +737,7 @@ class AppViewModel(
                     is Computation.Chess -> computationStack.lastElement()
                     else -> { stackIcons.removeLast(); computationStack.pop() } // do not Dispatch!!!
                 }
-                previousIntervalSet?.let { changeIntervalSet(previousIntervalSet)}
+                previousIntervalSet?.let { changeIntervalSetVertical(previousIntervalSet)}
                 when (previousComputation) {
                     is Computation.FirstFromLoading -> {
                         if(stepBack){
@@ -952,9 +952,13 @@ class AppViewModel(
     //    selectedCounterpointStack.push(newCounterpoint)
 
     }
-    fun changeIntervalSet(newIntervalSet: List<Int>){
+    fun changeIntervalSetVertical(newIntervalSet: List<Int>){
         val sortedList = newIntervalSet.sorted()
-        _intervalSet.value = sortedList
+        _intervalSetVertical.value = sortedList
+    }
+    fun changeIntervalSetHorizontal(newIntervalSet: List<Int>){
+        val sortedList = newIntervalSet.sorted()
+        _intervalSetHorizontal.value = sortedList
     }
     fun changeCounterpointsWithLimitAndCache(newCounterpoints: List<Counterpoint>, selectFirst: Boolean,
                                      take: Int = MAX_VISIBLE_COUNTERPOINTS,
@@ -1006,35 +1010,62 @@ class AppViewModel(
 
     // INTERVAL SETS ----------------------------------------------------------------------
     fun removeIntervalsAndRefresh(list: List<Int>){
-        val newList = intervalSet.value!!.toMutableList()
+        val newList = intervalSetVertical.value!!.toMutableList()
         newList.removeAll(list)
-        changeIntervalSet(newList)
+        changeIntervalSetVertical(newList)
         saveVerticalIntervalSet("from AppViewModel (remove)")
         dispatchIntervals()
     }
     fun addIntervalsAndRefresh(list: List<Int>){
-        val newList = intervalSet.value!!.toMutableList()
+        val newList = intervalSetVertical.value!!.toMutableList()
         newList.addAll(list)
-        changeIntervalSet(newList)
+        changeIntervalSetVertical(newList)
         saveVerticalIntervalSet("from AppViewModel (add)")
         dispatchIntervals()
     }
+    fun changeHorizontalIntervalsAndRefresh(list: List<Int>){
+        //println("Change horizontal:$list ")
+        changeIntervalSetHorizontal(list)
+        saveHorizontalIntervalSet("from AppViewModel (change horizontal)")
+        dispatchIntervals()
+    }
     var MBTIaffectsHorizontally = false
+    fun createAndSaveAllIntervals(intervalSet: List<Int>){
+        //println("interval set all:$intervalSet")
+        val flags = createFlagsFromIntervalSet(intervalSet)
+        val newIntervalSet =  createIntervalSetFromFlags(flags)
+        val haveChangedVertically = newIntervalSet != _intervalSetVertical.value
+        val haveChangedHorizontally = newIntervalSet != _intervalSetHorizontal.value
+        if(haveChangedVertically){
+            changeIntervalSetVertical(intervalSet)
+            updateUserOptions("intSetVertFlags", flags)
+        }
+        if(haveChangedHorizontally){
+            changeIntervalSetHorizontal(intervalSet)
+            updateUserOptions("intSetHorFlags", flags)
+        }
+        if(haveChangedHorizontally || haveChangedVertically) dispatchIntervals()
+    }
     fun createHorizontalIntervalSet(horizontalIntervalSetFlag: Int) {
         _intervalSetHorizontal.value = createIntervalSetFromFlags(horizontalIntervalSetFlag)
     }
     fun createVerticalIntervalSet(verticalIntervalSetFlag: Int, from: String) {
         //println("Creating Vert Interval Set: ${intervalSet.value!!} from $from")
-        _intervalSet.value = createIntervalSetFromFlags(verticalIntervalSetFlag)
+        _intervalSetVertical.value = createIntervalSetFromFlags(verticalIntervalSetFlag)
     }
     fun createVerticalIntervalSet(intervalSet: List<Int>, from: String) {
         //println("Creating Vert Interval Set: $intervalSet from $from")
-        _intervalSet.value = intervalSet.sorted()
+        _intervalSetVertical.value = intervalSet.sorted()
     }
     fun saveVerticalIntervalSet(from: String) {
         //println("Saving Vert Interval Set: ${intervalSet.value!!} from $from")
-        val flags = createFlagsFromIntervalSet(intervalSet.value!!)
+        val flags = createFlagsFromIntervalSet(intervalSetVertical.value!!)
         updateUserOptions("intSetVertFlags", flags)
+    }
+    fun saveHorizontalIntervalSet(from: String) {
+        //println("Saving Vert Interval Set: ${intervalSet.value!!} from $from")
+        val flags = createFlagsFromIntervalSet(intervalSetHorizontal.value!!)
+        updateUserOptions("intSetHorFlags", flags)
     }
     fun indexOfSelectedCounterpoint() : Int {
         counterpoints.value?.let{
@@ -1044,7 +1075,6 @@ class AppViewModel(
         }
         return -1
     }
-
     // ROOM ---------------------------------------------------------------------
     fun addSequence(sequence: ArrayList<Clip>){
         viewModelScope.launch(Dispatchers.IO) {

@@ -11,6 +11,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,16 +26,20 @@ import com.cristianovecchi.mikrokanon.composables.counterpointviews.*
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.convertFlagsToInts
 import com.cristianovecchi.mikrokanon.convertIntsToFlags
+import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
+import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.ui.shift
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+
+data class DerivedData(val first: AppColors, val second: List<Int>, val third: List<Int>, val fourth: Int)
 
 @Composable
 fun ResultDisplay(model: AppViewModel,
@@ -82,17 +87,19 @@ fun ResultDisplay(model: AppViewModel,
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
-    val triple by derivedStateOf {
+    //val horizontalIntervals by model.intervalSetHorizontal.observeAsState(model.intervalSetHorizontal.value!!)
+    val quadruple by derivedStateOf {
         if(userOptionsData.isNotEmpty()) {
             model.setAppColors(userOptionsData[0].colors)
-            Triple(
+            DerivedData(
                 model.appColors,
                 createIntervalSetFromFlags(userOptionsData[0].detectorFlags),
-                (1..userOptionsData[0].detectorExtension).toList()
+                (1..userOptionsData[0].detectorExtension).toList(),
+                userOptionsData[0].intSetHorFlags
             )
-        } else Triple(model.appColors, listOf(), listOf())
+        } else DerivedData(model.appColors, listOf(), listOf(), 127)
     }
-    val (colors, detectorIntervalSet, detectorExtensions) = triple
+    val (colors, detectorIntervalSet, detectorExtensions, horFlags) = quadruple
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val notesNames = language.noteNames
     val zodiacFlags by model.zodiacFlags.asFlow().collectAsState(initial = Triple(false,false,false))
@@ -343,17 +350,16 @@ fun ResultDisplay(model: AppViewModel,
                             buttonSize = buttonSize, colors = colors
                         ) {
                             if (!elaborating) {
-                                val flags = model.userOptionsData.value!![0].intSetHorFlags
-                                val intsFromFlags = convertFlagsToInts(flags)
+
+                                val intsFromFlags = convertFlagsToInts(horFlags)
                                 val intervalNames = if(zodiacPlanetsActive) getZodiacPlanets(zodiacEmojisActive) else language.intervalSet.map{ it.replace("\n"," / ") }
                                 intervalSetDialogData.value = MultiListDialogData(true, intervalNames,
                                     intsFromFlags.toSet(), dialogTitle = "${language.selectHorizontalIntervals}" // \n${language.FPremember}"
                                 ) { indexes, _ ->
-                                    model.updateUserOptions(
-                                        "intSetHorFlags",
-                                        if(indexes.isEmpty()) 0b1111111 else convertIntsToFlags(indexes.toSortedSet())
-                                    )
-                                    //model.dispatchIntervals
+                                    val newFlag = if(indexes.isEmpty()) 0b1111111 else convertIntsToFlags(indexes.toSortedSet())
+                                    if(newFlag != userOptionsData[0].intSetHorFlags){
+                                        model.changeHorizontalIntervalsAndRefresh(createIntervalSetFromFlags(newFlag))
+                                    }
                                     intervalSetDialogData.value = MultiListDialogData(itemList = intervalSetDialogData.value.itemList)
                                 }
                             }

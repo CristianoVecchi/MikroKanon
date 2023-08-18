@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
@@ -111,6 +112,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
     val vibratoDialogData by lazy {mutableStateOf(ListDialogData())}
     val zodiacDialogData by lazy { mutableStateOf(MultiListDialogData())}
 
+    val verticalIntervals by model.intervalSetVertical.observeAsState(model.intervalSetVertical.value!!)
     val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
     //val colors = model.appColors
     val optionNames= listOf(
@@ -1158,11 +1160,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                     })
                             }
                             "MBTI" -> {
-                                val verticalIntervals = createIntervalSetFromFlags(userOptions.intSetVertFlags)
-                                val mbtis = MBTI.listFromIntervals(
-                                    if(verticalIntervals.contains(-1)) createIntervalSetFromFlags(userOptions.intSetVertFlags).toSet()
-                                    else verticalIntervals.toSet()
-                                )
+                                val mbtis = MBTI.listFromIntervals(verticalIntervals.toSortedSet())
                                 val isOn = mbtis.isNotEmpty()
                                 val nl = newLineOrNot(mbtis, 4)
                                 val text = if (!isOn) lang.mbti else "${lang.mbti}: $nl${
@@ -1182,24 +1180,24 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                         mbtiDialogData.value = MultiListDialogData(
                                             true,
                                             MBTI.values().map{"${it}    ${it.stringOfPlanets(getZodiacPlanets(model.zodiacFlags.value!!.third))}\n  ${it.character}"},
-                                            intsFromMbtis.toSet(),
+                                            intsFromMbtis.toSortedSet(),
                                             dialogTitle = lang.selectMbti,
                                             affectsHorizontallySymbol,
                                             model.MBTIaffectsHorizontally,
                                         ) { indices, affectsHorizontally ->
                                             if(indices.isNotEmpty()) {
                                                 val intervals = MBTI.intervalsFromIndices(indices).toList()
-                                                model.createVerticalIntervalSet(intervals, "AppScaffold")
-                                                model.saveVerticalIntervalSet("AppScaffold")
+
                                                 if(affectsHorizontally) {
                                                     model.MBTIaffectsHorizontally = true
-                                                    val horFlags = createFlagsFromIntervalSet(intervals)
-                                                    model.createHorizontalIntervalSet(horFlags)
-                                                    model.updateUserOptions("intSetHorFlags", horFlags)
+                                                    model.createAndSaveAllIntervals(intervals)
                                                 } else {
-                                                    model.dispatchIntervals()
                                                     model.MBTIaffectsHorizontally = false
+                                                    model.createVerticalIntervalSet(intervals, "AppScaffold")
+                                                    model.saveVerticalIntervalSet("AppScaffold")
+                                                    model.dispatchIntervals()
                                                 }
+
                                             }
                                             mbtiDialogData.value =
                                                 MultiListDialogData(itemList = detectorDialogData.value.itemList)

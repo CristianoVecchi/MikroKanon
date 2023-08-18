@@ -35,13 +35,17 @@ enum class MBTI(val character: String, val intervals: Set<Int>){
     }
     companion object {
         fun listFromIntervals(intervals: Set<Int>): List<MBTI> {
+            //println("intervals from MBTI: $intervals")
+            val unique = values().filter{ intervals == it.intervals}
+            if(unique.size == 1) return unique
             val list = values().filter{ intervals.containsAll(it.intervals) }
+            //return list
             return if(intervals.containsAll(listOf(5,7))) list.filter{ it.intervals.containsAll(listOf(5,7))}
             else list.filter{ !it.intervals.containsAll(listOf(5,7))}
         }
         fun intervalsFromIndices(indices: List<Int>): Set<Int>{
             return values().filterIndexed{i, _-> indices.contains(i)}
-                .fold(mutableListOf<Int>()){ acc, v -> acc.addAll(v.intervals); acc}.toSet()
+                .fold(mutableListOf<Int>()){ acc, v -> acc.addAll(v.intervals); acc}.toSortedSet()
         }
 
     }

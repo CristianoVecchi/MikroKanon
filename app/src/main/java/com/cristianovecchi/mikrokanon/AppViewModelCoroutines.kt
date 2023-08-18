@@ -16,9 +16,9 @@ fun AppViewModel.findCounterpointsByMikroKanons2(){
             val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(
                 AppViewModel.MAX_NOTES_MK_2
             )
-            newList = mikroKanons2(sequence,intervalSet.value!!, 7)
+            newList = mikroKanons2(sequence,intervalSetVertical.value!!, 7)
                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
-                .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                 .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
         }
         changeCounterpointsWithLimitAndCache(newList, true, AppViewModel.MAX_VISIBLE_COUNTERPOINTS * 2)
@@ -30,18 +30,18 @@ fun AppViewModel.findCounterpointsByMikroKanons3(){
             val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(
                 AppViewModel.MAX_NOTES_MK_3
             )
-            val key = AppViewModel.CacheKey(sequence, intervalSet.value!!)
+            val key = AppViewModel.CacheKey(sequence, intervalSetVertical.value!!)
             if(mk3cache.containsKey(key)) {
                 changeCounterpointsWithLimitAndCache(mk3cache[key]!!.first, true)
             }else {
                 val newList: List<Counterpoint>
                 _elaborating.value = true
                 withContext(Dispatchers.Default) {
-                    newList = mikroKanons3(sequence,intervalSet.value!!,
+                    newList = mikroKanons3(sequence,intervalSetVertical.value!!,
                         AppViewModel.MAX_DEPTH_MK_3
                     )
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
-                        .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                        .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimitAndCache(newList, true, AppViewModel.MAX_VISIBLE_COUNTERPOINTS * 2,
@@ -57,7 +57,7 @@ fun AppViewModel.findCounterpointsByMikroKanons4(){
         if(sequenceToMikroKanons.value!!.isNotEmpty()) {
             val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList()
                 .take( if(deepSearch) AppViewModel.MAX_NOTES_MK_4DEEP else AppViewModel.MAX_NOTES_MK_4)
-            val key = AppViewModel.CacheKey(sequence, intervalSet.value!!)
+            val key = AppViewModel.CacheKey(sequence, intervalSetVertical.value!!)
             if(mk4cache.containsKey(key) && !deepSearch) {
                 changeCounterpointsWithLimitAndCache(mk4cache[key]!!.first, true)
             }else if(mk4deepSearchCache.containsKey(key) && deepSearch) {
@@ -70,11 +70,11 @@ fun AppViewModel.findCounterpointsByMikroKanons4(){
                         mikroKanons4(this.coroutineContext.job,
                             sequence,
                             deepSearch,
-                            intervalSet.value!!,
+                            intervalSetVertical.value!!,
                             AppViewModel.MAX_VISIBLE_COUNTERPOINTS
                         )
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                            .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                            .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSetVertical.value!!) }
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                     }
                     //val newList: List<Counterpoint> = def.await()
@@ -93,7 +93,7 @@ fun AppViewModel.findCounterpointsByMikroKanons5reducted() {
             val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(
                 AppViewModel.MAX_NOTES_MK_5RED
             )
-            val key = AppViewModel.CacheKey(sequence, intervalSet.value!!)
+            val key = AppViewModel.CacheKey(sequence, intervalSetVertical.value!!)
             if (mk5reductedCache.containsKey(key) ) {
                 changeCounterpointsWithLimitAndCache(mk5reductedCache[key]!!.first, true)
             } else {
@@ -104,11 +104,11 @@ fun AppViewModel.findCounterpointsByMikroKanons5reducted() {
                         mikroKanons5reducted(
                             this.coroutineContext.job,
                             sequence,
-                            intervalSet.value!!,
+                            intervalSetVertical.value!!,
                             AppViewModel.MAX_VISIBLE_COUNTERPOINTS
                         )
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                            .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                            .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSetVertical.value!!) }
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                     }
                     //val newList: List<Counterpoint> = def.await()
@@ -126,7 +126,7 @@ fun AppViewModel.findCounterpointsByMikroKanons6reducted() {
             val sequence = sequenceToMikroKanons.value!!.map { it.abstractNote }.toList().take(
                 AppViewModel.MAX_NOTES_MK_6RED
             )
-            val key = AppViewModel.CacheKey(sequence, intervalSet.value!!)
+            val key = AppViewModel.CacheKey(sequence, intervalSetVertical.value!!)
             if (mk6reductedCache.containsKey(key) ) {
                 changeCounterpointsWithLimitAndCache(mk6reductedCache[key]!!.first, true)
             } else {
@@ -137,11 +137,11 @@ fun AppViewModel.findCounterpointsByMikroKanons6reducted() {
                         mikroKanons6reducted(
                             this.coroutineContext.job,
                             sequence,
-                            intervalSet.value!!,
+                            intervalSetVertical.value!!,
                             AppViewModel.MAX_VISIBLE_COUNTERPOINTS
                         )
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                            .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                            .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSetVertical.value!!) }
                             .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                     }
                     //val newList: List<Counterpoint> = def.await()
@@ -156,7 +156,7 @@ fun AppViewModel.findCounterpointsByMikroKanons6reducted() {
 fun AppViewModel.findMazes(intSequences: List<List<Int>>) {
     viewModelScope.launch(Dispatchers.Main) {
         val sequence = intSequences.reduce{ acc, seq -> acc + seq }
-        val key = AppViewModel.CacheKey(sequence, intervalSet.value!!)
+        val key = AppViewModel.CacheKey(sequence, intervalSetVertical.value!!)
         if (mazeCache.containsKey(key) ) {
             changeCounterpointsWithLimitAndCache(mazeCache[key]!!.first, true)
         } else {
@@ -165,9 +165,9 @@ fun AppViewModel.findMazes(intSequences: List<List<Int>>) {
                 // val def = async(Dispatchers.Default + MKjob) {
                 val maxNotesInMaze = AppViewModel.MAX_NOTES_IN_MAZE[intSequences.size]
                 val newList = withContext(Dispatchers.Default) {
-                    maze(this.coroutineContext.job, intSequences.map{it.take(maxNotesInMaze)}, intervalSet.value!!)
+                    maze(this.coroutineContext.job, intSequences.map{it.take(maxNotesInMaze)}, intervalSetVertical.value!!)
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
-                        .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSet.value!!) }
+                        .pmapIf(spread != 0) { it.spreadAsPossible(intervalSet = intervalSetVertical.value!!) }
                         .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 }
                 changeCounterpointsWithLimitAndCache(newList, true, AppViewModel.MAX_VISIBLE_COUNTERPOINTS, Pair(mazeCache, key))
@@ -182,8 +182,8 @@ fun AppViewModel.flourishCounterpoints(originalCounterpoints: List<Counterpoint>
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = flourish(originalCounterpoints, intervalSet.value!!, intervalSetHorizontal.value!!.toList())
-                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                newList = flourish(originalCounterpoints, intervalSetVertical.value!!, intervalSetHorizontal.value!!.toList())
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimitAndCache(newList, true)
@@ -246,7 +246,7 @@ fun AppViewModel.duplicateAllPhrasesInCounterpoint(originalCounterpoint: Counter
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = duplicateAllInCounterpoint(originalCounterpoint)
-                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimitAndCache(newList, true)
@@ -259,11 +259,11 @@ fun AppViewModel.paradeOnCounterpoint(originalCounterpoint: Counterpoint){
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = paradeAllOnCounterpoint(originalCounterpoint, 1, MAX_PARTS,
-                                            intervalSet.value!!, intervalSetHorizontal.value!!,
+                                            intervalSetVertical.value!!, intervalSetHorizontal.value!!,
                                             cadenzaValues.extractIntsFromCsv(),
                                             resolutioValues.first.toSet(), resolutioValues.second.extractIntsFromCsv(),
                                             HarmonizationType.values()[resolutioValues.third])
-                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                     .sortedByDescending { it.parts.size }
             }
@@ -279,9 +279,9 @@ fun AppViewModel.overlapBothCounterpoints(counterpoint1st: Counterpoint, counter
             withContext(Dispatchers.Default){
                 newList = overlapCounterpointsSortingByFaults(
                     this.coroutineContext.job,
-                    counterpoint1st, counterpoint2nd, intervalSet.value!!,
+                    counterpoint1st, counterpoint2nd, intervalSetVertical.value!!,
                     AppViewModel.MAX_PARTS, crossover)
-                newList = if(spread != 0) newList.pmap{it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                newList = if(spread != 0) newList.pmap{it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                 else newList
             }
@@ -296,7 +296,7 @@ fun AppViewModel.glueBothCounterpoints(counterpoint1st: Counterpoint, counterpoi
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = glueCounterpoints(counterpoint1st, counterpoint2nd)
-                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimitAndCache(newList, true)
@@ -321,7 +321,7 @@ fun AppViewModel.eraseIntervalsOnCounterpoints(originalCounterpoints: List<Count
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = sortColumnsOnCounterpoints(originalCounterpoints, sortType)
-                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimitAndCache(newList, true)
@@ -334,7 +334,7 @@ fun AppViewModel.chessAllCounterpoints(originalCounterpoints: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = chessOnCounterpoints(originalCounterpoints, range)
-                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimitAndCache(newList, true)
@@ -373,7 +373,7 @@ fun AppViewModel.singleOnCounterpoints(originalCounterpoints: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = reduceCounterpointsToSinglePart(originalCounterpoints)
-                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimitAndCache(newList, true)
@@ -396,7 +396,7 @@ fun AppViewModel.singleOnCounterpoints(originalCounterpoints: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
                 newList = explodeCounterpointsToDoppelgänger(originalCounterpoints, AppViewModel.MAX_PARTS)
-                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .pmapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
             changeCounterpointsWithLimitAndCache(newList, true)
@@ -435,7 +435,7 @@ fun AppViewModel.tritoneSubstitutionOnCounterpoints(originalCounterpoints: List<
             withContext(Dispatchers.Default){
                 newList = originalCounterpoints.map{ it.tritoneSubstitution() }
             }
-            changeIntervalSet(tritoneSubstitutionOnIntervalSet(verticalIntervalSet))
+            changeIntervalSetVertical(tritoneSubstitutionOnIntervalSet(verticalIntervalSet))
             changeCounterpointsWithLimitAndCache(newList, false)
             changeSelectedCounterpoint(counterpoints.value!![index])
         }
@@ -459,7 +459,7 @@ fun AppViewModel.findPedal(nPedals: Int, list: ArrayList<Clip>?){
     val counterpoint = list?.let{ Counterpoint.counterpointFromClipList(list)} ?: selectedCounterpoint.value!!
     viewModelScope.launch(Dispatchers.Main){
         withContext(Dispatchers.Default){
-            newList = listOf(findPedalsOnCounterpoint(nPedals, counterpoint, intervalSet.value!!))
+            newList = listOf(findPedalsOnCounterpoint(nPedals, counterpoint, intervalSetVertical.value!!))
             //newIntervalSet = pair.second
         }
         //changeIntervalSet(newIntervalSet)
@@ -470,7 +470,7 @@ fun AppViewModel.findWavesFromSequence(nWaves: Int){
     var newList: List<Counterpoint>
     viewModelScope.launch(Dispatchers.Main){
         withContext(Dispatchers.Default){
-            newList = waves(listOf(Counterpoint.counterpointFromClipList(firstSequence.value!!)), intervalSet.value!! ,intervalSetHorizontal.value!!, nWaves)
+            newList = waves(listOf(Counterpoint.counterpointFromClipList(firstSequence.value!!)), intervalSetVertical.value!! ,intervalSetHorizontal.value!!, nWaves)
         }
         changeCounterpointsWithLimitAndCache(newList, true)
     }
@@ -480,9 +480,9 @@ fun AppViewModel.findWavesOnCounterpoints(originalCounterpoints: List<Counterpoi
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = waves(originalCounterpoints,intervalSet.value!!, intervalSetHorizontal.value!!, nWaves)
+                newList = waves(originalCounterpoints,intervalSetVertical.value!!, intervalSetHorizontal.value!!, nWaves)
                     .sortedBy { it.emptiness }//.take(maxVisibleCounterpoints)
-                    .mapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                    .mapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                     .sortedBy { it.emptiness }
             }
             changeCounterpointsWithLimitAndCache(newList, true)
@@ -494,9 +494,9 @@ fun AppViewModel.findFreeParts(trend: TREND){
     val directions = trend.directions.filter{ intervalSetHorizontal.value!!.contains(it)}
     viewModelScope.launch(Dispatchers.Main){
         withContext(Dispatchers.Default){
-            newList = freeParts(selectedCounterpoint.value!!,  intervalSet.value!!, directions)
+            newList = freeParts(selectedCounterpoint.value!!,  intervalSetVertical.value!!, directions)
                 .sortedBy { it.emptiness }//.take(maxVisibleCounterpoints)
-                .mapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSet.value!!)}
+                .mapIf(spread != 0){it.spreadAsPossible(intervalSet = intervalSetVertical.value!!)}
                 .sortedBy { it.emptiness }
         }
         changeCounterpointsWithLimitAndCache(newList, true)
@@ -507,10 +507,10 @@ fun AppViewModel.addSequenceToCounterpoint(repeat: Boolean){
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = addSequence(selectedCounterpoint.value!! , sequenceToAdd.value!!, intervalSet.value!! ,repeat, 7)
+                newList = addSequence(selectedCounterpoint.value!! , sequenceToAdd.value!!, intervalSetVertical.value!! ,repeat, 7)
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
                     .pmapIf(spread != 0){
-                        it.spreadAsPossible(true, intervalSet = intervalSet.value!!)}
+                        it.spreadAsPossible(true, intervalSet = intervalSetVertical.value!!)}
                     //.map{ it.emptiness = it.findEmptiness(); it}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
             }
@@ -523,10 +523,10 @@ fun AppViewModel.addQuotesToCounterpoint(genres: List<MelodyGenre> = listOf(Melo
         var newList: List<Counterpoint>
         viewModelScope.launch(Dispatchers.Main){
             withContext(Dispatchers.Default){
-                newList = addQuotes(selectedCounterpoint.value!! , genres, intervalSet.value!! ,repeat, 7)
+                newList = addQuotes(selectedCounterpoint.value!! , genres, intervalSetVertical.value!! ,repeat, 7)
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }//.take(maxVisibleCounterpoints)
                     .pmapIf(spread != 0){
-                        it.spreadAsPossible(true, intervalSet = intervalSet.value!!)}
+                        it.spreadAsPossible(true, intervalSet = intervalSetVertical.value!!)}
                     //.map{ it.emptiness = it.findEmptiness(); it}
                     .sortedBy { it.emptiness }.distinctBy { it.getAbsPitches() }
                     //.also { println("n results: ${it.size}") }
