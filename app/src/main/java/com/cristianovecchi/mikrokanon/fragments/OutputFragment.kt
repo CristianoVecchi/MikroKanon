@@ -43,12 +43,12 @@ class OutputFragment: Fragment() {
         model.buildingState.observe(viewLifecycleOwner){
             //println("Building phase: $it")
         }
-        if(model.userOptionsData.value != null && model.userOptionsData.value!!.isNotEmpty()){
-            val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
-            val horizontalIntervalSetFlag = model.userOptionsData.value!![0].intSetHorFlags
-            model.createVerticalIntervalSet(verticalIntervalSetFlag, "OutputFragment")
-            model.createHorizontalIntervalSet(horizontalIntervalSetFlag)
-        }
+//        if(model.userOptionsData.value != null && model.userOptionsData.value!!.isNotEmpty()){
+//            val verticalIntervalSetFlag = model.userOptionsData.value!![0].intSetVertFlags
+//            val horizontalIntervalSetFlag = model.userOptionsData.value!![0].intSetHorFlags
+//            model.createVerticalIntervalSet(verticalIntervalSetFlag, "OutputFragment")
+//            model.createHorizontalIntervalSet(horizontalIntervalSetFlag)
+//        }
         model.userOptionsData.observe(viewLifecycleOwner){
             model.userOptionsData.value.let {
                 if(it!!.isNotEmpty()) {
