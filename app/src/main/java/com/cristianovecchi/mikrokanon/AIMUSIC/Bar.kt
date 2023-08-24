@@ -170,8 +170,28 @@ fun List<Bar>.mergeOnesInMetro(): List<Bar>{
 //    result.forEachIndexed { i, bar ->  println("mergeOneInMetro bar#$i ${bar.metro} ${bar.duration}")}
     return result.toList()
 }
-
+//fun splitByDivisionTest(){
+//    val denominators = listOf(2,4,8,16,32,64)
+//    val divisions = HarmonizationDivision.values()
+//    denominators.forEach { denominator ->
+//        (0..20).forEach { numerator ->
+//            val metro = Pair(numerator, denominator)
+//            val dur = RhythmPatterns.denominatorMidiValue(metro.second) * metro.first
+//            val bar = Bar(metro, 0, dur.toLong())
+//            divisions.forEach { division ->
+//                val bars = listOf(bar).splitByDivision(division)
+//                val durCheck = if(bars.sumOf{it.duration} == bar.duration) {
+//                    "OK!!!"
+//                }  else {
+//                    "ERROR!!!"
+//                }
+//                println("division: ${division.name} = $metro -> ${bars.map{it.metro}.joinToString(" | ")} $durCheck")
+//            }
+//        }
+//    }
+//}
 //fun main(){
+//    splitByDivisionTest()
 //    val metro = Pair(7,2)
 //    val dur = RhythmPatterns.denominatorMidiValue(metro.second) * metro.first
 //    val bar = Bar(metro, 0, dur.toLong())
@@ -211,8 +231,7 @@ data class Bar(var metro: Pair<Int,Int> = METRO_4_4, val tick: Long, var duratio
         } else this.chord1!!.absoluteNotes.toList()
     }
     fun splitByDuration(durationMetro:Pair<Int,Int>): List<Bar> {
-        val duration =
-            RhythmPatterns.denominatorMidiValue(durationMetro.second) * durationMetro.first
+        val duration = RhythmPatterns.denominatorMidiValue(durationMetro.second) * durationMetro.first
         val barDur = this.duration.toInt()
         if (duration >= barDur) return listOf(this)
         val unitDur = RhythmPatterns.denominatorMidiValue(durationMetro.second)

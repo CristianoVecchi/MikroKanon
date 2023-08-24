@@ -3,7 +3,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 import com.cristianovecchi.mikrokanon.locale.NoteNamesIt
 
 enum class MelodyGenre {
-    GREGORIAN, CHORALE, DODECAPHONY, BEBOP, COUPLE, TRIPLE, SCALES//, QUADRUPLE, ALBERTI,
+    GREGORIAN, CHORALE, DODECAPHONY, BEBOP, COUPLE, TRIPLE, ONDA, ALBERTI, SCALES//, QUADRUPLE, ALBERTI,
     ;
     fun getQuotesByGenre(): List<List<Int>>{
         return when (this){
@@ -13,6 +13,8 @@ enum class MelodyGenre {
             BEBOP -> BebopQuotes.values().map { it.pitches }
             COUPLE -> CoupleQuotes.values().map { it.pitches }
             TRIPLE -> TripleQuotes.values().map { it.pitches }
+            ONDA -> OndaQuotes.values().map { it.pitches }
+            ALBERTI -> AlbertiQuotes.values().map { it.pitches }
             SCALES -> ScalesQuotes.values().map{ it.pitches }
         }
     }
@@ -24,6 +26,8 @@ enum class MelodyGenre {
             BEBOP -> BebopQuotes.values().map { it.name }
             COUPLE -> CoupleQuotes.values().map { it.name }
             TRIPLE -> TripleQuotes.values().map { it.name }
+            ONDA -> OndaQuotes.values().map { it.name }
+            ALBERTI -> AlbertiQuotes.values().map { it.name }
             SCALES -> ScalesQuotes.values().map{ it.name }
         }
     }
@@ -358,6 +362,50 @@ enum class TripleQuotes(val pitches: List<Int>){
     MAJ3_AUG_FOURTH(listOf(60, 64, 70)),
     FOURTH_FOURTH(listOf(60, 65, 70)),
     FOURTH_AUG_FOURTH(listOf(60, 65, 71)),
+}
+enum class OndaQuotes(val pitches: List<Int>){
+    ONDA_MIN2_MIN2(listOf(60, 61, 62, 61)),
+    ONDA_MIN2_MAJ2(listOf(60, 61, 63, 61)),
+    ONDA_MIN2_MIN3(listOf(60, 61, 64, 61)),
+    ONDA_MIN2_MAJ3(listOf(60, 61, 65, 61)),
+    ONDA_MIN2_FOURTH(listOf(60, 61, 66, 61)),
+    ONDA_MIN2_AUG_FOURTH(listOf(60, 61, 67, 61)),
+    ONDA_MAJ2_MAJ2(listOf(60, 62, 64, 62)),
+    ONDA_MAJ2_MIN3(listOf(60, 62, 65, 62)),
+    ONDA_MAJ2_MAJ3(listOf(60, 62, 66, 62)),
+    ONDA_MAJ2_FOURTH(listOf(60, 62, 67, 62)),
+    ONDA_MAJ2_AUG_FOURTH(listOf(60, 62, 68, 62)),
+    ONDA_MIN3_MIN3(listOf(60, 63, 66, 63)),
+    ONDA_MIN3_MAJ3(listOf(60, 63, 67, 63)),
+    ONDA_MIN3_FOURTH(listOf(60, 63, 68, 63)),
+    ONDA_MIN3_AUG_FOURTH(listOf(60, 63, 69, 63)),
+    ONDA_MAJ3_MAJ3(listOf(60, 64, 68, 64)),
+    ONDA_MAJ3_FOURTH(listOf(60, 64, 69, 64)),
+    ONDA_MAJ3_AUG_FOURTH(listOf(60, 64, 70, 64)),
+    ONDA_FOURTH_FOURTH(listOf(60, 65, 70, 65)),
+    ONDA_FOURTH_AUG_FOURTH(listOf(60, 65, 71, 65)),
+}
+enum class AlbertiQuotes(val pitches: List<Int>){
+    ALBERTI_MIN2_MIN2(listOf(60, 62, 61, 62)),
+    ALBERTI_MIN2_MAJ2(listOf(60, 63, 61, 63)),
+    ALBERTI_MIN2_MIN3(listOf(60, 64, 61, 64)),
+    ALBERTI_MIN2_MAJ3(listOf(60, 65, 61, 65)),
+    ALBERTI_MIN2_FOURTH(listOf(60, 66, 61, 66)),
+    ALBERTI_MIN2_AUG_FOURTH(listOf(60, 67, 61, 67)),
+    ALBERTI_MAJ2_MAJ2(listOf(60, 64, 62, 64)),
+    ALBERTI_MAJ2_MIN3(listOf(60, 65, 62, 65)),
+    ALBERTI_MAJ2_MAJ3(listOf(60, 66, 62, 66)),
+    ALBERTI_MAJ2_FOURTH(listOf(60, 67, 62, 67)),
+    ALBERTI_MAJ2_AUG_FOURTH(listOf(60, 68, 62, 68)),
+    ALBERTI_MIN3_MIN3(listOf(60, 66, 63, 66)),
+    ALBERTI_MIN3_MAJ3(listOf(60, 67, 63, 67)),
+    ALBERTI_MIN3_FOURTH(listOf(60, 68, 63, 68)),
+    ALBERTI_MIN3_AUG_FOURTH(listOf(60, 69, 63, 69)),
+    ALBERTI_MAJ3_MAJ3(listOf(60, 68, 64, 68)),
+    ALBERTI_MAJ3_FOURTH(listOf(60, 69, 64, 69)),
+    ALBERTI_MAJ3_AUG_FOURTH(listOf(60, 70, 64, 70)),
+    ALBERTI_FOURTH_FOURTH(listOf(60, 70, 65, 70)),
+    ALBERTI_FOURTH_AUG_FOURTH(listOf(60, 71, 65, 71)),
 }
 enum class ScalesQuotes(val pitches: List<Int>){
     LYDIAN_DOM(listOf(60,62,64,66,67,69,70)),
