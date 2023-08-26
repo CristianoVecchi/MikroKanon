@@ -43,16 +43,29 @@ fun List<Bar>.splitByDivision(division: HarmonizationDivision): List<Bar>{
         HarmonizationDivision.HALVES -> this.splitBarsInTwoParts()
         HarmonizationDivision.THIRDS -> this.splitBarsInThreeParts()
         HarmonizationDivision.QUARTERS -> this.splitBarsInTwoParts().splitBarsInTwoParts()
+
         HarmonizationDivision.DUR_9_8 -> this.map{ it.splitByDuration(Pair(9,8))}.flatten()
-        HarmonizationDivision.DUR_4_4 -> this.map{ it.splitByDuration(Pair(4,4))}.flatten()
+        HarmonizationDivision.DUR_8_8 -> this.map{ it.splitByDuration(Pair(8,8))}.flatten()
         HarmonizationDivision.DUR_7_8 -> this.map{ it.splitByDuration(Pair(7,8))}.flatten()
-        HarmonizationDivision.DUR_3_4 -> this.map{ it.splitByDuration(Pair(3,4))}.flatten()
+        HarmonizationDivision.DUR_6_8 -> this.map{ it.splitByDuration(Pair(6,8))}.flatten()
         HarmonizationDivision.DUR_5_8 -> this.map{ it.splitByDuration(Pair(5,8))}.flatten()
-        HarmonizationDivision.DUR_2_4 -> this.map{ it.splitByDuration(Pair(2,4))}.flatten()
+        HarmonizationDivision.DUR_4_8 -> this.map{ it.splitByDuration(Pair(4,8))}.flatten()
         HarmonizationDivision.DUR_3_8 -> this.map{ it.splitByDuration(Pair(3,8))}.flatten()
-        HarmonizationDivision.DUR_1_4 -> this.map{ it.splitByDuration(Pair(1,4))}.flatten()
+        HarmonizationDivision.DUR_2_8 -> this.map{ it.splitByDuration(Pair(2,8))}.flatten()
         HarmonizationDivision.DUR_1_8 -> this.map{ it.splitByDuration(Pair(1,8))}.flatten()
 
+        HarmonizationDivision.DUR_4_4 -> this.map{ it.splitByDuration(Pair(4,4))}.flatten()
+        HarmonizationDivision.DUR_3_4 -> this.map{ it.splitByDuration(Pair(3,4))}.flatten()
+        HarmonizationDivision.DUR_2_4 -> this.map{ it.splitByDuration(Pair(2,4))}.flatten()
+        HarmonizationDivision.DUR_1_4 -> this.map{ it.splitByDuration(Pair(1,4))}.flatten()
+
+        HarmonizationDivision.DUR_7_16 -> this.map{ it.splitByDuration(Pair(7,16))}.flatten()
+        HarmonizationDivision.DUR_5_16 -> this.map{ it.splitByDuration(Pair(5,16))}.flatten()
+        HarmonizationDivision.DUR_3_16 -> this.map{ it.splitByDuration(Pair(3,16))}.flatten()
+
+        HarmonizationDivision.DUR_7_32 -> this.map{ it.splitByDuration(Pair(7,32))}.flatten()
+        HarmonizationDivision.DUR_5_32 -> this.map{ it.splitByDuration(Pair(5,32))}.flatten()
+        HarmonizationDivision.DUR_3_32 -> this.map{ it.splitByDuration(Pair(3,32))}.flatten()
     }
 //        .also {
 //        println("Original bars: ${this.size} $this")
@@ -171,10 +184,11 @@ fun List<Bar>.mergeOnesInMetro(): List<Bar>{
     return result.toList()
 }
 //fun splitByDivisionTest(){
-//    val denominators = listOf(2,4,8,16,32,64)
+//    val denominators = listOf(2,4,8,16)
 //    val divisions = HarmonizationDivision.values()
+//    val errors = mutableListOf<String>()
 //    denominators.forEach { denominator ->
-//        (0..20).forEach { numerator ->
+//        (0..16).forEach { numerator ->
 //            val metro = Pair(numerator, denominator)
 //            val dur = RhythmPatterns.denominatorMidiValue(metro.second) * metro.first
 //            val bar = Bar(metro, 0, dur.toLong())
@@ -183,30 +197,19 @@ fun List<Bar>.mergeOnesInMetro(): List<Bar>{
 //                val durCheck = if(bars.sumOf{it.duration} == bar.duration) {
 //                    "OK!!!"
 //                }  else {
+//                    errors.add("$numerator/$denominator->${division.symbol}")
 //                    "ERROR!!!"
 //                }
 //                println("division: ${division.name} = $metro -> ${bars.map{it.metro}.joinToString(" | ")} $durCheck")
+//                println("ticks: ${bars.joinToString(",") { it.tick.toString() }}  durs: ${bars.joinToString(",") { it.duration.toString() }}")
 //            }
+//
 //        }
+//        println("ERRORS: $errors")
 //    }
 //}
 //fun main(){
 //    splitByDivisionTest()
-//    val metro = Pair(7,2)
-//    val dur = RhythmPatterns.denominatorMidiValue(metro.second) * metro.first
-//    val bar = Bar(metro, 0, dur.toLong())
-//    bar.splitByDuration(Pair(1,8)).also{
-//        println("original bar: $bar")
-//        println("split bars:")
-//        it.forEach { bar ->
-//            println(bar)
-//        }
-//        if(it.sumOf{it.duration} == bar.duration) {
-//            println("Duration integrity is preserved.")
-//        } else {
-//            println("Duration integrity is corrupted!!!")
-//        }
-//    }
 //}
 data class Bar(var metro: Pair<Int,Int> = METRO_4_4, val tick: Long, var duration: Long,
                var dodecaByte1stHalf: Int? = null, var dodecaByte2ndHalf: Int? = null,
@@ -231,23 +234,41 @@ data class Bar(var metro: Pair<Int,Int> = METRO_4_4, val tick: Long, var duratio
         } else this.chord1!!.absoluteNotes.toList()
     }
     fun splitByDuration(durationMetro:Pair<Int,Int>): List<Bar> {
-        val duration = RhythmPatterns.denominatorMidiValue(durationMetro.second) * durationMetro.first
+        val numerator = durationMetro.first
+        val denominator = durationMetro.second
+        val duration = RhythmPatterns.denominatorMidiValue(denominator) * numerator
         val barDur = this.duration.toInt()
         if (duration >= barDur) return listOf(this)
-        val unitDur = RhythmPatterns.denominatorMidiValue(durationMetro.second)
+        val unitDur = RhythmPatterns.denominatorMidiValue(denominator)
         val nTimes = barDur / duration
         val rest = barDur - duration * nTimes
         //println("rest % unitDur: ${rest % unitDur}")
         if (rest % unitDur == 0) {
             val result = mutableListOf<Bar>()
             var tick = this.tick
-            (0 until nTimes).forEach {
-                result.add(Bar(durationMetro, tick, duration.toLong()))
-                tick += duration
+            if(rest == unitDur && nTimes > 1){
+                (0 until nTimes -1).forEach { _ ->
+                    result.add(Bar(durationMetro, tick, duration.toLong()))
+                    tick += duration
+                }
+                val lastTwoNumerator = numerator + 1
+                val lastNumerator = lastTwoNumerator / 2
+                val secondLastNumerator = lastNumerator + lastTwoNumerator % 2
+                val secondLastDur = secondLastNumerator * unitDur
+                result.add(Bar(Pair(secondLastNumerator, denominator), tick, secondLastDur.toLong()))
+                tick += secondLastDur
+                result.add(Bar(Pair(lastNumerator, denominator), tick, lastNumerator * unitDur.toLong()))
+            } else {
+
+                (0 until nTimes).forEach { _ ->
+                    result.add(Bar(durationMetro, tick, duration.toLong()))
+                    tick += duration
+                }
+                if(rest != 0){
+                    result.add(Bar(Pair(rest / unitDur, denominator), tick, rest.toLong()))
+                }
             }
-            if(rest != 0){
-                result.add(Bar(Pair(rest / unitDur, durationMetro.second), tick, rest.toLong()))
-            }
+
 
             return result
         } else {

@@ -39,7 +39,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-data class DerivedData(val first: AppColors, val second: List<Int>, val third: List<Int>, val fourth: Int)
+data class DerivedData(val first: AppColors, val second: List<Int>, val third: List<Int>, val fourth: List<Int>)
 
 @Composable
 fun ResultDisplay(model: AppViewModel,
@@ -95,11 +95,12 @@ fun ResultDisplay(model: AppViewModel,
                 model.appColors,
                 createIntervalSetFromFlags(userOptionsData[0].detectorFlags),
                 (1..userOptionsData[0].detectorExtension).toList(),
-                userOptionsData[0].intSetHorFlags
+                //userOptionsData[0].intSetHorFlags
+                model.intervalSetHorizontal.value!!
             )
-        } else DerivedData(model.appColors, listOf(), listOf(), 127)
+        } else DerivedData(model.appColors, listOf(), listOf(), listOf(0,1,2,3,4,5,6,7,8,9,10,11))
     }
-    val (colors, detectorIntervalSet, detectorExtensions, horFlags) = quadruple
+    val (colors, detectorIntervalSet, detectorExtensions, horIntervals) = quadruple
     val language by model.language.asFlow().collectAsState(initial = Lang.provideLanguage(model.getUserLangDef()))
     val notesNames = language.noteNames
     val zodiacFlags by model.zodiacFlags.asFlow().collectAsState(initial = Triple(false,false,false))
@@ -350,7 +351,7 @@ fun ResultDisplay(model: AppViewModel,
                             buttonSize = buttonSize, colors = colors
                         ) {
                             if (!elaborating) {
-
+                                val horFlags = createFlagsFromIntervalSet(horIntervals)
                                 val intsFromFlags = convertFlagsToInts(horFlags)
                                 val intervalNames = if(zodiacPlanetsActive) getZodiacPlanets(zodiacEmojisActive) else language.intervalSet.map{ it.replace("\n"," / ") }
                                 intervalSetDialogData.value = MultiListDialogData(true, intervalNames,

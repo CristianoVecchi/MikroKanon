@@ -34,7 +34,11 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
                     HarmonizationType.FULL12 -> createFull12HarmonizedTrack(chordsTrack, barGroup,  diffChordVelocity, octaves, chordsChannel)
                     else -> {}
                 }
-
+                HarmonizationStyle.ATTACCO -> {
+                    val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
+                    createAttacco(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,
+                        diffChordVelocity, diffChordVelocity / 2, justVoicing, density)
+                }
                 HarmonizationStyle.RIBATTUTO -> {
                     val absPitches = findAbsPitches(barGroup, type, chordsTrack, chordsChannel)
                     createRibattuto(style, chordsTrack, chordsChannel, barGroup, absPitches, octaves,

@@ -9,19 +9,29 @@ enum class HarmonizationType(val title: String) {
     XWH("XW HARMONY"), FULL12("FULL 12")
 }
 enum class HarmonizationDivision(val symbol: String) {
-    WHOLE("[ ]"),
+    WHOLE("[  ]"),
     HALVES("[ | ]"),
     THIRDS("[ | | ]"),
     QUARTERS("[ | | | ]"),
     DUR_9_8("9/8"),
-    DUR_4_4("4/4"),
+    DUR_8_8("8/8"),
     DUR_7_8("7/8"),
-    DUR_3_4("3/4"),
+    DUR_6_8("6/8"),
     DUR_5_8("5/8"),
-    DUR_2_4("2/4"),
+    DUR_4_8("4/8"),
     DUR_3_8("3/8"),
-    DUR_1_4("1/4"),
+    DUR_2_8("2/8"),
     DUR_1_8("1/8"),
+    DUR_4_4("4/4"),
+    DUR_3_4("3/4"),
+    DUR_2_4("2/4"),
+    DUR_1_4("1/4"),
+    DUR_7_16("7/16"),
+    DUR_5_16("5/16"),
+    DUR_3_16("3/16"),
+    DUR_7_32("7/32"),
+    DUR_5_32("5/32"),
+    DUR_3_32("3/32"),
 }
 enum class HarmonizationDirection(val symbol: String) {
     ASCENDING("➚"), DESCENDING("➘"), RANDOM("~");
@@ -45,8 +55,10 @@ enum class StyleType {
     CHORDS, TEXTURES, PATTERNS, LINES, AERIALS, ALEA
 }
 
-enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val hasFlow: Boolean, val increase: Int, val type: StyleType, val maxDensity: Int = 1) {
+enum class HarmonizationStyle(val title: String, val hasDirection: Boolean, val hasFlow: Boolean,
+                              val increase: Int, val type: StyleType, val maxDensity: Int = 1) {
     ACCORDO("Accordo", false, false,0, StyleType.CHORDS),
+    ATTACCO("Attacco", false, false,0, StyleType.CHORDS, 15),
    // DRAMMATICO("Drammatico", false, false,0, StyleType.CHORDS),
     RIBATTUTO("Ribattuto", false, false,0, StyleType.CHORDS, 6),
     //RIBATTUTO_3("Ribattuto 3", false, false,0, StyleType.CHORDS),

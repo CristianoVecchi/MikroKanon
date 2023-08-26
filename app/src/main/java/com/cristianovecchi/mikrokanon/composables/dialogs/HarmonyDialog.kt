@@ -361,7 +361,8 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                         8,
                                         6,
                                         4,
-                                        2
+                                        2,
+                                        1
                                     )
                                     harmTypeDialogData.value = ListDialogData(
                                         true,
