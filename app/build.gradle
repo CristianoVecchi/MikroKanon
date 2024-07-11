@@ -10,15 +10,15 @@ plugins {
 android {
     namespace 'com.cristianovecchi.mikrokanon'
 
-    compileSdk 33
+    compileSdk 34
 //    buildToolsVersion '30.0.3'
 
     defaultConfig {
         applicationId "com.cristianovecchi.mikrokanon"
         minSdk 22
-        targetSdk 33
-        versionCode 12
-        versionName "1.1.1"
+        targetSdk 34
+        versionCode 16
+        versionName "1.1.5"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -52,7 +52,7 @@ android {
 //        kotlinCompilerExtensionVersion compose_version
 //        kotlinCompilerVersion '1.4.32'
 //    }
-    compileSdkVersion 33
+    compileSdkVersion 34
 //    buildToolsVersion '30.0.3'
 }
 
