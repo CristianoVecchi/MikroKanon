@@ -7,34 +7,37 @@ import java.text.DateFormat
 import java.util.*
 
 enum class LANGUAGES(val language:String){
-    ar("العربية"),
-    de("Deutsch"),
-    el("Ελληνικά"),en("English"),es("Español"),
-    fr("Français"),
-    hi("हिन्दी"),id("Bahasa Indonesia"),it("Italiano"),
-    ko("한국어") ,ja("日本語"),
-     pt("Português"), ru("Русский"),
-    sw("Kiswahili"), uk("Українська"), zh("中文");
+    AR("العربية"),
+    DE("Deutsch"),
+    EL("Ελληνικά"),EN("English"),ES("Español"),
+    FI("Suomen kieli"),FR("Français"),
+    HI("हिन्दी"),
+    ID("Bahasa Indonesia"), IT("Italiano"), IS("Íslenska"),
+    KO("한국어") ,JA("日本語"),
+    PL("Język polski"),PT("Português"), RU("Русский"),
+    SW("Kiswahili"), TH("ภาษาไทย"),
+    UK("Українська"), ZH("中文");
     companion object {
         fun languageNameFromDef(langDef: String): String {
             return when (langDef) {
-                "ar" -> ar.language
-                "de" -> de.language
-                "el" -> el.language
-                "en" -> en.language
-                "es" -> es.language
-                "fr" -> fr.language
-                "ko" -> ko.language
-                "ja" -> ja.language
-                "hi" -> hi.language
-                "id" -> id.language
-                "it" -> it.language
-                "pt" -> pt.language
-                "ru" -> ru.language
-                "sw" -> sw.language
-                "uk" -> uk.language
-                "zh" -> zh.language
-                else -> en.language
+                "AR" -> AR.language
+                "DE" -> DE.language
+                "EL" -> EL.language
+                "EN" -> EN.language
+                "ES" -> ES.language
+                "FR" -> FR.language
+                "KO" -> KO.language
+                "JA" -> JA.language
+                "HI" -> HI.language
+                "ID" -> ID.language
+                "IS" -> IS.language
+                "IT" -> IT.language
+                "PT" -> PT.language
+                "RU" -> RU.language
+                "SW" -> SW.language
+                "UK" -> UK.language
+                "ZH" -> ZH.language
+                else -> EN.language
             }
         }
     }
@@ -44,7 +47,10 @@ enum class LANGUAGES(val language:String){
 enum class NoteNamesPt {
     Dó,Ré,Mi,Fá,Sol,Lá,Si,EMPTY
 }
-
+// Icelandic and German use C D E F G A H/B
+//enum class NoteNames?? {
+//    Do,Re,Mí,Fa,Sol,La,Tí,EMPTY
+//}
 enum class NoteNamesIt {
     Do,Re,Mi,Fa,Sol,La,Si,EMPTY
 }
@@ -79,6 +85,11 @@ val synthsNames = listOf(
     "Bowed Glass", "Metal Pad", "Halo Pad", "Sweep Pad",
     "Ice Rain", "Soundtrack", "Crystal", "Atmosphere",
 "Brightness", "Goblins", "Echo Drops", "Sci Fi")
+
+
+
+
+
 val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية","غاميلان", "ساكسفون", "فلوت",
     "ضعف القصب", "كلارينيت","بوق فرنسي",  "مزمار", "تشيلو", "بيانو","قيثار","بييرو","الباروك","أوتار نتف","جوقة","مرعب")
 val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente","Gamelan", "Saxophone", "Flöten",
@@ -87,28 +98,35 @@ val ensembleNamesEl = listOf("Έγχόρδα", "Ξύλινα πνευστά τη
     "Διπλά καλάμια", "Κλαρινέτ", "Κέρατα", "Φαγκότα", "Βιολοντσέλα", "Πιάνο","Άρπα", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές","Χορωδία","Στοιχειωμένος")
 val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Gamelan", "Saxophones", "Flutes",
     "Double reeds", "Clarinets", "French horns", "Bassoons", "Cellos", "Piano","Harp","Pierrot","Baroque","Plucked strings","Choir","Spooky")
-
 val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal","Gamelán", "Saxofones", "Flautas",
     "Cañas dobles", "Clarinetes", "Trompas", "Fagotes", "Violonchelos", "Piano","Arpa", "Pierrot","Barroco","Instrumentos de cuerda pulsada","Coro","Escalofriante")
+val ensembleNamesFi = listOf("Jousisoittimet", "Puupuhaltimet", "Jousiorkesteri", "Vaskipuhaltimet", "Gamelan", "Saksofonit", "Huilut",
+    "Kaksoisruoko", "Klarinetit", "Käyrätorvit", "Fagottit", "Sellot", "Piano", "Harppu", "Pierrot", "Barokki", "Kynnitty kielet", "Kuoro", "Aavemainen")
+val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Gamelan","Saxophones", "Flûtes",
+    "Anches doubles", "Clarinettes", "Cors", "Bassons", "Violoncelles", "Piano","Harpe", "Pierrot","Baroque","Cordes pincées","Chorale","Sinistre")
 val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기","가믈란", "색소폰", "플루트",
     "더블 리드", "클라리넷", "프렌치 호른", "바순", "첼로 스", "피아노","하프","피에로","바로크","발현악기","합창","유령 같은")
 val ensembleNamesJa = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器","ガムラン","サックス", "フルート",
     "ダブルリード", "クラリネット", "ホルン", "ファゴット", "チェロ", "ピアノ","ハープ", "ピエロ", "バロック","撥弦楽器","合唱","不気味な")
-val ensembleNamesId = listOf("Alat musik dawai membungkuk", "Instrumen musik tiup kayu", "Orkestra dawai", "Instrumen musik tiup logam", "Gamelan","Saxophone", "Seruling",
-    "Alang-alang ganda", "Klarinet", "Tanduk", "Bassoon", "Cellos", "Piano", "Harpa", "Pierrot", "Baroque", "Dawai yang dipetik","Paduan suara","Menyeramkan")
-val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni","Gamelan", "Saxofoni", "Flauti",
-    "Ance doppie", "Clarinetti", "Corni", "Fagotti", "Violoncelli", "Pianoforte","Arpa","Pierrot","Barocco", "Corde pizzicate","Coro","Spooky")
-val ensembleNamesPt = listOf("Cordas friccionadas", "Madeiras", "Orquestra de cordas", "Metais","Gamelão","Saxofones", "Flautas",
-    "Palhetas duplas", "Clarinetes", "Trompas", "Fagotes", "Violoncelos", "Piano","Harpa", "Pierrot", "Barroco", "Cordas dedilhadas","Coro","Assustador")
-val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Gamelan","Saxophones", "Flûtes",
-    "Anches doubles", "Clarinettes", "Cors", "Bassons", "Violoncelles", "Piano","Harpe", "Pierrot","Baroque","Cordes pincées","Chorale","Sinistre")
 val ensembleNamesHi = listOf("झुका हुआ यंत्र", "वुडविंड उपकरण", "स्ट्रिंग ऑर्केस्ट्रा", "धातु पवन यंत्र","गमेलन", "सैक्सोफोन", "बांसुरी",
     "डबल रीड", "क्लैरिनेट", "फ्रेंच हॉर्न", "बासून", "सेलोस", "पियानो","वीणा","पिय्रोट","बरोक","प्लक्ड स्ट्रिंग इंस्ट्रूमेंट्स","वृन्दगान","डरावना")
+val ensembleNamesId = listOf("Alat musik dawai membungkuk", "Instrumen musik tiup kayu", "Orkestra dawai", "Instrumen musik tiup logam", "Gamelan","Saxophone", "Seruling",
+    "Alang-alang ganda", "Klarinet", "Tanduk", "Bassoon", "Cellos", "Piano", "Harpa", "Pierrot", "Baroque", "Dawai yang dipetik","Paduan suara","Menyeramkan")
+val ensembleNamesIs = listOf("Strengir", "Blásarhljóðfæri", "Strengjasveit", "Málmblásturshljóðfæri", "Gamelan", "Saxófónar", "Flautur",
+    "Tvöfaldur reyr", "Klarínettur", "Frönsk horn", "Fagottar", "Selló", "Píanó", "Harpa", "Pierrot", "Barokk", "Plokkaðir strengir", "Kór", "Skuggalegt")
+val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni","Gamelan", "Saxofoni", "Flauti",
+    "Ance doppie", "Clarinetti", "Corni", "Fagotti", "Violoncelli", "Pianoforte","Arpa","Pierrot","Barocco", "Corde pizzicate","Coro","Spooky")
+val ensembleNamesPl = listOf("Smyczki", "Dęte drewniane", "Orkiestra smyczkowa", "Instrumenty dęte blaszane", "Gamelan", "Saksofony", "Flety",
+    "Podwójne stroiki", "Klarnety", "Waltornie", "Fagoty", "Wiolonczele", "Fortepian", "Harfa", "Pierrot", "Barokowy", "Sznurki szarpane", "Chór", "Straszny")
+val ensembleNamesPt = listOf("Cordas friccionadas", "Madeiras", "Orquestra de cordas", "Metais","Gamelão","Saxofones", "Flautas",
+    "Palhetas duplas", "Clarinetes", "Trompas", "Fagotes", "Violoncelos", "Piano","Harpa", "Pierrot", "Barroco", "Cordas dedilhadas","Coro","Assustador")
 val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты","Гамелан", "Саксофоны", "Флейты",
     "Двойной тростью", "Кларнеты", "Валторны", "Фаготы", "Виолончели", "Фортепиано","Арфа", "Пьеро","Барокко","Струнные щипковые инструменты","Хор","Пугающий")
 val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao", "Orchestra ya ala za nyuzi", "Vyombo vya upepo vya chuma",
     "Gamelan", "Saxophones", "Zilizimbi","Mwanzi mara mbili", "Clarinets", "Pembe za Kifaransa", "Bassoons", "Cellos", "Piano", "Kinubi",
     "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa","Kwaya","Ya kutisha")
+val ensembleNamesTh = listOf("เครื่องสาย", "เครื่องลมไม้", "เครื่องสายออร์เคสตรา", "ทองเหลือง", "กาเมลัน", "แซกโซโฟน", "ฟลุต",
+    "ไม้อ้อคู่", "คลาริเน็ต", "เฟรนช์ฮอร์น", "บาสซูน", "เชลโล", "เปียโน", "ฮาร์ป", "เปียโรต์", "บาโรก", "ตามแบบบะโรค", "นักร้องประสานเสียง", "น่ากลัว")
 val ensembleNamesUk = listOf("Смичкові", "Дерев'яні духові", "Струнний оркестр", "Мідні духові", "Гамелан", "Саксофони", "Флейти",
     "Подвійний очерет", "Кларнети", "Валторни", "Фаготи", "Віолончелі", "фортепіано","арфа", "П'єро","бароко","Пощипані струни","Хор","моторошний")
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器","甘美蘭", "薩氏管", "长笛",
@@ -426,25 +444,429 @@ data class Lang( // English by default
 
     companion object {
         fun provideLanguage(lang: String): Lang {
-            return when (lang){
-                "ar" -> arabian()
-                "de" -> german()
-                "el" -> greek()
-                "en" -> english()
-                "es" -> spanish()
-                "fr" -> french()
-                "hi" -> hindi()
-                "ko" -> korean()
-                "ja" -> japanese()
-                "id" -> bahasa()
-                "it" -> italian()
-                "pt" -> portugues()
-                "ru" -> russian()
-                "sw" -> kiswahili()
-                "uk" -> ukranian()
-                "zh" -> chinese()
+            return when (lang.uppercase()){
+                "AR" -> arabian()
+                "DE" -> german()
+                "EL" -> greek()
+                "EN" -> english()
+                "ES" -> spanish()
+                "FI" -> finnish()
+                "FR" -> french()
+                "HI" -> hindi()
+                "KO" -> korean()
+                "JA" -> japanese()
+                "ID" -> bahasa()
+                "IS" -> icelandic()
+                "IT" -> italian()
+                "PL" -> polish()
+                "PT" -> portugues()
+                "RU" -> russian()
+                "SW" -> kiswahili()
+                "TH" -> thai()
+                "UK" -> ukranian()
+                "ZH" -> chinese()
                 else -> Lang()
             }
+        }
+        fun finnish(): Lang {
+            return Lang(
+                noteNames = NoteNamesEn.values().map { it.toString() },
+                intervalSet = intervalSetIt,
+                ensemble = "Organico",
+                enterSomeNotes = "Digita delle note!",
+                choose2ndSequence = "Scegli la seconda sequenza!",
+                chooseAnotherSequence = "Scegli un'altra sequenza!",
+                selectQuoteGenres= "Seleziona i generi per la citazione!",
+                repeatSequence = "Ripeti la sequenza",
+                selectEnsemble = "Scegli un organico!",
+                ensembleNames = ensembleNamesFi,
+                range = "Estensione",
+                selectRange = "Scegli un'estensione!",
+                rangeOptions = listOf("Libera", "Dello strumento", "Delimitata", "Quasi chiusa", "Chiusa"),
+                articulation = "Articolazione",
+                selectArticulation = "Scegli le alterazioni dell'articolazione!",
+                selectMelody ="Seleziona un tipo di melodia!",
+                melody = "Melodia",
+                //melodyOptions = listOf("Lineare","Ampia"),
+                selectGlissando = "Scegli gli intervalli per il glissando!",
+                selectVibrato = "Scegli l'intensità del vibrato!",
+                nuancesOptions = listOf("Nessuna", "In rilievo le note brevi", "In rilievo le note lunghe"),
+                nuances = "Nuances",
+                selectNuances = "Scegli le nuances per la dinamica!",
+                harmony = "Armonia",
+                selectHarmonizationType = "Scegli il tipo di armonizzazione!",
+                selectHarmonizationDivision = "Scegli la divisione della battuta!",
+                selectHarmonizationInstruments = "Scegli gli strumenti dell'armonizzazione!",
+                selectHarmonizationVolume = "Scegli il volume dell'armonizzazione!",
+                selectOctaves = "Seleziona le ottave!",
+                selectHarmonizationStyle = "Seleziona lo stile di armonizzazione!",
+                selectStyleDensity = "Seleziona la densità dello stile!",
+                drums = "Batteria",
+                selectDrumsType = "Scegli lo stile della batteria!",
+                selectDrumKit = "Scegli il tipo di batteria!",
+                selectDrumsVolume = "Scegli il volume della batteria!",
+                selectDrumsDensity = "Scegli la densità della batteria!",
+                selectDrumsResize = "Seleziona il ridimensionamento del pattern ritmico!",
+                checkAndReplace = "Individua e sostituisci",
+                //selectPitchRange = "Scegli un'estensione!",
+                selectCheckType  = "Seleziona il tipo di individuazione!",
+                selectReplaceType  = "Seleziona il tipo di sostituzione!",
+                selectStress  = "Seleziona lo stress della sostituzione!",
+                chordsToEnhance= "Accordi da esaltare",
+                selectChordsToEnhance= "Selezionare l'accordo da esaltare!",
+                enhanceChordsInTranspositions= "Mantenere gli accordi esaltati nelle trasposizioni",
+                dynamics = "Dinamica",
+                selectDynamicAlterations ="Scegli le alterazioni della dinamica!",
+                beatsPerMinute = "Pulsazioni al minuto",
+                selectRhythm = "Scegli un ritmo!",
+                selectDoubling = "Scegli degli intervalli per il raddoppio!",
+                doublingNames = doublingIt,
+                selectAudio8D = "Seleziona le voci in AUDIO 8D!",
+                rhythm = "Ritmo",
+                shuffle = "Shuffle",
+                selectShuffle = "Seleziona lo shuffle!",
+                rhythmShuffle  = "Mescola il ritmo",
+                partsShuffle  = "Mescola le parti",
+                rowForms = "Forme seriali",
+                selectRowForms = "Scegli le forme seriali!",
+                original = "Originale",
+                retrograde  = "Retrogrado",
+                inverse  = "Inverso",
+                invRetrograde  = "Inverso del retrogrado",
+                selectRitornello = "Scegli quante ripetizioni!",
+                transpose = "Trasponi",
+                selectTranspositions = "Scegli le trasposizioni!",
+                doubling  = "Raddoppi",
+                spreadWherePossible  = "Estendi dove è possibile",
+                deepSearch  = "Ricerca approfondita nei canoni a quattro parti",
+                horIntervalSet = "Intervalli delle parti libere",
+                detector = "Rilevatore",
+                selectIntervalsToDetect = "Scegli gli intervalli da rilevare!",
+                detectorExtension = "Raggio del rilevatore",
+                selectDetectorExtension = "Scegli il raggio del rilevatore!",
+                exportMidi  = "Esporta il file MIDI",
+                customColors = "Colori",
+                counterpointView = "Vista",
+                selectCounterpointView = "Seleziona una vista contrappuntistica!",
+                counterpointViewOptions = listOf("Note", "Biglie", "Quantum"),
+                language  = "Lingua",
+                zodiac = "Zodiaco",
+                zodiacOptions = listOf("Pianeti", "Segni", "Emojis"),
+                selectZodiac = "Usa questi simboli zodiacali:" ,
+                selectMbti= "Seleziona l'MBTI per cambiare gli intervalli!",
+                selectSpecialFunction = "Scegli una funzione!",
+                selectCadenzaForm = "Scegli una forma di cadenza!",
+                selectResolutioForm = "Scegli una forma di resolutio!",
+                selectFormatForm = "Scegli una forma di formato!",
+                selectToOverlap = "Scegli un contrappunto da sovrapporre!",
+                selectToCrossOver = "Scegli un contrappunto da embricare!",
+                selectToGlue = "Scegli un contrappunto da incollare!",
+                selectChessRange = "Seleziona un intervallo per la scacchiera!",
+                addSequencesToMaze = "Aggiungi altre sequenze al labirinto!",
+                selectHorizontalIntervals = "Scegli gli intervalli melodici per le funzioni!",
+                clearSlots = "Svuota i vani",
+                selectSlots = "Scegli i vani da svuotare!",
+            )
+        }
+        fun icelandic(): Lang {
+            return Lang(
+                noteNames = NoteNamesEn.values().map { it.toString() },
+                intervalSet = intervalSetIt,
+                ensemble = "Organico",
+                enterSomeNotes = "Digita delle note!",
+                choose2ndSequence = "Scegli la seconda sequenza!",
+                chooseAnotherSequence = "Scegli un'altra sequenza!",
+                selectQuoteGenres= "Seleziona i generi per la citazione!",
+                repeatSequence = "Ripeti la sequenza",
+                selectEnsemble = "Scegli un organico!",
+                ensembleNames = ensembleNamesIs,
+                range = "Estensione",
+                selectRange = "Scegli un'estensione!",
+                rangeOptions = listOf("Libera", "Dello strumento", "Delimitata", "Quasi chiusa", "Chiusa"),
+                articulation = "Articolazione",
+                selectArticulation = "Scegli le alterazioni dell'articolazione!",
+                selectMelody ="Seleziona un tipo di melodia!",
+                melody = "Melodia",
+                //melodyOptions = listOf("Lineare","Ampia"),
+                selectGlissando = "Scegli gli intervalli per il glissando!",
+                selectVibrato = "Scegli l'intensità del vibrato!",
+                nuancesOptions = listOf("Nessuna", "In rilievo le note brevi", "In rilievo le note lunghe"),
+                nuances = "Nuances",
+                selectNuances = "Scegli le nuances per la dinamica!",
+                harmony = "Armonia",
+                selectHarmonizationType = "Scegli il tipo di armonizzazione!",
+                selectHarmonizationDivision = "Scegli la divisione della battuta!",
+                selectHarmonizationInstruments = "Scegli gli strumenti dell'armonizzazione!",
+                selectHarmonizationVolume = "Scegli il volume dell'armonizzazione!",
+                selectOctaves = "Seleziona le ottave!",
+                selectHarmonizationStyle = "Seleziona lo stile di armonizzazione!",
+                selectStyleDensity = "Seleziona la densità dello stile!",
+                drums = "Batteria",
+                selectDrumsType = "Scegli lo stile della batteria!",
+                selectDrumKit = "Scegli il tipo di batteria!",
+                selectDrumsVolume = "Scegli il volume della batteria!",
+                selectDrumsDensity = "Scegli la densità della batteria!",
+                selectDrumsResize = "Seleziona il ridimensionamento del pattern ritmico!",
+                checkAndReplace = "Individua e sostituisci",
+                //selectPitchRange = "Scegli un'estensione!",
+                selectCheckType  = "Seleziona il tipo di individuazione!",
+                selectReplaceType  = "Seleziona il tipo di sostituzione!",
+                selectStress  = "Seleziona lo stress della sostituzione!",
+                chordsToEnhance= "Accordi da esaltare",
+                selectChordsToEnhance= "Selezionare l'accordo da esaltare!",
+                enhanceChordsInTranspositions= "Mantenere gli accordi esaltati nelle trasposizioni",
+                dynamics = "Dinamica",
+                selectDynamicAlterations ="Scegli le alterazioni della dinamica!",
+                beatsPerMinute = "Pulsazioni al minuto",
+                selectRhythm = "Scegli un ritmo!",
+                selectDoubling = "Scegli degli intervalli per il raddoppio!",
+                doublingNames = doublingIt,
+                selectAudio8D = "Seleziona le voci in AUDIO 8D!",
+                rhythm = "Ritmo",
+                shuffle = "Shuffle",
+                selectShuffle = "Seleziona lo shuffle!",
+                rhythmShuffle  = "Mescola il ritmo",
+                partsShuffle  = "Mescola le parti",
+                rowForms = "Forme seriali",
+                selectRowForms = "Scegli le forme seriali!",
+                original = "Originale",
+                retrograde  = "Retrogrado",
+                inverse  = "Inverso",
+                invRetrograde  = "Inverso del retrogrado",
+                selectRitornello = "Scegli quante ripetizioni!",
+                transpose = "Trasponi",
+                selectTranspositions = "Scegli le trasposizioni!",
+                doubling  = "Raddoppi",
+                spreadWherePossible  = "Estendi dove è possibile",
+                deepSearch  = "Ricerca approfondita nei canoni a quattro parti",
+                horIntervalSet = "Intervalli delle parti libere",
+                detector = "Rilevatore",
+                selectIntervalsToDetect = "Scegli gli intervalli da rilevare!",
+                detectorExtension = "Raggio del rilevatore",
+                selectDetectorExtension = "Scegli il raggio del rilevatore!",
+                exportMidi  = "Esporta il file MIDI",
+                customColors = "Colori",
+                counterpointView = "Vista",
+                selectCounterpointView = "Seleziona una vista contrappuntistica!",
+                counterpointViewOptions = listOf("Note", "Biglie", "Quantum"),
+                language  = "Lingua",
+                zodiac = "Zodiaco",
+                zodiacOptions = listOf("Pianeti", "Segni", "Emojis"),
+                selectZodiac = "Usa questi simboli zodiacali:" ,
+                selectMbti= "Seleziona l'MBTI per cambiare gli intervalli!",
+                selectSpecialFunction = "Scegli una funzione!",
+                selectCadenzaForm = "Scegli una forma di cadenza!",
+                selectResolutioForm = "Scegli una forma di resolutio!",
+                selectFormatForm = "Scegli una forma di formato!",
+                selectToOverlap = "Scegli un contrappunto da sovrapporre!",
+                selectToCrossOver = "Scegli un contrappunto da embricare!",
+                selectToGlue = "Scegli un contrappunto da incollare!",
+                selectChessRange = "Seleziona un intervallo per la scacchiera!",
+                addSequencesToMaze = "Aggiungi altre sequenze al labirinto!",
+                selectHorizontalIntervals = "Scegli gli intervalli melodici per le funzioni!",
+                clearSlots = "Svuota i vani",
+                selectSlots = "Scegli i vani da svuotare!",
+            )
+        }
+        fun polish(): Lang {
+            return Lang(
+                noteNames = NoteNamesEn.values().map { it.toString() },
+                intervalSet = intervalSetIt,
+                ensemble = "Organico",
+                enterSomeNotes = "Digita delle note!",
+                choose2ndSequence = "Scegli la seconda sequenza!",
+                chooseAnotherSequence = "Scegli un'altra sequenza!",
+                selectQuoteGenres= "Seleziona i generi per la citazione!",
+                repeatSequence = "Ripeti la sequenza",
+                selectEnsemble = "Scegli un organico!",
+                ensembleNames = ensembleNamesPl,
+                range = "Estensione",
+                selectRange = "Scegli un'estensione!",
+                rangeOptions = listOf("Libera", "Dello strumento", "Delimitata", "Quasi chiusa", "Chiusa"),
+                articulation = "Articolazione",
+                selectArticulation = "Scegli le alterazioni dell'articolazione!",
+                selectMelody ="Seleziona un tipo di melodia!",
+                melody = "Melodia",
+                //melodyOptions = listOf("Lineare","Ampia"),
+                selectGlissando = "Scegli gli intervalli per il glissando!",
+                selectVibrato = "Scegli l'intensità del vibrato!",
+                nuancesOptions = listOf("Nessuna", "In rilievo le note brevi", "In rilievo le note lunghe"),
+                nuances = "Nuances",
+                selectNuances = "Scegli le nuances per la dinamica!",
+                harmony = "Armonia",
+                selectHarmonizationType = "Scegli il tipo di armonizzazione!",
+                selectHarmonizationDivision = "Scegli la divisione della battuta!",
+                selectHarmonizationInstruments = "Scegli gli strumenti dell'armonizzazione!",
+                selectHarmonizationVolume = "Scegli il volume dell'armonizzazione!",
+                selectOctaves = "Seleziona le ottave!",
+                selectHarmonizationStyle = "Seleziona lo stile di armonizzazione!",
+                selectStyleDensity = "Seleziona la densità dello stile!",
+                drums = "Batteria",
+                selectDrumsType = "Scegli lo stile della batteria!",
+                selectDrumKit = "Scegli il tipo di batteria!",
+                selectDrumsVolume = "Scegli il volume della batteria!",
+                selectDrumsDensity = "Scegli la densità della batteria!",
+                selectDrumsResize = "Seleziona il ridimensionamento del pattern ritmico!",
+                checkAndReplace = "Individua e sostituisci",
+                //selectPitchRange = "Scegli un'estensione!",
+                selectCheckType  = "Seleziona il tipo di individuazione!",
+                selectReplaceType  = "Seleziona il tipo di sostituzione!",
+                selectStress  = "Seleziona lo stress della sostituzione!",
+                chordsToEnhance= "Accordi da esaltare",
+                selectChordsToEnhance= "Selezionare l'accordo da esaltare!",
+                enhanceChordsInTranspositions= "Mantenere gli accordi esaltati nelle trasposizioni",
+                dynamics = "Dinamica",
+                selectDynamicAlterations ="Scegli le alterazioni della dinamica!",
+                beatsPerMinute = "Pulsazioni al minuto",
+                selectRhythm = "Scegli un ritmo!",
+                selectDoubling = "Scegli degli intervalli per il raddoppio!",
+                doublingNames = doublingIt,
+                selectAudio8D = "Seleziona le voci in AUDIO 8D!",
+                rhythm = "Ritmo",
+                shuffle = "Shuffle",
+                selectShuffle = "Seleziona lo shuffle!",
+                rhythmShuffle  = "Mescola il ritmo",
+                partsShuffle  = "Mescola le parti",
+                rowForms = "Forme seriali",
+                selectRowForms = "Scegli le forme seriali!",
+                original = "Originale",
+                retrograde  = "Retrogrado",
+                inverse  = "Inverso",
+                invRetrograde  = "Inverso del retrogrado",
+                selectRitornello = "Scegli quante ripetizioni!",
+                transpose = "Trasponi",
+                selectTranspositions = "Scegli le trasposizioni!",
+                doubling  = "Raddoppi",
+                spreadWherePossible  = "Estendi dove è possibile",
+                deepSearch  = "Ricerca approfondita nei canoni a quattro parti",
+                horIntervalSet = "Intervalli delle parti libere",
+                detector = "Rilevatore",
+                selectIntervalsToDetect = "Scegli gli intervalli da rilevare!",
+                detectorExtension = "Raggio del rilevatore",
+                selectDetectorExtension = "Scegli il raggio del rilevatore!",
+                exportMidi  = "Esporta il file MIDI",
+                customColors = "Colori",
+                counterpointView = "Vista",
+                selectCounterpointView = "Seleziona una vista contrappuntistica!",
+                counterpointViewOptions = listOf("Note", "Biglie", "Quantum"),
+                language  = "Lingua",
+                zodiac = "Zodiaco",
+                zodiacOptions = listOf("Pianeti", "Segni", "Emojis"),
+                selectZodiac = "Usa questi simboli zodiacali:" ,
+                selectMbti= "Seleziona l'MBTI per cambiare gli intervalli!",
+                selectSpecialFunction = "Scegli una funzione!",
+                selectCadenzaForm = "Scegli una forma di cadenza!",
+                selectResolutioForm = "Scegli una forma di resolutio!",
+                selectFormatForm = "Scegli una forma di formato!",
+                selectToOverlap = "Scegli un contrappunto da sovrapporre!",
+                selectToCrossOver = "Scegli un contrappunto da embricare!",
+                selectToGlue = "Scegli un contrappunto da incollare!",
+                selectChessRange = "Seleziona un intervallo per la scacchiera!",
+                addSequencesToMaze = "Aggiungi altre sequenze al labirinto!",
+                selectHorizontalIntervals = "Scegli gli intervalli melodici per le funzioni!",
+                clearSlots = "Svuota i vani",
+                selectSlots = "Scegli i vani da svuotare!",
+            )
+        }
+        fun thai(): Lang {
+            return Lang(
+                noteNames = NoteNamesEn.values().map { it.toString() },
+                intervalSet = intervalSetIt,
+                ensemble = "Organico",
+                enterSomeNotes = "Digita delle note!",
+                choose2ndSequence = "Scegli la seconda sequenza!",
+                chooseAnotherSequence = "Scegli un'altra sequenza!",
+                selectQuoteGenres= "Seleziona i generi per la citazione!",
+                repeatSequence = "Ripeti la sequenza",
+                selectEnsemble = "Scegli un organico!",
+                ensembleNames = ensembleNamesTh,
+                range = "Estensione",
+                selectRange = "Scegli un'estensione!",
+                rangeOptions = listOf("Libera", "Dello strumento", "Delimitata", "Quasi chiusa", "Chiusa"),
+                articulation = "Articolazione",
+                selectArticulation = "Scegli le alterazioni dell'articolazione!",
+                selectMelody ="Seleziona un tipo di melodia!",
+                melody = "Melodia",
+                //melodyOptions = listOf("Lineare","Ampia"),
+                selectGlissando = "Scegli gli intervalli per il glissando!",
+                selectVibrato = "Scegli l'intensità del vibrato!",
+                nuancesOptions = listOf("Nessuna", "In rilievo le note brevi", "In rilievo le note lunghe"),
+                nuances = "Nuances",
+                selectNuances = "Scegli le nuances per la dinamica!",
+                harmony = "Armonia",
+                selectHarmonizationType = "Scegli il tipo di armonizzazione!",
+                selectHarmonizationDivision = "Scegli la divisione della battuta!",
+                selectHarmonizationInstruments = "Scegli gli strumenti dell'armonizzazione!",
+                selectHarmonizationVolume = "Scegli il volume dell'armonizzazione!",
+                selectOctaves = "Seleziona le ottave!",
+                selectHarmonizationStyle = "Seleziona lo stile di armonizzazione!",
+                selectStyleDensity = "Seleziona la densità dello stile!",
+                drums = "Batteria",
+                selectDrumsType = "Scegli lo stile della batteria!",
+                selectDrumKit = "Scegli il tipo di batteria!",
+                selectDrumsVolume = "Scegli il volume della batteria!",
+                selectDrumsDensity = "Scegli la densità della batteria!",
+                selectDrumsResize = "Seleziona il ridimensionamento del pattern ritmico!",
+                checkAndReplace = "Individua e sostituisci",
+                //selectPitchRange = "Scegli un'estensione!",
+                selectCheckType  = "Seleziona il tipo di individuazione!",
+                selectReplaceType  = "Seleziona il tipo di sostituzione!",
+                selectStress  = "Seleziona lo stress della sostituzione!",
+                chordsToEnhance= "Accordi da esaltare",
+                selectChordsToEnhance= "Selezionare l'accordo da esaltare!",
+                enhanceChordsInTranspositions= "Mantenere gli accordi esaltati nelle trasposizioni",
+                dynamics = "Dinamica",
+                selectDynamicAlterations ="Scegli le alterazioni della dinamica!",
+                beatsPerMinute = "Pulsazioni al minuto",
+                selectRhythm = "Scegli un ritmo!",
+                selectDoubling = "Scegli degli intervalli per il raddoppio!",
+                doublingNames = doublingIt,
+                selectAudio8D = "Seleziona le voci in AUDIO 8D!",
+                rhythm = "Ritmo",
+                shuffle = "Shuffle",
+                selectShuffle = "Seleziona lo shuffle!",
+                rhythmShuffle  = "Mescola il ritmo",
+                partsShuffle  = "Mescola le parti",
+                rowForms = "Forme seriali",
+                selectRowForms = "Scegli le forme seriali!",
+                original = "Originale",
+                retrograde  = "Retrogrado",
+                inverse  = "Inverso",
+                invRetrograde  = "Inverso del retrogrado",
+                selectRitornello = "Scegli quante ripetizioni!",
+                transpose = "Trasponi",
+                selectTranspositions = "Scegli le trasposizioni!",
+                doubling  = "Raddoppi",
+                spreadWherePossible  = "Estendi dove è possibile",
+                deepSearch  = "Ricerca approfondita nei canoni a quattro parti",
+                horIntervalSet = "Intervalli delle parti libere",
+                detector = "Rilevatore",
+                selectIntervalsToDetect = "Scegli gli intervalli da rilevare!",
+                detectorExtension = "Raggio del rilevatore",
+                selectDetectorExtension = "Scegli il raggio del rilevatore!",
+                exportMidi  = "Esporta il file MIDI",
+                customColors = "Colori",
+                counterpointView = "Vista",
+                selectCounterpointView = "Seleziona una vista contrappuntistica!",
+                counterpointViewOptions = listOf("Note", "Biglie", "Quantum"),
+                language  = "Lingua",
+                zodiac = "Zodiaco",
+                zodiacOptions = listOf("Pianeti", "Segni", "Emojis"),
+                selectZodiac = "Usa questi simboli zodiacali:" ,
+                selectMbti= "Seleziona l'MBTI per cambiare gli intervalli!",
+                selectSpecialFunction = "Scegli una funzione!",
+                selectCadenzaForm = "Scegli una forma di cadenza!",
+                selectResolutioForm = "Scegli una forma di resolutio!",
+                selectFormatForm = "Scegli una forma di formato!",
+                selectToOverlap = "Scegli un contrappunto da sovrapporre!",
+                selectToCrossOver = "Scegli un contrappunto da embricare!",
+                selectToGlue = "Scegli un contrappunto da incollare!",
+                selectChessRange = "Seleziona un intervallo per la scacchiera!",
+                addSequencesToMaze = "Aggiungi altre sequenze al labirinto!",
+                selectHorizontalIntervals = "Scegli gli intervalli melodici per le funzioni!",
+                clearSlots = "Svuota i vani",
+                selectSlots = "Scegli i vani da svuotare!",
+            )
         }
         fun english(): Lang {
             return Lang()
