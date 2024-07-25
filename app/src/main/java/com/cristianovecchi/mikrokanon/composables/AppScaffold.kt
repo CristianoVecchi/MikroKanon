@@ -499,7 +499,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                             "Articulation" -> {
                                 //val rangeOptions: List<String> = lang.rangeOptions
                                 val legatoTypes = userOptions.legatoTypes
-                                val ribattutos = getRibattutoSymbols()
+                                //val ribattutos = getRibattutoSymbols()
                                 val description = legatoTypes.describeForArticulation(legatoTypeMap)
                                 val nl = if(description.length<11) "" else "\n"
                                 SelectableCard(
@@ -883,7 +883,8 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                             "Clear Slots" -> {
                                 val timestamps =
                                     if (allCounterpointsData.isNotEmpty()) allCounterpointsData.map {
-                                        if (it == null || it?.timestamp == null || it.timestamp == -1L) ""
+                                        //if (it == null || it?.timestamp == null || it.timestamp == -1L) ""
+                                        if (it.timestamp == -1L) ""
                                         else it.timestamp.toString()
                                     } else List(16) { "" }
                                 val timestampsToDates =

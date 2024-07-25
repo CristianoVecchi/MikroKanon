@@ -26,7 +26,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationType
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
-import com.cristianovecchi.mikrokanon.locale.getNoteAndRestSymbols
+import com.cristianovecchi.mikrokanon.getNoteAndRestSymbols
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 
@@ -156,9 +156,9 @@ fun ResolutioDialog(
                     Row(modifier = modifierB.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween) {
 
-                        val colors = model.appColors
-                        val intervalPadding = 4.dp
-                        val innerPadding = 10.dp
+                        //val colors = model.appColors
+                        //val intervalPadding = 4.dp
+                        //val innerPadding = 10.dp
                         val cadenzaValues = cadenzaText.extractIntsFromCsv()
                         val (noteSymbol, restSymbol) = getNoteAndRestSymbols()
 

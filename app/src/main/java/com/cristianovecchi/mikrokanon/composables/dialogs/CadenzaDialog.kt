@@ -19,7 +19,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
-import com.cristianovecchi.mikrokanon.locale.getNoteAndRestSymbols
+import com.cristianovecchi.mikrokanon.getNoteAndRestSymbols
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 
@@ -28,7 +28,6 @@ fun CadenzaDialog(
     multiNumberDialogData: MutableState<MultiNumberDialogData>,
     parentDialogData: MutableState<ButtonsDialogData>, // is necessary a reference for the parent dialog
     dimensions: Dimensions,
-    okText: String = "OK",
     model: AppViewModel,
     onDismissRequest: () -> Unit = {
         multiNumberDialogData.value =
@@ -46,7 +45,7 @@ fun CadenzaDialog(
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             val fontColor = model.appColors.dialogFontColor
             val backgroundColor = model.appColors.dialogBackgroundColor
-            val model = multiNumberDialogData.value.model
+            //val model = multiNumberDialogData.value.model
             val width = if(dimensions.width <= 884) (dimensions.width / dimensions.dpDensity).toInt().dp
             else dimensions.dialogWidth
             Surface(
@@ -63,7 +62,7 @@ fun CadenzaDialog(
                     val modifierB = Modifier
                         //.fillMaxSize()
                         .weight(1f)
-                    var columnModifier = Modifier.weight(1f)
+                    val columnModifier = Modifier.weight(1f)
                     var cadenzaText by remember { mutableStateOf(multiNumberDialogData.value.value) }
                     val setCadenza = { index: Int, cadenzaValue: Int ->
                         val newCadenza = cadenzaValue.coerceIn(
@@ -75,7 +74,7 @@ fun CadenzaDialog(
                         cadenzaText = cadenzaValues.joinToString(",")
                     }
                     val fontSize = dimensions.dialogFontSize.sp//20.sp // buttons plus & minus
-                    val textSize = 24.sp
+                    //val textSize = 24.sp
                     val fontWeight = FontWeight.Normal
                     val numberFontWeight = FontWeight.Bold
                     val buttonPadding = 4.dp
@@ -85,9 +84,9 @@ fun CadenzaDialog(
                     Row(modifier = modifierA.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween) {
 
-                        val colors = model.appColors
-                        val intervalPadding = 4.dp
-                        val innerPadding = 10.dp
+                        //val colors = model.appColors
+                        //val intervalPadding = 4.dp
+                        //val innerPadding = 10.dp
                         val cadenzaValues = cadenzaText.extractIntsFromCsv()
                         val (noteSymbol, restSymbol) = getNoteAndRestSymbols()
 
@@ -268,8 +267,8 @@ fun CadenzaDialog(
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.Bottom
                         ) {
-                            val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
-                            val buttonSize = dimensions.inputButtonSize - 10.dp
+                            val buttonDimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
+                            val buttonSize = buttonDimensions.inputButtonSize - 10.dp
                             CustomButton(
                                 adaptSizeToIconButton = true,
                                 text = "",

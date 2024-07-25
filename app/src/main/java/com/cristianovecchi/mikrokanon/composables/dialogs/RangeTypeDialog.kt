@@ -26,7 +26,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntPairsFromCsv
-import com.cristianovecchi.mikrokanon.locale.getOctaveSymbols
+import com.cristianovecchi.mikrokanon.getOctaveSymbols
 import com.cristianovecchi.mikrokanon.locale.rangeTypeMap
 import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.ui.Dimensions
@@ -75,7 +75,7 @@ fun RangeTypeDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                     }
                     val fontSize = dimensions.dialogFontSize
                     val fontWeight = FontWeight.Normal
-                    val buttonPadding = 4.dp
+                    //val buttonPadding = 4.dp
                     val listState = rememberLazyListState()
                     val secondListState = rememberLazyListState()
                     Column(modifier = modifierA) {

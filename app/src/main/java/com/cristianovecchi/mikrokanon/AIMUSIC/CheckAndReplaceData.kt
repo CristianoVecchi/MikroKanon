@@ -1,8 +1,8 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.describeWithNotes
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.findIndicesInSection
-import com.cristianovecchi.mikrokanon.locale.describeWithNotes
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -661,23 +661,23 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
 fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>) -> Boolean {
     return when(checkType){
         is CheckType.None -> { _, _, _ -> false }
-        is CheckType.EqualOrGreater -> { trackData, index, trackDataList ->
+        is CheckType.EqualOrGreater -> { trackData, index, _ ->
             trackData.pitches[index]
             trackData.durations[index] >= checkType.limit
         }
-        is CheckType.StartPhrase -> { trackData, index, trackDataList ->
+        is CheckType.StartPhrase -> { trackData, index, _ ->
             trackData.isPreviousRest[index]
         }
-        is CheckType.EndPhrase -> { trackData, index, trackDataList ->
+        is CheckType.EndPhrase -> { trackData, index, _ ->
             trackData.isPreviousRest.getOrElse(index + 1) {true}
         }
-        is CheckType.SingleNote -> { trackData, index, trackDataList ->
+        is CheckType.SingleNote -> { trackData, index, _ ->
             trackData.isPreviousRest[index] && trackData.isPreviousRest.getOrElse(index + 1) {true}
         }
-        is CheckType.AtTheExtremes -> { trackData, index, trackDataList ->
+        is CheckType.AtTheExtremes -> { trackData, index, _ ->
             trackData.isPreviousRest[index] || trackData.isPreviousRest.getOrElse(index + 1) {true}
         }
-        is CheckType.NotAtTheExtremes -> { trackData, index, trackDataList ->
+        is CheckType.NotAtTheExtremes -> { trackData, index, _ ->
             !trackData.isPreviousRest[index] && !trackData.isPreviousRest.getOrElse(index + 1) {true}
         }
     }
@@ -750,7 +750,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
         }
         is ReplaceType.DrammaticoCrescendo, is ReplaceType.DrammaticoCrescDim,
         is ReplaceType.TremoloCrescendo, is ReplaceType.TremoloCrescDim,
-        is ReplaceType.RibattutoCrescendo, is ReplaceType.RibattutoCrescDim -> { trackData, index, trackDataList ->
+        is ReplaceType.RibattutoCrescendo, is ReplaceType.RibattutoCrescDim -> { trackData, index, _ ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
                     = trackData.extractNoteDataAtIndex(index)
             val actualDuration = articulationDuration ?: duration
@@ -814,8 +814,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 }
             }
         }
-        is ReplaceType.SOS -> { trackData, index, trackDataList ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
+        is ReplaceType.SOS -> { trackData, index, _ ->
+            val (pitch, tick, duration, velocity, _, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
             val pattern = RhythmPatterns.SOS.values
             val nElements = pattern.size
             val grain = 24
@@ -837,7 +837,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     if(ribattuto == null) null else listOf(ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto) )
             }
         }
-        is ReplaceType.Accento -> { trackData, index, trackDataList ->
+        is ReplaceType.Accento -> { trackData, index, _ ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
                     = trackData.extractNoteDataAtIndex(index)
             val actualDuration = articulationDuration ?: duration
@@ -887,7 +887,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             }
         }
         is ReplaceType.Cromatica, is ReplaceType.Diatonica,
-        is ReplaceType.CromaticaDiCambio, is ReplaceType.DiatonicaDiCambio -> { trackData, index, trackDataList ->
+        is ReplaceType.CromaticaDiCambio, is ReplaceType.DiatonicaDiCambio -> { trackData, index, _ ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
                     = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
@@ -951,7 +951,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             }
         }
         is ReplaceType.OscillazioneCromatica, is ReplaceType.OscillazioneDiatonica,
-        is ReplaceType.Irregular2m, is ReplaceType.Irregular2M -> { trackData, index, trackDataList ->
+        is ReplaceType.Irregular2m, is ReplaceType.Irregular2M -> { trackData, index, _ ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
                     = trackData.extractNoteDataAtIndex(index)
             val actualDuration = articulationDuration ?: duration
@@ -991,7 +991,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             }
         }
         is ReplaceType.Trillo2mCrescendo, is ReplaceType.Trillo2MCrescendo,
-        is ReplaceType.Trillo2mCrescDim, is ReplaceType.Trillo2MCrescDim -> { trackData, index, trackDataList ->
+        is ReplaceType.Trillo2mCrescDim, is ReplaceType.Trillo2MCrescDim -> { trackData, index, _ ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
             = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
@@ -1054,7 +1054,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                   //.apply { println("TRILLO:$index duration: $duration, artDur: $articulationDuration $this") }
             }
         }
-        is ReplaceType.Mordente -> { trackData, index, trackDataList ->
+        is ReplaceType.Mordente -> { trackData, index, _ ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(
                 index
             )
@@ -1105,7 +1105,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                  //   .apply { println("MORDENTE:$index duration: $duration, artDur: $articulationDuration $this") }
             }
         }
-           is ReplaceType.Mordente3x -> { trackData, index, trackDataList ->
+           is ReplaceType.Mordente3x -> { trackData, index, _ ->
                 val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
                 // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
 
@@ -1153,7 +1153,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                    // .apply { println("MORDENTE 3X:$index duration: $duration, artDur: $articulationDuration $this") }
                 }
             }
-       is ReplaceType.Mordente2x -> { trackData, index, trackDataList ->
+       is ReplaceType.Mordente2x -> { trackData, index, _ ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
             val actualDuration = articulationDuration ?: duration
@@ -1201,7 +1201,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 //    .apply { println("MORDENTE 2X:$index duration: $duration, artDur: $articulationDuration $this") }
             }
         }
-        is ReplaceType.Gruppetto, is ReplaceType.Cambio -> { trackData, index, trackDataList ->
+        is ReplaceType.Gruppetto, is ReplaceType.Cambio -> { trackData, index, _ ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
             val actualDuration = articulationDuration ?: duration
@@ -1258,7 +1258,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 }
             }
         }
-        is ReplaceType.Onda -> { trackData, index, trackDataList ->
+        is ReplaceType.Onda -> { trackData, index, _ ->
             val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
             val actualDuration = articulationDuration ?: duration
@@ -1316,7 +1316,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 }
             }
         }
-    is ReplaceType.Velocity, is ReplaceType.Glissando, is ReplaceType.Attack   -> { trackData, index, trackDataList ->
+    is ReplaceType.Velocity, is ReplaceType.Glissando, is ReplaceType.Attack   -> { trackData, index, _ ->
                 var (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
                 val stress = replaceType.stress
                 var actualDuration = articulationDuration ?: duration

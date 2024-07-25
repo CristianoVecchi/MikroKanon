@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.cristianovecchi.mikrokanon.db.CounterpointDataRepository
 import com.cristianovecchi.mikrokanon.db.SequenceDataRepository
 import com.cristianovecchi.mikrokanon.db.UserOptionsDataRepository
-import com.cristianovecchi.mikrokanon.locale.convertToFileDate
+import com.cristianovecchi.mikrokanon.convertToFileDate
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

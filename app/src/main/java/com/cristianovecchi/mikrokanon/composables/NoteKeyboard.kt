@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.locale.getZodiacSigns
+import com.cristianovecchi.mikrokanon.getZodiacSigns
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.shift
 

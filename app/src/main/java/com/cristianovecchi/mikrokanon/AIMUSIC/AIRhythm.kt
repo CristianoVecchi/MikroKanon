@@ -676,7 +676,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
 }
 fun List<Int>.mergeNegativeValues(): List<Int> {
     val result = mutableListOf<Int>()
-    var index = 0
+    //var index = 0
     var previousIsNegative = false
     this.forEach {
         if(it < 0) {

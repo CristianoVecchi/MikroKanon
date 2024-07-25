@@ -19,7 +19,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
-import com.cristianovecchi.mikrokanon.locale.getNoteAndRestSymbols
+import com.cristianovecchi.mikrokanon.getNoteAndRestSymbols
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 

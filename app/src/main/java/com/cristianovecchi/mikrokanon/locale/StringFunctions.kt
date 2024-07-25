@@ -1,7 +1,9 @@
 package com.cristianovecchi.mikrokanon
 
-import com.cristianovecchi.mikrokanon.locale.getRibattutoSymbols
-import com.cristianovecchi.mikrokanon.locale.rowFormsMap
+import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
+import com.cristianovecchi.mikrokanon.locale.*
+import java.text.DateFormat
+import java.util.*
 import kotlin.math.absoluteValue
 
 fun newLineOrNot(list: Collection<Any>, newLineFromN: Int ): String{
@@ -30,7 +32,7 @@ fun String.extractIntListsFromCsv(): List<List<Int>>{
     val list = this.split(',')
     return list.map{ subList -> subList.split('|').map{it.toInt()}}
 }
-fun  MutableList<Pair<Int,Int>>.toIntPairsString(): String {
+fun MutableList<Pair<Int,Int>>.toIntPairsString(): String {
     return this.joinToString(",") { "${it.first}|${it.second}" }
 }
 fun Pair<Int, Int>.describeSingleRowForm(rowFormsMap: Map<Int, String>, numbers: List<String>): String {
@@ -165,4 +167,95 @@ fun correctLegatos(legatos: String): String {
         }
     }
     return result.zip(result2){a, b -> "$a|$b" }.joinToString(",")//.also{println("res: $it")}
+}
+fun getZodiacPlanets(emojis: Boolean): List<String>{
+    return zodiacPlanets
+//    return if(emojis) {
+//        if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O) zodiacPlanets
+//        else zodiacPlanets
+//    } else zodiacPlanets
+}
+fun getZodiacSigns(emojis: Boolean): List<String>{
+    return if(emojis) return zodiacSignsEmojis else zodiacSigns
+}
+fun getGlissandoSymbols(): Pair<String,String>{
+    return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+        Pair("\uD834\uDDB1", "\uD834\uDDB2")
+    else Pair("➚", "➘")
+}
+fun getVibratoSymbol(): String {
+    return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+        "\u223f"
+    else "~"
+}
+fun getNoteAndRestSymbols(): List<String> {
+    return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+        listOf("\uD834\uDD60" ,"\uD834\uDD3E")
+    else listOf("♪", "-")
+}
+
+fun createGlissandoIntervals(doublingNames: List<String>): List<String>{
+    val symbols = getGlissandoSymbols()
+    val asc = symbols.first
+    val desc = symbols.second
+    return listOf("${doublingNames[0]}$asc", "${doublingNames[0]}$desc",
+        "${doublingNames[1]}$asc", "${doublingNames[1]}$desc", "${doublingNames[2]}$asc", "${doublingNames[2]}$desc",
+        "${doublingNames[3]}$asc", "${doublingNames[3]}$desc",
+        "${doublingNames[4]}$asc", "${doublingNames[4]}$desc", "${doublingNames[5]}$asc", "${doublingNames[5]}$desc",
+        "${doublingNames[6]}$asc", "${doublingNames[6]}$desc", "${doublingNames[7]}$asc", "${doublingNames[7]}$desc",
+        "${doublingNames[8]}$asc", "${doublingNames[8]}$desc", "${doublingNames[9]}$asc", "${doublingNames[9]}$desc",
+        "${doublingNames[10]}$asc", "${doublingNames[10]}$desc", "${doublingNames[11]}$asc", "${doublingNames[11]}$desc")
+}
+fun getDynamicSymbols(): List<String>{
+    return if(android.os.Build.VERSION.SDK_INT >=android.os.Build.VERSION_CODES.O)
+        listOf("\uD834\uDDC8","\uD834\uDD8F\uD834\uDD8F\uD834\uDD8F\uD834\uDD8F","\uD834\uDD8F\uD834\uDD8F\uD834\uDD8F","\uD834\uDD8F\uD834\uDD8F",
+            "\uD834\uDD8F","\uD834\uDD90\uD834\uDD8F","\uD834\uDD90\uD834\uDD91","\uD834\uDD91",
+            "\uD834\uDD91\uD834\uDD91","\uD834\uDD91\uD834\uDD91\uD834\uDD91","\uD834\uDD91\uD834\uDD91\uD834\uDD91\uD834\uDD91","\uD834\uDD91\uD834\uDD91\uD834\uDD91\uD834\uDD91\uD834\uDD91",
+            "\uD834\uDD92", "\uD834\uDD93")
+    else listOf("0","pppp","ppp","pp",  "p","mp","mf","f", "ff", "fff","ffff","fffff","<",">")
+}
+fun getOctaveSymbols(): List<String>{
+    return listOf("➘15","➘8", "", "➚8","➚15", "\u21c58", "\u21c515")
+}
+fun getRibattutoSymbols(): List<String>{
+    return listOf("","", "\"", "\"\'", "\"\"", "\"\"\'", "\"\"\"")
+}
+fun getIntervalsForTranspose(intervalSet: List<String> = intervalSetEn): List<String>{
+    val split = intervalSet.map{ it.split("\n")}
+    return listOf(split[6][0], split[0][0], split[1][0], split[2][0], split[3][0], split[4][0],
+        split[5][0], split[4][1], split[3][1], split[2][1], split[1][1], split[0][1])
+}
+fun IntRange.describeWithNotes(noteNames: List<String>): String{
+    val firstName = Clip.convertAbsToClipText(first % 12, noteNames)
+    val lastName = Clip.convertAbsToClipText(last % 12, noteNames)
+    return "$firstName${first/12-1}-$lastName${last/12-1}"
+}
+fun Int.describeAsNote(noteNames: List<String>): String {
+    val name = Clip.convertAbsToClipText(this % 12, noteNames)
+    return "$name${this/12-1}"
+}
+
+val convertToLocaleDate = { timestamps:List<String>, langDef:String ->
+    //println("langDef = $langDef")
+    val locale = Locale(langDef)
+    val dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, 3, locale) // timeFormat: 0,1,3
+    timestamps.map{
+        if(it.isNotEmpty()){
+            //val sdf = SimpleDateFormat("dd/MM/yyyy hh:mm:ss a", locale)
+            val netDate = Date(it.toLong())
+            dateFormat.format(netDate)
+        } else {
+            ""
+        }
+    }
+}
+val convertToFileDate = { timestamp:Long, langDef:String ->
+    val actualLangDef = when (langDef) {
+        "ar" -> "en"
+        else -> langDef
+    }
+    val locale = Locale(actualLangDef)
+    val dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, 2, locale) // timeFormat: 0,1,3
+    val netDate = Date(timestamp)
+    dateFormat.format(netDate).replace("[^A-Za-z0-9_]".toRegex(), "_").trim('_')
 }

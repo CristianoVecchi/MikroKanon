@@ -9,7 +9,7 @@ import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
+import com.cristianovecchi.mikrokanon.getZodiacPlanets
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.flow.Flow
 

@@ -29,8 +29,8 @@ import com.cristianovecchi.mikrokanon.convertIntsToFlags
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
-import com.cristianovecchi.mikrokanon.locale.getZodiacPlanets
+import com.cristianovecchi.mikrokanon.getIntervalsForTranspose
+import com.cristianovecchi.mikrokanon.getZodiacPlanets
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.ui.shift
@@ -279,7 +279,7 @@ fun ResultDisplay(model: AppViewModel,
                 MultiListDialog(intervalSetDialogData, dimensions, language.OkButton, colors)
                 TransposeDialog(transposeDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
                 TransposeDialog(doublingDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
-                CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
+                CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, model)
                 ResolutioDialog(resolutioDialogData, buttonsDialogData, dimensions, language.OkButton, model)
                 FormatDialog(formatDialogData, buttonsDialogData, dimensions, language.OkButton, model)
                 ListDialog(listDialogData = chessDialogData, dimensions = dimensions, appColors = colors, fillPrevious = true )

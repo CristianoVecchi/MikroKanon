@@ -28,8 +28,8 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.A0
 import com.cristianovecchi.mikrokanon.AIMUSIC.C8
 import com.cristianovecchi.mikrokanon.AIMUSIC.Clip
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.locale.describeAsNote
-import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
+import com.cristianovecchi.mikrokanon.describeAsNote
+import com.cristianovecchi.mikrokanon.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue

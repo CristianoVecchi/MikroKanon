@@ -25,7 +25,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
 import com.cristianovecchi.mikrokanon.composables.CustomButton
-import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
+import com.cristianovecchi.mikrokanon.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue

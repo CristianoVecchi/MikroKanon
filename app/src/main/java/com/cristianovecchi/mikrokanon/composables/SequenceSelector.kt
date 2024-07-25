@@ -17,7 +17,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.composables.dialogs.*
 import com.cristianovecchi.mikrokanon.db.UserOptionsData
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.locale.getIntervalsForTranspose
+import com.cristianovecchi.mikrokanon.getIntervalsForTranspose
 import com.cristianovecchi.mikrokanon.ui.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SequenceSelector(model: AppViewModel,
                      dimensionsFlow: Flow<Dimensions>,
-                     userOptionsDataFlow: Flow<List<UserOptionsData>>,
+                     //userOptionsDataFlow: Flow<List<UserOptionsData>>,
                      onSelect: (Int) -> Unit = model::changeSequenceSelection,
                      onDelete: (Int) -> Unit = model::deleteSequence,
                      onAdd: (ArrayList<Clip>, Boolean) -> Unit,
@@ -91,7 +91,8 @@ fun SequenceSelector(model: AppViewModel,
     val privacyDialogData = remember { mutableStateOf(TextDialogData())}
     val buttonSize = dimensions.selectorButtonSize
     val zodiacFlags by model.zodiacFlags.asFlow().collectAsState(initial = Triple(false,false,false))
-    val (zodiacPlanetsActive, zodiacSignsActive, zodiacEmojisActive) = zodiacFlags
+    //val (zodiacPlanetsActive, zodiacSignsActive, zodiacEmojisActive) = zodiacFlags
+    val (_ , zodiacSignsActive, zodiacEmojisActive) = zodiacFlags
     val sequencesToString = model.sequences.value!!.map { it.toStringAll(notesNames, zodiacSignsActive, zodiacEmojisActive) }
     val filledSlots by model.filledSlots.asFlow().collectAsState(initial = setOf())
 
@@ -135,7 +136,7 @@ fun SequenceSelector(model: AppViewModel,
                 model = model, language = language, filledSlots = filledSlots )
             SelectCounterpointDialog( buttonsDialogData = selectCounterpointDialogData,
                 dimensions = dimensions,model = model,language = language, filledSlots = filledSlots)
-            CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, language.OkButton, model)
+            CadenzaDialog(cadenzaDialogData, buttonsDialogData, dimensions, model)
             ResolutioDialog(resolutioDialogData, buttonsDialogData, dimensions, language.OkButton, model)
             FormatDialog(formatDialogData, buttonsDialogData, dimensions, language.OkButton, model)
             TransposeDialog(doublingDialogData, dimensions, getIntervalsForTranspose(language.intervalSet))
@@ -296,8 +297,8 @@ fun SequenceSelector(model: AppViewModel,
                                             val intSequences = listOf(sequences[selectedIndex].map{ it.abstractNote })
                                             multiSequenceDialogData.value = MultiNumberDialogData(true,
                                                 language.addSequencesToMaze, intSequences = intSequences, model = model,
-                                                dispatchIntLists = { intSequences ->
-                                                    onMaze(intSequences)
+                                                dispatchIntLists = { intSequencesOutput ->
+                                                    onMaze(intSequencesOutput)
                                                 }
                                             )
                                         },

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import com.cristianovecchi.mikrokanon.composables.Accidents
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.db.ClipData
-import com.cristianovecchi.mikrokanon.locale.getZodiacSigns
+import com.cristianovecchi.mikrokanon.getZodiacSigns
 import kotlinx.android.parcel.Parcelize
 import kotlin.random.Random
 
@@ -29,9 +29,9 @@ fun ArrayList<Clip>.toStringAll(notesNames: List<String>, zodiacSigns: Boolean, 
         "empty Sequence"
     }
 }
-fun ArrayList<Clip>.toAbsPitches(): List<Int> {
-    return this.map { it.abstractNote }
-}
+//fun ArrayList<Clip>.toAbsPitches(): List<Int> {
+//    return this.map { it.abstractNote }
+//}
 @Parcelize // remove?
 data class Clip(
     val id: Int = -1,
@@ -60,12 +60,12 @@ data class Clip(
     }
 
     companion object {
-        fun createClip(absNote: Int, ax: Int, noteNames: List<String>, id: Int) : Clip {
-            val absPitch = absNote + ax
-            return Clip(id,absPitch,
-                NoteNamesEn.values().first{it.abs == absNote},
-                Accidents.values().first{it.sum == ax})
-        }
+//        fun createClip(absNote: Int, ax: Int, id: Int) : Clip {
+//            val absPitch = absNote + ax
+//            return Clip(id,absPitch,
+//                NoteNamesEn.values().first{it.abs == absNote},
+//                Accidents.values().first{it.sum == ax})
+//        }
         fun inAbsRange(absPitch: Int) : Int {
             if(absPitch > 11) return absPitch - 12
             if(absPitch < 0) return absPitch + 12
@@ -79,7 +79,7 @@ data class Clip(
                 }
             )
         }
-        fun convertAbsToNameAndAx(absPitch: Int, noteNames: List<String> = NoteNamesEn.values().map{it.name}): Pair<NoteNamesEn, Accidents> {
+        fun convertAbsToNameAndAx(absPitch: Int): Pair<NoteNamesEn, Accidents> {
             return when (absPitch) {
                 0 -> Pair( NoteNamesEn.C, Accidents.NATURAL )
                 1 -> Pair( NoteNamesEn.C, Accidents.SHARP ) //C#
@@ -131,21 +131,21 @@ data class Clip(
         fun clipToDataClip(clip: Clip): ClipData {
             return ClipData (clip.id,clip.abstractNote,clip.name.abs,clip.ax.sum)
         }
-        fun clipSequenceToCsv(sequence : ArrayList<Clip>): String{
-            var csv = ""
-            sequence.forEach{
-                csv += "${it.name.abs},${it.ax.sum},"
-            }
-            csv.removeSuffix(",")
-            return csv
-        }
-        fun toClips(counterpoint: Counterpoint, noteNames: List<String>) : List<List<Clip>>{
-            return counterpoint.parts.map { part ->
-                part.absPitches.map{ absPitch ->
-                    val pair = Clip.convertAbsToNameAndAx(absPitch, noteNames)
-                    Clip(-1,absPitch,pair.first,pair.second) }.toList()
-            }.toList()
-        }
+//        fun clipSequenceToCsv(sequence : ArrayList<Clip>): String{
+//            var csv = ""
+//            sequence.forEach{
+//                csv += "${it.name.abs},${it.ax.sum},"
+//            }
+//            csv.removeSuffix(",")
+//            return csv
+//        }
+//        fun toClips(counterpoint: Counterpoint, noteNames: List<String>) : List<List<Clip>>{
+//            return counterpoint.parts.map { part ->
+//                part.absPitches.map{ absPitch ->
+//                    val pair = Clip.convertAbsToNameAndAx(absPitch)
+//                    Clip(-1,absPitch,pair.first,pair.second) }.toList()
+//            }.toList()
+//        }
         fun toClipsText(counterpoint: Counterpoint, noteNames: List<String>, zodiacSigns: Boolean = false, emoji: Boolean = false) : List<List<String>>{
             return if(zodiacSigns) {
                 counterpoint.parts.map { part ->
@@ -161,44 +161,44 @@ data class Clip(
                 }.toList()
             }
         }
-        fun toClips(csv: String, noteNames: List<String>) : List<Clip>{
-            val array = csv.split(",")
-            println(array + Integer.parseInt(array[0]))
-            val list = mutableListOf<Clip>()
-            var count = 0
+//        fun toClips(csv: String) : List<Clip>{
+//            val array = csv.split(",")
+//            println(array + Integer.parseInt(array[0]))
+//            val list = mutableListOf<Clip>()
+//            var count = 0
+//
+//            for(i in array.indices step 2){
+//                val clip = Clip.createClip(Integer.parseInt(array[i]),Integer.parseInt(array[i+1]), count++)
+//            }
+//            return list
+//        }
+//        fun randomClip(id: Int, optRest: Boolean): Clip {
+//            val n = if(optRest) Random.nextInt(0,8) else Random.nextInt(0,7)
+//            val a = Random.nextInt(0, 5)
+//            var absPitch: Int
+//            if(optRest && n == 8) absPitch = -1 else {
+//                absPitch = NoteNamesEn.values()[n].abs + Accidents.values()[a].sum
+//                if(absPitch > 11) absPitch -= 12
+//                if(absPitch < 0) absPitch += 12
+//            }
+//            val newId = id + 1
+//            return when (n) {
+//                in 0..6 -> {
+//                    Clip(
+//                        newId, absPitch,
+//                        NoteNamesEn.values()[n], Accidents.values()[a])
+//                }
+//                else -> Clip()
+//            }
+//        }
 
-            for(i in array.indices step 2){
-                val clip = Clip.createClip(Integer.parseInt(array[i]),Integer.parseInt(array[i+1]),noteNames,count++)
-            }
-            return list
-        }
-        fun randomClip(noteNames: List<String>, id: Int, optRest: Boolean): Clip {
-            val n = if(optRest) Random.nextInt(0,8) else Random.nextInt(0,7)
-            val a = Random.nextInt(0, 5)
-            var absPitch: Int
-            if(optRest && n == 8) absPitch = -1 else {
-                absPitch = NoteNamesEn.values()[n].abs + Accidents.values()[a].sum
-                if(absPitch > 11) absPitch -= 12
-                if(absPitch < 0) absPitch += 12
-            }
-            val newId = id + 1
-            return when (n) {
-                in 0..6 -> {
-                    Clip(
-                        newId, absPitch,
-                        NoteNamesEn.values()[n], Accidents.values()[a])
-                }
-                else -> Clip()
-            }
-        }
-
-        fun randomClipSequence(noteNames: List<String>, id: Int, size: Int, optRests: Boolean): MutableList<Clip> {
-            val seq = mutableListOf<Clip>()
-            for (i in 0 until size) {
-                val newId = id + i
-                seq.add(randomClip(noteNames, newId, optRests))
-            }
-            return seq
-        }
+//        fun randomClipSequence(noteNames: List<String>, id: Int, size: Int, optRests: Boolean): MutableList<Clip> {
+//            val seq = mutableListOf<Clip>()
+//            for (i in 0 until size) {
+//                val newId = id + i
+//                seq.add(randomClip(newId, optRests))
+//            }
+//            return seq
+//        }
     }
 }

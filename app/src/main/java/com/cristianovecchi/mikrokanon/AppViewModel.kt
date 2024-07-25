@@ -11,7 +11,7 @@ import androidx.lifecycle.*
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.db.*
 import com.cristianovecchi.mikrokanon.locale.Lang
-import com.cristianovecchi.mikrokanon.locale.getDynamicSymbols
+import com.cristianovecchi.mikrokanon.getDynamicSymbols
 import com.cristianovecchi.mikrokanon.midi.launchPlayer
 import com.cristianovecchi.mikrokanon.ui.*
 import kotlinx.coroutines.*
@@ -156,8 +156,8 @@ class AppViewModel(
         } else {
             val size = Point()
             windowManager.defaultDisplay.getRealSize(size)
-            val w = size.x
-            val h = size.y
+            //val w = size.x
+            //val h = size.y
             //println("SIZE X = $w   SIZE Y = $h")
             size
         }
@@ -289,7 +289,7 @@ class AppViewModel(
         //mediaPlayer?.let { if (it.isPlaying) _playing.value = true }
     }
     fun dispatchError(error:String){
-        //println("MIDI building ends with: $error")
+        println("MIDI building ends with: $error")
     }
     enum class Building {
         NONE, START, DATATRACKS, CHECK_N_REPLACE, DRUMS, MIDITRACKS, WRITE_FILE
@@ -431,7 +431,7 @@ class AppViewModel(
             val computation = if(crossover) Computation.Crossover(selectedCounterpoint.value!!.clone(), counterpoint2nd!!.clone(),list)
                 else Computation.Overlap(selectedCounterpoint.value!!.clone(), counterpoint2nd!!.clone(),list)
             computationStack.pushAndDispatch(computation)
-            overlapBothCounterpoints(selectedCounterpoint.value!!.clone(), counterpoint2nd!!.clone(), crossover)
+            overlapBothCounterpoints(selectedCounterpoint.value!!.clone(), counterpoint2nd.clone(), crossover)
         }
     }
     val onOverlap = { position: Int , crossover: Boolean->

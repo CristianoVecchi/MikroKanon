@@ -85,7 +85,7 @@ var start = true
                                 SequenceSelector(
                                     model = model,
                                     model.dimensions.asFlow(),
-                                    userOptionsDataFlow = model.userOptionsData.asFlow(),
+                                    //userOptionsDataFlow = model.userOptionsData.asFlow(),
                                     onAdd = { list, editing ->
                                         val bundle = Bundle()
                                         bundle.putParcelableArrayList("list", list)
