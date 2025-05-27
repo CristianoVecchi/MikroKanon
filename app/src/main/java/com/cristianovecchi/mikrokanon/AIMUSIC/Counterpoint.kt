@@ -7,10 +7,8 @@ import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.getIntOrEmptyValue
 import com.cristianovecchi.mikrokanon.shiftCycling
 import com.cristianovecchi.mikrokanon.tritoneSubstitutionOnIntervalSet
-import com.cristianovecchi.mikrokanon.ui.readFileLineByLineUsingForEachLine
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.*
-import java.io.File
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
@@ -319,7 +317,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                             val matchValues = mutableListOf<Int>()
                             label@for(j in clone.parts.indices){
                                 if(j == partIndex) continue@label
-                                    matchValues.add(clone.parts[j].absPitches[pitchIndex])
+                                matchValues.add(clone.parts[j].absPitches[pitchIndex])
                             }
                             val isValid = matchValues.map{
                                 it == -1 || Insieme.isIntervalInSet(intervalSet.toIntArray(),it,next)
