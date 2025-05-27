@@ -271,7 +271,7 @@ object Player {
                                         tracks.add(tempoTrack)
                                         tracks.addAll(counterpointTracks)
 
-                                        //ADD CHORD TRACK AND DRUMS TRACKS IF NEEDED
+
                                         //println(harmonizations)
                                         if(harmonizations.areNotBlank()) {
                                                 val chordBars = bars.resizeLastBar(totalLength)
@@ -281,9 +281,8 @@ object Player {
                                                     counterpointTrackDatas, audio8D, totalLength, false, 14)
                                                 tracks.addChordTrack(harmonizations.third, chordBars,
                                                     counterpointTrackDatas, audio8D, totalLength, false, 15)
-                                                drumsTrack?.let{tracks.add(it)}
                                         }
-
+                                        drumsTrack?.let{tracks.add(it)}
 
                                         val midi = MidiFile(MidiFile.DEFAULT_RESOLUTION, tracks)
                                         //println("JOB ACTIVE: ${job.isActive}")

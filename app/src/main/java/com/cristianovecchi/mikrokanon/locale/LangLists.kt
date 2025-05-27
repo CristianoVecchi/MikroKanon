@@ -111,6 +111,10 @@ val doublingIt = listOf("2ª minore","2ª Maggiore", "3ª minore", "3ª Maggiore
     "4ª Aumentata", "5ª", "6ª minore", "6ª Maggiore", "7ª minore", "7ª Maggiore",
     "Ottava", "9ª minore", "9ª Maggiore", "10ª minore", "10ª Maggiore", "11ª",
     "11ª Aumentata", "12ª", "13ª minore", "13ª Maggiore", "14ª minore", "14ª Maggiore", "Ottava doppia")
+val doublingFi = listOf("Pieni sekunti","Suuri sekunti", "Pieni terssi", "Suuri terssi", "Puhdas kvartti",
+    "Ylinouseva kvartti", "Puhdas kvintti", "Pieni seksti", "Suuri seksti", "Pieni septimi", "Suuri septimi",
+    "Puhdas oktaavi", "Pieni sekunti + oktaavi", "Suuri sekunti + oktaavi", "Pieni terssi + oktaavi", "Suuri terssi + oktaavi", "Puhdas kvartti + oktaavi",
+    "Ylinouseva kvartti + oktaavi", "Puhdas kvintti + oktaavi", "Pieni seksti + oktaavi", "Suuri seksti + oktaavi", "Pieni septimi + oktaavi", "Suuri septimi + oktaavi", "Oktaavi + oktaavi")
 val doublingFr = listOf("2ème mineur", "2ème Majeur", "3ème mineur", "3ème Majeur", "4e",
     "4e Augmentée", "5e", "6e mineure", "6e Majeure", "7ème mineure", "7ème Majeure",
     "Octave", "9ème mineur", "9ème Majeur", "10ème mineur", "10ème Majeur", "11ème",
@@ -155,6 +159,7 @@ val doublingPt = listOf("2ª menor","2ª Maior", "3ª menor", "3ª Maior", "4ª"
 val functionNamesEn = listOf("Wave 3", "Wave 4", "Wave 6")
 val intervalSetIt = listOf("2m\n7M","2M\n7m","3m\n6M","3M\n6m","4\n5","4A\n5d","U\n8")
 val intervalSetEn = listOf("m2\nM7","M2\nm7","m3\nM6","M3\nm6","4\n5","A4\nd5","U\n8")
+val intervalSetFi = listOf("p2\nS7","S2\np7","p3\nS6","S3\np6","4\n5","y4\nV5","U\n8")
 val intervalSetDe = listOf("k2\nG7","G2\nk7","k3\nG6","G3\nk6","4\n5","Ü4\nv5","1\n8")
 val intervalSetRu = listOf("2м\n7В","2В\n7м","3м\n6В","3В\n6м","4\n5","4У\n5у","1\n8")
 val intervalSetUk = listOf("м2\nВ7","В2\nм7","м3\nВ6","В3\nм6","4\n5","З4\nч5","1\n8")

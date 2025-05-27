@@ -19,12 +19,13 @@ enum class LANGUAGES(val language:String){
     UK("Українська"), ZH("中文");
     companion object {
         fun languageNameFromDef(langDef: String): String {
-            return when (langDef) {
+            return when (langDef.uppercase()) {
                 "AR" -> AR.language
                 "DE" -> DE.language
                 "EL" -> EL.language
                 "EN" -> EN.language
                 "ES" -> ES.language
+                "FI" -> FI.language
                 "FR" -> FR.language
                 "KO" -> KO.language
                 "JA" -> JA.language
@@ -32,9 +33,11 @@ enum class LANGUAGES(val language:String){
                 "ID" -> ID.language
                 "IS" -> IS.language
                 "IT" -> IT.language
+                "PL" -> PL.language
                 "PT" -> PT.language
                 "RU" -> RU.language
                 "SW" -> SW.language
+                "TH" -> TH.language
                 "UK" -> UK.language
                 "ZH" -> ZH.language
                 else -> EN.language
@@ -42,11 +45,9 @@ enum class LANGUAGES(val language:String){
         }
     }
 }
-
 //fun main(){
 //    println(convertToFileDate(System.currentTimeMillis(), "el"))
 //}
-
 data class Lang( // English by default
     val noteNames: List<String> = NoteNamesEn.values().map { it.toString() },
     val intervalSet: List<String> = intervalSetEn,
@@ -173,8 +174,6 @@ data class Lang( // English by default
     //val convertToDate: (Long) -> String = toDateEn
     ){
 
-
-
     companion object {
         fun provideLanguage(lang: String): Lang {
             return when (lang.uppercase()){
@@ -204,101 +203,100 @@ data class Lang( // English by default
         fun finnish(): Lang {
             return Lang(
                 noteNames = NoteNamesEn.values().map { it.toString() },
-                intervalSet = intervalSetIt,
-                ensemble = "Organico",
-                enterSomeNotes = "Digita delle note!",
-                choose2ndSequence = "Scegli la seconda sequenza!",
-                chooseAnotherSequence = "Scegli un'altra sequenza!",
-                selectQuoteGenres= "Seleziona i generi per la citazione!",
-                repeatSequence = "Ripeti la sequenza",
-                selectEnsemble = "Scegli un organico!",
+                intervalSet = intervalSetFi,
+                ensemble = "Yhtye",
+                enterSomeNotes = "Kirjoita joitain nuotteja!",
+                choose2ndSequence = "Valitse toinen sarja!",
+                chooseAnotherSequence = "Valitse toinen sarja!",
+                selectQuoteGenres= "Valitse genrejä lainattavaksi!",
+                repeatSequence = "Toista sarja",
+                selectEnsemble = "Valitse yhtye!",
                 ensembleNames = ensembleNamesFi,
-                range = "Estensione",
-                selectRange = "Scegli un'estensione!",
-                rangeOptions = listOf("Libera", "Dello strumento", "Delimitata", "Quasi chiusa", "Chiusa"),
-                articulation = "Articolazione",
-                selectArticulation = "Scegli le alterazioni dell'articolazione!",
-                selectMelody ="Seleziona un tipo di melodia!",
+                range = "Ääniala",
+                selectRange = "Valitse ääniala",
+                rangeOptions = listOf("Ilmainen", "Instrumentti", "Rajoitettu", "Melkein suljettu", "Suljettu"),
+                articulation = "Artikulaatio",
+                selectArticulation = "Valitse miten muutat artikulaatiota!",
+                selectMelody ="Valitse melodiatyyppi!",
                 melody = "Melodia",
                 //melodyOptions = listOf("Lineare","Ampia"),
-                selectGlissando = "Scegli gli intervalli per il glissando!",
-                selectVibrato = "Scegli l'intensità del vibrato!",
-                nuancesOptions = listOf("Nessuna", "In rilievo le note brevi", "In rilievo le note lunghe"),
-                nuances = "Nuances",
-                selectNuances = "Scegli le nuances per la dinamica!",
-                harmony = "Armonia",
-                selectHarmonizationType = "Scegli il tipo di armonizzazione!",
-                selectHarmonizationDivision = "Scegli la divisione della battuta!",
-                selectHarmonizationInstruments = "Scegli gli strumenti dell'armonizzazione!",
-                selectHarmonizationVolume = "Scegli il volume dell'armonizzazione!",
-                selectOctaves = "Seleziona le ottave!",
-                selectHarmonizationStyle = "Seleziona lo stile di armonizzazione!",
-                selectStyleDensity = "Seleziona la densità dello stile!",
-                drums = "Batteria",
-                selectDrumsType = "Scegli lo stile della batteria!",
-                selectDrumKit = "Scegli il tipo di batteria!",
-                selectDrumsVolume = "Scegli il volume della batteria!",
-                selectDrumsDensity = "Scegli la densità della batteria!",
-                selectDrumsResize = "Seleziona il ridimensionamento del pattern ritmico!",
-                checkAndReplace = "Individua e sostituisci",
+                selectGlissando = "Valitse glissandon intervallit!",
+                selectVibrato = "Valitse vibraton voimakkuus!",
+                nuancesOptions = listOf("Ei mitään", "Lyhyet nuotit korostettuina", "Pitkät nuotit korostettuina"),
+                nuances = "Vivahteita",
+                selectNuances = "Valitse dynamiikan vivahteet!",
+                harmony = "Harmonia",
+                selectHarmonizationType = "Valitse harmonisointityyppi!",
+                selectHarmonizationDivision = "Valitse musiikkibaarin osasto!",
+                selectHarmonizationInstruments = "Valitse harmonisoinnin soittimet!",
+                selectHarmonizationVolume = "Valitse harmonisoinnin äänenvoimakkuus!",
+                selectOctaves = "Valitse oktaavit!",
+                selectHarmonizationStyle = "Valitse harmonisointityyli!",
+                selectStyleDensity = "Valitse tyylin tiheys!",
+                drums = "Lyömäsoittimet",
+                selectDrumsType = "Valitse lyömäsoittimen tyylisi!",
+                selectDrumKit = "Valitse lyömäsoittimen tyyppi!",
+                selectDrumsVolume = "Valitse lyömäsoittimen äänenvoimakkuus!",
+                selectDrumsDensity = "Valitse lyömäsoittimen tiheys!",
+                selectDrumsResize = "Valitse rytmikuvion skaalaus!",
+                checkAndReplace = "Etsi ja vaihda",
                 //selectPitchRange = "Scegli un'estensione!",
-                selectCheckType  = "Seleziona il tipo di individuazione!",
-                selectReplaceType  = "Seleziona il tipo di sostituzione!",
-                selectStress  = "Seleziona lo stress della sostituzione!",
-                chordsToEnhance= "Accordi da esaltare",
-                selectChordsToEnhance= "Selezionare l'accordo da esaltare!",
-                enhanceChordsInTranspositions= "Mantenere gli accordi esaltati nelle trasposizioni",
-                dynamics = "Dinamica",
-                selectDynamicAlterations ="Scegli le alterazioni della dinamica!",
-                beatsPerMinute = "Pulsazioni al minuto",
-                selectRhythm = "Scegli un ritmo!",
-                selectDoubling = "Scegli degli intervalli per il raddoppio!",
-                doublingNames = doublingIt,
-                selectAudio8D = "Seleziona le voci in AUDIO 8D!",
-                rhythm = "Ritmo",
+                selectCheckType  = "Valitse tunnistustyyppi!",
+                selectReplaceType  = "Valitse vaihtotyyppi!",
+                selectStress  = "Valitse korvaamisen stressi!",
+                chordsToEnhance= "Sointuja tehostaaksesi",
+                selectChordsToEnhance= "Valitse sointu, jota haluat parantaa!",
+                enhanceChordsInTranspositions= "Sointujen pitäminen korkealla transponoinnissa",
+                dynamics = "Dynamiikka",
+                selectDynamicAlterations ="Valitse dynaamiset muutokset!",
+                beatsPerMinute = "Lyöntejä minuutissa",
+                selectRhythm = "Valitse musiikillinen rytmi!",
+                selectDoubling = "Valitse tuplausvälit!",
+                doublingNames = doublingFi,
+                selectAudio8D = "Valitse äänet AUDIO 8D:ssä!",
+                rhythm = "Rytmi",
                 shuffle = "Shuffle",
-                selectShuffle = "Seleziona lo shuffle!",
-                rhythmShuffle  = "Mescola il ritmo",
-                partsShuffle  = "Mescola le parti",
-                rowForms = "Forme seriali",
-                selectRowForms = "Scegli le forme seriali!",
-                original = "Originale",
-                retrograde  = "Retrogrado",
-                inverse  = "Inverso",
-                invRetrograde  = "Inverso del retrogrado",
-                selectRitornello = "Scegli quante ripetizioni!",
-                transpose = "Trasponi",
-                selectTranspositions = "Scegli le trasposizioni!",
-                doubling  = "Raddoppi",
-                spreadWherePossible  = "Estendi dove è possibile",
-                deepSearch  = "Ricerca approfondita nei canoni a quattro parti",
-                horIntervalSet = "Intervalli delle parti libere",
-                detector = "Rilevatore",
-                selectIntervalsToDetect = "Scegli gli intervalli da rilevare!",
-                detectorExtension = "Raggio del rilevatore",
-                selectDetectorExtension = "Scegli il raggio del rilevatore!",
-                exportMidi  = "Esporta il file MIDI",
-                customColors = "Colori",
-                counterpointView = "Vista",
-                selectCounterpointView = "Seleziona una vista contrappuntistica!",
-                counterpointViewOptions = listOf("Note", "Biglie", "Quantum"),
-                language  = "Lingua",
-                zodiac = "Zodiaco",
-                zodiacOptions = listOf("Pianeti", "Segni", "Emojis"),
-                selectZodiac = "Usa questi simboli zodiacali:" ,
-                selectMbti= "Seleziona l'MBTI per cambiare gli intervalli!",
-                selectSpecialFunction = "Scegli una funzione!",
-                selectCadenzaForm = "Scegli una forma di cadenza!",
-                selectResolutioForm = "Scegli una forma di resolutio!",
-                selectFormatForm = "Scegli una forma di formato!",
-                selectToOverlap = "Scegli un contrappunto da sovrapporre!",
-                selectToCrossOver = "Scegli un contrappunto da embricare!",
-                selectToGlue = "Scegli un contrappunto da incollare!",
-                selectChessRange = "Seleziona un intervallo per la scacchiera!",
-                addSequencesToMaze = "Aggiungi altre sequenze al labirinto!",
-                selectHorizontalIntervals = "Scegli gli intervalli melodici per le funzioni!",
-                clearSlots = "Svuota i vani",
-                selectSlots = "Scegli i vani da svuotare!",
+                selectShuffle = "Valitse shuffle!",
+                rhythmShuffle  = "Sekoita rytmi",
+                partsShuffle  = "Sekoittaa ääniä",
+                rowForms = "Rivimuotoja",
+                selectRowForms = "Valitse rivin muodot!",
+                original = "Alkuperäinen",
+                retrograde  = "Retrogradinen",
+                inverse  = "Käänteinen",
+                invRetrograde  = "Retrogradinen käänteinen",
+                selectRitornello = "Valitse kuinka monta toistoa!",
+                transpose = "Transponoi",
+                selectTranspositions = "Valitse transpositiot!",
+                doubling  = "Kaksinkertainen",
+                spreadWherePossible  = "Laajenna mahdollisuuksien mukaan",
+                deepSearch  = "Neliosaisten kaanonien perusteellinen tutkimus",
+                horIntervalSet = "Ilmaiset äänivälit",
+                detector = "Rilevat",
+                selectIntervalsToDetect = "Valitse tunnistettavat intervallit",
+                detectorExtension = "Ilmaisimen laajennus",
+                selectDetectorExtension = "Valitse ilmaisimen laajennus!",
+                exportMidi  = "Vie MIDI-tiedosto",
+                customColors = "Värit",
+                counterpointView = "Näkymä",
+                selectCounterpointView = "Valitse kontrapisteinen näkymä!",
+                counterpointViewOptions = listOf("Nuotit", "Marbles", "Kvantti"),
+                zodiac = "Zodiac",
+                zodiacOptions = listOf("Planeetat", "Horoskooppimerkit", "Emojit"),
+                selectZodiac = "Käytä näitä horoskooppimerkkejä:" ,
+                selectMbti= "Valitse MBTI muuttaaksesi intervalleja!",
+                selectSpecialFunction = "Valitse toiminto!",
+                selectCadenzaForm = "Valitse poljinnopeusmuoto!",
+                selectResolutioForm = "Valitse ratkaisun muoto!",
+                selectFormatForm = "Valitse muotomuoto!",
+                selectToOverlap = "Valitse päällekkäinen vastapiste!",
+                selectToCrossOver = "Valitse vastapiste ylitettäväksi",
+                selectToGlue = "Valitse liitettävä vastapiste!",
+                selectChessRange = "Valitse taululle valikoima!",
+                addSequencesToMaze = "Lisää sekvenssejä sokkeloon!",
+                selectHorizontalIntervals = "Valitse funktioille melodiset intervallit!",
+                clearSlots = "Tyhjennä tilat",
+                selectSlots = "Valitse tyhjennettävät tilat!!",
             )
         }
         fun icelandic(): Lang {
