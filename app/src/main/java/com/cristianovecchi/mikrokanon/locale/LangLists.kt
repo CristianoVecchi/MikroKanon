@@ -156,17 +156,22 @@ val doublingSw = listOf("Ndogo ya pili", "Kubwa ya pili", "Ndogo ya tatu", "Kubw
     "Octave", "Ndogo Hakuna", "Kubwa Hakuna", "Ndogo ya zaka", "Kubwa ya zaka", "Kumi na moja",
     "Kumi na moja kupindukia", "Kumi na mbili", "Ndogo kumi na tatu", "Kubwa kumi na tatu",
     "Ndogo kumi na nne", "Kubwa kumi na nne", "Octave mara mbili")
+val doublingPl = listOf("Sekunda mała","Sekunda Wielka", "Tercja mała", "Tercja Wielka", "Kwarta",
+    "Kwarta Zwiększona", "Kwinta", "Seksta mała", "Seksta Wielka", "Septyma mała", "Septyma Wielka",
+    "Oktawa", "Nona mała", "Nona Wielka", "Decyma mała", "Decyma Wielka", "Undecyma",
+    "Undecyma Zwiększona", "Duodecyma", "Tercdecyma mała", "Tercdecyma Wielka", "Kwartdecyma mała", "Kwartdecyma Wielka", "Podwójna oktawa")
 val doublingPt = listOf("2ª menor","2ª Maior", "3ª menor", "3ª Maior", "4ª",
     "4ª Aumentada", "5ª", "6ª menor", "6ª Maior", "7ª menor", "7ª Maior",
     "Oitava", "9ª menor", "9ª Maior", "10ª menor", "10ª Maior", "11ª",
     "11ª Aumentada", "12ª", "13ª menor", "13ª Maior", "14ª menor", "14ª Maior", "Oitava dupla")
 val functionNamesEn = listOf("Wave 3", "Wave 4", "Wave 6")
 val intervalSetIt = listOf("2m\n7M","2M\n7m","3m\n6M","3M\n6m","4\n5","4A\n5d","U\n8")
-
 val intervalSetIs = listOf("l2\nS7","S2\nl7","l3\nS6","S3\nl6","4\n5","A4\nm5","E\n8")
 val intervalSetEn = listOf("m2\nM7","M2\nm7","m3\nM6","M3\nm6","4\n5","A4\nd5","U\n8")
 val intervalSetFi = listOf("p2\nS7","S2\np7","p3\nS6","S3\np6","4\n5","y4\nV5","U\n8")
 val intervalSetDe = listOf("k2\nG7","G2\nk7","k3\nG6","G3\nk6","4\n5","Ü4\nv5","1\n8")
+
+val intervalSetPl = listOf("2m\n7W","2W\n7m","3m\n6W","3W\n6m","4\n5","4Z\n5z","P\n8")
 val intervalSetRu = listOf("2м\n7В","2В\n7м","3м\n6В","3В\n6м","4\n5","4У\n5у","1\n8")
 val intervalSetUk = listOf("м2\nВ7","В2\nм7","м3\nВ6","В3\nм6","4\n5","З4\nч5","1\n8")
 
