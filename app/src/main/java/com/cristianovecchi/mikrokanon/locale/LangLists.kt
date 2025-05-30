@@ -22,6 +22,9 @@ enum class NoteNamesUk {
 enum class NoteNamesEl {
     Ντο, Ρε, Μι, Φα, Σολ, Λα, Σι, EMPTY
 }
+enum class NoteNamesTh {
+    ด, ร, ม, ฟ, ซ, ล, ท, EMPTY
+}
 //enum class NoteNamesAr {
 //    دو, ري, مي, فا, صول, لا,سي , EMPTY
 //}
@@ -164,6 +167,11 @@ val doublingPt = listOf("2ª menor","2ª Maior", "3ª menor", "3ª Maior", "4ª"
     "4ª Aumentada", "5ª", "6ª menor", "6ª Maior", "7ª menor", "7ª Maior",
     "Oitava", "9ª menor", "9ª Maior", "10ª menor", "10ª Maior", "11ª",
     "11ª Aumentada", "12ª", "13ª menor", "13ª Maior", "14ª menor", "14ª Maior", "Oitava dupla")
+val doublingTh = listOf("วินาทีเล็กๆ","วินาทีที่ดี", "เล็กที่สาม", "ใหญ่ที่สาม", "สี่ที่สมบูรณ์แบบ",
+    "เพิ่มสี่", "ห้าที่สมบูรณ์แบบ", "หกน้อย", "ใหญ่ที่หก", "เล็กเจ็ด", "หลักที่เจ็ด",
+    "อ็อกเทฟที่สมบูรณ์แบบ", "เก้าน้อย", "เก้าที่ดี", "สิบเล็ก", "ใหญ่ที่สิบ", "สมบูรณ์แบบที่สิบเอ็ด",
+    "เพิ่มขึ้นเป็นสิบเอ็ด", "สิบสองสมบูรณ์แบบ", "สิบสามเล็ก", "สิบสามอันยิ่งใหญ่", "สิบสี่เล็กน้อย", "ใหญ่ที่สิบสี่", "อ็อกเทฟคู่")
+
 val functionNamesEn = listOf("Wave 3", "Wave 4", "Wave 6")
 val intervalSetIt = listOf("2m\n7M","2M\n7m","3m\n6M","3M\n6m","4\n5","4A\n5d","U\n8")
 val intervalSetIs = listOf("l2\nS7","S2\nl7","l3\nS6","S3\nl6","4\n5","A4\nm5","E\n8")
@@ -174,6 +182,8 @@ val intervalSetDe = listOf("k2\nG7","G2\nk7","k3\nG6","G3\nk6","4\n5","Ü4\nv5",
 val intervalSetPl = listOf("2m\n7W","2W\n7m","3m\n6W","3W\n6m","4\n5","4Z\n5z","P\n8")
 val intervalSetRu = listOf("2м\n7В","2В\n7м","3м\n6В","3В\n6м","4\n5","4У\n5у","1\n8")
 val intervalSetUk = listOf("м2\nВ7","В2\nм7","м3\nВ6","В3\nм6","4\n5","З4\nч5","1\n8")
+
+val intervalSetTh = listOf("2เ\n7ใ","2ใ\n7เ","3เ\n6ใ","3ใ\n6เ","4\n5","4♯\n5♭","1\n8")
 
 val rowFormsMap = mapOf(
     1 to "O", 2 to "I" , 3 to "R", 4 to "IR", -1 to "O |", -2 to "I |" , -3 to "R |", -4 to "IR |"
