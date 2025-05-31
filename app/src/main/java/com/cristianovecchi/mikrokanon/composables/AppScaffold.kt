@@ -32,6 +32,7 @@ import com.cristianovecchi.mikrokanon.ui.Dimensions
 import com.cristianovecchi.mikrokanon.ui.extractColorDefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
 import kotlin.math.absoluteValue
 
 @Composable
@@ -114,6 +115,8 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
 
     val verticalIntervals by model.intervalSetVertical.observeAsState(model.intervalSetVertical.value!!)
     val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
+    val percentageFormat: NumberFormat = NumberFormat.getPercentInstance()
+    percentageFormat.setMinimumFractionDigits(1)
     //val colors = model.appColors
     val optionNames= listOf(
         "Ensemble", "Glissando","Vibrato","Nuances",

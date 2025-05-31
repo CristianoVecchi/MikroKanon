@@ -53,7 +53,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
         val harmDivisionDialogData by lazy { mutableStateOf(ListDialogData()) }
         val densityDialogData by lazy { mutableStateOf(ListDialogData()) }
         val instrumentDialogData by lazy { mutableStateOf(MultiListDialogData()) }
-        val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val volumeDialogData by lazy { mutableStateOf(PercentageDialogData(model = model)) }
         val octavesDialogData by lazy { mutableStateOf(MultiListDialogData()) }
         val groupingDialogData by lazy { mutableStateOf(GroupingDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
@@ -61,7 +61,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
             ListDialog(harmDivisionDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(densityDialogData, dimensions, lang.OkButton, appColors)
             MultiListDialog(instrumentDialogData, dimensions, lang.OkButton, appColors)
-            ListDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
+            PercentageDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
             MultiListDialog(octavesDialogData, dimensions, lang.OkButton, appColors)
             GroupingListDialog(groupingDialogData, dimensions, lang.OkButton, appColors)
             val width =
@@ -341,40 +341,16 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     colors = model.appColors
                                 ) {
                                     val harmData = harmDatas[cursor]
-                                    val volumes = listOf(
-                                        100,
-                                        90,
-                                        80,
-                                        70,
-                                        60,
-                                        50,
-                                        45,
-                                        40,
-                                        35,
-                                        30,
-                                        26,
-                                        23,
-                                        20,
-                                        16,
-                                        13,
-                                        10,
-                                        8,
-                                        6,
-                                        4,
-                                        2,
-                                        1
-                                    )
-                                    harmTypeDialogData.value = ListDialogData(
-                                        true,
-                                        volumes.map { "$it%" },
-                                        volumes.indexOf((harmData.volume * 100).toInt()),
-                                        lang.selectHarmonizationVolume
-                                    ) { volumeIndex ->
+
+                                    volumeDialogData.value = PercentageDialogData(
+                                        true, lang.selectHarmonizationVolume,
+                                        harmData.volume,true, model = model
+                                    ) { volumePercentage ->
                                         val newHarmDatas = harmDatas.toMutableList()
                                         newHarmDatas[cursor] =
-                                            harmDatas[cursor].copy(volume = volumes[volumeIndex] / 100f)
+                                            harmDatas[cursor].copy(volume = volumePercentage)
                                         harmDatas = newHarmDatas
-                                        ListDialogData(itemList = harmTypeDialogData.value.itemList)
+                                        PercentageDialogData(model = model)
                                     }
                                 }
                                 CustomButton(

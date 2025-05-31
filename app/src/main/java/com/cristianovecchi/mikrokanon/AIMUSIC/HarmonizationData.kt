@@ -1,5 +1,8 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.formatDecimalWithoutZero
+import java.text.NumberFormat
+
 
 enum class HarmonizationType(val title: String) {
     NONE("No Harm."),
@@ -152,13 +155,16 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
         density = if(density > maxDensity) maxDensity else density
     }
     fun describe(): String {
+        val percentageFormat: NumberFormat = NumberFormat.getPercentInstance()
+        percentageFormat.setMinimumFractionDigits(1)
         val direction = if(this.style.hasDirection) this.direction.symbol else ""
         val withFlow = if(this.style.hasFlow && isFlow) "§" else ""
         val densityString = if(density < 2) "" else "^$density"
         val instrumentList = instruments.joinToString(", ") { ListaStrumenti.getNameByIndex(it) }
         return if(type == HarmonizationType.NONE) "  ---  ${this.type.title}  ---"
-        else "${this.type.title} ${this.division.symbol} ${this.style.title}$densityString ${withFlow}${direction}\n  $instrumentList ${this.describeOctaves()} ${String.format("%.0f%%",this.volume*100)}"
+        else "${this.type.title} ${this.division.symbol} ${this.style.title}$densityString ${withFlow}${direction}\n  $instrumentList ${this.describeOctaves()} ${this.volume.formatDecimalWithoutZero()}%"
     }
+    //${String.format("%.0f%%",this.volume*100)}
     fun toCsv(): String {
         val flowBool = if(isFlow) 1 else 0
         val instrumentCsv = instruments.joinToString("§") { it.toString() }
@@ -201,7 +207,8 @@ data class HarmonizationData(val type: HarmonizationType = HarmonizationType.NON
                 val densityInt = subValues.getOrElse(7){ "1" }.toInt()
                 val divisionInt = subValues.getOrElse(8){ "1" }.toInt()
                 HarmonizationData(harmValues[subValues[0].toInt()], instrumentList,
-                    subValues[2].toFloat(), styleValues[subValues.getOrElse(3){"0"}.toInt()],
+                    subValues[2].toFloat(), //volume
+                    styleValues[subValues.getOrElse(3){"0"}.toInt()],
                     subValues.getOrElse(4){"248"}.toInt(),
                     directionValues[subValues.getOrElse(5){"0"}.toInt()],
                     flowCsv != "0",

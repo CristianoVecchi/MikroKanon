@@ -259,3 +259,7 @@ val convertToFileDate = { timestamp:Long, langDef:String ->
     val netDate = Date(timestamp)
     dateFormat.format(netDate).replace("[^A-Za-z0-9_]".toRegex(), "_").trim('_')
 }
+
+fun Float.formatDecimal(numberOfDecimals: Int = 2): String = "%.${numberOfDecimals}f".format(this)
+
+fun Float.formatDecimalWithoutZero(): String =  "%,.1f".format(Locale.ENGLISH,this*100).replace(".0","")
