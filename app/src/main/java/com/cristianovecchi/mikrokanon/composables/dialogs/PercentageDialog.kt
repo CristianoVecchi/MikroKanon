@@ -22,11 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.PercentageSelector
+import com.cristianovecchi.mikrokanon.cutDecimals
 import com.cristianovecchi.mikrokanon.formatDecimal
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import java.text.NumberFormat
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
@@ -44,6 +46,9 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
     var percentage by remember { mutableStateOf(percentageDialogData.value.percentageValue) }
     val percentageFormat: NumberFormat = NumberFormat.getPercentInstance()
     percentageFormat.setMinimumFractionDigits(1)
+    val decimalsToKeep = percentageDialogData.value.decimalsToKeep
+    val showInts = percentageDialogData.value.showInts
+    val increase = if(showInts) 0.01f else 0.001f
     val fontColor = appColors.dialogFontColor
     val back1Color = appColors.dialogBackgroundColor
     val back2Color = appColors.drawerBackgroundColor
@@ -104,7 +109,8 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
                                 .height(h),
                             horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
                             Text( //text = String.format("%.0f%%",percentage*100),
-                                text = "%,.1f".format(Locale.ENGLISH,percentage*100),
+                                text = if(showInts) "${(percentage * 100).roundToInt()}"
+                                    else "%,.1f".format(Locale.ENGLISH,percentage*100).replace(".0",""),
                                 style = TextStyle(fontSize = (dimensions.selectorClipFontSize * 2).sp, fontWeight = FontWeight.ExtraBold,
                                     color = fontColor
 
@@ -140,7 +146,8 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
                         val fontSize = dimensions.dialogFontSize
                         Button(
                             onClick = {
-                                percentageDialogData.value.onSubmitButtonClick.invoke(percentage)
+                                //println("Percentage: $percentage")
+                                percentageDialogData.value.onSubmitButtonClick.invoke(percentage.cutDecimals(decimalsToKeep))
                                 onDismissRequest.invoke()
                             },
                             shape = MaterialTheme.shapes.large
@@ -151,7 +158,7 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
                             Button(
                                 modifier = Modifier.padding(horizontal = 8.dp),
                                 onClick = {
-                                    val newPercentage = (percentage - 0.001f).coerceIn(0f, 1f)
+                                    val newPercentage = (percentage - increase).coerceIn(0f, 1f)//.cutDecimals(percentageDialogData.value.decimalsToKeep)
                                     percentage = newPercentage
                                     onSetPercentageAndRefresh.invoke(newPercentage)
                                 },
@@ -161,7 +168,7 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
                             }
                             Button(
                                 onClick = {
-                                    val newPercentage = (percentage + 0.001f).coerceIn(0f, 1f)
+                                    val newPercentage = (percentage + increase).coerceIn(0f, 1f)
                                     percentage = newPercentage
                                     onSetPercentageAndRefresh.invoke(newPercentage)
                                 },

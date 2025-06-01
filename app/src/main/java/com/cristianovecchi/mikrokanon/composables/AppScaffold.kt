@@ -112,6 +112,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
     val ritornelloDialogData by lazy {mutableStateOf(ListDialogData())}
     val vibratoDialogData by lazy {mutableStateOf(ListDialogData())}
     val zodiacDialogData by lazy { mutableStateOf(MultiListDialogData())}
+    val percentageDialogData by lazy { mutableStateOf(PercentageDialogData(model = model))}
 
     val verticalIntervals by model.intervalSetVertical.observeAsState(model.intervalSetVertical.value!!)
     val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
@@ -184,6 +185,7 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
         DrumsDialog(drumsDialogData, dimensions)
         CheckAndReplaceDialog(checkAndReplaceDialogData, dimensions)
         ChordsToEnhanceDialog(chordsToEnhanceDialogData, dimensions)
+        PercentageDialog(percentageDialogData, dimensions, lang.OkButton, colors)
 
         SettingTabs(selectedTab = selectedTab, dimensions = dimensions, colors = colors, model = model)
 
@@ -329,26 +331,22 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                         }
                         "Swing Shuffle" -> {
                             val shuffle = userOptions.swingShuffle.toFloat()
-                            val isOn = shuffle != 0.5f
-                            val shuffles = listOf(90,80,75,70,66,60,50,40,33, 30,25,20,10)
+                            val isOn = (shuffle * 1000).toInt() != 500
                             SelectableCard(
-                                text = if(isOn) "${lang.shuffle}: ${(shuffle * 100).toInt()}%" else lang.shuffle,
+                                text = if(isOn) "${lang.shuffle}: ${shuffle.formatDecimalWithoutZero()}%" else lang.shuffle,
                                 fontSize = fontSize,
                                 colors = colors,
                                 isSelected = isOn,
                                 onClick = {
-                                    listDialogData.value = ListDialogData(
-                                        true,
-                                        shuffles.map{"$it%"},
-                                        shuffles.indexOf((shuffle * 100).toInt()),
-                                        lang.selectShuffle
-                                    ) { shuffleIndex ->
-                                        model.updateUserOptions(
-                                            "swingShuffle",
-                                            (shuffles[shuffleIndex] / 100f).toString()
-                                        )
-                                    }
-                                })
+                                            percentageDialogData.value = PercentageDialogData(
+                                                true, lang.selectShuffle,
+                                                shuffle, decimalsToKeep = 3, firstRendering = true, model = model
+                                            ) { shufflePercentage ->
+
+                                                    model.updateUserOptions("swingShuffle", shufflePercentage.toString())
+                                                }
+                                        }
+                            )
                         }
                         "Rhythm Shuffle" -> {
                             var isOn = userOptions.rhythmShuffle.toInt() != 0
@@ -849,8 +847,8 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                                 SelectableCard(
                                     text = if (!isSelected) lang.drums
                                     else "${lang.drums}: \n\n${
-                                        drumsDatas.mapIndexed { i, hm ->
-                                            "${i + 1}: ${hm.describe()}"
+                                        drumsDatas.mapIndexed { i, dd ->
+                                            "${i + 1}: ${dd.describe()}"
                                         }.joinToString("\n\n")
                                     }",
                                     fontSize = fontSize,

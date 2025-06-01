@@ -51,12 +51,12 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
         val glissSymbol = getGlissandoSymbols().first
         val checkTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val replaceTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
-        val stressDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val stressDialogData by lazy { mutableStateOf(PercentageDialogData(model = model)) }
         val rangeDialogData by lazy { mutableStateOf(MultiFloatDialogData(model = model)) }
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             ListDialog(checkTypeDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(replaceTypeDialogData, dimensions, lang.OkButton, appColors)
-            ListDialog(stressDialogData, dimensions, lang.OkButton, appColors)
+            PercentageDialog(stressDialogData, dimensions, lang.OkButton, appColors)
             PitchRangeDialog(rangeDialogData, dimensions, lang.OkButton)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
@@ -224,7 +224,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 newCnrDatas[cursor] = oldCnrData.copy(
                                     replace = oldReplace.clone(addGliss = !oldReplace.addGliss))
                                 checkAndReplaceDatas = newCnrDatas
-                                ListDialogData(itemList = stressDialogData.value.itemList)
+                                ListDialogData(itemList = replaceTypeDialogData.value.itemList)
                             }
                         }
                         Row(
@@ -252,7 +252,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                     val (down, up) = rangeCsv.extractIntsFromCsv()
                                     newCnrDatas[cursor] = oldCnrData.copy(range = IntRange(down, up))
                                     checkAndReplaceDatas = newCnrDatas
-                                    ListDialogData(itemList = stressDialogData.value.itemList)
+                                    ListDialogData(itemList = replaceTypeDialogData.value.itemList)
                                 }
                             }
                             CustomButton(
@@ -269,7 +269,7 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 newCnrDatas[cursor] = oldCnrData.copy(
                                     replace = oldReplace.clone(isRetrograde = !oldReplace.isRetrograde))
                                 checkAndReplaceDatas = newCnrDatas
-                                ListDialogData(itemList = stressDialogData.value.itemList)
+                                ListDialogData(itemList = replaceTypeDialogData.value.itemList)
                             }
                             CustomButton( // stress edit
                                 isActive = checkAndReplaceDatas[cursor].check !is CheckType.None && checkAndReplaceDatas[cursor].requiresStress(),
@@ -279,19 +279,18 @@ fun CheckAndReplaceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                                 colors = model.appColors
                             ) {
                                 val cnrDatas = checkAndReplaceDatas[cursor]
-                                val stresses = listOf(100,90,80,75,70,66, 60, 50, 45, 40, 35, 33,30, 25, 20, 16, 13, 10, 8, 6, 4, 2, 0)
-                                stressDialogData.value = ListDialogData(
-                                    true,
-                                    stresses.map{"$it"},
-                                    stresses.indexOf(cnrDatas.replace.stress),
-                                    lang.selectStress
-                                ) { stressIndex ->
+                                //val stresses = listOf(100,90,80,75,70,66, 60, 50, 45, 40, 35, 33,30, 25, 20, 16, 13, 10, 8, 6, 4, 2, 0)
+                                stressDialogData.value = PercentageDialogData(
+                                    true, lang.selectStress,
+                                    cnrDatas.replace.stress/100f, decimalsToKeep = 2,
+                                    showInts = true, firstRendering = true, model = model
+                                ) { stressPercentage ->
                                     val newCnrDatas = checkAndReplaceDatas.toMutableList()
                                     val oldCnrData = checkAndReplaceDatas[cursor]
                                     val oldReplace = oldCnrData.replace
-                                    newCnrDatas[cursor] = oldCnrData.copy(replace = oldReplace.clone(stresses[stressIndex]))
+                                    newCnrDatas[cursor] = oldCnrData.copy(replace = oldReplace.clone((stressPercentage * 100).toInt()))
                                     checkAndReplaceDatas = newCnrDatas
-                                    ListDialogData(itemList = stressDialogData.value.itemList)
+                                    //ListDialogData(itemList = stressDialogData.value.itemList)
                                 }
                             }
 

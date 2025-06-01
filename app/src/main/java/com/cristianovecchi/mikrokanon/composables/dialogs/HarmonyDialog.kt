@@ -344,7 +344,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
 
                                     volumeDialogData.value = PercentageDialogData(
                                         true, lang.selectHarmonizationVolume,
-                                        harmData.volume,true, model = model
+                                        harmData.volume, firstRendering = true, model = model
                                     ) { volumePercentage ->
                                         val newHarmDatas = harmDatas.toMutableList()
                                         newHarmDatas[cursor] =

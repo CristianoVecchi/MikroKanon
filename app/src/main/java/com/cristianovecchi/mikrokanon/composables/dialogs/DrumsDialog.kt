@@ -49,16 +49,16 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
 
         val drumsTypeDialogData by lazy { mutableStateOf(ListDialogData()) }
         val drumKitsDialogData by lazy { mutableStateOf(ListDialogData()) }
-        val volumeDialogData by lazy { mutableStateOf(ListDialogData()) }
-        val densityDialogData by lazy { mutableStateOf(ListDialogData()) }
+        val volumeDialogData by lazy { mutableStateOf(PercentageDialogData(model = model)) }
+        val densityDialogData by lazy { mutableStateOf(PercentageDialogData(model = model)) }
         val groupingDialogData by lazy { mutableStateOf(GroupingDialogData())}
         val resizeDialogData by lazy { mutableStateOf(ListDialogData())}
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             GroupingListDialog(groupingDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(drumsTypeDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(drumKitsDialogData, dimensions, lang.OkButton, appColors)
-            ListDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
-            ListDialog(densityDialogData, dimensions, lang.OkButton, appColors)
+            PercentageDialog(volumeDialogData, dimensions, lang.OkButton, appColors)
+            PercentageDialog(densityDialogData, dimensions, lang.OkButton, appColors)
             ListDialog(resizeDialogData, dimensions, lang.OkButton, appColors)
             val width =
                 if (dimensions.width <= 884) (dimensions.width / 10 * 8 / dimensions.dpDensity).toInt().dp
@@ -315,17 +315,13 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 colors = model.appColors
                             ) {
                                 val drumData = drumsDatas[cursor]
-                                val densities = listOf(100,95,90,85,80,75,70,65,60,55,50,45,40,35,30,25,20,15,10,5)
-                                densityDialogData.value = ListDialogData(
-                                    true,
-                                    densities.map{"$it%"},
-                                    densities.indexOf((drumData.density * 100).toInt()),
-                                    lang.selectDrumsDensity
-                                ) { densityIndex ->
+                                densityDialogData.value = PercentageDialogData(
+                                    true, lang.selectDrumsDensity,
+                                    drumData.density, firstRendering = true, model = model
+                                ) { densityPercentage ->
                                     val newDrumsDatas = drumsDatas.toMutableList()
-                                    newDrumsDatas[cursor] = drumsDatas[cursor].copy(density = densities[densityIndex] / 100f)
+                                    newDrumsDatas[cursor] = drumsDatas[cursor].copy(density = densityPercentage)
                                     drumsDatas = newDrumsDatas
-                                    ListDialogData(itemList = densityDialogData.value.itemList)
                                 }
                             }
                             CustomButton(
@@ -338,17 +334,13 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                 colors = model.appColors
                             ) {
                                 val drumData = drumsDatas[cursor]
-                                val volumes = listOf(100,90,80,70,60,50,45,40,35,30,26,23,20,16,13,10,8,6,4,2)
-                                volumeDialogData.value = ListDialogData(
-                                    true,
-                                    volumes.map{"$it%"},
-                                    volumes.indexOf((drumData.volume * 100).toInt()),
-                                    lang.selectDrumsVolume
-                                ) { volumeIndex ->
+                                volumeDialogData.value = PercentageDialogData(
+                                    true, lang.selectDrumsVolume,
+                                    drumData.volume, firstRendering = true, model = model
+                                ) { volumePercentage ->
                                     val newDrumsDatas = drumsDatas.toMutableList()
-                                    newDrumsDatas[cursor] = drumsDatas[cursor].copy(volume = volumes[volumeIndex] / 100f)
+                                    newDrumsDatas[cursor] = drumsDatas[cursor].copy(volume = volumePercentage)
                                     drumsDatas = newDrumsDatas
-                                    ListDialogData(itemList = volumeDialogData.value.itemList)
                                 }
                             }
                         }

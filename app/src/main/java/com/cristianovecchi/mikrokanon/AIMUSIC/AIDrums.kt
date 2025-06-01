@@ -1,5 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.formatDecimalWithoutZero
+
 data class DrumsData(val type: DrumsType = DrumsType.NONE,val drumKit: DrumKits = DrumKits.FULL,
                      val density: Float = 0.5f, val volume: Float = 0.5f, val pattern: Int = 0, val resize: Float = 1f,
                     ){
@@ -12,8 +14,8 @@ data class DrumsData(val type: DrumsType = DrumsType.NONE,val drumKit: DrumKits 
         }
         return when(type){
             DrumsType.NONE -> "  ---  ${this.type.title}  ---"
-            DrumsType.PATTERN -> "  ---  $patternTitle$resize  ${this.drumKit.title}  ---\n    Density: ${String.format("%.0f%%", this.density * 100)}   Volume: ${String.format("%.0f%%", this.volume * 100)}"
-            else -> "  ---  ${this.type.title}  ${this.drumKit.title}  ---\n    Density: ${String.format("%.0f%%",this.density*100)}   Volume: ${String.format("%.0f%%",this.volume*100)}"
+            DrumsType.PATTERN -> "  ---  $patternTitle$resize  ${this.drumKit.title}  ---\n    Density: ${this.density.formatDecimalWithoutZero()}%  Vol.: ${this.volume.formatDecimalWithoutZero()}%"
+            else -> "  ---  ${this.type.title}  ${this.drumKit.title}  ---\n    Density: ${this.density.formatDecimalWithoutZero()}%  Vol.: ${this.volume.formatDecimalWithoutZero()}%"
         }
 
 

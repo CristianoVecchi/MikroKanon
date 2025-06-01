@@ -44,8 +44,8 @@ data class MultiFloatDialogData(val dialogState: Boolean = false, val title:Stri
 data class CustomColorsDialogData(val dialogState: Boolean = false, val title:String = "", val arrayColorIndex: Int = 0,
                                   val model: AppViewModel, val firstRendering: Boolean = true, val isRefreshing: Boolean = false,
                                   val onSubmitButtonClick: (Int) -> Unit = {})
-data class PercentageDialogData(val dialogState: Boolean = false, val title:String = "", val percentageValue: Float = 0f,
-                                val firstRendering: Boolean = true, val isRefreshing: Boolean = false, val model: AppViewModel,
+data class PercentageDialogData(val dialogState: Boolean = false, val title:String = "", val percentageValue: Float = 0f, val decimalsToKeep: Int? = null,
+                               val showInts: Boolean = false, val firstRendering: Boolean = true, val isRefreshing: Boolean = false, val model: AppViewModel,
                                   val onSubmitButtonClick: (Float) -> Unit = {})
 data class ButtonsDialogData(
     val dialogState: Boolean = false, val title:String = "",

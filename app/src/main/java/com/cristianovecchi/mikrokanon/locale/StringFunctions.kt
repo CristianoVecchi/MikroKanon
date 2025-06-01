@@ -5,6 +5,8 @@ import com.cristianovecchi.mikrokanon.locale.*
 import java.text.DateFormat
 import java.util.*
 import kotlin.math.absoluteValue
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 fun newLineOrNot(list: Collection<Any>, newLineFromN: Int ): String{
     return if(list.size < newLineFromN) "" else "\n"
@@ -263,3 +265,9 @@ val convertToFileDate = { timestamp:Long, langDef:String ->
 fun Float.formatDecimal(numberOfDecimals: Int = 2): String = "%.${numberOfDecimals}f".format(this)
 
 fun Float.formatDecimalWithoutZero(): String =  "%,.1f".format(Locale.ENGLISH,this*100).replace(".0","")
+
+fun Float.cutDecimals(decimalsToKeep: Int? = null): Float {
+    if (decimalsToKeep == null) return this
+    val check = 10.0.pow(decimalsToKeep).toFloat()
+    return (this * check).roundToInt() / check
+}
