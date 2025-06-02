@@ -18,9 +18,9 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 @Composable
-fun PercentageSelector(width: Int = 150, height: Dp,
+fun PercentageSelector(width: Dp = 150.dp, height: Dp,
                        barHeight: Int = (height.value / 8f).toInt(), //+ (height.value % 4f).toInt(),
-                       startColor : Color = Color.Black,
+                       topColor : Color = Color.LightGray, groundColor: Color = Color.Black,
                        startPercentage: Float = 0f, refresh: Boolean, dispatchPercentage : (Float) -> Unit ) {
 
 
@@ -47,26 +47,29 @@ fun PercentageSelector(width: Int = 150, height: Dp,
     //percentage = if (sizeSlide.height == 0) startPercentage else (1f - (percentageY / (sizeSlide.height - barHeight))).coerceIn(0f, 1f)
 
     //val blue = if (sizeSlide.height == 0) 0f else (1f - (blueY / (sizeSlide.height - barHeight))).coerceIn(0f, 1f)
+    val topRed = topColor.red; val topGreen = topColor.green; val topBlue = topColor.blue
+    val groundRed = groundColor.red; val groundGreen = groundColor.green; val groundBlue = groundColor.blue
 
+    val red = (groundRed + (topRed - groundRed) * percentage).coerceIn(0f, 1f)
+    val green = (groundGreen + (topGreen - groundGreen) * percentage).coerceIn(0f, 1f)
+    val blue = (groundBlue + (topBlue - groundBlue) * percentage).coerceIn(0f, 1f)
     dispatchPercentage(percentage)
 
+    // quantity : x = 100 : perc
+    // quantity * perc = x * 100
+    // quantity * perc / 100 = x
 
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-
-//        Column(Modifier.width(wR.dp).onGloballyPositioned { coordinates ->
-//            sizeLeft = IntSize(wR, coordinates.size.height)}){
-//
-//        }
-        Column(Modifier.width(width.dp).onGloballyPositioned { coordinates ->
-            sizeSlide = IntSize(width, coordinates.size.height)})
+        Column(Modifier.width(width).onGloballyPositioned { coordinates ->
+            sizeSlide = coordinates.size})
+            //sizeSlide = IntSize(width.value.toInt(), coordinates.size.height)})
         {
-            Box(Modifier.background(startColor).size(width.dp, height ))
+            Box(Modifier.background(Color(red, green, blue)).size(width, height))
             {
                 Box(
                     Modifier
                         .offset { IntOffset(0, percentageY.roundToInt()) }
                         .background(Color.White)
-                        .size(width.dp, barHeight.toDp().dp+1.dp)
+                        .size(width, barHeight.toDp().dp+1.dp)
                         .pointerInput(Unit) {
                             detectDragGestures { change, dragAmount ->
                                 change.consumeAllChanges()
@@ -83,5 +86,5 @@ fun PercentageSelector(width: Int = 150, height: Dp,
 //
 //        }
     }
-}
+
 

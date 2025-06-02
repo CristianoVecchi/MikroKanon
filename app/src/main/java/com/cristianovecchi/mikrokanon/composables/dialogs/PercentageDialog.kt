@@ -1,12 +1,10 @@
 package com.cristianovecchi.mikrokanon.composables.dialogs
 
-
-
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -23,7 +21,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.cristianovecchi.mikrokanon.composables.PercentageSelector
 import com.cristianovecchi.mikrokanon.cutDecimals
-import com.cristianovecchi.mikrokanon.formatDecimal
 import com.cristianovecchi.mikrokanon.ui.AppColors
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import java.text.NumberFormat
@@ -42,7 +39,6 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
                        onDismissRequest: () -> Unit =
                            { percentageDialogData.value = PercentageDialogData(model = percentageDialogData.value.model) })
 {
-
     var percentage by remember { mutableStateOf(percentageDialogData.value.percentageValue) }
     val percentageFormat: NumberFormat = NumberFormat.getPercentInstance()
     percentageFormat.setMinimumFractionDigits(1)
@@ -53,11 +49,29 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
     val back1Color = appColors.dialogBackgroundColor
     val back2Color = appColors.drawerBackgroundColor
     val beatColor = appColors.selectionBorderColor
-    val pass1Color: Color
-    val pass2Color: Color
-    val radarColor: Color
+//    val pass1Color: Color
+//    val pass2Color: Color
+//    val radarColor: Color
+    val topDisplayColor = beatColor
+    val groundDisplayColor = back2Color
+    val internalColumnTopColor = back1Color
+    val internalColumnGroundColor = back2Color
+    val topRed = topDisplayColor.red; val topGreen = topDisplayColor.green; val topBlue = topDisplayColor.blue
+    val groundRed = groundDisplayColor.red; val groundGreen = groundDisplayColor.green; val groundBlue = groundDisplayColor.blue
+    val displayRed = (groundRed + (topRed - groundRed) * percentage).coerceIn(0f, 1f)
+    val displayGreen = (groundGreen + (topGreen - groundGreen) * percentage).coerceIn(0f, 1f)
+    val displayBlue = (groundBlue + (topBlue - groundBlue) * percentage).coerceIn(0f, 1f)
+    val externalColumnColor = back2Color
+    val percButtonBackColor = back2Color
+    val percButtonFontColor = fontColor
+    val percButtonSize = MaterialTheme.shapes.medium
+    val title = percentageDialogData.value.title
+    val fontSize = dimensions.dialogFontSize
+    val percButtonFontSize = fontSize -2
+    val middlePartHeight = dimensions.dialogHeight / 6 * 4
     if(percentageDialogData.value.dialogState){
         val padding = 10
+        val halfPadding = padding / 2
         Dialog(onDismissRequest = { onDismissRequest.invoke() }) {
             Surface(
                 modifier = Modifier
@@ -65,28 +79,19 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
                     .height(dimensions.dialogHeight),
                 shape = RoundedCornerShape(10.dp)
             ) {
+                // MAIN COLUMN
                 Column(modifier = Modifier.padding(padding.dp)) {
                     Spacer(modifier = Modifier.height(10.dp))
-
-
                     var customColor by remember{ mutableStateOf(Color.Black) }
                     val context = percentageDialogData.value.model.getContext()
                     if(percentageDialogData.value.firstRendering){
 
-                        //indexColors = G.indexColorArray
                         percentage = percentageDialogData.value.percentageValue
                         onRefreshRendering.invoke(false)
-                    } else {
-                        //percentage = percentageDialogData.value.percentageValue
-
-                        //indexColors = G.indexColorArray
-
                     }
-                    val h = dimensions.dialogHeight / 7//80.dp
+                    val h = dimensions.dialogHeight / 7
                     var size by remember { mutableStateOf(IntSize.Zero) }
-                    //val w = if (size.width == 0) listOf(0,0,0,0,0,0) else
-                       // ((size.width - padding) / dimensions.dpDensity + (size.width - padding) % dimensions.dpDensity ).toLong().divideDistributingRest(6).map{it.toInt()}
-                    val w = if (size.width == 0) 0 else size.width
+                    val w = (dimensions.dialogWidth - padding.dp * 2 )
                     Box(
                         Modifier
                             .fillMaxWidth()
@@ -94,48 +99,143 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
                             .onGloballyPositioned { coordinates ->
                                 size = coordinates.size
                             }
-                            .background(back2Color),
+                            .background(Color(displayRed, displayGreen, displayBlue)),
                     ){
-
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(h), horizontalArrangement = Arrangement.Center) {
-
-                        }
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(h),
+                        Text(text = title, Modifier.offset(halfPadding.dp, halfPadding.dp),
+                            fontWeight = FontWeight.Bold, color = fontColor,
+                            style = TextStyle(fontSize = fontSize.sp))
+                        Row(Modifier.fillMaxWidth().height(h),
                             horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
-                            Text( //text = String.format("%.0f%%",percentage*100),
-                                text = if(showInts) "${(percentage * 100).roundToInt()}"
-                                    else "%,.1f".format(Locale.ENGLISH,percentage*100).replace(".0",""),
-                                style = TextStyle(fontSize = (dimensions.selectorClipFontSize * 2).sp, fontWeight = FontWeight.ExtraBold,
-                                    color = fontColor
-
-                                ) )
-                        }
+                                    Text(text = if(showInts) "${(percentage * 100).roundToInt()}"
+                                                else "%,.1f%%".format(Locale.ENGLISH,percentage*100).replace(".0",""),
+                                                style = TextStyle(fontSize = (dimensions.selectorClipFontSize * 2).sp, fontWeight = FontWeight.ExtraBold, color = fontColor))
+                                }
                     }
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-
+                    Row(horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically ) {
+                        Column(Modifier.width(w/3).height(middlePartHeight).background(externalColumnColor),
+                                verticalArrangement = Arrangement.SpaceAround,
+                                horizontalAlignment = Alignment.CenterHorizontally) {
+                            Button(onClick = { onSetPercentageAndRefresh.invoke(1f/6f*5f) },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),) {
+                                Text(text = "5/6", fontSize = percButtonFontSize.sp) }
+                            Button(
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(1f/3f*2f)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                            ) {
+                                Text(text = "2/3", fontSize = percButtonFontSize.sp)
+                            }
+                            Button( // left for visual symmetry
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(1f/6f*3)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                                ) {
+                                Text(text = "3/6", fontSize = percButtonFontSize.sp)
+                            }
+                            Button(
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(1f/3f)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                                ) {
+                                Text(text = "1/3", fontSize = percButtonFontSize.sp)
+                            }
+                            Button(
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(1f/6f)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                                ) {
+                                Text(text = "1/6", fontSize = percButtonFontSize.sp)
+                            }
+                        }
+//                      //INTERNAL COLUMN
                         PercentageSelector(
-                            width = w,
-                            height = dimensions.dialogHeight / 6 * 4,
-                            startColor = back1Color.copy(),
+                            width = w/3,
+                            height = middlePartHeight,
+                            topColor = internalColumnTopColor.copy(),
+                            groundColor = internalColumnGroundColor.copy(),
                             startPercentage = percentage,
                             refresh = percentageDialogData.value.isRefreshing
                         ) { percentageFloat ->
                                 percentage = percentageFloat
-                                if(percentageDialogData.value.isRefreshing){
-                                    percentage = percentageFloat
-                                    onStopRefresh.invoke()
-                                } else {
-
-                                }
-
+                                if(percentageDialogData.value.isRefreshing){ onStopRefresh.invoke() }
                         }
-
+                        Column(Modifier.width(w/3).height(middlePartHeight).background(externalColumnColor),
+                            verticalArrangement = Arrangement.SpaceAround,
+                            horizontalAlignment = Alignment.CenterHorizontally) {
+                            Button(
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(0.25f/2f*7f)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                                ) {
+                                Text(text = "7/8", fontSize = percButtonFontSize.sp)
+                            }
+                            Button(
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(0.75f)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                                ) {
+                                Text(text = "3/4", fontSize = percButtonFontSize.sp)
+                            }
+                            Button(
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(0.25f/2f*5f)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                                ) {
+                                Text(text = "5/8", fontSize = percButtonFontSize.sp)
+                            }
+                            Button(
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(0.5f)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                                ) {
+                                Text(text = "1/2", fontSize = percButtonFontSize.sp)
+                            }
+                            Button(
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(0.25f/2f*3)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                                ) {
+                                Text(text = "3/8", fontSize = percButtonFontSize.sp)
+                            }
+                            Button(
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(0.25f)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                                ) {
+                                Text(text = "1/4", fontSize = percButtonFontSize.sp)
+                            }
+                            Button(
+                                onClick = {
+                                    onSetPercentageAndRefresh.invoke(0.25f/2f)
+                                },
+                                shape = percButtonSize,
+                                colors = ButtonDefaults.buttonColors(backgroundColor = percButtonBackColor, contentColor = percButtonFontColor),
+                                ) {
+                                Text(text = "1/8", fontSize = percButtonFontSize.sp)
+                            }
+                        }
                     }
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(modifier = Modifier
@@ -143,7 +243,6 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
                         .height(h),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically ){
-                        val fontSize = dimensions.dialogFontSize
                         Button(
                             onClick = {
                                 //println("Percentage: $percentage")
@@ -178,7 +277,6 @@ fun PercentageDialog(percentageDialogData: MutableState<PercentageDialogData>,
                             }
                         }
                     }
-
                 }
             }
         }
