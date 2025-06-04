@@ -5,7 +5,7 @@ import com.cristianovecchi.mikrokanon.rangeTo
 
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, GAMELAN, SAXOPHONES, FLUTES,
-    DOUBLE_REEDS,  CLARINETS, FRENCH_HORNS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
+    OBOES, DOUBLE_REEDS, CLARINETS, FRENCH_HORNS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
     BAROQUE, PLUCKED_STRINGS, CHOIR, SPOOKY,
     NYLON_GUITAR, STEEL_GUITAR, JAZZ_GUITAR, CLEAN_GUITAR, MUTED_GUITAR, OVERDRIVE_GUITAR, DISTORTION_GUITAR, BANJO,
     ACOUSTIC_BASS, FRETLESS_BASS, SLAP_BASS_1, SYN_BASS_1,
@@ -91,6 +91,7 @@ object Ensembles {
             EnsembleType.GAMELAN -> getGamelan(nParts)
             EnsembleType.SAXOPHONES -> getSaxophones(nParts)
             EnsembleType.FLUTES -> getFlutes(nParts)
+            EnsembleType.OBOES -> getOboes(nParts)
             EnsembleType.DOUBLE_REEDS -> getDoubleReeds(nParts)
             EnsembleType.CLARINETS -> getClarinets(nParts)
             EnsembleType.FRENCH_HORNS -> getFrenchHorns(nParts)
@@ -727,6 +728,57 @@ object Ensembles {
                 else -> listOf()
             }
         }
+    fun getOboes(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            1, 2, 3 -> listOf(
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE,
+                PART_ENGLISH_HORN_LOW_MIDDLE
+            )
+            4, 5 -> listOf(
+                PART_OBOE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_ENGLISH_HORN_LOW
+            )
+            6, 7 -> listOf(
+                PART_OBOE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_ENGLISH_HORN_LOW
+            )
+            8, 9 -> listOf(
+                PART_OBOE_HIGH,
+                PART_OBOE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE,
+                PART_OBOE_MIDDLE,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_ENGLISH_HORN_LOW
+            )
+            in 10..12 -> listOf(
+                PART_OBOE_HIGH,
+                PART_OBOE_HIGH,
+                PART_OBOE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE_HIGH,
+                PART_OBOE_MIDDLE,
+                PART_OBOE_MIDDLE,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_ENGLISH_HORN_LOW_MIDDLE,
+                PART_ENGLISH_HORN_LOW,
+                PART_ENGLISH_HORN_LOW
+            )
+            else -> listOf()
+        }
+    }
     fun getDoubleReeds(nParts: Int): List<EnsemblePart> {
         return when (nParts) {
             1, 2 -> listOf(

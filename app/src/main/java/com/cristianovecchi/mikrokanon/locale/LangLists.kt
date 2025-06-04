@@ -46,46 +46,45 @@ val synthsNames = listOf(
     "Brightness", "Goblins", "Echo Drops", "Sci Fi")
 
 val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية","غاميلان", "ساكسفون", "فلوت",
-    "ضعف القصب", "كلارينيت","بوق فرنسي",  "مزمار", "تشيلو", "بيانو","قيثار","بييرو","الباروك","أوتار نتف","جوقة","مرعب")
+    "المزمار","ضعف القصب", "كلارينيت","بوق فرنسي",  "مزمار", "تشيلو", "بيانو","قيثار","بييرو","الباروك","أوتار نتف","جوقة","مرعب")
 val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente","Gamelan", "Saxophone", "Flöten",
-    "Doppelblattinstrumente", "Klarinetten", "Hörner", "Fagotte", "Cellos", "Klavier","Harfe","Pierrot","Barockensemble","Zupfinstrument","Chor","Gespenstisch")
+    "Oboen","Doppelblattinstrumente", "Klarinetten", "Hörner", "Fagotte", "Cellos", "Klavier","Harfe","Pierrot","Barockensemble","Zupfinstrument","Chor","Gespenstisch")
 val ensembleNamesEl = listOf("Έγχόρδα", "Ξύλινα πνευστά της συμφωνικής ορχήστρας", "Ορχήστρα εγχόρδων", "Χάλκινα πνευστά της συμφωνικής ορχήστρας","Gamelan", "Σαξόφωνα", "Φλάουτα",
-    "Διπλά καλάμια", "Κλαρινέτ", "Κέρατα", "Φαγκότα", "Βιολοντσέλα", "Πιάνο","Άρπα", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές","Χορωδία","Στοιχειωμένος")
+    "Όμποε","Διπλά καλάμια", "Κλαρινέτ", "Κέρατα", "Φαγκότα", "Βιολοντσέλα", "Πιάνο","Άρπα", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές","Χορωδία","Στοιχειωμένος")
 val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Gamelan", "Saxophones", "Flutes",
-    "Double reeds", "Clarinets", "French horns", "Bassoons", "Cellos", "Piano","Harp","Pierrot","Baroque","Plucked strings","Choir","Spooky")
+    "Oboes","Double reeds", "Clarinets", "French horns", "Bassoons", "Cellos", "Piano","Harp","Pierrot","Baroque","Plucked strings","Choir","Spooky")
 val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal","Gamelán", "Saxofones", "Flautas",
-    "Cañas dobles", "Clarinetes", "Trompas", "Fagotes", "Violonchelos", "Piano","Arpa", "Pierrot","Barroco","Instrumentos de cuerda pulsada","Coro","Escalofriante")
+    "Oboes","Cañas dobles", "Clarinetes", "Trompas", "Fagotes", "Violonchelos", "Piano","Arpa", "Pierrot","Barroco","Instrumentos de cuerda pulsada","Coro","Escalofriante")
 val ensembleNamesFi = listOf("Jousisoittimet", "Puupuhaltimet", "Jousiorkesteri", "Vaskipuhaltimet", "Gamelan", "Saksofonit", "Huilut",
-    "Kaksoisruoko", "Klarinetit", "Käyrätorvit", "Fagottit", "Sellot", "Piano", "Harppu", "Pierrot", "Barokki", "Kynnitty kielet", "Kuoro", "Aavemainen")
+    "Obot","Kaksoisruoko", "Klarinetit", "Käyrätorvit", "Fagottit", "Sellot", "Piano", "Harppu", "Pierrot", "Barokki", "Kynnitty kielet", "Kuoro", "Aavemainen")
 val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Gamelan","Saxophones", "Flûtes",
-    "Anches doubles", "Clarinettes", "Cors", "Bassons", "Violoncelles", "Piano","Harpe", "Pierrot","Baroque","Cordes pincées","Chorale","Sinistre")
+    "Hautbois","Anches doubles", "Clarinettes", "Cors", "Bassons", "Violoncelles", "Piano","Harpe", "Pierrot","Baroque","Cordes pincées","Chorale","Sinistre")
 val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기","가믈란", "색소폰", "플루트",
-    "더블 리드", "클라리넷", "프렌치 호른", "바순", "첼로 스", "피아노","하프","피에로","바로크","발현악기","합창","유령 같은")
+    "오보에","더블 리드", "클라리넷", "프렌치 호른", "바순", "첼로 스", "피아노","하프","피에로","바로크","발현악기","합창","유령 같은")
 val ensembleNamesJa = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器","ガムラン","サックス", "フルート",
-    "ダブルリード", "クラリネット", "ホルン", "ファゴット", "チェロ", "ピアノ","ハープ", "ピエロ", "バロック","撥弦楽器","合唱","不気味な")
+    "オーボエ", "ダブルリード", "クラリネット", "ホルン", "ファゴット", "チェロ", "ピアノ","ハープ", "ピエロ", "バロック","撥弦楽器","合唱","不気味な")
 val ensembleNamesHi = listOf("झुका हुआ यंत्र", "वुडविंड उपकरण", "स्ट्रिंग ऑर्केस्ट्रा", "धातु पवन यंत्र","गमेलन", "सैक्सोफोन", "बांसुरी",
-    "डबल रीड", "क्लैरिनेट", "फ्रेंच हॉर्न", "बासून", "सेलोस", "पियानो","वीणा","पिय्रोट","बरोक","प्लक्ड स्ट्रिंग इंस्ट्रूमेंट्स","वृन्दगान","डरावना")
+    "ओबो","डबल रीड", "क्लैरिनेट", "फ्रेंच हॉर्न", "बासून", "सेलोस", "पियानो","वीणा","पिय्रोट","बरोक","प्लक्ड स्ट्रिंग इंस्ट्रूमेंट्स","वृन्दगान","डरावना")
 val ensembleNamesId = listOf("Alat musik dawai membungkuk", "Instrumen musik tiup kayu", "Orkestra dawai", "Instrumen musik tiup logam", "Gamelan","Saxophone", "Seruling",
-    "Alang-alang ganda", "Klarinet", "Tanduk", "Bassoon", "Cellos", "Piano", "Harpa", "Pierrot", "Baroque", "Dawai yang dipetik","Paduan suara","Menyeramkan")
+    "Obo","Alang-alang ganda", "Klarinet", "Tanduk", "Bassoon", "Cellos", "Piano", "Harpa", "Pierrot", "Baroque", "Dawai yang dipetik","Paduan suara","Menyeramkan")
 val ensembleNamesIs = listOf("Strengir", "Blásarhljóðfæri", "Strengjasveit", "Málmblásturshljóðfæri", "Gamelan", "Saxófónar", "Flautur",
-    "Tvöfaldur reyr", "Klarínettur", "Frönsk horn", "Fagottar", "Selló", "Píanó", "Harpa", "Pierrot", "Barokk", "Plokkaðir strengir", "Kór", "Skuggalegt")
+    "Óbó","Tvöfaldur reyr", "Klarínettur", "Frönsk horn", "Fagottar", "Selló", "Píanó", "Harpa", "Pierrot", "Barokk", "Plokkaðir strengir", "Kór", "Skuggalegt")
 val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni","Gamelan", "Saxofoni", "Flauti",
-    "Ance doppie", "Clarinetti", "Corni", "Fagotti", "Violoncelli", "Pianoforte","Arpa","Pierrot","Barocco", "Corde pizzicate","Coro","Spooky")
+    "Oboi","Ance doppie", "Clarinetti", "Corni", "Fagotti", "Violoncelli", "Pianoforte","Arpa","Pierrot","Barocco", "Corde pizzicate","Coro","Spooky")
 val ensembleNamesPl = listOf("Smyczki", "Dęte drewniane", "Orkiestra smyczkowa", "Instrumenty dęte blaszane", "Gamelan", "Saksofony", "Flety",
-    "Podwójne stroiki", "Klarnety", "Waltornie", "Fagoty", "Wiolonczele", "Fortepian", "Harfa", "Pierrot", "Barokowy", "Sznurki szarpane", "Chór", "Straszny")
+    "Oboje","Podwójne stroiki", "Klarnety", "Waltornie", "Fagoty", "Wiolonczele", "Fortepian", "Harfa", "Pierrot", "Barokowy", "Sznurki szarpane", "Chór", "Straszny")
 val ensembleNamesPt = listOf("Cordas friccionadas", "Madeiras", "Orquestra de cordas", "Metais","Gamelão","Saxofones", "Flautas",
-    "Palhetas duplas", "Clarinetes", "Trompas", "Fagotes", "Violoncelos", "Piano","Harpa", "Pierrot", "Barroco", "Cordas dedilhadas","Coro","Assustador")
+    "Oboés","Palhetas duplas", "Clarinetes", "Trompas", "Fagotes", "Violoncelos", "Piano","Harpa", "Pierrot", "Barroco", "Cordas dedilhadas","Coro","Assustador")
 val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты","Гамелан", "Саксофоны", "Флейты",
-    "Двойной тростью", "Кларнеты", "Валторны", "Фаготы", "Виолончели", "Фортепиано","Арфа", "Пьеро","Барокко","Струнные щипковые инструменты","Хор","Пугающий")
-val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao", "Orchestra ya ala za nyuzi", "Vyombo vya upepo vya chuma",
-    "Gamelan", "Saxophones", "Zilizimbi","Mwanzi mara mbili", "Clarinets", "Pembe za Kifaransa", "Bassoons", "Cellos", "Piano", "Kinubi",
-    "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa","Kwaya","Ya kutisha")
+    "Гобои","Двойной тростью", "Кларнеты", "Валторны", "Фаготы", "Виолончели", "Фортепиано","Арфа", "Пьеро","Барокко","Струнные щипковые инструменты","Хор","Пугающий")
+val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao", "Orchestra ya ala za nyuzi", "Vyombo vya upepo vya chuma", "Gamelan", "Saxophones", "Zilizimbi",
+    "Oboes","Mwanzi mara mbili", "Clarinets", "Pembe za Kifaransa", "Bassoons", "Cellos", "Piano", "Kinubi", "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa","Kwaya","Ya kutisha")
 val ensembleNamesTh = listOf("เครื่องสาย", "เครื่องลมไม้", "เครื่องสายออร์เคสตรา", "ทองเหลือง", "กาเมลัน", "แซกโซโฟน", "ฟลุต",
-    "ไม้อ้อคู่", "คลาริเน็ต", "เฟรนช์ฮอร์น", "บาสซูน", "เชลโล", "เปียโน", "ฮาร์ป", "เปียโรต์", "บาโรก", "ตามแบบบะโรค", "นักร้องประสานเสียง", "น่ากลัว")
+    "โอโบ","ไม้อ้อคู่", "คลาริเน็ต", "เฟรนช์ฮอร์น", "บาสซูน", "เชลโล", "เปียโน", "ฮาร์ป", "เปียโรต์", "บาโรก", "ตามแบบบะโรค", "นักร้องประสานเสียง", "น่ากลัว")
 val ensembleNamesUk = listOf("Смичкові", "Дерев'яні духові", "Струнний оркестр", "Мідні духові", "Гамелан", "Саксофони", "Флейти",
-    "Подвійний очерет", "Кларнети", "Валторни", "Фаготи", "Віолончелі", "фортепіано","арфа", "П'єро","бароко","Пощипані струни","Хор","моторошний")
+    "гобої","Подвійний очерет", "Кларнети", "Валторни", "Фаготи", "Віолончелі", "фортепіано","арфа", "П'єро","бароко","Пощипані струни","Хор","моторошний")
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器","甘美蘭", "薩氏管", "长笛",
-    "双簧管", "单簧管", "圆号", "巴松管", "大提琴", "钢琴","豎琴","皮埃罗","巴洛克","撥弦樂器","合唱","幽灵般的")
+    "双簧管","双簧管", "单簧管", "圆号", "巴松管", "大提琴", "钢琴","豎琴","皮埃罗","巴洛克","撥弦樂器","合唱","幽灵般的")
 
 var zodiacPlanets = listOf("\u2644", "\u2643", "\u2642","\u2640","\u263F","\u263D","\u2609")
 private var zodiacPlanetsEmojis = listOf("\u1fA90","\u9795","\u9794","\u9792","\u9791","\u1F31C","\u1F31E") // are different on xiaomi
