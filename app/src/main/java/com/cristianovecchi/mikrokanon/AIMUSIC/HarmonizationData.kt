@@ -6,6 +6,7 @@ import java.text.NumberFormat
 
 enum class HarmonizationType(val title: String) {
     NONE("No Harm."),
+    ROOTS("ROOTS"), ORGANUM("ORGANUM"),
     POP("POP"), POP7("POP 7"),
     LIBERTY("LIBERTY"),
     JAZZ("JAZZ"), JAZZ11("JAZZ 11"),

@@ -7,6 +7,9 @@ import org.jetbrains.annotations.NotNull;
  */
 
 public enum JazzChord {
+    ROOT("root", 0B000000000001), // solo fondamentale
+    FIFTH("just5", 0B000010000001), // solo quinta
+    DIMINISHED_FIFTH("just_d5", 0B000001000001), // solo quinta diminuita
     MAJOR_TRIAD("M", 0B000010010001), // triade maggiore
     MINOR_TRIAD("m", 0B000010001001), // triade minore
     DIM_TRIAD("dim", 0B000001001001), // triade diminuita
@@ -56,9 +59,25 @@ public enum JazzChord {
     public static int[] priorityFromTonicJust7 = {9, 5, 2, 7, 4, 10, 3, 8, 11, 1, 6, 0}; // from Do -> La, Fa, Re, Sol, Mi, Si, Sib, Mib, Lab, Si, Reb, Solb, Do
     public static int[] priorityFrom2and5Just7= {5, 10, 2, 9, 7, 3, 1, 8, 11, 4, 6, 0};//from Sol -> Do, Fa, La, Mi, Re, Sib, Lab, Mib, Solb, Si, Reb, Sol
 
+    public static Chord extractRootChord(Chord chord){
+        return new Chord(chord.getRoot(), JazzChord.ROOT);
+    }
+    public static Chord extractJustFifthChord(Chord chord){
+        JazzChord oldJazzChord = chord.getChord();
+        JazzChord newJazzChord;
+        if((oldJazzChord.dbyte & 0B10000000) != 0) {
+            newJazzChord =JazzChord.FIFTH;
+        }
+        else if ((oldJazzChord.dbyte & 0B1000000) != 0) {
+            newJazzChord = JazzChord.DIMINISHED_FIFTH;
+        } else {
+            newJazzChord =JazzChord.FIFTH;
+        }
+        return new Chord(chord.getRoot(), newJazzChord);
+    }
     public static int[] choosePriority(HarmonizationType harmType){
         switch (harmType) {
-            case POP: case POP7: case LIBERTY: return priorityFrom2and5Just7;
+            case ROOTS: case ORGANUM: case POP: case POP7: case LIBERTY: return priorityFrom2and5Just7;
             case JAZZ: case JAZZ11: return priorityFrom2and5;
             case XWH: return  new int[] {5, 8, 2, 10, 6, 4, 1, 11, 9, 7, 3, 0};
         }
@@ -81,6 +100,17 @@ public enum JazzChord {
         }
         return priorityFrom2and5Just7;
     }
+//    public static JazzChord[] selectChordArea_no_5(JazzChord previousChord){
+//        switch (previousChord){
+//            case MAJOR_TRIAD:
+//                return SECOND_GRADE_AREA_NO_5;
+//            case MINOR_TRIAD: case DIM_TRIAD:
+//                return DOMINANT_AREA_NO_5;
+//            case DOM_JUST7:
+//                return TONIC_AREA_NO_5;
+//        }
+//        return TONIC_AREA_NO_5;
+//    }
     public static JazzChord[] selectChordArea_no_7(JazzChord previousChord){
         switch (previousChord){
             case MAJOR_TRIAD:
@@ -153,6 +183,14 @@ public enum JazzChord {
         return TONIC_AREA_NO_11;
     }
 
+//    //ROOTS
+//    public static JazzChord[] TONIC_AREA_NO_5= {ROOT, EMPTY};
+//    public static JazzChord[] SECOND_GRADE_AREA_NO_5= {ROOT, EMPTY};
+//    public static JazzChord[] DOMINANT_AREA_NO_5 = {ROOT, EMPTY};
+//    //ORGANUM (root + fifth or diminished fifth)
+//    public static JazzChord[] TONIC_AREA_JUST_5= {FIFTH, DIMINISHED_FIFTH, EMPTY};
+//    public static JazzChord[] SECOND_GRADE_AREA_JUST_5= {FIFTH, DIMINISHED_FIFTH, EMPTY};
+//    public static JazzChord[] DOMINANT_AREA_JUST_5 = {FIFTH, DIMINISHED_FIFTH, EMPTY};
     //POP
     public static JazzChord[] TONIC_AREA_NO_7= {MAJOR_TRIAD, MINOR_TRIAD, DIM_TRIAD, DOM_JUST7, EMPTY};
     public static JazzChord[] SECOND_GRADE_AREA_NO_7= {MINOR_TRIAD, DIM_TRIAD, MAJOR_TRIAD, DOM_JUST7, EMPTY};

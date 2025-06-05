@@ -1,6 +1,8 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 
+import com.cristianovecchi.mikrokanon.AIMUSIC.JazzChord.extractJustFifthChord
+import com.cristianovecchi.mikrokanon.AIMUSIC.JazzChord.extractRootChord
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.ProgramChange
@@ -56,7 +58,7 @@ fun createPopJazzChordsSequence(dodecaBytes: IntArray, harmony: HarmonizationTyp
     var lastRoot = (Insieme.trovaFond(dodecaBytes[0])[0] - priority[0] + 12) % 12
     var previousChord = JazzChord.EMPTY
     val selectChordArea = when (harmony){
-        HarmonizationType.POP, HarmonizationType.POP7 -> {
+        HarmonizationType.ROOTS, HarmonizationType.ORGANUM, HarmonizationType.POP, HarmonizationType.POP7 -> {
             if(with7) { prevChord: JazzChord -> JazzChord.selectChordArea_just_7(prevChord)}
             else {prevChord:JazzChord -> JazzChord.selectChordArea_no_7(prevChord)}
         }
@@ -73,14 +75,16 @@ fun createPopJazzChordsSequence(dodecaBytes: IntArray, harmony: HarmonizationTyp
         }
     }
     //println("start root = $lastRoot")
-
     dodecaBytes.forEachIndexed { index, dodecaByte ->
         val jazzChords = selectChordArea(previousChord)
         val chordFaultsGrid =  dodecaByte.findChordFaultsGrid(jazzChords)
         priority = JazzChord.findRootMovementPriorityJust7(previousChord)
         val chordPosition = chordFaultsGrid.findBestChordPosition(lastRoot, priority)
-
-        val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
+        val chord = when (harmony){
+            HarmonizationType.ROOTS -> extractRootChord(Chord(chordPosition.first, jazzChords[chordPosition.second]))
+            HarmonizationType.ORGANUM -> extractJustFifthChord(Chord(chordPosition.first, jazzChords[chordPosition.second]))
+            else -> Chord(chordPosition.first, jazzChords[chordPosition.second])
+        }
         chords[index] = chord.absoluteNotes
         roots[index] = chord.root
         lastRoot = chordPosition.first

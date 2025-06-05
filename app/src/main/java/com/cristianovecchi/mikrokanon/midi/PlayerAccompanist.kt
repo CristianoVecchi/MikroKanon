@@ -25,6 +25,8 @@ fun addHarmonizationsToTrack(chordsTrack: MidiTrack, barGroups: List<List<Bar>>,
            // println("diff: $diffChordVelocity")
             when(style){
                 HarmonizationStyle.ACCORDO -> when (type){
+                    HarmonizationType.ROOTS -> createRootChordsTrack(chordsTrack, barGroup, false, diffChordVelocity, justVoicing, octaves, chordsChannel)
+                    HarmonizationType.ORGANUM -> createRootChordsTrack(chordsTrack, barGroup, true, diffChordVelocity, justVoicing, octaves, chordsChannel)
                     HarmonizationType.POP -> createPopChordsTrack(chordsTrack, barGroup, false, diffChordVelocity, justVoicing, octaves, chordsChannel)
                     HarmonizationType.POP7 -> createPopChordsTrack(chordsTrack, barGroup, true, diffChordVelocity, justVoicing, octaves, chordsChannel)
                     HarmonizationType.LIBERTY -> createLibertyChordsTrack(chordsTrack, barGroup, diffChordVelocity, justVoicing, octaves, chordsChannel)

@@ -1,5 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.AIMUSIC.JazzChord.extractJustFifthChord
+import com.cristianovecchi.mikrokanon.AIMUSIC.JazzChord.extractRootChord
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.locale.NoteNamesIt
 
@@ -295,6 +297,7 @@ fun List<Bar>.findChordSequence(harmonizationType: HarmonizationType){
     val roots = mutableListOf<Int>()
     var previousChord = JazzChord.EMPTY
     when (harmonizationType){
+        HarmonizationType.ROOTS, HarmonizationType.ORGANUM,
         HarmonizationType.POP, HarmonizationType.POP7 -> {
             val selectChordArea = if(harmonizationType == HarmonizationType.POP7) {
                 prevChord: JazzChord -> JazzChord.selectChordArea_just_7(prevChord)}
@@ -305,7 +308,12 @@ fun List<Bar>.findChordSequence(harmonizationType: HarmonizationType){
                 val chordFaultsGrid =  it.findChordFaultsGrid(jazzChords)
                 priority = JazzChord.findRootMovementPriorityJust7(previousChord)
                 val chordPosition = chordFaultsGrid.findBestChordPosition(lastRoot, priority)
-                val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
+                //val chord = Chord(chordPosition.first, jazzChords[chordPosition.second])
+                val chord = when (harmonizationType){
+                    HarmonizationType.ROOTS -> extractRootChord(Chord(chordPosition.first, jazzChords[chordPosition.second]))
+                    HarmonizationType.ORGANUM -> extractJustFifthChord(Chord(chordPosition.first, jazzChords[chordPosition.second]))
+                    else -> Chord(chordPosition.first, jazzChords[chordPosition.second])
+                }
                 it.chord1 = chord
                 lastRoot = chordPosition.first
                 previousChord = chord.chord

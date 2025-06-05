@@ -573,6 +573,8 @@ data class Counterpoint(val parts: List<AbsPart>,
             }
             val (resolutiones, roots) = when (harmony){
                 HarmonizationType.NONE -> return clone
+                HarmonizationType.ROOTS -> createPopJazzChordsSequence(dodecaBytes, harmony, false, false)
+                HarmonizationType.ORGANUM -> createPopJazzChordsSequence(dodecaBytes, harmony, false, false)
                 HarmonizationType.POP -> createPopJazzChordsSequence(dodecaBytes, harmony, false, false)
                 HarmonizationType.POP7 -> createPopJazzChordsSequence(dodecaBytes, harmony,true, false)
                 HarmonizationType.LIBERTY -> createPopJazzChordsSequence(dodecaBytes, harmony, true, false)
