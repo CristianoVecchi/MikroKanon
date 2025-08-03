@@ -1,7 +1,9 @@
 package com.cristianovecchi.mikrokanon.composables
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -14,6 +16,7 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import com.cristianovecchi.mikrokanon.*
@@ -49,8 +52,9 @@ fun AppScaffold(model: AppViewModel,
         model.appColors // default ALL BLACK
     }
     val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
-
-    Scaffold(
+    val scaffoldModifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Modifier.background(colors.selCardBorderColorSelected).padding(PaddingValues(0.dp, 46.dp, 0.dp, 0.dp))
+    else Modifier.background(colors.selCardBorderColorSelected).padding(PaddingValues(0.dp, 0.dp, 0.dp, 0.dp))
+    Scaffold(modifier = scaffoldModifier,
         //modifier = Modifier
             //.background(colors.selCardBorderColorSelected),
             //.border(1.dp, Color.Transparent),

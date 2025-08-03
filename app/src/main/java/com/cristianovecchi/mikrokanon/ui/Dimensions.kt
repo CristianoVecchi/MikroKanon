@@ -41,7 +41,7 @@ data class Dimensions( // 1600px width and over
     val outputButtonSize: Dp = (width/9).pxToDp.dp, // 60 // 64
     val outputFPbuttonFontSize: Int = (width/8 /3).pxToSp,
     val outputIntervalSetFontSize: Int = (width/8 /5).pxToSp,
-    val outputWeights: Pair<Float, Float> = Pair(16f, 7f),
+    val outputWeights: Pair<Float, Float> = Pair(16f, 7f), // 16 7
 
     val optionsFontSize: Int = (width/25).pxToSp,
     val dialogWidth: Dp = ((width/4*3)/dpDensity).toInt().dp,

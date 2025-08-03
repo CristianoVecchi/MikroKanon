@@ -8,7 +8,7 @@ enum class HarmonizationType(val title: String) {
     NONE("No Harm."),
     ROOTS("ROOTS"), ORGANUM("ORGANUM"),
     POP("POP"), POP7("POP 7"),
-    LIBERTY("LIBERTY"),
+    LIBERTY("LIBERTY"), //TRISTAN
     JAZZ("JAZZ"), JAZZ11("JAZZ 11"),
     XWH("XW HARMONY"), FULL12("FULL 12")
 }
@@ -33,9 +33,11 @@ enum class HarmonizationDivision(val symbol: String) {
     DUR_7_16("7/16"),
     DUR_5_16("5/16"),
     DUR_3_16("3/16"),
+    DUR_1_16("1/16"),
     DUR_7_32("7/32"),
     DUR_5_32("5/32"),
     DUR_3_32("3/32"),
+    DUR_1_32("1/32"),
 }
 enum class HarmonizationDirection(val symbol: String) {
     ASCENDING("➚"), DESCENDING("➘"), RANDOM("~");

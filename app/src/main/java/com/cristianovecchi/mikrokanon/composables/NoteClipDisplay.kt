@@ -32,7 +32,7 @@ fun NoteClipDisplay(
     modifier: Modifier, clips: List<Clip>, notesNames: List<String>,
     zodiacSigns: Boolean = false, emoji: Boolean = false,
     colors: AppColors, hintText: String = "",
-    cursor: MutableState<Int> = mutableStateOf(-1), fontSize: Int = 18,
+    cursor: Int = -1, fontSize: Int = 18,
     nCols: Int = 6, dispatch: (Int) -> Unit)
 {
     val listState = rememberLazyListState()
@@ -76,20 +76,20 @@ fun NoteClipDisplay(
                                         .clip(RoundedCornerShape(6.dp))
                                         .padding(intervalPadding)
                                         .clickable { dispatch(clip.id) },
-                                    backgroundColor = if (cursor.value == index) selectionBackColor else unselectionBackColor,
-                                    contentColor = if (cursor.value == index) selectionTextColor else unselectionTextColor,
+                                    backgroundColor = if (cursor == index) selectionBackColor else unselectionBackColor,
+                                    contentColor = if (cursor == index) selectionTextColor else unselectionTextColor,
                                     border = BorderStroke(
                                         2.dp,
-                                        if (cursor.value == index) selectionBorderColor else unselectionBorderColor
+                                        if (cursor == index) selectionBorderColor else unselectionBorderColor
                                     ),
-                                    elevation = if (cursor.value == index) 4.dp else 4.dp
+                                    elevation = if (cursor == index) 4.dp else 4.dp
                                 )
                                 {
                                     Text(
                                         text = text,
                                         modifier = Modifier.padding(innerPadding),
                                         style = TextStyle(fontSize = if(text.length>3) (fontSize/3 * 2).sp else fontSize.sp),
-                                        fontWeight = if (cursor.value == index) FontWeight.Bold else FontWeight.Normal
+                                        fontWeight = if (cursor == index) FontWeight.Bold else FontWeight.Normal
                                     )
                                 }
                                 index++
@@ -97,8 +97,8 @@ fun NoteClipDisplay(
                         }
                     }
                 }
-                if (cursor.value > -1) coroutineScope.launch {
-                    val rowIndex = if (clips.size <= nCols) 1 else cursor.value / nCols
+                if (cursor > -1) coroutineScope.launch {
+                    val rowIndex = if (clips.size <= nCols) 1 else cursor / nCols
                     listState.animateScrollToItem(rowIndex)
                 }
             }

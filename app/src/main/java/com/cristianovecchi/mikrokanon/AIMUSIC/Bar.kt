@@ -64,10 +64,12 @@ fun List<Bar>.splitByDivision(division: HarmonizationDivision): List<Bar>{
         HarmonizationDivision.DUR_7_16 -> this.map{ it.splitByDuration(Pair(7,16))}.flatten()
         HarmonizationDivision.DUR_5_16 -> this.map{ it.splitByDuration(Pair(5,16))}.flatten()
         HarmonizationDivision.DUR_3_16 -> this.map{ it.splitByDuration(Pair(3,16))}.flatten()
+        HarmonizationDivision.DUR_1_16 -> this.map{ it.splitByDuration(Pair(1,16))}.flatten()
 
         HarmonizationDivision.DUR_7_32 -> this.map{ it.splitByDuration(Pair(7,32))}.flatten()
         HarmonizationDivision.DUR_5_32 -> this.map{ it.splitByDuration(Pair(5,32))}.flatten()
         HarmonizationDivision.DUR_3_32 -> this.map{ it.splitByDuration(Pair(3,32))}.flatten()
+        HarmonizationDivision.DUR_1_32 -> this.map{ it.splitByDuration(Pair(1,32))}.flatten()
     }
 //        .also {
 //        println("Original bars: ${this.size} $this")

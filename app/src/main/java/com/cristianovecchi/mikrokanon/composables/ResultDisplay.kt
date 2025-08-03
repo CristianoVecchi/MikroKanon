@@ -1,5 +1,6 @@
 package com.cristianovecchi.mikrokanon.composables
 
+import android.os.Build
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -570,7 +571,7 @@ fun ResultDisplay(model: AppViewModel,
             Column(
                 modifier = Modifier
                     .background(colors.buttonsDisplayBackgroundColor)
-                    .padding(start = 4.dp, top = 8.dp, end = 4.dp, bottom = 15.dp),
+                    .padding(start = 4.dp, top = 8.dp, end = 4.dp, bottom = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) 33.dp else 15.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

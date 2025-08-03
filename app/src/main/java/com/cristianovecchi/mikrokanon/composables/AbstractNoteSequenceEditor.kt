@@ -19,7 +19,8 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                                editing: Boolean,
                                iconMap: Map<String,Int> = HashMap(), done_action: (ArrayList<Clip>, Boolean) -> Unit) {
     val dimensions by dimensionsFlow.collectAsState(initial = model.dimensions.value!!)
-    val clips: MutableList<Clip> = remember { mutableStateListOf(*list.toTypedArray()) }
+    val startingClips = list
+    val clips: MutableList<Clip> = remember { mutableStateListOf(*startingClips.toTypedArray()) }
     val userOptionsData by model.userOptionsData.asFlow().collectAsState(initial = listOf())
     val appColors by derivedStateOf {
         if(userOptionsData.isNotEmpty()) model.setAppColors(userOptionsData[0].colors)
@@ -30,15 +31,20 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
     val zodiacFlags by model.zodiacFlags.asFlow().collectAsState(initial = Triple(false,false,false))
     val (zodiacPlanetsActive, zodiacSignsActive, zodiacEmojisActive) = zodiacFlags
     val playing by model.playing.asFlow().collectAsState(initial = false)
-    val cursor = remember { mutableStateOf(clips.size -1) }
+    val startingCursor = clips.size-1
+    val cursor = remember { mutableStateOf(startingCursor) }
     val id = remember { mutableStateOf(0) }
-    val lastOutIsNotUndo = remember { mutableStateOf(true) }
-    val lastIsCursorChanged = remember { mutableStateOf(false) }
+//    val lastOutIsNotUndo = remember { mutableStateOf(true) }
+//    val lastIsCursorChanged = remember { mutableStateOf(true) }
 
 
     data class Undo(val list: MutableList<Clip>, val cursor: Int)
     val stack: java.util.Stack<Undo> by remember { mutableStateOf( java.util.Stack<Undo>()) }
-
+    val isStarting = remember{ mutableStateOf(true) }
+    if (isStarting.value) {
+        stack.push(Undo(startingClips, startingCursor))
+        isStarting.value = false
+    }
     Column(modifier = Modifier
         .fillMaxHeight()
         .background(appColors.inputBackgroundColor)) {
@@ -67,17 +73,18 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                 NoteClipDisplay(
                     modifier = Modifier.fillMaxWidth(),  clips = clips.toList(), hintText = language.enterSomeNotes,
                     notesNames = notesNames,  zodiacSigns = zodiacSignsActive, emoji = zodiacEmojisActive,
-                    colors = appColors, cursor = mutableStateOf(cursor.value),
+                    colors = appColors, cursor = cursor.value,
                     nCols = dimensions.inputNclipColumns, fontSize = dimensions.inputClipFontSize
                 ) { id ->
                     clips.forEachIndexed { index, clip ->
                         if (clip.id == id) {
                             cursor.value = index
                             stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
-                            lastOutIsNotUndo.value = true
-                            lastIsCursorChanged.value = true
+//                            lastOutIsNotUndo.value = true
+//                            lastIsCursorChanged.value = true
                         }
                     }
+                    //stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
                 }
             }
             Row(modifierB) {
@@ -90,8 +97,8 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                                 clips.add(Clip(id.value++, out.note.abs, out.note, Accidents.NATURAL))
 
                                 stack.push(Undo(ArrayList(clips), cursor.value))
-                                lastOutIsNotUndo.value = true
-                                lastIsCursorChanged.value = true
+//                                lastOutIsNotUndo.value = true
+//                                lastIsCursorChanged.value = true
 
                             } else {
                                 clips.add(
@@ -99,7 +106,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                                     Clip(id.value++, out.note.abs, out.note, Accidents.NATURAL)
                                 )
                                 stack.push(Undo(ArrayList(clips), cursor.value))
-                                lastOutIsNotUndo.value = true
+//                                lastOutIsNotUndo.value = true
                             }
                         }
                         is Out.Accident -> {
@@ -155,7 +162,7 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                                 if (change) {
                                     clips[cursor.value] = newClip
                                     stack.push(Undo(ArrayList(clips), cursor.value))
-                                    lastOutIsNotUndo.value = true
+//                                    lastOutIsNotUndo.value = true
                                 }
                             }
                         }
@@ -168,24 +175,24 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                             if (cursor.value > 0) {
                                 cursor.value--
                                 change = true
-                                lastIsCursorChanged.value = true
+//                                lastIsCursorChanged.value = true
 
                             }
                             if (clips.isEmpty()) {
                                 cursor.value = -1
                                 change = true
-                                lastIsCursorChanged.value = true
+//                                lastIsCursorChanged.value = true
 
                             }
                             if (change) stack.push(Undo(ArrayList(clips), cursor.value))
-                            lastOutIsNotUndo.value = true
+//                            lastOutIsNotUndo.value = true
                         }
                         is Out.Forward -> {
                             if (cursor.value < clips.size - 1) {
                                 cursor.value++
                                 stack.push(Undo(ArrayList(clips), cursor.value))
-                                lastOutIsNotUndo.value = true
-                                lastIsCursorChanged.value = true
+//                                lastOutIsNotUndo.value = true
+//                                lastIsCursorChanged.value = true
 
                             }
                         }
@@ -193,8 +200,8 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                             if (clips.isNotEmpty() && cursor.value > 0) {
                                 cursor.value--
                                 stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
-                                lastOutIsNotUndo.value = true
-                                lastIsCursorChanged.value = true
+//                                lastOutIsNotUndo.value = true
+//                                lastIsCursorChanged.value = true
 
                             }
                         }
@@ -202,8 +209,8 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                             if (cursor.value < clips.size - 1) {
                                 cursor.value = clips.size - 1
                                 stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
-                                lastOutIsNotUndo.value = true
-                                lastIsCursorChanged.value = true
+//                                lastOutIsNotUndo.value = true
+//                                lastIsCursorChanged.value = true
 
                             }
                         }
@@ -211,28 +218,21 @@ fun AbstractNoteSequenceEditor(list: ArrayList<Clip> = ArrayList(), model: AppVi
                             if (clips.isNotEmpty() && cursor.value > 0) {
                                 cursor.value = 0
                                 stack.push(Undo(ArrayList<Clip>(clips), cursor.value))
-                                lastOutIsNotUndo.value = true
-                                lastIsCursorChanged.value = true
+                                //lastOutIsNotUndo.value = true
+                                //lastIsCursorChanged.value = true
 
                             }
                         }
                         is Out.Undo -> {
-                            if (stack.isNotEmpty()) {
-                                if (lastOutIsNotUndo.value) {
+                            if (stack.size >1) {
                                     stack.pop()
-                                    lastOutIsNotUndo.value = false
-                                }
-                                val undo = stack.pop()
+                            }
+                            if (stack.size >= 1) {
+                                val undo = stack.peek()
                                 clips.clear()
                                 clips.addAll(0, undo.list)
                                 cursor.value = undo.cursor
-                                lastIsCursorChanged.value = true
-
-                            } else {
-                                clips.clear()
-                                cursor.value = -1
-                                lastIsCursorChanged.value = true
-
+                                //lastIsCursorChanged.value = true
                             }
                         }
                         is Out.PlaySequence -> {
