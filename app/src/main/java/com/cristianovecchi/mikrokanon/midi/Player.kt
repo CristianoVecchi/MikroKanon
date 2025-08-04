@@ -9,6 +9,8 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.BebopBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParker
 import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParkerBand
 import com.cristianovecchi.mikrokanon.AIMUSIC.DEF.MIDDLE_C
+import com.cristianovecchi.mikrokanon.AppViewModel.Companion.ARTICULATIONS
+import com.cristianovecchi.mikrokanon.AppViewModel.Companion.VIBRATO_EXTENSIONS
 
 import com.leff.midi.MidiFile
 import com.leff.midi.MidiTrack
@@ -181,18 +183,18 @@ object Player {
                     val actualEnsemblePartsList = if (partsShuffle) ensemblePartsList.map { it.shuffled() } else ensemblePartsList
                     val glissando: List<Int> = if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
                     val audio8D: List<Int> = if (audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
-                    val vibratoExtensions = intArrayOf(0, 480, 360, 240, 160, 120, 80, 60, 30, 15, 12, 8, 6)
+
                     //dispatch(AppViewModel.Building.DATATRACKS to nParts)
                     val counterpointTrackDatas: List<TrackData> = CounterpointInterpreter.doTheMagic(
                         context, dispatch,
                         actualCounterpoint, actualDurations, actualEnsemblePartsList,
                         nuances, doublingFlags, rangeTypes, melodyTypes,
-                        glissando, audio8D, vibratoExtensions[vibrato]
+                        glissando, audio8D, VIBRATO_EXTENSIONS[vibrato]
                     )
                     if (counterpointTrackDatas.isEmpty()) {
                         "No Tracks in Counterpoint!!!"
                     } else {
-                        //counterpointTrackData.forEach{ println(it.pitches.contentToString())}
+                        //counterpointTrackDatas.forEach{ println(it.vibratos.contentToString())}
                         if (!job.isActive) {
                             //dispatch("Cancelled during DataTracks building!")
                             "Cancelled during DataTracks building!"
@@ -209,14 +211,13 @@ object Player {
                             //println("legatoTypes: $legatoTypes")
                             if (legatoTypes != listOf(Pair(4, 0))) {
                                 val maxLegato = rhythm.minByOrNull { it.first.metroDenominatorMidiValue() }!!.first.metroDenominatorMidiValue() / 3
-                                val articulations = floatArrayOf(1f, 0.125f, 0.25f, 0.75f, 1f, 1.125f, 1.25f)
-                                counterpointTrackDatas.addLegatoAndRibattuto(maxLegato, articulations, legatoTypes, totalLength)
+                                counterpointTrackDatas.addLegatoAndRibattuto(maxLegato, ARTICULATIONS, legatoTypes, totalLength)
                             }
                             // CHECK AND REPLACE
-                            val actualCounterpointTrackData = counterpointTrackDatas.applyMultiCheckAndReplace(job, dispatch, checkAndReplace,totalLength)
-
+                            val actualCounterpointTrackDatas = counterpointTrackDatas.applyMultiCheckAndReplace(job, dispatch, checkAndReplace,totalLength)
+                            //actualCounterpointTrackDatas.forEach{ println(it.vibratos.contentToString())}
                             // CREATE DRUMS TRACK (channel=9)
-                            val drumsTrack: MidiTrack? = createDrumsTrack(job, dispatch, actualCounterpointTrackData, drumsData, totalLength.toInt())
+                            val drumsTrack: MidiTrack? = createDrumsTrack(job, dispatch, actualCounterpointTrackDatas, drumsData, totalLength.toInt())
                                             //val drumsData = listOf(
 //                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.2f),
 //                                            DrumsData(DrumsType.CENTROIDS, DrumKits.FULL,1f, 0.4f),
@@ -229,20 +230,20 @@ object Player {
                                 //dispatch("Cancelled during Check'n'replace building!")
                                 "Cancelled during Check'n'replace or Drums building!"
                             } else {
-                                val totalNotes = actualCounterpointTrackData.sumOf{it.pitches.size}
+                                val totalNotes = actualCounterpointTrackDatas.sumOf{it.pitches.size}
                                 //println("Total of notes after Check'n'replace: $totalNotes")
                                 if(totalNotes > 100000){
                                     dispatch(Triple(AppViewModel.Building.NONE, 0, 0))
                                     "-1" // ERROR: TOO MUCH NOTES!!!
                                 } else {
                                     // TRANSFORM DATATRACKS IN MIDITRACKS
-                                    val counterpointTracks = actualCounterpointTrackData.map {
+                                    val counterpointTracks = actualCounterpointTrackDatas.map {
                                         yield() //delay(1)
                                         if(job.isActive) {
                                             //dispatch("Building MidiTrack Channel: ${it.channel}")
                                             dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
                                             //println("Total on notes after Check'n'replace: ${actualCounterpointTrackData.sumOf{it.pitches.size}}")
-                                            it.convertToMidiTrack(actualCounterpointTrackData.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} })
+                                            it.convertToMidiTrack(actualCounterpointTrackDatas.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} })
                                         } else MidiTrack()
                                     }
                                     if (!job.isActive) {

@@ -331,7 +331,7 @@ fun printNoteLimits(ticks: IntArray, durations: IntArray) {
 fun TrackData.convertToMidiTrack(nParts: Int, addAttack: Boolean = false): MidiTrack {
     val track = MidiTrack()
     val channel = this.channel
-    val vibrato = this.vibrato
+    val vibratos = this.vibratos ?: IntArray(pitches.size) { 0 }
     val velocityOff = this.velocityOff
     val (pitches, ticks, durations, velocities, glissando) = this
     val articulationDurations = this.articulationDurations ?: durations
@@ -380,12 +380,13 @@ fun TrackData.convertToMidiTrack(nParts: Int, addAttack: Boolean = false): MidiT
             val duration = durations[i]
             val articulationDuration = articulationDurations[i]
             val ribattuto = ribattutos[i]
+            val vibrato = vibratos[i]
             val overLegato = articulationDuration > duration
 //                val attackDelay = if(lastIsGliss && (articulationDuration == duration || overLegato)) 127 else 0
             val dur = if(overLegato && (glissando.getOrElse(i) { 0 } >0 || gliss >0)  )
                 duration.toLong() else articulationDuration.toLong()
             //println("note $i attack: $attackDelay")
-            if (this.vibrato != 0) {
+            if (vibrato != 0) {
                 addVibratoToTrack(track, tick, dur, channel, vibrato)
             }
 //                if (attackDelay > 0){
@@ -410,13 +411,14 @@ fun TrackData.convertToMidiTrack(nParts: Int, addAttack: Boolean = false): MidiT
             val duration = durations[i]
             val articulationDuration = articulationDurations[i]
             val ribattuto = ribattutos[i]
+            val vibrato = vibratos[i]
             val overLegato = articulationDuration > duration
 //                val attackDelay = if(lastIsGliss && (articulationDuration == duration || overLegato)) 127 else 0
             val dur = if(overLegato && (glissando.getOrElse(i) { 0 } >0 || gliss >0)  )
                 duration.toLong() else articulationDuration.toLong()
             val pitch = pitches[i]
             val velocity = velocities[i]
-            if (this.vibrato != 0) {
+            if (vibrato != 0) {
                 addVibratoToTrack(track, tick, dur, channel, vibrato)
             }
             Player.insertNoteWithGlissando(

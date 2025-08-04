@@ -1,5 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.AppViewModel
+import com.cristianovecchi.mikrokanon.AppViewModel.Companion.VIBRATO_EXTENSIONS
 import com.cristianovecchi.mikrokanon.describeWithNotes
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.findIndicesInSection
@@ -220,6 +222,11 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 isRetrograde = isRetrograde,
                 addGliss = addGliss
             )
+            is Vibrato -> this.copy(
+                stress = stress,
+                isRetrograde = isRetrograde,
+                addGliss = addGliss
+            )
             is Irregular2M -> this.copy(
                 stress = stress,
                 isRetrograde = isRetrograde,
@@ -322,15 +329,16 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 is Irregular2m -> "24#$stress#$retr#$gliss"
                 is Irregular2M -> "25#$stress#$retr#$gliss"
                 is Glissando -> "26#$stress#$retr#$gliss"
-                is Velocity -> "27#$stress#$retr#$gliss"
-                is Attack -> "28#$stress#$retr#$gliss"
-                is Tornado -> "29#$stress#$retr#$gliss"
-                is Fantasia -> "30#$stress#$retr#$gliss"
+                is Vibrato -> "27#$stress#$retr#$gliss"
+                is Velocity -> "28#$stress#$retr#$gliss"
+                is Attack -> "29#$stress#$retr#$gliss"
+                is Tornado -> "30#$stress#$retr#$gliss"
+                is Fantasia -> "31#$stress#$retr#$gliss"
 
-                is Resolutio2m -> "31#$stress#$retr#$gliss"
-                is Resolutio2M -> "32#$stress#$retr#$gliss"
-                is Resolutio3m -> "33#$stress#$retr#$gliss"
-                is Resolutio3M -> "34#$stress#$retr#$gliss"
+                is Resolutio2m -> "32#$stress#$retr#$gliss"
+                is Resolutio2M -> "33#$stress#$retr#$gliss"
+                is Resolutio3m -> "34#$stress#$retr#$gliss"
+                is Resolutio3M -> "35#$stress#$retr#$gliss"
 
             }
         }
@@ -354,7 +362,7 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 "Accento", "SOS",
                 "Trillo< 2m", "Trillo< 2M", "Trillo<> 2m", "Trillo<> 2M",
                 "Oscillazione 2m", "Oscillazione 2M", "Irregolare 2m", "Irregolare 2M",
-                "Glissando", "Dinamica +", "Attacco",
+                "Glissando", "Vibrato", "Dinamica +", "Attacco",
                 "Tornado", "Fantasia",
                 "Resolutio➚ 2m", "Resolutio➚ 2M", "Resolutio➚ 3m", "Resolutio➚ 3M"
             )
@@ -485,36 +493,41 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    27 -> Velocity(
+                    27 -> Vibrato(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    28 -> Attack(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
+                    28 -> Velocity(
+                        stress = stress,
+                        isRetrograde = isRetrograde,
+                        addGliss = addGliss
+                    )
+                    29 -> Attack(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
                     // MACRO FUNCTION
-                    29 -> Tornado(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
-                    30 -> Fantasia(
+                    30 -> Tornado(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
+                    31 -> Fantasia(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
                     // CONTEXT DEPENDING
-                    31 -> Resolutio2m(
+                    32 -> Resolutio2m(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    32 -> Resolutio2M(
+                    33 -> Resolutio2M(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    33 -> Resolutio3m(
+                    34 -> Resolutio3m(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    34 -> Resolutio3M(
+                    35 -> Resolutio3M(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
@@ -548,6 +561,7 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
     data class TremoloCrescendo(override val title: String = "Tremolo<", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class TremoloCrescDim(override val title: String = "Tremolo<>", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Glissando(override val title: String = "Glissando", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
+    data class Vibrato(override val title: String = "Vibrato", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Velocity(override val title: String = "Dinamica +", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Attack(override val title: String = "Attacco<", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Irregular2m(override val title: String = "Irregolare 2m", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
@@ -1316,8 +1330,9 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 }
             }
         }
-    is ReplaceType.Velocity, is ReplaceType.Glissando, is ReplaceType.Attack   -> { trackData, index, _ ->
-                var (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
+    is ReplaceType.Velocity, is ReplaceType.Glissando,
+    is ReplaceType.Vibrato, is ReplaceType.Attack   -> { trackData, index, _ ->
+                var (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato) = trackData.extractNoteDataAtIndex(index)
                 val stress = replaceType.stress
                 var actualDuration = articulationDuration ?: duration
                 when (replaceType) {
@@ -1333,6 +1348,18 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                             val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
                             glissando = (nextPitch - pitch).coerceIn(-12, +12)
                         }
+                    }
+                    is ReplaceType.Vibrato -> {
+                        val vibratoIndex = when (stress) {
+                            0 -> 0
+                            100 -> VIBRATO_EXTENSIONS.size -1
+                            else -> {
+                                // 100 : stress = vb.size-1 : x
+                                ((VIBRATO_EXTENSIONS.size -1) * stress / 100) + 1
+                            }
+                        }
+                        vibrato = VIBRATO_EXTENSIONS[vibratoIndex]
+                        //println("new vibrato: $vibrato")
                     }
                     is ReplaceType.Attack ->{
                         if (attack == 0) {
@@ -1353,7 +1380,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 listOf(isPreviousRest),
                 if(articulationDuration == null) null
                 else listOf(actualDuration),
-                if(ribattuto == null) null else listOf(ribattuto) )
+                if(ribattuto == null) null else listOf(ribattuto),
+                if(vibrato == null) null else listOf(vibrato))
             //.apply { println("SUBSTITUTION NOTE: $this") }
     }
     is ReplaceType.Resolutio2m, is ReplaceType.Resolutio2M,

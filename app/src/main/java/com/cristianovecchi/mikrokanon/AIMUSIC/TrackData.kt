@@ -16,14 +16,15 @@ data class SubstitutionNotes(val index: Int, val newPitches: List<Int> = emptyLi
                              val newGlissando: List<Int> = emptyList(), val newAttacks: List<Int> = emptyList(),
                              val newIsPreviousRest: List<Boolean> = emptyList(),
                              val newArticulationDurations: List<Int>? = null,
-                             val newRibattutos: List<Int>? = null) {
+                             val newRibattutos: List<Int>? = null,
+                             val newVibratos: List<Int>? = null) {
 //    fun check(replace: ReplaceType) {
 //        if(newPitches.size != newVelocities.size) println("WARNING: SubstitutionNote from ${replace.title } is malformed $this")
 //    }
 }
 
 data class NoteData(val pitch: Int, val tick: Int, val duration: Int, val velocity:Int, val glissando: Int,
-val attack:Int, val isPreviousRest: Boolean, val articulationDuration: Int?, val ribattuto: Int?)
+val attack:Int, val isPreviousRest: Boolean, val articulationDuration: Int?, val ribattuto: Int?, val vibrato: Int?)
 
 data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: IntArray,
                      val velocities: IntArray, val glissando: IntArray, val attacks: IntArray,
@@ -31,7 +32,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                      var articulationDurations: IntArray? = null,
                      var ribattutos: IntArray? = null,
                      val channel: Int,  val velocityOff: Int = 80,
-                     val vibrato: Int, val doublingFlags: Int = 0,
+                     val vibratos: IntArray? = null, val doublingFlags: Int = 0,
                      val audio8D: Boolean = false, val partIndex: Int,
                      val changes: List<TickChangeData> = listOf()  )// tick + instrument
 {
@@ -39,7 +40,8 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         return NoteData(pitches[index], ticks[index], durations[index], velocities[index], glissando[index],
         attacks[index], isPreviousRest[index],
         if(articulationDurations == null) null else articulationDurations!![index],
-        if(ribattutos == null) null else ribattutos!![index] )
+        if(ribattutos == null) null else ribattutos!![index],
+        if(vibratos == null) null else vibratos!![index] )
     }
     fun isConnectedToNextNote(index: Int, isStaccato: Boolean): Boolean{
         if(index >= pitches.size - 1) return false
@@ -139,6 +141,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         val previousIsRestData = mutableListOf<Boolean>()
         val artDurData = mutableListOf<Int>()
         val ribattutosData = mutableListOf<Int>()
+        val vibratosData = mutableListOf<Int>()
         //substitutionNotes.forEach { println(it) }
         for(noteIndex in pitches.indices){
             if(subsIndex < substitutionNotes.size && noteIndex == substitutionNotes[subsIndex].index){
@@ -157,6 +160,9 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                 ribattutos?.let{
                     ribattutosData.addAll(subs.newRibattutos!!)
                 }
+                vibratos?.let{
+                    vibratosData.addAll(subs.newVibratos!!)
+                }
                 subsIndex++
             } else {
                 pitchesData.add(pitches[noteIndex])
@@ -172,6 +178,9 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                 ribattutos?.let{
                     ribattutosData.add(ribattutos!![noteIndex])
                 }
+                vibratos?.let{
+                    vibratosData.add(vibratos!![noteIndex])
+                }
             }
         }
 
@@ -181,7 +190,9 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
             previousIsRestData.toBooleanArray(),
             if(this.articulationDurations == null) null else artDurData.toIntArray(),
             if(this.ribattutos == null) null else ribattutosData.toIntArray(),
-            channel, 80, vibrato, doublingFlags,
+            channel, 80,
+            if(this.ribattutos == null) null else vibratosData.toIntArray(),
+            doublingFlags,
             audio8D, partIndex, changes)
     }
 
@@ -208,7 +219,11 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         } else if (other.ribattutos != null) return false
         if (channel != other.channel) return false
         if (velocityOff != other.velocityOff) return false
-        if (vibrato != other.vibrato) return false
+        if (vibratos != null) {
+            if (other.vibratos == null) return false
+            if (!vibratos.contentEquals(other.vibratos)) return false
+        } else if (other.vibratos != null) return false
+        //if (vibrato != other.vibrato) return false
         if (doublingFlags != other.doublingFlags) return false
         if (audio8D != other.audio8D) return false
         if (partIndex != other.partIndex) return false
@@ -229,7 +244,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         result = 31 * result + (ribattutos?.contentHashCode() ?: 0)
         result = 31 * result + channel
         result = 31 * result + velocityOff
-        result = 31 * result + vibrato
+        result = 31 * result + (vibratos?.contentHashCode() ?: 0)
         result = 31 * result + doublingFlags
         result = 31 * result + audio8D.hashCode()
         result = 31 * result + partIndex
@@ -241,7 +256,7 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
         fun emptyTrack(): TrackData{
             return TrackData(intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(), intArrayOf(),
                 intArrayOf(), booleanArrayOf(),null,null,
-                0,80,0,0,false,0)
+                0,80,null,0,false,0)
         }
         // TO CORRECT
         fun findPitchesInSlice(trackDataList: List<TrackData>, start: Long, end: Long): Set<Int>{

@@ -254,7 +254,7 @@ object CounterpointInterpreter {
                     null,
                     channel,
                     80,
-                    vibrato,
+                    IntArray(pitchesData.size) { vibrato },
                     doublingFlags,
                     audio8D.contains(partIndex),
                     partIndex,

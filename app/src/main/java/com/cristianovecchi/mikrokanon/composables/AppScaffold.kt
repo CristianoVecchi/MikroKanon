@@ -259,9 +259,11 @@ fun SettingsDrawer(model: AppViewModel, colors:AppColors, dimensionsFlow: Flow<D
                             var intensity = userOptions.vibrato.toInt()
                             //intensity = if(intensity >= 8) 7 else intensity
                             val sym = getVibratoSymbol()
-                            val timeIndices: List<String> = (0..AppViewModel.MAX_VIBRATO).map { if(it == 0) "-" else sym.repeat(it) }
+                            //val timeIndices: List<String> = (0..AppViewModel.MAX_VIBRATO).map { if(it == 0) "-" else sym.repeat(it) }
+                            val timeIndices: List<String> = (0..AppViewModel.MAX_VIBRATO).map { if(it == 0) "-" else "$sym$it" }
                             val isOn = intensity != 0
-                            val text = if (intensity == 0) lang.vibrato else "${lang.vibrato}: ${sym.repeat(intensity)}"
+                            //val text = if (intensity == 0) lang.vibrato else "${lang.vibrato}: ${sym.repeat(intensity)}"
+                            val text = if (intensity == 0) lang.vibrato else "${lang.vibrato}: $sym$intensity"
                             SelectableCard(
                                 text = text,
                                 fontSize = fontSize,
