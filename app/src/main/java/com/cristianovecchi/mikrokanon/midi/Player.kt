@@ -243,7 +243,7 @@ object Player {
                                             //dispatch("Building MidiTrack Channel: ${it.channel}")
                                             dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
                                             //println("Total on notes after Check'n'replace: ${actualCounterpointTrackData.sumOf{it.pitches.size}}")
-                                            it.convertToMidiTrack(actualCounterpointTrackDatas.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack} })
+                                            it.convertToMidiTrack(actualCounterpointTrackDatas.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack || it.replace is ReplaceType.AttackCrescDim} })
                                         } else MidiTrack()
                                     }
                                     if (!job.isActive) {

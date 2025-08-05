@@ -19,6 +19,7 @@ sealed class CheckType(open val title: String = "") {
             is SingleNote -> "4"
             is AtTheExtremes -> "5"
             is NotAtTheExtremes -> "6"
+            is EqualOrSmaller -> "7#$limit"
         }
     }
     fun describe(): String {
@@ -30,6 +31,7 @@ sealed class CheckType(open val title: String = "") {
             is SingleNote -> this.title
             is AtTheExtremes -> this.title
             is NotAtTheExtremes -> this.title
+            is EqualOrSmaller -> "${this.title}${limitInString(this.limit)}"
         }
     }
 
@@ -40,6 +42,7 @@ sealed class CheckType(open val title: String = "") {
     data class SingleNote(override val title: String = " |-| ") : CheckType()
     data class AtTheExtremes(override val title: String = " |- ... -| ") : CheckType()
     data class NotAtTheExtremes(override val title: String = " ∞ != |- -| ") : CheckType()
+    data class EqualOrSmaller(override val title: String = " \u2264 ", val limit: Int = 240) : CheckType()
     //, ALONE("].[ >=")
     companion object {
         fun provideCheckType(index: Int, limit: Int = 240): CheckType{
@@ -51,6 +54,7 @@ sealed class CheckType(open val title: String = "") {
                 4 -> SingleNote()
                 5 -> AtTheExtremes()
                 6 -> NotAtTheExtremes()
+                7 -> EqualOrSmaller(limit = limit)
                 else -> None()
             }
         }
@@ -65,7 +69,15 @@ sealed class CheckType(open val title: String = "") {
                 EqualOrGreater(limit = 2880), EqualOrGreater(limit = 3360),
                 EqualOrGreater(limit = 3840), EqualOrGreater(limit = 4320),
                 StartPhrase(), EndPhrase(), SingleNote(),
-                AtTheExtremes(), NotAtTheExtremes()
+                AtTheExtremes(), NotAtTheExtremes(),
+                EqualOrSmaller(limit = 120),
+                EqualOrSmaller(limit = 160),EqualOrSmaller(limit = 240),
+                EqualOrSmaller(limit = 320), EqualOrSmaller(limit = 480),
+                EqualOrSmaller(limit = 640),
+                EqualOrSmaller(limit = 960), EqualOrSmaller(limit = 1440),
+                EqualOrSmaller(limit = 1920), EqualOrSmaller(limit = 2400),
+                EqualOrSmaller(limit = 2880), EqualOrSmaller(limit = 3360),
+                EqualOrSmaller(limit = 3840), EqualOrSmaller(limit = 4320),
             )
         }
         fun limitInString(limit: Int): String {
@@ -113,6 +125,24 @@ sealed class CheckType(open val title: String = "") {
                 is SingleNote -> 18
                 is AtTheExtremes -> 19
                 is NotAtTheExtremes -> 20
+                is EqualOrSmaller -> when(check.limit){
+                    0 -> 21
+                    120 -> 22
+                    160 -> 23
+                    240 -> 24
+                    320 -> 25
+                    480 -> 26
+                    640 ->27
+                    960 -> 28
+                    1440 -> 29
+                    1920 -> 30
+                    2400 -> 31
+                    2880 -> 32
+                    3360 -> 33
+                    3840 -> 34
+                    4320 -> 35
+                    else -> 0
+                }
             }
         }
     }
@@ -213,6 +243,11 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 addGliss = addGliss
             )
             is Attack -> this.copy(
+                stress = stress,
+                isRetrograde = isRetrograde,
+                addGliss = addGliss
+            )
+            is AttackCrescDim -> this.copy(
                 stress = stress,
                 isRetrograde = isRetrograde,
                 addGliss = addGliss
@@ -332,13 +367,14 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 is Vibrato -> "27#$stress#$retr#$gliss"
                 is Velocity -> "28#$stress#$retr#$gliss"
                 is Attack -> "29#$stress#$retr#$gliss"
-                is Tornado -> "30#$stress#$retr#$gliss"
-                is Fantasia -> "31#$stress#$retr#$gliss"
+                is AttackCrescDim -> "30#$stress#$retr#$gliss"
+                is Tornado -> "31#$stress#$retr#$gliss"
+                is Fantasia -> "32#$stress#$retr#$gliss"
 
-                is Resolutio2m -> "32#$stress#$retr#$gliss"
-                is Resolutio2M -> "33#$stress#$retr#$gliss"
-                is Resolutio3m -> "34#$stress#$retr#$gliss"
-                is Resolutio3M -> "35#$stress#$retr#$gliss"
+                is Resolutio2m -> "33#$stress#$retr#$gliss"
+                is Resolutio2M -> "34#$stress#$retr#$gliss"
+                is Resolutio3m -> "35#$stress#$retr#$gliss"
+                is Resolutio3M -> "36#$stress#$retr#$gliss"
 
             }
         }
@@ -362,7 +398,7 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 "Accento", "SOS",
                 "Trillo< 2m", "Trillo< 2M", "Trillo<> 2m", "Trillo<> 2M",
                 "Oscillazione 2m", "Oscillazione 2M", "Irregolare 2m", "Irregolare 2M",
-                "Glissando", "Vibrato", "Dinamica +", "Attacco",
+                "Glissando", "Vibrato", "Dinamica +", "Attacco<", "Attacco<>",
                 "Tornado", "Fantasia",
                 "Resolutio➚ 2m", "Resolutio➚ 2M", "Resolutio➚ 3m", "Resolutio➚ 3M"
             )
@@ -504,30 +540,31 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                         addGliss = addGliss
                     )
                     29 -> Attack(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
+                    30 -> AttackCrescDim(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
                     // MACRO FUNCTION
-                    30 -> Tornado(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
-                    31 -> Fantasia(
+                    31 -> Tornado(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
+                    32 -> Fantasia(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
                     // CONTEXT DEPENDING
-                    32 -> Resolutio2m(
+                    33 -> Resolutio2m(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    33 -> Resolutio2M(
+                    34 -> Resolutio2M(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    34 -> Resolutio3m(
+                    35 -> Resolutio3m(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    35 -> Resolutio3M(
+                    36 -> Resolutio3M(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
@@ -564,6 +601,7 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
     data class Vibrato(override val title: String = "Vibrato", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Velocity(override val title: String = "Dinamica +", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Attack(override val title: String = "Attacco<", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
+    data class AttackCrescDim(override val title: String = "Attacco<>", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Irregular2m(override val title: String = "Irregolare 2m", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Irregular2M(override val title: String = "Irregolare 2M", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class SOS(override val title: String = "SOS", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
@@ -589,7 +627,8 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
             is ReplaceType.RibattutoCrescendo, is ReplaceType.RibattutoCrescDim,
             is ReplaceType.DrammaticoCrescendo, is ReplaceType.DrammaticoCrescDim,
             is ReplaceType.Accento, is ReplaceType.SOS,
-            is ReplaceType.Glissando, is ReplaceType.Velocity, is ReplaceType.Attack -> false
+            is ReplaceType.Glissando, is ReplaceType.Vibrato,
+            is ReplaceType.Velocity, is ReplaceType.Attack, is ReplaceType.AttackCrescDim-> false
             else -> true
         }
     }
@@ -597,6 +636,8 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
         return when (replace)
         {
             is ReplaceType.Glissando -> false
+            is ReplaceType.Vibrato -> false
+            is ReplaceType.Velocity -> false
             else -> true
         }
     }
@@ -622,6 +663,7 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
             is CheckType.SingleNote -> "${check.describe()} $rangeNotes $title$gliss $stress"
             is CheckType.AtTheExtremes -> "${check.describe()} $rangeNotes $title$gliss $stress"
             is CheckType.NotAtTheExtremes -> "${check.describe()} $rangeNotes $title$gliss $stress"
+            is CheckType.EqualOrSmaller -> "${check.describe()} $rangeNotes $title$gliss $stress"
         }
     }
     fun toCsv(): String {
@@ -694,6 +736,10 @@ fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>
         is CheckType.NotAtTheExtremes -> { trackData, index, _ ->
             !trackData.isPreviousRest[index] && !trackData.isPreviousRest.getOrElse(index + 1) {true}
         }
+        is CheckType.EqualOrSmaller -> { trackData, index, _ ->
+            trackData.pitches[index]
+            trackData.durations[index] <= checkType.limit
+        }
     }
 }
 fun provideFantasiaFunctions(stress: Int, isRetrograde: Boolean, addGliss: Boolean): List<ReplaceType>{
@@ -765,7 +811,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
         is ReplaceType.DrammaticoCrescendo, is ReplaceType.DrammaticoCrescDim,
         is ReplaceType.TremoloCrescendo, is ReplaceType.TremoloCrescDim,
         is ReplaceType.RibattutoCrescendo, is ReplaceType.RibattutoCrescDim -> { trackData, index, _ ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
+            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato)
                     = trackData.extractNoteDataAtIndex(index)
             val actualDuration = articulationDuration ?: duration
             val isRibattuto = replaceType is ReplaceType.RibattutoCrescendo || replaceType is ReplaceType.RibattutoCrescDim
@@ -823,13 +869,14 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         List(nNotes){attack},
                         listOf(isPreviousRest, *List(nNotes-1){false}.toTypedArray()),
                         if (articulationDuration == null) null else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
-                        if (ribattuto == null) null else List(nNotes){ribattuto}
+                        if (ribattuto == null) null else List(nNotes){ribattuto},
+                        if (vibrato == null) null else List(nNotes){vibrato}
                     )//.apply{ println("nNotes:$nNotes start:$velocity end:$stressedVelocity $this") }
                 }
             }
         }
         is ReplaceType.SOS -> { trackData, index, _ ->
-            val (pitch, tick, duration, velocity, _, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
+            val (pitch, tick, duration, velocity, _, attack, isPreviousRest, articulationDuration, ribattuto, vibrato) = trackData.extractNoteDataAtIndex(index)
             val pattern = RhythmPatterns.SOS.values
             val nElements = pattern.size
             val grain = 24
@@ -848,11 +895,12 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(attack,attack,attack,attack,attack,attack,attack,attack,attack),
                     listOf(isPreviousRest,false,false,true,false,false,true,false,false),
                     if(articulationDuration == null) null else durs,
-                    if(ribattuto == null) null else listOf(ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto) )
+                    if(ribattuto == null) null else listOf(ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto),
+                    if(vibrato == null) null else listOf(vibrato, vibrato, vibrato, vibrato, vibrato, vibrato, vibrato, vibrato, vibrato))
             }
         }
         is ReplaceType.Accento -> { trackData, index, _ ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
+            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato)
                     = trackData.extractNoteDataAtIndex(index)
             val actualDuration = articulationDuration ?: duration
             val isStaccato = actualDuration < duration
@@ -881,7 +929,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(0, attack),
                         listOf(isPreviousRest, false),
                         if (articulationDuration == null) null else listOf(longDur, accentDur),
-                        if (ribattuto == null) null else listOf(ribattuto, ribattuto)
+                        if (ribattuto == null) null else listOf(ribattuto, ribattuto),
+                        if (vibrato == null) null else listOf(vibrato, vibrato)
                     )
                 } else {
                     val diff = if(isStaccato || glissando != 0) 0 else actualDuration - duration
@@ -895,14 +944,15 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(attack, 0),
                         listOf(isPreviousRest, true),
                         if (articulationDuration == null) null else listOf(accentDur, longDur+diff),
-                        if (ribattuto == null) null else listOf(ribattuto, ribattuto)
+                        if (ribattuto == null) null else listOf(ribattuto, ribattuto),
+                        if (vibrato == null) null else listOf(vibrato, vibrato)
                     )
                 }
             }
         }
         is ReplaceType.Cromatica, is ReplaceType.Diatonica,
         is ReplaceType.CromaticaDiCambio, is ReplaceType.DiatonicaDiCambio -> { trackData, index, _ ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
+            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato)
                     = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
             val actualDuration = articulationDuration ?: duration
@@ -959,14 +1009,15 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(isPreviousRest, *List(nNotes-1){false}.toTypedArray()),
                         if(articulationDuration == null) null
                             else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
-                        if (ribattuto == null) null else List(nNotes){ribattuto}
+                        if (ribattuto == null) null else List(nNotes){ribattuto},
+                        if (vibrato == null) null else List(nNotes){vibrato}
                     )
                 }
             }
         }
         is ReplaceType.OscillazioneCromatica, is ReplaceType.OscillazioneDiatonica,
         is ReplaceType.Irregular2m, is ReplaceType.Irregular2M -> { trackData, index, _ ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
+            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato)
                     = trackData.extractNoteDataAtIndex(index)
             val actualDuration = articulationDuration ?: duration
             val isStaccato = actualDuration < duration
@@ -1000,13 +1051,14 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(isPreviousRest, *List(div-1){false}.toTypedArray()),
                     if (articulationDuration == null) null
                     else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
-                    if (ribattuto == null) null else List(div){ribattuto}
+                    if (ribattuto == null) null else List(div){ribattuto},
+                    if (vibrato == null) null else List(div){vibrato}
                 )//.apply{ println("div:$div $this") }
             }
         }
         is ReplaceType.Trillo2mCrescendo, is ReplaceType.Trillo2MCrescendo,
         is ReplaceType.Trillo2mCrescDim, is ReplaceType.Trillo2MCrescDim -> { trackData, index, _ ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto)
+            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato)
             = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
             val actualDuration = articulationDuration ?: duration
@@ -1063,13 +1115,14 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(isPreviousRest, *List(div-1){false}.toTypedArray()),
                     if (articulationDuration == null) null
                         else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
-                    if (ribattuto == null) null else List(div){ribattuto}
+                    if (ribattuto == null) null else List(div){ribattuto},
+                    if (vibrato == null) null else List(div){vibrato}
                 )
                   //.apply { println("TRILLO:$index duration: $duration, artDur: $articulationDuration $this") }
             }
         }
         is ReplaceType.Mordente -> { trackData, index, _ ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(
+            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato) = trackData.extractNoteDataAtIndex(
                 index
             )
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
@@ -1114,13 +1167,14 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(isPreviousRest, false, false),
                     if (articulationDuration == null) null
                       else listOf(*durs.dropLast(1).toTypedArray(),durs.last() + diff),
-                    if (ribattuto == null) null else listOf(ribattuto, ribattuto, ribattuto)
+                    if (ribattuto == null) null else listOf(ribattuto, ribattuto, ribattuto),
+                    if (vibrato == null) null else listOf(vibrato, vibrato, vibrato)
                 )
                  //   .apply { println("MORDENTE:$index duration: $duration, artDur: $articulationDuration $this") }
             }
         }
            is ReplaceType.Mordente3x -> { trackData, index, _ ->
-                val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
+                val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato) = trackData.extractNoteDataAtIndex(index)
                 // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
 
                 val actualDuration = articulationDuration ?: duration
@@ -1163,12 +1217,13 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(isPreviousRest, false, false, false, false, false, false),
                     if(articulationDuration == null) null
                     else listOf(*durs.dropLast(1).toTypedArray(),durs.last() + diff),
-                    if(ribattuto == null) null else listOf(ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto) )
+                    if(ribattuto == null) null else listOf(ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto, ribattuto),
+                    if(vibrato == null) null else listOf(vibrato, vibrato, vibrato, vibrato, vibrato, vibrato, vibrato) )
                    // .apply { println("MORDENTE 3X:$index duration: $duration, artDur: $articulationDuration $this") }
                 }
             }
        is ReplaceType.Mordente2x -> { trackData, index, _ ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
+            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato) = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
             val actualDuration = articulationDuration ?: duration
            val isStaccato = actualDuration < duration
@@ -1211,12 +1266,13 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     listOf(isPreviousRest, false, false, false, false),
                     if(articulationDuration == null) null
                         else listOf(*durs.dropLast(1).toTypedArray(),durs.last() + diff),
-                    if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto, ribattuto) )
+                    if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto, ribattuto),
+                    if(vibrato == null) null else listOf(vibrato,vibrato,vibrato, vibrato, vibrato) )
                 //    .apply { println("MORDENTE 2X:$index duration: $duration, artDur: $articulationDuration $this") }
             }
         }
         is ReplaceType.Gruppetto, is ReplaceType.Cambio -> { trackData, index, _ ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
+            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato) = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
             val actualDuration = articulationDuration ?: duration
             val isStaccato = actualDuration < duration
@@ -1255,7 +1311,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(isPreviousRest, false, false, false),
                         if(articulationDuration == null) null
                         else listOf(*newDurs.dropLast(1).toTypedArray(), newDurs.last() + diff),
-                        if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto) )
+                        if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto),
+                        if(vibrato == null) null else listOf(vibrato,vibrato,vibrato, vibrato) )
                     //  .apply { println("GRUPPETTO:$index duration: $duration, artDur: $articulationDuration $this") }
                 } else {
                     val (pitches, glissList) =  findGruppettoPitches(pitch, nextPitch, replaceType.addGliss, glissando)//.apply { println(this) }
@@ -1267,13 +1324,14 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(isPreviousRest, false, false, false, false),
                         if(articulationDuration == null) null
                         else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
-                        if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto, ribattuto) )
+                        if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto, ribattuto),
+                        if(vibrato == null) null else listOf(vibrato,vibrato,vibrato, vibrato, vibrato) )
                     //  .apply { println("GRUPPETTO:$index duration: $duration, artDur: $articulationDuration $this") }
                 }
             }
         }
         is ReplaceType.Onda -> { trackData, index, _ ->
-            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
+            val (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato) = trackData.extractNoteDataAtIndex(index)
             // 30 = 1/64  60 = 1/32  120 = 1/16  240 = 1/8  480 = 1/4
             val actualDuration = articulationDuration ?: duration
             val isStaccato = actualDuration < duration
@@ -1310,7 +1368,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(isPreviousRest, false, false),
                         if(articulationDuration == null) null
                         else listOf(*newDurs.dropLast(1).toTypedArray(), newDurs.last() + diff),
-                        if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto) )
+                        if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto),
+                        if(vibrato == null) null else listOf(vibrato,vibrato,vibrato) )
                     //  .apply { println("ONDA:$index duration: $duration, artDur: $articulationDuration $this") }
                 } else {
                     val middleVelocity = (stressedVelocity + velocity) / 2
@@ -1325,13 +1384,14 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(isPreviousRest, false, false, false, false),
                         if(articulationDuration == null) null
                         else listOf(*durs.dropLast(1).toTypedArray(), durs.last() + diff),
-                        if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto, ribattuto) )
+                        if(ribattuto == null) null else listOf(ribattuto,ribattuto,ribattuto, ribattuto, ribattuto),
+                        if(vibrato == null) null else listOf(vibrato,vibrato,vibrato, vibrato, vibrato) )
                     //  .apply { println("ONDA:$index duration: $duration, artDur: $articulationDuration $this") }
                 }
             }
         }
     is ReplaceType.Velocity, is ReplaceType.Glissando,
-    is ReplaceType.Vibrato, is ReplaceType.Attack   -> { trackData, index, _ ->
+    is ReplaceType.Vibrato, is ReplaceType.Attack, is ReplaceType.AttackCrescDim  -> { trackData, index, _ ->
                 var (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato) = trackData.extractNoteDataAtIndex(index)
                 val stress = replaceType.stress
                 var actualDuration = articulationDuration ?: duration
@@ -1362,12 +1422,13 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         //println("new vibrato: $vibrato")
                     }
                     is ReplaceType.Attack ->{
-                        if (attack == 0) {
-                            val originalNegativity = if(attack < 0) -1 else 1
                             val negativity = if(replaceType.isRetrograde) -1 else 1
-                            attack = attack.absoluteValue + stress
-                            attack = attack.coerceIn(0, 127) * negativity * originalNegativity
-                        }
+                            attack = stress * negativity
+                    }
+                    is ReplaceType.AttackCrescDim ->{
+                            val negativity = if(replaceType.isRetrograde) -1 else 1
+                            attack = 1000 + (stress * negativity)
+                            //println("new attack CrescDim: $attack")
                     }
                     else -> {}
                 }
@@ -1386,7 +1447,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
     }
     is ReplaceType.Resolutio2m, is ReplaceType.Resolutio2M,
     is ReplaceType.Resolutio3m, is ReplaceType.Resolutio3M -> { trackData, index, trackDataList ->
-        var (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto) = trackData.extractNoteDataAtIndex(index)
+        var (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato) = trackData.extractNoteDataAtIndex(index)
         val stress = replaceType.stress
         var actualDuration = articulationDuration ?: duration
         val direction = if(replaceType.isRetrograde) -1 else 1
@@ -1436,7 +1497,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         listOf(isPreviousRest, false),
                         if(articulationDuration == null) null
                         else listOf(firstDur, secondDur + diff),
-                        if(ribattuto == null) null else listOf(ribattuto, ribattuto) )
+                        if(ribattuto == null) null else listOf(ribattuto, ribattuto),
+                        if(vibrato == null) null else listOf(vibrato!!, vibrato!!) )
                 }.also{
                     println("resolutio: $it")
                 }
