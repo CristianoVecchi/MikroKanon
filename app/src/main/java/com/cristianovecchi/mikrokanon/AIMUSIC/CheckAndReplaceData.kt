@@ -252,6 +252,21 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 isRetrograde = isRetrograde,
                 addGliss = addGliss
             )
+            is AttackCrescDimX2 -> this.copy(
+                stress = stress,
+                isRetrograde = isRetrograde,
+                addGliss = addGliss
+            )
+            is AttackCrescDimX3 -> this.copy(
+                stress = stress,
+                isRetrograde = isRetrograde,
+                addGliss = addGliss
+            )
+            is AttackCrescDimX4 -> this.copy(
+                stress = stress,
+                isRetrograde = isRetrograde,
+                addGliss = addGliss
+            )
             is Glissando -> this.copy(
                 stress = stress,
                 isRetrograde = isRetrograde,
@@ -331,6 +346,7 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
         }
         }
         fun toCsv(): String {
+            //println("CheckAndReplace: toCsv: ${this.title}")
             val retr = if (this.isRetrograde) 1 else 0
             val gliss = if (this.addGliss) 1 else 0
             return when (this) {
@@ -368,13 +384,17 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 is Velocity -> "28#$stress#$retr#$gliss"
                 is Attack -> "29#$stress#$retr#$gliss"
                 is AttackCrescDim -> "30#$stress#$retr#$gliss"
-                is Tornado -> "31#$stress#$retr#$gliss"
-                is Fantasia -> "32#$stress#$retr#$gliss"
+                is AttackCrescDimX2 -> "31#$stress#$retr#$gliss"
+                is AttackCrescDimX3 -> "32#$stress#$retr#$gliss"
+                is AttackCrescDimX4 -> "33#$stress#$retr#$gliss"
 
-                is Resolutio2m -> "33#$stress#$retr#$gliss"
-                is Resolutio2M -> "34#$stress#$retr#$gliss"
-                is Resolutio3m -> "35#$stress#$retr#$gliss"
-                is Resolutio3M -> "36#$stress#$retr#$gliss"
+                is Tornado -> "34#$stress#$retr#$gliss"
+                is Fantasia -> "35#$stress#$retr#$gliss"
+
+                is Resolutio2m -> "36#$stress#$retr#$gliss"
+                is Resolutio2M -> "37#$stress#$retr#$gliss"
+                is Resolutio3m -> "38#$stress#$retr#$gliss"
+                is Resolutio3M -> "39#$stress#$retr#$gliss"
 
             }
         }
@@ -382,6 +402,9 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
         fun titleAsRetrograde(): String {
             return when {
                 title.contains("+") -> title.replace("+", "-")
+                title.contains("<><><><>") -> title.replace("<><><><>", "><><><><")
+                title.contains("<><><>") -> title.replace("<><><>", "><><><")
+                title.contains("<><>") -> title.replace("<><>", "><><")
                 title.contains("<>") -> title.replace("<>", "><")
                 title.contains("<") -> title.replace("<", ">")
                 title.contains("➚") -> title.replace("➚", "➘")
@@ -398,7 +421,8 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                 "Accento", "SOS",
                 "Trillo< 2m", "Trillo< 2M", "Trillo<> 2m", "Trillo<> 2M",
                 "Oscillazione 2m", "Oscillazione 2M", "Irregolare 2m", "Irregolare 2M",
-                "Glissando", "Vibrato", "Dinamica +", "Attacco<", "Attacco<>",
+                "Glissando", "Vibrato", "Dinamica +",
+                "Attacco<", "Attacco<>", "Attacco<><>","Attacco<><><>", "Attacco<><><><>",
                 "Tornado", "Fantasia",
                 "Resolutio➚ 2m", "Resolutio➚ 2M", "Resolutio➚ 3m", "Resolutio➚ 3M"
             )
@@ -541,30 +565,33 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
                     )
                     29 -> Attack(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
                     30 -> AttackCrescDim(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
+                    31 -> AttackCrescDimX2(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
+                    32 -> AttackCrescDimX3(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
+                    33 -> AttackCrescDimX4(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
                     // MACRO FUNCTION
-                    31 -> Tornado(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
-                    32 -> Fantasia(
+                    34 -> Tornado(stress = stress, isRetrograde = isRetrograde, addGliss = addGliss)
+                    35 -> Fantasia(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
                     // CONTEXT DEPENDING
-                    33 -> Resolutio2m(
+                    36 -> Resolutio2m(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    34 -> Resolutio2M(
+                    37 -> Resolutio2M(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    35 -> Resolutio3m(
+                    38 -> Resolutio3m(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
                     )
-                    36 -> Resolutio3M(
+                    39 -> Resolutio3M(
                         stress = stress,
                         isRetrograde = isRetrograde,
                         addGliss = addGliss
@@ -602,6 +629,9 @@ sealed class ReplaceType(open val title: String = "", open val stress: Int = 0 ,
     data class Velocity(override val title: String = "Dinamica +", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Attack(override val title: String = "Attacco<", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class AttackCrescDim(override val title: String = "Attacco<>", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
+    data class AttackCrescDimX2(override val title: String = "Attacco<><>", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
+    data class AttackCrescDimX3(override val title: String = "Attacco<><><>", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
+    data class AttackCrescDimX4(override val title: String = "Attacco<><><><>", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Irregular2m(override val title: String = "Irregolare 2m", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class Irregular2M(override val title: String = "Irregolare 2M", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
     data class SOS(override val title: String = "SOS", override val stress: Int = 16, override val isRetrograde: Boolean = false, override val addGliss: Boolean = false): ReplaceType()
@@ -1391,7 +1421,8 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             }
         }
     is ReplaceType.Velocity, is ReplaceType.Glissando,
-    is ReplaceType.Vibrato, is ReplaceType.Attack, is ReplaceType.AttackCrescDim  -> { trackData, index, _ ->
+    is ReplaceType.Vibrato, is ReplaceType.Attack, is ReplaceType.AttackCrescDim,
+    is ReplaceType.AttackCrescDimX2 ,is ReplaceType.AttackCrescDimX3 ,is ReplaceType.AttackCrescDimX4 -> { trackData, index, _ ->
                 var (pitch, tick, duration, velocity, glissando, attack, isPreviousRest, articulationDuration, ribattuto, vibrato) = trackData.extractNoteDataAtIndex(index)
                 val stress = replaceType.stress
                 var actualDuration = articulationDuration ?: duration
@@ -1429,6 +1460,21 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                             val negativity = if(replaceType.isRetrograde) -1 else 1
                             attack = 1000 + (stress * negativity)
                             //println("new attack CrescDim: $attack")
+                    }
+                    is ReplaceType.AttackCrescDimX2 ->{
+                        val negativity = if(replaceType.isRetrograde) -1 else 1
+                        attack = 2000 + (stress * negativity)
+                        //println("new attack CrescDimX2": $attack")
+                    }
+                    is ReplaceType.AttackCrescDimX3 ->{
+                        val negativity = if(replaceType.isRetrograde) -1 else 1
+                        attack = 3000 + (stress * negativity)
+                        //println("new attack CrescDimX3: $attack")
+                    }
+                    is ReplaceType.AttackCrescDimX4 ->{
+                        val negativity = if(replaceType.isRetrograde) -1 else 1
+                        attack = 4000 + (stress * negativity)
+                        //println("new attack CrescDimX4: $attack")
                     }
                     else -> {}
                 }

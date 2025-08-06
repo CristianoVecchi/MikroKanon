@@ -243,7 +243,9 @@ object Player {
                                             //dispatch("Building MidiTrack Channel: ${it.channel}")
                                             dispatch(Triple(AppViewModel.Building.MIDITRACKS, it.channel ,nParts))
                                             //println("Total on notes after Check'n'replace: ${actualCounterpointTrackData.sumOf{it.pitches.size}}")
-                                            it.convertToMidiTrack(actualCounterpointTrackDatas.size, checkAndReplace.any { it.any { it.replace is ReplaceType.Attack || it.replace is ReplaceType.AttackCrescDim} })
+                                            it.convertToMidiTrack(actualCounterpointTrackDatas.size,
+                                                checkAndReplace.any { it.any { it.replace is ReplaceType.Attack || it.replace is ReplaceType.AttackCrescDim
+                                                        || it.replace is ReplaceType.AttackCrescDimX2 || it.replace is ReplaceType.AttackCrescDimX3 || it.replace is ReplaceType.AttackCrescDimX4}})
                                         } else MidiTrack()
                                     }
                                     if (!job.isActive) {

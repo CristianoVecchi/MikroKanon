@@ -31,6 +31,18 @@ import kotlin.math.absoluteValue
 //    println("Total section 3: ${section3.nElements()}")
 //}
 
+public inline operator fun <T> List<T>.component5(): T {
+    return get(4)
+}
+public inline operator fun <T> List<T>.component6(): T {
+    return get(5)
+}
+public inline operator fun <T> List<T>.component7(): T {
+    return get(6)
+}
+public inline operator fun <T> List<T>.component8(): T {
+    return get(7)
+}
 
 fun List<List<String>>.indexInTotalOf(item: String): Int{
     var partialTotal = 0

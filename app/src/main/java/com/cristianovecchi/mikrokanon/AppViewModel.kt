@@ -50,7 +50,7 @@ class AppViewModel(
         val ARTICULATIONS = floatArrayOf(1f, 0.125f, 0.25f, 0.75f, 1f, 1.125f, 1.25f)
         const val MAX_VIBRATO = 48 //extensions.size -1
         val VIBRATO_EXTENSIONS = intArrayOf(0,3360,3180, 3000, 2820,2640, 2460, 2280,2100,1920,1800,1680,1560,1440,1320,1200,1080,960,900,840,780,720,660,600,540,480, 450, 420, 390, 360, 330, 300 ,270,240, 220, 200, 180, 160, 140, 120, 100, 80, 60, 45, 30, 15, 12, 8, 6)
-        val ATTACK_MIN = 12 // old is 29
+        val ATTACK_MIN = 20 // old is 29 (too low could generate a note-to-note click in some MIDI instruments)
     }
     var privacyIsAccepted = true
     val iconMap = Icons.provideIcons()

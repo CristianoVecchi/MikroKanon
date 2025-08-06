@@ -474,7 +474,7 @@ fun addDecrementalAttack(midiTrack: MidiTrack, intTick: Int, duration: Int, newA
             values = values.subList(0, attackDur).filter{it % 2 != 0 }
         }
         val step = attackDur / values.size // possibly reducted size
-        //println("DECR-> tick: $tick dur: $duration  attackDur: $attackDur  step: $step  ${values.size} $values")
+       // println("DECR-> tick: $tick dur: $duration  attackDur: $attackDur  step: $step  ${values.size} $values")
         val firstAttack = Controller(tick, channel,11, 127)
         midiTrack.insertEvent(firstAttack)
         tick = tick + duration - attackDur // set the decrescendo at the end of the note
@@ -503,32 +503,129 @@ fun TrackData.addAttackToMidiTrack(midiTrack: MidiTrack) {
     //println("attacks: ${this.attacks.contentToString()}")
     ticks.forEachIndexed { i, intTick ->
         val newAttack = attacks[i]
-        //println("newAttack: $newAttack")
-        if(newAttack >= 900) {
-            val realAttack = newAttack - 1000
-            //println("realAttack: $realAttack")
-            val halfDuration2 = durations[i] / 2
-            val halfDuration1 = halfDuration2 + durations[i] % 2
-            //println("Total duration: ${durations[i]}  half1: $halfDuration1  half2: $halfDuration2")
-            if (realAttack > 0){
-                addIncrementalAttack(midiTrack, intTick, halfDuration1, realAttack, this.channel)
-                addDecrementalAttack(midiTrack, intTick + halfDuration1, halfDuration2, -realAttack, this.channel)
-                // after lowering attack should be reset to normal (127) for the next note
-                this.checkForNormalAttackAndSetIt(midiTrack, i + 1)
-            } else if(realAttack < 0) { //AttackCrescDim >< (Dim-Cresc)
-                addDecrementalAttack(midiTrack, intTick, halfDuration1, realAttack, this.channel)
-                addIncrementalAttack(midiTrack, intTick + halfDuration1, halfDuration2, -realAttack, this.channel)
+       // println("newAttack: $newAttack")
+        when (newAttack) {
+            0 -> {}
+            in -100..100 -> {
+                if(newAttack > 0){
+                    addIncrementalAttack(midiTrack, intTick, durations[i], newAttack, this.channel)
+                } else { // negative attack
+                    addDecrementalAttack(midiTrack, intTick, durations[i], newAttack, this.channel)
+                    // after lowering attack should be reset to normal (127) for the next note
+                    this.checkForNormalAttackAndSetIt(midiTrack, i + 1)
+                }
             }
-        } else {
-
-            if(newAttack > 0){
-                addIncrementalAttack(midiTrack, intTick, durations[i], newAttack, this.channel)
-            } else if(newAttack < 0) {
-                addDecrementalAttack(midiTrack, intTick, durations[i], newAttack, this.channel)
-                // after lowering attack should be reset to normal (127) for the next note
-                this.checkForNormalAttackAndSetIt(midiTrack, i + 1)
+            in 900..1100 -> {
+                val realAttack = newAttack - 1000
+                //println("realAttack: $realAttack")
+                val halfDuration2 = durations[i] / 2
+                val halfDuration1 = halfDuration2 + durations[i] % 2
+                //println("Total duration: ${durations[i]}  half1: $halfDuration1  half2: $halfDuration2")
+                if (realAttack > 0) {
+                    addIncrementalAttack(midiTrack, intTick, halfDuration1, realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + halfDuration1, halfDuration2, -realAttack, this.channel)
+                    // after lowering attack should be reset to normal (127) for the next note
+                    this.checkForNormalAttackAndSetIt(midiTrack, i + 1)
+                } else if(realAttack < 0) { //AttackCrescDim >< (Dim-Cresc)
+                    addDecrementalAttack(midiTrack, intTick, halfDuration1, realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + halfDuration1, halfDuration2, -realAttack, this.channel)
+                }
+            }
+            in 1900..2100 -> { //X2 <><>
+                val realAttack = newAttack - 2000
+                //println("realAttack: $realAttack")
+                val (dur1, dur2, dur3, dur4) = durations[i].divideDistributingRest(4)
+                //println("Total duration: ${durations[i]}  half1: $halfDuration1  half2: $halfDuration2")
+                if (realAttack > 0) {
+                    addIncrementalAttack(midiTrack, intTick, dur1, realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1, dur2, -realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 +dur2, dur3, realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3, dur4, -realAttack, this.channel)
+                    // after lowering attack should be reset to normal (127) for the next note
+                    this.checkForNormalAttackAndSetIt(midiTrack, i + 1)
+                } else if(realAttack < 0) { //AttackCrescDim >< (Dim-Cresc)
+                    addDecrementalAttack(midiTrack, intTick, dur1, realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1, dur2, -realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 +dur2, dur3, realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3, dur4, -realAttack, this.channel)
+                }
+            }
+            in 2900..3100 -> { //X3 <><><>
+                val realAttack = newAttack - 3000
+                //println("realAttack: $realAttack")
+                val (dur1, dur2, dur3, dur4, dur5, dur6) = durations[i].divideDistributingRest(6)
+                //println("Total duration: ${durations[i]}  half1: $halfDuration1  half2: $halfDuration2")
+                if (realAttack > 0) {
+                    addIncrementalAttack(midiTrack, intTick, dur1, realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1, dur2, -realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 +dur2, dur3, realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3, dur4, -realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 +dur2 +dur3 +dur4, dur5, realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3 +dur4 +dur5, dur6, -realAttack, this.channel)
+                    // after lowering attack should be reset to normal (127) for the next note
+                    this.checkForNormalAttackAndSetIt(midiTrack, i + 1)
+                } else if(realAttack < 0) { //AttackCrescDim >< (Dim-Cresc)
+                    addDecrementalAttack(midiTrack, intTick, dur1, realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1, dur2, -realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 +dur2, dur3, realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3, dur4, -realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 +dur2 +dur3 +dur4, dur5, realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3 +dur4 +dur5, dur6, -realAttack, this.channel)
+                }
+            }
+            in 3900..4100 -> { //x4
+                val realAttack = newAttack - 4000
+                //println("realAttack: $realAttack")
+                val (dur1, dur2, dur3, dur4, dur5, dur6, dur7, dur8) = durations[i].divideDistributingRest(8)
+                //println("Total duration: ${durations[i]}  half1: $halfDuration1  half2: $halfDuration2")
+                if (realAttack > 0) {
+                    addIncrementalAttack(midiTrack, intTick, dur1, realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1, dur2, -realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 +dur2, dur3, realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3, dur4, -realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 +dur2 +dur3 +dur4, dur5, realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3 +dur4 +dur5, dur6, -realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 +dur2 +dur3 +dur4 +dur5 +dur6, dur7, realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3 +dur4 +dur5 +dur6 +dur7, dur8, -realAttack, this.channel)
+                    // after lowering attack should be reset to normal (127) for the next note
+                    this.checkForNormalAttackAndSetIt(midiTrack, i + 1)
+                } else if(realAttack < 0) { //AttackCrescDim >< (Dim-Cresc)
+                    addDecrementalAttack(midiTrack, intTick, dur1, realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1, dur2, -realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 +dur2, dur3, realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3, dur4, -realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 +dur2 +dur3 +dur4, dur5, realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3 +dur4 +dur5, dur6, -realAttack, this.channel)
+                    addDecrementalAttack(midiTrack, intTick + dur1 +dur2 +dur3 +dur4 +dur5 +dur6, dur7, realAttack, this.channel)
+                    addIncrementalAttack(midiTrack, intTick + dur1 + dur2 + dur3 +dur4 +dur5 +dur6 +dur7, dur8, -realAttack, this.channel)
+                }
             }
         }
+//        if(newAttack >= 900) {
+//            val realAttack = newAttack - 1000
+//            //println("realAttack: $realAttack")
+//            val halfDuration2 = durations[i] / 2
+//            val halfDuration1 = halfDuration2 + durations[i] % 2
+//            //println("Total duration: ${durations[i]}  half1: $halfDuration1  half2: $halfDuration2")
+//            if (realAttack > 0){
+//                addIncrementalAttack(midiTrack, intTick, halfDuration1, realAttack, this.channel)
+//                addDecrementalAttack(midiTrack, intTick + halfDuration1, halfDuration2, -realAttack, this.channel)
+//                // after lowering attack should be reset to normal (127) for the next note
+//                this.checkForNormalAttackAndSetIt(midiTrack, i + 1)
+//            } else if(realAttack < 0) { //AttackCrescDim >< (Dim-Cresc)
+//                addDecrementalAttack(midiTrack, intTick, halfDuration1, realAttack, this.channel)
+//                addIncrementalAttack(midiTrack, intTick + halfDuration1, halfDuration2, -realAttack, this.channel)
+//            }
+//        } else {
+//
+//            if(newAttack > 0){
+//                addIncrementalAttack(midiTrack, intTick, durations[i], newAttack, this.channel)
+//            } else if(newAttack < 0) {
+//                addDecrementalAttack(midiTrack, intTick, durations[i], newAttack, this.channel)
+//                // after lowering attack should be reset to normal (127) for the next note
+//                this.checkForNormalAttackAndSetIt(midiTrack, i + 1)
+//            }
+//        }
 
         // 70 = Sound Variation
         // 71 = Sound Timbre
@@ -542,6 +639,8 @@ fun TrackData.addAttackToMidiTrack(midiTrack: MidiTrack) {
         // 95 = Phaser Level
     }
 }
+
+
 fun setAudio8D(track: MidiTrack, nRevolutions: Int, channel: Int) {
     val length = track.lengthInTicks
     if(length == 0L) return
