@@ -3,7 +3,7 @@ package com.cristianovecchi.mikrokanon.AIMUSIC
 import android.os.Build
 import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.alterateLegatosWithDistribution
-import com.cristianovecchi.mikrokanon.midi.alterArticulation
+import com.cristianovecchi.mikrokanon.midi.playerFunctions.alterArticulation
 import kotlinx.coroutines.job
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.absoluteValue

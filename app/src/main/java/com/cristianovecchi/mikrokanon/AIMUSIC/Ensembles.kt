@@ -5,7 +5,8 @@ import com.cristianovecchi.mikrokanon.rangeTo
 
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, GAMELAN, SAXOPHONES, FLUTES,
-    OBOES, DOUBLE_REEDS, CLARINETS, FRENCH_HORNS, BASSOONS, CELLOS, PIANO, HARP, PIERROT,
+    OBOES, DOUBLE_REEDS, CLARINETS, FRENCH_HORNS, BASSOONS, CELLOS,
+    CONTRABASSES, PIANO, HARP, PIERROT,
     BAROQUE, PLUCKED_STRINGS, CHOIR, SPOOKY,
     NYLON_GUITAR, STEEL_GUITAR, JAZZ_GUITAR, CLEAN_GUITAR, MUTED_GUITAR, OVERDRIVE_GUITAR, DISTORTION_GUITAR, BANJO,
     ACOUSTIC_BASS, FRETLESS_BASS, SLAP_BASS_1, SYN_BASS_1,
@@ -97,6 +98,7 @@ object Ensembles {
             EnsembleType.FRENCH_HORNS -> getFrenchHorns(nParts)
             EnsembleType.BASSOONS -> getBassoons(nParts)
             EnsembleType.CELLOS -> getCellos(nParts)
+            EnsembleType.CONTRABASSES -> getContrabbasses(nParts)
             EnsembleType.PIANO -> getPiano(nParts)
             EnsembleType.HARP -> getHarp(nParts)
             EnsembleType.PIERROT -> getPierrot(nParts)
@@ -1034,6 +1036,49 @@ object Ensembles {
                 PART_CELLO_MIDDLE,
                 PART_STRING_ORCHESTRA_CELLO_LOW_MIDDLE,
                 PART_STRING_ORCHESTRA_CELLO_LOW
+            )
+            else -> listOf()
+        }
+    }
+    fun getContrabbasses(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            1, 2, 3 -> listOf(
+                PART_DOUBLE_BASS_MIDDLE_HIGH,
+                PART_DOUBLE_BASS_MIDDLE,
+                PART_DOUBLE_BASS_LOW_MIDDLE
+            )
+            in (4..6) -> listOf(
+                PART_DOUBLE_BASS_MIDDLE_HIGH,
+                PART_DOUBLE_BASS_MIDDLE_HIGH,
+                PART_DOUBLE_BASS_MIDDLE,
+                PART_DOUBLE_BASS_MIDDLE,
+                PART_DOUBLE_BASS_LOW_MIDDLE,
+                PART_DOUBLE_BASS_LOW
+            )
+            in (7..9) -> listOf(
+                PART_DOUBLE_BASS_HIGH_HIGHEST,
+                PART_DOUBLE_BASS_HIGH,
+                PART_DOUBLE_BASS_MIDDLE_HIGH,
+                PART_DOUBLE_BASS_MIDDLE_HIGH,
+                PART_DOUBLE_BASS_MIDDLE,
+                PART_DOUBLE_BASS_MIDDLE,
+                PART_DOUBLE_BASS_LOW_MIDDLE,
+                PART_DOUBLE_BASS_LOW,
+                PART_DOUBLE_BASS_LOW
+            )
+            in 10..12 -> listOf(
+                PART_DOUBLE_BASS_HIGHEST,
+                PART_DOUBLE_BASS_HIGH_HIGHEST,
+                PART_DOUBLE_BASS_HIGH_HIGHEST,
+                PART_DOUBLE_BASS_HIGH,
+                PART_DOUBLE_BASS_HIGH,
+                PART_DOUBLE_BASS_MIDDLE_HIGH,
+                PART_DOUBLE_BASS_MIDDLE_HIGH,
+                PART_DOUBLE_BASS_MIDDLE,
+                PART_DOUBLE_BASS_MIDDLE,
+                PART_DOUBLE_BASS_LOW_MIDDLE,
+                PART_DOUBLE_BASS_LOW,
+                PART_DOUBLE_BASS_LOW
             )
             else -> listOf()
         }

@@ -11,6 +11,11 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.CharlieParkerBand.CharlieParkerBan
 import com.cristianovecchi.mikrokanon.AIMUSIC.DEF.MIDDLE_C
 import com.cristianovecchi.mikrokanon.AppViewModel.Companion.ARTICULATIONS
 import com.cristianovecchi.mikrokanon.AppViewModel.Companion.VIBRATO_EXTENSIONS
+import com.cristianovecchi.mikrokanon.midi.playerFunctions.addVolumeToTrack
+import com.cristianovecchi.mikrokanon.midi.playerFunctions.buildTempoTrack
+import com.cristianovecchi.mikrokanon.midi.playerFunctions.convertToMidiTrack
+import com.cristianovecchi.mikrokanon.midi.playerFunctions.createDrumsTrack
+import com.cristianovecchi.mikrokanon.midi.playerFunctions.setTimeSignatures
 
 import com.leff.midi.MidiFile
 import com.leff.midi.MidiTrack
@@ -172,7 +177,8 @@ object Player {
 
                     if (rhythmShuffle) actualDurations.shuffle()
                     //println("durations after shuffle: ${actualDurations.contentToString()}")
-                    actualDurations = if (swingShuffle != 0.5f) actualDurations.applySwing(swingShuffle) else actualDurations
+                    //println("Player-> swingShuffle:$swingShuffle")
+                    actualDurations = if (swingShuffle != 0.5f) actualDurations.applySwing(swingShuffle, 240) else actualDurations
                     //println(actualDurations.contentToString())
                    // println("counterpoints size: ${counterpoints.size}")
                     //counterpoints.forEach { it?.display() }

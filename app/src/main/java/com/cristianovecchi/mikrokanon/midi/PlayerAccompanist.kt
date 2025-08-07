@@ -2,6 +2,8 @@ package com.cristianovecchi.mikrokanon.midi
 
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.midi.accompanimentStyles.*
+import com.cristianovecchi.mikrokanon.midi.playerFunctions.assignDodecaBytesToBars
+import com.cristianovecchi.mikrokanon.midi.playerFunctions.setAudio8D
 import com.leff.midi.MidiTrack
 import com.leff.midi.event.MidiEvent
 import com.leff.midi.event.ProgramChange

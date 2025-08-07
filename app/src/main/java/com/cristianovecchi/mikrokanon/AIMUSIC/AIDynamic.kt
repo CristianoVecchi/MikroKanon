@@ -35,17 +35,17 @@ fun accumulateVelocitiesCrescDim(nNotes: Int, start: Int, diff: Int, isDimCresc:
     }
     return result//.apply{ println(this)}
 }
-fun main() {
-    val list = listOf(1,2,3,4,5,6,7,8,9)
-    println(list.reversed())
-    throw Exception("Fake exception")
-    println(accumulateVelocitiesCrescDim(11, 67, 1, false))
-    println(accumulateVelocitiesCrescDim(11, 67, 0, false))
-    println(accumulateVelocities(4, 64, 30))
-    println(accumulateVelocities(5, 64, 30))
-    println(accumulateVelocitiesCrescDim(1, 64, 30))
-    println(accumulateVelocitiesCrescDim(7, 64, 30))
-    println(accumulateVelocitiesCrescDim(9, 64, 30))
-    println(accumulateVelocities(0, 64, 30))
-    println(accumulateVelocitiesCrescDim(0, 64, 30))
-}
+//fun main() {
+//    val list = listOf(1,2,3,4,5,6,7,8,9)
+//    println(list.reversed())
+//    throw Exception("Fake exception")
+//    println(accumulateVelocitiesCrescDim(11, 67, 1, false))
+//    println(accumulateVelocitiesCrescDim(11, 67, 0, false))
+//    println(accumulateVelocities(4, 64, 30))
+//    println(accumulateVelocities(5, 64, 30))
+//    println(accumulateVelocitiesCrescDim(1, 64, 30))
+//    println(accumulateVelocitiesCrescDim(7, 64, 30))
+//    println(accumulateVelocitiesCrescDim(9, 64, 30))
+//    println(accumulateVelocities(0, 64, 30))
+//    println(accumulateVelocitiesCrescDim(0, 64, 30))
+//}
