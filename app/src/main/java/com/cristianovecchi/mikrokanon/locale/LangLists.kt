@@ -46,64 +46,84 @@ val synthsNames = listOf(
     "Brightness", "Goblins", "Echo Drops", "Sci Fi")
 
 val ensembleNamesAr = listOf("آلة وترية ذات قوس", "آلة نفخ خشبية", "سلسلة الأوركسترا", "آلة نفخ نحاسية","غاميلان", "ساكسفون", "فلوت",
-    "المزمار","ضعف القصب", "كلارينيت","بوق فرنسي",  "مزمار", "تشيلو",
+    "المزمار","ضعف القصب", "كلارينيت","بوق فرنسي",  "مزمار",
+    "الكمانات","الفيولا","تشيلو",
     "الكونترباص", "بيانو","قيثار","بييرو","الباروك","أوتار نتف","جوقة","مرعب")
 val ensembleNamesDe = listOf("Streichinstrumente", "Holzblasinstrumente", "Streichorchester", "Blechblasinstrumente","Gamelan", "Saxophone", "Flöten",
-    "Oboen","Doppelblattinstrumente", "Klarinetten", "Hörner", "Fagotte", "Cellos",
+    "Oboen","Doppelblattinstrumente", "Klarinetten", "Hörner", "Fagotte",
+    "Violinen","Bratschen","Cellos",
     "Kontrabässe","Klavier","Harfe","Pierrot","Barockensemble","Zupfinstrument","Chor","Gespenstisch")
 val ensembleNamesEl = listOf("Έγχόρδα", "Ξύλινα πνευστά της συμφωνικής ορχήστρας", "Ορχήστρα εγχόρδων", "Χάλκινα πνευστά της συμφωνικής ορχήστρας","Gamelan", "Σαξόφωνα", "Φλάουτα",
-    "Όμποε","Διπλά καλάμια", "Κλαρινέτ", "Κέρατα", "Φαγκότα", "Βιολοντσέλα",
+    "Όμποε","Διπλά καλάμια", "Κλαρινέτ", "Κέρατα", "Φαγκότα",
+    "Βιολιά","Βιόλες","Βιολοντσέλα",
     "Κοντραμπάσα","Πιάνο","Άρπα", "Πιερότος","Μπαρόκ", "Ματαιωμένες χορδές","Χορωδία","Στοιχειωμένος")
 val ensembleNamesEn = listOf("Strings", "Woodwinds", "String orchestra", "Brass", "Gamelan", "Saxophones", "Flutes",
-    "Oboes","Double reeds", "Clarinets", "French horns", "Bassoons", "Cellos",
+    "Oboes","Double reeds", "Clarinets", "French horns", "Bassoons",
+    "Violins","Violas","Cellos",
     "Contrabasses", "Piano","Harp","Pierrot","Baroque","Plucked strings","Choir","Spooky")
 val ensembleNamesEs = listOf("Cuerdas", "Instrumentos de viento madera", "Orquesta de cuerdas", "Instrumentos de viento metal","Gamelán", "Saxofones", "Flautas",
-    "Oboes","Cañas dobles", "Clarinetes", "Trompas", "Fagotes", "Violonchelos",
+    "Oboes","Cañas dobles", "Clarinetes", "Trompas", "Fagotes",
+    "Violines","Violas","Violonchelos",
     "Contrabajos","Piano","Arpa", "Pierrot","Barroco","Instrumentos de cuerda pulsada","Coro","Escalofriante")
 val ensembleNamesFi = listOf("Jousisoittimet", "Puupuhaltimet", "Jousiorkesteri", "Vaskipuhaltimet", "Gamelan", "Saksofonit", "Huilut",
-    "Obot","Kaksoisruoko", "Klarinetit", "Käyrätorvit", "Fagottit", "Sellot",
+    "Obot","Kaksoisruoko", "Klarinetit", "Käyrätorvit", "Fagottit",
+    "Viulut","Alttoviulut","Sellot",
     "Kontrabassot","Piano", "Harppu", "Pierrot", "Barokki", "Kynnitty kielet", "Kuoro", "Aavemainen")
 val ensembleNamesFr = listOf("Cordes", "Bois", "Orchestre à cordes", "Cuivres", "Gamelan","Saxophones", "Flûtes",
-    "Hautbois","Anches doubles", "Clarinettes", "Cors", "Bassons", "Violoncelles",
+    "Hautbois","Anches doubles", "Clarinettes", "Cors", "Bassons",
+    "Violons","Altos","Violoncelles",
     "Contrebasses","Piano","Harpe", "Pierrot","Baroque","Cordes pincées","Chorale","Sinistre")
 val ensembleNamesKo = listOf("찰현악기", "목관악기", "현악 합주단", "금관악기","가믈란", "색소폰", "플루트",
-    "오보에","더블 리드", "클라리넷", "프렌치 호른", "바순", "첼로 스",
+    "오보에","더블 리드", "클라리넷", "프렌치 호른", "바순",
+    "바이올린","비올라","첼로 스",
     "더블베이스","피아노","하프","피에로","바로크","발현악기","합창","유령 같은")
 val ensembleNamesJa = listOf("弦楽", "木管楽器", "弦楽オーケストラ", "金管楽器","ガムラン","サックス", "フルート",
-    "オーボエ", "ダブルリード", "クラリネット", "ホルン", "ファゴット", "チェロ",
+    "オーボエ", "ダブルリード", "クラリネット", "ホルン", "ファゴット",
+    "ヴァイオリン","ヴァイオリン","チェロ",
     "コントラバス","ピアノ","ハープ", "ピエロ", "バロック","撥弦楽器","合唱","不気味な")
 val ensembleNamesHi = listOf("झुका हुआ यंत्र", "वुडविंड उपकरण", "स्ट्रिंग ऑर्केस्ट्रा", "धातु पवन यंत्र","गमेलन", "सैक्सोफोन", "बांसुरी",
-    "ओबो","डबल रीड", "क्लैरिनेट", "फ्रेंच हॉर्न", "बासून", "सेलोस",
+    "ओबो","डबल रीड", "क्लैरिनेट", "फ्रेंच हॉर्न", "बासून",
+    "वायलिन","वायोला","सेलोस",
     "डबल बेस","पियानो","वीणा","पिय्रोट","बरोक","प्लक्ड स्ट्रिंग इंस्ट्रूमेंट्स","वृन्दगान","डरावना")
 val ensembleNamesId = listOf("Alat musik dawai membungkuk", "Instrumen musik tiup kayu", "Orkestra dawai", "Instrumen musik tiup logam", "Gamelan","Saxophone", "Seruling",
-    "Obo","Alang-alang ganda", "Klarinet", "Tanduk", "Bassoon", "Cellos",
+    "Obo","Alang-alang ganda", "Klarinet", "Tanduk", "Bassoon",
+    "Biola","Viola","Cellos",
     "Kontrabas","Piano", "Harpa", "Pierrot", "Baroque", "Dawai yang dipetik","Paduan suara","Menyeramkan")
 val ensembleNamesIs = listOf("Strengir", "Blásarhljóðfæri", "Strengjasveit", "Málmblásturshljóðfæri", "Gamelan", "Saxófónar", "Flautur",
-    "Óbó","Tvöfaldur reyr", "Klarínettur", "Frönsk horn", "Fagottar", "Selló",
+    "Óbó","Tvöfaldur reyr", "Klarínettur", "Frönsk horn", "Fagottar",
+    "Fiðlur","Víólur","Selló",
     "Kontrabassir","Píanó", "Harpa", "Pierrot", "Barokk", "Plokkaðir strengir", "Kór", "Skuggalegt")
 val ensembleNamesIt = listOf("Archi", "Legni", "Orchestra d'archi", "Ottoni","Gamelan", "Saxofoni", "Flauti",
-    "Oboi","Ance doppie", "Clarinetti", "Corni", "Fagotti", "Violoncelli",
+    "Oboi","Ance doppie", "Clarinetti", "Corni", "Fagotti",
+    "Violini","Viole","Violoncelli",
     "Contrabbassi","Pianoforte","Arpa","Pierrot","Barocco", "Corde pizzicate","Coro","Spooky")
 val ensembleNamesPl = listOf("Smyczki", "Dęte drewniane", "Orkiestra smyczkowa", "Instrumenty dęte blaszane", "Gamelan", "Saksofony", "Flety",
-    "Oboje","Podwójne stroiki", "Klarnety", "Waltornie", "Fagoty", "Wiolonczele",
+    "Oboje","Podwójne stroiki", "Klarnety", "Waltornie", "Fagoty",
+    "Skrzypce","Altówki","Wiolonczele",
     "Kontrabasy","Fortepian", "Harfa", "Pierrot", "Barokowy", "Sznurki szarpane", "Chór", "Straszny")
 val ensembleNamesPt = listOf("Cordas friccionadas", "Madeiras", "Orquestra de cordas", "Metais","Gamelão","Saxofones", "Flautas",
-    "Oboés","Palhetas duplas", "Clarinetes", "Trompas", "Fagotes", "Violoncelos",
+    "Oboés","Palhetas duplas", "Clarinetes", "Trompas", "Fagotes",
+    "Violinos","Violas","Violoncelos",
     "Contrabaixos","Piano","Harpa", "Pierrot", "Barroco", "Cordas dedilhadas","Coro","Assustador")
 val ensembleNamesRu = listOf("Струнные", "Деревянные духовые инструменты", "Струнный оркестр", "Медные духовые инструменты","Гамелан", "Саксофоны", "Флейты",
-    "Гобои","Двойной тростью", "Кларнеты", "Валторны", "Фаготы", "Виолончели",
+    "Гобои","Двойной тростью", "Кларнеты", "Валторны", "Фаготы",
+    "Скрипки","Альты","Виолончели",
     "Контрабасы","Фортепиано","Арфа", "Пьеро","Барокко","Струнные щипковые инструменты","Хор","Пугающий")
 val ensembleNamesSw = listOf("Vyombo vilivyoinama", "Vyombo vya upepo vya mbao", "Orchestra ya ala za nyuzi", "Vyombo vya upepo vya chuma", "Gamelan", "Saxophones", "Zilizimbi",
-    "Oboes","Mwanzi mara mbili", "Clarinets", "Pembe za Kifaransa", "Bassoons", "Cellos",
+    "Oboes","Mwanzi mara mbili", "Clarinets", "Pembe za Kifaransa", "Bassoons",
+    "Violini","Viola","Cellos",
     "Besi mbili","Piano", "Kinubi", "Pierrot","Baroque", "Vyombo vya kamba vilivyokatwa","Kwaya","Ya kutisha")
 val ensembleNamesTh = listOf("เครื่องสาย", "เครื่องลมไม้", "เครื่องสายออร์เคสตรา", "ทองเหลือง", "กาเมลัน", "แซกโซโฟน", "ฟลุต",
-    "โอโบ","ไม้อ้อคู่", "คลาริเน็ต", "เฟรนช์ฮอร์น", "บาสซูน", "เชลโล",
+    "โอโบ","ไม้อ้อคู่", "คลาริเน็ต", "เฟรนช์ฮอร์น", "บาสซูน",
+    "ไวโอลิน","วิโอลา","เชลโล",
     "ดับเบิลเบส","เปียโน", "ฮาร์ป", "เปียโรต์", "บาโรก", "ตามแบบบะโรค", "นักร้องประสานเสียง", "น่ากลัว")
 val ensembleNamesUk = listOf("Смичкові", "Дерев'яні духові", "Струнний оркестр", "Мідні духові", "Гамелан", "Саксофони", "Флейти",
-    "гобої","Подвійний очерет", "Кларнети", "Валторни", "Фаготи", "Віолончелі",
+    "гобої","Подвійний очерет", "Кларнети", "Валторни", "Фаготи",
+    "Скрипки","Альти","Віолончелі",
     "Контрабаси","фортепіано","арфа", "П'єро","бароко","Пощипані струни","Хор","моторошний")
 val ensembleNamesZh = listOf("弦乐", "木管乐器", "弦乐团", "銅管樂器","甘美蘭", "薩氏管", "长笛",
-    "双簧管","双簧管", "单簧管", "圆号", "巴松管", "大提琴",
+    "双簧管","双簧管", "单簧管", "圆号", "巴松管",
+    "小提琴","中提琴","大提琴",
     "低音提琴","钢琴","豎琴","皮埃罗","巴洛克","撥弦樂器","合唱","幽灵般的")
 
 var zodiacPlanets = listOf("\u2644", "\u2643", "\u2642","\u2640","\u263F","\u263D","\u2609")

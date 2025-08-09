@@ -667,7 +667,6 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
         {
             is ReplaceType.Glissando -> false
             is ReplaceType.Vibrato -> false
-            is ReplaceType.Velocity -> false
             else -> true
         }
     }
@@ -748,7 +747,8 @@ fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>
     return when(checkType){
         is CheckType.None -> { _, _, _ -> false }
         is CheckType.EqualOrGreater -> { trackData, index, _ ->
-            trackData.pitches[index]
+            //trackData.pitches[index]
+            //println("index: $index  tick: ${trackData.ticks[index]} pitch: ${trackData.pitches[index]} dur: ${trackData.durations[index]}  limit: ${checkType.limit}")
             trackData.durations[index] >= checkType.limit
         }
         is CheckType.StartPhrase -> { trackData, index, _ ->
@@ -767,7 +767,8 @@ fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>
             !trackData.isPreviousRest[index] && !trackData.isPreviousRest.getOrElse(index + 1) {true}
         }
         is CheckType.EqualOrSmaller -> { trackData, index, _ ->
-            trackData.pitches[index]
+            //trackData.pitches[index]
+            println("dur: ${trackData.durations[index]}  limit: ${checkType.limit}")
             trackData.durations[index] <= checkType.limit
         }
     }
@@ -1428,9 +1429,11 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 var actualDuration = articulationDuration ?: duration
                 when (replaceType) {
                     is ReplaceType.Velocity -> {
+                        //println("index: $index  tick: $tick  dur: $duration  pitch: $pitch  old velocity: $velocity")
                         val negativity = if(replaceType.isRetrograde) -1 else 1
                         velocity += (stress * negativity)
                         velocity = velocity.coerceIn(0,127)
+                        //println("index: $index  tick: $tick  dur: $duration  pitch: $pitch  new velocity: $velocity")
                     }
                     is ReplaceType.Glissando -> {
                         if(glissando == 0){

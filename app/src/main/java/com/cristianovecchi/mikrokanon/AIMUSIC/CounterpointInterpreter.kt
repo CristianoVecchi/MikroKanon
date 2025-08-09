@@ -63,6 +63,7 @@ object CounterpointInterpreter {
 //        counterpoint.display()
 //        durations.also{println("Durations: $it")}
         //delay(1)
+            //println("glissandos: $glissando")
         yield()
         val durSize = durations.size
         val actualDurations =
@@ -132,6 +133,7 @@ object CounterpointInterpreter {
                 val startOctave = (ensemblePartSequence[0].octave + octaveTranspose).coerceIn(0, 8)
                 //ACTUAL PITCHES AND CHANGES
                 // val (actualPitches, changes) =
+
                 val (actualPitches, changesData) = if (melodyTypes.size == 1 && rangesAndEnsembleParts.size == 1) {
                     Pair(
                         Insieme.findMelody(
@@ -144,11 +146,17 @@ object CounterpointInterpreter {
                         listOf(ChangeData(0, ensemblePartSequence[0].instrument))
                     )
                 } else {
+//                    println("rangesandEnsembleParts: $rangesAndEnsembleParts")
+//                    println("startOctave: $startOctave")
+//                    println("absPitches: ${part.absPitches}")
+//                    println("range first: ${ranges[0].first} range last: ${ranges[0].last} ")
+//                    println("melodyType: ${melodyTypes[0]}")
                     findMelodyWithStructure(startOctave, part.absPitches.toIntArray(),
                         ranges.map { it.first }.toIntArray(), ranges.map { it.last }.toIntArray(),
                         melodyTypes.toIntArray(), rangesAndEnsembleParts.map { it.second })
 
                 }
+               // println("CountInterpreter-> actual pitches: ${actualPitches.toList()}")
                 //println("ChangesData: $changesData")
 
                 // NUANCES
@@ -284,3 +292,19 @@ object CounterpointInterpreter {
 
     }
 }
+
+//fun main() {
+//    val startOctave = 5
+//    val absPitches = listOf(0,0,5,10,10,7,4,9,9,9,8,7)
+//    val rangeFirst = 70
+//    val rangeLast = 91
+//    val melodyType = 0
+//    val resultPitches = Insieme.findMelody(
+//        startOctave,
+//        absPitches.toIntArray(),
+//        rangeFirst,
+//        rangeLast,
+//        melodyType
+//    )
+//    println("CounterpointInterpreter.main-> resultPitches: ${resultPitches.toList()}")
+//}

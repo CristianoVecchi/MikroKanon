@@ -572,6 +572,8 @@ fun findMelodyWithStructure(
 
     val sequences = nNoteGroups.mapIndexed{ index, nNotes ->
         val subSequence = absPitches.copyOfRange(lastTick2, lastTick2 + nNotes)//.also{println("subSequence $index: ${it.contentToString()}")}
+        //println("Functions-> lastOctave: $lastOctave subSeq: ${subSequence.toList()}")
+        //println("Functions-> lowLimit: ${lowLimits[index]}   upLimit: ${upLimits[index]}, melType: ${melTypes[index]}")
         val sequence = Insieme.findMelody(lastOctave, subSequence,
                 lowLimits[index], upLimits[index], melTypes[index])
         lastOctave = sequence.lastOrNull { it != -1 }?.let{ last -> last / 12 -1} ?: lastOctave // sequence could be empty

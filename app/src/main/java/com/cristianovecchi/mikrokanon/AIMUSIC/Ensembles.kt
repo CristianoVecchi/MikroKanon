@@ -5,7 +5,8 @@ import com.cristianovecchi.mikrokanon.rangeTo
 
 enum class EnsembleType {
     STRINGS, WOODWINDS, STRING_ORCHESTRA, BRASS, GAMELAN, SAXOPHONES, FLUTES,
-    OBOES, DOUBLE_REEDS, CLARINETS, FRENCH_HORNS, BASSOONS, CELLOS,
+    OBOES, DOUBLE_REEDS, CLARINETS, FRENCH_HORNS, BASSOONS,
+    VIOLINS, VIOLAS, CELLOS,
     CONTRABASSES, PIANO, HARP, PIERROT,
     BAROQUE, PLUCKED_STRINGS, CHOIR, SPOOKY,
     NYLON_GUITAR, STEEL_GUITAR, JAZZ_GUITAR, CLEAN_GUITAR, MUTED_GUITAR, OVERDRIVE_GUITAR, DISTORTION_GUITAR, BANJO,
@@ -97,6 +98,8 @@ object Ensembles {
             EnsembleType.CLARINETS -> getClarinets(nParts)
             EnsembleType.FRENCH_HORNS -> getFrenchHorns(nParts)
             EnsembleType.BASSOONS -> getBassoons(nParts)
+            EnsembleType.VIOLINS -> getViolins(nParts)
+            EnsembleType.VIOLAS -> getViolas(nParts)
             EnsembleType.CELLOS -> getCellos(nParts)
             EnsembleType.CONTRABASSES -> getContrabbasses(nParts)
             EnsembleType.PIANO -> getPiano(nParts)
@@ -993,6 +996,92 @@ object Ensembles {
                 PART_BASSOON_LOW_MIDDLE,
                 PART_CONTRABASSOON_LOW_MIDDLE,
                 PART_CONTRABASSOON_LOW,
+            )
+            else -> listOf()
+        }
+    }
+    fun getViolins(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            1, 2, 3 -> listOf(
+                PART_VIOLIN_MIDDLE_HIGH,
+                PART_VIOLIN_MIDDLE,
+                PART_VIOLIN_LOW_MIDDLE
+            )
+            in (4..6) -> listOf(
+                PART_VIOLIN_HIGH,
+                PART_VIOLIN_MIDDLE_HIGH,
+                PART_VIOLIN_MIDDLE_HIGH,
+                PART_VIOLIN_MIDDLE,
+                PART_VIOLIN_LOW_MIDDLE,
+                PART_VIOLIN_LOW
+            )
+            in (7..9) -> listOf(
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLIN_HIGH,
+                PART_VIOLIN_HIGH,
+                PART_VIOLIN_MIDDLE_HIGH,
+                PART_VIOLIN_MIDDLE_HIGH,
+                PART_VIOLIN_MIDDLE,
+                PART_VIOLIN_LOW_MIDDLE,
+                PART_VIOLIN_LOW_MIDDLE,
+                PART_VIOLIN_LOW
+            )
+            in 10..12 -> listOf(
+                PART_VIOLIN_HIGHEST,
+                PART_VIOLIN_HIGHEST,
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLIN_HIGH_HIGHEST,
+                PART_VIOLIN_HIGH,
+                PART_VIOLIN_HIGH,
+                PART_VIOLIN_MIDDLE_HIGH,
+                PART_VIOLIN_MIDDLE,
+                PART_VIOLIN_MIDDLE,
+                PART_VIOLIN_LOW_MIDDLE,
+                PART_VIOLIN_LOW_MIDDLE,
+                PART_VIOLIN_LOW
+            )
+            else -> listOf()
+        }
+    }
+    fun getViolas(nParts: Int): List<EnsemblePart> {
+        return when (nParts) {
+            1, 2, 3 -> listOf(
+                PART_VIOLA_MIDDLE,
+                PART_VIOLA_MIDDLE,
+                PART_VIOLA_LOW_MIDDLE
+            )
+            in (4..6) -> listOf(
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_MIDDLE,
+                PART_VIOLA_MIDDLE,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_VIOLA_LOW
+            )
+            in (7..9) -> listOf(
+                PART_VIOLA_HIGH_HIGHEST,
+                PART_VIOLA_HIGH,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_MIDDLE,
+                PART_VIOLA_MIDDLE,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_VIOLA_LOW,
+                PART_VIOLA_LOW
+            )
+            in 10..12 -> listOf(
+                PART_VIOLA_HIGHEST,
+                PART_VIOLA_HIGH_HIGHEST,
+                PART_VIOLA_HIGH_HIGHEST,
+                PART_VIOLA_HIGH,
+                PART_VIOLA_HIGH,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_MIDDLE_HIGH,
+                PART_VIOLA_MIDDLE,
+                PART_VIOLA_MIDDLE,
+                PART_VIOLA_LOW_MIDDLE,
+                PART_VIOLA_LOW,
+                PART_VIOLA_LOW
             )
             else -> listOf()
         }

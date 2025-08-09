@@ -36,6 +36,9 @@ data class TrackData(val pitches: IntArray, val ticks: IntArray, var durations: 
                      val audio8D: Boolean = false, val partIndex: Int,
                      val changes: List<TickChangeData> = listOf()  )// tick + instrument
 {
+    fun displayPitchesTicksAndDurations(){
+        println("pitches: ${this.pitches.toList()}  ticks: ${this.ticks.toList()}  durs: ${this.durations.toList()}")
+    }
     fun extractNoteDataAtIndex(index: Int): NoteData{
         return NoteData(pitches[index], ticks[index], durations[index], velocities[index], glissando[index],
         attacks[index], isPreviousRest[index],
@@ -320,7 +323,7 @@ fun List<TrackData>.applyMultiCheckAndReplace(context:CoroutineContext, dispatch
             // println(checkAndReplace)
             result =
                 trackDataToTransform.map{ trackData ->
-                    //dispatch("Check'n'replace applied to trackData:${trackData.channel}")
+                    //println("Check'n'replace applied to trackData:${trackData.channel}")
                     dispatch(Triple(AppViewModel.Building.CHECK_N_REPLACE, trackData.channel,this.size * checkAndReplace.size))
                     trackData.checkAndReplace(context, cnr, totalLength, trackDataToTransform)
                 }

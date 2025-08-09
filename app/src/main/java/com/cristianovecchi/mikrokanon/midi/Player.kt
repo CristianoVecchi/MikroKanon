@@ -181,11 +181,12 @@ object Player {
                     actualDurations = if (swingShuffle != 0.5f) actualDurations.applySwing(swingShuffle, 240) else actualDurations
                     //println(actualDurations.contentToString())
                    // println("counterpoints size: ${counterpoints.size}")
-                    //counterpoints.forEach { it?.display() }
+                   // counterpoints.forEach { it?.display() }
                     val nParts = counterpoints.maxByOrNull { it?.parts?.size ?: 0 }?.parts?.size ?: 0
                     val ensemblePartsList: List<List<EnsemblePart>> =
                         if (ensemblesList.size == 1) listOf(Ensembles.getEnsembleMix(nParts, ensemblesList[0]))
                         else Ensembles.getEnsemblesListMix(nParts, ensemblesList)
+
                     val actualEnsemblePartsList = if (partsShuffle) ensemblePartsList.map { it.shuffled() } else ensemblePartsList
                     val glissando: List<Int> = if (glissandoFlags == 0) listOf() else convertGlissandoFlags(glissandoFlags)
                     val audio8D: List<Int> = if (audio8DFlags == 0) listOf() else convertFlagsToInts(audio8DFlags).toList()
@@ -200,7 +201,7 @@ object Player {
                     if (counterpointTrackDatas.isEmpty()) {
                         "No Tracks in Counterpoint!!!"
                     } else {
-                        //counterpointTrackDatas.forEach{ println(it.vibratos.contentToString())}
+                        //counterpointTrackDatas.forEach{ it.displayPitchesTicksAndDurations()}
                         if (!job.isActive) {
                             //dispatch("Cancelled during DataTracks building!")
                             "Cancelled during DataTracks building!"
