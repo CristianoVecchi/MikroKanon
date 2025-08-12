@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import com.cristianovecchi.mikrokanon.divideDistributingRest
+import com.cristianovecchi.mikrokanon.reversedList
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -620,7 +621,7 @@ enum class RhythmPatterns(val type: RhythmType, val title: String, val values: L
             }
         }
         if (index == size - 1) result.add(listOf(values[index-1]))
-        return result.reversed().flatten()
+        return result.reversedList().flatten()
     }
 
     companion object {

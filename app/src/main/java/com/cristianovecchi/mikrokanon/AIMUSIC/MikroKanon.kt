@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Parcelable
 import com.cristianovecchi.mikrokanon.AIMUSIC.Byte128.Companion.extractByte128
 import com.cristianovecchi.mikrokanon.pmap
+import com.cristianovecchi.mikrokanon.reversedList
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
@@ -81,7 +82,7 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
             var list2 = absPitches.toMutableList()
             when (rowForm) {
                 1 -> list2 = Insieme.invertAbsPitches(list2.toIntArray()).toMutableList()
-                2 -> list2 = list2.reversed().toMutableList()
+                2 -> list2 = list2.reversedList().toMutableList()
                 3 -> list2 =
                     Insieme.invertAbsPitches(list2.toIntArray()).reversedArray().toMutableList()
                 else -> {
@@ -739,7 +740,7 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                     }
                 }
             } catch (ex: OutOfMemoryError) {
-                MikroKanon.findAll2AbsPartMikroKanons(absPitches, intervalSet, 2)
+                findAll2AbsPartMikroKanons(absPitches, intervalSet, 2)
             }
 
             try {
@@ -1049,7 +1050,7 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                             mkb.toMikroKanon(absPitches, comes, intervalSet)}
                 }
             } catch (ex: OutOfMemoryError) {
-                MikroKanon.findAll2AbsPartMikroKanons(absPitches, intervalSet, 2)
+                findAll2AbsPartMikroKanons(absPitches, intervalSet, 2)
             }
         }
 
@@ -1217,7 +1218,7 @@ data class MikroKanon(val parts: List<AbsPart>,val intervalSet: List<Int>,
                             mkb.toMikroKanon(absPitches, comes, intervalSet)}
                 }
             } catch (ex: OutOfMemoryError) {
-                MikroKanon.findAll2AbsPartMikroKanons(absPitches, intervalSet, 2)
+                findAll2AbsPartMikroKanons(absPitches, intervalSet, 2)
             }
         }
 

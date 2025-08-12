@@ -5,6 +5,7 @@ import com.cristianovecchi.mikrokanon.AppViewModel.Companion.VIBRATO_EXTENSIONS
 import com.cristianovecchi.mikrokanon.describeWithNotes
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.findIndicesInSection
+import com.cristianovecchi.mikrokanon.reversedList
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -658,7 +659,8 @@ data class CheckAndReplaceData(val check: CheckType = CheckType.None(),
             is ReplaceType.DrammaticoCrescendo, is ReplaceType.DrammaticoCrescDim,
             is ReplaceType.Accento, is ReplaceType.SOS,
             is ReplaceType.Glissando, is ReplaceType.Vibrato,
-            is ReplaceType.Velocity, is ReplaceType.Attack, is ReplaceType.AttackCrescDim-> false
+            is ReplaceType.Velocity, is ReplaceType.Attack, is ReplaceType.AttackCrescDim,
+            is ReplaceType.AttackCrescDimX2, is ReplaceType.AttackCrescDimX3, is ReplaceType.AttackCrescDimX4, -> false
             else -> true
         }
     }
@@ -768,7 +770,7 @@ fun provideCheckFunction(checkType: CheckType): (TrackData, Int, List<TrackData>
         }
         is CheckType.EqualOrSmaller -> { trackData, index, _ ->
             //trackData.pitches[index]
-            println("dur: ${trackData.durations[index]}  limit: ${checkType.limit}")
+            //println("CheckAndReplaceData-> dur: ${trackData.durations[index]}  limit: ${checkType.limit}")
             trackData.durations[index] <= checkType.limit
         }
     }
@@ -885,7 +887,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                         || replaceType is ReplaceType.RibattutoCrescendo
                         || replaceType is ReplaceType.DrammaticoCrescendo) {
                         var vels = accumulateVelocities(nNotes, velocity, velDiff)
-                        vels = if(replaceType.isRetrograde) vels.reversed() else vels
+                        vels = if(replaceType.isRetrograde) vels.reversedList() else vels
                         vels
                     } else {
                         accumulateVelocitiesCrescDim(nNotes, velocity, velDiff, replaceType.isRetrograde)
@@ -1014,7 +1016,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                     else -> semitones
                 }
                 var durs = findScaleDurations(if(isRetrograde) actualDuration else duration, nNotes, 60)
-                durs = if(isRetrograde) durs.reversed() else durs
+                durs = if(isRetrograde) durs.reversedList() else durs
                 if(durs.last()  < 12 || durs.first() < 12){
                     SubstitutionNotes(-1)
                 } else {
@@ -1130,7 +1132,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                 val velDiff = stressedVelocity - velocity
                 val velocities = if(replaceType is ReplaceType.Trillo2mCrescendo || replaceType is ReplaceType.Trillo2MCrescendo ){
                     var vels = accumulateVelocities(div, velocity, velDiff)
-                    vels = if(replaceType.isRetrograde) vels.reversed() else vels
+                    vels = if(replaceType.isRetrograde) vels.reversedList() else vels
                     vels
                 } else {
                     accumulateVelocitiesCrescDim(div, velocity, velDiff, replaceType.isRetrograde)
@@ -1161,7 +1163,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             val isRetrograde = replaceType.isRetrograde
             val isStaccato = actualDuration < duration
             var durs = find2ShortAndLongDurations(if(!isStaccato) duration else actualDuration, 60)
-            durs = if(isRetrograde) durs.reversed() else durs
+            durs = if(isRetrograde) durs.reversedList() else durs
             val dur = if(isRetrograde) durs.last() else durs.first()
             val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
             val notPossible = if(isRetrograde){
@@ -1213,7 +1215,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
                val isRetrograde = replaceType.isRetrograde
                 var durs = find6ShortAndLongDurations(
                     if(!isStaccato) duration else actualDuration, 60)
-               durs = if(isRetrograde) durs.reversed() else durs
+               durs = if(isRetrograde) durs.reversedList() else durs
                val dur = if(isRetrograde) durs.last() else durs.first()
                val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
                val notPossible = if(isRetrograde){
@@ -1262,7 +1264,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             var durs = find4ShortAndLongDurations(
                 if(!isStaccato) duration else actualDuration, 60)
 
-           durs = if(isRetrograde) durs.reversed() else durs
+           durs = if(isRetrograde) durs.reversedList() else durs
            val dur = if(isRetrograde) durs.last() else durs.first()
            val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
            val notPossible = if(isRetrograde){
@@ -1310,7 +1312,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             val isRetrograde = replaceType.isRetrograde
             var durs = find4ShortAndLongDurations(
                 if(!isStaccato) duration else actualDuration, 60)
-            durs = if(isRetrograde) durs.reversed() else durs
+            durs = if(isRetrograde) durs.reversedList() else durs
             val dur = if(isRetrograde) durs.last() else durs.first()
             val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
             val notPossible = if(isRetrograde){
@@ -1368,7 +1370,7 @@ fun provideReplaceFunction(replaceType: ReplaceType):
             val isStaccato = actualDuration < duration
             val isRetrograde = replaceType.isRetrograde
             var durs = find4ShortAndLongDurations(if(!isStaccato) duration else actualDuration, 60)
-            durs = if(isRetrograde) durs.reversed() else durs
+            durs = if(isRetrograde) durs.reversedList() else durs
             val dur = if(isRetrograde) durs.last() else durs.first()
             val nextPitch = trackData.pitches.getOrElse(index+1) { pitch }
             val notPossible = if(isRetrograde){

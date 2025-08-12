@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon
 
 import android.content.res.Resources
+import android.os.Build
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.cristianovecchi.mikrokanon.AIMUSIC.ChangeData
@@ -9,7 +10,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.Insieme
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import java.util.*
+import java.util.Collections
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -30,6 +31,18 @@ import kotlin.math.absoluteValue
 //    println("Total section 2: ${section2.nElements()}")
 //    println("Total section 3: ${section3.nElements()}")
 //}
+public fun printSystemInfos(){
+    var s = "Debug-infos:"
+    s += """
+ OS Version: ${System.getProperty("os.version")}(${Build.VERSION.INCREMENTAL})"""
+    s += """
+ OS API Level: ${Build.VERSION.SDK_INT}"""
+    s += """
+ Device: ${Build.DEVICE}"""
+    s += """
+ Model (and Product): ${Build.MODEL} (${Build.PRODUCT})"""
+    println("Functions-> System: $s")
+}
 
 public inline operator fun <T> List<T>.component5(): T {
     return get(4)
@@ -42,6 +55,18 @@ public inline operator fun <T> List<T>.component7(): T {
 }
 public inline operator fun <T> List<T>.component8(): T {
     return get(7)
+}
+
+fun <E> List<E>.reversedList(): List<E> {
+    val size = this.size
+    if(size!=0){
+        val result = mutableListOf<E>()
+        (size-1 downTo 0).map{ revIndex ->
+            result.add(this[revIndex]) // It is not copied...
+        }
+        return result
+    }
+    return listOf<E>()
 }
 
 fun List<List<String>>.indexInTotalOf(item: String): Int{

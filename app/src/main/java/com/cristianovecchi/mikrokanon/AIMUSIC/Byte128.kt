@@ -1,5 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
+import com.cristianovecchi.mikrokanon.reversedList
+
 data class Byte128(var lowByte: Int = 0, var byte2nd: Int = 0, var byte3rd: Int = 0,var byte4th: Int = 0){
     fun bitOn(pos: Int){
         when (pos){
@@ -116,7 +118,7 @@ data class  MikroKanonByte128(val byte: Byte128, val delays: List<Int>, val tran
             }
             parts.add(comesPart)
         }
-        return MikroKanon(parts.map { AbsPart(it) }.reversed(), intervalSet)
+        return MikroKanon(parts.map { AbsPart(it) }.reversedList(), intervalSet)
     }
     fun nRests(): Int {
         return byte.nRests(length)

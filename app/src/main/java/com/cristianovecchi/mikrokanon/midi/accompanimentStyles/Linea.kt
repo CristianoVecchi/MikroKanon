@@ -6,6 +6,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationStyle
 import com.cristianovecchi.mikrokanon.AIMUSIC.getProgressiveVelocities
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
+import com.cristianovecchi.mikrokanon.reversedList
 import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
@@ -14,7 +15,7 @@ fun createNoteLine(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
     //bars.forEach { println(it) }
     var lastPitch = -1
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversedList()
     val increase = harmonizationStyle.increase
     val isAccumulo = when(harmonizationStyle){
         HarmonizationStyle.ACCUMULO -> true
@@ -79,7 +80,7 @@ fun createNoteDoubleTripleLine(harmonizationStyle: HarmonizationStyle, chordsTra
     var lastPitch1 = -1
     var lastPitch2 = -1
     var lastPitch3 = -1
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversedList()
     val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration

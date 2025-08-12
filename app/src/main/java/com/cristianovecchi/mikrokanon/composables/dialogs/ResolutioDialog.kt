@@ -27,6 +27,7 @@ import com.cristianovecchi.mikrokanon.AppViewModel
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
 import com.cristianovecchi.mikrokanon.getNoteAndRestSymbols
+import com.cristianovecchi.mikrokanon.reversedList
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 
 
@@ -95,7 +96,7 @@ fun ResolutioDialog(
                     val fontWeight = FontWeight.Normal
                     val numberFontWeight = FontWeight.Bold
                     val buttonPadding = 4.dp
-                    val itemList = (0..11).map{ Clip.convertAbsToClipText(it, model.language.value!!.noteNames)}.reversed()
+                    val itemList = (0..11).map{ Clip.convertAbsToClipText(it, model.language.value!!.noteNames)}.reversedList()
                     val harmonies = HarmonizationType.values().map{ it.title }.drop(1).dropLast(2)
                     val listStateNotes = rememberLazyListState()
                     val listStateHarmony = rememberLazyListState()

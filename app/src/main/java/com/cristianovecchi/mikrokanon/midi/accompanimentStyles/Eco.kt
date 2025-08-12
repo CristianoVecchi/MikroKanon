@@ -3,6 +3,7 @@ package com.cristianovecchi.mikrokanon.midi.accompanimentStyles
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
+import com.cristianovecchi.mikrokanon.reversedList
 import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
@@ -12,7 +13,7 @@ fun createEco(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, ch
     //data class Note(val pitch: Int, val tick: Long, var duration: Long, val velocity: Int)
     //bars.forEach { println(it) }
     var lastPitch = -1
-    val actualOctavePitches = octaves.map { (it + 1) * 12 }.reversed()
+    val actualOctavePitches = octaves.map { (it + 1) * 12 }.reversedList()
     val increase = harmonizationStyle.increase
     val delay = when (density) {
         2 -> 2

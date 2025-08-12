@@ -3,6 +3,7 @@ package com.cristianovecchi.mikrokanon.midi.accompanimentStyles
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
+import com.cristianovecchi.mikrokanon.reversedList
 import com.leff.midi.MidiTrack
 
 fun createArpeggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
@@ -10,7 +11,7 @@ fun createArpeggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrac
 ) {
 
     val actualOctavePitches = when(direction) {
-        HarmonizationDirection.DESCENDING -> octaves.map{ (it +1) * 12}.reversed()
+        HarmonizationDirection.DESCENDING -> octaves.map{ (it +1) * 12}.reversedList()
         HarmonizationDirection.RANDOM -> octaves.map{ (it +1) * 12 }.shuffled()
         else -> octaves.map{ (it +1) * 12}
     }

@@ -3,12 +3,13 @@ package com.cristianovecchi.mikrokanon.midi.accompanimentStyles
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
+import com.cristianovecchi.mikrokanon.reversedList
 import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createMultiTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                  diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean) {
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversedList()
     val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration.toInt()
@@ -81,7 +82,7 @@ fun createMultiTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiT
 }
 fun createTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                  diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, isFlow: Boolean) {
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversedList()
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
         var pitches = if(barDur < 18 ) {if(bar.chord1 == null) emptyList() else listOf(bar.chord1!!.root)}
@@ -120,7 +121,7 @@ fun createTrillo(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack,
                     }
                     if (isFlow) {
                         //pitches = pitches.shiftCycling()
-                        trills = trills.map{ it.reversed() }
+                        trills = trills.map{ it.reversedList() }
                         firstNotes = trills.map{ it.first() }
                         secondNotes = trills.map{ it.last() }.filter{!firstNotes.contains(it)}
                     }

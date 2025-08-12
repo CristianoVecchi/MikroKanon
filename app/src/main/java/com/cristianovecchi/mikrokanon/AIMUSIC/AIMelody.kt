@@ -274,7 +274,7 @@ fun findGlissandoForScales(pitches: List<Int>, nextPitch:Int, glissandoLimit: In
 //    println( findWholeToneScaleDiCambio(10,21, true) )
 //    println( findWholeToneScaleDiCambio(21,10, true) )
 
-//    val durs = findScaleDurations(1000, 6, 60).reversed()
+//    val durs = findScaleDurations(1000, 6, 60).reversedList()
 //    println(durs)
 //    println(findScaleTicks(0, durs))
 //

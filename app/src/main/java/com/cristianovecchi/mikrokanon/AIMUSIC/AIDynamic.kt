@@ -1,6 +1,7 @@
 package com.cristianovecchi.mikrokanon.AIMUSIC
 
 import com.cristianovecchi.mikrokanon.divideDistributingRest
+import com.cristianovecchi.mikrokanon.reversedList
 
 fun accumulateVelocities(nNotes: Int, start: Int, diff: Int): List<Int>{
     if(diff == 0 || nNotes == 1) return List(nNotes) { start }
@@ -25,11 +26,11 @@ fun accumulateVelocitiesCrescDim(nNotes: Int, start: Int, diff: Int, isDimCresc:
 
     if(isDimCresc){
         val secondArch = if(nNotes % 2 == 0) firstArch else firstArch.drop(1)
-        result += firstArch.reversed()
+        result += firstArch.reversedList()
         result += secondArch
 
     } else {
-        val secondArch = if(nNotes % 2 == 0) firstArch.reversed() else firstArch.reversed().drop(1)
+        val secondArch = if(nNotes % 2 == 0) firstArch.reversedList() else firstArch.reversedList().drop(1)
         result += firstArch
         result += secondArch
     }
@@ -37,7 +38,7 @@ fun accumulateVelocitiesCrescDim(nNotes: Int, start: Int, diff: Int, isDimCresc:
 }
 //fun main() {
 //    val list = listOf(1,2,3,4,5,6,7,8,9)
-//    println(list.reversed())
+//    println(list.reversedList())
 //    throw Exception("Fake exception")
 //    println(accumulateVelocitiesCrescDim(11, 67, 1, false))
 //    println(accumulateVelocitiesCrescDim(11, 67, 0, false))

@@ -18,7 +18,7 @@ fun createAttacco(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack
         val attaccoDur = if(density -1 >= densityDurs.size) barDur-1L else (densityDurs[density-1].coerceAtMost(barDur.toInt() -1)).toLong()
         val velocity = (bar.minVelocity!! - diffChordVelocity + increase).coerceIn(0,127)
         val tick = bar.tick
-        println("ATTACCO bar#$i $pitches dur:$attaccoDur vel:$velocity")
+        //println("ATTACCO(accompaniment)-> bar#$i $pitches dur:$attaccoDur vel:$velocity")
         if(pitches.isNotEmpty() && attaccoDur > 4){
                 //println("tick: $tick")
                 actualOctavePitches.forEach { octave ->

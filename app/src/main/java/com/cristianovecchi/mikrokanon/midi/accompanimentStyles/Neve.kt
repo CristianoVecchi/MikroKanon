@@ -3,6 +3,7 @@ package com.cristianovecchi.mikrokanon.midi.accompanimentStyles
 import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
+import com.cristianovecchi.mikrokanon.reversedList
 import com.leff.midi.MidiTrack
 
 fun createNeve2(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
@@ -10,7 +11,7 @@ fun createNeve2(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, 
 ) {
     var actualOctavePitches = octaves.map { (it + 1) * 12 }
     actualOctavePitches = when (direction) {
-        HarmonizationDirection.ASCENDING -> actualOctavePitches.reversed()
+        HarmonizationDirection.ASCENDING -> actualOctavePitches.reversedList()
         HarmonizationDirection.RANDOM -> actualOctavePitches.shuffled()
         else -> actualOctavePitches
     }
@@ -61,7 +62,7 @@ fun createNeve(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, c
 ) {
     var actualOctavePitches = octaves.map { (it + 1) * 12 }
     actualOctavePitches = when (direction) {
-        HarmonizationDirection.ASCENDING -> actualOctavePitches.reversed()
+        HarmonizationDirection.ASCENDING -> actualOctavePitches.reversedList()
         HarmonizationDirection.RANDOM -> actualOctavePitches.shuffled()
         else -> actualOctavePitches
     }

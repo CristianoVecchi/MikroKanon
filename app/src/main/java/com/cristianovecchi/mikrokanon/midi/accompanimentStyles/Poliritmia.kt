@@ -4,13 +4,14 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
 import com.cristianovecchi.mikrokanon.repeatCycling
+import com.cristianovecchi.mikrokanon.reversedList
 import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createMultiPoliritmia(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                      diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean, density: Int
 ) {
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversedList()
     val increase = harmonizationStyle.increase
     val (div, start) = when (density){
         3 -> 3 to 3
@@ -56,7 +57,7 @@ fun createMultiPoliritmia(harmonizationStyle: HarmonizationStyle, chordsTrack: M
 fun createPoliritmia(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                      diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
 ) {
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversedList()
     val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration

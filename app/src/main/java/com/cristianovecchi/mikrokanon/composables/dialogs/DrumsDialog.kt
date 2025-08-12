@@ -26,6 +26,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.reversedList
 import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
@@ -263,7 +264,7 @@ fun DrumsDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     3f, 2.875f, 2.75f, 2.66f, 2.625f, 2.5f, 2.375f, 2.33f, 2.25f, 2.125f,
                                     2f, 1.875f, 1.75f, 1.66f, 1.625f, 1.5f, 1.375f, 1.33f, 1.25f, 1.125f,
                                     1f, 0.875f, 0.75f, 0.66f, 0.625f, 0.5f, 0.375f, 0.33f, 0.25f, 0.125f
-                                ).reversed()
+                                ).reversedList()
                                 resizeDialogData.value = ListDialogData(
                                     true,
                                     values.map{"${(it * 100).toInt()}%"},

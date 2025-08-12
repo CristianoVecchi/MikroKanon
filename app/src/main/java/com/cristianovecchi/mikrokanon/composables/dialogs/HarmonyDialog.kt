@@ -27,6 +27,7 @@ import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.Lang
 import com.cristianovecchi.mikrokanon.extractIntsFromCsv
+import com.cristianovecchi.mikrokanon.reversedList
 import com.cristianovecchi.mikrokanon.toIntPairsString
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
@@ -319,7 +320,7 @@ fun HarmonyDialog(multiNumberDialogData: MutableState<MultiNumberDialogData>,
                                     val octaves = harmData.convertFromOctavesByte()
                                     octavesDialogData.value = MultiListDialogData(
                                         true,
-                                        (1..7).map{it.toString()}.reversed(),
+                                        (1..7).map{it.toString()}.reversedList(),
                                         octaves.map{7 - it}.toSet(),
                                         lang.selectOctaves
                                     ) { octaveList, _ ->

@@ -26,6 +26,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.*
 import com.cristianovecchi.mikrokanon.addOrInsert
 import com.cristianovecchi.mikrokanon.composables.CustomButton
 import com.cristianovecchi.mikrokanon.locale.Lang
+import com.cristianovecchi.mikrokanon.reversedList
 import com.cristianovecchi.mikrokanon.ui.Dimensions
 import kotlinx.coroutines.launch
 
@@ -163,7 +164,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
                             val chordToEnhanceData = chordsToEnhanceDatas[cursor]
                             pitchesDialogData.value = MultiListDialogData(
                                 true,
-                                absPitchNames.reversed(),
+                                absPitchNames.reversedList(),
                                 chordToEnhanceData.absPitches.map{11 - it}.toSet(),
                                 lang.selectChordsToEnhance,
                                 isSubSetSymbol,
@@ -253,7 +254,7 @@ fun ChordsToEnhanceDialog(multiNumberDialogData: MutableState<MultiNumberDialogD
 
                             pitchesDialogData.value = MultiListDialogData(
                                 true,
-                                absPitchNames.reversed(),
+                                absPitchNames.reversedList(),
                                 setOf(),
                                 lang.selectChordsToEnhance,
                                 isSubSetSymbol

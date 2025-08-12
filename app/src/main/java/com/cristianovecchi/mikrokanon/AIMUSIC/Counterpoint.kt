@@ -5,6 +5,7 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.RowForm.*
 import com.cristianovecchi.mikrokanon.composables.NoteNamesEn
 import com.cristianovecchi.mikrokanon.cutAdjacentRepetitions
 import com.cristianovecchi.mikrokanon.getIntOrEmptyValue
+import com.cristianovecchi.mikrokanon.reversedList
 import com.cristianovecchi.mikrokanon.shiftCycling
 import com.cristianovecchi.mikrokanon.tritoneSubstitutionOnIntervalSet
 import kotlinx.android.parcel.Parcelize
@@ -868,7 +869,7 @@ data class Counterpoint(val parts: List<AbsPart>,
     }
 
     fun upsideDown(): Counterpoint {
-        return this.copy(parts = parts.reversed())
+        return this.copy(parts = parts.reversedList())
     }
     fun centerVertically(counterpoint2nd: Counterpoint): Pair<Counterpoint, Counterpoint>{
         val nParts1st = this.parts.size
@@ -1169,7 +1170,7 @@ data class Counterpoint(val parts: List<AbsPart>,
                     val fiorituraNotes: List<Int> = Insieme.orderAbsPitchesByTrend(
                         bestFioritura.toTypedArray(),
                         targetNote, actualDirections.toTypedArray()
-                    ).toList().reversed()
+                    ).toList().reversedList()
                         .dropLastWhile { it == targetNote }
                         .dropWhile {
                             !Insieme.isIntervalInSet(
@@ -1357,7 +1358,7 @@ data class Counterpoint(val parts: List<AbsPart>,
             when (rowForm) {
                 INVERSE -> actualSeq =
                     Insieme.invertAbsPitches(actualSeq.toIntArray()).toMutableList()
-                RETROGRADE -> actualSeq = actualSeq.reversed().toMutableList()
+                RETROGRADE -> actualSeq = actualSeq.reversedList().toMutableList()
                 INV_RETROGRADE -> actualSeq =
                     Insieme.invertAbsPitches(actualSeq.toIntArray()).reversedArray().toMutableList()
                 else -> {
@@ -1672,8 +1673,8 @@ data class Counterpoint(val parts: List<AbsPart>,
                     when (actionRow[partIndex]){
                         '0' -> tuple.add(sequence.toList())
                         '1' ->  tuple.add(Insieme.invertAbsPitches(sequence.toIntArray()).toList())
-                        '2' -> tuple.add(sequence.reversed())
-                        else -> tuple.add(Insieme.invertAbsPitches(sequence.toIntArray()).toList().reversed())
+                        '2' -> tuple.add(sequence.reversedList())
+                        else -> tuple.add(Insieme.invertAbsPitches(sequence.toIntArray()).toList().reversedList())
                     }
                 }
                 count++

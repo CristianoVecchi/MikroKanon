@@ -6,13 +6,14 @@ import com.cristianovecchi.mikrokanon.AIMUSIC.HarmonizationStyle
 import com.cristianovecchi.mikrokanon.AIMUSIC.getProgressiveVelocities
 import com.cristianovecchi.mikrokanon.divideDistributingRest
 import com.cristianovecchi.mikrokanon.midi.Player
+import com.cristianovecchi.mikrokanon.reversedList
 import com.cristianovecchi.mikrokanon.shiftCycling
 import com.leff.midi.MidiTrack
 
 fun createPassaggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTrack, chordsChannel: Int, bars: List<Bar>, absPitches: List<List<Int>>, octaves: List<Int>,
                        diffChordVelocity:Int, diffRootVelocity:Int, justVoicing: Boolean = true, direction: HarmonizationDirection, isFlow: Boolean
 ) {
-    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversed()
+    val actualOctavePitches = octaves.map{ (it +1) * 12 }.reversedList()
     val increase = harmonizationStyle.increase
     bars.forEachIndexed { i, bar ->
         val barDur = bar.duration
@@ -20,7 +21,7 @@ fun createPassaggio(harmonizationStyle: HarmonizationStyle, chordsTrack: MidiTra
         if(pitches.isNotEmpty()) {
             var passaggioPitches = when (direction) {
                 HarmonizationDirection.ASCENDING -> pitches.map { it - 1 }
-                HarmonizationDirection.DESCENDING -> pitches.map { it + 1 }.reversed()
+                HarmonizationDirection.DESCENDING -> pitches.map { it + 1 }.reversedList()
                 HarmonizationDirection.RANDOM -> (0..11).filter { !pitches.contains(it) }.shuffled()
             }
             //val goalPitches = direction.invert().applyDirection(pitches)

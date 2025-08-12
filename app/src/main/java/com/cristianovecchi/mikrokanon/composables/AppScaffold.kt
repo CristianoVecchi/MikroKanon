@@ -52,8 +52,35 @@ fun AppScaffold(model: AppViewModel,
         model.appColors // default ALL BLACK
     }
     val dimensions by model.dimensions.asFlow().collectAsState(initial = model.dimensions.value!!)
-    val scaffoldModifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Modifier.background(colors.selCardBorderColorSelected).padding(PaddingValues(0.dp, 46.dp, 0.dp, 0.dp))
-    else Modifier.background(colors.selCardBorderColorSelected).padding(PaddingValues(0.dp, 0.dp, 0.dp, 0.dp))
+    val scaffoldModifier = if (Build.VERSION.SDK_INT >= 35) Modifier.background(colors.selCardBorderColorSelected).padding(PaddingValues(0.dp, 46.dp, 0.dp, 0.dp))
+    else Modifier
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        Scaffold(modifier = scaffoldModifier,
+            //modifier = Modifier
+            //.background(colors.selCardBorderColorSelected),
+            //.border(1.dp, Color.Transparent),
+            scaffoldState = scaffoldState,
+            drawerContent = { SettingsDrawer(model, colors, dimensionsFlow, userOptionsDataFlow, counterpointsDataFlow)},
+            topBar = {
+                val creditsDialogData by lazy { mutableStateOf(TextDialogData())}
+                CreditsDialog(creditsDialogData, dimensions)
+                SmartTopAppBar(modifier = Modifier.height(dimensions.selectorButtonSize).border(1.dp,colors.selCardBorderColorSelected),
+                    dimensions = dimensions, colors = colors, model = model,
+                    onMenuClick = {
+                        scope.launch { scaffoldState.drawerState.open() }
+                    },
+                    onCreditsClick = {
+                        creditsDialogData.value = TextDialogData(true, "Credits:",
+                        ) {
+                            creditsDialogData.value = TextDialogData()
+                        }
+                    })
+            },
+            content = {
+                content()
+            }
+        )
+    }
     Scaffold(modifier = scaffoldModifier,
         //modifier = Modifier
             //.background(colors.selCardBorderColorSelected),
